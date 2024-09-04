@@ -1,4 +1,0 @@
-Removed DD depdency from Aroused
-Assorted prompt tweaks
-Fixed several bugs resulting in backwards conditions for teasing, pinching, etc.
-Added support for Devious Followers skooma deal - Player can ask devious follower about Skooma. Devious follower can also drug the player at will.
