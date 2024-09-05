@@ -287,112 +287,12 @@ Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking)
       bDeviousFollowerInScene = True
     EndIf
   EndIf
-  
-  ;; Appearance
-  string actorRace = (player.GetActorBase().GetRace() as Form).GetName()
-  int cotrIndex = StringUtil.Find(actorRace, " DZ")
-  if cotrIndex != -1
-    actorRace = StringUtil.Substring(actorRace, 0, cotrIndex)
-  endif
-  string gender = ""
-  int sexInt = player.GetActorBase().GetSex()
-  if sexInt == 0
-    gender = "man"
-  elseif sexInt == 1
-    gender = "woman"
-  else
-    gender = "transgender"
-  endif
 
   string actorName = getActorName(actorToSpeakTo, playerref, False)
-  
-  if bHasBabo && bPlayerInScene
-    String appearance = ""
-    string breasts = ""
-    string butt = ""
-    int beautyInt = baboConfigs.BeautyValue.GetValueInt()
-    if beautyInt < 20
-      appearance = "rather ugly"
-    elseif beautyInt < 40
-      appearance = "below average (In appearance)"
-    elseif beautyInt < 60
-      appearance = "average (In appearance)"
-    elseif beautyInt < 80
-      appearance = "rather attractive"
-    else
-      appearance = "absolutely gorgeous"
-    endif
-    
-    int breastsInt = baboConfigs.BreastsValue.GetValueInt()
-    if breastsInt < 20
-      breasts = "flat breasts"
-    elseif breastsInt < 40
-      breasts = "small breasts"
-    elseif breastsInt < 60
-      breasts = "average breasts"
-    elseif breastsInt < 80
-      breasts = "large boobs"
-    else
-      breasts = "enormous tits"
-    endif
-    int buttInt = baboConfigs.ButtocksValue.GetValueInt()
-    if buttInt < 20
-      butt = "flat ass"
-    elseif buttInt < 40
-      butt = "small muscular ass"
-    elseif buttInt < 60
-      butt = "average typical ass"
-    elseif buttInt < 80
-      butt = "large thick ass"
-    else
-      butt = "enormous beautiful ass"
-    endif
-    string appearanceStr = "The player is an " + appearance + " " + actorRace + " " + gender + " with " + breasts + " and a " + butt + "."
-    debug.Trace("[minai] Set player description (Babo): " + appearanceStr)
-    RegisterAction(appearanceStr)
-  elseif bPlayerInScene ; Description for people not using babo
-    string appearanceStr = "The player is a " + gender + " " + actorRace + "."  
-    debug.Trace("[minai] Set player description: " + appearanceStr)
-    RegisterAction(appearanceStr)
-  EndIf
 
-  if bHasSLHH && bPlayerInScene && !bDeviousFollowerInScene
-    debug.Trace("[minai] Registering SLHH rape")
-    RegisterAction("!If you are certain that you want to molest the player, include the keyword: -molest- in your response.!")
+  if bPlayerInScene
+    WritePlayerAppearance(player)
   EndIf
-
-  if bHasSLApp && bPlayerInScene && !bDeviousFollowerInScene
-    debug.Trace("[minai] Registering Slapp Events")
-    RegisterAction("!If you want to kiss the player, include the keyword: -kiss- in your response.!")
-    RegisterAction("!If you want to sexually harass the player by hugging her to touch her (or explore her body), include the keyword: -hug- in your response.!")
-  EndIf
-  
-  ;;; Keyword definitions
-  ;; Start vibrator integration
-  if bHasDD && CanVibrate(actorToSpeakTo)
-    WriteVibrateString(actorToSpeakTo, player, False)
-  EndIf
-  ; This is going to require further thought I think.
-  ; if bHasDD && CanVibrate(actorSpeaking)
-  ;   WriteVibrateString(actorSpeaking, player, True)
-  ; EndIf
-  ;; End vibrator integration
-  ;; Sexlab integration
-  if slf != None
-    RegisterAction("!If you are very sure that you want to start having sex, include the keyword: '-startsex-' in your response.!")
-  EndIf
-  ;; Spanking / STA integration
-  if bHasSTA && bPlayerInScene
-    RegisterAction("!If you want to spank the player's ass in order to discipline or lightly punish her, include the keyword -spankass- in your response.!")
-    RegisterAction("!If you want to spank the player's breasts in order to discipline or lightly punish her, include the keyword -spanktits- in your response.!")
-  EndIf
-  ;; General keywords
-  
-  RegisterAction("!If you want to punish, tease, or sexually harass the player by pinching her nipples, include the keyword -pinchnipples- in your response.!")
-  RegisterAction("!If you want to grope the player's genitals to tease or sexually harass her, include the keyword -grope- in your response.!")
-
-  ;;;
-  
   
   if bHasDD
     WriteDDString(actorToSpeakTo, player, False)
@@ -462,7 +362,6 @@ Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking)
 	  if !skoomaRuleDone && StringUtil.Find(ruleDesc, "skooma daily") != -1
 	    skoomaRuleDone = True
 	    RegisterAction("The player has agreed to be take drugs that you provide daily. You should provide the player with drugs if they ask. !You want to get the player addicted to drugs so that you can use them as an additional means of controlling the player.!")
-            RegisterAction("!if you want to give the player skooma, or if you want to drug the player (or give them drugs), respond with the keyword: -drugplayer-.!")
 	  EndIf
           j += 1
         EndWhile
@@ -473,11 +372,9 @@ Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking)
         string ruleDesc = "you must wear a chastity belt that only the devious follower has the key to at all times. This is to ensure that the player cannot get relief without permission, and to show that the devious follower owns the player's pussy."
         RegisterAction("The player has agreed to the the following deal with their follower, and must obey it: " + ruleDesc)
       EndIf
-      RegisterAction("!you are the Devious Follower. The Devious Follower is a pervert, though they initially hide this well. Their goal in becoming the player's follower is to entrap them with debt that they owe the Devious Follower from their fees, and eventually make the player their sex slave / pet. The Devious Follower charges the player gold over time in exchange for their services, with an agreed daily payment schedule. The Devious Follower has a good mix of being serious and flirty with the player, and derives enjoyment from teasing and embarrassing her. The Devious Follower may pinch the player's nipples (Include the -pinch- keyword in your response in order to do so) in order to tease or punish her if they want to. The Devious Follower may grope the character's pussy (Include the -grope- keyword in your response in order to do so) if he wants to humiliate, arouse, or embarass the player. The Devious Follower may spank the player (Include the -spankass- keyword to spank the player's ass, or the -spanktits- keyword to spank the character's breasts or tits) if he wants to. Remember to use the keyword if you want to spank the player. If you want to drug the player (Or give her drugs), include the -drugplayer- keyword in your response to do so.!")
-      RegisterAction("!While you are perverted and do want to tease and arouse the player, you tend to be a bit subtle about it. You should incorporate perverted content and keywords into your responses when appropriate, but not do it constantly. You want to continue adventuring and are more likely to talk about adventure and events going on than the arrangement with the player (Though you should incorporate perverted elements into this).!")
+      RegisterAction("!you are the Devious Follower. The Devious Follower is a pervert, though they initially hide this well. Their goal in becoming the player's follower is to entrap them with debt that they owe the Devious Follower from their fees, and eventually make the player their sex slave / pet. The Devious Follower charges the player gold over time in exchange for their services, with an agreed daily payment schedule. The Devious Follower has a good mix of being serious and flirty with the player, and derives enjoyment from teasing and embarrassing her. The devious follower is likely to use perverted means such as remotely activating vibrators, shocking the player, groping the player, pinching the player's nipples, and so forth in their interactions if he deems it appropriate. While you are perverted and do want to tease and arouse the player, you tend to be a bit subtle about it. You should incorporate perverted content and keywords into your responses when appropriate, but not do it constantly. You want to continue adventuring and are more likely to talk about adventure and events going on than the arrangement with the player (Though you should incorporate perverted elements into this). The devious follower will not -hug-, -kiss-, or -molest- the player.!")
       if CanVibrate(player)
-        RegisterAction("!The Devious Follower can remotely make the player's peircings or plugs vibrate (Include one of these keywords in your response: -teaseveryweak-, -teaseweak-, ,-tease-, -teasestrong-, -teaseverystrong-, -vibrateveryweak-, -vibrateweak-, -vibrate-, -vibratestrong-, or -vibrateverystrong- order to do so) when he wants to, in order to reward, or punish the player, depending on how the Devious Follower uses them. If the Devious Follower wants the player's vibrators or piercings to stop, include the -stopvibrate- keyword in your response. The Devious Follower can also make the player have an orgasm at will using their magic (Use the -forceorgasm- keyword to do this). Remember to use the -forceorgasm- keyword if you want the player to climax. The Devious Follower can also cause the piercings or vibrators to painfully shock the player if he is displeased, or if he wants to reduce the arousal of the player (Include the -shock- keyword in your response to do so). Remember to use the keyword if you want to shock the  player. You need to remember to use the keyword if you want the players piercings or plugs to vibrate.!")
-	RegisterAction("!If you want the player's vibrator to be active, you must use the keywords for this somewhat often. Every time you use the keyword it activates them for a limited time. They do not stay on all the time.!")
+        RegisterAction("!The Devious Follower can remotely make the player's peircings or plugs vibrate when he wants to in order to reward, or punish the player, depending on how the Devious Follower uses them. The Devious Follower can also make (or allow) the player have an orgasm or climax at will (Use the -forceorgasm- keyword to do this). The Devious Follower can also cause the piercings or vibrators to painfully shock the player if he is displeased, or if he wants to reduce the arousal of the player (Include the -shock- keyword in your response to do so).!")
       EndIf
       if Debt.GetValueInt() >= EnslaveDebt.GetValueInt()
         if targetRule  == ""
@@ -491,26 +388,6 @@ Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking)
 	; RegisterAction("!If the player tells you that they refuse, respond with the keyword: -rejectdeal- in your response.!")
       EndIf
     EndIf
-
-  ;; Weather and Needs
-  ; if bHasSunhelm
-  ;   sunhelm.ForceUpdate()
-  ;   int temperature = sunhelm._SHWeatherTemperature.GetValueInt()
-  ;   if temperature == sunhelm.ClearWeatherPen
-  ;     RegisterAction("the weather is curently clear. The sun is shining. It is a nice comfortable temperature out.")
-  ;   elseif temperature == sunhelm.RainWeatherPen
-  ;     RegisterAction("the weather is curently lightly raining. The temperature is a little bit chilly out.")
-  ;   elseif temperature == sunhelm.CloudySnowPen
-  ;     RegisterAction("the weather is curently overcast grey skies. It is a cold temperature out.")
-  ;   elseif temperature == sunhelm.SnowWeatherPen
-  ;     RegisterAction("the weather is curently snowing. It is an uncomfortably cold temperature out.")
-  ;   elseif temperature == sunhelm.BlizzardWeatherPen
-  ;     RegisterAction("the weather is curently an intense blizzard. Visibility is poor. It is an extremely cold temperature out.")
-  ;   EndIf
-  ; EndIf
-  
-    String reminderStr = "Remember to use the previously identified keywords in your response when you want to perform an action such as hugging, kissing, molesting, spanking, vibrating, having sex, giving an orgasm to, or teasing " + actorName + "."
-    RegisterAction("!" + reminderStr + "! " + reminderStr)
 EndFunction
 
 
@@ -906,20 +783,6 @@ function WriteDDString(actor akActor, actor player, bool isYou=false)
 EndFunction
 
 
-Function WriteVibrateString(actor akActor, actor player, bool isYou=false)
-  debug.Trace("[minai] Registering vibration and shock keywords")
-  string actorName = GetActorName(akActor, player, isYou)
-
-  RegisterAction("!If you want to tease, motivate, arouse, distract, or adjust the settings on " + actorName + " by remotely causing her piercings or vibrator to very lightly stimulate her without letting her orgasm, include the keyword: '-teaseveryweak-' in your response. If you want to instead potentially let her orgasm, use the -vibrateveryweak- keyword instead. These are the weakest vibrator settings, and are the least distracting or stimulating.!")
-  RegisterAction("!If you want to tease, motivate, arouse, distract, or adjust the settings on " + actorName + " by remotely causing her piercings or vibrator to lightly stimulate her without letting her orgasm, include the keyword: '-teaseweak-' in your response. If you want to instead potentially let her orgasm, use the -vibrateweak- keyword instead. These are the weak (But still arousing) settings of the vibrators.!")
-  RegisterAction("!If you want to tease, motivate, arouse, distract, or adjust the settings on " + actorName + " by remotely causing her piercings or vibrator to moderately stimulate her without letting her orgasm, include the keyword: '-tease-' in your response. If you want to instead potentially let her orgasm, use the -vibrate- keyword instead. These are the standard vibrator settings, and are pretty distracting or stimulating.!")
-  RegisterAction("!If you want to tease, motivate, arouse, distract, or adjust the settings on " + actorName + " by remotely causing her piercings or vibrator to strongly stimulate her without letting her orgasm, include the keyword: '-teasestrong-' in your response. If you want to instead potentially let her orgasm, use the -vibratestrong- keyword instead. These are strong vibrator settings, and are the very distracting or stimulating and hard to resist.!")
-  RegisterAction("!If you want to tease, motivate, arouse, distract, or adjust the settings on " + actorName + " by remotely causing her piercings or vibrator to extremely strongly stimulate her without letting her orgasm, include the keyword: '-teaseverystrong-' in your response. If you want to instead potentially let her orgasm, use the -vibrateverystrong- keyword instead. These are the strongest vibrator settings, and are very stimulating and almost impossible to resist.!")
-  RegisterAction("!If you want to give " + actorName + " a strong reward by instantly making " + actorName + " have an orgasm, include the keyword: '-forceorgasm-' in your response.!")
-  RegisterAction("!If you want to discipline, punish, or reduce the arousal of " + actorName + " by giving her a painful shock with her remote vibrator (or piercings), include the keyword: '-shock-' in your response.!")
-  RegisterAction("!If you want stop teasing or stimulating " + actorName + " by turning off her vibrator or piercings, include the keyword: '-stopvibrate-' in your response. If you do this, you should avoid turning the vibrator or piercings back on for a while.!")
-EndFunction
-
 String Function GetActorName(actor akActor, actor Player, bool isYou)
   bool isPlayer = (akActor == player)
   string actorName = akActor.GetActorBase().GetName()
@@ -937,4 +800,71 @@ string Function GetYouYour(actor akCaster)
     return GetActorName(akCaster, playerRef, False) + "'s"
   endif
   return "your"
+EndFunction
+
+Function WritePlayerAppearance(Actor player)
+  ;; Appearance
+  string actorRace = (player.GetActorBase().GetRace() as Form).GetName()
+  int cotrIndex = StringUtil.Find(actorRace, " DZ")
+  if cotrIndex != -1
+    actorRace = StringUtil.Substring(actorRace, 0, cotrIndex)
+  endif
+  string gender = ""
+  int sexInt = player.GetActorBase().GetSex()
+  if sexInt == 0
+    gender = "man"
+  elseif sexInt == 1
+    gender = "woman"
+  else
+    gender = "transgender"
+  endif
+  if bHasBabo
+    String appearance = ""
+    string breasts = ""
+    string butt = ""
+    int beautyInt = baboConfigs.BeautyValue.GetValueInt()
+    if beautyInt < 20
+      appearance = "rather ugly"
+    elseif beautyInt < 40
+      appearance = "below average (In appearance)"
+    elseif beautyInt < 60
+      appearance = "average (In appearance)"
+    elseif beautyInt < 80
+      appearance = "rather attractive"
+    else
+      appearance = "absolutely gorgeous"
+    endif
+    
+    int breastsInt = baboConfigs.BreastsValue.GetValueInt()
+    if breastsInt < 20
+      breasts = "flat breasts"
+    elseif breastsInt < 40
+      breasts = "small breasts"
+    elseif breastsInt < 60
+      breasts = "average breasts"
+    elseif breastsInt < 80
+      breasts = "large boobs"
+    else
+      breasts = "enormous tits"
+    endif
+    int buttInt = baboConfigs.ButtocksValue.GetValueInt()
+    if buttInt < 20
+      butt = "flat ass"
+    elseif buttInt < 40
+      butt = "small muscular ass"
+    elseif buttInt < 60
+      butt = "average typical ass"
+    elseif buttInt < 80
+      butt = "large thick ass"
+    else
+      butt = "enormous beautiful ass"
+    endif
+    string appearanceStr = "The player is an " + appearance + " " + actorRace + " " + gender + " with " + breasts + " and a " + butt + "."
+    debug.Trace("[minai] Set player description (Babo): " + appearanceStr)
+    RegisterAction(appearanceStr)
+  else
+    string appearanceStr = "The player is a " + gender + " " + actorRace + "."  
+    debug.Trace("[minai] Set player description: " + appearanceStr)
+    RegisterAction(appearanceStr)
+  EndIf
 EndFunction
