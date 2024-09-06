@@ -886,7 +886,7 @@ Function WritePlayerAppearance(Actor player)
     debug.Trace("[minai] Set player description (Babo): " + appearanceStr)
     RegisterAction(appearanceStr)
   else
-    string appearanceStr = "The player is a " + gender + " " + actorRace + "."  
+    string appearanceStr = "The player is a " + actorRace + " " + gender + "."  
     debug.Trace("[minai] Set player description: " + appearanceStr)
     RegisterAction(appearanceStr)
   EndIf
