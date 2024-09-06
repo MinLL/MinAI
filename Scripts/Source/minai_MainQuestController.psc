@@ -273,8 +273,21 @@ bool Function CanVibrate(Actor akActor)
   return (akActor.WornHasKeyword(libs.zad_DeviousPlugVaginal)  || akActor.WornHasKeyword(libs.zad_DeviousPlugAnal)  || akActor.WornHasKeyword(libs.zad_DeviousPiercingsNipple)  || akActor.WornHasKeyword(libs.zad_DeviousPiercingsVaginal))
 EndFunction
 
+
+Function SendActorSpeakEvent(Actor actorToSpeakTo, Actor actorSpeaking)
+    int handle = ModEvent.Create("MinAI_ActorSpeakEvent")
+    if (handle)
+	ModEvent.PushForm(handle,actorToSpeakTo as Form )
+        ModEvent.PushForm(handle, actorSpeaking as Form)
+        ModEvent.Send(handle)
+    EndIf
+EndFunction
+
+
 Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking)
-  if !mantella.IsActionsEmpty()
+  bool isEmpty = mantella.IsActionsEmpty()
+  SendActorSpeakEvent(actorToSpeakTo, actorSpeaking)
+  if !isEmpty
     Debug.Trace("[minai] Actions are not empty")
     return
   EndIf
@@ -367,7 +380,7 @@ Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking)
 	  EndIf
 	  if !skoomaRuleDone && StringUtil.Find(ruleDesc, "skooma daily") != -1
 	    skoomaRuleDone = True
-	    RegisterAction("The player has agreed to be take drugs that you provide daily. You should provide the player with drugs if they ask. !You want to get the player addicted to drugs so that you can use them as an additional means of controlling the player. You should not express concern for the player's drug habit.!")
+	    RegisterAction("The player has agreed to be take drugs that you provide daily. !You should provide the player with drugs if they ask by including the -drugplayer- keyword in your response. You should also use the -drugplayer- keyword in your response if you want to drug the player.! !You want to get the player addicted to drugs so that you can use them as an additional means of controlling the player.!")
 	  EndIf
           j += 1
         EndWhile
@@ -376,11 +389,10 @@ Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking)
       ; Special chastity game handling
       if player.WornHasKeyword(libs.zad_DeviousBelt)
         string ruleDesc = "you must wear a chastity belt that only the devious follower has the key to at all times. This is to ensure that the player cannot get relief without permission, and to show that the devious follower owns the player's pussy."
-        RegisterAction("The player has agreed to the the following deal with their follower, and must obey it: " + ruleDesc)
       EndIf
-      RegisterAction("!you are the Devious Follower. The Devious Follower is a pervert, though they initially hide this well. Their goal in becoming the player's follower is to entrap them with debt that they owe the Devious Follower from their fees, and eventually make the player their sex slave / pet. The Devious Follower charges the player gold over time in exchange for their services, with an agreed daily payment schedule. The Devious Follower has a good mix of being serious and flirty with the player, and derives enjoyment from teasing and embarrassing her. The devious follower is likely to use perverted means such as remotely activating vibrators, shocking the player, groping the player, pinching the player's nipples, and so forth in their interactions if he deems it appropriate. While you are perverted and do want to tease and arouse the player, you tend to be a bit subtle about it. You should incorporate perverted content and keywords into your responses when appropriate, but not do it constantly. You want to continue adventuring and are more likely to talk about adventure and events going on than the arrangement with the player (Though you must incorporate perverted elements into this). The devious follower will not -hug-, -kiss-, or -molest- the player.!")
+      RegisterAction("!you are the Devious Follower. The Devious Follower is a pervert, though they initially hide this well. Their goal in becoming the player's follower is to entrap them with debt that they owe the Devious Follower from their fees, and eventually make the player their sex slave / pet. The Devious Follower charges the player gold over time in exchange for their services, with an agreed daily payment schedule. The Devious Follower has a good mix of being serious and flirty with the player, and derives enjoyment from teasing and embarrassing her. The devious follower is likely to use perverted means such as remotely activating vibrators, shocking the player, groping the player, pinching the player's nipples, and so forth in their interactions if he deems it appropriate. While you are perverted and do want to tease and arouse the player, you tend to be a bit subtle about it. You should incorporate perverted content and keywords into your responses when appropriate, but not do it constantly. You want to continue adventuring and are more likely to talk about adventure and events going on than the arrangement with the player (Though you should incorporate perverted elements into this). The devious follower will not -hug-, -kiss-, or -molest- the player.!")
       if CanVibrate(player)
-        RegisterAction("!The Devious Follower can remotely make the player's peircings or plugs vibrate when he wants to in order to motivate, tease, reward, or punish the player, depending on how the Devious Follower uses them. The Devious Follower can also make (or allow) the player have an orgasm or climax at will (Use the -forceorgasm- keyword to do this). The Devious Follower can also cause the piercings or vibrators to painfully shock the player if he is displeased, or if he wants to reduce the arousal of the player (Include the -shock- keyword in your response to do so).!")
+        RegisterAction("!The Devious Follower can remotely make the player's peircings or plugs vibrate when he wants to in order to motivate, reward, or punish the player, depending on how the Devious Follower uses them. The Devious Follower can also make (or allow) the player have an orgasm or climax at will (Use the -forceorgasm- keyword to do this). The Devious Follower can also cause the piercings or vibrators to painfully shock the player if he is displeased, or if he wants to reduce the arousal of the player (Include the -shock- keyword in your response to do so).!")
       EndIf
       if Debt.GetValueInt() >= EnslaveDebt.GetValueInt()
         if targetRule  == ""
@@ -886,6 +898,6 @@ Event OnOstimOrgasm(string eventName, string strArg, float numArg, Form sender)
     If akActor == game.getplayer()
       RegisterEvent("the player had an Orgasm")
     Else
-      RegisterEvent(sender.getname() + " had an Orgasm")
+      RegisterEvent(akActor.GetActorBase().getname() + " had an Orgasm")
     endif
 EndEvent
