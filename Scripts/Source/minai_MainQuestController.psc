@@ -803,6 +803,9 @@ function WriteDDString(actor akActor, actor player, bool isYou=false)
     if akActor.WornHasKeyword(libs.zad_DeviousClamps)
       RegisterAction(actorName + " is wearing a set of painful nipples clamps.")
     EndIf
+    if !CanVibrate(akActor)
+      RegisterAction("!" + actorName + " is not currently wearing any vibrators. You must not use the keywords that activate " + actorName + "'s vibrators.!")
+    EndIf
 EndFunction
 
 
