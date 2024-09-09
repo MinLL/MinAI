@@ -406,6 +406,8 @@ Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking)
 	; RegisterAction("!If the player tells you that they refuse, respond with the keyword: -rejectdeal- in your response.!")
       EndIf
     EndIf
+    string reminderStr = "Remember to use the previously identified keywords in your response when you want to perform an action such as hugging, kissing, molesting, spanking, vibrating, having sex, giving an orgasm to, or teasing " + actorName + "."
+    RegisterAction(reminderStr + "\n!" + reminderStr + "!")
 EndFunction
 
 
