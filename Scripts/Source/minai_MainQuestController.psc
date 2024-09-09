@@ -578,14 +578,14 @@ Function ActionResponse(Form actorToSpeakTo,Form actorSpeaking, string sayLine)
     EndIf
     ; Replicated the functions from MGO's NSFW plugin, as they're handy
     if stringutil.Find(sayLine, "-gear-") != -1
-      akTarget.OpenInventory(true)
+      akSpeaker.OpenInventory(true)
     EndIf
     if stringutil.Find(sayLine, "-trade-") != -1
-      akTarget.showbartermenu()
-      RegisterEvent("the player began to trade with " + akTarget.GetActorBase().GetName())
+      akSpeaker.showbartermenu()
+      RegisterEvent("the player began to trade with " + akSpeaker.GetActorBase().GetName())
     EndIf
     if stringutil.Find(sayLine, "-gift-") != -1
-      akTarget.ShowGiftMenu(true)
+      akSpeaker.ShowGiftMenu(true)
     EndIf
     if stringutil.Find(sayLine, "-undress-") != -1
       akSpeaker.UnequipAll()
@@ -804,7 +804,7 @@ function WriteDDString(actor akActor, actor player, bool isYou=false)
       RegisterAction(actorName + " is wearing a set of painful nipples clamps.")
     EndIf
     if !CanVibrate(akActor) && actorName != "you"
-      RegisterAction("!" + actorName + " is not currently wearing any vibrators. You must not use the keywords that activate " + actorName + "'s vibrators.!")
+      RegisterAction("!" + actorName + " is not currently wearing any vibrators. You must not activate " + actorName + "'s vibrators.!")
     EndIf
 EndFunction
 
