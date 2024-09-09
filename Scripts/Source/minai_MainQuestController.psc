@@ -546,7 +546,7 @@ Function ActionResponse(Form actorToSpeakTo,Form actorSpeaking, string sayLine)
     EndIf
 
     ; Mutually Exclusive keywords
-    ; if !slf.IsRunning()
+    if !slf.IsActorActive(akTarget) && !slf.IsActorActive(akSpeaker)
       If stringutil.Find(sayLine, "-startsex-") != -1 || stringUtil.Find(sayLine, "-have sex-") != -1 || stringUtil.Find(sayLine, "-sex-") != -1 || stringUtil.Find(sayLine, "-having sex-") != -1
         if bHasOstim
           ;; Use ostim if it's available
@@ -561,9 +561,9 @@ Function ActionResponse(Form actorToSpeakTo,Form actorSpeaking, string sayLine)
       elseif stringUtil.Find(sayLine, "-harasshug-") != -1 || stringUtil.Find(sayLine, "-hug-") != -1 || stringUtil.Find(sayLine, "-hugging-") != -1
         HarassHug(akSpeaker)
       EndIf
-    ; Else
-    ;   Debug.Trace("[minai] Not processing keywords for exclusive scene - Conflicting scene is running")
-    ; EndIf
+    Else
+      Debug.Trace("[minai] Not processing keywords for exclusive scene - Conflicting scene is running")
+    EndIf
     
     if stringUtil.Find(sayLine, "-acceptdeal-") != -1 
       Debug.Notification("AI: Accepted Deal: " + targetRule)
