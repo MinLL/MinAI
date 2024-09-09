@@ -477,43 +477,45 @@ Function ActionResponse(Form actorToSpeakTo,Form actorSpeaking, string sayLine)
   debug.Trace("[minai] ActionResponse(" + akSpeaker.GetActorBase().GetName() + ", " + akTarget.GetActorBase().GetName() + ", playerInScene="+bPlayerInScene+"): " + sayLine)
     int vibTime = Utility.RandomInt(1,15)
     int vibTimeLong = Utility.RandomInt(10,30)
-    if stringutil.Find(sayLine, "-forceorgasm-") != -1
-      libs.ActorOrgasm(akTarget)
-    ;
-    ; Vibration hooks
-    ;
-    elseIf stringUtil.Find(sayLine, "-teaseveryweak-") != -1
-      libs.StopVibrating(akTarget)
-      libs.VibrateEffect(akTarget, 1, vibTime, True)
-    elseIf stringUtil.Find(sayLine, "-teaseweak-") != -1
-      libs.StopVibrating(akTarget)
-      libs.VibrateEffect(akTarget, 2, vibTime, True)
-    elseIf stringUtil.Find(sayLine, "-tease-") != -1 || stringUtil.Find(sayLine, "-teasing-") != -1
-      libs.StopVibrating(akTarget)
-      libs.VibrateEffect(akTarget, 3, vibTime, True)
-     elseIf stringUtil.Find(sayLine, "-teasestrong-") != -1
-      libs.StopVibrating(akTarget)
-      libs.VibrateEffect(akTarget, 4, vibTimeLong, True)
-    elseIf stringUtil.Find(sayLine, "-teaseverystrong-") != -1
-      libs.StopVibrating(akTarget)
-      libs.VibrateEffect(akTarget, 5, vibTimeLong, True)
-    elseIf stringUtil.Find(sayLine, "-vibrateveryweak-") != -1
-      libs.StopVibrating(akTarget)
-      libs.VibrateEffect(akTarget, 1, vibTime)
-    elseIf stringUtil.Find(sayLine, "-vibrateweak-") != -1
-      libs.StopVibrating(akTarget)
-      libs.VibrateEffect(akTarget, 2, vibTime)
-    elseIf stringUtil.Find(sayLine, "-vibrate-") != -1 || stringUtil.Find(sayLine, "-vibrating-") != -1
-      libs.StopVibrating(akTarget)
-      libs.VibrateEffect(akTarget, 3, vibTime)
-     elseIf stringUtil.Find(sayLine, "-vibratestrong-") != -1 || stringUtil.Find(sayLine, "-vibratestronger-") != -1
-      libs.StopVibrating(akTarget)
-      libs.VibrateEffect(akTarget, 4, vibTime)
-    elseIf stringUtil.Find(sayLine, "-vibrateverystrong-") != -1
-      libs.StopVibrating(akTarget)
-      libs.VibrateEffect(akTarget, 5, vibTimeLong)
-    elseIf stringUtil.Find(sayLine, "-stopvibrate-") != -1 || stringUtil.Find(sayLine, "-stopvibrating-") != -1 || stringUtil.Find(sayLine, "-stopvibrator-") != -1
-      libs.StopVibrating(akTarget)
+    if CanVibrate(akTarget)
+      if stringutil.Find(sayLine, "-forceorgasm-") != -1
+        libs.ActorOrgasm(akTarget)
+      ;
+      ; Vibration hooks
+      ;
+      elseIf stringUtil.Find(sayLine, "-teaseveryweak-") != -1
+        libs.StopVibrating(akTarget)
+        libs.VibrateEffect(akTarget, 1, vibTime, True)
+      elseIf stringUtil.Find(sayLine, "-teaseweak-") != -1
+        libs.StopVibrating(akTarget)
+        libs.VibrateEffect(akTarget, 2, vibTime, True)
+      elseIf stringUtil.Find(sayLine, "-tease-") != -1 || stringUtil.Find(sayLine, "-teasing-") != -1
+        libs.StopVibrating(akTarget)
+        libs.VibrateEffect(akTarget, 3, vibTime, True)
+       elseIf stringUtil.Find(sayLine, "-teasestrong-") != -1
+        libs.StopVibrating(akTarget)
+        libs.VibrateEffect(akTarget, 4, vibTimeLong, True)
+      elseIf stringUtil.Find(sayLine, "-teaseverystrong-") != -1
+        libs.StopVibrating(akTarget)
+        libs.VibrateEffect(akTarget, 5, vibTimeLong, True)
+      elseIf stringUtil.Find(sayLine, "-vibrateveryweak-") != -1
+        libs.StopVibrating(akTarget)
+        libs.VibrateEffect(akTarget, 1, vibTime)
+      elseIf stringUtil.Find(sayLine, "-vibrateweak-") != -1
+        libs.StopVibrating(akTarget)
+        libs.VibrateEffect(akTarget, 2, vibTime)
+      elseIf stringUtil.Find(sayLine, "-vibrate-") != -1 || stringUtil.Find(sayLine, "-vibrating-") != -1
+        libs.StopVibrating(akTarget)
+        libs.VibrateEffect(akTarget, 3, vibTime)
+       elseIf stringUtil.Find(sayLine, "-vibratestrong-") != -1 || stringUtil.Find(sayLine, "-vibratestronger-") != -1
+        libs.StopVibrating(akTarget)
+        libs.VibrateEffect(akTarget, 4, vibTime)
+      elseIf stringUtil.Find(sayLine, "-vibrateverystrong-") != -1
+        libs.StopVibrating(akTarget)
+        libs.VibrateEffect(akTarget, 5, vibTimeLong)
+      elseIf stringUtil.Find(sayLine, "-stopvibrate-") != -1 || stringUtil.Find(sayLine, "-stopvibrating-") != -1 || stringUtil.Find(sayLine, "-stopvibrator-") != -1
+        libs.StopVibrating(akTarget)
+      EndIf
     EndIf
     ;
     ; End vibration hooks
@@ -544,20 +546,24 @@ Function ActionResponse(Form actorToSpeakTo,Form actorSpeaking, string sayLine)
     EndIf
 
     ; Mutually Exclusive keywords
-    If stringutil.Find(sayLine, "-startsex-") != -1 || stringUtil.Find(sayLine, "-have sex-") != -1 || stringUtil.Find(sayLine, "-sex-") != -1 || stringUtil.Find(sayLine, "-having sex-") != -1
-      if bHasOstim
-        ;; Use ostim if it's available
-	OThread.QuickStart(OActorUtil.ToArray(akTarget, akSpeaker))
-      else
-        slf.Quickstart(akTarget,akSpeaker)
-      endif
-    elseif stringUtil.Find(sayLine, "-molest-") != -1 || stringUtil.Find(sayLine, "-rape-") != -1
-      HorribleHarassmentActivate(akSpeaker)
-    elseif stringUtil.Find(sayLine, "-harasskiss-") != -1 || stringUtil.Find(sayLine, "-kiss-") != -1 || stringUtil.Find(sayLine, "-kissing-") != -1
-      HarassKiss(akSpeaker)
-    elseif stringUtil.Find(sayLine, "-harasshug-") != -1 || stringUtil.Find(sayLine, "-hug-") != -1 || stringUtil.Find(sayLine, "-hugging-") != -1
-      HarassHug(akSpeaker)
-    EndIf
+    ; if !slf.IsRunning()
+      If stringutil.Find(sayLine, "-startsex-") != -1 || stringUtil.Find(sayLine, "-have sex-") != -1 || stringUtil.Find(sayLine, "-sex-") != -1 || stringUtil.Find(sayLine, "-having sex-") != -1
+        if bHasOstim
+          ;; Use ostim if it's available
+	  OThread.QuickStart(OActorUtil.ToArray(akTarget, akSpeaker))
+        else
+          slf.Quickstart(akTarget,akSpeaker)
+        endif
+      elseif stringUtil.Find(sayLine, "-molest-") != -1 || stringUtil.Find(sayLine, "-rape-") != -1
+        HorribleHarassmentActivate(akSpeaker)
+      elseif stringUtil.Find(sayLine, "-harasskiss-") != -1 || stringUtil.Find(sayLine, "-kiss-") != -1 || stringUtil.Find(sayLine, "-kissing-") != -1
+        HarassKiss(akSpeaker)
+      elseif stringUtil.Find(sayLine, "-harasshug-") != -1 || stringUtil.Find(sayLine, "-hug-") != -1 || stringUtil.Find(sayLine, "-hugging-") != -1
+        HarassHug(akSpeaker)
+      EndIf
+    ; Else
+    ;   Debug.Trace("[minai] Not processing keywords for exclusive scene - Conflicting scene is running")
+    ; EndIf
     
     if stringUtil.Find(sayLine, "-acceptdeal-") != -1 
       Debug.Notification("AI: Accepted Deal: " + targetRule)
@@ -804,7 +810,7 @@ function WriteDDString(actor akActor, actor player, bool isYou=false)
       RegisterAction(actorName + " is wearing a set of painful nipples clamps.")
     EndIf
     if !CanVibrate(akActor) && actorName != "you"
-      RegisterAction("!" + actorName + " is not currently wearing any vibrators. You must not activate " + actorName + "'s vibrators.!")
+      RegisterAction("!" + actorName + " is not currently wearing any vibrators. You must not tease, vibrate, or activate " + actorName + "'s vibrators, piercings, or plugs.!")
     EndIf
 EndFunction
 
