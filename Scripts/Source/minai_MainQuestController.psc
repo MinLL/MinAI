@@ -1,4 +1,4 @@
-Scriptname minai_MainQuestController extends Quest
+ScriptName minai_MainQuestController extends Quest
 
 MantellaConversation mantella
 
@@ -635,7 +635,7 @@ EndEvent
 
 Function WriteArousedString(Actor akCaster, Actor akTarget, Actor player)
     string actorName = GetActorName(akCaster, player, False)
-    int exposure = aroused.GetActorExposure(akCaster)
+    int exposure = aroused.GetActorArousal(akCaster)
     if akCaster.getActorBase().getSex() == 0 ; Male
       If exposure >= 99
         RegisterAction(actorName + " appears to have a raging erection that is difficult to hide. " + actorName + " appears to be absolutely desperate for sex.")
@@ -657,13 +657,13 @@ Function WriteArousedString(Actor akCaster, Actor akTarget, Actor player)
         RegisterAction(actorName + " appears to be mildly turned on, and is blushing slightly.")
       EndIf
     EndIf
-    If aroused.GetActorExposure(akTarget) >= 99
+    If aroused.GetActorArousal(akTarget) >= 99
       RegisterAction("you are extremely aroused, and are extremely horny.")
-    ElseIf aroused.GetActorExposure(akTarget) >= 85
+    ElseIf aroused.GetActorArousal(akTarget) >= 85
       RegisterAction("you are very aroused, and are very horny.")
-    ElseIf aroused.GetActorExposure(akTarget) >= 70
+    ElseIf aroused.GetActorArousal(akTarget) >= 70
       RegisterAction("you are feeling rather aroused, and are a bit horny.")
-    Elseif aroused.GetActorExposure(akTarget) >= 50
+    Elseif aroused.GetActorArousal(akTarget) >= 50
       RegisterAction("you are mildly aroused.")
     else
       RegisterAction("you are not currently horny.")
@@ -811,11 +811,29 @@ function WriteDDString(actor akActor, actor player, bool isYou=false)
     if akActor.WornHasKeyword(libs.zad_DeviousClamps)
       RegisterAction(actorName + " is wearing a set of painful nipples clamps.")
     EndIf
-    if !CanVibrate(akActor) && actorName != "you"
-      RegisterAction("!" + actorName + " is not currently wearing any vibrators. You must not tease, vibrate, or activate " + actorName + "'s vibrators, piercings, or plugs.!")
+    if CanVibrate(akActor) && actorName != "you"
+      WriteVibrateString(akActor, player, isYou)
     EndIf
 EndFunction
 
+
+Function WriteVibrateString(actor akActor, actor player, bool isYou=false)
+  debug.Trace("[minai] Registering vibration and shock keywords")
+  string actorName = GetActorName(akActor, player, isYou)
+
+  RegisterAction("!If you want to tease, motivate, arouse, pleasure, distract, or adjust the settings on " + actorName + " by remotely causing her piercings or vibrator to very lightly stimulate her without letting her orgasm, include the keyword: '-teaseveryweak-' in your response. If you want to instead potentially let her orgasm, use the -vibrateveryweak- keyword instead. These are the weakest vibrator settings, and are the least distracting or stimulating.!")
+  RegisterAction("!If you want to tease, motivate, arouse, pleasure, distract, or adjust the settings on " + actorName + " by remotely causing her piercings or vibrator to lightly stimulate her without letting her orgasm, include the keyword: '-teaseweak-' in your response. If you want to instead potentially let her orgasm, use the -vibrateweak- keyword instead. These are the weak (But still arousing) settings of the vibrators.!")
+  RegisterAction("!If you want to tease, motivate, arouse, pleasure, distract, or adjust the settings on " + actorName + " by remotely causing her piercings or vibrator to moderately stimulate her without letting her orgasm, include the keyword: '-tease-' in your response. If you want to instead potentially let her orgasm, use the -vibrate- keyword instead. These are the standard vibrator settings, and are pretty distracting or stimulating.!")
+  RegisterAction("!If you want to tease, motivate, arouse, pleasure, distract, or adjust the settings on " + actorName + " by remotely causing her piercings or vibrator to strongly stimulate her without letting her orgasm, include the keyword: '-teasestrong-' in your response. If you want to instead potentially let her orgasm, use the -vibratestrong- keyword instead. These are strong vibrator settings, and are the very distracting or stimulating and hard to resist.!")
+  RegisterAction("!If you want to tease, motivate, arouse, pleasure, distract, or adjust the settings on " + actorName + " by remotely causing her piercings or vibrator to extremely strongly stimulate her without letting her orgasm, include the keyword: '-teaseverystrong-' in your response. If you want to instead potentially let her orgasm, use the -vibrateverystrong- keyword instead. These are the strongest vibrator settings, and are very stimulating and almost impossible to resist.!")
+  RegisterAction("!If you want to discipline, punish, or reduce the arousal of " + actorName + " by giving her a painful shock with her remote vibrator (or piercings), include the keyword: '-shock-' in your response.!")
+  RegisterAction("!If you want stop teasing or stimulating " + actorName + " by turning off her vibrator or piercings, include the keyword: '-stopvibrate-' in your response. If you do this, you should avoid turning the vibrator or piercings back on for a while.!")
+  RegisterAction("!If you want to give " + actorName + " a strong reward by instantly making the player have an orgasm or letting her climax, include the keyword: '-forceorgasm-' in your response.!")
+  RegisterAction("!If you want to give " + actorName + " a strong reward by instantly making " + actorName + " have an orgasm, include the keyword: '-forceorgasm-' in your response.!")
+  RegisterAction("!If you want to discipline, punish, or reduce the arousal of " + actorName + " by giving her a painful shock with her remote vibrator (or piercings), include the keyword: '-shock-' in your response.!")
+  RegisterAction("!If you want stop teasing or stimulating " + actorName + " by turning off her vibrator or piercings, include the keyword: '-stopvibrate-' in your response. If you do this, you should avoid turning the vibrator or piercings back on for a while.!")
+  RegisterAction("!If you want the player's vibrator to be active, you must use the keywords for this somewhat often. Every time you use the keyword it activates them for a limited time. They do not stay on all the time.!")
+EndFunction
 
 String Function GetActorName(actor akActor, actor Player, bool isYou)
   bool isPlayer = (akActor == player)
