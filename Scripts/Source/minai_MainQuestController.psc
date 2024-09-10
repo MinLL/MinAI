@@ -472,7 +472,7 @@ EndFunction
 
 
 bool Function CanAnimate(actor akTarget, actor akSpeaker)
-  if slf != None
+  if slf == None
     return True
   EndIf
   return !slf.IsActorActive(akTarget) && !slf.IsActorActive(akSpeaker)
