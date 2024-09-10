@@ -199,11 +199,12 @@ Function Maintenance()
   Debug.Trace("[minai] Initialization complete.")
 
   if Game.GetModByName("OStim.esp") != 255
+    Debug.Trace("[minai] Found OStim")
     bHasOstim = True
   EndIf
 
   minai_GlobalInjectToggle = Game.GetFormFromFile(0x0905, "MantellaMinAI.esp") as GlobalVariable
-  minai_UseOStim = Game.GetFormFromFile(0x0905, "MantellaMinAI.esp") as GlobalVariable
+  minai_UseOStim = Game.GetFormFromFile(0x0906, "MantellaMinAI.esp") as GlobalVariable
   if minai_GlobalInjectToggle == None || minai_UseOStim == None
     Debug.MessageBox("Script mismatch between MantellaMinAi.esp and minai_MainQuestController")
     Debug.Trace("[minai] Could not find inject toggle!")
@@ -501,7 +502,7 @@ Function ActionResponse(Form actorToSpeakTo,Form actorSpeaking, string sayLine)
   debug.Trace("[minai] ActionResponse(" + akSpeaker.GetActorBase().GetName() + ", " + akTarget.GetActorBase().GetName() + ", playerInScene="+bPlayerInScene+"): " + sayLine)
     int vibTime = Utility.RandomInt(1,15)
     int vibTimeLong = Utility.RandomInt(10,30)
-    if CanVibrate(akTarget)
+    if bHasDD && CanVibrate(akTarget)
       if stringutil.Find(sayLine, "-forceorgasm-") != -1
         libs.ActorOrgasm(akTarget)
       ;
@@ -574,6 +575,7 @@ Function ActionResponse(Form actorToSpeakTo,Form actorSpeaking, string sayLine)
       If stringutil.Find(sayLine, "-startsex-") != -1 || stringUtil.Find(sayLine, "-have sex-") != -1 || stringUtil.Find(sayLine, "-sex-") != -1 || stringUtil.Find(sayLine, "-having sex-") != -1
         if bHasOstim && minai_UseOStim.GetValue() == 1.0
           ;; Use ostim if it's available
+	  Debug.Trace("minai DEBUG] - Starting ostim scene")
 	  OThread.QuickStart(OActorUtil.ToArray(akTarget, akSpeaker))
         else
           slf.Quickstart(akTarget,akSpeaker)
