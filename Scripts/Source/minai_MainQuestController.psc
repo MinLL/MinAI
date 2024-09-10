@@ -53,6 +53,10 @@ GlobalVariable EnslaveDebt
 GlobalVariable ContractRemaining
 string targetRule = ""
 
+GlobalVariable minai_GlobalInjectToggle
+GlobalVariable minai_UseOstim
+
+
 Event OnInit()
   Maintenance()
 EndEvent
@@ -197,6 +201,13 @@ Function Maintenance()
   if Game.GetModByName("OStim.esp") != 255
     bHasOstim = True
   EndIf
+
+  minai_GlobalInjectToggle = Game.GetFormFromFile(0x0905, "MantellaMinAI.esp") as GlobalVariable
+  minai_UseOStim = Game.GetFormFromFile(0x0905, "MantellaMinAI.esp") as GlobalVariable
+  if minai_GlobalInjectToggle == None || minai_UseOStim == None
+    Debug.MessageBox("Script mismatch between MantellaMinAi.esp and minai_MainQuestController")
+    Debug.Trace("[minai] Could not find inject toggle!")
+  EndIf
 EndFunction
 
 Event OnOrgasm(string eventName, string actorName, float numArg, Form sender)
@@ -259,6 +270,10 @@ EndEvent
 
 
 Function RegisterAction(String eventLine)
+  if minai_GlobalInjectToggle.GetValue() != 1.0
+    Debug.Trace("[minai] RegisterAction() - Not doing anything, this is disabled.")
+    return
+  EndIf
   Debug.Trace("[minai] RegisterAction(): " + eventLine)
   mantella.AddInGameEvent(eventLine)
 EndFunction
@@ -456,6 +471,13 @@ int function CountMatch(string sayLine, string lineToMatch)
 EndFunction
 
 
+bool Function CanAnimate(actor akTarget, actor akSpeaker)
+  if slf != None
+    return True
+  EndIf
+  return !slf.IsActorActive(akTarget) && !slf.IsActorActive(akSpeaker)
+EndFunction
+
 Function ActionResponse(Form actorToSpeakTo,Form actorSpeaking, string sayLine)
   ; akTarget is the person being talked to.
   actor akTarget = actorToSpeakTo as Actor
@@ -548,9 +570,9 @@ Function ActionResponse(Form actorToSpeakTo,Form actorSpeaking, string sayLine)
     EndIf
 
     ; Mutually Exclusive keywords
-    if !slf.IsActorActive(akTarget) && !slf.IsActorActive(akSpeaker)
+    if CanAnimate(akTarget, akSpeaker)
       If stringutil.Find(sayLine, "-startsex-") != -1 || stringUtil.Find(sayLine, "-have sex-") != -1 || stringUtil.Find(sayLine, "-sex-") != -1 || stringUtil.Find(sayLine, "-having sex-") != -1
-        if bHasOstim
+        if bHasOstim && minai_UseOStim.GetValue() == 1.0
           ;; Use ostim if it's available
 	  OThread.QuickStart(OActorUtil.ToArray(akTarget, akSpeaker))
         else
