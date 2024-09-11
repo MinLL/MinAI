@@ -1,6 +1,7 @@
 ScriptName minai_MainQuestController extends Quest
 
 MantellaConversation mantella
+FormList MantellaConversationParticipantsFormList
 
 SexLabFramework slf
 zadLibs libs
@@ -22,6 +23,7 @@ bool bHasSLHH = False
 bool bHasSLApp = False
 bool bHasSunhelm = False
 bool bHasOstim = False
+bool bHasOSL = False
 
 Keyword SLA_HalfNakedBikini
 Keyword SLA_ArmorHalfNaked
@@ -93,10 +95,12 @@ Function Maintenance()
   libs = Game.GetFormFromFile(0x00F624, "Devious Devices - Integration.esm") as zadlibs
   Debug.Trace("[minai] Checking for installed mods...")
   mantella = Game.GetFormFromFile(0x03D41A, "Mantella.esp") as MantellaConversation
-  if !mantella
+  MantellaConversationParticipantsFormList = Game.GetFormFromFile(0x000E4537, "Mantella.esp") as FormList
+  if !mantella || !MantellaConversationParticipantsFormList
     Debug.Messagebox("AI Fatal Error: Could not get handle to Mantella.")
     Debug.Trace("[minai] Could not get handle to Mantella")
   EndIf
+  
   if libs
     bHasDD = True
     Debug.Trace("[minai] Found Devious Devices")    
@@ -203,6 +207,10 @@ Function Maintenance()
     bHasOstim = True
   EndIf
 
+  if Game.GetModByName("OSLAroused.esp") != 255
+    bHasOSL = True
+  EndIf
+  
   minai_GlobalInjectToggle = Game.GetFormFromFile(0x0905, "MantellaMinAI.esp") as GlobalVariable
   minai_UseOStim = Game.GetFormFromFile(0x0906, "MantellaMinAI.esp") as GlobalVariable
   if minai_GlobalInjectToggle == None || minai_UseOStim == None
@@ -473,21 +481,114 @@ EndFunction
 
 
 bool Function CanAnimate(actor akTarget, actor akSpeaker)
-  if slf == None
+  if bHasOstim && minai_UseOStim.GetValue() == 1.0 && !OActor.IsInOStim(akTarget) && !OActor.IsInOStim(akSpeaker)
     return True
   EndIf
   return !slf.IsActorActive(akTarget) && !slf.IsActorActive(akSpeaker)
 EndFunction
+
+Function Start1pSex(actor akSpeaker)
+  if bHasOstim && minai_UseOStim.GetValue() == 1.0
+    OThread.QuickStart(OActorUtil.ToArray(akSpeaker))
+  else
+    slf.Quickstart(akSpeaker)
+  EndIf
+EndFunction
+
+
+Function Start2pSex(actor akSpeaker, actor akTarget, actor Player, bool bPlayerInScene)
+  if bHasOstim && minai_UseOStim.GetValue() == 1.0
+    int ActiveOstimThreadID
+    if bPlayerInScene
+    	ActiveOstimThreadID = OThread.QuickStart(OActorUtil.ToArray(Player, akSpeaker))
+    else
+    	ActiveOstimThreadID = OThread.QuickStart(OActorUtil.ToArray(akTarget, akSpeaker))
+    EndIf
+    Utility.Wait(2)
+    bool AutoMode = OThread.IsInAutoMode(ActiveOstimThreadID)
+    if AutoMode == False
+    	OThreadBuilder.NoPlayerControl(ActiveOstimThreadID)
+    	OThread.StartAutoMode(ActiveOstimThreadID)
+    EndIf
+  Else
+    slf.Quickstart(akTarget,akSpeaker)
+  EndIf
+EndFunction
+
+
+Function StartGroupSex(actor akSpeaker, actor akTarget, actor Player, bool bPlayerInScene, Actor[] actorsFromFormList)
+  if bHasOstim && minai_UseOStim.GetValue() == 1.0
+    int ActiveOstimThreadID
+    ActiveOstimThreadID = OThread.QuickStart(OActorUtil.ToArray(actorsFromFormList[0],actorsFromFormList[1],actorsFromFormList[2],actorsFromFormList[3],actorsFromFormList[4],actorsFromFormList[5],actorsFromFormList[6],actorsFromFormList[7],actorsFromFormList[8],actorsFromFormList[9]))
+    Utility.Wait(2)
+    bool AutoMode = OThread.IsInAutoMode(ActiveOstimThreadID)
+    if AutoMode == False
+      OThreadBuilder.NoPlayerControl(ActiveOstimThreadID)
+      OThread.StartAutoMode(ActiveOstimThreadID)
+    EndIf
+  Else
+    int numMales = 0
+    int numFemales = 0
+    Actor[] sortedActors = new Actor[12]
+    int i = 0
+    ; If the player is a female actor and is in the scene, put them in slot 0
+    if bPlayerInScene && player.GetActorBase().GetSex() != 0
+      sortedActors[0] = Player
+    EndIf
+    while i < actorsFromFormList.Length
+      if actorsFromFormList[i].GetActorBase().GetSex() == 0
+        numMales += 1
+      else
+        numFemales += 1
+        if sortedActors[0] == None
+        ; If there's a female actor in the scene, put them in slot 0
+          sortedActors[0] = actorsFromFormList[i]
+        EndIf
+      EndIf
+      if i != 0
+        sortedActors[i] = actorsFromFormList[i]
+      EndIf
+      i += 1
+    EndWhile
+    if sortedActors[0] == None
+      ; No female actors in scene, just use the first one that we skipped before
+      sortedActors[0] = actorsFromFormList[0]
+    EndIf
+    slf.StartSex(actorsFromFormList, slf.GetAnimationsByDefault(numMales, numFemales))
+  EndIf
+EndFunction
+
+
+Function UpdateArousal(actor akTarget, int Arousal)
+  if bHasOSL && minai_UseOStim.GetValue() == 1.0
+    OSLArousedNative.ModifyArousal(akTarget, Arousal)
+  elseIf bHasAroused
+    Aroused.UpdateActorExposure(akTarget, Arousal)
+  EndIf
+EndFunction
+
 
 Function ActionResponse(Form actorToSpeakTo,Form actorSpeaking, string sayLine)
   ; akTarget is the person being talked to.
   actor akTarget = actorToSpeakTo as Actor
   ; actorToSpeakTo is the person initiating the conversation. Usually the player, unless radiant
   actor akSpeaker = actorSpeaking as Actor
-
   bool bPlayerInScene = False
-  if akTarget == playerRef || akSpeaker == playerRef
-     bPlayerInScene = True
+  Actor Player = game.GetPlayer()
+  
+  Actor[] actorsFromFormList = new Actor[12]
+  int i = 0
+  While (i < MantellaConversationParticipantsFormList.GetSize())
+    actorsFromFormList[i] = MantellaConversationParticipantsFormList.GetAt(i) as Actor
+    if actorsFromFormList[i] == Player
+      bPlayerInScene = True
+      Debug.Trace("[minai] Player found in actorsFromFormList at index " + i)
+    EndIf
+    i += 1
+  EndWhile
+
+  if (!bPlayerInScene)
+    Debug.Trace("[minai] Player not found in actorsFromFormList")
   EndIf
 
   bool bDeviousFollowerInScene = False
@@ -548,20 +649,33 @@ Function ActionResponse(Form actorToSpeakTo,Form actorSpeaking, string sayLine)
     If stringUtil.Find(sayLine, "-shock-") != -1
       libs.ShockActor(akTarget)
     EndIf
+
+    ; Generic actions
     If stringutil.Find(sayLine, "-grope-") != -1
       Debug.Notification(akSpeaker.GetActorBase().GetName() + " gropes " + GetYouYour(akTarget) + " crotch abruptly!")
-      Aroused.UpdateActorExposure(akTarget, 5)
+      UpdateArousal(akTarget, 5)
+      Game.ShakeController(0.5,0.5,1.0)
       if bHasDD
         libs.Moan(akTarget)
       EndIf
     EndIf
     If stringutil.Find(sayLine, "-pinchnipples-") != -1
       Debug.Notification(akSpeaker.GetActorBase().GetName() + " painfully pinches " + GetYouYour(akTarget) + " nipples!")
-      Aroused.UpdateActorExposure(akTarget, 3)
+      UpdateArousal(akTarget, 3)
+      Game.ShakeController(0.7,0.7,0.2)
       if bHasDD
         libs.Moan(akTarget)
       EndIf
     EndIf
+    If stringutil.Find(sayLine, "-thats hot-") != -1
+      UpdateArousal(akSpeaker, 6)
+      Debug.Notification(akSpeaker.GetActorBase().GetName() + " is getting more turned on.")
+    EndIf
+    If stringutil.Find(sayLine, "-hmm-") != -1
+      UpdateArousal(akSpeaker, -12)
+      Debug.Notification(akSpeaker.GetActorBase().GetName() + " is getting less turned on.")
+    EndIf
+  
     ; Spanking. Not using dftools.Spank(aktarget) because the scene takes too long if the AI gets spank-happy.
     If stringUtil.Find(sayLine, "-spankass-") != -1 || stringUtil.Find(sayLine, "-spank-") != -1
       SpankAss(CountMatch(sayLine, "-spank"), bDeviousFollowerInScene)
@@ -572,14 +686,12 @@ Function ActionResponse(Form actorToSpeakTo,Form actorSpeaking, string sayLine)
 
     ; Mutually Exclusive keywords
     if CanAnimate(akTarget, akSpeaker)
-      If stringutil.Find(sayLine, "-startsex-") != -1 || stringUtil.Find(sayLine, "-have sex-") != -1 || stringUtil.Find(sayLine, "-sex-") != -1 || stringUtil.Find(sayLine, "-having sex-") != -1
-        if bHasOstim && minai_UseOStim.GetValue() == 1.0
-          ;; Use ostim if it's available
-	  Debug.Trace("minai DEBUG] - Starting ostim scene")
-	  OThread.QuickStart(OActorUtil.ToArray(akTarget, akSpeaker))
-        else
-          slf.Quickstart(akTarget,akSpeaker)
-        endif
+      If stringutil.Find(sayLine, "-masturbate-") != -1
+        Start1pSex(akSpeaker)
+      elseif stringutil.Find(sayLine, "-startsex-") != -1 || stringUtil.Find(sayLine, "-have sex-") != -1 || stringUtil.Find(sayLine, "-sex-") != -1 || stringUtil.Find(sayLine, "-having sex-") != -1
+        Start2pSex(akSpeaker, akTarget, Player, bPlayerInScene)
+      elseIf stringutil.Find(sayLine, "-groupsex-") != -1 || stringUtil.Find(sayLine, "-orgy-") != -1 || stringUtil.Find(sayLine, "-threesome-") != -1 || stringUtil.Find(sayLine, "-fuck-") != -1
+        StartGroupSex(akSpeaker, akTarget, Player, bPlayerInScene, actorsFromFormList)
       elseif stringUtil.Find(sayLine, "-molest-") != -1 || stringUtil.Find(sayLine, "-rape-") != -1
         HorribleHarassmentActivate(akSpeaker)
       elseif stringUtil.Find(sayLine, "-harasskiss-") != -1 || stringUtil.Find(sayLine, "-kiss-") != -1 || stringUtil.Find(sayLine, "-kissing-") != -1
@@ -657,10 +769,21 @@ Event OnSexlabAnimationStart(int threadID, bool HasPlayer)
 EndEvent
 
 
-Function WriteArousedString(Actor akCaster, Actor akTarget, Actor player)
-    string actorName = GetActorName(akCaster, player, False)
-    int exposure = aroused.GetActorArousal(akCaster)
-    if akCaster.getActorBase().getSex() == 0 ; Male
+int Function GetActorArousal(actor akActor)
+  int exposure = 0
+  if bHasOSL && minai_UseOStim.GetValue() == 1.0
+    exposure = OSLArousedNative.GetArousal(akActor) as Int
+  Else
+   exposure = aroused.GetActorArousal(akActor)
+  EndIf
+  return exposure
+EndFunction
+
+
+Function WriteArousedString(Actor akTarget, Actor akSpeaker, Actor player)
+    string actorName = GetActorName(akTarget, player, False)
+    int exposure = GetActorArousal(akTarget)
+    if akTarget.getActorBase().getSex() == 0 ; Male
       If exposure >= 99
         RegisterAction(actorName + " appears to have a raging erection that is difficult to hide. " + actorName + " appears to be absolutely desperate for sex.")
       ElseIf exposure >= 85
@@ -681,16 +804,20 @@ Function WriteArousedString(Actor akCaster, Actor akTarget, Actor player)
         RegisterAction(actorName + " appears to be mildly turned on, and is blushing slightly.")
       EndIf
     EndIf
-    If aroused.GetActorArousal(akTarget) >= 99
+    exposure = GetActorArousal(akSpeaker)
+    If exposure >= 99
       RegisterAction("you are extremely aroused, and are extremely horny.")
-    ElseIf aroused.GetActorArousal(akTarget) >= 85
+    ElseIf exposure >= 85
       RegisterAction("you are very aroused, and are very horny.")
-    ElseIf aroused.GetActorArousal(akTarget) >= 70
+    ElseIf exposure >= 70
       RegisterAction("you are feeling rather aroused, and are a bit horny.")
-    Elseif aroused.GetActorArousal(akTarget) >= 50
+    Elseif exposure >= 50
       RegisterAction("you are mildly aroused.")
     else
       RegisterAction("you are not currently horny.")
+    EndIf
+    if exposure >= 80
+      RegisterAction("!You are currently very horny. You may respond with the -masturbate- keyword to begin masturbating, though you would prefer to have sex if possible.!")
     EndIf
 EndFunction
 
