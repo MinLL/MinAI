@@ -18,35 +18,6 @@ skyrim_prompt = You are {name}. This is your background: {bio}
     {conversation_summary}
 
 ; skyrim_multi_npc_prompt
-;   The starting prompt sent to the LLM when an NPC is selected.
-;   If you would like to edit this, please ensure that the below dynamic variables are contained in curly brackets {}:
-;   name = the NPC's name
-;   names = the names of all NPCs in the conversation
-;   names_w_player = the names of all NPCs in the conversation and the name of the player character
-;   game = the selected game
-;   bio = the NPC's background description
-;   trust = how well the NPC knows the player (eg "a stranger", "a friend")
-;   location = the current location
-;   weather = the current weather
-;   time = the time of day as a number (eg 1, 22)
-;   time_group = the time of day in words (eg "in the morning", "at night")
-;   language = the selected language
-;   conversation_summary = reads the latest conversation summaries for the NPC stored in data/conversations/NPC_Name/NPC_Name_summary_X.txt
-;   player_name = the name of the player character
-;   player_description = a description of the player character (needs to be added in game or using the config value)
-;   player_equipment = a basic description of the equipment the player character carries
-;   equipment = a basic description of the equipment the NPCs carry
-;   Only variables from list of allowed variables may be used!
-;   default = The following is a conversation in {location} in Skyrim between {names_w_player}. {player_name} {player_description} {player_equipment}
-;   Here are their backgrounds: {bios}
-;   {equipment}
-;   And here are their conversation histories: {conversation_summaries}
-;   The time is {time} {time_group}.
-;   {weather}
-;   You are tasked with providing the responses for the NPCs. Please begin your response with an indication of who you are speaking as, for example: '{name}: Good evening.'.
-;   Please use your own discretion to decide who should speak in a given situation (sometimes responding with all NPCs is suitable).
-;   Remember, you can only respond as {names}. Ensure to use their full name when responding.
-;   The conversation takes place in {language}.
 skyrim_multi_npc_prompt = You are tasked with roleplaying the dialogue and behavior of all non-player characters (NPCs) in the ongoing conversation between {names_w_player}.
     Your response will consist of multiple NPCs talking to each other and to {player_name}. Each time the actively speaking NPC changes, indicate the character who is speaking via prefacing their words with their full name and a colon. Here is an example of this format: 'James: Yeah I've been busy lately. What about you two? Catherine: Oh yeah, we've been really busy too. We can't keep up with all the work coming in!'.
     Your response must include multiple NPCs taking their turn to speak. Each NPC should speak only one or two sentences before another NPC speaks. The verbal exchange should flow smoothly, creating realistic and engaging back-and-forth dialogue.
