@@ -573,6 +573,10 @@ Function ActionResponse(Form actorToSpeakTo,Form actorSpeaking, string sayLine)
   actor akTarget = actorToSpeakTo as Actor
   ; actorToSpeakTo is the person initiating the conversation. Usually the player, unless radiant
   actor akSpeaker = actorSpeaking as Actor
+  if akTarget.IsChild() || akSpeaker.IsChild()
+    Debug.Trace("[minai] Not processing response - one of the actors is a child.")
+    return
+  EndIf
   bool bPlayerInScene = False
   Actor Player = game.GetPlayer()
   
