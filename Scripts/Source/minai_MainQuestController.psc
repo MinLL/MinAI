@@ -58,7 +58,7 @@ string targetRule = ""
 GlobalVariable minai_GlobalInjectToggle
 GlobalVariable minai_UseOstim
 
-
+;test
 Event OnInit()
   Maintenance()
 EndEvent
