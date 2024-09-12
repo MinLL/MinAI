@@ -579,6 +579,10 @@ Function ActionResponse(Form actorToSpeakTo,Form actorSpeaking, string sayLine)
     return
   EndIf
   bool bPlayerInScene = False
+	if actorSpeaking == playerRef || actorToSpeakTo == playerRef
+		Debug.Trace("[minai] Player in Scene")
+		bPlayerInScene = True
+	EndIf
   Actor Player = game.GetPlayer()
   
   Actor[] actorsFromFormList = GetActorsFromFormList()
@@ -862,10 +866,6 @@ function WriteClothingString(actor akActor, actor player, bool isYou=false)
     if akActor.WornHasKeyword(SLA_ArmorRubber)
       RegisterAction(actorName + "'s outfit is made out of tight form-fitting rubber (Referred to as Ebonite).")
     EndIf
-    Armor cuirass = akActor.GetWornForm(cuirassSlot) as Armor
-    if !cuirass
-      RegisterAction(actorName + " is not wearing any clothing.")
-    EndIf
 EndFunction
 
 
@@ -1032,9 +1032,9 @@ Function WritePlayerAppearance(Actor player)
   string gender = ""
   int sexInt = player.GetActorBase().GetSex()
   if sexInt == 0
-    gender = "man"
+    gender = "male"
   elseif sexInt == 1
-    gender = "woman"
+    gender = "female"
   else
     gender = "transgender"
   endif
