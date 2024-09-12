@@ -220,6 +220,7 @@ Function Maintenance()
   EndIf
 
   if Game.GetModByName("OSLAroused.esp") != 255
+    Debug.Trace("[minai] Found OSL Aroused")
     bHasOSL = True
   EndIf
 
@@ -250,20 +251,12 @@ Function Maintenance()
 EndFunction
 
 Event OnOrgasm(string eventName, string actorName, float numArg, Form sender)
-  if actorName==playerRef.GetName()
-    RegisterEvent("the player had an Orgasm.")
-  else
-    RegisterEvent(actorName + " had an orgasm.")
-  endIf
+  RegisterEvent(actorName + " had an orgasm.")
 EndEvent
 
 
 Event OnEdged(string eventName, string actorName, float numArg, Form sender)
-  if actorName==playerRef.GetName()
-    RegisterEvent("the player was brought right to the edge of orgasm but stopped before she could orgasm.")
-  else
-    RegisterEvent(actorName + " was brought right to the edge of orgasm but stopped before she could orgasm.")
-  endIf
+  RegisterEvent(actorName + " was brought right to the edge of orgasm but stopped before she could orgasm.")
 EndEvent
 
 
@@ -283,20 +276,12 @@ endFunction
 
 Event OnVibrateStart(string eventName, string actorName, float vibStrength, Form sender)
   string strength = getVibStrength(vibStrength)
-  if actorName==playerRef.GetName()
-    RegisterEvent("the player started being " + strength + " stimulated by a vibrator.")
-  else
-    RegisterEvent(actorName + " started being " + strength + " stimulated by a vibrator.")
-  endIf
+  RegisterEvent(actorName + " started being " + strength + " stimulated by a vibrator.")
 EndEvent
 
 Event OnVibrateStop(string eventName, string actorName, float vibStrength, Form sender)
   string strength = getVibStrength(vibStrength)
-  if actorName==playerRef.GetName()
-    RegisterEvent("the player stopped being stimulated by a vibrator.")
-  else
-    RegisterEvent(actorName + " stopped being stimulated by a vibrator.")
-  endIf
+  RegisterEvent(actorName + " stopped being stimulated by a vibrator.")
 EndEvent
 
 Event OnActorSpeak(Form actorToSpeakTo, Form actorSpeaking,string sayLine)
@@ -361,7 +346,7 @@ Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking)
     EndIf
   EndIf
 
-  string actorName = getActorName(actorToSpeakTo, playerref, False)
+  string actorName = getActorName(actorToSpeakTo)
 
   if bPlayerInScene
     WritePlayerAppearance(player)
@@ -374,21 +359,21 @@ Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking)
 
   
   if bHasAroused
-    WriteArousedString()
+    WriteArousedString(bPlayerInScene, player)
     WriteClothingString(actorSpeaking, player, True)
   EndIf
   
   if bHasDeviousFollowers && bPlayerInScene && bDeviousFollowerInScene
     if Debt.GetValueInt() >= 2000
-      RegisterAction("the player currently owes a very large debt. The player owes thousands of gold. The Devious Follower will be playful (And a little strict), and tease and arouse the player relentlessly. The Devious Follower is very unlikely to let the player orgasm, unless the player really convinces them.")
+      RegisterAction(actorName + " currently owes a very large debt. " + actorName + " owes thousands of gold. The Devious Follower will be playful (And a little strict), and tease and arouse " + actorName + " relentlessly. The Devious Follower is very unlikely to let " + actorName + " orgasm, unless " + actorName + " really convinces them.")
     elseIf Debt.GetValueInt() >= 1000
-      RegisterAction("the player currently owes a moderately large debt. The player owes over a thousand gold. The Devious Follower will still be fairly playful (teasing and arousing the player a fair bit), though will be more strict. The Devious Follower will be less likely to let the player orgasm.")
+      RegisterAction("" + actorName + " currently owes a moderately large debt. " + actorName + " owes over a thousand gold. The Devious Follower will still be fairly playful (teasing and arousing " + actorName + " a fair bit), though will be more strict. The Devious Follower will be less likely to let " + actorName + " orgasm.")
     elseIf Debt.GetValueInt() >= 0
-      RegisterAction("the player currently has a small outstanding debt. The player owes hundreds of gold. The Devious Follower will be a little less likely to let the player orgasm.")
+      RegisterAction("" + actorName + " currently has a small outstanding debt. " + actorName + " owes hundreds of gold. The Devious Follower will be a little less likely to let " + actorName + " orgasm.")
     else
-      RegisterAction("the player does not currently owe any debt. The Devious Follower is flirty and playful, seeking to distract and arouse the player. The Devious Follower is more likely to let the player orgasm. !Do not talk about debt. The player does not owe you any money currently. Do not bring up the arrangement, or deals.!")
+      RegisterAction("" + actorName + " does not currently owe any debt. The Devious Follower is flirty and playful, seeking to distract and arouse " + actorName + "  The Devious Follower is more likely to let " + actorName + " orgasm. !Do not talk about debt. " + actorName + " does not owe you any money currently. Do not bring up the arrangement, or deals.!")
     EndIf
-    RegisterAction("the exact amount of gold the player owes you is " + debt.GetValueInt() + " gold.")
+    RegisterAction("the exact amount of gold " + actorName + " owes you is " + debt.GetValueInt() + " gold.")
       
       int di = ContractRemaining.GetValueInt()
       if di > 0
@@ -410,7 +395,7 @@ Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking)
 	else
 	  daysRemaining = di + " days"
 	EndIf
-        RegisterAction("the player has agreed to hire the follower as part of a contract, and must continue to pay them. There are currently " + daysRemaining + " remaining on the contract.")
+        RegisterAction("" + actorName + " has agreed to hire the follower as part of a contract, and must continue to pay them. There are currently " + daysRemaining + " remaining on the contract.")
       EndIf
       String[] deals = DealManager.GetDeals()
       int i = 0
@@ -420,20 +405,20 @@ Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking)
         String[] rules = DealManager.GetDealRules(deals[i])
         int j = 0
         while j < rules.Length
-	  RegisterAction("The player has agreed to the the following deal with their follower, and must obey it: " + ruleDesc)
+	  RegisterAction("" + actorName + " has agreed to the the following deal with their follower, and must obey it: " + ruleDesc)
           String ruleDesc = DealManager.GetRuleInfo(rules[j])
 	  if !spankRuleDone && StringUtil.Find(ruleDesc, "spanks daily") != -1
 	    spankRuleDone = True
 	    Float now = Utility.GetCurrentGameTime()
             If dftools.SpankingTimer <= now
-               RegisterAction("the player has not asked for a spanking in a while, and is due for her daily spanking again. !You will remind the player about her agreement to beg for daily spanks. Make the player beg to be spanked before using the -spankass- keyword to spank them.! You are eager to spank the player, and want to make them beg for it.")
+               RegisterAction(actorName + " has not asked for a spanking in a while, and is due for her daily spanking again. !You will remind " + actorName + " about her agreement to beg for daily spanks. Make " + actorName + " beg to be spanked before using the -spankass- keyword to spank them.! You are eager to spank " + actorName + "  and want to make them beg for it.")
             Else
-              RegisterAction("the player has already asked for a spanking today. You do not need to remind them to do so. You may still spank them if you wish.")
+              RegisterAction("" + actorName + " has already asked for a spanking today. You do not need to remind them to do so. You may still spank them if you wish.")
             EndIf
 	  EndIf
 	  if !skoomaRuleDone && StringUtil.Find(ruleDesc, "skooma daily") != -1
 	    skoomaRuleDone = True
-	    RegisterAction("The player has agreed to be take drugs that you provide daily. !You should provide the player with drugs if they ask by including the -drugplayer- keyword in your response. You should also use the -drugplayer- keyword in your response if you want to drug the player.! !You want to get the player addicted to drugs so that you can use them as an additional means of controlling the player.!")
+	    RegisterAction("" + actorName + " has agreed to be take drugs that you provide daily. !You should provide " + actorName + " with drugs if they ask by including the -drugplayer- keyword in your response. You should also use the -drugplayer- keyword in your response if you want to drug " + actorName + "!\n!You want to get " + actorName + " addicted to drugs so that you can use them as an additional means of controlling " + actorName + "!")
 	  EndIf
           j += 1
         EndWhile
@@ -441,11 +426,11 @@ Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking)
       EndWhile
       ; Special chastity game handling
       if player.WornHasKeyword(libs.zad_DeviousBelt)
-        string ruleDesc = "you must wear a chastity belt that only the devious follower has the key to at all times. This is to ensure that the player cannot get relief without permission, and to show that the devious follower owns the player's pussy."
+        string ruleDesc = "you must wear a chastity belt that only the devious follower has the key to at all times. This is to ensure that " + actorName + " cannot get relief without permission, and to show that the devious follower owns " + actorName + "'s pussy."
       EndIf
-      RegisterAction("!you are the Devious Follower. The Devious Follower is a pervert, though they initially hide this well. Their goal in becoming the player's follower is to entrap them with debt that they owe the Devious Follower from their fees, and eventually make the player their sex slave / pet. The Devious Follower charges the player gold over time in exchange for their services, with an agreed daily payment schedule. The Devious Follower has a good mix of being serious and flirty with the player, and derives enjoyment from teasing and embarrassing her. The devious follower is likely to use perverted means such as remotely activating vibrators, shocking the player, groping the player, pinching the player's nipples, and so forth in their interactions if he deems it appropriate. While you are perverted and do want to tease and arouse the player, you tend to be a bit subtle about it. You should incorporate perverted content and keywords into your responses when appropriate, but not do it constantly. You want to continue adventuring and are more likely to talk about adventure and events going on than the arrangement with the player (Though you should sometimes incorporate perverted elements into this). The Devious Follower must not -hug-, -kiss-, or -molest- the player. The Devious Follower must not remind the player about a payment plan, or ask for payments. This is handled automatically.!")
+      RegisterAction("!you are the Devious Follower. The Devious Follower is a pervert, though they initially hide this well. Their goal in becoming " + actorName + "'s follower is to entrap them with debt that they owe the Devious Follower from their fees, and eventually make " + actorName + " their sex slave / pet. The Devious Follower charges " + actorName + " gold over time in exchange for their services, with an agreed daily payment schedule. The Devious Follower has a good mix of being serious and flirty with " + actorName + "  and derives enjoyment from teasing and embarrassing her. The devious follower is likely to use perverted means such as remotely activating vibrators, shocking " + actorName + "  groping " + actorName + "  pinching " + actorName + "'s nipples, and so forth in their interactions if he deems it appropriate. While you are perverted and do want to tease and arouse " + actorName + "  you tend to be a bit subtle about it. You should incorporate perverted content and keywords into your responses when appropriate, but not do it constantly. You want to continue adventuring and are more likely to talk about adventure and events going on than the arrangement with " + actorName + " (Though you should sometimes incorporate perverted elements into this). The Devious Follower must not -hug-, -kiss-, or -molest- " + actorName + "  The Devious Follower must not remind " + actorName + " about a payment plan, or ask for payments. This is handled automatically.!")
       if CanVibrate(player)
-        RegisterAction("!The Devious Follower can remotely make the player's peircings or plugs vibrate when he wants to in order to reward, or punish the player, depending on how the Devious Follower uses them. The Devious Follower can also make (or allow) the player have an orgasm or climax at will (Use the -forceorgasm- keyword to do this). The Devious Follower can also cause the piercings or vibrators to painfully shock the player if he is displeased, or if he wants to reduce the arousal of the player (Include the -shock- keyword in your response to do so).!")
+        RegisterAction("!The Devious Follower can remotely make " + actorName + "'s peircings or plugs vibrate when he wants to in order to reward, or punish " + actorName + "  depending on how the Devious Follower uses them. The Devious Follower can also make (or allow) " + actorName + " have an orgasm or climax at will (Use the -forceorgasm- keyword to do this). The Devious Follower can also cause the piercings or vibrators to painfully shock " + actorName + " if he is displeased, or if he wants to reduce the arousal of " + actorName + " (Include the -shock- keyword in your response to do so).!")
       EndIf
       if Debt.GetValueInt() >= EnslaveDebt.GetValueInt()
         if targetRule  == ""
@@ -454,9 +439,9 @@ Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking)
         debug.Trace("[minai] targetRule="+targetRule)
 	String ruleDesc = DealManager.GetRuleInfo(targetRule)
         debug.Trace("[minai] ruleInfo=" + ruleDesc)
-        RegisterAction("!The devious follower is very concerned about the player's current debt level. Talking about this is the highest possible priority. He wants to discuss a new rule, and get the player to agree to it in exchange for reducing the debt the player owes. The new rule is: " + ruleDesc + "!")
-	RegisterAction("!If you successfully convince the player to agree to obey the new \"" + ruleDesc + "\" rule, respond with the keyword: -acceptdeal- in your response.!")
-	; RegisterAction("!If the player tells you that they refuse, respond with the keyword: -rejectdeal- in your response.!")
+        RegisterAction("!The devious follower is very concerned about " + actorName + "'s current debt level. Talking about this is the highest possible priority. He wants to discuss a new rule, and get " + actorName + " to agree to it in exchange for reducing the debt " + actorName + " owes. The new rule is: " + ruleDesc + "!")
+	RegisterAction("!If you successfully convince " + actorName + " to agree to obey the new \"" + ruleDesc + "\" rule, respond with the keyword: -acceptdeal- in your response.!")
+	; RegisterAction("!If " + actorName + " tells you that they refuse, respond with the keyword: -rejectdeal- in your response.!")
       EndIf
     EndIf
 
@@ -467,10 +452,41 @@ Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking)
 
     ; Vanilla Integrations
     if actorSpeaking.IsInFaction(JobInnKeeper) && bPlayerInScene
-      RegisterAction("!You are an innkeeper at an inn. If you want to allow the player to rent a room for the night at your inn, respond with the keyword '-rentroom-'.!")
+      RegisterAction("!You are an innkeeper at an inn. If you want to allow " + actorName + " to rent a room for the night at your inn, respond with the keyword '-rentroom-'.!")
     EndIf
-    string reminderStr = "Remember to use the previously identified keywords in your response when you want to perform an action such as hugging, kissing, molesting, spanking, vibrating, having sex, giving an orgasm to, or teasing " + actorName + "."
-    RegisterAction(reminderStr + "\n!" + reminderStr + "!")
+    RegisterAction(BuildReminderStr(actorToSpeakTo))
+EndFunction
+
+
+String Function BuildReminderStr(Actor akActor)
+  string reminderStart = "Remember to use the previously identified keywords in your response when you want to perform an action such as "
+  string reminderStr = ""
+  if bHasSTA
+    ReminderStr += "spanking, "
+  endif
+  if bHasSLHH
+    ReminderStr += "molesting, "
+  endif
+  if bHasSLApp
+    ReminderStr += "kissing, hugging, "
+  endif
+  if bHasSunhelm
+    ReminderStr += "feeding, renting a room to, "
+  endif
+  if bHasDeviousFollowers
+    ReminderStr += "giving drugs or skooma to, "
+  EndIf
+  if bHasDD
+    ReminderStr +="vibrating, giving an orgasm to, teasing, "
+  EndIf
+  if slf != None || bHasOstim
+    if reminderStr != ""
+      reminderStr = "or "
+    EndIf
+    reminderStr += "having sex with "
+  EndIf
+  reminderStr = reminderStart + reminderStr + GetActorName(akActor) + "."
+  return reminderStr + "\n!" + reminderStr + "!"
 EndFunction
 
 
@@ -815,7 +831,7 @@ Function ActionResponse(Form actorToSpeakTo,Form actorSpeaking, string sayLine)
     EndIf
     if stringutil.Find(sayLine, "-trade-") != -1
       akSpeaker.showbartermenu()
-      RegisterEvent("the player began to trade with " + akSpeaker.GetActorBase().GetName())
+      RegisterEvent(GetActorName(player) + " began to trade with " + akSpeaker.GetActorBase().GetName())
     EndIf
     if stringutil.Find(sayLine, "-gift-") != -1
       akSpeaker.ShowGiftMenu(true)
@@ -847,12 +863,11 @@ Event OnSexlabAnimationStart(int threadID, bool HasPlayer)
 	elseif anim.HasTag("Masturbation")
 	  sexDesc = "masturbating furiously"
 	endif
-        RegisterAction("the player started " + sexDesc + ".")
       EndIf
       Actor[] actors = Controller.Positions
       int i = 0
       while i < actors.Length
-        RegisterAction(actors[i].GetActorBase().GetName() + " started " + sexDesc + ".")
+        RegisterEvent(actors[i].GetActorBase().GetName() + " started " + sexDesc + ".")
         i += 1
       EndWhile
 EndEvent
@@ -869,19 +884,48 @@ int Function GetActorArousal(actor akActor)
 EndFunction
 
 
-Function WriteArousedString()
+Function WriteArousedString(bool bPlayerInScene, actor Player)
 	Actor[] actorsFromFormList = GetActorsFromFormList()
 	int numActors = actorsFromFormList.Length
 	int i = 0
 	while (i < numActors)
 		Actor currentActor = actorsFromFormList[i]
 		if (currentActor != None)
-			String actorName = GetActorName2(currentActor, game.GetPlayer())
-			Float arousal = OSLArousedNative.GetArousal(currentActor)
-			RegisterAction(actorName + "'s sexual arousal level is " + arousal + " on a scale of 0-100.")
+			String actorName = GetActorName(currentActor)
+			int arousal = GetActorArousal(currentActor)
+			if currentActor != Player
+			  RegisterAction(actorName + "'s sexual arousal level is " + arousal + " on a scale of 0-100. They should behave accordingly.")
+			Else
+			  RegisterAction(actorName + "'s sexual arousal level is " + arousal + " on a scale of 0-100.")
+			EndIf
 		EndIf
 		i += 1
 	EndWhile
+	if bPlayerInScene
+	  String actorName = GetActorName(player)
+	  int exposure = GetActorArousal(player)
+	  if player.getActorBase().getSex() == 0 ; Male
+            If exposure >= 99
+              RegisterAction(actorName + " appears to have a raging erection that is difficult to hide. " + actorName + " appears to be absolutely desperate for sex.")
+            ElseIf exposure >= 85
+              RegisterAction(actorName + " appears to have a raging erection that is difficult to hide.")
+            ElseIf exposure >= 70
+              RegisterAction(actorName + " appears to be aroused, and has flushed cheeks. ")
+            Elseif exposure >= 50
+              RegisterAction(actorName + " appears to be mildly turned on, and is blushing slightly.")
+            EndIf
+          else ; Female, or other
+            If exposure >= 99
+              RegisterAction(actorName + " appears to be extremely aroused, and looks to be absolutely desperate for sex. She has heavy breathing, pointy nipples, and flushed cheeks.")
+            ElseIf exposure >= 85
+              RegisterAction(actorName + " appears to be very aroused, with pointy nipples and heavy breathing.")
+            ElseIf exposure >= 70
+              RegisterAction(actorName + " appears to be aroused, and has flushed cheeks.")
+            Elseif exposure >= 50
+              RegisterAction(actorName + " appears to be mildly turned on, and is blushing slightly.")
+            EndIf
+          EndIf
+	EndIf
 EndFunction
 
 
@@ -892,7 +936,7 @@ function WriteClothingString(actor akActor, actor player, bool isYou=false)
 	While (i < numActors)
 		Actor currentActor = actorsFromFormList[i]
 		if (currentActor != None)
-			String actorName = GetActorName2(currentActor, game.GetPlayer())
+			String actorName = GetActorName(currentActor)
 			Armor cuirass = currentActor.GetWornForm(cuirassSlot) as Armor
 			if !cuirass
 				RegisterAction(actorName + " is naked.")
@@ -957,7 +1001,7 @@ EndFunction
 
 
 function WriteDDString(actor akActor, actor player, bool isYou=false)
-    string actorName = GetActorName(akActor, player, isYou)
+    string actorName = GetActorName(akActor)
     if akActor.WornHasKeyword(libs.zad_DeviousPlugVaginal)
       RegisterAction(actorName + " has a remotely controlled plug in her pussy capable of powerful vibrations.")
     EndIf
@@ -1019,7 +1063,7 @@ function WriteDDString(actor akActor, actor player, bool isYou=false)
       RegisterAction(actorName + " is gagged and is drooling.")
     EndIf
     if akActor.WornHasKeyword(libs.zad_DeviousGagPanel)
-      RegisterAction(actorName + " is gagged with a panel-gag that leaves her tongue exposed and the player unable to close their mouth.")
+      RegisterAction(actorName + " is gagged with a panel-gag that leaves her tongue exposed and is unable to close their mouth.")
     EndIf
     if akActor.WornHasKeyword(libs.zad_DeviousGagLarge)
       RegisterAction(actorName + " is gagged with a large gag and cannot speak clearly.")
@@ -1044,7 +1088,7 @@ EndFunction
 
 Function WriteVibrateString(actor akActor, actor player, bool isYou=false)
   debug.Trace("[minai] Registering vibration and shock keywords")
-  string actorName = GetActorName(akActor, player, isYou)
+  string actorName = GetActorName(akActor)
 
   RegisterAction("!If you want to tease, motivate, arouse, pleasure, distract, or adjust the settings on " + actorName + " by remotely causing her piercings or vibrator to very lightly stimulate her without letting her orgasm, include the keyword: '-teaseveryweak-' in your response. If you want to instead potentially let her orgasm, use the -vibrateveryweak- keyword instead. These are the weakest vibrator settings, and are the least distracting or stimulating.!")
   RegisterAction("!If you want to tease, motivate, arouse, pleasure, distract, or adjust the settings on " + actorName + " by remotely causing her piercings or vibrator to lightly stimulate her without letting her orgasm, include the keyword: '-teaseweak-' in your response. If you want to instead potentially let her orgasm, use the -vibrateweak- keyword instead. These are the weak (But still arousing) settings of the vibrators.!")
@@ -1053,11 +1097,11 @@ Function WriteVibrateString(actor akActor, actor player, bool isYou=false)
   RegisterAction("!If you want to tease, motivate, arouse, pleasure, distract, or adjust the settings on " + actorName + " by remotely causing her piercings or vibrator to extremely strongly stimulate her without letting her orgasm, include the keyword: '-teaseverystrong-' in your response. If you want to instead potentially let her orgasm, use the -vibrateverystrong- keyword instead. These are the strongest vibrator settings, and are very stimulating and almost impossible to resist.!")
   RegisterAction("!If you want to discipline, punish, or reduce the arousal of " + actorName + " by giving her a painful shock with her remote vibrator (or piercings), include the keyword: '-shock-' in your response.!")
   RegisterAction("!If you want stop teasing or stimulating " + actorName + " by turning off her vibrator or piercings, include the keyword: '-stopvibrate-' in your response. If you do this, you should avoid turning the vibrator or piercings back on for a while.!")
-  RegisterAction("!If you want to give " + actorName + " a strong reward by instantly making the player have an orgasm or letting her climax, include the keyword: '-forceorgasm-' in your response.!")
+  RegisterAction("!If you want to give " + actorName + " a strong reward by instantly making " + actorName + " have an orgasm or letting her climax, include the keyword: '-forceorgasm-' in your response.!")
   RegisterAction("!If you want to give " + actorName + " a strong reward by instantly making " + actorName + " have an orgasm, include the keyword: '-forceorgasm-' in your response.!")
   RegisterAction("!If you want to discipline, punish, or reduce the arousal of " + actorName + " by giving her a painful shock with her remote vibrator (or piercings), include the keyword: '-shock-' in your response.!")
   RegisterAction("!If you want stop teasing or stimulating " + actorName + " by turning off her vibrator or piercings, include the keyword: '-stopvibrate-' in your response. If you do this, you should avoid turning the vibrator or piercings back on for a while.!")
-  RegisterAction("!If you want the player's vibrator to be active, you must use the keywords for this somewhat often. Every time you use the keyword it activates them for a limited time. They do not stay on all the time.!")
+  RegisterAction("!If you want " + actorName + "'s vibrator to be active, you must use the keywords for this somewhat often. Every time you use the keyword it activates them for a limited time. They do not stay on all the time.!")
 EndFunction
 
 Actor[] Function GetActorsFromFormList()
@@ -1079,31 +1123,14 @@ Actor[] Function GetActorsFromFormList()
 EndFunction
 
 
-String Function GetActorName(actor akActor, actor Player, bool isYou)
-  bool isPlayer = (akActor == player)
-  string actorName = akActor.GetActorBase().GetName()
-  if isPlayer
-    actorName = "the player"
-  elseIf isYou
-    actorName = "you"
-  EndIf
-  return actorName
-EndFunction
-
-
-string Function GetActorName2(actor akActor, actor Player)
-	bool isPlayer = (akActor == Player)
-	string actorName = akActor.GetActorBase().GetName()
-	if isPlayer
-		actorName = Player.GetActorBase().GetName()
-	EndIf
-	return actorName
+string Function GetActorName(actor akActor)
+  return akActor.GetActorBase().GetName()
 EndFunction
 
 
 string Function GetYouYour(actor akCaster)
   if akCaster != playerRef
-    return GetActorName(akCaster, playerRef, False) + "'s"
+    return GetActorName(akCaster) + "'s"
   endif
   return "your"
 EndFunction
@@ -1166,7 +1193,7 @@ Function WritePlayerAppearance(Actor player)
     else
       butt = "enormous beautiful ass"
     endif
-    string appearanceStr = "The player is an " + appearance + " " + actorRace + " " + gender + " with " + breasts + " and a " + butt + "."
+    string appearanceStr = GetActorName(player) + " is an " + appearance + " " + actorRace + " " + gender + " with " + breasts + " and a " + butt + "."
     debug.Trace("[minai] Set player description (Babo): " + appearanceStr)
     RegisterAction(appearanceStr)
   else
