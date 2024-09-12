@@ -30,6 +30,7 @@ bool bHasSLApp = False
 bool bHasSunhelm = False
 bool bHasOstim = False
 bool bHasOSL = False
+bool bUseVanilla = True
 
 Keyword SLA_HalfNakedBikini
 Keyword SLA_ArmorHalfNaked
@@ -447,7 +448,7 @@ Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking)
 
     ; Sunhelm Integrations
     if bHasSunhelm && (actorSpeaking.IsInFaction(JobInnServer) || actorSpeaking.IsInFaction(JobInnKeeper)) && bPlayerInScene
-      RegisterAction("!You are a server at an inn. If you want to serve " + actorName + " food, include the keyword '-feedplayer-' keyword in your response.!")
+      RegisterAction("!You are a server at an inn. If you want to serve " + actorName + " food, a meal, breakfast, dinner, lunch, or a snack, include the keyword '-feedplayer-' keyword in your response.!")
     EndIf
 
     ; Vanilla Integrations
@@ -461,6 +462,9 @@ EndFunction
 String Function BuildReminderStr(Actor akActor)
   string reminderStart = "Remember to use the previously identified keywords in your response when you want to perform an action such as "
   string reminderStr = ""
+  if bUseVanilla
+    reminderStr += "trading with, "
+  EndIf
   if bHasSTA
     ReminderStr += "spanking, "
   endif
@@ -894,9 +898,9 @@ Function WriteArousedString(bool bPlayerInScene, actor Player)
 			String actorName = GetActorName(currentActor)
 			int arousal = GetActorArousal(currentActor)
 			if currentActor != Player
-			  RegisterAction(actorName + "'s sexual arousal level is " + arousal + " on a scale of 0-100. They should behave accordingly.")
+			  RegisterAction(actorName + "'s sexual arousal level is " + arousal + " on a scale of 0-100, where 0 is \"not horny\", and 100 is \"desperate for sex\". They should behave accordingly.")
 			Else
-			  RegisterAction(actorName + "'s sexual arousal level is " + arousal + " on a scale of 0-100.")
+			  RegisterAction(actorName + "'s sexual arousal level is " + arousal + " on a scale of 0-100, where 0 is \"not horny\", and 100 is \"desperate for sex\".")
 			EndIf
 		EndIf
 		i += 1
