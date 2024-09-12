@@ -55,6 +55,12 @@ Keyword SLA_MicroSkirt
 Keyword SLA_BootsHeels
 Keyword SLA_HasLeggings
 Keyword SLA_ArmorRubber
+Keyword TNG_XS
+Keyword TNG_S
+Keyword TNG_M
+Keyword TNG_L
+Keyword TNG_XL
+Keyword TNG_DefaultSize
 
 Keyword SLHHScriptEventKeyword
 
@@ -949,6 +955,7 @@ function WriteClothingString(actor akActor, actor player, bool isYou=false)
 				RegisterAction(actorName + " is wearing " + cuirass.GetName())
 			EndIf
 			if bHasTNG
+				string sizeDescription = ""
 				Form equipmentInSlot52 = akActor.GetWornForm(0x00000034)
 				if equipmentInSlot52 != None
 					Armor armorInSlot52 = equipmentInSlot52 as Armor
@@ -966,11 +973,13 @@ function WriteClothingString(actor akActor, actor player, bool isYou=false)
 						EndIf
 					EndIf
 				EndIf
+				if sizeDescription != ""
+					RegisterAction("You can see that " + actorName + " has " + sizeDescription + ".")
+				EndIf
 			EndIf
-		if sizeDescription != ""
-			RegisterAction("You can see that " + actorName + " has " + sizeDescription + ".")
-		EndIf
-	EndIf
+
+
+
 			if !bHasArousedKeywords
 				return
 			endif
