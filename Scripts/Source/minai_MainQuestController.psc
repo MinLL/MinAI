@@ -346,7 +346,6 @@ Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking)
   
   if bHasAroused
     WriteArousedString()
-    WriteClothingString(actorToSpeakTo, player, False)
     WriteClothingString(actorSpeaking, player, True)
   EndIf
   
@@ -810,62 +809,60 @@ function WriteClothingString(actor akActor, actor player, bool isYou=false)
 			else
 				RegisterAction(actorName + " is wearing " + cuirass.GetName())
 			EndIf
+			if !bHasArousedKeywords
+				return
+			endif
+			if currentActor.WornHasKeyword(SLA_HalfNakedBikini)
+			  RegisterAction(actorName + " is wearing a set of revealing bikini armor.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_ArmorHalfNaked)
+			  RegisterAction(actorName + " is wearing very revealing attire, leaving them half naked.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_Brabikini)
+			  RegisterAction(actorName + " is wearing a bra underneath her other equipment.")
+			EndIf
+			  if currentActor.WornHasKeyword(SLA_ThongT) || currentActor.WornHasKeyword(SLA_ThongLowLeg) || currentActor.WornHasKeyword(SLA_ThongCString) || currentActor.WornHasKeyword(SLA_ThongGstring)
+			  RegisterAction(actorName + " is wearing a thong underneath her other equipment.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_PantiesNormal)
+			  RegisterAction(actorName + " is wearing plain panties underneath her other equipment.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_KillerHeels) || currentActor.WornHasKeyword(SLA_BootsHeels)
+			  RegisterAction(actorName + " is wearing a set of high-heels.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_PantsNormal)
+			  RegisterAction(actorName + " is wearing a set of ordinary pants.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_MicroHotPants)
+			  RegisterAction(actorName + " is wearing a set of short hot-pants that accentuate her ass.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_ArmorHarness)
+			  RegisterAction(actorName + " is wearing a form-fitting body harness.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_ArmorSpendex)
+			  RegisterAction(actorName + "'s outfit is made out of latex (Referred to as Ebonite).")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_ArmorTransparent)
+			  RegisterAction(actorName + "'s outfit is transparent, leaving nothing to the imagination.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_ArmorLewdLeotard)
+			  RegisterAction(actorName + " is wearing a sheer, revealing leotard leaving very little to the imagination.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_PelvicCurtain)
+			  RegisterAction(actorName + "'s pussy is covered only by a sheer curtain of fabric.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_FullSkirt)
+			  RegisterAction(actorName + " is wearing a full length skirt that goes down to her knees.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_MiniSkirt) || currentActor.WornHasKeyword(SLA_MicroSkirt)
+			  RegisterAction(actorName + " is wearing a short mini-skirt that barely covers her ass. Her underwear or panties are sometimes visible underneath when she moves.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_ArmorRubber)
+			  RegisterAction(actorName + "'s outfit is made out of tight form-fitting rubber (Referred to as Ebonite).")
+			EndIf
 		EndIf
 		i += 1
 	EndWhile
-
-  if !bHasArousedKeywords
-    return
-  endif
-  string actorName = GetActorName2(akActor, player)
-    if akActor.WornHasKeyword(SLA_HalfNakedBikini)
-      RegisterAction(actorName + " is wearing a set of revealing bikini armor.")
-    EndIf
-    if akActor.WornHasKeyword(SLA_ArmorHalfNaked)
-      RegisterAction(actorName + " is wearing very revealing attire, leaving them half naked.")
-    EndIf
-    if akActor.WornHasKeyword(SLA_Brabikini)
-      RegisterAction(actorName + " is wearing a bra underneath her other equipment.")
-    EndIf
-      if akActor.WornHasKeyword(SLA_ThongT) || akActor.WornHasKeyword(SLA_ThongLowLeg) || akActor.WornHasKeyword(SLA_ThongCString) || akActor.WornHasKeyword(SLA_ThongGstring)
-      RegisterAction(actorName + " is wearing a thong underneath her other equipment.")
-    EndIf
-    if akActor.WornHasKeyword(SLA_PantiesNormal)
-      RegisterAction(actorName + " is wearing plain panties underneath her other equipment.")
-    EndIf
-    if akActor.WornHasKeyword(SLA_KillerHeels) || akActor.WornHasKeyword(SLA_BootsHeels)
-      RegisterAction(actorName + " is wearing a set of high-heels.")
-    EndIf
-    if akActor.WornHasKeyword(SLA_PantsNormal)
-      RegisterAction(actorName + " is wearing a set of ordinary pants.")
-    EndIf
-    if akActor.WornHasKeyword(SLA_MicroHotPants)
-      RegisterAction(actorName + " is wearing a set of short hot-pants that accentuate her ass.")
-    EndIf
-    if akActor.WornHasKeyword(SLA_ArmorHarness)
-      RegisterAction(actorName + " is wearing a form-fitting body harness.")
-    EndIf
-    if akActor.WornHasKeyword(SLA_ArmorSpendex)
-      RegisterAction(actorName + "'s outfit is made out of latex (Referred to as Ebonite).")
-    EndIf
-    if akActor.WornHasKeyword(SLA_ArmorTransparent)
-      RegisterAction(actorName + "'s outfit is transparent, leaving nothing to the imagination.")
-    EndIf
-    if akActor.WornHasKeyword(SLA_ArmorLewdLeotard)
-      RegisterAction(actorName + " is wearing a sheer, revealing leotard leaving very little to the imagination.")
-    EndIf
-    if akActor.WornHasKeyword(SLA_PelvicCurtain)
-      RegisterAction(actorName + "'s pussy is covered only by a sheer curtain of fabric.")
-    EndIf
-    if akActor.WornHasKeyword(SLA_FullSkirt)
-      RegisterAction(actorName + " is wearing a full length skirt that goes down to her knees.")
-    EndIf
-    if akActor.WornHasKeyword(SLA_MiniSkirt) || akActor.WornHasKeyword(SLA_MicroSkirt)
-      RegisterAction(actorName + " is wearing a short mini-skirt that barely covers her ass. Her underwear or panties are sometimes visible underneath when she moves.")
-    EndIf
-    if akActor.WornHasKeyword(SLA_ArmorRubber)
-      RegisterAction(actorName + "'s outfit is made out of tight form-fitting rubber (Referred to as Ebonite).")
-    EndIf
 EndFunction
 
 
