@@ -1,7 +1,5 @@
 ScriptName minai_MainQuestController extends Quest
 
-int cuirassSlot = 0x00000004
-
 MantellaConversation mantella
 FormList MantellaConversationParticipantsFormList
 
@@ -59,6 +57,7 @@ string targetRule = ""
 
 GlobalVariable minai_GlobalInjectToggle
 GlobalVariable minai_UseOstim
+
 
 Event OnInit()
   Maintenance()
@@ -345,7 +344,7 @@ Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking)
 
   
   if bHasAroused
-    WriteArousedString()
+    WriteArousedString(actorToSpeakTo, actorSpeaking, player)
     WriteClothingString(actorToSpeakTo, player, False)
     WriteClothingString(actorSpeaking, player, True)
   EndIf
@@ -579,13 +578,18 @@ Function ActionResponse(Form actorToSpeakTo,Form actorSpeaking, string sayLine)
     return
   EndIf
   bool bPlayerInScene = False
-	if actorSpeaking == playerRef || actorToSpeakTo == playerRef
-		Debug.Trace("[minai] Player in Scene")
-		bPlayerInScene = True
-	EndIf
   Actor Player = game.GetPlayer()
   
-  Actor[] actorsFromFormList = GetActorsFromFormList()
+  Actor[] actorsFromFormList = new Actor[12]
+  int i = 0
+  While (i < MantellaConversationParticipantsFormList.GetSize())
+    actorsFromFormList[i] = MantellaConversationParticipantsFormList.GetAt(i) as Actor
+    if actorsFromFormList[i] == Player
+      bPlayerInScene = True
+      Debug.Trace("[minai] Player found in actorsFromFormList at index " + i)
+    EndIf
+    i += 1
+  EndWhile
 
   if (!bPlayerInScene)
     Debug.Trace("[minai] Player not found in actorsFromFormList")
@@ -780,44 +784,53 @@ int Function GetActorArousal(actor akActor)
 EndFunction
 
 
-Function WriteArousedString()
-	Actor[] actorsFromFormList = GetActorsFromFormList()
-	int numActors = actorsFromFormList.Length
-	int i = 0
-	while (i < numActors)
-		Actor currentActor = actorsFromFormList[i]
-		if (currentActor != None)
-			String actorName = GetActorName2(currentActor, game.GetPlayer())
-			Float arousal = OSLArousedNative.GetArousal(currentActor)
-			RegisterAction(actorName + "'s sexual arousal level is " + arousal + " on a scale of 0-100.")
-		EndIf
-		i += 1
-	EndWhile
+Function WriteArousedString(Actor akTarget, Actor akSpeaker, Actor player)
+    string actorName = GetActorName(akTarget, player, False)
+    int exposure = GetActorArousal(akTarget)
+    if akTarget.getActorBase().getSex() == 0 ; Male
+      If exposure >= 99
+        RegisterAction(actorName + " appears to have a raging erection that is difficult to hide. " + actorName + " appears to be absolutely desperate for sex.")
+      ElseIf exposure >= 85
+        RegisterAction(actorName + " appears to have a raging erection that is difficult to hide.")
+      ElseIf exposure >= 70
+        RegisterAction(actorName + " appears to be aroused, and has flushed cheeks. ")
+      Elseif exposure >= 50
+        RegisterAction(actorName + " appears to be mildly turned on, and is blushing slightly.")
+      EndIf
+    else ; Female, or other
+      If exposure >= 99
+        RegisterAction(actorName + " appears to be extremely aroused, and looks to be absolutely desperate for sex. She has heavy breathing, pointy nipples, and flushed cheeks.")
+      ElseIf exposure >= 85
+        RegisterAction(actorName + " appears to be very aroused, with pointy nipples and heavy breathing.")
+      ElseIf exposure >= 70
+        RegisterAction(actorName + " appears to be aroused, and has flushed cheeks.")
+      Elseif exposure >= 50
+        RegisterAction(actorName + " appears to be mildly turned on, and is blushing slightly.")
+      EndIf
+    EndIf
+    exposure = GetActorArousal(akSpeaker)
+    If exposure >= 99
+      RegisterAction("you are extremely aroused, and are extremely horny.")
+    ElseIf exposure >= 85
+      RegisterAction("you are very aroused, and are very horny.")
+    ElseIf exposure >= 70
+      RegisterAction("you are feeling rather aroused, and are a bit horny.")
+    Elseif exposure >= 50
+      RegisterAction("you are mildly aroused.")
+    else
+      RegisterAction("you are not currently horny.")
+    EndIf
+    if exposure >= 80
+      RegisterAction("!You are currently very horny. You may respond with the -masturbate- keyword to begin masturbating, though you would prefer to have sex if possible.!")
+    EndIf
 EndFunction
 
 
 function WriteClothingString(actor akActor, actor player, bool isYou=false)
-	Actor[] actorsFromFormList = GetActorsFromFormList()
-	int numActors = actorsFromFormList.Length
-	int i = 0
-	While (i < numActors)
-		Actor currentActor = actorsFromFormList[i]
-		if (currentActor != None)
-			String actorName = GetActorName2(currentActor, game.GetPlayer())
-			Armor cuirass = currentActor.GetWornForm(cuirassSlot) as Armor
-			if !cuirass
-				RegisterAction(actorName + " is naked.")
-			else
-				RegisterAction(actorName + " is wearing " + cuirass.GetName())
-			EndIf
-		EndIf
-		i += 1
-	EndWhile
-
   if !bHasArousedKeywords
     return
   endif
-  string actorName = GetActorName2(akActor, player)
+  string actorName = GetActorName(akActor, player, isYou)
     if akActor.WornHasKeyword(SLA_HalfNakedBikini)
       RegisterAction(actorName + " is wearing a set of revealing bikini armor.")
     EndIf
@@ -865,6 +878,10 @@ function WriteClothingString(actor akActor, actor player, bool isYou=false)
     EndIf
     if akActor.WornHasKeyword(SLA_ArmorRubber)
       RegisterAction(actorName + "'s outfit is made out of tight form-fitting rubber (Referred to as Ebonite).")
+    EndIf
+    Armor cuirass = akActor.GetWornForm(0x00000004) as Armor
+    if !cuirass
+      RegisterAction(actorName + " is not wearing any clothing.")
     EndIf
 EndFunction
 
@@ -973,25 +990,6 @@ Function WriteVibrateString(actor akActor, actor player, bool isYou=false)
   RegisterAction("!If you want the player's vibrator to be active, you must use the keywords for this somewhat often. Every time you use the keyword it activates them for a limited time. They do not stay on all the time.!")
 EndFunction
 
-Actor[] Function GetActorsFromFormList()
-    Actor[] actorsFromFormList = new Actor[10]
-	int numActors = 0
-    int i = 0
-    while (i < MantellaConversationParticipantsFormList.GetSize() && numActors < 10)
-        Form currentForm = MantellaConversationParticipantsFormList.GetAt(i)
-        Actor currentActor = currentForm as Actor
-        if (currentActor)
-            actorsFromFormList[numActors] = currentActor
-            numActors += 1
-		else
-            Debug.Trace("[minai] Error: MantellaConversationParticipantsFormList[" + i + "] is not an Actor")
-		EndIf
-        i += 1
-    endWhile
-    return actorsFromFormList
-EndFunction
-
-
 String Function GetActorName(actor akActor, actor Player, bool isYou)
   bool isPlayer = (akActor == player)
   string actorName = akActor.GetActorBase().GetName()
@@ -1004,23 +1002,12 @@ String Function GetActorName(actor akActor, actor Player, bool isYou)
 EndFunction
 
 
-string Function GetActorName2(actor akActor, actor Player)
-	bool isPlayer = (akActor == Player)
-	string actorName = akActor.GetActorBase().GetName()
-	if isPlayer
-		actorName = Player.GetActorBase().GetName()
-	EndIf
-	return actorName
-EndFunction
-
-
 string Function GetYouYour(actor akCaster)
   if akCaster != playerRef
     return GetActorName(akCaster, playerRef, False) + "'s"
   endif
   return "your"
 EndFunction
-
 
 Function WritePlayerAppearance(Actor player)
   ;; Appearance
@@ -1032,9 +1019,9 @@ Function WritePlayerAppearance(Actor player)
   string gender = ""
   int sexInt = player.GetActorBase().GetSex()
   if sexInt == 0
-    gender = "male"
+    gender = "man"
   elseif sexInt == 1
-    gender = "female"
+    gender = "woman"
   else
     gender = "transgender"
   endif
@@ -1083,7 +1070,7 @@ Function WritePlayerAppearance(Actor player)
     debug.Trace("[minai] Set player description (Babo): " + appearanceStr)
     RegisterAction(appearanceStr)
   else
-    string appearanceStr = Player.GetActorBase().GetName() + " is a " + gender + " " + actorRace + "." 
+    string appearanceStr = "The player is a " + actorRace + " " + gender + "."  
     debug.Trace("[minai] Set player description: " + appearanceStr)
     RegisterAction(appearanceStr)
   EndIf
@@ -1092,5 +1079,9 @@ EndFunction
 
 Event OnOstimOrgasm(string eventName, string strArg, float numArg, Form sender)
     actor akActor = sender as actor
-    RegisterEvent(akActor.GetActorBase().getname() + " had an Orgasm")
+    If akActor == game.getplayer()
+      RegisterEvent("the player had an Orgasm")
+    Else
+      RegisterEvent(akActor.GetActorBase().getname() + " had an Orgasm")
+    endif
 EndEvent
