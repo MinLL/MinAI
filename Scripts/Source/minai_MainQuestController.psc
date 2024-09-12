@@ -60,7 +60,6 @@ string targetRule = ""
 GlobalVariable minai_GlobalInjectToggle
 GlobalVariable minai_UseOstim
 
-;test
 Event OnInit()
   Maintenance()
 EndEvent
@@ -346,7 +345,7 @@ Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking)
 
   
   if bHasAroused
-    WriteArousedString(actorToSpeakTo, actorSpeaking, player)
+    WriteArousedString()
     WriteClothingString(actorToSpeakTo, player, False)
     WriteClothingString(actorSpeaking, player, True)
   EndIf
@@ -786,58 +785,19 @@ int Function GetActorArousal(actor akActor)
 EndFunction
 
 
-Function WriteArousedString(Actor akTarget, Actor akSpeaker, Actor player)
-		Actor[] actorsFromFormList = GetActorsFromFormList()
-		int numActors = actorsFromFormList.Length
-		int i = 0
-		while (i < numActors)
-			Actor currentActor = actorsFromFormList[i]
-			if (currentActor != None)
-				String actorName = GetActorName2(currentActor, game.GetPlayer())
-				Float arousal = OSLArousedNative.GetArousal(currentActor)
-				RegisterAction(actorName + "'s sexual arousal level is " + arousal + " on a scale of 0-100.")
-			EndIf
-			i += 1
-		EndWhile
-;	
-;/ 		string actorName = GetActorName(akTarget, player, False)
-		int exposure = GetActorArousal(akTarget)
-		if akTarget.getActorBase().getSex() == 0 ; Male
-		  If exposure >= 99
-			RegisterAction(actorName + " appears to have a raging erection that is difficult to hide. " + actorName + " appears to be absolutely desperate for sex.")
-		  ElseIf exposure >= 85
-			RegisterAction(actorName + " appears to have a raging erection that is difficult to hide.")
-		  ElseIf exposure >= 70
-			RegisterAction(actorName + " appears to be aroused, and has flushed cheeks. ")
-		  Elseif exposure >= 50
-			RegisterAction(actorName + " appears to be mildly turned on, and is blushing slightly.")
-		  EndIf
-		else ; Female, or other
-		  If exposure >= 99
-			RegisterAction(actorName + " appears to be extremely aroused, and looks to be absolutely desperate for sex. She has heavy breathing, pointy nipples, and flushed cheeks.")
-		  ElseIf exposure >= 85
-			RegisterAction(actorName + " appears to be very aroused, with pointy nipples and heavy breathing.")
-		  ElseIf exposure >= 70
-			RegisterAction(actorName + " appears to be aroused, and has flushed cheeks.")
-		  Elseif exposure >= 50
-			RegisterAction(actorName + " appears to be mildly turned on, and is blushing slightly.")
-		  EndIf
+Function WriteArousedString()
+	Actor[] actorsFromFormList = GetActorsFromFormList()
+	int numActors = actorsFromFormList.Length
+	int i = 0
+	while (i < numActors)
+		Actor currentActor = actorsFromFormList[i]
+		if (currentActor != None)
+			String actorName = GetActorName2(currentActor, game.GetPlayer())
+			Float arousal = OSLArousedNative.GetArousal(currentActor)
+			RegisterAction(actorName + "'s sexual arousal level is " + arousal + " on a scale of 0-100.")
 		EndIf
-		exposure = GetActorArousal(akSpeaker)
-		If exposure >= 99
-		  RegisterAction("you are extremely aroused, and are extremely horny.")
-		ElseIf exposure >= 85
-		  RegisterAction("you are very aroused, and are very horny.")
-		ElseIf exposure >= 70
-		  RegisterAction("you are feeling rather aroused, and are a bit horny.")
-		Elseif exposure >= 50
-		  RegisterAction("you are mildly aroused.")
-		else
-		  RegisterAction("you are not currently horny.")
-		EndIf
-		if exposure >= 80
-		  RegisterAction("!You are currently very horny. You may respond with the -masturbate- keyword to begin masturbating, though you would prefer to have sex if possible.!")
-		EndIf /;
+		i += 1
+	EndWhile
 EndFunction
 
 
