@@ -1,6 +1,7 @@
 ScriptName minai_MainQuestController extends Quest
 
 int cuirassSlot = 0x00000004
+int genitalSlot = 0x00000034
 
 MantellaConversation mantella
 FormList MantellaConversationParticipantsFormList
@@ -30,6 +31,7 @@ bool bHasSLApp = False
 bool bHasSunhelm = False
 bool bHasOstim = False
 bool bHasOSL = False
+bool bHasTNG = False
 
 Keyword SLA_HalfNakedBikini
 Keyword SLA_ArmorHalfNaked
@@ -129,6 +131,9 @@ Function Maintenance()
     if dftools == None || enslavedebt == None || dfDealController == None
       Debug.Notification("Warning: Some devious followers content will be broken, incompatible version!")
     EndIf
+  EndIf
+  if Game.GetModByName("TheNewGentleman.esp") !=255
+    bHasTNG = True
   EndIf
   if Game.GetModByName("Spank That Ass.esp") != 255
     Debug.Trace("[minai] Found Spank That Ass")
@@ -943,6 +948,29 @@ function WriteClothingString(actor akActor, actor player, bool isYou=false)
 			else
 				RegisterAction(actorName + " is wearing " + cuirass.GetName())
 			EndIf
+			if bHasTNG
+				Form equipmentInSlot52 = akActor.GetWornForm(0x00000034)
+				if equipmentInSlot52 != None
+					Armor armorInSlot52 = equipmentInSlot52 as Armor
+					if armorInSlot52 != None	
+						if armorInSlot52.HasKeyword(TNG_XS)
+							sizeDescription = "an embarrassingly tiny prick"
+						elseif armorInSlot52.HasKeyword(TNG_S)
+							sizeDescription = "a very small cock"
+						elseif armorInSlot52.HasKeyword(TNG_M) || armorInSlot52.HasKeyword(TNG_DefaultSize)
+							sizeDescription = "an average sized cock"
+						elseif armorInSlot52.HasKeyword(TNG_L)
+							sizeDescription = "a large cock"
+						elseif armorInSlot52.HasKeyword(TNG_XL)
+							sizeDescription = "one of the biggest cocks you've ever seen"
+						EndIf
+					EndIf
+				EndIf
+			EndIf
+		if sizeDescription != ""
+			RegisterAction("You can see that " + actorName + " has " + sizeDescription + ".")
+		EndIf
+	EndIf
 			if !bHasArousedKeywords
 				return
 			endif
