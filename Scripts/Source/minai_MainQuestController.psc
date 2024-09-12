@@ -1,5 +1,7 @@
 ScriptName minai_MainQuestController extends Quest
 
+int cuirassSlot = 0x00000004
+
 MantellaConversation mantella
 FormList MantellaConversationParticipantsFormList
 
@@ -59,13 +61,13 @@ GlobalVariable EnslaveDebt
 GlobalVariable ContractRemaining
 string targetRule = ""
 
-GlobalVariable minai_GlobalInjectToggle
-GlobalVariable minai_UseOstim
-
 Form Gold
 Quest DialogueGeneric
 Faction JobInnKeeper
 Faction JobInnServer
+
+GlobalVariable minai_GlobalInjectToggle
+GlobalVariable minai_UseOstim
 
 Event OnInit()
   Maintenance()
@@ -208,8 +210,6 @@ Function Maintenance()
 
     if !sunhelmMain || !sunhelmWeather|| !sunhelmFoodEatSound
       Debug.Trace("[minai] Could not load all sunhelm references")
-      Debug.Notification("Incompatible version of Sunhelm. AI Integrations Disabled.")
-      bHasSunhelm = False
     EndIf    
   EndIf
   Debug.Trace("[minai] Initialization complete.")
@@ -223,7 +223,7 @@ Function Maintenance()
     bHasOSL = True
   EndIf
 
-  ; Vanilla Integrations
+   ; Vanilla Integrations
   gold = Game.GetFormFromFile(0x0000000F, "Skyrim.esm")
   if !gold
     Debug.Trace("[minai] - Could not get reference to gold?")
@@ -374,8 +374,7 @@ Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking)
 
   
   if bHasAroused
-    WriteArousedString(actorToSpeakTo, actorSpeaking, player)
-    WriteClothingString(actorToSpeakTo, player, False)
+    WriteArousedString()
     WriteClothingString(actorSpeaking, player, True)
   EndIf
   
@@ -465,13 +464,51 @@ Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking)
     if bHasSunhelm && (actorSpeaking.IsInFaction(JobInnServer) || actorSpeaking.IsInFaction(JobInnKeeper)) && bPlayerInScene
       RegisterAction("!You are a server at an inn. If you want to serve " + actorName + " food, include the keyword '-feedplayer-' keyword in your response.!")
     EndIf
-    
+
     ; Vanilla Integrations
     if actorSpeaking.IsInFaction(JobInnKeeper) && bPlayerInScene
       RegisterAction("!You are an innkeeper at an inn. If you want to allow the player to rent a room for the night at your inn, respond with the keyword '-rentroom-'.!")
     EndIf
     string reminderStr = "Remember to use the previously identified keywords in your response when you want to perform an action such as hugging, kissing, molesting, spanking, vibrating, having sex, giving an orgasm to, or teasing " + actorName + "."
     RegisterAction(reminderStr + "\n!" + reminderStr + "!")
+EndFunction
+
+
+Function FeedPlayer(Actor akSpeaker, Actor player)
+  if player.GetItemCount(Gold) < 20
+    Debug.Notification("AI: Player has insufficient gold for meal.")
+    return
+  EndIf
+  player.RemoveItem(Gold, 20)
+
+  int thirstVal = 100
+  float perkModifier = 0.0 ; Depricated
+  if(sunhelmMain.Thirst.IsRunning())
+      sunhelmMain.Thirst.DecreaseThirstLevel(thirstVal)
+  endif
+  if(sunhelmMain.Hunger.IsRunning())
+      sunhelmMain.Hunger.DecreaseHungerLevel(165 + (165 * perkModifier))
+  endif
+  sunhelmFoodEatSound.Play(Game.GetPlayer())
+   If Player.GetAnimationVariableInt("i1stPerson") as Int == 1
+      if(Player.GetSitState() == 0)
+          ;    Debug.SendAnimationEvent(Player, "idleEatingStandingStart")
+          ;    Utility.Wait(7.0)
+          ;    Player.PlayIdle(IdleStop_Loose)
+      elseif(Player.GetSitState() == 3)
+          Game.ForceThirdPerson()
+          Utility.Wait(1.0)
+          Debug.SendAnimationEvent(Player, "ChairEatingStart")
+          Utility.Wait(1.0)
+          Game.ForceFirstPerson()
+      endif
+  else
+      if(Player.GetSitState() == 0)
+          Debug.SendAnimationEvent(Player, "idleEatingStandingStart")
+      elseif(Player.GetSitState() == 3)
+          Debug.SendAnimationEvent(Player, "ChairEatingStart")
+      endif
+  endif
 EndFunction
 
 
@@ -607,43 +644,6 @@ Function UpdateArousal(actor akTarget, int Arousal)
   EndIf
 EndFunction
 
-Function FeedPlayer(Actor akSpeaker, Actor player)
-  if player.GetItemCount(Gold) < 20
-    Debug.Notification("AI: Player has insufficient gold for meal.")
-    return
-  EndIf
-  player.RemoveItem(Gold, 20)
-
-  int thirstVal = 100
-  float perkModifier = 0.0 ; Depricated
-  if(sunhelmMain.Thirst.IsRunning())
-      sunhelmMain.Thirst.DecreaseThirstLevel(thirstVal)
-  endif
-  if(sunhelmMain.Hunger.IsRunning())
-      sunhelmMain.Hunger.DecreaseHungerLevel(165 + (165 * perkModifier))
-  endif
-  sunhelmFoodEatSound.Play(Game.GetPlayer())
-   If Player.GetAnimationVariableInt("i1stPerson") as Int == 1
-      if(Player.GetSitState() == 0)
-          ;    Debug.SendAnimationEvent(Player, "idleEatingStandingStart")
-          ;    Utility.Wait(7.0)
-          ;    Player.PlayIdle(IdleStop_Loose)
-      elseif(Player.GetSitState() == 3)
-          Game.ForceThirdPerson()
-          Utility.Wait(1.0)
-          Debug.SendAnimationEvent(Player, "ChairEatingStart")
-          Utility.Wait(1.0)
-          Game.ForceFirstPerson()
-      endif
-  else
-      if(Player.GetSitState() == 0)
-          Debug.SendAnimationEvent(Player, "idleEatingStandingStart")
-      elseif(Player.GetSitState() == 3)
-          Debug.SendAnimationEvent(Player, "ChairEatingStart")
-      endif
-  endif
-EndFunction
-
 
 Function ActionResponse(Form actorToSpeakTo,Form actorSpeaking, string sayLine)
   ; akTarget is the person being talked to.
@@ -655,18 +655,13 @@ Function ActionResponse(Form actorToSpeakTo,Form actorSpeaking, string sayLine)
     return
   EndIf
   bool bPlayerInScene = False
+	if actorSpeaking == playerRef || actorToSpeakTo == playerRef
+		Debug.Trace("[minai] Player in Scene")
+		bPlayerInScene = True
+	EndIf
   Actor Player = game.GetPlayer()
   
-  Actor[] actorsFromFormList = new Actor[12]
-  int i = 0
-  While (i < MantellaConversationParticipantsFormList.GetSize())
-    actorsFromFormList[i] = MantellaConversationParticipantsFormList.GetAt(i) as Actor
-    if actorsFromFormList[i] == Player
-      bPlayerInScene = True
-      Debug.Trace("[minai] Player found in actorsFromFormList at index " + i)
-    EndIf
-    i += 1
-  EndWhile
+  Actor[] actorsFromFormList = GetActorsFromFormList()
 
   if (!bPlayerInScene)
     Debug.Trace("[minai] Player not found in actorsFromFormList")
@@ -874,105 +869,90 @@ int Function GetActorArousal(actor akActor)
 EndFunction
 
 
-Function WriteArousedString(Actor akTarget, Actor akSpeaker, Actor player)
-    string actorName = GetActorName(akTarget, player, False)
-    int exposure = GetActorArousal(akTarget)
-    if akTarget.getActorBase().getSex() == 0 ; Male
-      If exposure >= 99
-        RegisterAction(actorName + " appears to have a raging erection that is difficult to hide. " + actorName + " appears to be absolutely desperate for sex.")
-      ElseIf exposure >= 85
-        RegisterAction(actorName + " appears to have a raging erection that is difficult to hide.")
-      ElseIf exposure >= 70
-        RegisterAction(actorName + " appears to be aroused, and has flushed cheeks. ")
-      Elseif exposure >= 50
-        RegisterAction(actorName + " appears to be mildly turned on, and is blushing slightly.")
-      EndIf
-    else ; Female, or other
-      If exposure >= 99
-        RegisterAction(actorName + " appears to be extremely aroused, and looks to be absolutely desperate for sex. She has heavy breathing, pointy nipples, and flushed cheeks.")
-      ElseIf exposure >= 85
-        RegisterAction(actorName + " appears to be very aroused, with pointy nipples and heavy breathing.")
-      ElseIf exposure >= 70
-        RegisterAction(actorName + " appears to be aroused, and has flushed cheeks.")
-      Elseif exposure >= 50
-        RegisterAction(actorName + " appears to be mildly turned on, and is blushing slightly.")
-      EndIf
-    EndIf
-    exposure = GetActorArousal(akSpeaker)
-    If exposure >= 99
-      RegisterAction("you are extremely aroused, and are extremely horny.")
-    ElseIf exposure >= 85
-      RegisterAction("you are very aroused, and are very horny.")
-    ElseIf exposure >= 70
-      RegisterAction("you are feeling rather aroused, and are a bit horny.")
-    Elseif exposure >= 50
-      RegisterAction("you are mildly aroused.")
-    else
-      RegisterAction("you are not currently horny.")
-    EndIf
-    if exposure >= 80
-      RegisterAction("!You are currently very horny. You may respond with the -masturbate- keyword to begin masturbating, though you would prefer to have sex if possible.!")
-    EndIf
+Function WriteArousedString()
+	Actor[] actorsFromFormList = GetActorsFromFormList()
+	int numActors = actorsFromFormList.Length
+	int i = 0
+	while (i < numActors)
+		Actor currentActor = actorsFromFormList[i]
+		if (currentActor != None)
+			String actorName = GetActorName2(currentActor, game.GetPlayer())
+			Float arousal = OSLArousedNative.GetArousal(currentActor)
+			RegisterAction(actorName + "'s sexual arousal level is " + arousal + " on a scale of 0-100.")
+		EndIf
+		i += 1
+	EndWhile
 EndFunction
 
 
 function WriteClothingString(actor akActor, actor player, bool isYou=false)
-  if !bHasArousedKeywords
-    return
-  endif
-  string actorName = GetActorName(akActor, player, isYou)
-    if akActor.WornHasKeyword(SLA_HalfNakedBikini)
-      RegisterAction(actorName + " is wearing a set of revealing bikini armor.")
-    EndIf
-    if akActor.WornHasKeyword(SLA_ArmorHalfNaked)
-      RegisterAction(actorName + " is wearing very revealing attire, leaving them half naked.")
-    EndIf
-    if akActor.WornHasKeyword(SLA_Brabikini)
-      RegisterAction(actorName + " is wearing a bra underneath her other equipment.")
-    EndIf
-      if akActor.WornHasKeyword(SLA_ThongT) || akActor.WornHasKeyword(SLA_ThongLowLeg) || akActor.WornHasKeyword(SLA_ThongCString) || akActor.WornHasKeyword(SLA_ThongGstring)
-      RegisterAction(actorName + " is wearing a thong underneath her other equipment.")
-    EndIf
-    if akActor.WornHasKeyword(SLA_PantiesNormal)
-      RegisterAction(actorName + " is wearing plain panties underneath her other equipment.")
-    EndIf
-    if akActor.WornHasKeyword(SLA_KillerHeels) || akActor.WornHasKeyword(SLA_BootsHeels)
-      RegisterAction(actorName + " is wearing a set of high-heels.")
-    EndIf
-    if akActor.WornHasKeyword(SLA_PantsNormal)
-      RegisterAction(actorName + " is wearing a set of ordinary pants.")
-    EndIf
-    if akActor.WornHasKeyword(SLA_MicroHotPants)
-      RegisterAction(actorName + " is wearing a set of short hot-pants that accentuate her ass.")
-    EndIf
-    if akActor.WornHasKeyword(SLA_ArmorHarness)
-      RegisterAction(actorName + " is wearing a form-fitting body harness.")
-    EndIf
-    if akActor.WornHasKeyword(SLA_ArmorSpendex)
-      RegisterAction(actorName + "'s outfit is made out of latex (Referred to as Ebonite).")
-    EndIf
-    if akActor.WornHasKeyword(SLA_ArmorTransparent)
-      RegisterAction(actorName + "'s outfit is transparent, leaving nothing to the imagination.")
-    EndIf
-    if akActor.WornHasKeyword(SLA_ArmorLewdLeotard)
-      RegisterAction(actorName + " is wearing a sheer, revealing leotard leaving very little to the imagination.")
-    EndIf
-    if akActor.WornHasKeyword(SLA_PelvicCurtain)
-      RegisterAction(actorName + "'s pussy is covered only by a sheer curtain of fabric.")
-    EndIf
-    if akActor.WornHasKeyword(SLA_FullSkirt)
-      RegisterAction(actorName + " is wearing a full length skirt that goes down to her knees.")
-    EndIf
-    if akActor.WornHasKeyword(SLA_MiniSkirt) || akActor.WornHasKeyword(SLA_MicroSkirt)
-      RegisterAction(actorName + " is wearing a short mini-skirt that barely covers her ass. Her underwear or panties are sometimes visible underneath when she moves.")
-    EndIf
-    if akActor.WornHasKeyword(SLA_ArmorRubber)
-      RegisterAction(actorName + "'s outfit is made out of tight form-fitting rubber (Referred to as Ebonite).")
-    EndIf
-    Armor cuirass = akActor.GetWornForm(0x00000004) as Armor
-    if !cuirass
-      RegisterAction(actorName + " is not wearing any clothing.")
-    EndIf
+	Actor[] actorsFromFormList = GetActorsFromFormList()
+	int numActors = actorsFromFormList.Length
+	int i = 0
+	While (i < numActors)
+		Actor currentActor = actorsFromFormList[i]
+		if (currentActor != None)
+			String actorName = GetActorName2(currentActor, game.GetPlayer())
+			Armor cuirass = currentActor.GetWornForm(cuirassSlot) as Armor
+			if !cuirass
+				RegisterAction(actorName + " is naked.")
+			else
+				RegisterAction(actorName + " is wearing " + cuirass.GetName())
+			EndIf
+			if !bHasArousedKeywords
+				return
+			endif
+			if currentActor.WornHasKeyword(SLA_HalfNakedBikini)
+			  RegisterAction(actorName + " is wearing a set of revealing bikini armor.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_ArmorHalfNaked)
+			  RegisterAction(actorName + " is wearing very revealing attire, leaving them half naked.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_Brabikini)
+			  RegisterAction(actorName + " is wearing a bra underneath her other equipment.")
+			EndIf
+			  if currentActor.WornHasKeyword(SLA_ThongT) || currentActor.WornHasKeyword(SLA_ThongLowLeg) || currentActor.WornHasKeyword(SLA_ThongCString) || currentActor.WornHasKeyword(SLA_ThongGstring)
+			  RegisterAction(actorName + " is wearing a thong underneath her other equipment.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_PantiesNormal)
+			  RegisterAction(actorName + " is wearing plain panties underneath her other equipment.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_KillerHeels) || currentActor.WornHasKeyword(SLA_BootsHeels)
+			  RegisterAction(actorName + " is wearing a set of high-heels.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_PantsNormal)
+			  RegisterAction(actorName + " is wearing a set of ordinary pants.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_MicroHotPants)
+			  RegisterAction(actorName + " is wearing a set of short hot-pants that accentuate her ass.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_ArmorHarness)
+			  RegisterAction(actorName + " is wearing a form-fitting body harness.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_ArmorSpendex)
+			  RegisterAction(actorName + "'s outfit is made out of latex (Referred to as Ebonite).")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_ArmorTransparent)
+			  RegisterAction(actorName + "'s outfit is transparent, leaving nothing to the imagination.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_ArmorLewdLeotard)
+			  RegisterAction(actorName + " is wearing a sheer, revealing leotard leaving very little to the imagination.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_PelvicCurtain)
+			  RegisterAction(actorName + "'s pussy is covered only by a sheer curtain of fabric.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_FullSkirt)
+			  RegisterAction(actorName + " is wearing a full length skirt that goes down to her knees.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_MiniSkirt) || currentActor.WornHasKeyword(SLA_MicroSkirt)
+			  RegisterAction(actorName + " is wearing a short mini-skirt that barely covers her ass. Her underwear or panties are sometimes visible underneath when she moves.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_ArmorRubber)
+			  RegisterAction(actorName + "'s outfit is made out of tight form-fitting rubber (Referred to as Ebonite).")
+			EndIf
+		EndIf
+		i += 1
+	EndWhile
 EndFunction
 
 
@@ -1080,6 +1060,25 @@ Function WriteVibrateString(actor akActor, actor player, bool isYou=false)
   RegisterAction("!If you want the player's vibrator to be active, you must use the keywords for this somewhat often. Every time you use the keyword it activates them for a limited time. They do not stay on all the time.!")
 EndFunction
 
+Actor[] Function GetActorsFromFormList()
+    Actor[] actorsFromFormList = new Actor[10]
+	int numActors = 0
+    int i = 0
+    while (i < MantellaConversationParticipantsFormList.GetSize() && numActors < 10)
+        Form currentForm = MantellaConversationParticipantsFormList.GetAt(i)
+        Actor currentActor = currentForm as Actor
+        if (currentActor)
+            actorsFromFormList[numActors] = currentActor
+            numActors += 1
+		else
+            Debug.Trace("[minai] Error: MantellaConversationParticipantsFormList[" + i + "] is not an Actor")
+		EndIf
+        i += 1
+    endWhile
+    return actorsFromFormList
+EndFunction
+
+
 String Function GetActorName(actor akActor, actor Player, bool isYou)
   bool isPlayer = (akActor == player)
   string actorName = akActor.GetActorBase().GetName()
@@ -1092,12 +1091,23 @@ String Function GetActorName(actor akActor, actor Player, bool isYou)
 EndFunction
 
 
+string Function GetActorName2(actor akActor, actor Player)
+	bool isPlayer = (akActor == Player)
+	string actorName = akActor.GetActorBase().GetName()
+	if isPlayer
+		actorName = Player.GetActorBase().GetName()
+	EndIf
+	return actorName
+EndFunction
+
+
 string Function GetYouYour(actor akCaster)
   if akCaster != playerRef
     return GetActorName(akCaster, playerRef, False) + "'s"
   endif
   return "your"
 EndFunction
+
 
 Function WritePlayerAppearance(Actor player)
   ;; Appearance
@@ -1109,9 +1119,9 @@ Function WritePlayerAppearance(Actor player)
   string gender = ""
   int sexInt = player.GetActorBase().GetSex()
   if sexInt == 0
-    gender = "man"
+    gender = "male"
   elseif sexInt == 1
-    gender = "woman"
+    gender = "female"
   else
     gender = "transgender"
   endif
@@ -1160,7 +1170,7 @@ Function WritePlayerAppearance(Actor player)
     debug.Trace("[minai] Set player description (Babo): " + appearanceStr)
     RegisterAction(appearanceStr)
   else
-    string appearanceStr = "The player is a " + actorRace + " " + gender + "."  
+    string appearanceStr = Player.GetActorBase().GetName() + " is a " + gender + " " + actorRace + "." 
     debug.Trace("[minai] Set player description: " + appearanceStr)
     RegisterAction(appearanceStr)
   EndIf
@@ -1169,9 +1179,5 @@ EndFunction
 
 Event OnOstimOrgasm(string eventName, string strArg, float numArg, Form sender)
     actor akActor = sender as actor
-    If akActor == game.getplayer()
-      RegisterEvent("the player had an Orgasm")
-    Else
-      RegisterEvent(akActor.GetActorBase().getname() + " had an Orgasm")
-    endif
+    RegisterEvent(akActor.GetActorBase().getname() + " had an Orgasm")
 EndEvent
