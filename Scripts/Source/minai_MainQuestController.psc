@@ -581,16 +581,7 @@ Function ActionResponse(Form actorToSpeakTo,Form actorSpeaking, string sayLine)
   bool bPlayerInScene = False
   Actor Player = game.GetPlayer()
   
-  Actor[] actorsFromFormList = new Actor[12]
-  int i = 0
-  While (i < MantellaConversationParticipantsFormList.GetSize())
-    actorsFromFormList[i] = MantellaConversationParticipantsFormList.GetAt(i) as Actor
-    if actorsFromFormList[i] == Player
-      bPlayerInScene = True
-      Debug.Trace("[minai] Player found in actorsFromFormList at index " + i)
-    EndIf
-    i += 1
-  EndWhile
+  Actor[] actorsFromFormList = GetActorsFromFormList()
 
   if (!bPlayerInScene)
     Debug.Trace("[minai] Player not found in actorsFromFormList")
