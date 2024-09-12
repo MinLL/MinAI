@@ -461,9 +461,8 @@ Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking)
       EndIf
     EndIf
 
-    Debug.Trace("MINAI - Test " + actorSpeaking.IsInFaction(JobInnServer) + ", " + actorSpeaking.IsInFaction(JobInnKeeper))
     ; Sunhelm Integrations
-    if bHasSunhelm && actorSpeaking.IsInFaction(JobInnServer) && bPlayerInScene
+    if bHasSunhelm && (actorSpeaking.IsInFaction(JobInnServer) || actorSpeaking.IsInFaction(JobInnKeeper)) && bPlayerInScene
       RegisterAction("!You are a server at an inn. If you want to serve " + actorName + " food, include the keyword '-feedplayer-' keyword in your response.!")
     EndIf
     
