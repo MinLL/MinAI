@@ -11,9 +11,13 @@ Actor playerRef
 _DFtools dftools
 BaboDialogueConfigMenu baboConfigs
 SLAppPCSexQuestScript slapp
-_shweathersystem sunhelm
 _DFDealUberController dfDealController
 slaUtilScr Aroused
+
+_shweathersystem sunhelmWeather
+_SunHelmMain property sunhelmMain auto
+Sound sunhelmFoodEatSound
+Sound property sunhelmFillBottlesSound auto
 
 bool bHasAroused = False
 bool bHasArousedKeywords = False
@@ -56,6 +60,11 @@ GlobalVariable Debt
 GlobalVariable EnslaveDebt
 GlobalVariable ContractRemaining
 string targetRule = ""
+
+Form Gold
+Quest DialogueGeneric
+Faction JobInnKeeper
+Faction JobInnServer
 
 GlobalVariable minai_GlobalInjectToggle
 GlobalVariable minai_UseOstim
@@ -194,11 +203,13 @@ Function Maintenance()
   if Game.GetModByName("SunhelmSurvival.esp") != 255
     bHasSunhelm = True
     Debug.Trace("[minai] Found Sunhelm")
-    sunhelm = Game.GetFormFromFile(0x989760, "SunhelmSurvival.esp") as _shweathersystem
-    if !sunhelm
-      Debug.Trace("[minai] Could not find _sunhelmeathersystem")
-      Debug.Notification("Incompatible version of Sunhelm. AI Integrations Disabled.")
-      bHasSunhelm = False
+    sunhelmMain = Game.GetFormFromFile(0x000D61, "SunhelmSurvival.esp") as _sunhelmmain
+    sunhelmWeather = Game.GetFormFromFile(0x989760, "SunhelmSurvival.esp") as _shweathersystem
+    sunhelmFoodEatSound = Game.GetFormFromFile(0x5674E1, "SunhelmSurvival.esp") as Sound
+    sunhelmFillBottlesSound = Game.GetFormFromFile(0x4BB249, "SunhelmSurvival.esp") as Sound
+
+    if !sunhelmMain || !sunhelmWeather|| !sunhelmFoodEatSound
+      Debug.Trace("[minai] Could not load all sunhelm references")
     EndIf    
   EndIf
   Debug.Trace("[minai] Initialization complete.")
@@ -210,6 +221,24 @@ Function Maintenance()
 
   if Game.GetModByName("OSLAroused.esp") != 255
     bHasOSL = True
+  EndIf
+
+   ; Vanilla Integrations
+  gold = Game.GetFormFromFile(0x0000000F, "Skyrim.esm")
+  if !gold
+    Debug.Trace("[minai] - Could not get reference to gold?")
+  EndIf
+
+  DialogueGeneric = Game.GetFormFromFile(0x13EB3, "Skyrim.esm") as Quest
+  if !DialogueGeneric
+    Debug.Trace("[minai] - Could not get handle to DialogueGeneric.")
+  EndIf
+
+  JobInnKeeper = Game.GetFormFromFile(0x5091B, "Skyrim.esm") as Faction
+  JobInnServer = Game.GetFormFromFile(0xDEE93, "Skyrim.esm") as Faction
+
+  if !JobInnKeeper || !JobInnServer
+    Debug.Trace("[minai] - Failed to fetch vanilla factions")
   EndIf
   
   minai_GlobalInjectToggle = Game.GetFormFromFile(0x0905, "MantellaMinAI.esp") as GlobalVariable
@@ -430,8 +459,56 @@ Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking)
 	; RegisterAction("!If the player tells you that they refuse, respond with the keyword: -rejectdeal- in your response.!")
       EndIf
     EndIf
+
+    ; Sunhelm Integrations
+    if bHasSunhelm && (actorSpeaking.IsInFaction(JobInnServer) || actorSpeaking.IsInFaction(JobInnKeeper)) && bPlayerInScene
+      RegisterAction("!You are a server at an inn. If you want to serve " + actorName + " food, include the keyword '-feedplayer-' keyword in your response.!")
+    EndIf
+
+    ; Vanilla Integrations
+    if actorSpeaking.IsInFaction(JobInnKeeper) && bPlayerInScene
+      RegisterAction("!You are an innkeeper at an inn. If you want to allow the player to rent a room for the night at your inn, respond with the keyword '-rentroom-'.!")
+    EndIf
     string reminderStr = "Remember to use the previously identified keywords in your response when you want to perform an action such as hugging, kissing, molesting, spanking, vibrating, having sex, giving an orgasm to, or teasing " + actorName + "."
     RegisterAction(reminderStr + "\n!" + reminderStr + "!")
+EndFunction
+
+
+Function FeedPlayer(Actor akSpeaker, Actor player)
+  if player.GetItemCount(Gold) < 20
+    Debug.Notification("AI: Player has insufficient gold for meal.")
+    return
+  EndIf
+  player.RemoveItem(Gold, 20)
+
+  int thirstVal = 100
+  float perkModifier = 0.0 ; Depricated
+  if(sunhelmMain.Thirst.IsRunning())
+      sunhelmMain.Thirst.DecreaseThirstLevel(thirstVal)
+  endif
+  if(sunhelmMain.Hunger.IsRunning())
+      sunhelmMain.Hunger.DecreaseHungerLevel(165 + (165 * perkModifier))
+  endif
+  sunhelmFoodEatSound.Play(Game.GetPlayer())
+   If Player.GetAnimationVariableInt("i1stPerson") as Int == 1
+      if(Player.GetSitState() == 0)
+          ;    Debug.SendAnimationEvent(Player, "idleEatingStandingStart")
+          ;    Utility.Wait(7.0)
+          ;    Player.PlayIdle(IdleStop_Loose)
+      elseif(Player.GetSitState() == 3)
+          Game.ForceThirdPerson()
+          Utility.Wait(1.0)
+          Debug.SendAnimationEvent(Player, "ChairEatingStart")
+          Utility.Wait(1.0)
+          Game.ForceFirstPerson()
+      endif
+  else
+      if(Player.GetSitState() == 0)
+          Debug.SendAnimationEvent(Player, "idleEatingStandingStart")
+      elseif(Player.GetSitState() == 3)
+          Debug.SendAnimationEvent(Player, "ChairEatingStart")
+      endif
+  endif
 EndFunction
 
 
@@ -719,6 +796,19 @@ Function ActionResponse(Form actorToSpeakTo,Form actorSpeaking, string sayLine)
       dfDealController.RejectDeal(targetRule)
       targetRule = ""
     EndIf
+
+    ; Sunhelm
+    if stringUtil.Find(sayLine, "-feedplayer-") != -1
+      FeedPlayer(akSpeaker, Player)
+    EndIf
+    ; Vanilla functionality
+    if stringUtil.Find(sayLine, "-rentroom-") != -1
+      if player.GetItemCount(Gold) < (DialogueGeneric as DialogueGenericScript).RoomRentalCost.GetValue() as Int
+        Debug.Notification("AI: Player does not have enough gold to rent room.")
+      Else
+        (akSpeaker as RentRoomScript).RentRoom(DialogueGeneric as DialogueGenericScript)
+      EndIf
+    EndIf  
     ; Replicated the functions from MGO's NSFW plugin, as they're handy
     if stringutil.Find(sayLine, "-gear-") != -1
       akSpeaker.OpenInventory(true)
