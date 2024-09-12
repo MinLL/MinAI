@@ -1,5 +1,7 @@
 ScriptName minai_MainQuestController extends Quest
 
+int cuirassSlot = 0x00000004
+
 MantellaConversation mantella
 FormList MantellaConversationParticipantsFormList
 
@@ -9,13 +11,9 @@ Actor playerRef
 _DFtools dftools
 BaboDialogueConfigMenu baboConfigs
 SLAppPCSexQuestScript slapp
+_shweathersystem sunhelm
 _DFDealUberController dfDealController
 slaUtilScr Aroused
-
-_shweathersystem sunhelmWeather
-_SunHelmMain property sunhelmMain auto
-Sound sunhelmFoodEatSound
-Sound property sunhelmFillBottlesSound auto
 
 bool bHasAroused = False
 bool bHasArousedKeywords = False
@@ -61,11 +59,6 @@ string targetRule = ""
 
 GlobalVariable minai_GlobalInjectToggle
 GlobalVariable minai_UseOstim
-
-Form Gold
-Quest DialogueGeneric
-Faction JobInnKeeper
-Faction JobInnServer
 
 Event OnInit()
   Maintenance()
@@ -201,13 +194,9 @@ Function Maintenance()
   if Game.GetModByName("SunhelmSurvival.esp") != 255
     bHasSunhelm = True
     Debug.Trace("[minai] Found Sunhelm")
-    sunhelmMain = Game.GetFormFromFile(0x000D61, "SunhelmSurvival.esp") as _sunhelmmain
-    sunhelmWeather = Game.GetFormFromFile(0x989760, "SunhelmSurvival.esp") as _shweathersystem
-    sunhelmFoodEatSound = Game.GetFormFromFile(0x5674E1, "SunhelmSurvival.esp") as Sound
-    sunhelmFillBottlesSound = Game.GetFormFromFile(0x4BB249, "SunhelmSurvival.esp") as Sound
-
-    if !sunhelmMain || !sunhelmWeather|| !sunhelmFoodEatSound
-      Debug.Trace("[minai] Could not load all sunhelm references")
+    sunhelm = Game.GetFormFromFile(0x989760, "SunhelmSurvival.esp") as _shweathersystem
+    if !sunhelm
+      Debug.Trace("[minai] Could not find _sunhelmeathersystem")
       Debug.Notification("Incompatible version of Sunhelm. AI Integrations Disabled.")
       bHasSunhelm = False
     EndIf    
@@ -221,24 +210,6 @@ Function Maintenance()
 
   if Game.GetModByName("OSLAroused.esp") != 255
     bHasOSL = True
-  EndIf
-
-  ; Vanilla Integrations
-  gold = Game.GetFormFromFile(0x0000000F, "Skyrim.esm")
-  if !gold
-    Debug.Trace("[minai] - Could not get reference to gold?")
-  EndIf
-
-  DialogueGeneric = Game.GetFormFromFile(0x13EB3, "Skyrim.esm") as Quest
-  if !DialogueGeneric
-    Debug.Trace("[minai] - Could not get handle to DialogueGeneric.")
-  EndIf
-
-  JobInnKeeper = Game.GetFormFromFile(0x5091B, "Skyrim.esm") as Faction
-  JobInnServer = Game.GetFormFromFile(0xDEE93, "Skyrim.esm") as Faction
-
-  if !JobInnKeeper || !JobInnServer
-    Debug.Trace("[minai] - Failed to fetch vanilla factions")
   EndIf
   
   minai_GlobalInjectToggle = Game.GetFormFromFile(0x0905, "MantellaMinAI.esp") as GlobalVariable
@@ -459,16 +430,6 @@ Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking)
 	; RegisterAction("!If the player tells you that they refuse, respond with the keyword: -rejectdeal- in your response.!")
       EndIf
     EndIf
-
-    ; Sunhelm Integrations
-    if bHasSunhelm && (actorSpeaking.IsInFaction(JobInnServer) || actorSpeaking.IsInFaction(JobInnKeeper)) && bPlayerInScene
-      RegisterAction("!You are a server at an inn. If you want to serve " + actorName + " food, include the keyword '-feedplayer-' keyword in your response.!")
-    EndIf
-    
-    ; Vanilla Integrations
-    if actorSpeaking.IsInFaction(JobInnKeeper) && bPlayerInScene
-      RegisterAction("!You are an innkeeper at an inn. If you want to allow the player to rent a room for the night at your inn, respond with the keyword '-rentroom-'.!")
-    EndIf
     string reminderStr = "Remember to use the previously identified keywords in your response when you want to perform an action such as hugging, kissing, molesting, spanking, vibrating, having sex, giving an orgasm to, or teasing " + actorName + "."
     RegisterAction(reminderStr + "\n!" + reminderStr + "!")
 EndFunction
@@ -606,43 +567,6 @@ Function UpdateArousal(actor akTarget, int Arousal)
   EndIf
 EndFunction
 
-Function FeedPlayer(Actor akSpeaker, Actor player)
-  if player.GetItemCount(Gold) < 20
-    Debug.Notification("AI: Player has insufficient gold for meal.")
-    return
-  EndIf
-  player.RemoveItem(Gold, 20)
-
-  int thirstVal = 100
-  float perkModifier = 0.0 ; Depricated
-  if(sunhelmMain.Thirst.IsRunning())
-      sunhelmMain.Thirst.DecreaseThirstLevel(thirstVal)
-  endif
-  if(sunhelmMain.Hunger.IsRunning())
-      sunhelmMain.Hunger.DecreaseHungerLevel(165 + (165 * perkModifier))
-  endif
-  sunhelmFoodEatSound.Play(Game.GetPlayer())
-   If Player.GetAnimationVariableInt("i1stPerson") as Int == 1
-      if(Player.GetSitState() == 0)
-          ;    Debug.SendAnimationEvent(Player, "idleEatingStandingStart")
-          ;    Utility.Wait(7.0)
-          ;    Player.PlayIdle(IdleStop_Loose)
-      elseif(Player.GetSitState() == 3)
-          Game.ForceThirdPerson()
-          Utility.Wait(1.0)
-          Debug.SendAnimationEvent(Player, "ChairEatingStart")
-          Utility.Wait(1.0)
-          Game.ForceFirstPerson()
-      endif
-  else
-      if(Player.GetSitState() == 0)
-          Debug.SendAnimationEvent(Player, "idleEatingStandingStart")
-      elseif(Player.GetSitState() == 3)
-          Debug.SendAnimationEvent(Player, "ChairEatingStart")
-      endif
-  endif
-EndFunction
-
 
 Function ActionResponse(Form actorToSpeakTo,Form actorSpeaking, string sayLine)
   ; akTarget is the person being talked to.
@@ -654,18 +578,13 @@ Function ActionResponse(Form actorToSpeakTo,Form actorSpeaking, string sayLine)
     return
   EndIf
   bool bPlayerInScene = False
+	if actorSpeaking == playerRef || actorToSpeakTo == playerRef
+		Debug.Trace("[minai] Player in Scene")
+		bPlayerInScene = True
+	EndIf
   Actor Player = game.GetPlayer()
   
-  Actor[] actorsFromFormList = new Actor[12]
-  int i = 0
-  While (i < MantellaConversationParticipantsFormList.GetSize())
-    actorsFromFormList[i] = MantellaConversationParticipantsFormList.GetAt(i) as Actor
-    if actorsFromFormList[i] == Player
-      bPlayerInScene = True
-      Debug.Trace("[minai] Player found in actorsFromFormList at index " + i)
-    EndIf
-    i += 1
-  EndWhile
+  Actor[] actorsFromFormList = GetActorsFromFormList()
 
   if (!bPlayerInScene)
     Debug.Trace("[minai] Player not found in actorsFromFormList")
@@ -800,19 +719,6 @@ Function ActionResponse(Form actorToSpeakTo,Form actorSpeaking, string sayLine)
       dfDealController.RejectDeal(targetRule)
       targetRule = ""
     EndIf
-
-    ; Sunhelm
-    if stringUtil.Find(sayLine, "-feedplayer-") != -1
-      FeedPlayer(akSpeaker, Player)
-    EndIf
-    ; Vanilla functionality
-    if stringUtil.Find(sayLine, "-rentroom-") != -1
-      if player.GetItemCount(Gold) < (DialogueGeneric as DialogueGenericScript).RoomRentalCost.GetValue() as Int
-        Debug.Notification("AI: Player does not have enough gold to rent room.")
-      Else
-        (akSpeaker as RentRoomScript).RentRoom(DialogueGeneric as DialogueGenericScript)
-      EndIf
-    EndIf  
     ; Replicated the functions from MGO's NSFW plugin, as they're handy
     if stringutil.Find(sayLine, "-gear-") != -1
       akSpeaker.OpenInventory(true)
@@ -873,45 +779,19 @@ int Function GetActorArousal(actor akActor)
 EndFunction
 
 
-Function WriteArousedString(Actor akTarget, Actor akSpeaker, Actor player)
-    string actorName = GetActorName(akTarget, player, False)
-    int exposure = GetActorArousal(akTarget)
-    if akTarget.getActorBase().getSex() == 0 ; Male
-      If exposure >= 99
-        RegisterAction(actorName + " appears to have a raging erection that is difficult to hide. " + actorName + " appears to be absolutely desperate for sex.")
-      ElseIf exposure >= 85
-        RegisterAction(actorName + " appears to have a raging erection that is difficult to hide.")
-      ElseIf exposure >= 70
-        RegisterAction(actorName + " appears to be aroused, and has flushed cheeks. ")
-      Elseif exposure >= 50
-        RegisterAction(actorName + " appears to be mildly turned on, and is blushing slightly.")
-      EndIf
-    else ; Female, or other
-      If exposure >= 99
-        RegisterAction(actorName + " appears to be extremely aroused, and looks to be absolutely desperate for sex. She has heavy breathing, pointy nipples, and flushed cheeks.")
-      ElseIf exposure >= 85
-        RegisterAction(actorName + " appears to be very aroused, with pointy nipples and heavy breathing.")
-      ElseIf exposure >= 70
-        RegisterAction(actorName + " appears to be aroused, and has flushed cheeks.")
-      Elseif exposure >= 50
-        RegisterAction(actorName + " appears to be mildly turned on, and is blushing slightly.")
-      EndIf
-    EndIf
-    exposure = GetActorArousal(akSpeaker)
-    If exposure >= 99
-      RegisterAction("you are extremely aroused, and are extremely horny.")
-    ElseIf exposure >= 85
-      RegisterAction("you are very aroused, and are very horny.")
-    ElseIf exposure >= 70
-      RegisterAction("you are feeling rather aroused, and are a bit horny.")
-    Elseif exposure >= 50
-      RegisterAction("you are mildly aroused.")
-    else
-      RegisterAction("you are not currently horny.")
-    EndIf
-    if exposure >= 80
-      RegisterAction("!You are currently very horny. You may respond with the -masturbate- keyword to begin masturbating, though you would prefer to have sex if possible.!")
-    EndIf
+Function WriteArousedString()
+	Actor[] actorsFromFormList = GetActorsFromFormList()
+	int numActors = actorsFromFormList.Length
+	int i = 0
+	while (i < numActors)
+		Actor currentActor = actorsFromFormList[i]
+		if (currentActor != None)
+			String actorName = GetActorName2(currentActor, game.GetPlayer())
+			Float arousal = OSLArousedNative.GetArousal(currentActor)
+			RegisterAction(actorName + "'s sexual arousal level is " + arousal + " on a scale of 0-100.")
+		EndIf
+		i += 1
+	EndWhile
 EndFunction
 
 
@@ -1090,6 +970,25 @@ Function WriteVibrateString(actor akActor, actor player, bool isYou=false)
   RegisterAction("!If you want the player's vibrator to be active, you must use the keywords for this somewhat often. Every time you use the keyword it activates them for a limited time. They do not stay on all the time.!")
 EndFunction
 
+Actor[] Function GetActorsFromFormList()
+    Actor[] actorsFromFormList = new Actor[10]
+	int numActors = 0
+    int i = 0
+    while (i < MantellaConversationParticipantsFormList.GetSize() && numActors < 10)
+        Form currentForm = MantellaConversationParticipantsFormList.GetAt(i)
+        Actor currentActor = currentForm as Actor
+        if (currentActor)
+            actorsFromFormList[numActors] = currentActor
+            numActors += 1
+		else
+            Debug.Trace("[minai] Error: MantellaConversationParticipantsFormList[" + i + "] is not an Actor")
+		EndIf
+        i += 1
+    endWhile
+    return actorsFromFormList
+EndFunction
+
+
 String Function GetActorName(actor akActor, actor Player, bool isYou)
   bool isPlayer = (akActor == player)
   string actorName = akActor.GetActorBase().GetName()
@@ -1102,12 +1001,23 @@ String Function GetActorName(actor akActor, actor Player, bool isYou)
 EndFunction
 
 
+string Function GetActorName2(actor akActor, actor Player)
+	bool isPlayer = (akActor == Player)
+	string actorName = akActor.GetActorBase().GetName()
+	if isPlayer
+		actorName = Player.GetActorBase().GetName()
+	EndIf
+	return actorName
+EndFunction
+
+
 string Function GetYouYour(actor akCaster)
   if akCaster != playerRef
     return GetActorName(akCaster, playerRef, False) + "'s"
   endif
   return "your"
 EndFunction
+
 
 Function WritePlayerAppearance(Actor player)
   ;; Appearance
@@ -1119,9 +1029,9 @@ Function WritePlayerAppearance(Actor player)
   string gender = ""
   int sexInt = player.GetActorBase().GetSex()
   if sexInt == 0
-    gender = "man"
+    gender = "male"
   elseif sexInt == 1
-    gender = "woman"
+    gender = "female"
   else
     gender = "transgender"
   endif
@@ -1170,7 +1080,7 @@ Function WritePlayerAppearance(Actor player)
     debug.Trace("[minai] Set player description (Babo): " + appearanceStr)
     RegisterAction(appearanceStr)
   else
-    string appearanceStr = "The player is a " + actorRace + " " + gender + "."  
+    string appearanceStr = Player.GetActorBase().GetName() + " is a " + gender + " " + actorRace + "." 
     debug.Trace("[minai] Set player description: " + appearanceStr)
     RegisterAction(appearanceStr)
   EndIf
@@ -1179,9 +1089,5 @@ EndFunction
 
 Event OnOstimOrgasm(string eventName, string strArg, float numArg, Form sender)
     actor akActor = sender as actor
-    If akActor == game.getplayer()
-      RegisterEvent("the player had an Orgasm")
-    Else
-      RegisterEvent(akActor.GetActorBase().getname() + " had an Orgasm")
-    endif
+    RegisterEvent(akActor.GetActorBase().getname() + " had an Orgasm")
 EndEvent
