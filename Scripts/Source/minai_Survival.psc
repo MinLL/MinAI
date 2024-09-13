@@ -16,8 +16,10 @@ Faction JobInnServer
 
 minai_MainQuestController main
 minai_Mantella minMantella
+actor playerRef
 
 function Maintenance(minai_MainQuestController _main)
+  playerRef = Game.GetPlayer()
   main = _main
   minMantella = (Self as Quest) as minai_Mantella
   Debug.Trace("[minai] Initializing Survival Module")
@@ -51,7 +53,7 @@ function Maintenance(minai_MainQuestController _main)
   if !JobInnKeeper || !JobInnServer
     Debug.Trace("[minai] - Failed to fetch vanilla factions")
   EndIf
-
+  RegisterForModEvent("AIFF_CommandReceived", "CommandDispatcher") ; Hook into AIFF
 EndFunction
 
 
@@ -149,3 +151,41 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
       akSpeaker.UnequipAll()
     endif
 EndFunction
+
+
+
+
+
+
+
+
+
+
+
+Event CommandDispatcher(String speakerName,String  command, String parameter)
+  Debug.Trace("[MinAI AIFF] External command "+command+ " received for "+speakerName + " with argument " + parameter)
+  Actor akSpeaker=AIAgentFunctions.getAgentByName(speakerName)
+  actor akTarget
+  if parameter == ""
+    akTarget = AIAgentFunctions.getAgentByName(parameter)
+  else
+    akTarget = PlayerRef
+  EndIf
+  string targetName = main.GetActorName(akTarget)
+  ; Sunhelm
+  if command == "ExtCmdServeFood"
+    FeedPlayer(akSpeaker, PlayerRef)
+    AIAgentFunctions.logMessageForActor("command@ExtCmdFeedPlayer@@"+speakerName+" served " + targetName + " a meal.","funcret",speakerName)
+  EndIf
+  ; Vanilla functionality
+  if command == "ExtCmdRentRoom"
+    if playerRef.GetItemCount(Gold) < (DialogueGeneric as DialogueGenericScript).RoomRentalCost.GetValue() as Int
+      Debug.Notification("AI: Player does not have enough gold to rent room.")
+      AIAgentFunctions.logMessageForActor("command@ExtCmdRentRoom@@" + targetName + " did not have enough gold for the room.","funcret", speakerName)
+    Else
+      (akSpeaker as RentRoomScript).RentRoom(DialogueGeneric as DialogueGenericScript)
+      AIAgentFunctions.logMessageForActor("command@ExtCmdRentRoom@@"+speakerName+" provided " + targetName + " a room for the night.","funcret",speakerName)
+    EndIf
+    
+  EndIf
+EndEvent

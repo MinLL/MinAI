@@ -87,6 +87,7 @@ function Maintenance(minai_MainQuestController _main)
       Debug.Trace("[minai] Could not fetch baboConfigs")
     EndIf
   EndIf
+  RegisterForModEvent("AIFF_CommandReceived", "CommandDispatcher") ; Hook into AIFF
 EndFunction
 
 
@@ -326,3 +327,28 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
       Debug.Notification(akSpeaker.GetActorBase().GetName() + " is getting less turned on.")
     EndIf
 EndFunction
+
+
+
+
+Event CommandDispatcher(String speakerName,String  command, String parameter)
+  Debug.Trace("[MinAI AIFF] External command "+command+ " received for "+speakerName + " with argument " + parameter)
+  Actor akSpeaker=AIAgentFunctions.getAgentByName(speakerName)
+  actor akTarget
+  if parameter == ""
+    akTarget = AIAgentFunctions.getAgentByName(parameter)
+  else
+    akTarget = PlayerRef
+  EndIf
+  string targetName = main.GetActorName(akTarget)
+  if command == "ExtCmdIncreaseArousal"
+    UpdateArousal(akSpeaker, 6)
+    Debug.Notification(akSpeaker.GetActorBase().GetName() + " is getting more turned on.")
+    AIAgentFunctions.logMessageForActor("command@ExtCmdIncreaseArousal@@"+speakerName+"'s arousal level increased.","funcret",speakerName)
+  EndIf
+  if command == "ExtCmdDecreaseArousal"
+    UpdateArousal(akSpeaker, -12)
+    Debug.Notification(akSpeaker.GetActorBase().GetName() + " is getting less turned on.")
+    AIAgentFunctions.logMessageForActor("command@ExtCmdDecreaseArousal@@"+speakerName+"'s arousal level decreased.","funcret",speakerName)
+  EndIf
+EndEvent

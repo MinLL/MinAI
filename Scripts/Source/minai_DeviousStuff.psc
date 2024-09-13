@@ -21,8 +21,11 @@ minai_MainQuestController main
 minai_Arousal arousal
 minai_Sex sex
 
+actor playerRef
+
 function Maintenance(minai_MainQuestController _main)
   Debug.Trace("[minai] Initializing Devious Module")
+  playerRef = game.GetPlayer()
   main = _main
   
   arousal = (Self as Quest)as minai_Arousal
@@ -30,7 +33,16 @@ function Maintenance(minai_MainQuestController _main)
   
   RegisterForModEvent("DeviceActorOrgasm", "OnOrgasm")
   RegisterForModEvent("DeviceActorEdged", "OnEdged")
-  RegisterForModEvent("DeviceVibrateEffectStart", "OnVibrateStart")
+  RegisterForModEvent("DeviceVibrateEffectSta", "OnVibrateStart")
+
+  RegisterForModEvent("DDI_DeviceEquipped", "OnDeviceEquipped")
+  RegisterForModEvent("DDI_DeviceRemoved", "OnDeviceRemoved")
+  RegisterForModEvent("DDI_KeyBreak", "OnKeyBreak")
+  RegisterForModEvent("DDI_JamLock", "OnJamLock")
+  RegisterForModEvent("DDI_DeviceEscapeAttempt", "OnDeviceEscapeAttempt")
+  
+  
+  RegisterForModEvent("AIFF_CommandReceived", "CommandDispatcher") ; Hook into AIFF
   
   libs = Game.GetFormFromFile(0x00F624, "Devious Devices - Integration.esm") as zadlibs
     if libs
@@ -130,7 +142,20 @@ Function Harasskiss(actor akActor)
   slapp.StartHarassment(akActor, 2)
 EndFunction
 
+Event OnDeviceEquipped(Form inventoryDevice, Form deviceKeyword, form akActor)
+  Debug.Trace("[minai] Equipped Device: " + (inventoryDevice as Armor).GetName() + " on " + main.GetActorName(akActor as Actor))
+  SetContext(akActor as Actor)
+EndEvent
 
+Event OnDeviceRemoved(Form inventoryDevice, Form deviceKeyword, form akActor)
+  Debug.Trace("[minai] Removed Device: " + (inventoryDevice as Armor).GetName() + " on " + main.GetActorName(akActor as Actor))
+  SetContext(akActor as Actor)
+EndEvent
+
+; Function ReceiveFunction(Form akSource,Form akFormActor,Int aiSetArousal)
+;*      Actor akActor = akFormActor as Actor
+;*      ;process function
+;*   EndFunction
 
 
 
@@ -519,3 +544,114 @@ EndFunction
 bool function UseDD()
   return bHasDD
 EndFunction
+
+Event CommandDispatcher(String speakerName,String  command, String parameter)
+  Debug.Trace("[MinAI AIFF] External command "+command+ " received for "+speakerName + " with argument " + parameter)
+  Actor akSpeaker=AIAgentFunctions.getAgentByName(speakerName)
+  actor akTarget
+  if parameter == ""
+    akTarget = AIAgentFunctions.getAgentByName(parameter)
+  else
+    akTarget = PlayerRef
+  EndIf
+  string targetName = main.GetActorName(akTarget)
+  
+  bool bDeviousFollowerInScene = False
+  if bHasDeviousFollowers
+    Actor deviousFollower = (Quest.GetQuest("_Dflow") as QF__Gift_09000D62).Alias__DMaster.GetRef() as Actor
+    bDeviousFollowerInScene =  (akSpeaker == deviousFollower)
+  EndIf
+  
+  if bHasDD && CanVibrate(akTarget)
+    int vibTime = Utility.RandomInt(1,15)
+    int vibTimeLong = Utility.RandomInt(10,30)
+    if (command == "ExtCmdForceOrgasm")
+      libs.ActorOrgasm(akTarget)
+    ;
+    ; Vibration hooks
+    ;
+    elseIf (command == "ExtCmdTeaseWithVibratorVeryWeak")
+      libs.StopVibrating(akTarget)
+      libs.VibrateEffect(akTarget, 1, vibTime, True)
+      AIAgentFunctions.logMessageForActor("command@ExtCmdTeaseWithVibratorVeryWeak@@"+speakerName+" very weakly teases " + targetName + " with a remote vibrator.","funcret",speakerName)
+    elseIf (command == "ExtCmdStimulateWithVibratorVeryWeak")
+      libs.StopVibrating(akTarget)
+      libs.VibrateEffect(akTarget, 1, vibTime, False)
+      AIAgentFunctions.logMessageForActor("command@ExtCmdStimulateWithVibratorVeryWeak@@"+speakerName+" very weakly stimulates " + targetName + " with a remote vibrator.","funcret",speakerName)
+    elseIf (command == "ExtCmdTeaseWithVibratorWeak")
+      libs.StopVibrating(akTarget)
+      libs.VibrateEffect(akTarget, 2, vibTime, True)
+      AIAgentFunctions.logMessageForActor("command@ExtCmdTeaseWithVibratorWeak@@"+speakerName+" weakly teases " + targetName + " with a remote vibrator.","funcret",speakerName)
+    elseIf (command == "ExtCmdStimulateWithVibratorWeak")
+      libs.StopVibrating(akTarget)
+      libs.VibrateEffect(akTarget, 2, vibTime, False)
+      AIAgentFunctions.logMessageForActor("command@ExtCmdStimulateWithVibratorWeak@@"+speakerName+" weakly stimulates " + targetName + " with a remote vibrator.","funcret",speakerName)
+    elseIf (command == "ExtCmdTeaseWithVibratorMedium")
+      libs.StopVibrating(akTarget)
+      libs.VibrateEffect(akTarget, 3, vibTime, True)
+      AIAgentFunctions.logMessageForActor("command@ExtCmdTeaseWithVibratorMedium@@"+speakerName+" teases " + targetName + " with a remote vibrator.","funcret",speakerName)
+    elseIf (command == "ExtCmdStimulateWithVibratorMedium")
+      libs.StopVibrating(akTarget)
+      libs.VibrateEffect(akTarget, 3, vibTime, False)
+      AIAgentFunctions.logMessageForActor("command@ExtCmdStimulateWithVibratorMedium@@"+speakerName+" stimulates " + targetName + " with a remote vibrator.","funcret",speakerName)
+    elseIf (command == "ExtCmdTeaseWithVibratorStrong")
+      libs.StopVibrating(akTarget)
+      libs.VibrateEffect(akTarget, 4, vibTime, True)
+      AIAgentFunctions.logMessageForActor("command@ExtCmdTeaseWithVibratorStrong@@"+speakerName+" strongly teases " + targetName + " with a remote vibrator.","funcret",speakerName)
+    elseIf (command == "ExtCmdStimulateWithVibratorStrong")
+      libs.StopVibrating(akTarget)
+      libs.VibrateEffect(akTarget, 4, vibTime, False)
+      AIAgentFunctions.logMessageForActor("command@ExtCmdStimulateWithVibratorStrong@@"+speakerName+" strongly stimulates " + targetName + " with a remote vibrator.","funcret",speakerName)
+    elseIf (command == "ExtCmdTeaseWithVibratorVeryStrong")
+      libs.StopVibrating(akTarget)
+      libs.VibrateEffect(akTarget, 5, vibTime, True)
+      AIAgentFunctions.logMessageForActor("command@ExtCmdTeaseWithVibratorVeryStrong@@"+speakerName+" very strongly teases " + targetName + " with a remote vibrator.","funcret",speakerName)
+    elseIf (command == "ExtCmdStimulateWithVibratorVeryStrong")
+      libs.StopVibrating(akTarget)
+      libs.VibrateEffect(akTarget, 5, vibTime, False)
+      AIAgentFunctions.logMessageForActor("command@ExtCmdStimulateWithVibratorVeryStrong@@"+speakerName+" very strongly stimulates " + targetName + " with a remote vibrator.","funcret",speakerName)
+    elseIf (command == "ExtCmdstopVibrate")
+      libs.StopVibrating(akTarget)
+      AIAgentFunctions.logMessageForActor("command@ExtCmdStopVibrate@@"+speakerName+" turns off " + targetName + "'s remote vibrator.","funcret",speakerName)
+    elseIf (command == "ExtCmdshock")
+      libs.ShockActor(akTarget)
+      AIAgentFunctions.logMessageForActor("command@ExtCmdShock@@"+speakerName+" remotely shocks  " + targetName + ".","funcret",speakerName)
+    EndIf
+  EndIf
+  ;  Generic actions
+  If (command == "ExtCmdGrope")
+    Debug.Notification(speakerName + " gropes " + main.GetYouYour(akTarget) + " crotch abruptly!")
+    arousal.UpdateArousal(akTarget, 5)
+    Game.ShakeController(0.5,0.5,1.0)
+    if bHasDD
+      libs.Moan(akTarget)
+    EndIf
+    AIAgentFunctions.logMessageForActor("command@ExtCmdGrope@@"+speakerName+" gropes " + targetName + " in a vulgar manner.","funcret",speakerName)
+  EndIf
+  If (command == "ExtCmdPinchNipples")
+    Debug.Notification(speakerName + " painfully pinches " + main.GetYouYour(akTarget) + " nipples!")
+    arousal.UpdateArousal(akTarget, 3)
+    Game.ShakeController(0.7,0.7,0.2)
+    if bHasDD
+      libs.Moan(akTarget)
+    EndIf
+    AIAgentFunctions.logMessageForActor("command@ExtCmdPinchNipples@@"+speakerName+" pinches " + targetName + "'s nipples in a vulgar manner.","funcret",speakerName)
+  elseif (command=="ExtCmdSpankAss")
+    SpankAss(1, bDeviousFollowerInScene)
+    AIAgentFunctions.logMessageForActor("command@ExtCmdSpankAss@@"+speakerName+" spanks " + targetName + "'s ass.","funcret",speakerName)
+  elseif (command=="ExtCmdSpankTits")
+    SpankTits(1, bDeviousFollowerInScene)
+    AIAgentFunctions.logMessageForActor("command@ExtCmdSpankTits@@"+speakerName+" spanks " + targetName + "'s tits.","funcret",speakerName)
+  EndIf
+EndEvent
+
+Function SetContext(actor akTarget)
+  string actorName = main.GetActorName(akTarget)
+  debug.Trace("[minai] Devious - SetContext( " + actorName + " )")
+  if CanVibrate(akTarget)
+    ; AIAgentFunctions
+  EndIf
+  ; AIAgentFunctions.logMessage("sexscene@off","setconf")
+  ; AIAgentFunctions.logMessage("sexscene_sexlab@off","setconf")
+EndFunction
+

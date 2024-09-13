@@ -8,8 +8,10 @@ GlobalVariable minai_UseOstim
 
 
 minai_MainQuestController main
+Actor PlayerRef
 
 function Maintenance(minai_MainQuestController _main)
+  playerRef = Game.GetPlayer()
   main = _main
   Debug.Trace("[minai] - Initializing Sex Module.")
   RegisterForModEvent("HookAnimationStart", "OnSexlabAnimationStart")
@@ -21,13 +23,12 @@ function Maintenance(minai_MainQuestController _main)
     bHasOstim = True
   EndIf
 
-
-
-
   minai_UseOStim = Game.GetFormFromFile(0x0906, "MinAI.esp") as GlobalVariable
   if !minai_UseOStim
     Debug.Trace("[minai] Could not find ostim toggle")
-  EndIf  
+  EndIf
+  
+  RegisterForModEvent("AIFF_CommandReceived", "CommandDispatcher") ; Hook into AIFF
 EndFunction
 
 
@@ -162,4 +163,32 @@ Event OnSexlabAnimationStart(int threadID, bool HasPlayer)
         main.RegisterEvent(actors[i].GetActorBase().GetName() + " started " + sexDesc + ".")
         i += 1
       EndWhile
+EndEvent
+
+
+
+Event CommandDispatcher(String speakerName,String  command, String parameter)
+  Debug.Trace("[MinAI AIFF] External command "+command+ " received for "+speakerName + " with argument " + parameter)
+  Actor akSpeaker=AIAgentFunctions.getAgentByName(speakerName)
+  actor akTarget
+  if parameter == ""
+    akTarget = AIAgentFunctions.getAgentByName(parameter)
+  else
+    akTarget = PlayerRef
+  EndIf
+
+  bool bPlayerInScene = (akTarget == PlayerRef || akSpeaker == PlayerRef)
+
+  string targetName = main.GetActorName(akTarget)
+  if CanAnimate(akTarget, akSpeaker)
+    If command == "ExtCmdMasturbate"
+      Start1pSex(akSpeaker)
+    elseif command == "ExtCmdSex"
+      Start2pSex(akSpeaker, akTarget, PlayerRef, bPlayerInScene)
+    elseIf command == "ExtCmdOrgy"
+      ; StartGroupSex(akSpeaker, akTarget, PlayerRef, bPlayerInScene, actorsFromFormList)
+    EndIf
+  Else
+    Debug.Trace("[minai] Not processing keywords for exclusive scene - Conflicting scene is running")
+  EndIf
 EndEvent
