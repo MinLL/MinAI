@@ -27,13 +27,13 @@ Function GetPhysicalDescription($name) {
     return $ret;
   }
   if($beautyScore != "0") {
-    $ret .= "Their beauty is a {$beautyScore}, on a scale from 0-100. ";
+    $ret .= "Her beauty is a {$beautyScore}, on a scale from 0-100. ";
   }
   if($breastsScore != "0") {
-    $ret .= "The sexual attractiveness of their breasts is a {$breastsScore}, on a scale from 0-100. ";
+    $ret .= "The sexual attractiveness of her breasts is a {$breastsScore}, on a scale from 0-100. ";
   }
   if($buttScore != "0") {
-    $ret .= "The sexual attractiveness of their ass is a {$buttScore}, on a scale from 0-100. ";
+    $ret .= "The sexual attractiveness of her ass is a {$buttScore}, on a scale from 0-100. ";
   }
   return $ret;
 }

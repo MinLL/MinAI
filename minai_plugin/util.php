@@ -7,7 +7,7 @@ function CanVibrate($name) {
 Function GetActorValue($name, $key) {
   $name = strtolower($name);
   $ret = $GLOBALS["db"]->fetchAll("select * from conf_opts where LOWER(id)=LOWER('_minai_{$name}//{$key}')")[0]['value'];
-  if ($ret) {
+  if (!$ret) {
       return "0";
   }
   return $ret;
