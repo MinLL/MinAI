@@ -34,11 +34,15 @@ EndEvent
 ***/
 
 
-
+require_once("config.php");
 require "generalperverted.php";
 require "deviousdevices.php";
 require "arousal.php";
 require "survival.php";
 require "sex.php";
 require "slapp.php";
+if ($force_voice_type) {
+    require "fix_xtts.php";
+}
+
 ?>

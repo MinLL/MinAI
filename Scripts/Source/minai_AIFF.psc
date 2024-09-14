@@ -29,6 +29,8 @@ EndFunction
 
 Function SetContext(actor akTarget)
   Debug.Trace("[minai] AIFF - SetContext()")
+  ; Fix shitty xtts support in AIFF for VR by exposing the voiceType to the plugin for injection
+  SetActorVariable(akTarget, "voiceType", akTarget.GetVoiceType())
   devious.SetContext(akTarget)
   arousal.SetContext(akTarget)
   survival.SetContext(akTarget)
