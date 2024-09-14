@@ -1043,7 +1043,7 @@ function WriteClothingString(actor akActor, actor player, bool isYou=false, acto
 			EndIf
 			if bHasTNG
 				if currentActor.GetActorBase().GetSex() == 0 && IsExposed(currentActor) || currentActor.HasKeyword(TNG_Gentlewoman) && IsExposed(currentActor)
-					if IsExposed(currentActor)
+					if IsExposed(currentActor) && cuirass != None
 						RegisterAction(actorName + "'s genitals are exposed.")
 					EndIf
 					string sizeDescription = ""
@@ -1058,10 +1058,8 @@ function WriteClothingString(actor akActor, actor player, bool isYou=false, acto
 						sizeDescription = "a large cock"
 					elseif currentActor.HasKeyword(TNG_XL) || currentActor.HasKeywordString("TNG_ActorAddnAuto:05")
 						sizeDescription = "one of the biggest cocks you've ever seen"
-					else
-						if currentActor != playerRef
+					elseif currentActor != playerRef
 							sizeDescription = "no cock or balls at all"
-						EndIf
 					EndIf
 					if sizeDescription != ""
 						RegisterAction("You can see that " + actorName + " has " + sizeDescription + ".")
