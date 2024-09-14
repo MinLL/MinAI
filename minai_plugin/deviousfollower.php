@@ -8,7 +8,7 @@ function GetDeviousFollowerContext($name) {
   }
   $playerName = $GLOBALS["PLAYER_NAME"];
   $dfName = GetActorValue($playerName, "deviousFollowerName");
-  if ($dfName == "") {
+  if ($dfName == "0" || $dfName == "") {
     $minai_has_df = false;
     return;
   }
@@ -42,22 +42,22 @@ function GetDeviousFollowerContext($name) {
     $daysRemaining = "about 3 months";
   }
   elseif ($dfContractRemaining > 70 && $dfContractRemaining <= 80) {
-    $daysRemaining = "about 3 months";
+    $daysRemaining = "2 or 3 months";
   }
   elseif ($dfContractRemaining > 50 && $dfContractRemaining <= 70) {
-    $daysRemaining = "about 3 months";
+    $daysRemaining = "about 2 months";
   }
   elseif ($dfContractRemaining > 40 && $dfContractRemaining <= 50) {
-    $daysRemaining = "about 3 months";
+    $daysRemaining = "1 or 2 months";
   }
   elseif ($dfContractRemaining > 20 && $dfContractRemaining <= 40) {
-    $daysRemaining = "about 3 months";
+    $daysRemaining = "about 1 month";
   }
   elseif ($dfContractRemaining > 14 && $dfContractRemaining <= 20) {
-    $daysRemaining = "about 3 months";
+    $daysRemaining = "a bit over 2 weeks";
   }
   elseif ($dfContractRemaining > 7 && $dfContractRemaining <= 14) {
-    $daysRemaining = "about 3 months";
+    $daysRemaining = "1 or 2 weeks";
   }
   else {
     $daysRemaining = "{$dfContractRemaining} days";

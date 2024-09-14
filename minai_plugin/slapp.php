@@ -26,18 +26,7 @@ $GLOBALS["FUNCTIONS"][] = [
 $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdHug";
 
 
-$GLOBALS["FUNCRET"]["ExtCmdHug"]=function($gameRequest) {
-    // Example, if papyrus execution gives some error, we will need to rewrite request her.
-    // BY default, request will be $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdHug"]
-    // $gameRequest = [type of message,localts,gamets,data]
-    $GLOBALS["FORCE_MAX_TOKENS"]=48;    // We can overwrite anything here using $GLOBALS;
-   
-    if (stripos($gameRequest[3],"error")!==false) // Papyrus returned error
-        return ["argName"=>"target","request"=>"{$GLOBALS["HERIKA_NAME"]} says sorry about unable to rent out a room. {$GLOBALS["TEMPLATE_DIALOG"]}"];
-    else
-        return ["argName"=>"target"];
-    
-};
+$GLOBALS["FUNCRET"]["ExtCmdHug"]=$GenericFuncRet;
 
 
 
@@ -66,18 +55,7 @@ $GLOBALS["FUNCTIONS"][] = [
 $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdKiss";
 
 
-$GLOBALS["FUNCRET"]["ExtCmdKiss"]=function($gameRequest) {
-    // Example, if papyrus execution gives some error, we will need to rewrite request her.
-    // BY default, request will be $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdKiss"]
-    // $gameRequest = [type of message,localts,gamets,data]
-    $GLOBALS["FORCE_MAX_TOKENS"]=48;    // We can overwrite anything here using $GLOBALS;
-   
-    if (stripos($gameRequest[3],"error")!==false) // Papyrus returned error
-        return ["argName"=>"target","request"=>"{$GLOBALS["HERIKA_NAME"]} says sorry about unable to serve food. {$GLOBALS["TEMPLATE_DIALOG"]}"];
-    else
-        return ["argName"=>"target"];
-    
-};
+$GLOBALS["FUNCRET"]["ExtCmdKiss"]=$GenericFuncRet;
 
 
 
@@ -107,18 +85,7 @@ $GLOBALS["FUNCTIONS"][] = [
 $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdMolest";
 
 
-$GLOBALS["FUNCRET"]["ExtCmdMolest"]=function($gameRequest) {
-    // Example, if papyrus execution gives some error, we will need to rewrite request her.
-    // BY default, request will be $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdMolest"]
-    // $gameRequest = [type of message,localts,gamets,data]
-    $GLOBALS["FORCE_MAX_TOKENS"]=48;    // We can overwrite anything here using $GLOBALS;
-   
-    if (stripos($gameRequest[3],"error")!==false) // Papyrus returned error
-        return ["argName"=>"target","request"=>"{$GLOBALS["HERIKA_NAME"]} says sorry about unable to serve food. {$GLOBALS["TEMPLATE_DIALOG"]}"];
-    else
-        return ["argName"=>"target"];
-    
-};
+$GLOBALS["FUNCRET"]["ExtCmdMolest"]=$GenericFuncRet;
 
 
 

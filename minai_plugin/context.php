@@ -27,7 +27,8 @@ Function GetPhysicalDescription($name) {
     return $ret;
   }
   if($beautyScore != "0") {
-    $ret .= "Her beauty is a {$beautyScore}, on a scale from 0-100. ";
+    $beautyScore = ceil($beautyScore/10);
+    $ret .= "Her beauty is a {$beautyScore}, on a scale from 0-10. ";
   }
   if($breastsScore != "0") {
     $ret .= "The sexual attractiveness of her breasts is a {$breastsScore}, on a scale from 0-100. ";
@@ -116,10 +117,10 @@ Function GetDDContext($name) {
     $ret .= "{$name} is wearing a remotely controlled clitoral ring capable of powerful vibration.\n";
   }
   if (IsEnabled($name, "zad_DeviousArmCuffs")) {
-    $ret .= "{$name} is wearing arm cuffs on each arm.\n";
+    $ret .= "{$name} is wearing an arm cuff on each arm.\n";
   }
   if (IsEnabled($name, "zad_DeviousLegCuffs")) {
-    $ret .= "{$name} is wearing leg cuffs on each leg.\n";
+    $ret .= "{$name} is wearing a leg cuff on each leg.\n";
   }
   if (IsEnabled($name, "zad_DeviousBra")) {
     $ret .= "{$name}'s breasts are locked away in a chastity bra.\n";
@@ -131,7 +132,7 @@ Function GetDDContext($name) {
     $ret .= "{$name}'s hands and neck are locked in an uncomfortable yoke, leaving her helpless.\n";
   }
   if (IsEnabled($name, "zad_DeviousElbowTie")) {
-    $ret .= "{$name}'s arms are tied behind her back ina strict elbow tie, leaving her helpless.\n";
+    $ret .= "{$name}'s arms are tied behind her back in-a strict elbow tie, leaving her helpless.\n";
   }
   if (IsEnabled($name, "zad_DeviousPetSuit")) {
     $ret .= "{$name} is wearing a full-body suit made out of shiny latex (Referred to as Ebonite) leaving nothing to the imagination.\n";
@@ -173,7 +174,7 @@ Function GetDDContext($name) {
     $ret .= "{$name} is wearing a set of ankle shackles, restricting her ability to move quickly.\n";
   }
   if (IsEnabled($name, "zad_DeviousClamps")) {
-    $ret .= "{$name} is wearing a set of painful nipples clamps.\n";
+    $ret .= "{$name} is wearing a set of painful nipple clamps.\n";
   }
   return $ret;
 }

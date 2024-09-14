@@ -23,18 +23,7 @@ $GLOBALS["FUNCTIONS"][] = [
 $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartSexScene";
 
 
-$GLOBALS["FUNCRET"]["ExtCmdStartSexScene"]=function($gameRequest) {
-    // Example, if papyrus execution gives some error, we will need to rewrite request here.
-    // BY default, request will be $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdStartSexScene"]
-    // $gameRequest = [type of message,localts,gamets,data]
-    $GLOBALS["FORCE_MAX_TOKENS"]=48;    // We can overwrite anything here using $GLOBALS;
-   
-    if (stripos($gameRequest[3],"error")!==false) // Papyrus returned error
-        return ["argName"=>"target","request"=>"{$GLOBALS["HERIKA_NAME"]} says sorry about unable to have sex at this time. {$GLOBALS["TEMPLATE_DIALOG"]}"];
-    else
-        return ["argName"=>"target"];
-    
-};
+$GLOBALS["FUNCRET"]["ExtCmdStartSexScene"]=$GenericFuncRet;
 
 
 $GLOBALS["F_NAMES"]["ExtCmdMasturbate"]="Masturbate";
@@ -60,18 +49,7 @@ $GLOBALS["FUNCTIONS"][] = [
 $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdMasturbate";
 
 
-$GLOBALS["FUNCRET"]["ExtCmdMasturbate"]=function($gameRequest) {
-    // Example, if papyrus execution gives some error, we will need to rewrite request here.
-    // BY default, request will be $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdMasturbate"]
-    // $gameRequest = [type of message,localts,gamets,data]
-    $GLOBALS["FORCE_MAX_TOKENS"]=48;    // We can overwrite anything here using $GLOBALS;
-   
-    if (stripos($gameRequest[3],"error")!==false) // Papyrus returned error
-        return ["argName"=>"target","request"=>"{$GLOBALS["HERIKA_NAME"]} says sorry about unable to have sex at this time. {$GLOBALS["TEMPLATE_DIALOG"]}"];
-    else
-        return ["argName"=>"target"];
-    
-};
+$GLOBALS["FUNCRET"]["ExtCmdMasturbate"]=$GenericFuncRet;
 
 
 
@@ -98,19 +76,7 @@ $GLOBALS["FUNCTIONS"][] = [
 $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartOrgy";
 
 
-$GLOBALS["FUNCRET"]["ExtCmdStartOrgy"]=function($gameRequest) {
-    // Example, if papyrus execution gives some error, we will need to rewrite request here.
-    // BY default, request will be $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdStartOrgy"]
-    // $gameRequest = [type of message,localts,gamets,data]
-    $GLOBALS["FORCE_MAX_TOKENS"]=48;    // We can overwrite anything here using $GLOBALS;
-   
-    if (stripos($gameRequest[3],"error")!==false) // Papyrus returned error
-        return ["argName"=>"target","request"=>"{$GLOBALS["HERIKA_NAME"]} says sorry about unable to have sex at this time. {$GLOBALS["TEMPLATE_DIALOG"]}"];
-    else
-        return ["argName"=>"target"];
-    
-};
-
+$GLOBALS["FUNCRET"]["ExtCmdStartOrgy"]=$GenericFuncRet;
 
 
 ?>

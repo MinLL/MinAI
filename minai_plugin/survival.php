@@ -63,18 +63,7 @@ $GLOBALS["FUNCTIONS"][] = [
 
 
 
-$GLOBALS["FUNCRET"]["ExtCmdServeFood"]=function($gameRequest) {
-    // Example, if papyrus execution gives some error, we will need to rewrite request her.
-    // BY default, request will be $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdServeFood"]
-    // $gameRequest = [type of message,localts,gamets,data]
-    $GLOBALS["FORCE_MAX_TOKENS"]=48;    // We can overwrite anything here using $GLOBALS;
-   
-    if (stripos($gameRequest[3],"error")!==false) // Papyrus returned error
-        return ["argName"=>"target","request"=>"{$GLOBALS["HERIKA_NAME"]} says sorry about unable to serve food. {$GLOBALS["TEMPLATE_DIALOG"]}"];
-    else
-        return ["argName"=>"target"];
-    
-};
+$GLOBALS["FUNCRET"]["ExtCmdServeFood"]=$GenericFuncRet;
 
 $isInnkeeper = IsEnabled($GLOBALS['HERIKA_NAME'], "JobInnKeeper");
 $isServer = IsEnabled($GLOBALS['HERIKA_NAME'], "JobInnServer");
