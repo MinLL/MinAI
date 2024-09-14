@@ -12,7 +12,9 @@ Function BuildContext($name) {
 Function GetArousalContext($name) {
   $ret = "";
   $arousal = GetActorValue($name, "arousal");
-  $ret .= "{$name}'s sexual arousal is {$arousal} on a scale from 0-100.";
+  if ($arousal != "") {
+    $ret .= "{$name}'s sexual arousal is {$arousal} on a scale from 0-100.";
+  }
   return $ret;
 }
 
@@ -22,7 +24,10 @@ Function GetPhysicalDescription($name) {
   $beautyScore = GetActorValue($name, "beautyScore");
   $breastsScore = GetActorValue($name, "breastsScore");
   $buttScore = GetActorValue($name, "buttScore");
-  $ret = "{$name} is a {$gender} {$race}. ";
+  $ret = "";
+  if ($gender != "" && $race != "") {
+    $ret .= "{$name} is a {$gender} {$race}. ";
+  }
   if (!IsPlayer($name)) {
     return $ret;
   }

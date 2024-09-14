@@ -186,7 +186,10 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
       (akSpeaker as RentRoomScript).RentRoom(DialogueGeneric as DialogueGenericScript)
       AIAgentFunctions.logMessageForActor("command@ExtCmdRentRoom@@"+speakerName+" provided " + targetName + " a room for the night.","funcret",speakerName)
     EndIf
-    
+  EndIf
+  if command == "ExtCmdTrade"
+    akSpeaker.showbartermenu()
+    AIAgentFunctions.logMessageForActor("command@ExtCmdTrade@@"+speakerName+" started trading goods with " + targetName + ".","funcret",speakerName)
   EndIf
 EndEvent
 

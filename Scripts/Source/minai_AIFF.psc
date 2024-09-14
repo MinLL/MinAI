@@ -27,10 +27,21 @@ EndFunction
 
 
 
+Function StoreActorVoice(actor akTarget)
+  if akTarget == None 
+    Return
+  EndIf
+  VoiceType voice = akTarget.GetVoiceType()
+  if !voice
+    Return
+  EndIf
+  ; Fix broken xtts support in AIFF for VR by exposing the voiceType to the plugin for injection
+  SetActorVariable(akTarget, "voiceType", voice)
+EndFunction
+
+
 Function SetContext(actor akTarget)
   Debug.Trace("[minai] AIFF - SetContext()")
-  ; Fix broken xtts support in AIFF for VR by exposing the voiceType to the plugin for injection
-  SetActorVariable(akTarget, "voiceType", akTarget.GetVoiceType())
   devious.SetContext(akTarget)
   arousal.SetContext(akTarget)
   survival.SetContext(akTarget)

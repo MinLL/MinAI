@@ -68,11 +68,35 @@ $GLOBALS["FUNCRET"]["ExtCmdServeFood"]=$GenericFuncRet;
 $isInnkeeper = IsEnabled($GLOBALS['HERIKA_NAME'], "JobInnKeeper");
 $isServer = IsEnabled($GLOBALS['HERIKA_NAME'], "JobInnServer");
 
+
+$GLOBALS["F_NAMES"]["ExtCmdTrade"]="BeginTrading";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdTrade"]="Buy or sell goods from {$GLOBALS["PLAYER_NAME"]}";
+
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdTrade"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdTrade"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+
+
 if ($isInnkeeper || $isServer) {
   $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdServeFood";
 }
-if ($isInnkeeper) {
+if ($isInnKeeper) {
   $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdRentRoom";
 }
 
+// Allow anyone to buy or sell. Don't restrict this to shop-keepers.
+$GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdTrade";
 ?>
