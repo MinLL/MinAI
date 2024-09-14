@@ -302,12 +302,6 @@ Function WritePlayerAppearance(Actor player)
 EndFunction
 
 
-Event OnOstimOrgasm(string eventName, string strArg, float numArg, Form sender)
-    actor akActor = sender as actor
-    main.RegisterEvent(akActor.GetActorBase().getname() + " had an Orgasm")
-EndEvent
-
-
 Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking, actor[] actorsFromFormList, bool bPlayerInScene, string targetName, string speakerName, string playerName)
   if bPlayerInScene
     WritePlayerAppearance(playerRef)

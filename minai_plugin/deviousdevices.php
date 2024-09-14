@@ -107,9 +107,9 @@ foreach ($vibSettings as $strength) {
 					      "type" => "object",
 					      "properties" => [
 							       "intensity" => [
-									       "type" => "integer",
+									       "type" => "string",
 									       "description" => "Strength of the vibration",
-									       "enum" => ["weak", "moderate", "strong"]
+									       "enum" => ["Very Weak", "Weak", "Medium", "Strong", "Very Strong"]
 
 									       ]
 		
@@ -137,10 +137,9 @@ foreach ($vibSettings as $strength) {
 					      "type" => "object",
 					      "properties" => [
 							       "intensity" => [
-									       "type" => "integer",
+									       "type" => "string",
 									       "description" => "Strength of the vibration",
-									       "enum" => ["weak", "moderate", "strong"]
-
+									       "enum" => ["Very Weak", "Weak", "Medium", "Strong", "Very Strong"]
 									       ]
 		
 							       ],

@@ -60,3 +60,12 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   survival.CommandDispatcher(speakerName, command, parameter)
   arousal.CommandDispatcher(speakerName, command, parameter)
 EndEvent
+
+
+Function ChillOut()
+  AIAgentFunctions.logMessage("Relax and enjoy","force_current_task")
+EndFunction
+
+Function SetAnimationBusy(int busy, string name)
+  AIAgentFunctions.setAnimationBusy(busy,name)
+EndFunction

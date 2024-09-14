@@ -26,14 +26,14 @@ Function GetPhysicalDescription($name) {
   if (!IsPlayer($name)) {
     return $ret;
   }
-  if($beautyScore != "0") {
+  if($beautyScore != "") {
     $beautyScore = ceil($beautyScore/10);
     $ret .= "Her beauty is a {$beautyScore}, on a scale from 0-10. ";
   }
-  if($breastsScore != "0") {
+  if($breastsScore != "") {
     $ret .= "The sexual attractiveness of her breasts is a {$breastsScore}, on a scale from 0-100. ";
   }
-  if($buttScore != "0") {
+  if($buttScore != "") {
     $ret .= "The sexual attractiveness of her ass is a {$buttScore}, on a scale from 0-100. ";
   }
   return $ret;
@@ -186,5 +186,17 @@ $GLOBALS["COMMAND_PROMPT"].="
 
 ";
 
+// Remove all references to sex scene, and only keep the last one.
+$locaLastElement=[];
+foreach ($GLOBALS["contextDataFull"] as $n=>$ctxLine) {
+    if (strpos($ctxLine["content"],"#SEX_SCENARIO")!==false) {
+        $locaLastElement[]=$n;
+    }
+}
+array_pop($locaLastElement);
+
+foreach ($locaLastElement as $n) {
+  unset($GLOBALS["contextDataFull"][$n]); 
+}
 
 ?>
