@@ -71,7 +71,7 @@ $isServer = IsEnabled($GLOBALS['HERIKA_NAME'], "JobInnServer");
 if ($isInnkeeper || $isServer) {
   $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdServeFood";
 }
-if ($isInnKeeper) {
+if ($isInnkeeper) {
   $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdRentRoom";
 }
 
