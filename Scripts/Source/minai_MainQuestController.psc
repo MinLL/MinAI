@@ -1,10 +1,12 @@
 ScriptName minai_MainQuestController extends Quest
 
 int cuirassSlot = 0x00000004
-int genitalSlot = 0x00000034
+int genitalSlot = 0x00000020
+int skinSlot = 0x00000001
 
 MantellaConversation mantella
 FormList MantellaConversationParticipantsFormList
+FormList property TNG_GentifiedFormList auto
 
 SexLabFramework slf
 zadLibs libs
@@ -32,6 +34,7 @@ bool bHasSunhelm = False
 bool bHasOstim = False
 bool bHasOSL = False
 bool bUseVanilla = True
+bool bHasTNG
 
 Keyword SLA_HalfNakedBikini
 Keyword SLA_ArmorHalfNaked
@@ -61,6 +64,8 @@ Keyword TNG_M
 Keyword TNG_L
 Keyword TNG_XL
 Keyword TNG_DefaultSize
+Keyword TNG_Gentlewoman
+Keyword TNG_Revealing
 
 Keyword SLHHScriptEventKeyword
 
@@ -138,8 +143,22 @@ Function Maintenance()
       Debug.Notification("Warning: Some devious followers content will be broken, incompatible version!")
     EndIf
   EndIf
-  if Game.GetModByName("TheNewGentleman.esp") !=255
+  if Game.GetModByName("TheNewGentleman.esp") != 255
     bHasTNG = True
+	Debug.Trace("[minai] Found TNG")
+	TNG_XS = Game.GetFormFromFile(0x03BFE1, "TheNewGentleman.esp") as Keyword
+	TNG_S = Game.GetFormFromFile(0x03BFE2, "TheNewGentleman.esp") as Keyword
+	TNG_M = Game.GetFormFromFile(0x03BFE3, "TheNewGentleman.esp") as Keyword
+	TNG_L = Game.GetFormFromFile(0x03BFE4, "TheNewGentleman.esp") as Keyword
+	TNG_XL = Game.GetFormFromFile(0x03BFE5, "TheNewGentleman.esp") as Keyword
+	TNG_DefaultSize = Game.GetFormFromFile(0x03BFE0, "TheNewGentleman.esp") as Keyword
+	TNG_Gentlewoman = Game.GetFormFromFile(0x03BFF8, "TheNewGentleman.esp") as Keyword
+	TNG_Revealing = Game.GetFormFromFile(0x03BFFF, "TheNewGentleman.esp") as Keyword
+	if TNG_XS != None && TNG_S != None && TNG_M != None && TNG_L != None && TNG_XL != None && TNG_DefaultSize != None
+		Debug.Trace("[minai] TNG size keywords retrieved successfully.")
+	else
+		Debug.Trace("[minai] Failed to retrieve one or more TNG size keywords.")
+	EndIf
   EndIf
   if Game.GetModByName("Spank That Ass.esp") != 255
     Debug.Trace("[minai] Found Spank That Ass")
@@ -937,9 +956,9 @@ Function WriteArousedString(bool bPlayerInScene, actor Player, actor[] actorsFro
 			String actorName = GetActorName(currentActor)
 			int arousal = GetActorArousal(currentActor)
 			if currentActor != Player
-			  RegisterAction(actorName + "'s sexual arousal level is " + arousal + " on a scale of 0-100, where 0 is \"not horny\", and 100 is \"desperate for sex\". They should behave accordingly.")
+			  RegisterAction(actorName + "'s sexual arousal is " + arousal + "%")
 			Else
-			  RegisterAction(actorName + "'s sexual arousal level is " + arousal + " on a scale of 0-100, where 0 is \"not horny\", and 100 is \"desperate for sex\".")
+			  RegisterAction(actorName + "'s sexual arousal is " + arousal + "%")
 			EndIf
 		EndIf
 		i += 1
@@ -972,6 +991,43 @@ Function WriteArousedString(bool bPlayerInScene, actor Player, actor[] actorsFro
 EndFunction
 
 
+;/ bool Function IsGentified(Actor akActor)
+	TNG_GentifiedFormList = Game.GetFormFromFile(0x03BE00, "TheNewGentleman.esp") as FormList
+	int i = 0
+    while i < TNG_GentifiedFormList.GetSize()
+        if TNG_GentifiedFormList.GetAt(i) == akActor
+            return true
+        endif
+        i += 1
+    endwhile
+		Debug.Trace("[minai] " + GetActorName(akActor) + " is Gentified.")
+		return True
+	return False
+EndFunction /;
+
+	
+bool Function IsExposed(Actor akActor)
+    int itemIndex = akActor.GetNumItems()
+    while itemIndex > 0
+        itemIndex -= 1
+        Form item = akActor.GetNthForm(itemIndex)
+        Armor armorItem = item as Armor
+        if armorItem
+            if Math.LogicalAnd(armorItem.GetSlotMask(), cuirassSlot) != 0
+                if akActor.IsEquipped(armorItem)
+                    Debug.Trace("Equipped item in slot 52: " + armorItem.GetName())
+                    if !armorItem.HasKeyword(TNG_Revealing)
+                        return False
+                    EndIf
+                EndIf
+            EndIf
+        EndIf
+    EndWhile
+;	Debug.Trace("[minai] " + GetActorName(akActor) + " is exposed.")
+	return True
+EndFunction
+
+
 function WriteClothingString(actor akActor, actor player, bool isYou=false, actor[] actorsFromFormList)
 	int numActors = actorsFromFormList.Length
 	int i = 0
@@ -980,37 +1036,38 @@ function WriteClothingString(actor akActor, actor player, bool isYou=false, acto
 		if (currentActor != None)
 			String actorName = GetActorName(currentActor)
 			Armor cuirass = currentActor.GetWornForm(cuirassSlot) as Armor
-			if !cuirass
+			if cuirass == None
 				RegisterAction(actorName + " is naked.")
 			else
 				RegisterAction(actorName + " is wearing " + cuirass.GetName())
 			EndIf
 			if bHasTNG
-				string sizeDescription = ""
-				Form equipmentInSlot52 = akActor.GetWornForm(0x00000034)
-				if equipmentInSlot52 != None
-					Armor armorInSlot52 = equipmentInSlot52 as Armor
-					if armorInSlot52 != None	
-						if armorInSlot52.HasKeyword(TNG_XS)
-							sizeDescription = "an embarrassingly tiny prick"
-						elseif armorInSlot52.HasKeyword(TNG_S)
-							sizeDescription = "a very small cock"
-						elseif armorInSlot52.HasKeyword(TNG_M) || armorInSlot52.HasKeyword(TNG_DefaultSize)
-							sizeDescription = "an average sized cock"
-						elseif armorInSlot52.HasKeyword(TNG_L)
-							sizeDescription = "a large cock"
-						elseif armorInSlot52.HasKeyword(TNG_XL)
-							sizeDescription = "one of the biggest cocks you've ever seen"
+				if currentActor.GetActorBase().GetSex() == 0 && IsExposed(currentActor) || currentActor.HasKeyword(TNG_Gentlewoman) && IsExposed(currentActor)
+					if IsExposed(currentActor)
+						RegisterAction(actorName + "'s genitals are exposed.")
+					EndIf
+					string sizeDescription = ""
+					Debug.Trace("[minai] TNG Dick Check")
+					if currentActor.HasKeyword(TNG_XS) || currentActor.HasKeywordString("TNG_ActorAddnAuto:01")
+						sizeDescription = "an embarrassingly tiny prick"
+					elseif currentActor.HasKeyword(TNG_S) || currentActor.HasKeywordString("TNG_ActorAddnAuto:02")
+						sizeDescription = "a very small cock"
+					elseif currentActor.HasKeyword(TNG_M) || currentActor.HasKeyword(TNG_DefaultSize) || currentActor.HasKeywordString("TNG_ActorAddnAuto:03")
+						sizeDescription = "an average sized cock"
+					elseif currentActor.HasKeyword(TNG_L) || currentActor.HasKeywordString("TNG_ActorAddnAuto:04")
+						sizeDescription = "a large cock"
+					elseif currentActor.HasKeyword(TNG_XL) || currentActor.HasKeywordString("TNG_ActorAddnAuto:05")
+						sizeDescription = "one of the biggest cocks you've ever seen"
+					else
+						if currentActor != playerRef
+							sizeDescription = "no cock or balls at all"
 						EndIf
 					EndIf
-				EndIf
-				if sizeDescription != ""
-					RegisterAction("You can see that " + actorName + " has " + sizeDescription + ".")
+					if sizeDescription != ""
+						RegisterAction("You can see that " + actorName + " has " + sizeDescription + ".")
+					EndIf
 				EndIf
 			EndIf
-
-
-
 			if !bHasArousedKeywords
 				return
 			endif
