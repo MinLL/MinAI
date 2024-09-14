@@ -46,6 +46,8 @@ function Maintenance(minai_MainQuestController _main)
   ; Reset incase the player quit during a sex scene or this got stuck
   SetSexSceneState("off")
   InitializeSexDescriptions()
+  aiff.SetModAvailable("Ostim", bHasOstim)
+  aiff.SetModAvailable("Sexlab", slf != None)
 EndFunction
 
 
@@ -66,8 +68,16 @@ Function Start1pSex(actor akSpeaker)
 EndFunction
 
 
-Function Start2pSex(actor akSpeaker, actor akTarget, actor Player, bool bPlayerInScene)
+Function Start2pSex(actor akSpeaker, actor akTarget, actor Player, bool bPlayerInScene, string tags="")
   if bHasOstim && minai_UseOStim.GetValue() == 1.0
+    ; Convert sexlab tags to ostim tags
+    if tags == "Anal"
+      tags = "analsex"
+    elseif tags == "vaginal"
+      tags = "vaginalsex"
+    elseif tags == "oral"
+      tags = "blowjob"
+    EndIf
     int ActiveOstimThreadID
     if bPlayerInScene
       ActiveOstimThreadID = OThread.QuickStart(OActorUtil.ToArray(Player, akSpeaker))
@@ -81,8 +91,26 @@ Function Start2pSex(actor akSpeaker, actor akTarget, actor Player, bool bPlayerI
       OThread.StartAutoMode(ActiveOstimThreadID)
     EndIf
   Else
-    slf.Quickstart(akTarget,akSpeaker)
+    slf.Quickstart(akTarget,akSpeaker, animationTags=tags)
   EndIf
+EndFunction
+
+Function StartSexOrSwitchTo(actor akSpeaker, actor akTarget, actor Player, bool bPlayerInScene, string tags)
+      AIFF.ChillOut()
+      if CanAnimate(akTarget, akSpeaker)
+        Start2pSex(akSpeaker, akTarget, PlayerRef, bPlayerInScene, tags)
+        main.RegisterEvent(akSpeaker.GetDisplayName() + " and " + akTarget.GetDisplayName() + " started having sex.", "info_sexscene")
+      else
+        if akSpeaker != playerRef && akTarget != playerRef
+          Return
+        EndIf
+        int threadID = slf.FindPlayerController()
+        sslThreadController Controller = slf.ThreadSlots.GetController(threadID)
+        sslBaseAnimation[] animations = slf.GetAnimationsByTags(2, tags)
+        Controller.SetForcedAnimations(animations)
+        Controller.SetAnimation()
+        main.RegisterEvent(akSpeaker.GetDisplayName() + " and " + akTarget.GetDisplayName() + " changed up the sex to " + tags + " instead.", "info_sexscene")
+      endif
 EndFunction
 
 
@@ -171,7 +199,16 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     If command == "ExtCmdMasturbate"
       Start1pSex(akSpeaker)
     elseif command == "ExtCmdStartSexScene"
-      Start2pSex(akSpeaker, akTarget, PlayerRef, bPlayerInScene)
+      Main.RegisterEvent(akSpeaker.GetDisplayName() + " and " + akTarget.GetDisplayName() + " started having an intimate encounter together.")
+      SetSexSceneState("on")
+    elseif command == "ExtCmdStartBlowjob"
+      StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Oral")
+    elseif command == "ExtCmdStartAnal"
+      StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Anal")
+    elseif command == "ExtCmdStartVaginal"
+      StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Vaginal")
+    elseif command == "ExtCmdStartHandjob"
+      StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Handjob")
     elseIf command == "ExtCmdOrgy"
       Debug.Notification("Orgy is broken until I figure out how to get all AI actors")
       ; StartGroupSex(akSpeaker, akTarget, PlayerRef, bPlayerInScene, actorsFromFormList)
@@ -180,6 +217,7 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     Debug.Trace("[minai] Not processing keywords for exclusive scene - Conflicting scene is running")
   EndIf
 EndEvent
+
 
 
 Event OnOstimOrgasm(string eventName, string strArg, float numArg, Form sender)
@@ -299,7 +337,6 @@ Event OnAnimationStart(int tid, bool HasPlayer)
       bPlayerInScene=true;
     EndIf
   EndWhile
-  
   if (bPlayerInScene)
     AIFF.ChillOut()
   endif

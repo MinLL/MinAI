@@ -57,6 +57,7 @@ function Maintenance(minai_MainQuestController _main)
   if !JobInnKeeper || !JobInnServer
     Debug.Trace("[minai] - Failed to fetch vanilla factions")
   EndIf
+  aiff.SetModAvailable("Sunhelm", bHasSunhelm)
 EndFunction
 
 

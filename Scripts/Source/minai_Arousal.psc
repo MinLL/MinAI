@@ -91,6 +91,10 @@ function Maintenance(minai_MainQuestController _main)
       Debug.Trace("[minai] Could not fetch baboConfigs")
     EndIf
   EndIf
+  aiff.SetModAvailable("Aroused", bHasAroused)
+  aiff.SetModAvailable("ArousedKeywords", bHasArousedKeywords)
+  aiff.SetModAvailable("OSL", bHasOSL)
+  aiff.SetModAvailable("Babo", bHasBabo)
 EndFunction
 
 

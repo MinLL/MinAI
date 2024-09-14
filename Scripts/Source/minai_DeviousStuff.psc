@@ -93,6 +93,11 @@ function Maintenance(minai_MainQuestController _main)
     EndIf
   EndIf
 
+  aiff.SetModAvailable("DeviousFollowers", bHasDeviousFollowers)
+  aiff.SetModAvailable("DD", bHasDD)
+  aiff.SetModAvailable("STA", bHasSTA)
+  aiff.SetModAvailable("SLHH", bHasSLHH)
+  aiff.SetModAvailable("SLApp", bHasSLApp)
 EndFunction
 
 Function ResetSpankRule()

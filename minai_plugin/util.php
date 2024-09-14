@@ -36,4 +36,8 @@ $GenericFuncRet =function($gameRequest) {
     
 };
 
+Function IsModEnabled($mod) {
+    return IsEnabled($GLOBALS['PLAYER_NAME'], "mod_{$mod}");
+}
+
 ?>

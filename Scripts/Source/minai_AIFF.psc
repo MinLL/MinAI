@@ -6,6 +6,7 @@ minai_Survival survival
 minai_Arousal arousal
 minai_DeviousStuff devious
 
+bool bHasAIFF = False
 
 int Property contextUpdateInterval Auto
 Actor player
@@ -21,6 +22,7 @@ Function Maintenance(minai_MainQuestController _main)
   survival = (Self as Quest)as minai_Survival
   arousal = (Self as Quest)as minai_Arousal
   devious = (Self as Quest)as minai_DeviousStuff
+  bHasAIFF = True
   SetContext(player)
   RegisterForModEvent("AIFF_CommandReceived", "CommandDispatcher") ; Hook into AIFF
 EndFunction
@@ -76,9 +78,20 @@ EndEvent
 
 
 Function ChillOut()
-  AIAgentFunctions.logMessage("Relax and enjoy","force_current_task")
+  if bHasAIFF
+    AIAgentFunctions.logMessage("Relax and enjoy","force_current_task")
+  EndIf
 EndFunction
 
 Function SetAnimationBusy(int busy, string name)
-  AIAgentFunctions.setAnimationBusy(busy,name)
+  if bHasAIFF
+    AIAgentFunctions.setAnimationBusy(busy,name)
+  EndIf
+EndFunction
+
+
+Function SetModAvailable(string mod, bool yesOrNo)
+  if bHasAIFF
+    SetActorVariable(player, "mod_" + mod, yesOrNo)
+  EndIf
 EndFunction

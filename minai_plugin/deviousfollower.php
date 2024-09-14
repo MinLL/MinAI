@@ -6,6 +6,9 @@ function GetDeviousFollowerContext($name) {
   if (!IsPlayer($name)) {
     return "";
   }
+  if (!IsModEnabled("DeviousFollowers")) {
+      return "";
+  }
   $playerName = $GLOBALS["PLAYER_NAME"];
   $dfName = GetActorValue($playerName, "deviousFollowerName");
   if ($dfName == "0" || $dfName == "") {

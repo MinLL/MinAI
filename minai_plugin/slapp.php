@@ -23,7 +23,6 @@ $GLOBALS["FUNCTIONS"][] = [
 
 
 
-$GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdHug";
 
 
 $GLOBALS["FUNCRET"]["ExtCmdHug"]=$GenericFuncRet;
@@ -52,7 +51,6 @@ $GLOBALS["FUNCTIONS"][] = [
 
 
 
-$GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdKiss";
 
 
 $GLOBALS["FUNCRET"]["ExtCmdKiss"]=$GenericFuncRet;
@@ -80,12 +78,15 @@ $GLOBALS["FUNCTIONS"][] = [
         ],
     ];
 
-
-
-$GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdMolest";
-
-
 $GLOBALS["FUNCRET"]["ExtCmdMolest"]=$GenericFuncRet;
+
+if (IsModEnabled("SLAPP")) {
+    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdHug";
+    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdKiss";
+}
+if (IsModEnabled("SLHH")) {
+    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdMolest";
+}
 
 
 

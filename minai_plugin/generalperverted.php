@@ -93,8 +93,11 @@ $GLOBALS["FUNCTIONS"][] = [
 
 
 // Add this function to enabled array
-$GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdSpankAss";
-$GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdSpankTits";
+if (IsModEnabled("DeviousFollowers")) {
+    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdSpankAss";
+    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdSpankTits";
+}
+
 $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdGrope";
 $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdPinchNipples";
 

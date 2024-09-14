@@ -1,8 +1,9 @@
 <?php
 
-// Not working well. Revisit this later.
-$GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdIncreaseArousal";
-$GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdDecreaseArousal";
+if (IsModEnabled("OSL") || IsModEnabled("Aroused")) {
+    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdIncreaseArousal";
+    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdDecreaseArousal";
+}
 
 $GLOBALS["F_NAMES"]["ExtCmdIncreaseArousal"]="IncreaseArousal";
 $GLOBALS["F_NAMES"]["ExtCmdDecreaseArousal"]="DecreaseArousal";

@@ -90,7 +90,7 @@ $GLOBALS["FUNCTIONS"][] = [
     ];
 
 
-if ($isInnkeeper || $isServer) {
+if (IsModEnabled("Sunhelm") && ($isInnKeeper || $isServer)) {
   $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdServeFood";
 }
 if ($isInnKeeper) {
