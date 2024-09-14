@@ -1058,8 +1058,6 @@ function WriteClothingString(actor akActor, actor player, bool isYou=false, acto
 						sizeDescription = "a large cock"
 					elseif currentActor.HasKeyword(TNG_XL) || currentActor.HasKeywordString("TNG_ActorAddnAuto:05")
 						sizeDescription = "one of the biggest cocks you've ever seen"
-					elseif currentActor != playerRef
-							sizeDescription = "no cock or balls at all"
 					EndIf
 					if sizeDescription != ""
 						RegisterAction("You can see that " + actorName + " has " + sizeDescription + ".")
