@@ -85,12 +85,12 @@ $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdStopStimulation"]="{$GLOBALS["HER
 
 $GLOBALS["FUNCRET"]["ExtCmdShock"]=$GenericFuncRet;
 $GLOBALS["FUNCRET"]["ExtCmdForceOrgasm"]=$GenericFuncRet;
-$GLOBALS["FUNCRET"]["ExtCmdStopStimulation"]=$Genericfuncret;
+$GLOBALS["FUNCRET"]["ExtCmdStopStimulation"]=$GenericFuncRet;
 
 
 
 
-$Vibsettings = Array ("Very Weak", "Weak", "Medium", "Strong", "Very Strong");
+$vibSettings = Array ("Very Weak", "Weak", "Medium", "Strong", "Very Strong");
 
 // Temporary ugly hack until I can figure out why parameters aren't working. Mantella feature parity
 foreach ($vibSettings as $strength) {
