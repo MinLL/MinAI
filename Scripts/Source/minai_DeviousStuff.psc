@@ -20,6 +20,7 @@ string targetRule = ""
 minai_MainQuestController main
 minai_Arousal arousal
 minai_Sex sex
+minai_AIFF aiff
 
 actor playerRef
 
@@ -28,8 +29,9 @@ function Maintenance(minai_MainQuestController _main)
   playerRef = game.GetPlayer()
   main = _main
   
-  arousal = (Self as Quest)as minai_Arousal
-  sex = (Self as Quest)as minai_Sex
+  arousal = (Self as Quest) as minai_Arousal
+  sex = (Self as Quest) as minai_Sex
+  aiff = (Self as Quest) as minai_AIFF
   
   RegisterForModEvent("DeviceActorOrgasm", "OnOrgasm")
   RegisterForModEvent("DeviceActorEdged", "OnEdged")
@@ -41,8 +43,6 @@ function Maintenance(minai_MainQuestController _main)
   RegisterForModEvent("DDI_JamLock", "OnJamLock")
   RegisterForModEvent("DDI_DeviceEscapeAttempt", "OnDeviceEscapeAttempt")
   
-  
-  RegisterForModEvent("AIFF_CommandReceived", "CommandDispatcher") ; Hook into AIFF
   
   libs = Game.GetFormFromFile(0x00F624, "Devious Devices - Integration.esm") as zadlibs
     if libs
@@ -364,8 +364,8 @@ Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking, actor[] actorsF
         String[] rules = DealManager.GetDealRules(deals[i])
         int j = 0
         while j < rules.Length
-	  main.RegisterAction("" + playerName + " has agreed to the the following deal with their follower, and must obey it: " + ruleDesc)
           String ruleDesc = DealManager.GetRuleInfo(rules[j])
+	  main.RegisterAction("" + playerName + " has agreed to the the following deal with their follower, and must obey it: " + ruleDesc)
 	  if !spankRuleDone && StringUtil.Find(ruleDesc, "spanks daily") != -1
 	    spankRuleDone = True
 	    Float now = Utility.GetCurrentGameTime()
@@ -507,7 +507,7 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
       Debug.Notification("AI: Accepted Deal: " + targetRule)
       Debug.Trace("[minai] Player Accepted Deal: " + targetRule)
       dfDealController.MakeDeal(targetRule)
-      targetRule = ""
+      ClearTargetRule()
     EndIf
     if stringUtil.Find(sayLine, "-drugplayer-") != -1
       Debug.Notification("AI: Drinking Skooma")
@@ -518,7 +518,7 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
       Debug.Trace("[minai] Player Reject Deal")
       Debug.Notification("AI: Rejected Deal")
       dfDealController.RejectDeal(targetRule)
-      targetRule = ""
+      ClearTargetRule()
     EndIf
 
 EndFunction
@@ -546,14 +546,12 @@ bool function UseDD()
 EndFunction
 
 Event CommandDispatcher(String speakerName,String  command, String parameter)
-  Debug.Trace("[MinAI AIFF] External command "+command+ " received for "+speakerName + " with argument " + parameter)
   Actor akSpeaker=AIAgentFunctions.getAgentByName(speakerName)
-  actor akTarget
-  if parameter == ""
-    akTarget = AIAgentFunctions.getAgentByName(parameter)
-  else
+  actor akTarget= AIAgentFunctions.getAgentByName(parameter)
+  if !akTarget
     akTarget = PlayerRef
   EndIf
+
   string targetName = main.GetActorName(akTarget)
   
   bool bDeviousFollowerInScene = False
@@ -563,13 +561,10 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   EndIf
   
   if bHasDD && CanVibrate(akTarget)
-    int vibTime = Utility.RandomInt(1,15)
-    int vibTimeLong = Utility.RandomInt(10,30)
+    int vibTime = Utility.RandomInt(20,60)
     if (command == "ExtCmdForceOrgasm")
       libs.ActorOrgasm(akTarget)
-    ;
-    ; Vibration hooks
-    ;
+      AIAgentFunctions.logMessageForActor("command@ExtCmdForceActorOrgasm@@"+speakerName+" made " + targetName + " have an orgasm with a remote vibrator.","funcret",speakerName)
     elseIf (command == "ExtCmdTeaseWithVibratorVeryWeak")
       libs.StopVibrating(akTarget)
       libs.VibrateEffect(akTarget, 1, vibTime, True)
@@ -610,9 +605,9 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
       libs.StopVibrating(akTarget)
       libs.VibrateEffect(akTarget, 5, vibTime, False)
       AIAgentFunctions.logMessageForActor("command@ExtCmdStimulateWithVibratorVeryStrong@@"+speakerName+" very strongly stimulates " + targetName + " with a remote vibrator.","funcret",speakerName)
-    elseIf (command == "ExtCmdstopVibrate")
+    elseIf (command == "ExtCmdStopStimulation")
       libs.StopVibrating(akTarget)
-      AIAgentFunctions.logMessageForActor("command@ExtCmdStopVibrate@@"+speakerName+" turns off " + targetName + "'s remote vibrator.","funcret",speakerName)
+      AIAgentFunctions.logMessageForActor("command@ExtCmdStopStimulation@@"+speakerName+" turns off " + targetName + "'s remote vibrator.","funcret",speakerName)
     elseIf (command == "ExtCmdshock")
       libs.ShockActor(akTarget)
       AIAgentFunctions.logMessageForActor("command@ExtCmdShock@@"+speakerName+" remotely shocks  " + targetName + ".","funcret",speakerName)
@@ -643,15 +638,115 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     SpankTits(1, bDeviousFollowerInScene)
     AIAgentFunctions.logMessageForActor("command@ExtCmdSpankTits@@"+speakerName+" spanks " + targetName + "'s tits.","funcret",speakerName)
   EndIf
+
+  ; Mutually Exclusive commands
+  if sex.CanAnimate(akTarget, akSpeaker)
+    if command == "ExtCmdMolest"
+      HorribleHarassmentActivate(akSpeaker)
+      AIAgentFunctions.logMessageForActor("command@ExtCmdMolest@@"+speakerName+" began to sexually assault " + targetName + "'.","funcret",speakerName)
+    elseif command == "ExtCmdKiss"
+      HarassKiss(akSpeaker)
+      AIAgentFunctions.logMessageForActor("command@ExtCmdKiss@@"+speakerName+" began to kiss " + targetName + "'.","funcret",speakerName)
+    elseif command == "ExtCmdHug"
+      HarassHug(akSpeaker)
+      AIAgentFunctions.logMessageForActor("command@ExtCmdHug@@"+speakerName+" began to hug " + targetName + "'.","funcret",speakerName)
+    EndIf
+  Else
+    Debug.Trace("[minai] Not processing commands for exclusive scene - Conflicting scene is running")
+  EndIf
+
+  string ruleDesc = DealManager.GetRuleInfo(targetRule);
+  ; Devious Follower
+  if (command == "ExtCmdAcceptDeal") 
+    Debug.Notification("AI: Accepted Deal: " + targetRule)
+    Debug.Trace("[minai] Player Accepted Deal: " + targetRule)
+    dfDealController.MakeDeal(targetRule)
+    AIAgentFunctions.logMessageForActor("command@ExtCmdAcceptDeal@@"+targetName+" agreed to obey a new rule: \"" + ruleDesc + "\".","funcret",speakerName)
+    ClearTargetRule()
+  EndIf
+  if (command == "ExtCmdDrugPlayer") 
+    Debug.Notification("AI: Drinking Skooma")
+    Debug.Trace("[minai] Player Drinking Skooma")
+    dfDealController.MDC.DrinkSkooma()
+    AIAgentFunctions.logMessageForActor("command@ExtCmdAcceptDeal@@"+targetName+" used the drugs that " + speakerName + " provided.","funcret",speakerName)
+  EndIf
+  if (command == "ExtCmdRejectDeal") 
+    Debug.Trace("[minai] Player Reject Deal")
+    Debug.Notification("AI: Rejected Deal")
+    dfDealController.RejectDeal(targetRule)
+    AIAgentFunctions.logMessageForActor("command@ExtCmdAcceptDeal@@"+targetName+" refused to obey the new rule: \"" + ruleDesc + "\".","funcret",speakerName)
+    ClearTargetRule()
+  EndIf
 EndEvent
 
 Function SetContext(actor akTarget)
+  if !aiff
+    return
+  EndIf
   string actorName = main.GetActorName(akTarget)
   debug.Trace("[minai] Devious - SetContext( " + actorName + " )")
-  if CanVibrate(akTarget)
-    ; AIAgentFunctions
+  aiff.SetActorVariable(akTarget, "canVibrate", CanVibrate(akTarget))
+  aiff.SetActorVariable(akTarget, "zad_DeviousPlugVaginal", akTarget.WornHasKeyword(libs.zad_DeviousPlugVaginal))
+  aiff.SetActorVariable(akTarget, "zad_DeviousPlugAnal", akTarget.WornHasKeyword(libs.zad_DeviousPlugAnal))
+  aiff.SetActorVariable(akTarget, "zad_DeviousBelt", akTarget.WornHasKeyword(libs.zad_DeviousBelt))
+  aiff.SetActorVariable(akTarget, "zad_DeviousCollar", akTarget.WornHasKeyword(libs.zad_DeviousCollar))
+  aiff.SetActorVariable(akTarget, "zad_DeviousPiercingsNipple", akTarget.WornHasKeyword(libs.zad_DeviousPiercingsNipple))
+  aiff.SetActorVariable(akTarget, "zad_DeviousPiercingsVaginal", akTarget.WornHasKeyword(libs.zad_DeviousPiercingsVaginal))
+  aiff.SetActorVariable(akTarget, "zad_DeviousArmCuffs", akTarget.WornHasKeyword(libs.zad_DeviousArmCuffs))
+  aiff.SetActorVariable(akTarget, "zad_DeviousLegCuffs", akTarget.WornHasKeyword(libs.zad_DeviousLegCuffs))
+  aiff.SetActorVariable(akTarget, "zad_DeviousBra", akTarget.WornHasKeyword(libs.zad_DeviousBra))
+  aiff.SetActorVariable(akTarget, "zad_DeviousArmbinder", akTarget.WornHasKeyword(libs.zad_DeviousArmbinder))
+  aiff.SetActorVariable(akTarget, "zad_DeviousYoke", akTarget.WornHasKeyword(libs.zad_DeviousYoke))
+  aiff.SetActorVariable(akTarget, "zad_DeviousElbowTie", akTarget.WornHasKeyword(libs.zad_DeviousElbowTie))
+  aiff.SetActorVariable(akTarget, "zad_DeviousPetSuit", akTarget.WornHasKeyword(libs.zad_DeviousPetSuit))
+  aiff.SetActorVariable(akTarget, "zad_DeviousStraitJacket", akTarget.WornHasKeyword(libs.zad_DeviousStraitJacket))
+  aiff.SetActorVariable(akTarget, "zad_DeviousCorset", akTarget.WornHasKeyword(libs.zad_DeviousCorset))
+  aiff.SetActorVariable(akTarget, "zad_DeviousHood", akTarget.WornHasKeyword(libs.zad_DeviousHood))
+  aiff.SetActorVariable(akTarget, "zad_DeviousHobbleSkirt", akTarget.WornHasKeyword(libs.zad_DeviousHobbleSkirt))
+  aiff.SetActorVariable(akTarget, "zad_DeviousGloves", akTarget.WornHasKeyword(libs.zad_DeviousGloves))
+  aiff.SetActorVariable(akTarget, "zad_DeviousSuit", akTarget.WornHasKeyword(libs.zad_DeviousSuit))
+  aiff.SetActorVariable(akTarget, "zad_DeviousGag", akTarget.WornHasKeyword(libs.zad_DeviousGag))
+  aiff.SetActorVariable(akTarget, "zad_DeviousGagPanel", akTarget.WornHasKeyword(libs.zad_DeviousGagPanel))
+  aiff.SetActorVariable(akTarget, "zad_DeviousGagLarge", akTarget.WornHasKeyword(libs.zad_DeviousGagLarge))
+  aiff.SetActorVariable(akTarget, "zad_DeviousHarness", akTarget.WornHasKeyword(libs.zad_DeviousHarness))
+  aiff.SetActorVariable(akTarget, "zad_DeviousBlindfold", akTarget.WornHasKeyword(libs.zad_DeviousBlindfold))
+  aiff.SetActorVariable(akTarget, "zad_DeviousAnkleShackles", akTarget.WornHasKeyword(libs.zad_DeviousAnkleShackles))
+  aiff.SetActorVariable(akTarget, "zad_DeviousClamps", akTarget.WornHasKeyword(libs.zad_DeviousClamps))
+  if bHasDeviousFollowers
+    Actor deviousFollower = (Quest.GetQuest("_Dflow") as QF__Gift_09000D62).Alias__DMaster.GetRef() as Actor
+    if deviousFollower
+      aiff.SetActorVariable(playerRef, "deviousFollowerName", main.GetActorName(deviousFollower))
+    else
+      aiff.SetActorVariable(playerRef, "deviousFollowerName", "")
+    EndIf
+    aiff.SetActorVariable(playerRef, "deviousFollowerDebt", Debt.GetValueInt())
+    aiff.SetActorVariable(playerRef, "deviousFollowerEnslaveDebt", EnslaveDebt.GetValueInt())
+    aiff.SetActorVariable(playerRef, "deviousFollowerContractRemaining", ContractRemaining.GetValueInt())
+    aiff.SetActorVariable(playerRef, "deviousFollowerWillpower", dftools._DflowWill.GetValueInt())
+    if Debt.GetValueInt() >= EnslaveDebt.GetValueInt()
+      if targetRule  == ""
+        targetRule  = dfDealController.GetPotentialDeal()
+      EndIf
+      aiff.SetActorVariable(akTarget, "deviousFollowerTargetRule", targetRule)
+    EndIf
+    string ruleList = "";
+    String[] deals = DealManager.GetDeals()
+    int i = 0
+    while i < deals.Length
+      String[] rules = DealManager.GetDealRules(deals[i])
+      int j = 0
+      while j < rules.Length
+       String ruleDesc = DealManager.GetRuleInfo(rules[j])
+       ruleList += ruleDesc + "\n";
+      EndWhile
+    EndWhile
+    aiff.SetActorVariable(playerRef, "deviousFollowerRules", ruleList)
+    aiff.SetActorVariable(playerRef, "deviousTimeForSpanks",  dftools.SpankingTimer <= Utility.GetCurrentGameTime())
   EndIf
-  ; AIAgentFunctions.logMessage("sexscene@off","setconf")
-  ; AIAgentFunctions.logMessage("sexscene_sexlab@off","setconf")
 EndFunction
 
+
+Function ClearTargetRule()
+  targetRule = ""
+  aiff.SetActorVariable(playerRef, "deviousFollowerTargetRule", "")
+EndFunction

@@ -27,8 +27,6 @@ function Maintenance(minai_MainQuestController _main)
   if !minai_UseOStim
     Debug.Trace("[minai] Could not find ostim toggle")
   EndIf
-  
-  RegisterForModEvent("AIFF_CommandReceived", "CommandDispatcher") ; Hook into AIFF
 EndFunction
 
 
@@ -168,12 +166,9 @@ EndEvent
 
 
 Event CommandDispatcher(String speakerName,String  command, String parameter)
-  Debug.Trace("[MinAI AIFF] External command "+command+ " received for "+speakerName + " with argument " + parameter)
   Actor akSpeaker=AIAgentFunctions.getAgentByName(speakerName)
-  actor akTarget
-  if parameter == ""
-    akTarget = AIAgentFunctions.getAgentByName(parameter)
-  else
+  actor akTarget= AIAgentFunctions.getAgentByName(parameter)
+  if !akTarget
     akTarget = PlayerRef
   EndIf
 
@@ -183,9 +178,10 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   if CanAnimate(akTarget, akSpeaker)
     If command == "ExtCmdMasturbate"
       Start1pSex(akSpeaker)
-    elseif command == "ExtCmdSex"
+    elseif command == "ExtCmdStartSexScene"
       Start2pSex(akSpeaker, akTarget, PlayerRef, bPlayerInScene)
     elseIf command == "ExtCmdOrgy"
+      Debug.Notification("Orgy is broken until I figure out how to get all AI actors")
       ; StartGroupSex(akSpeaker, akTarget, PlayerRef, bPlayerInScene, actorsFromFormList)
     EndIf
   Else

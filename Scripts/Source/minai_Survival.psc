@@ -16,12 +16,16 @@ Faction JobInnServer
 
 minai_MainQuestController main
 minai_Mantella minMantella
+minai_AIFF aiff
+
 actor playerRef
 
 function Maintenance(minai_MainQuestController _main)
   playerRef = Game.GetPlayer()
   main = _main
   minMantella = (Self as Quest) as minai_Mantella
+  aiff = (Self as Quest) as minai_AIFF
+  
   Debug.Trace("[minai] Initializing Survival Module")
   if Game.GetModByName("SunhelmSurvival.esp") != 255
     bHasSunhelm = True
@@ -53,7 +57,6 @@ function Maintenance(minai_MainQuestController _main)
   if !JobInnKeeper || !JobInnServer
     Debug.Trace("[minai] - Failed to fetch vanilla factions")
   EndIf
-  RegisterForModEvent("AIFF_CommandReceived", "CommandDispatcher") ; Hook into AIFF
 EndFunction
 
 
@@ -163,12 +166,9 @@ EndFunction
 
 
 Event CommandDispatcher(String speakerName,String  command, String parameter)
-  Debug.Trace("[MinAI AIFF] External command "+command+ " received for "+speakerName + " with argument " + parameter)
   Actor akSpeaker=AIAgentFunctions.getAgentByName(speakerName)
-  actor akTarget
-  if parameter == ""
-    akTarget = AIAgentFunctions.getAgentByName(parameter)
-  else
+  actor akTarget= AIAgentFunctions.getAgentByName(parameter)
+  if !akTarget
     akTarget = PlayerRef
   EndIf
   string targetName = main.GetActorName(akTarget)
@@ -189,3 +189,29 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     
   EndIf
 EndEvent
+
+
+Function SetContext(actor akTarget)
+  if !aiff
+    return
+  EndIf
+  if bHasSunhelm
+    aiff.SetActorVariable(playerRef, "hunger", sunhelmMain.Hunger.CurrentHungerStage)
+    aiff.SetActorVariable(playerRef, "thirst", sunhelmMain.Thirst.CurrentThirstStage)
+    aiff.SetActorVariable(playerRef, "fatigue", sunhelmMain.Fatigue.CurrentFatigueStage)
+  EndIf
+  actor[] actors = new actor[2]
+  actors[0] = akTarget
+  actors[1] = playerRef
+  aiff.SetActorVariable(akTarget, "JobInnServer", minMantella.FactionInScene(JobInnServer, actors))
+  aiff.SetActorVariable(akTarget, "JobInnKeeper", minMantella.FactionInScene(JobInnKeeper, actors))
+
+  string allFactions = ""
+  Faction[] factions = akTarget.GetFactions(-128, 127)
+  int i = 0
+  while i < factions.Length
+    allFactions += factions[i].GetName() + "|"
+    i += 1
+  EndWhile
+  aiff.SetActorVariable(akTarget, "AllFactions", allFactions)
+EndFunction

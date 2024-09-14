@@ -36,7 +36,6 @@ Function Maintenance()
   survival = (Self as Quest) as minai_Survival
   arousal = (Self as Quest) as minai_Arousal
   devious = (Self as Quest) as minai_DeviousStuff
-  sex = (Self as Quest) as minai_Sex
   
   sex.Maintenance(Self)
   survival.Maintenance(Self)
@@ -59,8 +58,17 @@ Function RegisterAction(String eventLine)
   minMantella.RegisterAction(eventLine)
 EndFunction
 
-Function RegisterEvent(String eventLine)
-  minMantella.RegisterEvent(eventLine)
+Function RegisterEvent(String eventLine, string eventType = "")
+  if minMantella
+    minMantella.RegisterEvent(eventLine)
+  EndIf
+  if minAIFF
+    if eventType == ""
+      eventType = "info_sexscene"
+    EndIf
+    minAIFF.RegisterEvent(eventLine, eventType)
+  EndIf
+  
 EndFunction
 
 string Function GetActorName(actor akActor)
