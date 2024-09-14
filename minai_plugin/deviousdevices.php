@@ -1,12 +1,17 @@
 <?php
 
+require_once("util.php");
+
+$canVibrate = CanVibrate($GLOBALS["PLAYER_NAME"]);
+
+  
 $GLOBALS["F_NAMES"]["ExtCmdShock"]="Shock";
 $GLOBALS["F_NAMES"]["ExtCmdForceOrgasm"]="ForceOrgasm";
-$GLOBALS["F_NAMES"]["ExtCmdStopVibrate"]="StopVibrate";
+$GLOBALS["F_NAMES"]["ExtCmdStopStimulation"]="StopStimulation";
 
 $GLOBALS["F_TRANSLATIONS"]["ExtCmdShock"]="Shock the target in order to punish them or reduce their arousal";
 $GLOBALS["F_TRANSLATIONS"]["ExtCmdForceOrgasm"]="Make the target immediately have an orgasm";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdStopVibrate"]="Turn off the targets vibrator";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStopStimulation"]="Turn off the targets vibrator";
 
 
 
@@ -45,8 +50,8 @@ $GLOBALS["FUNCTIONS"][] = [
     ];
 
 $GLOBALS["FUNCTIONS"][] = [
-        "name" => $GLOBALS["F_NAMES"]["ExtCmdStopVibrate"],
-        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStopVibrate"],
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdStopStimulation"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStopStimulation"],
         "parameters" => [
             "type" => "object",
             "properties" => [
@@ -65,27 +70,27 @@ $GLOBALS["FUNCTIONS"][] = [
 
 
 
-
-$GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdShock";
-$GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdForceOrgasm";
-$GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStopVibrate";
-
+if ($canVibrate) {
+  $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdShock";
+  $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdForceOrgasm";
+  $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStopStimulation";
+ }
 
 
 $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdShock"]="{$GLOBALS["HERIKA_NAME"]} comments on remotely shocking {$GLOBALS["PLAYER_NAME"]}. {$GLOBALS["TEMPLATE_DIALOG"]}";
 $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdForceOrgasm"]="{$GLOBALS["HERIKA_NAME"]} comments on remotely forcing {$GLOBALS["PLAYER_NAME"]} to have an orgasm. {$GLOBALS["TEMPLATE_DIALOG"]}";
-$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdStopVibrate"]="{$GLOBALS["HERIKA_NAME"]} comments on turning off {$GLOBALS["PLAYER_NAME"]}'s vibrator. {$GLOBALS["TEMPLATE_DIALOG"]}";
+$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdStopStimulation"]="{$GLOBALS["HERIKA_NAME"]} comments on turning off {$GLOBALS["PLAYER_NAME"]}'s vibrator. {$GLOBALS["TEMPLATE_DIALOG"]}";
 
 
 
 $GLOBALS["FUNCRET"]["ExtCmdShock"]=$GLOBALS["FUNCRET"]["ExtCmdSpankAss"];
 $GLOBALS["FUNCRET"]["ExtCmdForceOrgasm"]=$GLOBALS["FUNCRET"]["ExtCmdSpankAss"];
-$GLOBALS["FUNCRET"]["ExtCmdStopVibrate"]=$GLOBALS["FUNCRET"]["ExtCmdSpankAss"];
+$GLOBALS["FUNCRET"]["ExtCmdStopStimulation"]=$GLOBALS["FUNCRET"]["ExtCmdSpankAss"];
 
 
 
 
-$vibSettings = array ("very weak", "weak", "medium", "strong", "very strong");
+$vibSettings = array ("Very Weak", "Weak", "Medium", "Strong", "Very Strong");
 
 // Temporary ugly hack until I can figure out why parameters aren't working. Mantella feature parity
 foreach ($vibSettings as $strength) {
@@ -109,15 +114,17 @@ foreach ($vibSettings as $strength) {
 									       ]
 		
 							       ],
-					      "required" => ["intensity"],
+					      "required" => [],
 					      ],
 			     ];
-  $GLOBALS["ENABLED_FUNCTIONS"][]="$keyword";
+  if ($canVibrate) {
+    $GLOBALS["ENABLED_FUNCTIONS"][]="$keyword";
+  }
   $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["$keyword"]="{$GLOBALS["HERIKA_NAME"]} comments on remotely teasing {$GLOBALS["PLAYER_NAME"]} with a $strength vibration. {$GLOBALS["TEMPLATE_DIALOG"]}";
 }
 
 foreach ($vibSettings as $strength) {
-  $keyword = "ExtCmdStimulateithVibrator" . str_replace(' ', '', $strength);
+  $keyword = "ExtCmdStimulateWithVibrator" . str_replace(' ', '', $strength);
   $name = "StimulateWithVibrator" . str_replace(' ', '', $strength);
   
   $GLOBALS["F_NAMES"][$keyword]=$name;
@@ -137,10 +144,12 @@ foreach ($vibSettings as $strength) {
 									       ]
 		
 							       ],
-					      "required" => ["intensity"],
+					      "required" => [],
 					      ],
 			     ];
-  $GLOBALS["ENABLED_FUNCTIONS"][]="$keyword";
+  if ($canVibrate) {
+    $GLOBALS["ENABLED_FUNCTIONS"][]="$keyword";
+  }
   $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["$keyword"]="{$GLOBALS["HERIKA_NAME"]} comments on remotely stimulating {$GLOBALS["PLAYER_NAME"]} with a $strength vibration. {$GLOBALS["TEMPLATE_DIALOG"]}";
 }
 

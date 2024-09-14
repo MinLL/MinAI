@@ -22,7 +22,6 @@ $GLOBALS["FUNCTIONS"][] = [
 
 
 
-$GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdRentRoom";
 
 
 $GLOBALS["FUNCRET"]["ExtCmdRentRoom"]=function($gameRequest) {
@@ -62,7 +61,6 @@ $GLOBALS["FUNCTIONS"][] = [
 
 
 
-$GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdServeFood";
 
 
 $GLOBALS["FUNCRET"]["ExtCmdServeFood"]=function($gameRequest) {
@@ -78,6 +76,14 @@ $GLOBALS["FUNCRET"]["ExtCmdServeFood"]=function($gameRequest) {
     
 };
 
+$isInnkeeper = IsEnabled($GLOBALS['HERIKA_NAME'], "JobInnKeeper");
+$isServer = IsEnabled($GLOBALS['HERIKA_NAME'], "JobInnServer");
 
+if ($isInnkeeper || $isServer) {
+  $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdServeFood";
+}
+if ($isInnKeeper) {
+  $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdRentRoom";
+}
 
 ?>

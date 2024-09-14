@@ -39,4 +39,6 @@ require "generalperverted.php";
 require "deviousdevices.php";
 require "arousal.php";
 require "survival.php";
+require "sex.php";
+require "slapp.php";
 ?>
