@@ -27,7 +27,7 @@ Function GetPhysicalDescription($name) {
     return $ret;
   }
   if($beautyScore != "0") {
-    $beautyScore = ceil($beautyScore/10);
+    $beautyScore = ceil(intval($beautyScore)/10);
     $ret .= "Her beauty is a {$beautyScore}, on a scale from 0-10. ";
   }
   if($breastsScore != "0") {
