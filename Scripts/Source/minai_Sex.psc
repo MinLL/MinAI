@@ -195,26 +195,22 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   bool bPlayerInScene = (akTarget == PlayerRef || akSpeaker == PlayerRef)
 
   string targetName = main.GetActorName(akTarget)
-  if CanAnimate(akTarget, akSpeaker)
-    If command == "ExtCmdMasturbate"
-      Start1pSex(akSpeaker)
-    elseif command == "ExtCmdStartSexScene"
-      Main.RegisterEvent(akSpeaker.GetDisplayName() + " and " + akTarget.GetDisplayName() + " started having an intimate encounter together.")
-      SetSexSceneState("on")
-    elseif command == "ExtCmdStartBlowjob"
-      StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Oral")
-    elseif command == "ExtCmdStartAnal"
-      StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Anal")
-    elseif command == "ExtCmdStartVaginal"
-      StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Vaginal")
-    elseif command == "ExtCmdStartHandjob"
-      StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Handjob")
-    elseIf command == "ExtCmdOrgy"
-      Debug.Notification("Orgy is broken until I figure out how to get all AI actors")
-      ; StartGroupSex(akSpeaker, akTarget, PlayerRef, bPlayerInScene, actorsFromFormList)
-    EndIf
-  Else
-    Debug.Trace("[minai] Not processing keywords for exclusive scene - Conflicting scene is running")
+  If command == "ExtCmdMasturbate"
+    Start1pSex(akSpeaker)
+  elseif command == "ExtCmdStartSexScene"
+    Main.RegisterEvent(akSpeaker.GetDisplayName() + " and " + akTarget.GetDisplayName() + " started having an intimate encounter together.")
+    SetSexSceneState("on")
+  elseif command == "ExtCmdStartBlowjob"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Oral")
+  elseif command == "ExtCmdStartAnal"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Anal")
+  elseif command == "ExtCmdStartVaginal"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Vaginal")
+  elseif command == "ExtCmdStartHandjob"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Handjob")
+  elseIf command == "ExtCmdOrgy"
+    Debug.Notification("Orgy is broken until I figure out how to get all AI actors")
+    ; StartGroupSex(akSpeaker, akTarget, PlayerRef, bPlayerInScene, actorsFromFormList)
   EndIf
 EndEvent
 
