@@ -20,6 +20,7 @@ jobs:
     - name: Remove metafiles
       run: |
         rm .gitignore
+        rm -rf .github
         rm README.md
         mkdir mantella_files
         mv config.ini mantella_files
