@@ -25,6 +25,7 @@ jobs:
         mv *.ini minai/
         mv Scripts minai/
         mv Data minai/
+        mv mantella_files minai/
         
     - name: Zip the files
       uses: TheDoctor0/zip-release@0.7.6
