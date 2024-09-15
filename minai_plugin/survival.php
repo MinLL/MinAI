@@ -131,7 +131,7 @@ if ($isInnKeeper) {
   $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdRentRoom";
 }
 
-if (IsInFaction($name, "CarriageSystem")) {
+if (IsInFaction($GLOBALS['HERIKA_NAME'], "Carriage System Vendors")) {
     $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdCarriageRide";
 }
 
