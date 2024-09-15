@@ -15,7 +15,7 @@ Function OnEffectStart(Actor akTarget, Actor akCaster)
     ; sex = (Self as Quest) as minai_Sex
     aiff.SetContext(akTarget)
     RegisterForSingleUpdate(aiff.ContextUpdateInterval)
-  Else
+  ElseIf akTarget
     ; Store voice types even if they're not a managed actor so that they will immediately have voices when spoken to
     aiff.StoreActorVoice(akTarget)
     ; Store factions and keywords for the same reason
@@ -31,5 +31,6 @@ Event OnUpdate()
     UnregisterForUpdate()
     return
   endif
+  aiff.SetContext(akTarget)
   RegisterForSingleUpdate(aiff.ContextUpdateInterval)
 EndEvent

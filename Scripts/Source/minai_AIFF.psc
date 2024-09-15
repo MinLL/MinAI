@@ -48,7 +48,11 @@ EndFunction
 
 
 Function SetContext(actor akTarget)
-  Debug.Trace("[minai] AIFF - SetContext()")
+  if !akTarget
+    Debug.Trace("[minai] AIFF - SetContext() called with none target")
+    return
+  EndIf
+  Debug.Trace("[minai] AIFF - SetContext(" + akTarget.GetDisplayName() + ")")
   devious.SetContext(akTarget)
   arousal.SetContext(akTarget)
   survival.SetContext(akTarget)
