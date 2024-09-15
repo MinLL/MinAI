@@ -25,13 +25,23 @@ Keyword SLA_MicroSkirt
 Keyword SLA_BootsHeels
 Keyword SLA_HasLeggings
 Keyword SLA_ArmorRubber
+Keyword TNG_XS
+Keyword TNG_S
+Keyword TNG_M
+Keyword TNG_L
+Keyword TNG_XL
+Keyword TNG_DefaultSize
+Keyword TNG_Gentlewoman
+Keyword TNG_Revealing
 
 
 bool bHasAroused = False
 bool bHasArousedKeywords = False
 bool bHasOSL = False
 bool bHasBabo = False
+bool bHasTNG = False
 int cuirassSlot = 0x00000004
+int genitalSlot = 0x00000020
 
 
 minai_MainQuestController main
@@ -45,42 +55,60 @@ function Maintenance(minai_MainQuestController _main)
   aiff = (Self as Quest) as minai_AIFF
   
   Debug.Trace("[minai] - Initializing Arousal Module.")
+  if Game.GetModByName("OSLAroused.esp") != 255
+    Debug.Trace("[minai] Found OSL Aroused")
+    bHasOSL = True
+  EndIf ;This could be elseif - abandon getting SLA keywords by FormID and use HasKeywordString instead
   if Game.GetModByName("SexlabAroused.esm") != 255
     Debug.Trace("[minai] Found Sexlab Aroused")
     bHasAroused = True
     Aroused = Game.GetFormFromFile(0x04290F, "SexlabAroused.esm") as slaUtilScr
     SLA_HalfNakedBikini = Game.GetFormFromFile(0x08E854, "SexlabAroused.esm") as Keyword
     SLA_ArmorHalfNaked = Game.GetFormFromFile(0x08E855, "SexlabAroused.esm") as Keyword
-    SLA_Brabikini = Game.GetFormFromFile(0x0308E856, "SexlabAroused.esm") as Keyword
-    SLA_ThongT = Game.GetFormFromFile(0x0308E857, "SexlabAroused.esm") as Keyword
-    SLA_ArmorSpendex = Game.GetFormFromFile(0x0308E858, "SexlabAroused.esm") as Keyword
-    SLA_PantiesNormal = Game.GetFormFromFile(0x0308EDC1, "SexlabAroused.esm") as Keyword
-    SLA_ThongLowLeg = Game.GetFormFromFile(0x0308EDC2, "SexlabAroused.esm") as Keyword
-    SLA_ThongCString = Game.GetFormFromFile(0x0308EDC3, "SexlabAroused.esm") as Keyword
-    SLA_KillerHeels = Game.GetFormFromFile(0x0308F326, "SexlabAroused.esm") as Keyword
-    SLA_PantsNormal = Game.GetFormFromFile(0x0308F3F3, "SexlabAroused.esm") as Keyword
-    SLA_MicroHotPants = Game.GetFormFromFile(0x0308F3F4, "SexlabAroused.esm") as Keyword
-    SLA_ThongGstring = Game.GetFormFromFile(0x0308F3F5, "SexlabAroused.esm") as Keyword
-    SLA_ArmorHarness = Game.GetFormFromFile(0x0308F3FC, "SexlabAroused.esm") as Keyword
-    SLA_ArmorTransparent = Game.GetFormFromFile(0x0308F3FD, "SexlabAroused.esm") as Keyword
-    SLA_ArmorLewdLeotard = Game.GetFormFromFile(0x0308F401, "SexlabAroused.esm") as Keyword
-    SLA_PelvicCurtain = Game.GetFormFromFile(0x0308F402, "SexlabAroused.esm") as Keyword
-    SLA_FullSkirt = Game.GetFormFromFile(0x0308F40D, "SexlabAroused.esm") as Keyword
-    SLA_MiniSkirt = Game.GetFormFromFile(0x0308F40E, "SexlabAroused.esm") as Keyword
-    SLA_MicroSkirt = Game.GetFormFromFile(0x0308F40F, "SexlabAroused.esm") as Keyword
-    SLA_BootsHeels = Game.GetFormFromFile(0x0308F410, "SexlabAroused.esm") as Keyword
-    SLA_HasLeggings = Game.GetFormFromFile(0x0308FE9F, "SexlabAroused.esm") as Keyword
-    SLA_ArmorRubber = Game.GetFormFromFile(0x0308FEA4, "SexlabAroused.esm") as Keyword
+    SLA_Brabikini = Game.GetFormFromFile(0x08E856, "SexlabAroused.esm") as Keyword
+    SLA_ThongT = Game.GetFormFromFile(0x08E857, "SexlabAroused.esm") as Keyword
+    SLA_ArmorSpendex = Game.GetFormFromFile(0x08E858, "SexlabAroused.esm") as Keyword
+    SLA_PantiesNormal = Game.GetFormFromFile(0x08EDC1, "SexlabAroused.esm") as Keyword
+    SLA_ThongLowLeg = Game.GetFormFromFile(0x08EDC2, "SexlabAroused.esm") as Keyword
+    SLA_ThongCString = Game.GetFormFromFile(0x08EDC3, "SexlabAroused.esm") as Keyword
+    SLA_KillerHeels = Game.GetFormFromFile(0x08F326, "SexlabAroused.esm") as Keyword
+    SLA_PantsNormal = Game.GetFormFromFile(0x08F3F3, "SexlabAroused.esm") as Keyword
+    SLA_MicroHotPants = Game.GetFormFromFile(0x08F3F4, "SexlabAroused.esm") as Keyword
+    SLA_ThongGstring = Game.GetFormFromFile(0x08F3F5, "SexlabAroused.esm") as Keyword
+    SLA_ArmorHarness = Game.GetFormFromFile(0x08F3FC, "SexlabAroused.esm") as Keyword
+    SLA_ArmorTransparent = Game.GetFormFromFile(0x08F3FD, "SexlabAroused.esm") as Keyword
+    SLA_ArmorLewdLeotard = Game.GetFormFromFile(0x08F401, "SexlabAroused.esm") as Keyword
+    SLA_PelvicCurtain = Game.GetFormFromFile(0x08F402, "SexlabAroused.esm") as Keyword
+    SLA_FullSkirt = Game.GetFormFromFile(0x08F40D, "SexlabAroused.esm") as Keyword
+    SLA_MiniSkirt = Game.GetFormFromFile(0x08F40E, "SexlabAroused.esm") as Keyword
+    SLA_MicroSkirt = Game.GetFormFromFile(0x08F40F, "SexlabAroused.esm") as Keyword
+    SLA_BootsHeels = Game.GetFormFromFile(0x08F410, "SexlabAroused.esm") as Keyword
+    SLA_HasLeggings = Game.GetFormFromFile(0x08FE9F, "SexlabAroused.esm") as Keyword
+    SLA_ArmorRubber = Game.GetFormFromFile(0x08FEA4, "SexlabAroused.esm") as Keyword
     ; Check a couple keywords to see if it's a stripped down SexlabAroused
     if SLA_HalfNakedBikini && SLA_ArmorHalfNaked
       bHasArousedKeywords = True
     EndIf
     Debug.Trace("[minai] Sexlab Aroused Keywords=" + bHasArousedKeywords)
   EndIf
-  if Game.GetModByName("OSLAroused.esp") != 255
-    Debug.Trace("[minai] Found OSL Aroused")
-    bHasOSL = True
+  if Game.GetModByName("TheNewGentleman.esp") != 255
+    bHasTNG = True
+	Debug.Trace("[minai] Found TNG")
+	TNG_XS = Game.GetFormFromFile(0x03BFE1, "TheNewGentleman.esp") as Keyword
+	TNG_S = Game.GetFormFromFile(0x03BFE2, "TheNewGentleman.esp") as Keyword
+	TNG_M = Game.GetFormFromFile(0x03BFE3, "TheNewGentleman.esp") as Keyword
+	TNG_L = Game.GetFormFromFile(0x03BFE4, "TheNewGentleman.esp") as Keyword
+	TNG_XL = Game.GetFormFromFile(0x03BFE5, "TheNewGentleman.esp") as Keyword
+	TNG_DefaultSize = Game.GetFormFromFile(0x03BFE0, "TheNewGentleman.esp") as Keyword
+	TNG_Gentlewoman = Game.GetFormFromFile(0x03BFF8, "TheNewGentleman.esp") as Keyword
+	TNG_Revealing = Game.GetFormFromFile(0x03BFFF, "TheNewGentleman.esp") as Keyword
+	if TNG_XS != None && TNG_S != None && TNG_M != None && TNG_L != None && TNG_XL != None && TNG_DefaultSize != None
+		Debug.Trace("[minai] TNG size keywords retrieved successfully.")
+	else
+		Debug.Trace("[minai] Failed to retrieve one or more TNG size keywords.")
+	EndIf
   EndIf
+
   if Game.GetModByName("BaboInteractiveDia.esp") != 255
     Debug.Trace("[minai] Found BaboDialogue")
     bHasBabo = True
@@ -132,9 +160,9 @@ Function WriteArousedString(bool bPlayerInScene, actor Player, actor[] actorsFro
 			String actorName = main.GetActorName(currentActor)
 			int arousal = GetActorArousal(currentActor)
 			if currentActor != Player
-			  main.RegisterAction(actorName + "'s sexual arousal level is " + arousal + " on a scale of 0-100, where 0 is \"not horny\", and 100 is \"desperate for sex\". They should behave accordingly.")
+			  main.RegisterAction(actorName + "'s sexual arousal is " + arousal + "%")
 			Else
-			  main.RegisterAction(actorName + "'s sexual arousal level is " + arousal + " on a scale of 0-100, where 0 is \"not horny\", and 100 is \"desperate for sex\".")
+			  main.RegisterAction(actorName + "'s sexual arousal is " + arousal + "%.")
 			EndIf
 		EndIf
 		i += 1
@@ -175,10 +203,33 @@ function WriteClothingString(actor akActor, actor player, bool isYou=false, acto
 		if (currentActor != None)
 			String actorName = main.GetActorName(currentActor)
 			Armor cuirass = currentActor.GetWornForm(cuirassSlot) as Armor
-			if !cuirass
+			if cuirass == None
 				main.RegisterAction(actorName + " is naked.")
 			else
 				main.RegisterAction(actorName + " is wearing " + cuirass.GetName())
+			EndIf
+			if bHasTNG
+				if currentActor.GetActorBase().GetSex() == 0 && IsExposed(currentActor) || currentActor.HasKeyword(TNG_Gentlewoman) && IsExposed(currentActor)
+					if IsExposed(currentActor) && cuirass != None
+						RegisterAction(actorName + "'s genitals are exposed.")
+					EndIf
+					string sizeDescription = ""
+					Debug.Trace("[minai] TNG Dick Check")
+					if currentActor.HasKeyword(TNG_XS) || currentActor.HasKeywordString("TNG_ActorAddnAuto:01")
+						sizeDescription = "an embarrassingly tiny prick"
+					elseif currentActor.HasKeyword(TNG_S) || currentActor.HasKeywordString("TNG_ActorAddnAuto:02")
+						sizeDescription = "a very small cock"
+					elseif currentActor.HasKeyword(TNG_M) || currentActor.HasKeyword(TNG_DefaultSize) || currentActor.HasKeywordString("TNG_ActorAddnAuto:03")
+						sizeDescription = "an average sized cock"
+					elseif currentActor.HasKeyword(TNG_L) || currentActor.HasKeywordString("TNG_ActorAddnAuto:04")
+						sizeDescription = "a large cock"
+					elseif currentActor.HasKeyword(TNG_XL) || currentActor.HasKeywordString("TNG_ActorAddnAuto:05")
+						sizeDescription = "one of the biggest cocks you've ever seen"
+					EndIf
+					if sizeDescription != ""
+						RegisterAction("You can see that " + actorName + " has " + sizeDescription + ".")
+					EndIf
+				EndIf
 			EndIf
 			if !bHasArousedKeywords
 				return
@@ -413,3 +464,24 @@ string Function GetFactionsForActor(actor akTarget)
   return ret
 EndFunction
 
+
+bool Function IsExposed(Actor akActor)
+    int itemIndex = akActor.GetNumItems()
+    while itemIndex > 0
+        itemIndex -= 1
+        Form item = akActor.GetNthForm(itemIndex)
+        Armor armorItem = item as Armor
+        if armorItem
+            if Math.LogicalAnd(armorItem.GetSlotMask(), cuirassSlot) != 0
+                if akActor.IsEquipped(armorItem)
+                    Debug.Trace("Equipped item in slot 52: " + armorItem.GetName())
+                    if !armorItem.HasKeyword(TNG_Revealing)
+                        return False
+                    EndIf
+                EndIf
+            EndIf
+        EndIf
+    EndWhile
+;	Debug.Trace("[minai] " + GetActorName(akActor) + " is exposed.")
+	return True
+EndFunction
