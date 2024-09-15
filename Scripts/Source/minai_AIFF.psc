@@ -95,3 +95,15 @@ Function SetModAvailable(string mod, bool yesOrNo)
     SetActorVariable(player, "mod_" + mod, yesOrNo)
   EndIf
 EndFunction
+
+
+Function StoreFactions(actor akTarget)
+  string allFactions = ""
+  Faction[] factions = akTarget.GetFactions(-128, 127)
+  int i = 0
+  while i < factions.Length
+    allFactions += factions[i].GetName() + "|"
+    i += 1
+  EndWhile
+  SetActorVariable(akTarget, "AllFactions", allFactions)
+EndFunction

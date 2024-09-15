@@ -2,7 +2,6 @@
 
 $GLOBALS["F_NAMES"]["ExtCmdRentRoom"]="RentRoom";
 $GLOBALS["F_TRANSLATIONS"]["ExtCmdRentRoom"]="Allow the target to rent a room";
-
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdRentRoom"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdRentRoom"],
@@ -13,17 +12,11 @@ $GLOBALS["FUNCTIONS"][] = [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
                     "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
-
                 ]
             ],
             "required" => [],
         ],
     ];
-
-
-
-
-
 $GLOBALS["FUNCRET"]["ExtCmdRentRoom"]=function($gameRequest) {
     // Example, if papyrus execution gives some error, we will need to rewrite request her.
     // BY default, request will be $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdRentRoom"]
@@ -41,7 +34,6 @@ $GLOBALS["FUNCRET"]["ExtCmdRentRoom"]=function($gameRequest) {
 
 $GLOBALS["F_NAMES"]["ExtCmdServeFood"]="ServeFood";
 $GLOBALS["F_TRANSLATIONS"]["ExtCmdServeFood"]="Serve food to the target";
-
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdServeFood"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdServeFood"],
@@ -58,20 +50,13 @@ $GLOBALS["FUNCTIONS"][] = [
             "required" => [],
         ],
     ];
-
-
-
-
-
 $GLOBALS["FUNCRET"]["ExtCmdServeFood"]=$GenericFuncRet;
 
 $isInnkeeper = IsEnabled($GLOBALS['HERIKA_NAME'], "JobInnKeeper");
 $isServer = IsEnabled($GLOBALS['HERIKA_NAME'], "JobInnServer");
 
-
 $GLOBALS["F_NAMES"]["ExtCmdTrade"]="BeginTrading";
 $GLOBALS["F_TRANSLATIONS"]["ExtCmdTrade"]="Buy or sell goods from {$GLOBALS["PLAYER_NAME"]}";
-
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdTrade"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdTrade"],
@@ -90,6 +75,55 @@ $GLOBALS["FUNCTIONS"][] = [
     ];
 
 
+$destinations = array();
+$destinations[] = "Whiterun";
+$destinations[] = "Solitude";
+$destinations[] = "Markarth";
+$destinations[] = "Riften";
+$destinations[] = "Windhelm";
+$destinations[] = "Morthal";
+$destinations[] = "Dawnstar";
+$destinations[] = "Falkreath";
+$destinations[] = "Winterhold";
+$destinations[] = "Darkwater Crossing";
+$destinations[] = "Dragon Bridge";
+$destinations[] = "Ivarstead";
+$destinations[] = "Karthwasten";
+$destinations[] = "Kynesgrove";
+$destinations[] = "Old Hroldan";
+$destinations[] = "Riverwood";
+$destinations[] = "Rorikstead";
+$destinations[] = "Shor's Stone";
+$destinations[] = "Stonehills";
+if (IsModEnabled("BetterFastTravel")) {
+    $destinations[] = "HalfMoonMill";
+    $destinations[] = "HeartwoodMill";
+    $destinations[] = "AngasMill";
+    $destinations[] = "LakeviewManor";
+    $destinations[] = "WindstadManor";
+    $destinations[] = "HeljarchenHall";
+    $destinations[] = "DayspringCanyon";
+    $destinations[] = "Helgen";
+}
+$GLOBALS["F_NAMES"]["ExtCmdCarriageRide"]="BeginCarriageRide";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdCarriageRide"]="Give {$GLOBALS["PLAYER_NAME"]} a ride in your carriage";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdCarriageRide"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdCarriageRide"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "The destination you are taking {$GLOBALS["PLAYER_NAME"]}",
+                    "enum" => $destinations
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+
+
 if (IsModEnabled("Sunhelm") && ($isInnKeeper || $isServer)) {
   $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdServeFood";
 }
@@ -97,6 +131,10 @@ if ($isInnKeeper) {
   $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdRentRoom";
 }
 
+if (IsInFaction($name, "CarriageSystem")) {
+    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdCarriageRide";
+}
+
 // Allow anyone to buy or sell. Don't restrict this to shop-keepers.
-$GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdTrade";
+$GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdCarriageRide";
 ?>

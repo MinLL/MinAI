@@ -2,6 +2,7 @@ scriptname minai_Survival extends Quest
 
 bool bHasSunhelm = False
 bool bUseVanilla = True
+bool bHasBFT = False
 
 _shweathersystem sunhelmWeather
 _SunHelmMain property sunhelmMain auto
@@ -13,6 +14,7 @@ Quest DialogueGeneric
 Faction JobInnKeeper
 Faction JobInnServer
 
+CarriageSystemScript carriageScript
 
 minai_MainQuestController main
 minai_Mantella minMantella
@@ -40,6 +42,13 @@ function Maintenance(minai_MainQuestController _main)
     EndIf    
   EndIf
 
+  carriageScript = Game.GetFormFromFile(0x17F01, "Skyrim.esm") as CarriageSystemScript
+  if !carriageScript
+    Debug.Trace("[minai] Could not get reference to carriageScript")
+  EndIf
+  if Game.GetModByName("BFT Ships and Carriages.esp") != 255
+    bHasBFT = true
+  EndIf
   ; Vanilla Integrations
   gold = Game.GetFormFromFile(0x0000000F, "Skyrim.esm")
   if !gold
@@ -58,6 +67,7 @@ function Maintenance(minai_MainQuestController _main)
     Debug.Trace("[minai] - Failed to fetch vanilla factions")
   EndIf
   aiff.SetModAvailable("Sunhelm", bHasSunhelm)
+  aiff.SetModAvailable("BetterFastTravel", bHasBFT)
 EndFunction
 
 
@@ -192,7 +202,75 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     akSpeaker.showbartermenu()
     AIAgentFunctions.logMessageForActor("command@ExtCmdTrade@@"+speakerName+" started trading goods with " + targetName + ".","funcret",speakerName)
   EndIf
+  if command == "ExtCmdCarriageRide"
+    ; Parameter has destination
+    int destination = GetDestination(parameter)
+    carriageScript.Travel(destination, akSpeaker)
+    AIAgentFunctions.logMessageForActor("command@ExtCmdCarriageTrip@@"+speakerName+" gave " + targetName + " a ride in a carriage to " + destination + ".","funcret",speakerName)
+  EndIf
 EndEvent
+
+
+int Function GetDestination(string destination)
+  if destination == "Whiterun"
+    return 1
+  elseif destination == "Solitude"
+    return 2
+  elseif destination == "Markarth"
+    return 3
+  elseif destination == "Riften"
+    return 4
+  elseif destination == "Windhelm"
+    return 5
+  elseif destination == "Morthal"
+    return 6
+  elseif destination == "Dawnstar"
+    return 7
+  elseif destination == "Falkreath"
+    return 8
+  elseif destination == "Winterhold"
+    return 9
+  ;; BYOH locations
+  elseif destination == "Darkwater Crossing"
+    return 10
+  elseif destination == "Dragon Bridge"
+    return 11
+  elseif destination == "Ivarstead"
+    return 12
+  elseif destination == "Karthwasten"
+    return 13
+  elseif destination == "Kynesgrove"
+    return 14
+  elseif destination == "Old Hroldan"
+    return 15
+  elseif destination == "Riverwood"
+    return 16
+  elseif destination == "Rorikstead"
+    return 17
+  elseif destination == "Shor's Stone"
+    return 18
+  elseif destination == "Stonehills"
+    return 19
+  elseif destination == "HalfMoonMill"
+    return 120
+  elseif destination == "HeartwoodMill"
+    return 121
+  elseif destination == "AngasMill"
+    return 122
+  elseif destination == "LakeviewManor"
+    return 123
+  elseif destination == "WindstadManor"
+    return 124
+  elseif destination == "HeljarchenHall"
+    return 125
+  elseif destination == "DayspringCanyon"
+    return 126
+  elseif destination == "Helgen"
+    return 127
+  EndIf
+  return 0
+EndFunction
+
 
 
 Function SetContext(actor akTarget)
@@ -209,13 +287,5 @@ Function SetContext(actor akTarget)
   actors[1] = playerRef
   aiff.SetActorVariable(akTarget, "JobInnServer", minMantella.FactionInScene(JobInnServer, actors))
   aiff.SetActorVariable(akTarget, "JobInnKeeper", minMantella.FactionInScene(JobInnKeeper, actors))
-
-  string allFactions = ""
-  Faction[] factions = akTarget.GetFactions(-128, 127)
-  int i = 0
-  while i < factions.Length
-    allFactions += factions[i].GetName() + "|"
-    i += 1
-  EndWhile
-  aiff.SetActorVariable(akTarget, "AllFactions", allFactions)
+  aiff.StoreFactions(akTarget)
 EndFunction

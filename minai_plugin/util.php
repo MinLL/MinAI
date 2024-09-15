@@ -40,4 +40,7 @@ Function IsModEnabled($mod) {
     return IsEnabled($GLOBALS['PLAYER_NAME'], "mod_{$mod}");
 }
 
+Function IsInFaction($name, $faction) {
+    return str_contains(GetActorValue($name, "AllFactions"), $faction);
+}
 ?>
