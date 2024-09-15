@@ -13,6 +13,8 @@ minai_Survival survival
 minai_Arousal arousal
 minai_DeviousStuff devious
 
+bool bHasMantella = False;
+bool bHasAIFF = False;
 
 Event OnInit()
   Maintenance()
@@ -36,17 +38,19 @@ Function Maintenance()
   survival = (Self as Quest) as minai_Survival
   arousal = (Self as Quest) as minai_Arousal
   devious = (Self as Quest) as minai_DeviousStuff
-  sex = (Self as Quest) as minai_Sex
   
   sex.Maintenance(Self)
   survival.Maintenance(Self)
   arousal.Maintenance(Self)
   devious.Maintenance(Self)
 
-  if minMantella
+  bHasMantella = (Game.GetModByName("Mantella.esp") != 255)
+  bHasAIFF = (Game.GetModByName("AIAgent.esp") != 255)
+  
+  if bHasMantella
     minMantella.Maintenance(Self)
   EndIf
-  if minAIFF
+  if bHasAIFF
     minAIFF.Maintenance(Self)
   EndIf
   Debug.Trace("[minai] Initialization complete.")
@@ -56,11 +60,22 @@ EndFunction
 
 
 Function RegisterAction(String eventLine)
-  minMantella.RegisterAction(eventLine)
+  if bHasMantella
+    minMantella.RegisterAction(eventLine)
+  EndIf
 EndFunction
 
-Function RegisterEvent(String eventLine)
-  minMantella.RegisterEvent(eventLine)
+Function RegisterEvent(String eventLine, string eventType = "")
+  if bHasMantella
+    minMantella.RegisterEvent(eventLine)
+  EndIf
+  if bHasAIFF
+    if eventType == ""
+      eventType = "info_sexscene"
+    EndIf
+    minAIFF.RegisterEvent(eventLine, eventType)
+  EndIf
+  
 EndFunction
 
 string Function GetActorName(actor akActor)

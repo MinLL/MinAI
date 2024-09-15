@@ -35,11 +35,15 @@ int cuirassSlot = 0x00000004
 
 
 minai_MainQuestController main
+minai_AIFF aiff
+
 actor playerRef
 
 function Maintenance(minai_MainQuestController _main)
   playerRef = Game.GetPlayer()
   main = _main
+  aiff = (Self as Quest) as minai_AIFF
+  
   Debug.Trace("[minai] - Initializing Arousal Module.")
   if Game.GetModByName("SexlabAroused.esm") != 255
     Debug.Trace("[minai] Found Sexlab Aroused")
@@ -87,6 +91,10 @@ function Maintenance(minai_MainQuestController _main)
       Debug.Trace("[minai] Could not fetch baboConfigs")
     EndIf
   EndIf
+  aiff.SetModAvailable("Aroused", bHasAroused)
+  aiff.SetModAvailable("ArousedKeywords", bHasArousedKeywords)
+  aiff.SetModAvailable("OSL", bHasOSL)
+  aiff.SetModAvailable("Babo", bHasBabo)
 EndFunction
 
 
@@ -298,12 +306,6 @@ Function WritePlayerAppearance(Actor player)
 EndFunction
 
 
-Event OnOstimOrgasm(string eventName, string strArg, float numArg, Form sender)
-    actor akActor = sender as actor
-    main.RegisterEvent(akActor.GetActorBase().getname() + " had an Orgasm")
-EndEvent
-
-
 Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking, actor[] actorsFromFormList, bool bPlayerInScene, string targetName, string speakerName, string playerName)
   if bPlayerInScene
     WritePlayerAppearance(playerRef)
@@ -325,4 +327,71 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
       UpdateArousal(akSpeaker, -12)
       Debug.Notification(akSpeaker.GetActorBase().GetName() + " is getting less turned on.")
     EndIf
+EndFunction
+
+
+
+
+Event CommandDispatcher(String speakerName,String  command, String parameter)
+  Actor akSpeaker=AIAgentFunctions.getAgentByName(speakerName)
+  actor akTarget= AIAgentFunctions.getAgentByName(parameter)
+  if !akTarget
+    akTarget = PlayerRef
+  EndIf
+  string targetName = main.GetActorName(akTarget)
+  if command == "ExtCmdIncreaseArousal"
+    UpdateArousal(akSpeaker, 6)
+    Debug.Notification(akSpeaker.GetActorBase().GetName() + " is getting more turned on.")
+    AIAgentFunctions.logMessageForActor("command@ExtCmdIncreaseArousal@@"+speakerName+"'s arousal level increased.","funcret",speakerName)
+  EndIf
+  if command == "ExtCmdDecreaseArousal"
+    UpdateArousal(akSpeaker, -12)
+    Debug.Notification(akSpeaker.GetActorBase().GetName() + " is getting less turned on.")
+    AIAgentFunctions.logMessageForActor("command@ExtCmdDecreaseArousal@@"+speakerName+"'s arousal level decreased.","funcret",speakerName)
+  EndIf
+EndEvent
+
+
+Function SetContext(actor akTarget)
+  if !aiff
+    return
+  EndIf
+  String actorName = main.GetActorName(akTarget)
+  Armor cuirass = akTarget.GetWornForm(cuirassSlot) as Armor
+  aiff.SetActorVariable(akTarget, "isnaked", !cuirass)
+  aiff.SetActorVariable(akTarget, "arousal", GetActorArousal(akTarget))
+  
+  if !bHasArousedKeywords
+  	return
+  endif
+  aiff.SetActorVariable(akTarget, "SLA_HalfNakedBikini", akTarget.WornHasKeyword(SLA_HalfNakedBikini))
+  aiff.SetActorVariable(akTarget, "SLA_ArmorHalfNaked", akTarget.WornHasKeyword(SLA_ArmorHalfNaked))
+  aiff.SetActorVariable(akTarget, "SLA_Brabikini", akTarget.WornHasKeyword(SLA_Brabikini))
+  aiff.SetActorVariable(akTarget, "SLA_Thong", akTarget.WornHasKeyword(SLA_ThongT) || akTarget.WornHasKeyword(SLA_ThongLowLeg) || akTarget.WornHasKeyword(SLA_ThongCString) || akTarget.WornHasKeyword(SLA_ThongGstring))
+  aiff.SetActorVariable(akTarget, "SLA_PantiesNormal", akTarget.WornHasKeyword(SLA_PantiesNormal))
+  aiff.SetActorVariable(akTarget, "SLA_Heels", akTarget.WornHasKeyword(SLA_KillerHeels) || akTarget.WornHasKeyword(SLA_BootsHeels))
+  aiff.SetActorVariable(akTarget, "SLA_PantsNormal", akTarget.WornHasKeyword(SLA_PantsNormal))
+  aiff.SetActorVariable(akTarget, "SLA_MicroHotPants", akTarget.WornHasKeyword(SLA_MicroHotPants))
+  aiff.SetActorVariable(akTarget, "SLA_ArmorHarness", akTarget.WornHasKeyword(SLA_ArmorHarness))
+  aiff.SetActorVariable(akTarget, "SLA_ArmorSpendex", akTarget.WornHasKeyword(SLA_ArmorSpendex))
+  aiff.SetActorVariable(akTarget, "SLA_ArmorTransparent", akTarget.WornHasKeyword(SLA_ArmorTransparent))
+  aiff.SetActorVariable(akTarget, "SLA_ArmorLewdLeotard", akTarget.WornHasKeyword(SLA_ArmorLewdLeotard))
+  aiff.SetActorVariable(akTarget, "SLA_PelvicCurtain", akTarget.WornHasKeyword(SLA_PelvicCurtain))
+  aiff.SetActorVariable(akTarget, "SLA_FullSkirt", akTarget.WornHasKeyword(SLA_FullSkirt))
+  aiff.SetActorVariable(akTarget, "SLA_MiniSkirt", akTarget.WornHasKeyword(SLA_MiniSkirt) || akTarget.WornHasKeyword(SLA_MicroSkirt))
+  aiff.SetActorVariable(akTarget, "SLA_ArmorRubber", akTarget.WornHasKeyword(SLA_ArmorRubber))
+  aiff.SetActorVariable(akTarget, "beautyScore", baboConfigs.BeautyValue.GetValueInt())
+  aiff.SetActorVariable(akTarget, "breastsScore", baboConfigs.BreastsValue.GetValueInt())
+  aiff.SetActorVariable(akTarget, "buttScore", baboConfigs.ButtocksValue.GetValueInt())
+  string gender = "male";
+  if akTarget.GetActorBase().GetSex() != 0
+    gender = "female"
+  endif
+  aiff.SetActorVariable(akTarget, "gender", gender)
+  string actorRace = (playerRef.GetActorBase().GetRace() as Form).GetName()
+  int cotrIndex = StringUtil.Find(actorRace, " DZ")
+  if cotrIndex != -1
+    actorRace = StringUtil.Substring(actorRace, 0, cotrIndex)
+  endif
+  aiff.SetActorVariable(akTarget, "race", actorRace)
 EndFunction

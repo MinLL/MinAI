@@ -16,10 +16,16 @@ Faction JobInnServer
 
 minai_MainQuestController main
 minai_Mantella minMantella
+minai_AIFF aiff
+
+actor playerRef
 
 function Maintenance(minai_MainQuestController _main)
+  playerRef = Game.GetPlayer()
   main = _main
   minMantella = (Self as Quest) as minai_Mantella
+  aiff = (Self as Quest) as minai_AIFF
+  
   Debug.Trace("[minai] Initializing Survival Module")
   if Game.GetModByName("SunhelmSurvival.esp") != 255
     bHasSunhelm = True
@@ -51,7 +57,7 @@ function Maintenance(minai_MainQuestController _main)
   if !JobInnKeeper || !JobInnServer
     Debug.Trace("[minai] - Failed to fetch vanilla factions")
   EndIf
-
+  aiff.SetModAvailable("Sunhelm", bHasSunhelm)
 EndFunction
 
 
@@ -148,4 +154,68 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
     if stringutil.Find(sayLine, "-undress-") != -1
       akSpeaker.UnequipAll()
     endif
+EndFunction
+
+
+
+
+
+
+
+
+
+
+
+Event CommandDispatcher(String speakerName,String  command, String parameter)
+  Actor akSpeaker=AIAgentFunctions.getAgentByName(speakerName)
+  actor akTarget= AIAgentFunctions.getAgentByName(parameter)
+  if !akTarget
+    akTarget = PlayerRef
+  EndIf
+  string targetName = main.GetActorName(akTarget)
+  ; Sunhelm
+  if command == "ExtCmdServeFood"
+    FeedPlayer(akSpeaker, PlayerRef)
+    AIAgentFunctions.logMessageForActor("command@ExtCmdFeedPlayer@@"+speakerName+" served " + targetName + " a meal.","funcret",speakerName)
+  EndIf
+  ; Vanilla functionality
+  if command == "ExtCmdRentRoom"
+    if playerRef.GetItemCount(Gold) < (DialogueGeneric as DialogueGenericScript).RoomRentalCost.GetValue() as Int
+      Debug.Notification("AI: Player does not have enough gold to rent room.")
+      AIAgentFunctions.logMessageForActor("command@ExtCmdRentRoom@@" + targetName + " did not have enough gold for the room.","funcret", speakerName)
+    Else
+      (akSpeaker as RentRoomScript).RentRoom(DialogueGeneric as DialogueGenericScript)
+      AIAgentFunctions.logMessageForActor("command@ExtCmdRentRoom@@"+speakerName+" provided " + targetName + " a room for the night.","funcret",speakerName)
+    EndIf
+  EndIf
+  if command == "ExtCmdTrade"
+    akSpeaker.showbartermenu()
+    AIAgentFunctions.logMessageForActor("command@ExtCmdTrade@@"+speakerName+" started trading goods with " + targetName + ".","funcret",speakerName)
+  EndIf
+EndEvent
+
+
+Function SetContext(actor akTarget)
+  if !aiff
+    return
+  EndIf
+  if bHasSunhelm
+    aiff.SetActorVariable(playerRef, "hunger", sunhelmMain.Hunger.CurrentHungerStage)
+    aiff.SetActorVariable(playerRef, "thirst", sunhelmMain.Thirst.CurrentThirstStage)
+    aiff.SetActorVariable(playerRef, "fatigue", sunhelmMain.Fatigue.CurrentFatigueStage)
+  EndIf
+  actor[] actors = new actor[2]
+  actors[0] = akTarget
+  actors[1] = playerRef
+  aiff.SetActorVariable(akTarget, "JobInnServer", minMantella.FactionInScene(JobInnServer, actors))
+  aiff.SetActorVariable(akTarget, "JobInnKeeper", minMantella.FactionInScene(JobInnKeeper, actors))
+
+  string allFactions = ""
+  Faction[] factions = akTarget.GetFactions(-128, 127)
+  int i = 0
+  while i < factions.Length
+    allFactions += factions[i].GetName() + "|"
+    i += 1
+  EndWhile
+  aiff.SetActorVariable(akTarget, "AllFactions", allFactions)
 EndFunction
