@@ -22,8 +22,6 @@ jobs:
         mkdir minai
         mv minai_plugin minai/
         mv *.esp minai/
-        mv config.ini minai/mantella_files/
-        mv prompts_vanilla.txt minai/mantella_files/
         mv *.ini minai/
         mv Scripts minai/
         mv Data minai/
