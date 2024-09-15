@@ -136,5 +136,5 @@ if (IsInFaction($name, "CarriageSystem")) {
 }
 
 // Allow anyone to buy or sell. Don't restrict this to shop-keepers.
-$GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdCarriageRide";
+$GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdCarriageTrade";
 ?>
