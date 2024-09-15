@@ -46,55 +46,55 @@ Function GetPhysicalDescription($name) {
 
 Function GetClothingContext($name) {
   $ret = "";
-  if (IsEnabled($name, "SLA_HalfNakedBikini")) {
+  if (HasKeyword($name, "SLA_HalfNakedBikini")) {
     $ret .= "{$name} is wearing a set of revealing bikini armor.\n";
   }
-  if (IsEnabled($name, "SLA_ArmorHalfNaked")) {
+  if (HasKeyword($name, "SLA_ArmorHalfNaked")) {
     $ret .= "{$name} is wearing very revealing attire, leaving them half naked.\n";
   }
-  if (IsEnabled($name, "SLA_Brabikini")) {
+  if (HasKeyword($name, "SLA_Brabikini")) {
     $ret .= "{$name} is wearing a bra underneath her other equipment.\n";
   }
-  if (IsEnabled($name, "SLA_Thong")) {
+  if (HasKeyword($name, "SLA_Thong")) {
     $ret .= "{$name} is wearing a thong underneath her other equipment.\n";
   }
-  if (IsEnabled($name, "SLA_PantiesNormal")) {
+  if (HasKeyword($name, "SLA_PantiesNormal")) {
     $ret .= "{$name} is wearing plain panties underneath her other equipment.\n";
   }
-  if (IsEnabled($name, "SLA_Heels")) {
+  if (HasKeyword($name, "SLA_Heels")) {
     $ret .= "{$name} is wearing a set of high-heels.\n";
   }
-  if (IsEnabled($name, "SLA_PantsNormal")) {
+  if (HasKeyword($name, "SLA_PantsNormal")) {
     $ret .= "{$name} is wearing a set of ordinary pants.\n";
   }
-  if (IsEnabled($name, "SLA_MicroHotPants")) {
+  if (HasKeyword($name, "SLA_MicroHotPants")) {
     $ret .= "{$name} is wearing a set of short hot-pants that accentuate her ass.\n";
   }
-  if (IsEnabled($name, "SLA_ArmorHarness")) {
+  if (HasKeyword($name, "SLA_ArmorHarness")) {
     $ret .= "{$name} is wearing a form-fitting body harness.\n";
   }
-  if (IsEnabled($name, "SLA_ArmorSpendex")) {
+  if (HasKeyword($name, "SLA_ArmorSpendex")) {
     $ret .= "{$name}'s outfit is made out of latex (Referred to as Ebonite).\n";
   }
-  if (IsEnabled($name, "SLA_ArmorTransparent")) {
+  if (HasKeyword($name, "SLA_ArmorTransparent")) {
     $ret .= "{$name}'s outfit is transparent, leaving nothing to the imagination.\n";
   }
-  if (IsEnabled($name, "SLA_ArmorLewdLeotard")) {
+  if (HasKeyword($name, "SLA_ArmorLewdLeotard")) {
     $ret .= "{$name} is wearing a sheer, revealing leotard leaving very little to the imagination.\n";
   }
-  if (IsEnabled($name, "SLA_PelvicCurtain")) {
+  if (HasKeyword($name, "SLA_PelvicCurtain")) {
     $ret .= "{$name}'s pussy is covered only by a sheer curtain of fabric.\n";
   }
-  if (IsEnabled($name, "SLA_FullSkirt")) {
+  if (HasKeyword($name, "SLA_FullSkirt")) {
     $ret .= "{$name} is wearing a full length skirt that goes down to her knees.\n";
   }
-  if (IsEnabled($name, "SLA_MiniSkirt")) {
+  if (HasKeyword($name, "SLA_MiniSkirt")) {
     $ret .= "{$name} is wearing a short mini-skirt that barely covers her ass. Her underwear or panties are sometimes visible underneath when she moves.\n";
   }
-  if (IsEnabled($name, "SLA_ArmorRubber")) {
+  if (HasKeyword($name, "SLA_ArmorRubber")) {
     $ret .= "{$name}'s outfit is made out of tight form-fitting rubber (Referred to as Ebonite).\n";
   }
-  if (IsEnabled($name, "isNaked")) {
+  if (HasKeyword($name, "isNaked")) {
     $ret .= "{$name} is naked and exposed.\n";
   }
   return $ret;
@@ -103,82 +103,82 @@ Function GetClothingContext($name) {
 
 Function GetDDContext($name) {
   $ret = "";
-  if (IsEnabled($name, "zad_DeviousPlugVaginal")) {
+  if (HasKeyword($name, "zad_DeviousPlugVaginal")) {
     $ret .= "{$name} has a remotely controlled plug in her pussy capable of powerful vibrations.\n";
   }
-  if (IsEnabled($name, "zad_DeviousPlugAnal")) {
+  if (HasKeyword($name, "zad_DeviousPlugAnal")) {
     $ret .= "{$name} has a remotely controlled plug in her ass capable of powerful vibrations.\n";
   }
-  if (IsEnabled($name, "zad_DeviousBelt")) {
+  if (HasKeyword($name, "zad_DeviousBelt")) {
     $ret .= "{$name}'s pussy is locked away by a chastity belt, preventing her from touching it or having sex.\n";
   }
-  if (IsEnabled($name, "zad_DeviousCollar")) {
+  if (HasKeyword($name, "zad_DeviousCollar")) {
     $ret .= "{$name} is wearing a collar marking her as someone's property.\n";
   }
-  if (IsEnabled($name, "zad_DeviousPiercingsNipple")) {
+  if (HasKeyword($name, "zad_DeviousPiercingsNipple")) {
     $ret .= "{$name} is wearing remotely controlled nipple piercings capable of powerful vibration.\n";
   }
-  if (IsEnabled($name, "zad_DeviousPiercingsVaginal")) {
+  if (HasKeyword($name, "zad_DeviousPiercingsVaginal")) {
     $ret .= "{$name} is wearing a remotely controlled clitoral ring capable of powerful vibration.\n";
   }
-  if (IsEnabled($name, "zad_DeviousArmCuffs")) {
+  if (HasKeyword($name, "zad_DeviousArmCuffs")) {
     $ret .= "{$name} is wearing an arm cuff on each arm.\n";
   }
-  if (IsEnabled($name, "zad_DeviousLegCuffs")) {
+  if (HasKeyword($name, "zad_DeviousLegCuffs")) {
     $ret .= "{$name} is wearing a leg cuff on each leg.\n";
   }
-  if (IsEnabled($name, "zad_DeviousBra")) {
+  if (HasKeyword($name, "zad_DeviousBra")) {
     $ret .= "{$name}'s breasts are locked away in a chastity bra.\n";
   }
-  if (IsEnabled($name, "zad_DeviousArmbinder")) {
+  if (HasKeyword($name, "zad_DeviousArmbinder")) {
     $ret .= "{$name}'s hands are secured behind her back by an armbinder, leaving her helpless.\n";
   }
-  if (IsEnabled($name, "zad_DeviousYoke")) {
+  if (HasKeyword($name, "zad_DeviousYoke")) {
     $ret .= "{$name}'s hands and neck are locked in an uncomfortable yoke, leaving her helpless.\n";
   }
-  if (IsEnabled($name, "zad_DeviousElbowTie")) {
+  if (HasKeyword($name, "zad_DeviousElbowTie")) {
     $ret .= "{$name}'s arms are tied behind her back in-a strict elbow tie, leaving her helpless.\n";
   }
-  if (IsEnabled($name, "zad_DeviousPetSuit")) {
+  if (HasKeyword($name, "zad_DeviousPetSuit")) {
     $ret .= "{$name} is wearing a full-body suit made out of shiny latex (Referred to as Ebonite) leaving nothing to the imagination.\n";
   }
-  if (IsEnabled($name, "zad_DeviousStraitJacket")) {
+  if (HasKeyword($name, "zad_DeviousStraitJacket")) {
     $ret .= "{$name}'s arms are secured by a strait jacket, leaving her helpless.\n";
   }
-  if (IsEnabled($name, "zad_DeviousCorset")) {
+  if (HasKeyword($name, "zad_DeviousCorset")) {
     $ret .= "{$name} is wearing a corset around her waist.\n";
   }
-  if (IsEnabled($name, "zad_DeviousHood")) {
+  if (HasKeyword($name, "zad_DeviousHood")) {
     $ret .= "{$name} is wearing a hood over her head.\n";
   }
-  if (IsEnabled($name, "zad_DeviousHobbleSkirt")) {
+  if (HasKeyword($name, "zad_DeviousHobbleSkirt")) {
     $ret .= "{$name} is wearing a confining hobble-skirt that is restricting her movements.\n";
   }
-  if (IsEnabled($name, "zad_DeviousGloves")) {
+  if (HasKeyword($name, "zad_DeviousGloves")) {
     $ret .= "{$name} is wearing a a pair of locking gloves.\n";
   }
-  if (IsEnabled($name, "zad_DeviousSuit")) {
+  if (HasKeyword($name, "zad_DeviousSuit")) {
     $ret .= "{$name} is wearing skin tight body-suit.\n";
   }
-  if (IsEnabled($name, "zad_DeviousGag")) {
+  if (HasKeyword($name, "zad_DeviousGag")) {
     $ret .= "{$name} is gagged and is drooling.\n";
   }
-  if (IsEnabled($name, "zad_DeviousGagPanel")) {
+  if (HasKeyword($name, "zad_DeviousGagPanel")) {
     $ret .= "{$name} is gagged with a panel-gag that leaves her tongue exposed and is unable to close their mouth.\n";
   }
-  if (IsEnabled($name, "zad_DeviousGagLarge")) {
+  if (HasKeyword($name, "zad_DeviousGagLarge")) {
     $ret .= "{$name} is gagged with a large gag and cannot speak clearly.\n";
   }
-  if (IsEnabled($name, "zad_DeviousHarness")) {
+  if (HasKeyword($name, "zad_DeviousHarness")) {
     $ret .= "{$name} is wearing a form-fitting leather harness.\n";
   }
-  if (IsEnabled($name, "zad_DeviousBlindfold")) {
+  if (HasKeyword($name, "zad_DeviousBlindfold")) {
     $ret .= "{$name} is blindfolded and cannot see where she is going.\n";
   }
-  if (IsEnabled($name, "zad_DeviousAnkleShackles")) {
+  if (HasKeyword($name, "zad_DeviousAnkleShackles")) {
     $ret .= "{$name} is wearing a set of ankle shackles, restricting her ability to move quickly.\n";
   }
-  if (IsEnabled($name, "zad_DeviousClamps")) {
+  if (HasKeyword($name, "zad_DeviousClamps")) {
     $ret .= "{$name} is wearing a set of painful nipple clamps.\n";
   }
   return $ret;

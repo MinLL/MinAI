@@ -691,32 +691,6 @@ Function SetContext(actor akTarget)
   string actorName = main.GetActorName(akTarget)
   debug.Trace("[minai] Devious - SetContext( " + actorName + " )")
   aiff.SetActorVariable(akTarget, "canVibrate", CanVibrate(akTarget))
-  aiff.SetActorVariable(akTarget, "zad_DeviousPlugVaginal", akTarget.WornHasKeyword(libs.zad_DeviousPlugVaginal))
-  aiff.SetActorVariable(akTarget, "zad_DeviousPlugAnal", akTarget.WornHasKeyword(libs.zad_DeviousPlugAnal))
-  aiff.SetActorVariable(akTarget, "zad_DeviousBelt", akTarget.WornHasKeyword(libs.zad_DeviousBelt))
-  aiff.SetActorVariable(akTarget, "zad_DeviousCollar", akTarget.WornHasKeyword(libs.zad_DeviousCollar))
-  aiff.SetActorVariable(akTarget, "zad_DeviousPiercingsNipple", akTarget.WornHasKeyword(libs.zad_DeviousPiercingsNipple))
-  aiff.SetActorVariable(akTarget, "zad_DeviousPiercingsVaginal", akTarget.WornHasKeyword(libs.zad_DeviousPiercingsVaginal))
-  aiff.SetActorVariable(akTarget, "zad_DeviousArmCuffs", akTarget.WornHasKeyword(libs.zad_DeviousArmCuffs))
-  aiff.SetActorVariable(akTarget, "zad_DeviousLegCuffs", akTarget.WornHasKeyword(libs.zad_DeviousLegCuffs))
-  aiff.SetActorVariable(akTarget, "zad_DeviousBra", akTarget.WornHasKeyword(libs.zad_DeviousBra))
-  aiff.SetActorVariable(akTarget, "zad_DeviousArmbinder", akTarget.WornHasKeyword(libs.zad_DeviousArmbinder))
-  aiff.SetActorVariable(akTarget, "zad_DeviousYoke", akTarget.WornHasKeyword(libs.zad_DeviousYoke))
-  aiff.SetActorVariable(akTarget, "zad_DeviousElbowTie", akTarget.WornHasKeyword(libs.zad_DeviousElbowTie))
-  aiff.SetActorVariable(akTarget, "zad_DeviousPetSuit", akTarget.WornHasKeyword(libs.zad_DeviousPetSuit))
-  aiff.SetActorVariable(akTarget, "zad_DeviousStraitJacket", akTarget.WornHasKeyword(libs.zad_DeviousStraitJacket))
-  aiff.SetActorVariable(akTarget, "zad_DeviousCorset", akTarget.WornHasKeyword(libs.zad_DeviousCorset))
-  aiff.SetActorVariable(akTarget, "zad_DeviousHood", akTarget.WornHasKeyword(libs.zad_DeviousHood))
-  aiff.SetActorVariable(akTarget, "zad_DeviousHobbleSkirt", akTarget.WornHasKeyword(libs.zad_DeviousHobbleSkirt))
-  aiff.SetActorVariable(akTarget, "zad_DeviousGloves", akTarget.WornHasKeyword(libs.zad_DeviousGloves))
-  aiff.SetActorVariable(akTarget, "zad_DeviousSuit", akTarget.WornHasKeyword(libs.zad_DeviousSuit))
-  aiff.SetActorVariable(akTarget, "zad_DeviousGag", akTarget.WornHasKeyword(libs.zad_DeviousGag))
-  aiff.SetActorVariable(akTarget, "zad_DeviousGagPanel", akTarget.WornHasKeyword(libs.zad_DeviousGagPanel))
-  aiff.SetActorVariable(akTarget, "zad_DeviousGagLarge", akTarget.WornHasKeyword(libs.zad_DeviousGagLarge))
-  aiff.SetActorVariable(akTarget, "zad_DeviousHarness", akTarget.WornHasKeyword(libs.zad_DeviousHarness))
-  aiff.SetActorVariable(akTarget, "zad_DeviousBlindfold", akTarget.WornHasKeyword(libs.zad_DeviousBlindfold))
-  aiff.SetActorVariable(akTarget, "zad_DeviousAnkleShackles", akTarget.WornHasKeyword(libs.zad_DeviousAnkleShackles))
-  aiff.SetActorVariable(akTarget, "zad_DeviousClamps", akTarget.WornHasKeyword(libs.zad_DeviousClamps))
   if bHasDeviousFollowers
     Actor deviousFollower = (Quest.GetQuest("_Dflow") as QF__Gift_09000D62).Alias__DMaster.GetRef() as Actor
     if deviousFollower
@@ -755,3 +729,42 @@ Function ClearTargetRule()
   targetRule = ""
   aiff.SetActorVariable(playerRef, "deviousFollowerTargetRule", "")
 EndFunction
+
+
+string Function GetKeywordsForActor(actor akTarget)
+  string ret = ""
+  ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousPlugVaginal", libs.zad_DeviousPlugVaginal)
+  ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousPlugAnal", libs.zad_DeviousPlugAnal)
+  ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousBelt", libs.zad_DeviousBelt)
+  ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousCollar", libs.zad_DeviousCollar)
+  ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousPiercingsNipple", libs.zad_DeviousPiercingsNipple)
+  ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousPiercingsVaginal", libs.zad_DeviousPiercingsVaginal)
+  ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousArmCuffs", libs.zad_DeviousArmCuffs)
+  ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousLegCuffs", libs.zad_DeviousLegCuffs)
+  ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousBra", libs.zad_DeviousBra)
+  ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousArmbinder", libs.zad_DeviousArmbinder)
+  ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousYoke", libs.zad_DeviousYoke)
+  ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousElbowTie", libs.zad_DeviousElbowTie)
+  ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousPetSuit", libs.zad_DeviousPetSuit)
+  ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousStraitJacket", libs.zad_DeviousStraitJacket)
+  ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousCorset", libs.zad_DeviousCorset)
+  ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousHood", libs.zad_DeviousHood)
+  ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousHobbleSkirt", libs.zad_DeviousHobbleSkirt)
+  ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousGloves", libs.zad_DeviousGloves)
+  ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousSuit", libs.zad_DeviousSuit)
+  ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousGag", libs.zad_DeviousGag)
+  ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousGagPanel", libs.zad_DeviousGagPanel)
+  ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousGagLarge", libs.zad_DeviousGagLarge)
+  ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousHarness", libs.zad_DeviousHarness)
+  ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousBlindfold", libs.zad_DeviousBlindfold)
+  ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousAnkleShackles", libs.zad_DeviousAnkleShackles)
+  ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousClamps", libs.zad_DeviousClamps)
+  return ret
+EndFunction
+
+string Function GetFactionsForActor(actor akTarget)
+  string ret = ""
+
+  return ret
+EndFunction
+

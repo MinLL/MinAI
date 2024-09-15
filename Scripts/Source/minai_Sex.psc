@@ -515,3 +515,17 @@ function InitializeSexDescriptions()
   JValue.writeToFile(descriptionsMap, "Data/Data/minai/sexlab_descriptions.json")
 endFunction
 
+
+
+string Function GetKeywordsForActor(actor akTarget)
+  string ret = ""
+
+  return ret
+EndFunction
+
+string Function GetFactionsForActor(actor akTarget)
+  string ret = ""
+
+  return ret
+EndFunction
+

@@ -1,17 +1,37 @@
 <?php
 
+$allKeywords = "";
+$allFactions = "";
+
 function CanVibrate($name) {
   return IsEnabled($name, "CanVibrate");
 }
 
+// Return the specified actor value.
+// Caches the results of several queries that are repeatedly referenced.
 Function GetActorValue($name, $key) {
-  $name = strtolower($name);
-  $ret = $GLOBALS["db"]->fetchAll("select * from conf_opts where LOWER(id)=LOWER('_minai_{$name}//{$key}')")[0]['value'];
-  if (!$ret) {
-      return "";
-  }
-  return $ret;
+    global $allKeywords;
+    global $allFactions;
 
+    if ($allKeywords != "") {
+        return $allKeywords;
+    }
+    if ($allFactions != "") {
+        return $allFactions;
+    }
+    // return strtolower("JobInnkeeper,Whiterun,,,,Bannered Mare Services,,Whiterun Bannered Mare Faction,,SLA TimeRate,sla_Arousal,sla_Exposure,slapp_HaveSeenBody,slapp_IsAnimatingWKidFaction,");
+    $ret = $GLOBALS["db"]->fetchAll("select * from conf_opts where LOWER(id)=LOWER('_minai_{$name}//{$key}')");
+    if (!$ret) {
+        return "";
+    }
+    $ret = strtolower($ret[0]['value']);
+    if ($name == "AllKeywords") {
+        $allKeywords = $ret;
+    }
+    if ($name == "AllFactions") {
+        $allFactions = $ret;
+    }
+    return $ret;
 }
 
 Function IsEnabled($name, $key) {
@@ -41,6 +61,13 @@ Function IsModEnabled($mod) {
 }
 
 Function IsInFaction($name, $faction) {
+    $faction = strtolower($faction);
     return str_contains(GetActorValue($name, "AllFactions"), $faction);
 }
+
+Function HasKeyword($name, $keyword) {
+    $keyword = strtolower($keyword);
+    return str_contains(GetActorValue($name, "AllKeywords"), $keyword);
+}
+
 ?>

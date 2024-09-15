@@ -364,22 +364,6 @@ Function SetContext(actor akTarget)
   if !bHasArousedKeywords
   	return
   endif
-  aiff.SetActorVariable(akTarget, "SLA_HalfNakedBikini", akTarget.WornHasKeyword(SLA_HalfNakedBikini))
-  aiff.SetActorVariable(akTarget, "SLA_ArmorHalfNaked", akTarget.WornHasKeyword(SLA_ArmorHalfNaked))
-  aiff.SetActorVariable(akTarget, "SLA_Brabikini", akTarget.WornHasKeyword(SLA_Brabikini))
-  aiff.SetActorVariable(akTarget, "SLA_Thong", akTarget.WornHasKeyword(SLA_ThongT) || akTarget.WornHasKeyword(SLA_ThongLowLeg) || akTarget.WornHasKeyword(SLA_ThongCString) || akTarget.WornHasKeyword(SLA_ThongGstring))
-  aiff.SetActorVariable(akTarget, "SLA_PantiesNormal", akTarget.WornHasKeyword(SLA_PantiesNormal))
-  aiff.SetActorVariable(akTarget, "SLA_Heels", akTarget.WornHasKeyword(SLA_KillerHeels) || akTarget.WornHasKeyword(SLA_BootsHeels))
-  aiff.SetActorVariable(akTarget, "SLA_PantsNormal", akTarget.WornHasKeyword(SLA_PantsNormal))
-  aiff.SetActorVariable(akTarget, "SLA_MicroHotPants", akTarget.WornHasKeyword(SLA_MicroHotPants))
-  aiff.SetActorVariable(akTarget, "SLA_ArmorHarness", akTarget.WornHasKeyword(SLA_ArmorHarness))
-  aiff.SetActorVariable(akTarget, "SLA_ArmorSpendex", akTarget.WornHasKeyword(SLA_ArmorSpendex))
-  aiff.SetActorVariable(akTarget, "SLA_ArmorTransparent", akTarget.WornHasKeyword(SLA_ArmorTransparent))
-  aiff.SetActorVariable(akTarget, "SLA_ArmorLewdLeotard", akTarget.WornHasKeyword(SLA_ArmorLewdLeotard))
-  aiff.SetActorVariable(akTarget, "SLA_PelvicCurtain", akTarget.WornHasKeyword(SLA_PelvicCurtain))
-  aiff.SetActorVariable(akTarget, "SLA_FullSkirt", akTarget.WornHasKeyword(SLA_FullSkirt))
-  aiff.SetActorVariable(akTarget, "SLA_MiniSkirt", akTarget.WornHasKeyword(SLA_MiniSkirt) || akTarget.WornHasKeyword(SLA_MicroSkirt))
-  aiff.SetActorVariable(akTarget, "SLA_ArmorRubber", akTarget.WornHasKeyword(SLA_ArmorRubber))
   aiff.SetActorVariable(akTarget, "beautyScore", baboConfigs.BeautyValue.GetValueInt())
   aiff.SetActorVariable(akTarget, "breastsScore", baboConfigs.BreastsValue.GetValueInt())
   aiff.SetActorVariable(akTarget, "buttScore", baboConfigs.ButtocksValue.GetValueInt())
@@ -395,3 +379,37 @@ Function SetContext(actor akTarget)
   endif
   aiff.SetActorVariable(akTarget, "race", actorRace)
 EndFunction
+
+
+string Function GetKeywordsForActor(actor akTarget)
+  string ret = ""
+  ret += aiff.GetKeywordIfExists(akTarget, "SLA_HalfNakedBikini", SLA_HalfNakedBikini)
+  ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorHalfNaked", SLA_ArmorHalfNaked)
+  ret += aiff.GetKeywordIfExists(akTarget, "SLA_Brabikini", SLA_Brabikini)
+  ret += aiff.GetKeywordIfExists(akTarget, "SLA_Thong", SLA_ThongT)
+  ret += aiff.GetKeywordIfExists(akTarget, "SLA_Thong", SLA_ThongLowLeg)
+  ret += aiff.GetKeywordIfExists(akTarget, "SLA_Thong", SLA_ThongCString)
+  ret += aiff.GetKeywordIfExists(akTarget, "SLA_Thong", SLA_ThongGstring)
+  ret += aiff.GetKeywordIfExists(akTarget, "SLA_PantiesNormal", SLA_PantiesNormal)
+  ret += aiff.GetKeywordIfExists(akTarget, "SLA_Heels", SLA_KillerHeels)
+  ret += aiff.GetKeywordIfExists(akTarget, "SLA_Heels", SLA_BootsHeels)
+  ret += aiff.GetKeywordIfExists(akTarget, "SLA_PantsNormal", SLA_PantsNormal)
+  ret += aiff.GetKeywordIfExists(akTarget, "SLA_MicroHotPants", SLA_MicroHotPants)
+  ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorHarness", SLA_ArmorHarness)
+  ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorSpendex", SLA_ArmorSpendex)
+  ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorTransparent", SLA_ArmorTransparent)
+  ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorLewdLeotard", SLA_ArmorLewdLeotard)
+  ret += aiff.GetKeywordIfExists(akTarget, "SLA_PelvicCurtain", SLA_PelvicCurtain)
+  ret += aiff.GetKeywordIfExists(akTarget, "SLA_FullSkirt", SLA_FullSkirt)
+  ret += aiff.GetKeywordIfExists(akTarget, "SLA_MiniSkirt", SLA_MiniSkirt)
+  ret += aiff.GetKeywordIfExists(akTarget, "SLA_MiniSkirt", SLA_MicroSkirt)
+  ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorRubber", SLA_ArmorRubber)
+  return ret
+EndFunction
+
+string Function GetFactionsForActor(actor akTarget)
+  string ret = ""
+
+  return ret
+EndFunction
+

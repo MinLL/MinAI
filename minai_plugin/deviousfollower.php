@@ -84,7 +84,7 @@ function GetDeviousFollowerContext($name) {
   }
 
   // Special Chastity Handling
-  if (IsEnabled($playerName, "ZAD_DeviousBelt")) {
+  if (HasKeyword($playerName, "ZAD_DeviousBelt")) {
       $ret .= "{$player} must wear a chastity belt that only {$dfName} has the key to at all times. This is to ensure that {$playerName} cannot get relief without permission, and to show that {$dfName} owns {$playerName}'s pussy.\n";
   }
   $ret .= "{$player}s remaining willpower to resist {$dfName} is {$dfWill}, on a scale from 0-10.\n";

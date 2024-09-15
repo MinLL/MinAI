@@ -52,9 +52,6 @@ $GLOBALS["FUNCTIONS"][] = [
     ];
 $GLOBALS["FUNCRET"]["ExtCmdServeFood"]=$GenericFuncRet;
 
-$isInnkeeper = IsEnabled($GLOBALS['HERIKA_NAME'], "JobInnKeeper");
-$isServer = IsEnabled($GLOBALS['HERIKA_NAME'], "JobInnServer");
-
 $GLOBALS["F_NAMES"]["ExtCmdTrade"]="BeginTrading";
 $GLOBALS["F_TRANSLATIONS"]["ExtCmdTrade"]="Buy or sell goods from {$GLOBALS["PLAYER_NAME"]}";
 $GLOBALS["FUNCTIONS"][] = [
@@ -123,6 +120,9 @@ $GLOBALS["FUNCTIONS"][] = [
         ],
     ];
 
+
+$isInnKeeper = IsInFaction($GLOBALS['HERIKA_NAME'], "JobInnKeeper");
+$isServer = IsInFaction($GLOBALS['HERIKA_NAME'], "JobInnServer");
 
 if (IsModEnabled("Sunhelm") && ($isInnKeeper || $isServer)) {
   $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdServeFood";

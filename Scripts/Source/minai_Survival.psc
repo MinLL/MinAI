@@ -285,7 +285,21 @@ Function SetContext(actor akTarget)
   actor[] actors = new actor[2]
   actors[0] = akTarget
   actors[1] = playerRef
-  aiff.SetActorVariable(akTarget, "JobInnServer", minMantella.FactionInScene(JobInnServer, actors))
-  aiff.SetActorVariable(akTarget, "JobInnKeeper", minMantella.FactionInScene(JobInnKeeper, actors))
+  
   aiff.StoreFactions(akTarget)
 EndFunction
+
+
+string Function GetKeywordsForActor(actor akTarget)
+  string ret = ""
+
+  return ret
+EndFunction
+
+string Function GetFactionsForActor(actor akTarget)
+  string ret = ""
+  ret += aiff.GetFactionIfExists(akTarget, "JobInnServer", JobInnServer)
+  ret += aiff.GetFactionIfExists(akTarget, "JobInnKeeper", JobInnKeeper)
+  return ret
+EndFunction
+
