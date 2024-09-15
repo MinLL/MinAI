@@ -17,19 +17,22 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     
-    - name: Remove metafiles
+    - name: Move mod files
       run: |
-        rm .gitignore
-        rm -rf .github
-        rm README.md
-        mkdir mantella_files
-        mv config.ini mantella_files
-        mv prompts_vanilla.txt mantella_files
+        mkdir minai
+        mv *.esp minai
+        mv *.ini minai
+        mv Scripts minai
+        mv Data minai
+        mv minai_plugin minai/
+        mkdir minai/mantella_files
+        mv config.ini minai/mantella_files
+        mv prompts_vanilla.txt minai/mantella_files
         
     - name: Zip the files
       uses: TheDoctor0/zip-release@0.7.6
       with:
-        path: "./*"
+        path: "./minai/*"
         type: "zip"
         filename: "MinAI-${{github.ref_name}}:.zip"
 
