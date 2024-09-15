@@ -123,6 +123,7 @@ function Maintenance(minai_MainQuestController _main)
   aiff.SetModAvailable("ArousedKeywords", bHasArousedKeywords)
   aiff.SetModAvailable("OSL", bHasOSL)
   aiff.SetModAvailable("Babo", bHasBabo)
+  aiff.SetModAvailable("TNG", bHasTNG)
 EndFunction
 
 
@@ -434,27 +435,49 @@ EndFunction
 
 string Function GetKeywordsForActor(actor akTarget)
   string ret = ""
-  ret += aiff.GetKeywordIfExists(akTarget, "SLA_HalfNakedBikini", SLA_HalfNakedBikini)
-  ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorHalfNaked", SLA_ArmorHalfNaked)
-  ret += aiff.GetKeywordIfExists(akTarget, "SLA_Brabikini", SLA_Brabikini)
-  ret += aiff.GetKeywordIfExists(akTarget, "SLA_Thong", SLA_ThongT)
-  ret += aiff.GetKeywordIfExists(akTarget, "SLA_Thong", SLA_ThongLowLeg)
-  ret += aiff.GetKeywordIfExists(akTarget, "SLA_Thong", SLA_ThongCString)
-  ret += aiff.GetKeywordIfExists(akTarget, "SLA_Thong", SLA_ThongGstring)
-  ret += aiff.GetKeywordIfExists(akTarget, "SLA_PantiesNormal", SLA_PantiesNormal)
-  ret += aiff.GetKeywordIfExists(akTarget, "SLA_Heels", SLA_KillerHeels)
-  ret += aiff.GetKeywordIfExists(akTarget, "SLA_Heels", SLA_BootsHeels)
-  ret += aiff.GetKeywordIfExists(akTarget, "SLA_PantsNormal", SLA_PantsNormal)
-  ret += aiff.GetKeywordIfExists(akTarget, "SLA_MicroHotPants", SLA_MicroHotPants)
-  ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorHarness", SLA_ArmorHarness)
-  ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorSpendex", SLA_ArmorSpendex)
-  ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorTransparent", SLA_ArmorTransparent)
-  ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorLewdLeotard", SLA_ArmorLewdLeotard)
-  ret += aiff.GetKeywordIfExists(akTarget, "SLA_PelvicCurtain", SLA_PelvicCurtain)
-  ret += aiff.GetKeywordIfExists(akTarget, "SLA_FullSkirt", SLA_FullSkirt)
-  ret += aiff.GetKeywordIfExists(akTarget, "SLA_MiniSkirt", SLA_MiniSkirt)
-  ret += aiff.GetKeywordIfExists(akTarget, "SLA_MiniSkirt", SLA_MicroSkirt)
-  ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorRubber", SLA_ArmorRubber)
+	if bHasArousedKeywords
+	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_HalfNakedBikini", SLA_HalfNakedBikini)
+	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorHalfNaked", SLA_ArmorHalfNaked)
+	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_Brabikini", SLA_Brabikini)
+	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_Thong", SLA_ThongT)
+	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_Thong", SLA_ThongLowLeg)
+	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_Thong", SLA_ThongCString)
+	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_Thong", SLA_ThongGstring)
+	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_PantiesNormal", SLA_PantiesNormal)
+	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_Heels", SLA_KillerHeels)
+	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_Heels", SLA_BootsHeels)
+	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_PantsNormal", SLA_PantsNormal)
+	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_MicroHotPants", SLA_MicroHotPants)
+	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorHarness", SLA_ArmorHarness)
+	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorSpendex", SLA_ArmorSpendex)
+	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorTransparent", SLA_ArmorTransparent)
+	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorLewdLeotard", SLA_ArmorLewdLeotard)
+	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_PelvicCurtain", SLA_PelvicCurtain)
+	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_FullSkirt", SLA_FullSkirt)
+	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_MiniSkirt", SLA_MiniSkirt)
+	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_MiniSkirt", SLA_MicroSkirt)
+	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorRubber", SLA_ArmorRubber)
+	EndIf
+	if bHasTNG
+	  ret += aiff.GetKeywordIfExists(akTarget, "TNG_XS", TNG_XS)
+	  ret += aiff.GetKeywordIfExists(akTarget, "TNG_S", TNG_S)
+	  ret += aiff.GetKeywordIfExists(akTarget, "TNG_M", TNG_M)
+	  ret += aiff.GetKeywordIfExists(akTarget, "TNG_L", TNG_L)
+	  ret += aiff.GetKeywordIfExists(akTarget, "TNG_XL", TNG_XL)
+	  ret += aiff.GetKeywordIfExists(akTarget, "TNG_DefaultSize", TNG_DefaultSize)
+	  ret += aiff.GetKeywordIfExists(akTarget, "TNG_Gentlewoman", TNG_Gentlewoman)
+	  if akActor.HasKeywordString(TNG_ActorAddnAuto:01)
+		ret += "TNG_ActorAddnAuto:01,"
+	  elseif akActor.HasKeywordString(TNG_ActorAddnAuto:02)
+		ret += "TNG_ActorAddnAuto:02,"
+	  elseif akActor.HasKeywordString(TNG_ActorAddnAuto:03)
+		ret += "TNG_ActorAddnAuto:03,"
+	  elseif akActor.HasKeywordString(TNG_ActorAddnAuto:04)
+		ret += "TNG_ActorAddnAuto:04,"
+	  elseif akActor.HasKeywordString(TNG_ActorAddnAuto:05)
+		ret += "TNG_ActorAddnAuto:05,"
+	  EndIf
+	EndIf
   return ret
 EndFunction
 
@@ -474,8 +497,8 @@ bool Function IsExposed(Actor akActor)
         if armorItem
             if Math.LogicalAnd(armorItem.GetSlotMask(), cuirassSlot) != 0
                 if akActor.IsEquipped(armorItem)
-                    Debug.Trace("Equipped item in slot 52: " + armorItem.GetName())
-                    if !armorItem.HasKeyword(TNG_Revealing)
+                    Debug.Trace("Equipped item in " + cuirassSlot ": " + armorItem.GetName())
+                    if !armorItem.HasKeyword(TNG_Revealing) && !armorItem.HasKeywordString("TNG_Revealing")
                         return False
                     EndIf
                 EndIf
