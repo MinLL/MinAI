@@ -466,15 +466,15 @@ string Function GetKeywordsForActor(actor akTarget)
 	  ret += aiff.GetKeywordIfExists(akTarget, "TNG_XL", TNG_XL)
 	  ret += aiff.GetKeywordIfExists(akTarget, "TNG_DefaultSize", TNG_DefaultSize)
 	  ret += aiff.GetKeywordIfExists(akTarget, "TNG_Gentlewoman", TNG_Gentlewoman)
-	  if akActor.HasKeywordString(TNG_ActorAddnAuto:01)
+	  if akActor.HasKeywordString("TNG_ActorAddnAuto:01")
 		ret += "TNG_ActorAddnAuto:01,"
-	  elseif akActor.HasKeywordString(TNG_ActorAddnAuto:02)
+	  elseif akActor.HasKeywordString("TNG_ActorAddnAuto:02")
 		ret += "TNG_ActorAddnAuto:02,"
-	  elseif akActor.HasKeywordString(TNG_ActorAddnAuto:03)
+	  elseif akActor.HasKeywordString("TNG_ActorAddnAuto:03")
 		ret += "TNG_ActorAddnAuto:03,"
-	  elseif akActor.HasKeywordString(TNG_ActorAddnAuto:04)
+	  elseif akActor.HasKeywordString("TNG_ActorAddnAuto:04")
 		ret += "TNG_ActorAddnAuto:04,"
-	  elseif akActor.HasKeywordString(TNG_ActorAddnAuto:05)
+	  elseif akActor.HasKeywordString("TNG_ActorAddnAuto:05")
 		ret += "TNG_ActorAddnAuto:05,"
 	  EndIf
 	EndIf
