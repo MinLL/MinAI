@@ -52,6 +52,10 @@ Function Maintenance()
   EndIf
   if bHasAIFF
     minAIFF.Maintenance(Self)
+    if (!minAIFF.IsInitialized())
+      Debug.Notification("MinAI - First time setup complete. Save/reload to enable mod functionality")
+      minAIFF.SetInitialized()
+    EndIf
   EndIf
   Debug.Trace("[minai] Initialization complete.")
 EndFunction

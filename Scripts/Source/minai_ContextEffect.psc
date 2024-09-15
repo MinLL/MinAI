@@ -7,8 +7,12 @@ minai_Arousal arousal
 minai_DeviousStuff devious
 minai_AIFF aiff
 
-Function OnEffectStart(Actor akTarget, Actor akCaster)
+Function OnEffectStart(Actor target, Actor caster)
+  actor akTarget = GetTargetActor()
   aiff = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_AIFF
+  if (!target || !aiff || !aiff.IsInitialized())
+    return
+  EndIf
   string targetName = akTarget.GetActorBase().GetName()  
   if AIAgentFunctions.getAgentByName(targetName)
     Debug.Trace("[minai] - Updating context for managed NPC: " + targetName)

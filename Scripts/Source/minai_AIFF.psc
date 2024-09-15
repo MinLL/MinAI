@@ -11,8 +11,9 @@ bool bHasAIFF = False
 int Property contextUpdateInterval Auto
 Actor player
 VoiceType NullVoiceType
-
+bool isInitialized
 minai_MainQuestController main
+
 Function Maintenance(minai_MainQuestController _main)
   contextUpdateInterval = 30
   main = _main
@@ -24,11 +25,13 @@ Function Maintenance(minai_MainQuestController _main)
   arousal = (Self as Quest)as minai_Arousal
   devious = (Self as Quest)as minai_DeviousStuff
   bHasAIFF = True
-  SetContext(player)
   RegisterForModEvent("AIFF_CommandReceived", "CommandDispatcher") ; Hook into AIFF
   NullVoiceType = Game.GetFormFromFile(0x01D70E, "AIAgent.esp") as VoiceType
   if (!NullVoiceType)
     Debug.Trace("[minai] Could not load null voice type")
+  EndIf
+  if isInitialized
+    SetContext(player)
   EndIf
 EndFunction
 
@@ -64,6 +67,10 @@ EndFunction
 
 
 Function SetActorVariable(Actor akActor, string variable, string value)
+  if (!IsInitialized())
+    Debug.Trace("[minai] SetActorVariable() - Still Initializing.")
+    return
+  EndIf
   string actorName = main.GetActorName(akActor)
   Debug.Trace("[minai] Set actor value for actor " + actorName + " "+ variable + " to " + value)
   AIAgentFunctions.logMessage("_minai_" + actorName + "//" + variable + "@" + value, "setconf")
@@ -71,12 +78,20 @@ EndFunction
 
 
 Function RegisterEvent(string eventLine, string eventType)
+  if (!IsInitialized())
+    Debug.Trace("[minai] RegisterEvent() - Still Initializing.")
+    return
+  EndIf
   AIAgentFunctions.logMessage(eventLine, eventType)
 EndFunction
 
 
 Event CommandDispatcher(String speakerName,String  command, String parameter)
   Debug.Trace("[minai] - CommandDispatcher(" + speakerName +", " + command +", " + parameter + ")")
+  if (!IsInitialized())
+    Debug.Trace("[minai] CommandDispatcher() - Still Initializing.")
+    return
+  EndIf
   Actor akActor = AIAgentFunctions.getAgentByName(speakerName)
   if !akActor
     return
@@ -91,6 +106,10 @@ EndEvent
 
 Function ChillOut()
   if bHasAIFF
+    if (!IsInitialized())
+      Debug.Trace("[minai] ChillOut() - Still Initializing.")
+      return
+    EndIf
     AIAgentFunctions.logMessage("Relax and enjoy","force_current_task")
   EndIf
 EndFunction
@@ -152,4 +171,14 @@ Function StoreKeywords(actor akTarget)
   keywords += survival.GetKeywordsForActor(akTarget)
   keywords += sex.GetKeywordsForActor(akTarget)
   SetActorVariable(akTarget, "AllKeywords", keywords)
+EndFunction
+
+
+bool Function IsInitialized()
+  return isInitialized
+EndFunction
+
+Function SetInitialized()
+  debug.Trace("[minai] AIFF initialization complete.")
+  isInitialized = True
 EndFunction
