@@ -10,6 +10,7 @@ bool bHasDD = False
 bool bHasSTA = False
 bool bHasSLHH = False
 bool bHasSLApp = False
+bool bHasDeviouslyAccessible = False
 
 Keyword SLHHScriptEventKeyword
 GlobalVariable Debt
@@ -21,6 +22,12 @@ minai_MainQuestController main
 minai_Arousal arousal
 minai_Sex sex
 minai_AIFF aiff
+
+GlobalVariable eyefucktrack
+GlobalVariable eyepenalty
+GlobalVariable eyereward
+GlobalVariable eyescore
+
 
 actor playerRef
 
@@ -93,11 +100,24 @@ function Maintenance(minai_MainQuestController _main)
     EndIf
   EndIf
 
+  if Game.GetModByName("DeviouslyAccessible.esp") != 255
+    bHasDeviouslyAccessible = True
+    eyefucktrack = Game.GetFormFromFile(0x0AB14D, "DeviouslyAccessible.esp") as GlobalVariable
+    eyepenalty = Game.GetFormFromFile(0x0AB14C, "DeviouslyAccessible.esp") as GlobalVariable
+    eyereward = Game.GetFormFromFile(0x0AB142, "DeviouslyAccessible.esp") as GlobalVariable
+    eyescore = Game.GetFormFromFile(0x0AB141, "DeviouslyAccessible.esp") as GlobalVariable
+    if (!eyefucktrack || !eyepenalty || !eyereward || !eyescore)
+      Debug.Trace("[minai] Could not find DeviouslyAccessible globals")
+      Debug.Notification("Incompatible version of DeviouslyAccessible. AI Integrations Disabled.")
+      bHasDeviouslyAccessible = False
+    EndIf
+  EndIf  
   aiff.SetModAvailable("DeviousFollowers", bHasDeviousFollowers)
   aiff.SetModAvailable("DD", bHasDD)
   aiff.SetModAvailable("STA", bHasSTA)
   aiff.SetModAvailable("SLHH", bHasSLHH)
   aiff.SetModAvailable("SLApp", bHasSLApp)
+  aiff.SetModAvailable("DeviouslyAccessible", bHasDeviouslyAccessible)
 EndFunction
 
 Function ResetSpankRule()
@@ -691,7 +711,7 @@ Function SetContext(actor akTarget)
   string actorName = main.GetActorName(akTarget)
   debug.Trace("[minai] Devious - SetContext( " + actorName + " )")
   aiff.SetActorVariable(akTarget, "canVibrate", CanVibrate(akTarget))
-  if bHasDeviousFollowers
+  if bHasDeviousFollowers && akTarget == PlayerRef
     Actor deviousFollower = (Quest.GetQuest("_Dflow") as QF__Gift_09000D62).Alias__DMaster.GetRef() as Actor
     if deviousFollower
       aiff.SetActorVariable(playerRef, "deviousFollowerName", main.GetActorName(deviousFollower))
@@ -721,6 +741,12 @@ Function SetContext(actor akTarget)
     EndWhile
     aiff.SetActorVariable(playerRef, "deviousFollowerRules", ruleList)
     aiff.SetActorVariable(playerRef, "deviousTimeForSpanks",  dftools.SpankingTimer <= Utility.GetCurrentGameTime())
+  EndIf
+  if bHasDeviouslyAccessible && akTarget == PlayerRef
+    aiff.SetActorVariable(playerRef, "deviouslyAccessibleEyeFuckTrack", eyefucktrack.GetValueInt())
+    aiff.SetActorVariable(playerRef, "deviouslyAccessibleEyePenalty", eyepenalty.GetValueInt())
+    aiff.SetActorVariable(playerRef, "deviouslyAccessibleEyeReward", eyereward.GetValueInt())
+    aiff.SetActorVariable(playerRef, "deviouslyAccessibleEyeScore", eyescore.GetValueInt())
   EndIf
 EndFunction
 
