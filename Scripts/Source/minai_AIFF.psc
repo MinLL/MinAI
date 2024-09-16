@@ -74,9 +74,17 @@ EndFunction
 
 
 
+bool Function HasIllegalCharacters(string theString)
+  return (StringUtil.Find(theString, "'") != -1)
+EndFunction
+
 Function SetActorVariable(Actor akActor, string variable, string value)
   if (!IsInitialized())
     Debug.Trace("[minai] SetActorVariable() - Still Initializing.")
+    return
+  EndIf
+  if (HasIllegalCharacters(variable) || HasIllegalCharacters(value))
+    Debug.Trace("[minai] SetActorVariable(" + variable + "): Not persisting value due to illegal character: " + value)
     return
   EndIf
   string actorName = main.GetActorName(akActor)
