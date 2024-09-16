@@ -220,7 +220,7 @@ function WriteClothingString(actor akActor, actor player, bool isYou=false, acto
 			EndIf
 			if bHasTNG
 				if currentActor.GetActorBase().GetSex() == 0 && IsTNGExposed(currentActor) || currentActor.HasKeyword(TNG_Gentlewoman) && IsTNGExposed(currentActor)
-					if IsExposed(currentActor) && cuirass != None
+					if IsTNGExposed(currentActor) && cuirass != None
 						RegisterAction(actorName + "'s genitals are exposed.")
 					EndIf
 					string sizeDescription = ""
