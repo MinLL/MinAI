@@ -25,6 +25,11 @@ Keyword SLA_MicroSkirt
 Keyword SLA_BootsHeels
 Keyword SLA_HasLeggings
 Keyword SLA_ArmorRubber
+Keyword EroticArmor
+Keyword SLA_PiercingVulva
+Keyword SLA_PiercingBelly
+Keyword SLA_PiercingNipple
+Keyword SLA_PiercingClit
 Keyword TNG_XS
 Keyword TNG_S
 Keyword TNG_M
