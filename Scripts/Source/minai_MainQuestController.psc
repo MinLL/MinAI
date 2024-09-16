@@ -3,6 +3,8 @@ ScriptName minai_MainQuestController extends Quest
 GlobalVariable minai_WhichAI
 actor playerRef
 
+int property logLevel Auto
+
 ; AI
 minai_Mantella minMantella
 minai_AIFF minAIFF
@@ -27,9 +29,12 @@ EndFunction
 
 Function Maintenance()
   playerRef = game.GetPlayer()
-  Debug.Trace("[minai] Maintenance() - minai v" +GetVersion() + " initializing.")
+  if logLevel == 0
+    logLevel = 3
+  EndIf
+  Info("Maintenance() - minai v" +GetVersion() + " initializing.")
   ; Register for Mod Events
-  Debug.Trace("[minai] Checking for installed mods...")
+  Info("Checking for installed mods...")
 
   minai_WhichAI = Game.GetFormFromFile(0x0907, "MinAI.esp") as GlobalVariable
   minMantella = (Self as Quest) as minai_Mantella
@@ -57,7 +62,7 @@ Function Maintenance()
       minAIFF.SetInitialized()
     EndIf
   EndIf
-  Debug.Trace("[minai] Initialization complete.")
+  Info("Initialization complete.")
 EndFunction
 
 
@@ -102,4 +107,35 @@ int function CountMatch(string sayLine, string lineToMatch)
     count += 1
   endWhile
   return count
+EndFunction
+
+
+Function Log(String str, string lvl)
+  Debug.Trace("[minai (" + lvl + ")]: " + str)
+EndFunction
+
+Function Error(String str)
+  if logLevel >= 1
+    Log(str, "ERROR")
+  EndIf
+EndFunction
+
+
+Function Warn(String str)
+  if logLevel >= 2
+    Log(str, "WARN")
+  EndIf
+EndFunction
+
+
+Function Info(String str)
+  if logLevel >= 3
+    Log(str, "INFO")
+  EndIf
+EndFunction
+
+Function Debug(String str)
+  if LogLevel >= 4
+    Log(str, "DEBUG")
+  EndIf
 EndFunction

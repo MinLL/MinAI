@@ -44,9 +44,9 @@ function Maintenance(minai_MainQuestController _main)
   main = _main
   aiff = (Self as Quest) as minai_AIFF
   
-  Debug.Trace("[minai] - Initializing Arousal Module.")
+  Main.Info("- Initializing Arousal Module.")
   if Game.GetModByName("SexlabAroused.esm") != 255
-    Debug.Trace("[minai] Found Sexlab Aroused")
+    Main.Info("Found Sexlab Aroused")
     bHasAroused = True
     Aroused = Game.GetFormFromFile(0x04290F, "SexlabAroused.esm") as slaUtilScr
     SLA_HalfNakedBikini = Game.GetFormFromFile(0x08E854, "SexlabAroused.esm") as Keyword
@@ -75,20 +75,20 @@ function Maintenance(minai_MainQuestController _main)
     if SLA_HalfNakedBikini && SLA_ArmorHalfNaked
       bHasArousedKeywords = True
     EndIf
-    Debug.Trace("[minai] Sexlab Aroused Keywords=" + bHasArousedKeywords)
+    Main.Info("Sexlab Aroused Keywords=" + bHasArousedKeywords)
   EndIf
   if Game.GetModByName("OSLAroused.esp") != 255
-    Debug.Trace("[minai] Found OSL Aroused")
+    Main.Info("Found OSL Aroused")
     bHasOSL = True
   EndIf
   if Game.GetModByName("BaboInteractiveDia.esp") != 255
-    Debug.Trace("[minai] Found BaboDialogue")
+    Main.Info("Found BaboDialogue")
     bHasBabo = True
     baboConfigs = (Game.GetFormFromFile(0x2FEA1B, "BaboInteractiveDia.esp") as BaboDialogueConfigMenu)
     if !baboConfigs
       bHasBabo = False
       Debug.Notification("Incompatible version of BaboDialogue. AI integrations disabled.")
-      Debug.Trace("[minai] Could not fetch baboConfigs")
+      Main.Error("Could not fetch baboConfigs")
     EndIf
   EndIf
   aiff.SetModAvailable("Aroused", bHasAroused)
@@ -296,11 +296,11 @@ Function WritePlayerAppearance(Actor player)
       butt = "enormous beautiful ass"
     endif
     string appearanceStr = main.GetActorName(player) + " is an " + appearance + " " + actorRace + " " + gender + " with " + breasts + " and a " + butt + "."
-    debug.Trace("[minai] Set player description (Babo): " + appearanceStr)
+    Main.Info("Set player description (Babo): " + appearanceStr)
     main.RegisterAction(appearanceStr)
   else
     string appearanceStr = Player.GetActorBase().GetName() + " is a " + gender + " " + actorRace + "." 
-    debug.Trace("[minai] Set player description: " + appearanceStr)
+    Main.Info("Set player description: " + appearanceStr)
     main.RegisterAction(appearanceStr)
   EndIf
 EndFunction

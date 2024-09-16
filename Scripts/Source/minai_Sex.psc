@@ -17,7 +17,7 @@ function Maintenance(minai_MainQuestController _main)
   playerRef = Game.GetPlayer()
   main = _main
   aiff = (Self as Quest) as minai_AIFF
-  Debug.Trace("[minai] - Initializing Sex Module.")
+  Main.Info("- Initializing Sex Module.")
   bHasAIFF = (Game.GetModByName("AIAgent.esp") != 255)
   
   RegisterForModEvent("HookStageStart", "OnStageStart")
@@ -34,13 +34,13 @@ function Maintenance(minai_MainQuestController _main)
     
   slf = Game.GetFormFromFile(0xD62, "SexLab.esm") as SexLabFramework
   if Game.GetModByName("OStim.esp") != 255
-    Debug.Trace("[minai] Found OStim")
+    Main.Info("Found OStim")
     bHasOstim = True
   EndIf
 
   minai_UseOStim = Game.GetFormFromFile(0x0906, "MinAI.esp") as GlobalVariable
   if !minai_UseOStim
-    Debug.Trace("[minai] Could not find ostim toggle")
+    Main.Error("Could not find ostim toggle")
   EndIf
   
   ; Reset incase the player quit during a sex scene or this got stuck
@@ -175,7 +175,7 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
         StartGroupSex(akSpeaker, akTarget, Player, bPlayerInScene, actorsFromFormList)
       EndIf
     Else
-      Debug.Trace("[minai] Not processing keywords for exclusive scene - Conflicting scene is running")
+      Main.Warn("Not processing keywords for exclusive scene - Conflicting scene is running")
     EndIf
     
 EndFunction
@@ -224,7 +224,7 @@ EndEvent
 
 Event OStimManager(string eventName, string strArg, float numArg, Form sender)
   int ostimTid = numArg as int
-  Debug.Trace("[minai] oStim eventName: "+eventName+", strArg: "+strArg);
+  Main.Info("oStim eventName: "+eventName+", strArg: "+strArg);
   if (eventName=="ostim_thread_start")
     string sceneName=OThread.GetScene(ostimTid);
     bool isRunning=OThread.IsRunning(ostimTid);
@@ -247,7 +247,7 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
     if bHasAIFF
       AIAgentFunctions.logMessage("ostim@"+sceneName+" "+isRunning+" "+actorString,"setconf")
     EndIf
-    Debug.Trace("[minai] Started intimate scene")
+    Main.Info("Started intimate scene")
   
   elseif (eventName=="ostim_thread_scenechanged")
     string sceneId = strArg 
@@ -269,13 +269,13 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
       AIFF.ChillOut()
     endif
     main.RegisterEvent(""+sceneName+" id:"+sceneId+" isRunning:"+isRunning+" Actors:"+actorString,"info_sexscene")
-    Debug.Trace("[minai] Ostim Scene changed")
+    Main.Info("Ostim Scene changed")
 
   elseif (eventName=="ostim_actor_orgasm")    
     Actor OrgasmedActor = Sender as Actor
     main.RegisterEvent(OrgasmedActor.GetDisplayName() + " had an Orgasm")
     DirtyTalk("ohh... yes.","chatnf_sl_2",OrgasmedActor.GetDisplayName())
-    Debug.Trace("[minai] Ostim Actor orgasm")
+    Main.Info("Ostim Actor orgasm")
 
   elseif (eventName=="ostim_thread_end")    
     string sceneName=OThread.GetScene(ostimTid);
@@ -296,7 +296,7 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
       AIFF.ChillOut()
     endif
     SetSexSceneState("off")
-    Debug.Trace("[minai] Ended intimate scene")
+    Main.Info("Ended intimate scene")
   endif
 EndEvent
 
@@ -306,10 +306,10 @@ EndEvent
 
 Function LoadSexlabDescriptions()
   if (descriptionsMap==0)
-    Debug.Trace("[minai] Loading Sexlab Descriptions")
+    Main.Info("Loading Sexlab Descriptions")
     descriptionsMap=JValue.readFromFile( "Data/Data/minai/sexlab_descriptions.json");
     JValue.retain(descriptionsMap)
-    Debug.Trace("[minai] Descriptions set: "+JMap.count(descriptionsMap)+" using map: "+descriptionsMap+ " Data/Data/minai/sexlab_descriptions.json")
+    Main.Info("Descriptions set: "+JMap.count(descriptionsMap)+" using map: "+descriptionsMap+ " Data/Data/minai/sexlab_descriptions.json")
   endif
 EndFunction
 
@@ -337,7 +337,7 @@ Event OnAnimationStart(int tid, bool HasPlayer)
     AIFF.ChillOut()
   endif
   SetSexSceneState("on")
-  Debug.Trace("[minai] Started Sex Scene")
+  Main.Info("Started Sex Scene")
 EndEvent
 
 
@@ -455,7 +455,7 @@ EndEvent
 
 Event EndSexScene(int tid, bool HasPlayer)
     JValue.release(descriptionsMap)
-    Debug.Trace("[minai] Ended Sex scene")
+    Main.Info("Ended Sex scene")
     sslThreadController controller = slf.GetController(tid)
 
     Actor[] actorList = slf.HookActors(tid)
@@ -480,25 +480,25 @@ EndEvent
 
 
 String function GetSexStageDescription(String animationStageName) 
-    Debug.Trace("[minai] Obtaining description for: <"+animationStageName+"> using map: "+descriptionsMap)
+    Main.Info("Obtaining description for: <"+animationStageName+"> using map: "+descriptionsMap)
   return JMap.getStr(descriptionsMap,animationStageName)
 endFunction
 
 
 function InitializeSexDescriptions()
   if (JMap.count(descriptionsMap) != 0 || descriptionsMap != 0)
-    Debug.Trace("[minai] Not reinitializing sexlab descriptions - data already exists.")
+    Main.Info("Not reinitializing sexlab descriptions - data already exists.")
     return
   EndIf
   descriptionsMap = JMap.object()
   LoadSexlabDescriptions()
 
   if (JMap.count(descriptionsMap) != 0 || descriptionsMap != 0)
-    Debug.Trace("[minai] Not reinitializing sexlab descriptions - data already exists.")
+    Main.Info("Not reinitializing sexlab descriptions - data already exists.")
     return
   EndIf
   
-  Debug.Trace("[minai] Initializing sex descriptions");
+  Main.Info("Initializing sex descriptions");
   JMap.clear(descriptionsMap)
   JMap.setStr(descriptionsMap,"Mitos_Laplove_A1_S1","Stands over partner.")
   JMap.setStr(descriptionsMap,"Leito_Cowgirl_A1_S1","staying atop partner with gentle movements.")
@@ -511,7 +511,7 @@ function InitializeSexDescriptions()
   JMap.setStr(descriptionsMap,"Leito_Cowgirl_A2_S4","lying down in a passive stance.")
   JMap.setStr(descriptionsMap,"Leito_Cowgirl_A1_S5","still staying atop partner, almost hugging, moving now slowly. Trembling with Pleasure.")
   JMap.setStr(descriptionsMap,"Leito_Cowgirl_A2_S5","lying down in a passive stance. Trembling with Pleasure.")
-  Debug.Trace("[minai] Descriptions set: "+JMap.count(descriptionsMap)+" using map: "+descriptionsMap)
+  Main.Info("Descriptions set: "+JMap.count(descriptionsMap)+" using map: "+descriptionsMap)
   JValue.writeToFile(descriptionsMap, "Data/Data/minai/sexlab_descriptions.json")
 endFunction
 
