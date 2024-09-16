@@ -480,7 +480,11 @@ string Function GetKeywordsForActor(actor akTarget)
 	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_FullSkirt", SLA_FullSkirt)
 	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_MiniSkirt", SLA_MiniSkirt)
 	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_MiniSkirt", SLA_MicroSkirt)
-	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorRubber", SLA_ArmorRubber)
+	  ret += aiff.GetKeywordIfExists(akTarget, "EroticArmor", EroticArmor)
+	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_PiercingVulva", SLA_PiercingVulva)
+	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_PiercingBelly", SLA_PiercingBelly)
+	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_PiercingNipple", SLA_PiercingNipple)
+	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_PiercingClit", SLA_PiercingClit)
 	EndIf
 	if bHasTNG
 	  ret += aiff.GetKeywordIfExists(akTarget, "TNG_XS", TNG_XS)
