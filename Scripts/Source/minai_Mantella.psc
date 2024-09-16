@@ -17,7 +17,7 @@ actor playerRef
 
 Function Maintenance(minai_MainQuestController _main)
   main = _main
-  Debug.Trace("[minai] - Initializing for Mantella.")
+  Main.Info("- Initializing for Mantella.")
   main = (Self as Quest)as minai_MainQuestController
   
   RegisterForModEvent("Mantella_ActorSpeakEvent", "OnActorSpeak")
@@ -27,12 +27,12 @@ Function Maintenance(minai_MainQuestController _main)
   MantellaConversationParticipantsFormList = Game.GetFormFromFile(0x000E4537, "Mantella.esp") as FormList
   if !mantella || !MantellaConversationParticipantsFormList
     Debug.Messagebox("AI Fatal Error: Could not get handle to Mantella.")
-    Debug.Trace("[minai] Could not get handle to Mantella")
+    Main.Error("Could not get handle to Mantella")
   EndIf
 
   minai_GlobalInjectToggle = Game.GetFormFromFile(0x0905, "MinAI.esp") as GlobalVariable
   if !minai_GlobalInjectToggle
-    Debug.Trace("[minai] Could not find inject toggle")
+    Main.Error("Could not find inject toggle")
   EndIf
 
   sex = (Self as Quest)as minai_Sex
@@ -56,7 +56,7 @@ Event OnActorSpeak(Form actorToSpeakTo, Form actorSpeaking,string sayLine)
 EndEvent
 
 Event OnPlayerInput(string playerInput)
-  Debug.Trace("[minai] OnPlayerInput(): " + playerInput)
+  Main.Info("OnPlayerInput(): " + playerInput)
   actor player = Game.GetPlayer()
   ;; Fix injected prompts being missing from first sentence of dialogue
   actor[] actorsFromFormList = GetActorsFromFormList()
@@ -69,7 +69,7 @@ Event OnPlayerInput(string playerInput)
       EndIf
       i += 1
     EndWhile
-    Debug.Trace("[minai] 2 players in conversation, setting initial context if not set")
+    Main.Info("2 players in conversation, setting initial context if not set")
     UpdateEvents(player, otherActor, actorsFromFormList)
   EndIf
   
@@ -79,15 +79,15 @@ EndEvent
 
 Function RegisterAction(String eventLine)
   if minai_GlobalInjectToggle.GetValue() != 1.0
-    Debug.Trace("[minai] RegisterAction() - Not doing anything, this is disabled.")
+    Main.Warn("RegisterAction() - Not doing anything, this is disabled.")
     return
   EndIf
-  Debug.Trace("[minai] RegisterAction(): " + eventLine)
+  Main.Info("RegisterAction(): " + eventLine)
   mantella.AddInGameEvent(eventLine)
 EndFunction
 
 Function RegisterEvent(String eventLine)
-  Debug.Trace("[minai] RegisterEvent(): " + eventLine)
+  Main.Info("RegisterEvent(): " + eventLine)
   mantella.AddInGameEvent(eventLine)
 EndFunction
 
@@ -108,14 +108,14 @@ Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking, actor[] actorsF
   bool isEmpty = mantella.IsActionsEmpty()
   SendActorSpeakEvent(actorToSpeakTo, actorSpeaking)
   if !isEmpty
-    Debug.Trace("[minai] Actions are not empty")
+    Main.Info("Actions are not empty")
     return
   EndIf
   Actor player = game.GetPlayer()
   bool bPlayerInScene = False
   
   if actorSpeaking == playerRef || actorToSpeakTo == playerRef
-    Debug.Trace("[minai] Player in Scene")
+    Main.Info("Player in Scene")
     bPlayerInScene = True
   EndIf
 
@@ -191,17 +191,17 @@ Function ActionResponse(Form actorToSpeakTo,Form actorSpeaking, string sayLine)
   ; actorToSpeakTo is the person initiating the conversation. Usually the player, unless radiant
   actor akSpeaker = actorSpeaking as Actor
   if akTarget.IsChild() || akSpeaker.IsChild()
-    Debug.Trace("[minai] Not processing response - one of the actors is a child.")
+    Main.Warn("Not processing response - one of the actors is a child.")
     return
   EndIf
   bool bPlayerInScene = False
   if actorSpeaking == playerRef || actorToSpeakTo == playerRef
-    Debug.Trace("[minai] Player in Scene")
+    Main.Info("Player in Scene")
     bPlayerInScene = True
   EndIf
   Actor[] actorsFromFormList = GetActorsFromFormList()
 
-  debug.Trace("[minai] ActionResponse(" + akSpeaker.GetActorBase().GetName() + ", " + akTarget.GetActorBase().GetName() + ", playerInScene="+bPlayerInScene+"): " + sayLine)
+  Main.Info("ActionResponse(" + akSpeaker.GetActorBase().GetName() + ", " + akTarget.GetActorBase().GetName() + ", playerInScene="+bPlayerInScene+"): " + sayLine)
   devious.ActionResponse(akTarget, akSpeaker, sayLine, actorsFromFormList)
   arousal.ActionResponse(akTarget, akSpeaker, sayLine, actorsFromFormList)
   sex.ActionResponse(akTarget, akSpeaker, sayLine, actorsFromFormList, bPlayerInScene)
@@ -226,7 +226,7 @@ Actor[] Function GetActorsFromFormList()
             actorsFromFormList[numActors] = currentActor
             numActors += 1
 		else
-            Debug.Trace("[minai] Error: MantellaConversationParticipantsFormList[" + i + "] is not an Actor")
+            Main.Warn("Error: MantellaConversationParticipantsFormList[" + i + "] is not an Actor")
 		EndIf
         i += 1
     endWhile

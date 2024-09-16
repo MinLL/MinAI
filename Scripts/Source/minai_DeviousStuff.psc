@@ -10,6 +10,7 @@ bool bHasDD = False
 bool bHasSTA = False
 bool bHasSLHH = False
 bool bHasSLApp = False
+bool bHasDeviouslyAccessible = False
 
 Keyword SLHHScriptEventKeyword
 GlobalVariable Debt
@@ -22,10 +23,16 @@ minai_Arousal arousal
 minai_Sex sex
 minai_AIFF aiff
 
+GlobalVariable eyefucktrack
+GlobalVariable eyepenalty
+GlobalVariable eyereward
+GlobalVariable eyescore
+
+
 actor playerRef
 
 function Maintenance(minai_MainQuestController _main)
-  Debug.Trace("[minai] Initializing Devious Module")
+  Main.Info("Initializing Devious Module")
   playerRef = game.GetPlayer()
   main = _main
   
@@ -47,19 +54,19 @@ function Maintenance(minai_MainQuestController _main)
   libs = Game.GetFormFromFile(0x00F624, "Devious Devices - Integration.esm") as zadlibs
     if libs
     bHasDD = True
-    Debug.Trace("[minai] Found Devious Devices")    
+    Main.Info("Found Devious Devices")    
   EndIf
   
   if Game.GetModByName("DeviousFollowers.esp") != 255
-    Debug.Trace("[minai] Found Devious Followers")
+    Main.Info("Found Devious Followers")
     bHasDeviousFollowers = True
     Debt = Game.GetFormFromFile(0xC54F, "DeviousFollowers.esp") as GlobalVariable
     ContractRemaining = Game.GetFormFromFile(0x218C7C, "DeviousFollowers.esp") as GlobalVariable
     dftools = Game.GetFormFromFile(0x01210D, "DeviousFollowers.esp") as _DFtools
     dfDealController = Game.GetFormFromFile(0x01C86D, "DeviousFollowers.esp") as _DFDealUberController
     EnslaveDebt = Game.GetFormFromFile(0x00C548, "DeviousFollowers.esp") as GlobalVariable
-    debug.Trace("[minai] enslaveDebt=" + EnslaveDebt.GetValueInt())
-    Debug.Trace("[minai] dftools="+dftools)
+    Main.Info("enslaveDebt=" + EnslaveDebt.GetValueInt())
+    Main.Info("dftools="+dftools)
     
     if dftools == None || enslavedebt == None || dfDealController == None
       Debug.Notification("Warning: Some devious followers content will be broken, incompatible version!")
@@ -67,16 +74,16 @@ function Maintenance(minai_MainQuestController _main)
   EndIf
   
   if Game.GetModByName("Spank That Ass.esp") != 255
-    Debug.Trace("[minai] Found Spank That Ass")
+    Main.Info("Found Spank That Ass")
     bHasSTA = True
   EndIf
 
   if Game.GetModByName("SexlabHorribleHarassment.esp") != 255
     bHasSLHH = True
-    Debug.Trace("[minai] Found SLHH")
+    Main.Info("Found SLHH")
     SLHHScriptEventKeyword = Game.GetFormFromFile(0x00C510, "SexLabHorribleHarassment.esp") as Keyword
     if !SLHHScriptEventKeyword
-      Debug.Trace("[minai] Could not find SLHHScriptEventKeyword")
+      Main.Error("Could not find SLHHScriptEventKeyword")
       Debug.Notification("Incompatible version of SLHH. AI Integrations Disabled.")
       bHasSLHH = False
     EndIf
@@ -84,20 +91,33 @@ function Maintenance(minai_MainQuestController _main)
 
   if Game.GetModByName("Sexlab Approach.esp") != 255
     bHasSLApp = True
-    Debug.Trace("[minai] Found SLApp")
+    Main.Info("Found SLApp")
     slapp = Game.GetFormFromFile(0x0083F7, "Sexlab Approach.esp") as SLAppPCSexQuestScript
     if !slapp
-      Debug.Trace("[minai] Could not find SLAppPCSexQuestScript")
+      Main.Error("Could not find SLAppPCSexQuestScript")
       Debug.Notification("Incompatible version of SLApp. AI Integrations Disabled.")
       bHasSLapp = False
     EndIf
   EndIf
 
+  if Game.GetModByName("DeviouslyAccessible.esp") != 255
+    bHasDeviouslyAccessible = True
+    eyefucktrack = Game.GetFormFromFile(0x0AB14D, "DeviouslyAccessible.esp") as GlobalVariable
+    eyepenalty = Game.GetFormFromFile(0x0AB14C, "DeviouslyAccessible.esp") as GlobalVariable
+    eyereward = Game.GetFormFromFile(0x0AB142, "DeviouslyAccessible.esp") as GlobalVariable
+    eyescore = Game.GetFormFromFile(0x0AB141, "DeviouslyAccessible.esp") as GlobalVariable
+    if (!eyefucktrack || !eyepenalty || !eyereward || !eyescore)
+      Main.Error("Could not find DeviouslyAccessible globals")
+      Debug.Notification("Incompatible version of DeviouslyAccessible. AI Integrations Disabled.")
+      bHasDeviouslyAccessible = False
+    EndIf
+  EndIf  
   aiff.SetModAvailable("DeviousFollowers", bHasDeviousFollowers)
   aiff.SetModAvailable("DD", bHasDD)
   aiff.SetModAvailable("STA", bHasSTA)
   aiff.SetModAvailable("SLHH", bHasSLHH)
   aiff.SetModAvailable("SLApp", bHasSLApp)
+  aiff.SetModAvailable("DeviouslyAccessible", bHasDeviouslyAccessible)
 EndFunction
 
 Function ResetSpankRule()
@@ -148,12 +168,12 @@ Function Harasskiss(actor akActor)
 EndFunction
 
 Event OnDeviceEquipped(Form inventoryDevice, Form deviceKeyword, form akActor)
-  Debug.Trace("[minai] Equipped Device: " + (inventoryDevice as Armor).GetName() + " on " + main.GetActorName(akActor as Actor))
+  Main.Info("Equipped Device: " + (inventoryDevice as Armor).GetName() + " on " + main.GetActorName(akActor as Actor))
   SetContext(akActor as Actor)
 EndEvent
 
 Event OnDeviceRemoved(Form inventoryDevice, Form deviceKeyword, form akActor)
-  Debug.Trace("[minai] Removed Device: " + (inventoryDevice as Armor).GetName() + " on " + main.GetActorName(akActor as Actor))
+  Main.Info("Removed Device: " + (inventoryDevice as Armor).GetName() + " on " + main.GetActorName(akActor as Actor))
   SetContext(akActor as Actor)
 EndEvent
 
@@ -291,7 +311,7 @@ EndFunction
 
 
 Function WriteVibrateString(actor akActor, actor player, bool isYou=false)
-  debug.Trace("[minai] Registering vibration and shock keywords")
+  Main.Info("Registering vibration and shock keywords")
   string actorName = main.GetActorName(akActor)
 
   main.RegisterAction("!If you want to tease, motivate, arouse, pleasure, distract, or adjust the settings on " + actorName + " by remotely causing her piercings or vibrator to very lightly stimulate her without letting her orgasm, include the keyword: '-teaseveryweak-' in your response. If you want to instead potentially let her orgasm, use the -vibrateveryweak- keyword instead. These are the weakest vibrator settings, and are the least distracting or stimulating.!")
@@ -318,7 +338,7 @@ Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking, actor[] actorsF
   if bHasDeviousFollowers
     Actor deviousFollower = (Quest.GetQuest("_Dflow") as QF__Gift_09000D62).Alias__DMaster.GetRef() as Actor
     if actorSpeaking == deviousFollower || actorToSpeakTo == deviousFollower
-      Debug.Trace("[minai] Devious Follower in Scene")
+      Main.Info("Devious Follower in Scene")
       bDeviousFollowerInScene = True
     EndIf
   EndIf
@@ -400,9 +420,9 @@ Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking, actor[] actorsF
         if targetRule  == ""
           targetRule  = dfDealController.GetPotentialDeal()
 	EndIf
-        debug.Trace("[minai] targetRule="+targetRule)
+        Main.Info("targetRule="+targetRule)
 	String ruleDesc = DealManager.GetRuleInfo(targetRule)
-        debug.Trace("[minai] ruleInfo=" + ruleDesc)
+        Main.Info("ruleInfo=" + ruleDesc)
         main.RegisterAction("!The devious follower is very concerned about " + playerName + "'s current debt level. Talking about this is the highest possible priority. He wants to discuss a new rule, and get " + playerName + " to agree to it in exchange for reducing the debt " + playerName + " owes. The new rule is: " + ruleDesc + "!")
 	main.RegisterAction("!If " + speakerName + " successfully convinces " + playerName + " to agree to obey the new \"" + ruleDesc + "\" rule, respond with the keyword: -acceptdeal- in your response.!")
 	; main.RegisterAction("!If " + playerName + " tells you that they refuse, respond with the keyword: -rejectdeal- in your response.!")
@@ -417,7 +437,7 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
   if bHasDeviousFollowers
     Actor deviousFollower = (Quest.GetQuest("_Dflow") as QF__Gift_09000D62).Alias__DMaster.GetRef() as Actor
     if akTarget == deviousFollower || akSpeaker == deviousFollower
-      Debug.Trace("[minai] Devious Follower in Scene")
+      Main.Info("Devious Follower in Scene")
       bDeviousFollowerInScene = True
     EndIf
   EndIf
@@ -505,22 +525,22 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
         HarassHug(akSpeaker)
       EndIf
     Else
-      Debug.Trace("[minai] Not processing keywords for exclusive scene - Conflicting scene is running")
+      Main.Warn("Not processing keywords for exclusive scene - Conflicting scene is running")
     EndIf
 
     if stringUtil.Find(sayLine, "-acceptdeal-") != -1 
       Debug.Notification("AI: Accepted Deal: " + targetRule)
-      Debug.Trace("[minai] Player Accepted Deal: " + targetRule)
+      Main.Info("Player Accepted Deal: " + targetRule)
       dfDealController.MakeDeal(targetRule)
       ClearTargetRule()
     EndIf
     if stringUtil.Find(sayLine, "-drugplayer-") != -1
       Debug.Notification("AI: Drinking Skooma")
-      Debug.Trace("[minai] Player Drinking Skooma")
+      Main.Info("Player Drinking Skooma")
       dfDealController.MDC.DrinkSkooma()
     EndIf
     if stringUtil.Find(sayLine, "-rejectdeal-") != -1
-      Debug.Trace("[minai] Player Reject Deal")
+      Main.Info("Player Reject Deal")
       Debug.Notification("AI: Rejected Deal")
       dfDealController.RejectDeal(targetRule)
       ClearTargetRule()
@@ -657,26 +677,26 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
       AIAgentFunctions.logMessageForActor("command@ExtCmdHug@@"+speakerName+" began to hug " + targetName + "'.","funcret",speakerName)
     EndIf
   Else
-    Debug.Trace("[minai] Not processing commands for exclusive scene - Conflicting scene is running")
+    Main.Warn("Not processing commands for exclusive scene - Conflicting scene is running")
   EndIf
 
   string ruleDesc = DealManager.GetRuleInfo(targetRule);
   ; Devious Follower
   if (command == "ExtCmdAcceptDeal") 
     Debug.Notification("AI: Accepted Deal: " + targetRule)
-    Debug.Trace("[minai] Player Accepted Deal: " + targetRule)
+    Main.Info("Player Accepted Deal: " + targetRule)
     dfDealController.MakeDeal(targetRule)
     AIAgentFunctions.logMessageForActor("command@ExtCmdAcceptDeal@@"+targetName+" agreed to obey a new rule: \"" + ruleDesc + "\".","funcret",speakerName)
     ClearTargetRule()
   EndIf
   if (command == "ExtCmdDrugPlayer") 
     Debug.Notification("AI: Drinking Skooma")
-    Debug.Trace("[minai] Player Drinking Skooma")
+    Main.Info("Player Drinking Skooma")
     dfDealController.MDC.DrinkSkooma()
     AIAgentFunctions.logMessageForActor("command@ExtCmdAcceptDeal@@"+targetName+" used the drugs that " + speakerName + " provided.","funcret",speakerName)
   EndIf
   if (command == "ExtCmdRejectDeal") 
-    Debug.Trace("[minai] Player Reject Deal")
+    Main.Info("Player Reject Deal")
     Debug.Notification("AI: Rejected Deal")
     dfDealController.RejectDeal(targetRule)
     AIAgentFunctions.logMessageForActor("command@ExtCmdAcceptDeal@@"+targetName+" refused to obey the new rule: \"" + ruleDesc + "\".","funcret",speakerName)
@@ -689,9 +709,8 @@ Function SetContext(actor akTarget)
     return
   EndIf
   string actorName = main.GetActorName(akTarget)
-  debug.Trace("[minai] Devious - SetContext( " + actorName + " )")
   aiff.SetActorVariable(akTarget, "canVibrate", CanVibrate(akTarget))
-  if bHasDeviousFollowers
+  if bHasDeviousFollowers && akTarget == PlayerRef
     Actor deviousFollower = (Quest.GetQuest("_Dflow") as QF__Gift_09000D62).Alias__DMaster.GetRef() as Actor
     if deviousFollower
       aiff.SetActorVariable(playerRef, "deviousFollowerName", main.GetActorName(deviousFollower))
@@ -721,6 +740,12 @@ Function SetContext(actor akTarget)
     EndWhile
     aiff.SetActorVariable(playerRef, "deviousFollowerRules", ruleList)
     aiff.SetActorVariable(playerRef, "deviousTimeForSpanks",  dftools.SpankingTimer <= Utility.GetCurrentGameTime())
+  EndIf
+  if bHasDeviouslyAccessible && akTarget == PlayerRef
+    aiff.SetActorVariable(playerRef, "deviouslyAccessibleEyeFuckTrack", eyefucktrack.GetValueInt())
+    aiff.SetActorVariable(playerRef, "deviouslyAccessibleEyePenalty", eyepenalty.GetValueInt())
+    aiff.SetActorVariable(playerRef, "deviouslyAccessibleEyeReward", eyereward.GetValueInt())
+    aiff.SetActorVariable(playerRef, "deviouslyAccessibleEyeScore", eyescore.GetValueInt())
   EndIf
 EndFunction
 

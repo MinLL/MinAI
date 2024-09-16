@@ -1,3 +1,3 @@
 <?php
-    $force_voice_type = false;
+    $force_voice_type = true;
 ?>

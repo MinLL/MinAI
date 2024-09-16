@@ -13,9 +13,10 @@ Function OnEffectStart(Actor target, Actor caster)
   if (!target || !aiff || !aiff.IsInitialized())
     return
   EndIf
-  string targetName = akTarget.GetActorBase().GetName()  
+  string targetName = akTarget.GetActorBase().GetName()
+  Debug.Trace("[minai (DEBUG)]: OnEffectStart(" + targetName +") START")
   if AIAgentFunctions.getAgentByName(targetName)
-    Debug.Trace("[minai] - Updating context for managed NPC: " + targetName)
+    Debug.Trace("- Updating context for managed NPC: " + targetName)
     ; sex = (Self as Quest) as minai_Sex
     aiff.SetContext(akTarget)
     RegisterForSingleUpdate(aiff.ContextUpdateInterval)
@@ -23,9 +24,10 @@ Function OnEffectStart(Actor target, Actor caster)
     ; Store voice types even if they're not a managed actor so that they will immediately have voices when spoken to
     aiff.StoreActorVoice(akTarget)
     ; Store factions and keywords for the same reason
-    aiff.StoreFactions(akTarget)
-    aiff.StoreKeywords(akTarget)
+    ; aiff.StoreFactions(akTarget)
+    ; aiff.StoreKeywords(akTarget)
   EndIf
+  Debug.Trace("[minai (DEBUG)]: OnEffectStart(" + targetName +") END")
 EndFunction
 
 
@@ -35,6 +37,7 @@ Event OnUpdate()
     UnregisterForUpdate()
     return
   endif
+  Debug.Trace("- Updating context for managed NPC: " + akTarget.GetDisplayName())
   aiff.SetContext(akTarget)
   RegisterForSingleUpdate(aiff.ContextUpdateInterval)
 EndEvent

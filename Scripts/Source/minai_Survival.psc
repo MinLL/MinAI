@@ -28,23 +28,23 @@ function Maintenance(minai_MainQuestController _main)
   minMantella = (Self as Quest) as minai_Mantella
   aiff = (Self as Quest) as minai_AIFF
   
-  Debug.Trace("[minai] Initializing Survival Module")
+  main.Info("Initializing Survival Module")
   if Game.GetModByName("SunhelmSurvival.esp") != 255
     bHasSunhelm = True
-    Debug.Trace("[minai] Found Sunhelm")
+    Main.Info("Found Sunhelm")
     sunhelmMain = Game.GetFormFromFile(0x000D61, "SunhelmSurvival.esp") as _sunhelmmain
     sunhelmWeather = Game.GetFormFromFile(0x989760, "SunhelmSurvival.esp") as _shweathersystem
     sunhelmFoodEatSound = Game.GetFormFromFile(0x5674E1, "SunhelmSurvival.esp") as Sound
     sunhelmFillBottlesSound = Game.GetFormFromFile(0x4BB249, "SunhelmSurvival.esp") as Sound
 
     if !sunhelmMain || !sunhelmWeather|| !sunhelmFoodEatSound
-      Debug.Trace("[minai] Could not load all sunhelm references")
+      Main.Error("Could not load all sunhelm references")
     EndIf    
   EndIf
 
   carriageScript = Game.GetFormFromFile(0x17F01, "Skyrim.esm") as CarriageSystemScript
   if !carriageScript
-    Debug.Trace("[minai] Could not get reference to carriageScript")
+    Main.Error("Could not get reference to carriageScript")
   EndIf
   if Game.GetModByName("BFT Ships and Carriages.esp") != 255
     bHasBFT = true
@@ -52,19 +52,19 @@ function Maintenance(minai_MainQuestController _main)
   ; Vanilla Integrations
   gold = Game.GetFormFromFile(0x0000000F, "Skyrim.esm")
   if !gold
-    Debug.Trace("[minai] - Could not get reference to gold?")
+    Main.Error("- Could not get reference to gold?")
   EndIf
 
   DialogueGeneric = Game.GetFormFromFile(0x13EB3, "Skyrim.esm") as Quest
   if !DialogueGeneric
-    Debug.Trace("[minai] - Could not get handle to DialogueGeneric.")
+    Main.Error("- Could not get handle to DialogueGeneric.")
   EndIf
 
   JobInnKeeper = Game.GetFormFromFile(0x5091B, "Skyrim.esm") as Faction
   JobInnServer = Game.GetFormFromFile(0xDEE93, "Skyrim.esm") as Faction
 
   if !JobInnKeeper || !JobInnServer
-    Debug.Trace("[minai] - Failed to fetch vanilla factions")
+    Main.Error("- Failed to fetch vanilla factions")
   EndIf
   aiff.SetModAvailable("Sunhelm", bHasSunhelm)
   aiff.SetModAvailable("BetterFastTravel", bHasBFT)

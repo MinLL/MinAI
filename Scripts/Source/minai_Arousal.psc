@@ -59,8 +59,11 @@ function Maintenance(minai_MainQuestController _main)
     Debug.Trace("[minai] Found OSL Aroused")
     bHasOSL = True
   EndIf ;This could be elseif - abandon getting SLA keywords by FormID and use HasKeywordString instead
+
+  Main.Info("- Initializing Arousal Module.")
+
   if Game.GetModByName("SexlabAroused.esm") != 255
-    Debug.Trace("[minai] Found Sexlab Aroused")
+    Main.Info("Found Sexlab Aroused")
     bHasAroused = True
     Aroused = Game.GetFormFromFile(0x04290F, "SexlabAroused.esm") as slaUtilScr
     SLA_HalfNakedBikini = Game.GetFormFromFile(0x08E854, "SexlabAroused.esm") as Keyword
@@ -85,15 +88,22 @@ function Maintenance(minai_MainQuestController _main)
     SLA_BootsHeels = Game.GetFormFromFile(0x08F410, "SexlabAroused.esm") as Keyword
     SLA_HasLeggings = Game.GetFormFromFile(0x08FE9F, "SexlabAroused.esm") as Keyword
     SLA_ArmorRubber = Game.GetFormFromFile(0x08FEA4, "SexlabAroused.esm") as Keyword
+    EroticArmor = Game.GetFormFromFile(0x08C7F6, "SexlabAroused.esm") as Keyword
+    SLA_PiercingVulva = Game.GetFormFromFile(0x08F3F6, "SexlabAroused.esm") as Keyword
+    SLA_PiercingBelly = Game.GetFormFromFile(0x088F3F7, "SexlabAroused.esm") as Keyword
+    SLA_PiercingNipple = Game.GetFormFromFile(0x08F3F8, "SexlabAroused.esm") as Keyword
+    SLA_PiercingClit = Game.GetFormFromFile(0x08F40B, "SexlabAroused.esm") as Keyword
+    
     ; Check a couple keywords to see if it's a stripped down SexlabAroused
     if SLA_HalfNakedBikini && SLA_ArmorHalfNaked
       bHasArousedKeywords = True
     EndIf
-    Debug.Trace("[minai] Sexlab Aroused Keywords=" + bHasArousedKeywords)
+    Main.Info("Sexlab Aroused Keywords=" + bHasArousedKeywords)
   EndIf
+
   if Game.GetModByName("TheNewGentleman.esp") != 255
     bHasTNG = True
-	Debug.Trace("[minai] Found TNG")
+	Main.Info("Found TNG")
 	TNG_XS = Game.GetFormFromFile(0x03BFE1, "TheNewGentleman.esp") as Keyword
 	TNG_S = Game.GetFormFromFile(0x03BFE2, "TheNewGentleman.esp") as Keyword
 	TNG_M = Game.GetFormFromFile(0x03BFE3, "TheNewGentleman.esp") as Keyword
@@ -106,17 +116,16 @@ function Maintenance(minai_MainQuestController _main)
 		Debug.Trace("[minai] TNG size keywords retrieved successfully.")
 	else
 		Debug.Trace("[minai] Failed to retrieve one or more TNG size keywords.")
-	EndIf
   EndIf
 
   if Game.GetModByName("BaboInteractiveDia.esp") != 255
-    Debug.Trace("[minai] Found BaboDialogue")
+    Main.Info("Found BaboDialogue")
     bHasBabo = True
     baboConfigs = (Game.GetFormFromFile(0x2FEA1B, "BaboInteractiveDia.esp") as BaboDialogueConfigMenu)
     if !baboConfigs
       bHasBabo = False
       Debug.Notification("Incompatible version of BaboDialogue. AI integrations disabled.")
-      Debug.Trace("[minai] Could not fetch baboConfigs")
+      Main.Error("Could not fetch baboConfigs")
     EndIf
   EndIf
   aiff.SetModAvailable("Aroused", bHasAroused)
@@ -127,9 +136,6 @@ function Maintenance(minai_MainQuestController _main)
 EndFunction
 
 
-
-
-
 Function UpdateArousal(actor akTarget, int Arousal)
   if bHasOSL
     OSLArousedNative.ModifyArousal(akTarget, Arousal)
@@ -137,8 +143,6 @@ Function UpdateArousal(actor akTarget, int Arousal)
     Aroused.UpdateActorExposure(akTarget, Arousal)
   EndIf
 EndFunction
-
-
 
 
 int Function GetActorArousal(actor akActor)
@@ -283,6 +287,21 @@ function WriteClothingString(actor akActor, actor player, bool isYou=false, acto
 			if currentActor.WornHasKeyword(SLA_ArmorRubber)
 			  main.RegisterAction(actorName + "'s outfit is made out of tight form-fitting rubber (Referred to as Ebonite).")
 			EndIf
+			if currentActor.WornHasKeyword(EroticArmor)
+			  main.RegisterAction(actorName + "'s outfit is sexy and revealing.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_PiercingNipple)
+			  main.RegisterAction(actorName + " has nipple piercings.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_PiercingBelly)
+			  main.RegisterAction(actorName + " has a navel piercing.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_PiercingVulva)
+			  main.RegisterAction(actorName + " has labia piercings.")
+			EndIf
+			if currentActor.WornHasKeyword(SLA_PiercingClit)
+			  main.RegisterAction(actorName + " has a clitoris piercing.")
+			EndIf
 		EndIf
 		i += 1
 	EndWhile
@@ -348,11 +367,11 @@ Function WritePlayerAppearance(Actor player)
       butt = "enormous beautiful ass"
     endif
     string appearanceStr = main.GetActorName(player) + " is an " + appearance + " " + actorRace + " " + gender + " with " + breasts + " and a " + butt + "."
-    debug.Trace("[minai] Set player description (Babo): " + appearanceStr)
+    Main.Info("Set player description (Babo): " + appearanceStr)
     main.RegisterAction(appearanceStr)
   else
     string appearanceStr = Player.GetActorBase().GetName() + " is a " + gender + " " + actorRace + "." 
-    debug.Trace("[minai] Set player description: " + appearanceStr)
+    Main.Info("Set player description: " + appearanceStr)
     main.RegisterAction(appearanceStr)
   EndIf
 EndFunction
