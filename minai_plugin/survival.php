@@ -136,5 +136,5 @@ if (IsInFaction($GLOBALS['HERIKA_NAME'], "Carriage System Vendors")) {
 }
 
 // Allow anyone to buy or sell. Don't restrict this to shop-keepers.
-$GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdCarriageTrade";
+$GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdTrade";
 ?>

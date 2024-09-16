@@ -9,6 +9,8 @@ minai_DeviousStuff devious
 bool bHasAIFF = False
 
 int Property contextUpdateInterval Auto
+int Property playerContextUpdateInterval Auto
+
 Actor player
 VoiceType NullVoiceType
 bool isInitialized
@@ -16,6 +18,10 @@ minai_MainQuestController main
 
 Function Maintenance(minai_MainQuestController _main)
   contextUpdateInterval = 30
+  ; This is inefficient. We need to more selectively set specific parts of the context rather than repeatedly re-set everything.
+  ; Things like arousal need to update this often probably, most things don't.
+  ; TODO: Break this out and fix this.
+  playerContextUpdateInterval = 5
   main = _main
   player = Game.GetPlayer()
   Debug.Trace("[minai] - Initializing for AIFF.")
@@ -32,6 +38,7 @@ Function Maintenance(minai_MainQuestController _main)
   EndIf
   if isInitialized
     SetContext(player)
+    RegisterForSingleUpdate(playerContextUpdateInterval)
   EndIf
 EndFunction
 
@@ -55,13 +62,14 @@ Function SetContext(actor akTarget)
     Debug.Trace("[minai] AIFF - SetContext() called with none target")
     return
   EndIf
-  Debug.Trace("[minai] AIFF - SetContext(" + akTarget.GetDisplayName() + ")")
+  Debug.Trace("[minai] AIFF - SetContext(" + akTarget.GetDisplayName() + ") START")
   devious.SetContext(akTarget)
   arousal.SetContext(akTarget)
   survival.SetContext(akTarget)
   StoreActorVoice(akTarget)
   StoreKeywords(akTarget)
   StoreFactions(akTarget)
+  Debug.Trace("[minai] AIFF - SetContext(" + akTarget.GetDisplayName() + ") FINISH")
 EndFunction
 
 
@@ -72,7 +80,7 @@ Function SetActorVariable(Actor akActor, string variable, string value)
     return
   EndIf
   string actorName = main.GetActorName(akActor)
-  Debug.Trace("[minai] Set actor value for actor " + actorName + " "+ variable + " to " + value)
+  ; Debug.Trace("[minai] Set actor value for actor " + actorName + " "+ variable + " to " + value)
   AIAgentFunctions.logMessage("_minai_" + actorName + "//" + variable + "@" + value, "setconf")
 EndFunction
 
@@ -182,3 +190,13 @@ Function SetInitialized()
   debug.Trace("[minai] AIFF initialization complete.")
   isInitialized = True
 EndFunction
+
+
+Event OnUpdate()
+  if (!IsInitialized())
+    UnregisterForUpdate()
+    return;
+  EndIf
+  SetContext(player)
+  RegisterForSingleUpdate(playerContextUpdateInterval)
+EndEvent
