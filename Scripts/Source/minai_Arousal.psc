@@ -219,7 +219,7 @@ function WriteClothingString(actor akActor, actor player, bool isYou=false, acto
 				main.RegisterAction(actorName + " is wearing " + cuirass.GetName())
 			EndIf
 			if bHasTNG
-				if currentActor.GetActorBase().GetSex() == 0 && IsExposed(currentActor) || currentActor.HasKeyword(TNG_Gentlewoman) && IsExposed(currentActor)
+				if currentActor.GetActorBase().GetSex() == 0 && IsTNGExposed(currentActor) || currentActor.HasKeyword(TNG_Gentlewoman) && IsTNGExposed(currentActor)
 					if IsExposed(currentActor) && cuirass != None
 						RegisterAction(actorName + "'s genitals are exposed.")
 					EndIf
@@ -516,7 +516,7 @@ string Function GetFactionsForActor(actor akTarget)
 EndFunction
 
 
-bool Function IsExposed(Actor akActor)
+bool Function IsTNGExposed(Actor akActor)
     int itemIndex = akActor.GetNumItems()
     while itemIndex > 0
         itemIndex -= 1
