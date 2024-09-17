@@ -119,7 +119,7 @@ Function GetClothingContext($name) {
   if (HasKeyword($name, "SLA_ArmorRubber")) {
     $ret .= "{$name}'s outfit is made out of tight form-fitting rubber (Referred to as Ebonite).\n";
   }
-  if (HasKeyword($name, "isNaked")) {
+  if (IsEnabled($name, "isNaked")) {
     $ret .= "{$name} is naked and exposed.\n";
   }
   if (HasKeyword($name, "EroticArmor")) {
