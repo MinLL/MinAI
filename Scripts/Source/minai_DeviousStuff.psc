@@ -220,6 +220,9 @@ EndEvent
 
 
 bool Function CanVibrate(Actor akActor)
+  if (!bHasDD)
+    return False
+  EndIf
   return (akActor.WornHasKeyword(libs.zad_DeviousPlugVaginal)  || akActor.WornHasKeyword(libs.zad_DeviousPlugAnal)  || akActor.WornHasKeyword(libs.zad_DeviousPiercingsNipple)  || akActor.WornHasKeyword(libs.zad_DeviousPiercingsVaginal))
 EndFunction
 
