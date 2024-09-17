@@ -168,7 +168,7 @@ EndFunction
 
 ; Helper function for keyword management
 String Function GetKeywordIfExists(actor akTarget, string keywordStr, Keyword theKeyword)
-  if !theKeyword
+  if theKeyword == None
     return ""
   EndIf
   if (akTarget.WornHasKeyword(theKeyword))
