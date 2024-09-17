@@ -10,6 +10,8 @@ function CanVibrate($name) {
 // Return the specified actor value.
 // Caches the results of several queries that are repeatedly referenced.
 Function GetActorValue($name, $key) {
+    $name = addslashes($name);
+    $key = addslashes($key);
     global $allKeywords;
     global $allFactions;
 
