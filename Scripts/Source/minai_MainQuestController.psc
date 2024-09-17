@@ -3,7 +3,7 @@ ScriptName minai_MainQuestController extends Quest
 GlobalVariable minai_WhichAI
 actor playerRef
 
-int property logLevel Auto
+GlobalVariable property logLevel Auto
 
 ; AI
 minai_Mantella minMantella
@@ -29,8 +29,9 @@ EndFunction
 
 Function Maintenance()
   playerRef = game.GetPlayer()
-  if logLevel == 0
-    logLevel = 3
+  logLevel = Game.GetFormFromFile(0x090B, "MinAI.esp") as GlobalVariable
+  if (!logLevel)
+    Debug.MessageBox("Mismatched MinAI.esp and minai_MainQuestController version")
   EndIf
   Info("Maintenance() - minai v" +GetVersion() + " initializing.")
   ; Register for Mod Events
@@ -115,27 +116,27 @@ Function Log(String str, string lvl)
 EndFunction
 
 Function Error(String str)
-  if logLevel >= 1
+  if logLevel.GetValueInt() >= 1
     Log(str, "ERROR")
   EndIf
 EndFunction
 
 
 Function Warn(String str)
-  if logLevel >= 2
+  if logLevel.GetValueInt() >= 2
     Log(str, "WARN")
   EndIf
 EndFunction
 
 
 Function Info(String str)
-  if logLevel >= 3
+  if logLevel.GetValueInt() >= 3
     Log(str, "INFO")
   EndIf
 EndFunction
 
 Function Debug(String str)
-  if LogLevel >= 4
+  if LogLevel.GetValueInt() >= 4
     Log(str, "DEBUG")
   EndIf
 EndFunction

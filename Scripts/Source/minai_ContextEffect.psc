@@ -24,8 +24,8 @@ Function OnEffectStart(Actor target, Actor caster)
     ; Store voice types even if they're not a managed actor so that they will immediately have voices when spoken to
     aiff.StoreActorVoice(akTarget)
     ; Store factions and keywords for the same reason
-    ; aiff.StoreFactions(akTarget)
-    ; aiff.StoreKeywords(akTarget)
+    aiff.StoreFactions(akTarget)
+    aiff.StoreKeywords(akTarget)
   EndIf
   Debug.Trace("[minai (DEBUG)]: OnEffectStart(" + targetName +") END")
 EndFunction
