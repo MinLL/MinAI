@@ -59,13 +59,11 @@ function Maintenance(minai_MainQuestController _main)
   main = _main
   aiff = (Self as Quest) as minai_AIFF
   
-  Debug.Trace("[minai] - Initializing Arousal Module.")
+  Main.Info("Initializing Arousal Module.")
   if Game.GetModByName("OSLAroused.esp") != 255
-    Debug.Trace("[minai] Found OSL Aroused")
+    Main.Info("Found OSL Aroused")
     bHasOSL = True
   EndIf ;This could be elseif - abandon getting SLA keywords by FormID and use HasKeywordString instead
-
-  Main.Info("- Initializing Arousal Module.")
 
   if Game.GetModByName("SexlabAroused.esm") != 255
     Main.Info("Found Sexlab Aroused")
@@ -118,9 +116,10 @@ function Maintenance(minai_MainQuestController _main)
 	TNG_Gentlewoman = Game.GetFormFromFile(0x03BFF8, "TheNewGentleman.esp") as Keyword
 	TNG_Revealing = Game.GetFormFromFile(0x03BFFF, "TheNewGentleman.esp") as Keyword
 	if TNG_XS != None && TNG_S != None && TNG_M != None && TNG_L != None && TNG_XL != None && TNG_DefaultSize != None
-		Debug.Trace("[minai] TNG size keywords retrieved successfully.")
+		Main.Debug("TNG size keywords retrieved successfully.")
 	else
-		Debug.Trace("[minai] Failed to retrieve one or more TNG size keywords.")
+		Main.Debug("Failed to retrieve one or more TNG size keywords.")
+	EndIf
   EndIf
 
   if Game.GetModByName("BaboInteractiveDia.esp") != 255
@@ -129,7 +128,6 @@ function Maintenance(minai_MainQuestController _main)
     baboConfigs = (Game.GetFormFromFile(0x2FEA1B, "BaboInteractiveDia.esp") as BaboDialogueConfigMenu)
     if !baboConfigs
       bHasBabo = False
-      Debug.Notification("Incompatible version of BaboDialogue. AI integrations disabled.")
       Main.Error("Could not fetch baboConfigs")
     EndIf
   EndIf
@@ -219,12 +217,13 @@ function WriteClothingString(actor akActor, actor player, bool isYou=false, acto
 				main.RegisterAction(actorName + " is wearing " + cuirass.GetName())
 			EndIf
 			if bHasTNG
-				if currentActor.GetActorBase().GetSex() == 0 && IsTNGExposed(currentActor) || currentActor.HasKeyword(TNG_Gentlewoman) && IsTNGExposed(currentActor)
-					if IsTNGExposed(currentActor) && cuirass != None
-						RegisterAction(actorName + "'s genitals are exposed.")
+				bool exposed = IsTNGExposed(currentActor)
+				if currentActor.GetActorBase().GetSex() == 0 && exposed == True || currentActor.HasKeyword(TNG_Gentlewoman) && exposed == True
+					if exposed == True && cuirass != None
+						main.RegisterAction(actorName + "'s genitals are exposed.")
 					EndIf
 					string sizeDescription = ""
-					Debug.Trace("[minai] TNG Dick Check")
+					Main.Debug("TNG Dick Check")
 					if currentActor.HasKeyword(TNG_XS) || currentActor.HasKeywordString("TNG_ActorAddnAuto:01")
 						sizeDescription = "an embarrassingly tiny prick"
 					elseif currentActor.HasKeyword(TNG_S) || currentActor.HasKeywordString("TNG_ActorAddnAuto:02")
@@ -237,7 +236,7 @@ function WriteClothingString(actor akActor, actor player, bool isYou=false, acto
 						sizeDescription = "one of the biggest cocks you've ever seen"
 					EndIf
 					if sizeDescription != ""
-						RegisterAction("You can see that " + actorName + " has " + sizeDescription + ".")
+						main.RegisterAction("You can see that " + actorName + " has " + sizeDescription + ".")
 					EndIf
 				EndIf
 			EndIf
@@ -311,7 +310,6 @@ function WriteClothingString(actor akActor, actor player, bool isYou=false, acto
 		i += 1
 	EndWhile
 EndFunction
-
 
 
 Function WritePlayerAppearance(Actor player)
@@ -406,8 +404,6 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
 EndFunction
 
 
-
-
 Event CommandDispatcher(String speakerName,String  command, String parameter)
   Actor akSpeaker=AIAgentFunctions.getAgentByName(speakerName)
   actor akTarget= AIAgentFunctions.getAgentByName(parameter)
@@ -494,15 +490,15 @@ string Function GetKeywordsForActor(actor akTarget)
 	  ret += aiff.GetKeywordIfExists(akTarget, "TNG_XL", TNG_XL)
 	  ret += aiff.GetKeywordIfExists(akTarget, "TNG_DefaultSize", TNG_DefaultSize)
 	  ret += aiff.GetKeywordIfExists(akTarget, "TNG_Gentlewoman", TNG_Gentlewoman)
-	  if akActor.HasKeywordString("TNG_ActorAddnAuto:01")
+	  if akTarget.HasKeywordString("TNG_ActorAddnAuto:01")
 		ret += "TNG_ActorAddnAuto:01,"
-	  elseif akActor.HasKeywordString("TNG_ActorAddnAuto:02")
+	  elseif akTarget.HasKeywordString("TNG_ActorAddnAuto:02")
 		ret += "TNG_ActorAddnAuto:02,"
-	  elseif akActor.HasKeywordString("TNG_ActorAddnAuto:03")
+	  elseif akTarget.HasKeywordString("TNG_ActorAddnAuto:03")
 		ret += "TNG_ActorAddnAuto:03,"
-	  elseif akActor.HasKeywordString("TNG_ActorAddnAuto:04")
+	  elseif akTarget.HasKeywordString("TNG_ActorAddnAuto:04")
 		ret += "TNG_ActorAddnAuto:04,"
-	  elseif akActor.HasKeywordString("TNG_ActorAddnAuto:05")
+	  elseif akTarget.HasKeywordString("TNG_ActorAddnAuto:05")
 		ret += "TNG_ActorAddnAuto:05,"
 	  EndIf
 	EndIf
@@ -516,23 +512,11 @@ string Function GetFactionsForActor(actor akTarget)
 EndFunction
 
 
-bool Function IsTNGExposed(Actor akActor)
-    int itemIndex = akActor.GetNumItems()
-    while itemIndex > 0
-        itemIndex -= 1
-        Form item = akActor.GetNthForm(itemIndex)
-        Armor armorItem = item as Armor
-        if armorItem
-            if Math.LogicalAnd(armorItem.GetSlotMask(), cuirassSlot) != 0
-                if akActor.IsEquipped(armorItem)
-                    Debug.Trace("Equipped item in " + cuirassSlot ": " + armorItem.GetName())
-                    if !armorItem.HasKeyword(TNG_Revealing) && !armorItem.HasKeywordString("TNG_Revealing")
-                        return False
-                    EndIf
-                EndIf
-            EndIf
-        EndIf
-    EndWhile
-;	Debug.Trace("[minai] " + GetActorName(akActor) + " is exposed.")
+bool Function IsTNGExposed(Actor akTarget)
+	Armor armorItem = akTarget.GetWornForm(cuirassSlot) as Armor
+	if !armorItem.HasKeyword(TNG_Revealing) && !armorItem.HasKeywordString("TNG_Revealing")
+		return False
+	EndIf
+	Main.Debug(main.GetActorName(akTarget) + " is exposed.")
 	return True
 EndFunction
