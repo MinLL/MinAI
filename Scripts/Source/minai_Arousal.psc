@@ -498,31 +498,31 @@ string Function GetKeywordsForActor(actor akTarget)
 	EndIf
 	if bHasTNG
 	  if akTarget.HasKeyword(TNG_Gentlewoman)
-	    ret += "TNG_Gentlewoman"
+	    ret += "TNG_Gentlewoman,"
 	  EndIf
 	  if akTarget.HasKeyword(TNG_XS)
-	    ret += "TNG_XS"
+	    ret += "TNG_XS,"
 	  elseif akTarget.HasKeyword(TNG_S)
-  	    ret += "TNG_S"
+  	    ret += "TNG_S,"
 	  elseif akTarget.HasKeyword(TNG_M)
-	    ret += "TNG_M"
+	    ret += "TNG_M,"
 	  elseif akTarget.HasKeyword(TNG_L)
-	    ret += "TNG_L"
+	    ret += "TNG_L,"
 	  elseif akTarget.HasKeyword(TNG_XL)
-	    ret += "TNG_XL"
+	    ret += "TNG_XL,"
 	  elseif akTarget.HasKeyword(TNG_DefaultSize)
-	    ret += "TNG_DefaultSize"
+	    ret += "TNG_DefaultSize,"
 	  EndIf
 	  if akTarget.HasKeywordString("TNG_ActorAddnAuto:01")
-		ret += "TNG_ActorAddnAuto:01"
+		ret += "TNG_ActorAddnAuto:01,"
 	  elseif akTarget.HasKeywordString("TNG_ActorAddnAuto:02")
-		ret += "TNG_ActorAddnAuto:02"
+		ret += "TNG_ActorAddnAuto:02,"
 	  elseif akTarget.HasKeywordString("TNG_ActorAddnAuto:03")
-		ret += "TNG_ActorAddnAuto:03"
+		ret += "TNG_ActorAddnAuto:03,"
 	  elseif akTarget.HasKeywordString("TNG_ActorAddnAuto:04")
-		ret += "TNG_ActorAddnAuto:04"
+		ret += "TNG_ActorAddnAuto:04,"
 	  elseif akTarget.HasKeywordString("TNG_ActorAddnAuto:05")
-		ret += "TNG_ActorAddnAuto:05"
+		ret += "TNG_ActorAddnAuto:05,"
 	  EndIf
 	EndIf
   return ret
