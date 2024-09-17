@@ -7,7 +7,7 @@
 
 require_once("util.php");
 function parseVoiceType($voiceTypeRaw) {
-    if ($GLOBALS["TTS"]["XTTS"]["voiceid"].startswith("#")) {
+    if (str_starts_with($GLOBALS["TTS"]["XTTS"]["voiceid"], "#")) {
         return lstrip($GLOBALS["TTS"]["XTTS"]["voiceid"]);
     }
     if ($voiceTypeRaw == "") {

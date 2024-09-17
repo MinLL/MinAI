@@ -41,9 +41,34 @@ Function GetPhysicalDescription($name) {
   if($buttScore != "") {
     $ret .= "The sexual attractiveness of her ass is a {$buttScore}, on a scale from 0-100. ";
   }
+  $ret  .= GetPenisSize($name);
   return $ret;
 }
 
+Function GetPenisSize($name) {
+    $sizeDescription = "";
+    if (HasKeyword($name, "TNG_XL") || HasKeyword($name, "TNG_ActorAddnAuto:05")) {
+        $sizeDescription = "one of the biggest cocks you've ever seen";
+    }
+    elseif(HasKeyword($name, "TNG_L") || HasKeyword($name, "TNG_ActorAddnAuto:04")) {
+        $sizeDescription = "a large cock";
+    }
+    elseif (HasKeyword($name, "TNG_M") || HasKeyword($name, "TNG_DefaultSize") || HasKeyword($name, "TNG_ActorAddnAuto:03")) {
+        $sizeDescription = "an average sized cock";
+    }
+    elseif (HasKeyword($name, "TNG_S") || HasKeyword($name, "TNG_ActorAddnAuto:02")) {
+        $sizeDescription = "a very small cock";
+    }        
+    elseif (HasKeyword($name, "TNG_XS") || HasKeyword($name, "TNG_ActorAddnAuto:01")) {
+        $sizeDescription = "an embarrassingly tiny prick";
+    }
+    if ($sizeDescription != "") {
+        return "{$GLOBALS["HERIKA_NAME"]} has {$sizeDescription}. ";
+    }
+    return "";
+}
+
+                            
 Function GetClothingContext($name) {
   $ret = "";
   if (HasKeyword($name, "SLA_HalfNakedBikini")) {
@@ -94,8 +119,23 @@ Function GetClothingContext($name) {
   if (HasKeyword($name, "SLA_ArmorRubber")) {
     $ret .= "{$name}'s outfit is made out of tight form-fitting rubber (Referred to as Ebonite).\n";
   }
-  if (HasKeyword($name, "isNaked")) {
+  if (IsEnabled($name, "isNaked")) {
     $ret .= "{$name} is naked and exposed.\n";
+  }
+  if (HasKeyword($name, "EroticArmor")) {
+      $ret .= "{$name} is wearing a very erotic set of armor.\n";
+  }
+  if (HasKeyword($name, "SLA_PiercingVulva")) {
+      $ret .= "{$name} has a piercing in her vulva.\n";
+  }
+  if (HasKeyword($name, "SLA_PiercingBelly")) {
+      $ret .= "{$name} has a belly piercing.\n";
+  }
+  if (HasKeyword($name, "SLA_PiercingNipple")) {
+      $ret .= "{$name} has nipple piercings.\n";
+  }
+  if (HasKeyword($name, "SLA_PiercingClit")) {
+      $ret .= "{$name} has a piercing in her clit.\n";
   }
   return $ret;
 }

@@ -450,9 +450,11 @@ Function SetContext(actor akTarget)
   if !bHasArousedKeywords
   	return
   endif
-  aiff.SetActorVariable(akTarget, "beautyScore", baboConfigs.BeautyValue.GetValueInt())
-  aiff.SetActorVariable(akTarget, "breastsScore", baboConfigs.BreastsValue.GetValueInt())
-  aiff.SetActorVariable(akTarget, "buttScore", baboConfigs.ButtocksValue.GetValueInt())
+  if bHasBabo
+    aiff.SetActorVariable(akTarget, "beautyScore", baboConfigs.BeautyValue.GetValueInt())
+    aiff.SetActorVariable(akTarget, "breastsScore", baboConfigs.BreastsValue.GetValueInt())
+    aiff.SetActorVariable(akTarget, "buttScore", baboConfigs.ButtocksValue.GetValueInt())
+  EndIf
   string gender = "male";
   if akTarget.GetActorBase().GetSex() != 0
     gender = "female"
