@@ -63,7 +63,7 @@ Function GetPenisSize($name) {
         $sizeDescription = "an embarrassingly tiny prick";
     }
     if ($sizeDescription != "") {
-        return "{$GLOBALS["HERIKA_NAME"]} has a {$sizeDescription}. ";
+        return "{$GLOBALS["HERIKA_NAME"]} has {$sizeDescription}. ";
     }
     return "";
 }
