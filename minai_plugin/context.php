@@ -244,4 +244,6 @@ foreach ($locaLastElement as $n) {
   unset($GLOBALS["contextDataFull"][$n]); 
 }
 
+
+require "command_prompt_custom.php";
 ?>
