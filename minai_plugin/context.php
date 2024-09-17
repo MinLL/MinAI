@@ -47,19 +47,34 @@ Function GetPhysicalDescription($name) {
 
 Function GetPenisSize($name) {
     $sizeDescription = "";
-    if (HasKeyword($name, "TNG_XL") || HasKeyword($name, "TNG_ActorAddnAuto:05")) {
+    if (HasKeyword($name, "TNG_ActorAddnAuto:05")) {
         $sizeDescription = "one of the biggest cocks you've ever seen";
     }
-    elseif(HasKeyword($name, "TNG_L") || HasKeyword($name, "TNG_ActorAddnAuto:04")) {
+    elseif(HasKeyword($name, "TNG_ActorAddnAuto:04")) {
         $sizeDescription = "a large cock";
     }
-    elseif (HasKeyword($name, "TNG_M") || HasKeyword($name, "TNG_DefaultSize") || HasKeyword($name, "TNG_ActorAddnAuto:03")) {
+    elseif (HasKeyword($name, "TNG_ActorAddnAuto:03")) {
         $sizeDescription = "an average sized cock";
     }
-    elseif (HasKeyword($name, "TNG_S") || HasKeyword($name, "TNG_ActorAddnAuto:02")) {
+    elseif (HasKeyword($name, "TNG_ActorAddnAuto:02")) {
         $sizeDescription = "a very small cock";
     }        
-    elseif (HasKeyword($name, "TNG_XS") || HasKeyword($name, "TNG_ActorAddnAuto:01")) {
+    elseif (HasKeyword($name, "TNG_ActorAddnAuto:01")) {
+        $sizeDescription = "an embarrassingly tiny prick";
+    }
+	elseif (HasKeyword($name, "TNG_XL")) {
+        $sizeDescription = "one of the biggest cocks you've ever seen";
+    }
+    elseif(HasKeyword($name, "TNG_L")) {
+        $sizeDescription = "a large cock";
+    }
+    elseif (HasKeyword($name, "TNG_M") || HasKeyword($name, "TNG_DefaultSize")) {
+        $sizeDescription = "an average sized cock";
+    }
+    elseif (HasKeyword($name, "TNG_S")) {
+        $sizeDescription = "a very small cock";
+    }        
+    elseif (HasKeyword($name, "TNG_XS")) {
         $sizeDescription = "an embarrassingly tiny prick";
     }
     if ($sizeDescription != "") {
@@ -123,19 +138,19 @@ Function GetClothingContext($name) {
     $ret .= "{$name} is naked and exposed.\n";
   }
   if (HasKeyword($name, "EroticArmor")) {
-      $ret .= "{$name} is wearing a very erotic set of armor.\n";
+      $ret .= "{$name} is wearing a sexy revealing outfit.\n";
   }
   if (HasKeyword($name, "SLA_PiercingVulva")) {
-      $ret .= "{$name} has a piercing in her vulva.\n";
+      $ret .= "{$name} has labia piercings.\n";
   }
   if (HasKeyword($name, "SLA_PiercingBelly")) {
-      $ret .= "{$name} has a belly piercing.\n";
+      $ret .= "{$name} has a navel piercing.\n";
   }
   if (HasKeyword($name, "SLA_PiercingNipple")) {
       $ret .= "{$name} has nipple piercings.\n";
   }
   if (HasKeyword($name, "SLA_PiercingClit")) {
-      $ret .= "{$name} has a piercing in her clit.\n";
+      $ret .= "{$name} has a clit piercing.\n";
   }
   return $ret;
 }
