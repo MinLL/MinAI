@@ -41,9 +41,34 @@ Function GetPhysicalDescription($name) {
   if($buttScore != "") {
     $ret .= "The sexual attractiveness of her ass is a {$buttScore}, on a scale from 0-100. ";
   }
+  $ret  .= GetPenisSize($name);
   return $ret;
 }
 
+Function GetPenisSize($name) {
+    $sizeDescription = "";
+    if (HasKeyword($name, "TNG_XL") || HasKeyword($name, "TNG_ActorAddnAuto:05")) {
+        $sizeDescription = "one of the biggest cocks you've ever seen";
+    }
+    elseif(HasKeyword($name, "TNG_L") || HasKeyword($name, "TNG_ActorAddnAuto:04")) {
+        $sizeDescription = "a large cock";
+    }
+    elseif (HasKeyword($name, "TNG_M") || HasKeyword($name, "TNG_DefaultSize") || HasKeyword($name, "TNG_ActorAddnAuto:03")) {
+        $sizeDescription = "an average sized cock";
+    }
+    elseif (HasKeyword($name, "TNG_S") || HasKeyword($name, "TNG_ActorAddnAuto:02")) {
+        $sizeDescription = "a very small cock";
+    }        
+    elseif (HasKeyword($name, "TNG_XS") || HasKeyword($name, "TNG_ActorAddnAuto:01")) {
+        $sizeDescription = "an embarrassingly tiny prick";
+    }
+    if ($sizeDescription != "") {
+        return "{$GLOBALS["HERIKA_NAME"]} has a {$sizeDescription}. ";
+    }
+    return "";
+}
+
+                            
 Function GetClothingContext($name) {
   $ret = "";
   if (HasKeyword($name, "SLA_HalfNakedBikini")) {
