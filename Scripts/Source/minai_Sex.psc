@@ -68,7 +68,7 @@ Function Start1pSex(actor akSpeaker)
 EndFunction
 
 
-Function Start2pSex(actor akSpeaker, actor akTarget, actor Player, bool bPlayerInScene, string tags="")
+int Function Start2pSex(actor akSpeaker, actor akTarget, actor Player, bool bPlayerInScene, string tags="")
   if bHasOstim && minai_UseOStim.GetValue() == 1.0
     ; Convert sexlab tags to ostim tags
     if tags == "Anal"
@@ -78,17 +78,21 @@ Function Start2pSex(actor akSpeaker, actor akTarget, actor Player, bool bPlayerI
     elseif tags == "oral"
       tags = "blowjob"
     EndIf
-    int ActiveOstimThreadID
-    if bPlayerInScene
-      ActiveOstimThreadID = OThread.QuickStart(OActorUtil.ToArray(Player, akSpeaker))
-    else
-      ActiveOstimThreadID = OThread.QuickStart(OActorUtil.ToArray(akTarget, akSpeaker))
-    EndIf
+	Actor[] ostimActors = new Actor[2]
+	if bPlayerInScene
+	  ostimActors = OActorUtil.ToArray(Player, akSpeaker) as Actor[]
+	else
+	  ostimActors = OActorUtil.ToArray(akTarget, akSpeaker) as Actor[]
+	EndIf
+	int ActiveOstimThreadID = OThreadBuilder.Create(ostimActors)
+	OThreadBuilder.SetStartingAnimation(ActiveOstimThreadID, OLibrary.GetRandomSceneWithSceneTag(ostimActors, tags))
+	OThreadBuilder.Start(ActiveOstimThreadID)
     Utility.Wait(2)
     bool AutoMode = OThread.IsInAutoMode(ActiveOstimThreadID)
     if AutoMode == False
       OThreadBuilder.NoPlayerControl(ActiveOstimThreadID)
       OThread.StartAutoMode(ActiveOstimThreadID)
+	  return ActiveOstimThreadID
     EndIf
   Else
     slf.Quickstart(akTarget,akSpeaker, animationTags=tags)
@@ -96,21 +100,33 @@ Function Start2pSex(actor akSpeaker, actor akTarget, actor Player, bool bPlayerI
 EndFunction
 
 Function StartSexOrSwitchTo(actor akSpeaker, actor akTarget, actor Player, bool bPlayerInScene, string tags)
-      AIFF.ChillOut()
-      if CanAnimate(akTarget, akSpeaker)
+	AIFF.ChillOut()
+	if CanAnimate(akTarget, akSpeaker)
         Start2pSex(akSpeaker, akTarget, PlayerRef, bPlayerInScene, tags)
         main.RegisterEvent(akSpeaker.GetDisplayName() + " and " + akTarget.GetDisplayName() + " started having sex.", "info_sexscene")
-      else
-        if akSpeaker != playerRef && akTarget != playerRef
-          Return
-        EndIf
-        int threadID = slf.FindPlayerController()
-        sslThreadController Controller = slf.ThreadSlots.GetController(threadID)
-        sslBaseAnimation[] animations = slf.GetAnimationsByTags(2, tags)
-        Controller.SetForcedAnimations(animations)
-        Controller.SetAnimation()
-        main.RegisterEvent(akSpeaker.GetDisplayName() + " and " + akTarget.GetDisplayName() + " changed up the sex to " + tags + " instead.", "info_sexscene")
-      endif
+	elseif bHasOstim && minai_UseOStim.GetValue() == 1.0 && OActor.IsInOStim(akTarget) && OActor.IsInOStim(akSpeaker)
+		int ActiveOstimThreadID = 0
+		Actor[] ostimActors = new Actor[2]
+		if bPlayerInScene
+			ostimActors = OActorUtil.ToArray(Player, akSpeaker)
+			ActiveOstimThreadID = 0
+		else
+			ostimActors = OActorUtil.ToArray(akTarget, akSpeaker)
+			ActiveOstimThreadID = 1
+		EndIf
+		OThread.NavigateTo(ActiveOstimThreadID, OLibrary.GetRandomSceneWithSceneTag(ostimActors, tags))
+		main.RegisterEvent(akSpeaker.GetDisplayName() + " and " + akTarget.GetDisplayName() + " changed up the sex to " + tags + " instead.", "info_sexscene")
+		Return
+	elseif akSpeaker != playerRef && akTarget != playerRef
+		Return
+	else
+		int threadID = slf.FindPlayerController()
+		sslThreadController Controller = slf.ThreadSlots.GetController(threadID)
+		sslBaseAnimation[] animations = slf.GetAnimationsByTags(2, tags)
+		Controller.SetForcedAnimations(animations)
+		Controller.SetAnimation()
+		main.RegisterEvent(akSpeaker.GetDisplayName() + " and " + akTarget.GetDisplayName() + " changed up the sex to " + tags + " instead.", "info_sexscene")
+	EndIf
 EndFunction
 
 
@@ -186,8 +202,8 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   if !bHasAIFF
     return
   EndIf
-  Actor akSpeaker=AIAgentFunctions.getAgentByName(speakerName)
-  actor akTarget= AIAgentFunctions.getAgentByName(parameter)
+  Actor akSpeaker = AIAgentFunctions.getAgentByName(speakerName)
+  actor akTarget = AIAgentFunctions.getAgentByName(parameter)
   if !akTarget
     akTarget = PlayerRef
   EndIf
@@ -209,8 +225,13 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   elseif command == "ExtCmdStartHandjob"
     StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Handjob")
   elseIf command == "ExtCmdOrgy"
-    Debug.Notification("Orgy is broken until I figure out how to get all AI actors")
-    ; StartGroupSex(akSpeaker, akTarget, PlayerRef, bPlayerInScene, actorsFromFormList)
+    if bHasOstim
+      Actor[] sexActors = OActorUtil.GetActorsInRange(akSpeaker, 300, true, true)
+	  StartGroupSex(akSpeaker, akTarget, PlayerRef, bPlayerInScene, sexActors)
+	else
+      Debug.Notification("SL Orgy is broken until I figure out how to get all AI actors")
+      ; StartGroupSex(akSpeaker, akTarget, PlayerRef, bPlayerInScene, actorsFromFormList)
+	EndIf
   EndIf
 EndEvent
 

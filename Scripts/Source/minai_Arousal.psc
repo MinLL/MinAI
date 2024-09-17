@@ -42,7 +42,6 @@ Keyword TNG_Revealing
 
 bool bHasAroused = False
 bool bHasArousedKeywords = False
-bool bHasOSL = False
 bool bHasBabo = False
 bool bHasTNG = False
 int cuirassSlot = 0x00000004
@@ -59,11 +58,6 @@ function Maintenance(minai_MainQuestController _main)
   aiff = (Self as Quest) as minai_AIFF
   
   Main.Info("Initializing Arousal Module.")
-  if Game.GetModByName("OSLAroused.esp") != 255
-    Main.Info("Found OSL Aroused")
-    bHasOSL = True
-  EndIf ;This could be elseif - abandon getting SLA keywords by FormID and use HasKeywordString instead
-
   if Game.GetModByName("SexlabAroused.esm") != 255
     Main.Info("Found Sexlab Aroused")
     bHasAroused = True
@@ -117,7 +111,7 @@ function Maintenance(minai_MainQuestController _main)
 	if TNG_XS != None && TNG_S != None && TNG_M != None && TNG_L != None && TNG_XL != None && TNG_DefaultSize != None
 		Main.Debug("TNG size keywords retrieved successfully.")
 	else
-		Main.Debug("Failed to retrieve one or more TNG size keywords.")
+		Main.Error("Failed to retrieve one or more TNG size keywords.")
 	EndIf
   EndIf
 
@@ -132,16 +126,13 @@ function Maintenance(minai_MainQuestController _main)
   EndIf
   aiff.SetModAvailable("Aroused", bHasAroused)
   aiff.SetModAvailable("ArousedKeywords", bHasArousedKeywords)
-  aiff.SetModAvailable("OSL", bHasOSL)
   aiff.SetModAvailable("Babo", bHasBabo)
   aiff.SetModAvailable("TNG", bHasTNG)
 EndFunction
 
 
 Function UpdateArousal(actor akTarget, int Arousal)
-  if bHasOSL
-    OSLArousedNative.ModifyArousal(akTarget, Arousal)
-  elseIf bHasAroused
+  If bHasAroused
     Aroused.UpdateActorExposure(akTarget, Arousal)
   EndIf
 EndFunction
@@ -149,9 +140,7 @@ EndFunction
 
 int Function GetActorArousal(actor akActor)
   int exposure = 0
-  if bHasOSL
-    exposure = OSLArousedNative.GetArousal(akActor) as Int
-  Else
+  if bHasAroused
    exposure = aroused.GetActorArousal(akActor)
   EndIf
   return exposure
