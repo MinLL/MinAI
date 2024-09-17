@@ -222,24 +222,36 @@ function WriteClothingString(actor akActor, actor player, bool isYou=false, acto
 						main.RegisterAction(actorName + "'s genitals are exposed.")
 					EndIf
 					string sizeDescription = ""
-					Main.Debug("TNG Dick Check")
-					if currentActor.HasKeyword(TNG_XL) || currentActor.HasKeywordString("TNG_ActorAddnAuto:05")
+					Main.Debug("TNG Dick Check on "+ actorName)
+					; Check for auto-assigned first
+					if currentActor.HasKeywordString("TNG_ActorAddnAuto:05")
 						sizeDescription = "one of the biggest cocks you've ever seen"
-					elseif currentActor.HasKeyword(TNG_L) || currentActor.HasKeywordString("TNG_ActorAddnAuto:04")
+					elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:04")
 						sizeDescription = "a large cock"
-					elseif currentActor.HasKeyword(TNG_M) || currentActor.HasKeyword(TNG_DefaultSize) || currentActor.HasKeywordString("TNG_ActorAddnAuto:03")
+					elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:03")
 						sizeDescription = "an average sized cock"
-					elseif currentActor.HasKeyword(TNG_S) || currentActor.HasKeywordString("TNG_ActorAddnAuto:02")
+					elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:02")
 						sizeDescription = "a very small cock"
-					elseif currentActor.HasKeyword(TNG_XS) || currentActor.HasKeywordString("TNG_ActorAddnAuto:01")
+					elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:01")
+						sizeDescription = "an embarrassingly tiny prick"
+					EndIf
+					; Supersede if manually set
+					if currentActor.HasKeyword(TNG_XL)
+						sizeDescription = "one of the biggest cocks you've ever seen"
+					elseif currentActor.HasKeyword(TNG_L)
+						sizeDescription = "a large cock"
+					elseif currentActor.HasKeyword(TNG_M) || currentActor.HasKeyword(TNG_DefaultSize)
+						sizeDescription = "an average sized cock"
+					elseif currentActor.HasKeyword(TNG_S)
+						sizeDescription = "a very small cock"
+					elseif currentActor.HasKeyword(TNG_XS)
 						sizeDescription = "an embarrassingly tiny prick"
 					EndIf
 					if sizeDescription != ""
 						main.RegisterAction("You can see that " + actorName + " has " + sizeDescription + ".")
 					else
-						Main.Info("Dick Check Failed")
+						Main.Info("TNG Dick Check Failed on " + actorName)
 					EndIf
-					
 				EndIf
 			EndIf
 			if !bHasArousedKeywords
@@ -485,13 +497,22 @@ string Function GetKeywordsForActor(actor akTarget)
 	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_PiercingClit", SLA_PiercingClit)
 	EndIf
 	if bHasTNG
-	  ret += aiff.GetKeywordIfExists(akTarget, "TNG_XS", TNG_XS)
-	  ret += aiff.GetKeywordIfExists(akTarget, "TNG_S", TNG_S)
-	  ret += aiff.GetKeywordIfExists(akTarget, "TNG_M", TNG_M)
-	  ret += aiff.GetKeywordIfExists(akTarget, "TNG_L", TNG_L)
-	  ret += aiff.GetKeywordIfExists(akTarget, "TNG_XL", TNG_XL)
-	  ret += aiff.GetKeywordIfExists(akTarget, "TNG_DefaultSize", TNG_DefaultSize)
-	  ret += aiff.GetKeywordIfExists(akTarget, "TNG_Gentlewoman", TNG_Gentlewoman)
+	  if akTarget.HasKeyword(TNG_Gentlewoman)
+	    ret += "TNG_Gentlewoman,"
+	  EndIf
+	  if akTarget.HasKeyword(TNG_XS)
+	    ret += "TNG_XS,"
+	  elseif akTarget.HasKeyword(TNG_S)
+  	    ret += "TNG_S,"
+	  elseif akTarget.HasKeyword(TNG_M)
+	    ret += "TNG_M,"
+	  elseif akTarget.HasKeyword(TNG_L)
+	    ret += "TNG_L,"
+	  elseif akTarget.HasKeyword(TNG_XL)
+	    ret += "TNG_XL,"
+	  elseif akTarget.HasKeyword(TNG_DefaultSize)
+	    ret += "TNG_DefaultSize,"
+	  EndIf
 	  if akTarget.HasKeywordString("TNG_ActorAddnAuto:01")
 		ret += "TNG_ActorAddnAuto:01,"
 	  elseif akTarget.HasKeywordString("TNG_ActorAddnAuto:02")
