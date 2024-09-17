@@ -122,6 +122,21 @@ Function GetClothingContext($name) {
   if (HasKeyword($name, "isNaked")) {
     $ret .= "{$name} is naked and exposed.\n";
   }
+  if (HasKeyword($name, "EroticArmor")) {
+      $ret .= "{$name} is wearing a very erotic set of armor.\n";
+  }
+  if (HasKeyword($name, "SLA_PiercingVulva")) {
+      $ret .= "{$name} has a piercing in her vulva.\n";
+  }
+  if (HasKeyword($name, "SLA_PiercingBelly")) {
+      $ret .= "{$name} has a belly piercing.\n";
+  }
+  if (HasKeyword($name, "SLA_PiercingNipple")) {
+      $ret .= "{$name} has nipple piercings.\n";
+  }
+  if (HasKeyword($name, "SLA_PiercingClit")) {
+      $ret .= "{$name} has a piercing in her clit.\n";
+  }
   return $ret;
 }
 
