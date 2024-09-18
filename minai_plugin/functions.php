@@ -36,8 +36,6 @@ EndEvent
 
 require_once("config.php");
 if (!$disable_nsfw) {
-    require "generalperverted.php";
-    require "deviousdevices.php";
     require "arousal.php";
     require "sex.php";
     require "slapp.php";
@@ -50,8 +48,11 @@ if ($force_voice_type) {
 if (!$disable_nsfw) {
     require_once("deviousnarrator.php");
     if (ShouldUseDeviousNarrator()) {
+        // Anything loaded after this will have functions enabled for the narrator
         EnableDeviousNarratorActions();
     }
+    require "generalperverted.php";
+    require "deviousdevices.php";
 }
 
 ?>

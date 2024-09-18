@@ -48,14 +48,8 @@ Function ShouldUseDeviousNarrator() {
 
 Function EnableDeviousNarratorActions() {
     $GLOBALS["FUNCTIONS_ARE_ENABLED"]=true;
-    // Enable a few specific actions for the devious narrator
+    // Clear narrator actions. Files loaded after this will have their actions enabled for the narrator.
     $GLOBALS["ENABLED_FUNCTIONS"] = array();
-    if (IsModEnabled("DeviousFollowers")) {
-        $GLOBALS["ENABLED_FUNCTIONS"][] = "ExtCmdSpankAss";
-        $GLOBALS["ENABLED_FUNCTIONS"][] = "ExtCmdSpankTits";
-    }
-    $GLOBALS["ENABLED_FUNCTIONS"][] = "ExtCmdGrope";
-    $GLOBALS["ENABLED_FUNCTIONS"][] = "ExtCmdPinchNipples";
 }
 
 ?>
