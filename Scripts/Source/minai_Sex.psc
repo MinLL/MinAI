@@ -78,12 +78,15 @@ Function Start2pSex(actor akSpeaker, actor akTarget, actor Player, bool bPlayerI
     elseif tags == "oral"
       tags = "blowjob"
     EndIf
-    int ActiveOstimThreadID
-    if bPlayerInScene
-      ActiveOstimThreadID = OThread.QuickStart(OActorUtil.ToArray(Player, akSpeaker))
-    else
-      ActiveOstimThreadID = OThread.QuickStart(OActorUtil.ToArray(akTarget, akSpeaker))
-    EndIf
+	Actor[] ostimActors = new Actor[2]
+	if bPlayerInScene
+	  ostimActors = OActorUtil.ToArray(Player, akSpeaker) as Actor[]
+	else
+	  ostimActors = OActorUtil.ToArray(akTarget, akSpeaker) as Actor[]
+	EndIf
+	int ActiveOstimThreadID = OThreadBuilder.Create(ostimActors)
+	OThreadBuilder.SetStartingAnimation(ActiveOstimThreadID, OLibrary.GetRandomSceneWithSceneTag(ostimActors, tags))
+	OThreadBuilder.Start(ActiveOstimThreadID)
     Utility.Wait(2)
     bool AutoMode = OThread.IsInAutoMode(ActiveOstimThreadID)
     if AutoMode == False
@@ -96,7 +99,7 @@ Function Start2pSex(actor akSpeaker, actor akTarget, actor Player, bool bPlayerI
 EndFunction
 
 Function StartSexOrSwitchTo(actor akSpeaker, actor akTarget, actor Player, bool bPlayerInScene, string tags)
-      AIFF.ChillOut()
+	  AIFF.ChillOut()
       if CanAnimate(akTarget, akSpeaker)
         Start2pSex(akSpeaker, akTarget, PlayerRef, bPlayerInScene, tags)
         main.RegisterEvent(akSpeaker.GetDisplayName() + " and " + akTarget.GetDisplayName() + " started having sex.", "info_sexscene")
@@ -104,13 +107,13 @@ Function StartSexOrSwitchTo(actor akSpeaker, actor akTarget, actor Player, bool 
         if akSpeaker != playerRef && akTarget != playerRef
           Return
         EndIf
-        int threadID = slf.FindPlayerController()
-        sslThreadController Controller = slf.ThreadSlots.GetController(threadID)
-        sslBaseAnimation[] animations = slf.GetAnimationsByTags(2, tags)
-        Controller.SetForcedAnimations(animations)
-        Controller.SetAnimation()
-        main.RegisterEvent(akSpeaker.GetDisplayName() + " and " + akTarget.GetDisplayName() + " changed up the sex to " + tags + " instead.", "info_sexscene")
-      endif
+		int threadID = slf.FindPlayerController()
+		sslThreadController Controller = slf.ThreadSlots.GetController(threadID)
+		sslBaseAnimation[] animations = slf.GetAnimationsByTags(2, tags)
+		Controller.SetForcedAnimations(animations)
+		Controller.SetAnimation()
+		main.RegisterEvent(akSpeaker.GetDisplayName() + " and " + akTarget.GetDisplayName() + " changed up the sex to " + tags + " instead.", "info_sexscene")
+	EndIf
 EndFunction
 
 
@@ -171,6 +174,14 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
         Start1pSex(akSpeaker)
       elseif stringutil.Find(sayLine, "-startsex-") != -1 || stringUtil.Find(sayLine, "-have sex-") != -1 || stringUtil.Find(sayLine, "-sex-") != -1 || stringUtil.Find(sayLine, "-having sex-") != -1
         Start2pSex(akSpeaker, akTarget, Player, bPlayerInScene)
+      elseif stringutil.Find(sayLine, "-vaginalsex-") != -1
+        StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "vaginalsex")
+      elseif stringutil.Find(sayLine, "-analsex-") != -1
+        StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "analsex")
+      elseif stringutil.Find(sayLine, "-blowjob-") != -1
+        StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "blowjob")
+      elseif stringutil.Find(sayLine, "-handjob-") != -1
+        StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "handjob")
       elseIf stringutil.Find(sayLine, "-groupsex-") != -1 || stringUtil.Find(sayLine, "-orgy-") != -1 || stringUtil.Find(sayLine, "-threesome-") != -1 || stringUtil.Find(sayLine, "-fuck-") != -1
         StartGroupSex(akSpeaker, akTarget, Player, bPlayerInScene, actorsFromFormList)
       EndIf
@@ -186,8 +197,8 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   if !bHasAIFF
     return
   EndIf
-  Actor akSpeaker=AIAgentFunctions.getAgentByName(speakerName)
-  actor akTarget= AIAgentFunctions.getAgentByName(parameter)
+  Actor akSpeaker = AIAgentFunctions.getAgentByName(speakerName)
+  actor akTarget = AIAgentFunctions.getAgentByName(parameter)
   if !akTarget
     akTarget = PlayerRef
   EndIf
@@ -528,4 +539,3 @@ string Function GetFactionsForActor(actor akTarget)
 
   return ret
 EndFunction
-
