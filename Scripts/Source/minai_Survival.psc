@@ -182,14 +182,17 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   if !akTarget
     akTarget = PlayerRef
   EndIf
+  Main.Debug("Survival - CommandDispatcher(" + speakerName +", " + command +", " + parameter + ")")
   string targetName = main.GetActorName(akTarget)
   ; Sunhelm
   if command == "ExtCmdServeFood"
+    Main.Debug("Feeding Player")
     FeedPlayer(akSpeaker, PlayerRef)
     Main.RegisterEvent(""+speakerName+" served " + targetName + " a meal.")
   EndIf
   ; Vanilla functionality
   if command == "ExtCmdRentRoom"
+    Main.Debug("Renting Room")
     if playerRef.GetItemCount(Gold) < (DialogueGeneric as DialogueGenericScript).RoomRentalCost.GetValue() as Int
       Debug.Notification("AI: Player does not have enough gold to rent room.")
       Main.RegisterEvent("" + targetName + " did not have enough gold for the room.")

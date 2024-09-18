@@ -574,6 +574,7 @@ bool function UseDD()
 EndFunction
 
 Event CommandDispatcher(String speakerName,String  command, String parameter)
+  Main.Debug("Devious - CommandDispatcher(" + speakerName +", " + command +", " + parameter + ")")
   Actor akSpeaker=AIAgentFunctions.getAgentByName(speakerName)
   actor akTarget= AIAgentFunctions.getAgentByName(parameter)
   if !akTarget

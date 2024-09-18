@@ -413,6 +413,7 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   if !akTarget
     akTarget = PlayerRef
   EndIf
+  Main.Debug("Arousal - CommandDispatcher(" + speakerName +", " + command +", " + parameter + ")")
   string targetName = main.GetActorName(akTarget)
   if command == "ExtCmdIncreaseArousal"
     UpdateArousal(akSpeaker, 6)

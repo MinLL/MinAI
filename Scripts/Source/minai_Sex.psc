@@ -197,6 +197,7 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   if !bHasAIFF
     return
   EndIf
+  Main.Debug("Sex - CommandDispatcher(" + speakerName +", " + command +", " + parameter + ")")
   Actor akSpeaker = AIAgentFunctions.getAgentByName(speakerName)
   actor akTarget = AIAgentFunctions.getAgentByName(parameter)
   if !akTarget

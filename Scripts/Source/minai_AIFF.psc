@@ -62,6 +62,10 @@ Function SetContext(actor akTarget)
     Main.Warn("AIFF - SetContext() called with none target")
     return
   EndIf
+  if (!IsInitialized())
+    Main.Warn("SetContext(" + akTarget + ") - Still Initializing.")
+    return
+  EndIf  
   Main.Debug("AIFF - SetContext(" + akTarget.GetDisplayName() + ") START")
   devious.SetContext(akTarget)
   arousal.SetContext(akTarget)
@@ -104,20 +108,12 @@ EndFunction
 
 
 Event CommandDispatcher(String speakerName,String  command, String parameter)
-  Main.Info("- CommandDispatcher(" + speakerName +", " + command +", " + parameter + ")")
-  if (!IsInitialized())
-    Main.Info("CommandDispatcher() - Still Initializing.")
-    return
-  EndIf
+  Main.Info("AIFF - CommandDispatcher(" + speakerName +", " + command +", " + parameter + ")")
   Actor akActor = AIAgentFunctions.getAgentByName(speakerName)
   if !akActor
     return
   EndIf
   SetContext(akActor)
-  devious.CommandDispatcher(speakerName, command, parameter)
-  sex.CommandDispatcher(speakerName, command, parameter)
-  survival.CommandDispatcher(speakerName, command, parameter)
-  arousal.CommandDispatcher(speakerName, command, parameter)
 EndEvent
 
 
