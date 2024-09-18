@@ -156,12 +156,12 @@ Function StoreFactions(actor akTarget)
   allFactions += sex.GetFactionsForActor(akTarget)
 
   ; Causing illegal characters that break sql too often
-  ; Faction[] factions = akTarget.GetFactions(-128, 127)
-  ; int i = 0
-  ; while i < factions.Length
-  ;  allFactions += factions[i].GetName() + ","
-  ;  i += 1
-  ; EndWhile
+  Faction[] factions = akTarget.GetFactions(-128, 127)
+  int i = 0
+  while i < factions.Length
+   allFactions += factions[i].GetName() + ","
+   i += 1
+  EndWhile
   SetActorVariable(akTarget, "AllFactions", allFactions)
 EndFunction
 

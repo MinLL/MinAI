@@ -592,53 +592,53 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     int vibTime = Utility.RandomInt(20,60)
     if (command == "ExtCmdForceOrgasm")
       libs.ActorOrgasm(akTarget)
-      AIAgentFunctions.logMessageForActor("command@ExtCmdForceActorOrgasm@@"+speakerName+" made " + targetName + " have an orgasm with a remote vibrator.","funcret",speakerName)
+      Main.RegisterEvent(""+speakerName+" made " + targetName + " have an orgasm with a remote vibrator.")
     elseIf (command == "ExtCmdTeaseWithVibratorVeryWeak")
       libs.StopVibrating(akTarget)
       libs.VibrateEffect(akTarget, 1, vibTime, True)
-      AIAgentFunctions.logMessageForActor("command@ExtCmdTeaseWithVibratorVeryWeak@@"+speakerName+" very weakly teases " + targetName + " with a remote vibrator.","funcret",speakerName)
+      Main.RegisterEvent(""+speakerName+" very weakly teases " + targetName + " with a remote vibrator.")
     elseIf (command == "ExtCmdStimulateWithVibratorVeryWeak")
       libs.StopVibrating(akTarget)
       libs.VibrateEffect(akTarget, 1, vibTime, False)
-      AIAgentFunctions.logMessageForActor("command@ExtCmdStimulateWithVibratorVeryWeak@@"+speakerName+" very weakly stimulates " + targetName + " with a remote vibrator.","funcret",speakerName)
+      Main.RegisterEvent(""+speakerName+" very weakly stimulates " + targetName + " with a remote vibrator.")
     elseIf (command == "ExtCmdTeaseWithVibratorWeak")
       libs.StopVibrating(akTarget)
       libs.VibrateEffect(akTarget, 2, vibTime, True)
-      AIAgentFunctions.logMessageForActor("command@ExtCmdTeaseWithVibratorWeak@@"+speakerName+" weakly teases " + targetName + " with a remote vibrator.","funcret",speakerName)
+      Main.RegisterEvent(""+speakerName+" weakly teases " + targetName + " with a remote vibrator.")
     elseIf (command == "ExtCmdStimulateWithVibratorWeak")
       libs.StopVibrating(akTarget)
       libs.VibrateEffect(akTarget, 2, vibTime, False)
-      AIAgentFunctions.logMessageForActor("command@ExtCmdStimulateWithVibratorWeak@@"+speakerName+" weakly stimulates " + targetName + " with a remote vibrator.","funcret",speakerName)
+      Main.RegisterEvent(""+speakerName+" weakly stimulates " + targetName + " with a remote vibrator.")
     elseIf (command == "ExtCmdTeaseWithVibratorMedium")
       libs.StopVibrating(akTarget)
       libs.VibrateEffect(akTarget, 3, vibTime, True)
-      AIAgentFunctions.logMessageForActor("command@ExtCmdTeaseWithVibratorMedium@@"+speakerName+" teases " + targetName + " with a remote vibrator.","funcret",speakerName)
+      Main.RegisterEvent(""+speakerName+" teases " + targetName + " with a remote vibrator.")
     elseIf (command == "ExtCmdStimulateWithVibratorMedium")
       libs.StopVibrating(akTarget)
       libs.VibrateEffect(akTarget, 3, vibTime, False)
-      AIAgentFunctions.logMessageForActor("command@ExtCmdStimulateWithVibratorMedium@@"+speakerName+" stimulates " + targetName + " with a remote vibrator.","funcret",speakerName)
+      Main.RegisterEvent(""+speakerName+" stimulates " + targetName + " with a remote vibrator.")
     elseIf (command == "ExtCmdTeaseWithVibratorStrong")
       libs.StopVibrating(akTarget)
       libs.VibrateEffect(akTarget, 4, vibTime, True)
-      AIAgentFunctions.logMessageForActor("command@ExtCmdTeaseWithVibratorStrong@@"+speakerName+" strongly teases " + targetName + " with a remote vibrator.","funcret",speakerName)
+      Main.RegisterEvent(""+speakerName+" strongly teases " + targetName + " with a remote vibrator.")
     elseIf (command == "ExtCmdStimulateWithVibratorStrong")
       libs.StopVibrating(akTarget)
       libs.VibrateEffect(akTarget, 4, vibTime, False)
-      AIAgentFunctions.logMessageForActor("command@ExtCmdStimulateWithVibratorStrong@@"+speakerName+" strongly stimulates " + targetName + " with a remote vibrator.","funcret",speakerName)
+      Main.RegisterEvent(""+speakerName+" strongly stimulates " + targetName + " with a remote vibrator.")
     elseIf (command == "ExtCmdTeaseWithVibratorVeryStrong")
       libs.StopVibrating(akTarget)
       libs.VibrateEffect(akTarget, 5, vibTime, True)
-      AIAgentFunctions.logMessageForActor("command@ExtCmdTeaseWithVibratorVeryStrong@@"+speakerName+" very strongly teases " + targetName + " with a remote vibrator.","funcret",speakerName)
+      Main.RegisterEvent(""+speakerName+" very strongly teases " + targetName + " with a remote vibrator.")
     elseIf (command == "ExtCmdStimulateWithVibratorVeryStrong")
       libs.StopVibrating(akTarget)
       libs.VibrateEffect(akTarget, 5, vibTime, False)
-      AIAgentFunctions.logMessageForActor("command@ExtCmdStimulateWithVibratorVeryStrong@@"+speakerName+" very strongly stimulates " + targetName + " with a remote vibrator.","funcret",speakerName)
+      Main.RegisterEvent(""+speakerName+" very strongly stimulates " + targetName + " with a remote vibrator.")
     elseIf (command == "ExtCmdStopStimulation")
       libs.StopVibrating(akTarget)
-      AIAgentFunctions.logMessageForActor("command@ExtCmdStopStimulation@@"+speakerName+" turns off " + targetName + "'s remote vibrator.","funcret",speakerName)
+      Main.RegisterEvent(""+speakerName+" turns off " + targetName + "'s remote vibrator.")
     elseIf (command == "ExtCmdshock")
       libs.ShockActor(akTarget)
-      AIAgentFunctions.logMessageForActor("command@ExtCmdShock@@"+speakerName+" remotely shocks  " + targetName + ".","funcret",speakerName)
+      Main.RegisterEvent(""+speakerName+" remotely shocks  " + targetName + ".")
     EndIf
   EndIf
   ;  Generic actions
@@ -649,7 +649,7 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     if bHasDD
       libs.Moan(akTarget)
     EndIf
-    AIAgentFunctions.logMessageForActor("command@ExtCmdGrope@@"+speakerName+" gropes " + targetName + " in a vulgar manner.","funcret",speakerName)
+    Main.RegisterEvent(""+speakerName+" gropes " + targetName + " in a vulgar manner.")
   EndIf
   If (command == "ExtCmdPinchNipples")
     Debug.Notification(speakerName + " painfully pinches " + main.GetYouYour(akTarget) + " nipples!")
@@ -658,52 +658,53 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     if bHasDD
       libs.Moan(akTarget)
     EndIf
-    AIAgentFunctions.logMessageForActor("command@ExtCmdPinchNipples@@"+speakerName+" pinches " + targetName + "'s nipples in a vulgar manner.","funcret",speakerName)
+    Main.RegisterEvent(""+speakerName+" pinches " + targetName + "'s nipples in a vulgar manner.")
   elseif (command=="ExtCmdSpankAss")
     SpankAss(1, bDeviousFollowerInScene)
-    AIAgentFunctions.logMessageForActor("command@ExtCmdSpankAss@@"+speakerName+" spanks " + targetName + "'s ass.","funcret",speakerName)
+    Main.RegisterEvent(""+speakerName+" spanks " + targetName + "'s ass.")
   elseif (command=="ExtCmdSpankTits")
     SpankTits(1, bDeviousFollowerInScene)
-    AIAgentFunctions.logMessageForActor("command@ExtCmdSpankTits@@"+speakerName+" spanks " + targetName + "'s tits.","funcret",speakerName)
+    Main.RegisterEvent(""+speakerName+" spanks " + targetName + "'s tits.")
   EndIf
 
   ; Mutually Exclusive commands
   if sex.CanAnimate(akTarget, akSpeaker)
     if command == "ExtCmdMolest"
       HorribleHarassmentActivate(akSpeaker)
-      AIAgentFunctions.logMessageForActor("command@ExtCmdMolest@@"+speakerName+" began to sexually assault " + targetName + "'.","funcret",speakerName)
+      Main.RegisterEvent(""+speakerName+" began to sexually assault " + targetName + "'.")
     elseif command == "ExtCmdKiss"
       HarassKiss(akSpeaker)
-      AIAgentFunctions.logMessageForActor("command@ExtCmdKiss@@"+speakerName+" began to kiss " + targetName + "'.","funcret",speakerName)
+      Main.RegisterEvent(""+speakerName+" began to kiss " + targetName + "'.")
     elseif command == "ExtCmdHug"
       HarassHug(akSpeaker)
-      AIAgentFunctions.logMessageForActor("command@ExtCmdHug@@"+speakerName+" began to hug " + targetName + "'.","funcret",speakerName)
+      Main.RegisterEvent(""+speakerName+" began to hug " + targetName + "'.")
     EndIf
   Else
     Main.Warn("Not processing commands for exclusive scene - Conflicting scene is running")
   EndIf
-
-  string ruleDesc = DealManager.GetRuleInfo(targetRule);
-  ; Devious Follower
-  if (command == "ExtCmdAcceptDeal") 
-    Debug.Notification("AI: Accepted Deal: " + targetRule)
-    Main.Info("Player Accepted Deal: " + targetRule)
-    dfDealController.MakeDeal(targetRule)
-    AIAgentFunctions.logMessageForActor("command@ExtCmdAcceptDeal@@"+targetName+" agreed to obey a new rule: \"" + ruleDesc + "\".","funcret",speakerName)
-    ClearTargetRule()
-  EndIf
-  if (command == "ExtCmdDrugPlayer") 
-    Debug.Notification("AI: Drinking Skooma")
-    Main.Info("Player Drinking Skooma")
-    dfDealController.MDC.DrinkSkooma()
-    AIAgentFunctions.logMessageForActor("command@ExtCmdAcceptDeal@@"+targetName+" used the drugs that " + speakerName + " provided.","funcret",speakerName)
-  EndIf
-  if (command == "ExtCmdRejectDeal") 
-    Main.Info("Player Reject Deal")
-    Debug.Notification("AI: Rejected Deal")
-    dfDealController.RejectDeal(targetRule)
-    AIAgentFunctions.logMessageForActor("command@ExtCmdAcceptDeal@@"+targetName+" refused to obey the new rule: \"" + ruleDesc + "\".","funcret",speakerName)
-    ClearTargetRule()
+  if bHasDeviousFollowers
+    string ruleDesc = DealManager.GetRuleInfo(targetRule);
+    ; Devious Follower
+    if (command == "ExtCmdAcceptDeal") 
+      Debug.Notification("AI: Accepted Deal: " + targetRule)
+      Main.Info("Player Accepted Deal: " + targetRule)
+      dfDealController.MakeDeal(targetRule)
+      Main.RegisterEvent(""+targetName+" agreed to obey a new rule: \"" + ruleDesc + "\".")
+      ClearTargetRule()
+    EndIf
+    if (command == "ExtCmdDrugPlayer") 
+      Debug.Notification("AI: Drinking Skooma")
+      Main.Info("Player Drinking Skooma")
+      dfDealController.MDC.DrinkSkooma()
+      Main.RegisterEvent(""+targetName+" used the drugs that " + speakerName + " provided.")
+    EndIf
+    if (command == "ExtCmdRejectDeal") 
+      Main.Info("Player Reject Deal")
+      Debug.Notification("AI: Rejected Deal")
+      dfDealController.RejectDeal(targetRule)
+      Main.RegisterEvent(""+targetName+" refused to obey the new rule: \"" + ruleDesc + "\".")
+      ClearTargetRule()
+    EndIf
   EndIf
 EndEvent
 

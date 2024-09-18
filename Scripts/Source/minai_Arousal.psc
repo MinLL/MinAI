@@ -417,12 +417,12 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   if command == "ExtCmdIncreaseArousal"
     UpdateArousal(akSpeaker, 6)
     Debug.Notification(akSpeaker.GetActorBase().GetName() + " is getting more turned on.")
-    AIAgentFunctions.logMessageForActor("command@ExtCmdIncreaseArousal@@"+speakerName+"'s arousal level increased.","funcret",speakerName)
+    Main.RegisterEvent(""+speakerName+"'s arousal level increased.")
   EndIf
   if command == "ExtCmdDecreaseArousal"
     UpdateArousal(akSpeaker, -12)
     Debug.Notification(akSpeaker.GetActorBase().GetName() + " is getting less turned on.")
-    AIAgentFunctions.logMessageForActor("command@ExtCmdDecreaseArousal@@"+speakerName+"'s arousal level decreased.","funcret",speakerName)
+    Main.RegisterEvent(""+speakerName+"'s arousal level decreased.")
   EndIf
 EndEvent
 
@@ -439,7 +439,7 @@ Function SetContext(actor akTarget)
   if !bHasArousedKeywords
   	return
   endif
-  if bHasBabo
+  if bHasBabo && akTarget == PlayerRef
     aiff.SetActorVariable(akTarget, "beautyScore", baboConfigs.BeautyValue.GetValueInt())
     aiff.SetActorVariable(akTarget, "breastsScore", baboConfigs.BreastsValue.GetValueInt())
     aiff.SetActorVariable(akTarget, "buttScore", baboConfigs.ButtocksValue.GetValueInt())
