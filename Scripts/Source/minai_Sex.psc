@@ -68,7 +68,7 @@ Function Start1pSex(actor akSpeaker)
 EndFunction
 
 
-int Function Start2pSex(actor akSpeaker, actor akTarget, actor Player, bool bPlayerInScene, string tags="")
+Function Start2pSex(actor akSpeaker, actor akTarget, actor Player, bool bPlayerInScene, string tags="")
   if bHasOstim && minai_UseOStim.GetValue() == 1.0
     ; Convert sexlab tags to ostim tags
     if tags == "Anal"
@@ -92,7 +92,6 @@ int Function Start2pSex(actor akSpeaker, actor akTarget, actor Player, bool bPla
     if AutoMode == False
       OThreadBuilder.NoPlayerControl(ActiveOstimThreadID)
       OThread.StartAutoMode(ActiveOstimThreadID)
-	  return ActiveOstimThreadID
     EndIf
   Else
     slf.Quickstart(akTarget,akSpeaker, animationTags=tags)
@@ -100,26 +99,14 @@ int Function Start2pSex(actor akSpeaker, actor akTarget, actor Player, bool bPla
 EndFunction
 
 Function StartSexOrSwitchTo(actor akSpeaker, actor akTarget, actor Player, bool bPlayerInScene, string tags)
-	AIFF.ChillOut()
-	if CanAnimate(akTarget, akSpeaker)
+	  AIFF.ChillOut()
+      if CanAnimate(akTarget, akSpeaker)
         Start2pSex(akSpeaker, akTarget, PlayerRef, bPlayerInScene, tags)
         main.RegisterEvent(akSpeaker.GetDisplayName() + " and " + akTarget.GetDisplayName() + " started having sex.", "info_sexscene")
-	elseif bHasOstim && minai_UseOStim.GetValue() == 1.0 && OActor.IsInOStim(akTarget) && OActor.IsInOStim(akSpeaker)
-		int ActiveOstimThreadID = 0
-		Actor[] ostimActors = new Actor[2]
-		if bPlayerInScene
-			ostimActors = OActorUtil.ToArray(Player, akSpeaker)
-			ActiveOstimThreadID = 0
-		else
-			ostimActors = OActorUtil.ToArray(akTarget, akSpeaker)
-			ActiveOstimThreadID = 1
-		EndIf
-		OThread.NavigateTo(ActiveOstimThreadID, OLibrary.GetRandomSceneWithSceneTag(ostimActors, tags))
-		main.RegisterEvent(akSpeaker.GetDisplayName() + " and " + akTarget.GetDisplayName() + " changed up the sex to " + tags + " instead.", "info_sexscene")
-		Return
-	elseif akSpeaker != playerRef && akTarget != playerRef
-		Return
-	else
+      else
+        if akSpeaker != playerRef && akTarget != playerRef
+          Return
+        EndIf
 		int threadID = slf.FindPlayerController()
 		sslThreadController Controller = slf.ThreadSlots.GetController(threadID)
 		sslBaseAnimation[] animations = slf.GetAnimationsByTags(2, tags)
@@ -187,6 +174,14 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
         Start1pSex(akSpeaker)
       elseif stringutil.Find(sayLine, "-startsex-") != -1 || stringUtil.Find(sayLine, "-have sex-") != -1 || stringUtil.Find(sayLine, "-sex-") != -1 || stringUtil.Find(sayLine, "-having sex-") != -1
         Start2pSex(akSpeaker, akTarget, Player, bPlayerInScene)
+      elseif stringutil.Find(sayLine, "-vaginalsex-") != -1
+        StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "vaginalsex")
+      elseif stringutil.Find(sayLine, "-analsex-") != -1
+        StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "analsex")
+      elseif stringutil.Find(sayLine, "-blowjob-") != -1
+        StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "blowjob")
+      elseif stringutil.Find(sayLine, "-handjob-") != -1
+        StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "handjob")
       elseIf stringutil.Find(sayLine, "-groupsex-") != -1 || stringUtil.Find(sayLine, "-orgy-") != -1 || stringUtil.Find(sayLine, "-threesome-") != -1 || stringUtil.Find(sayLine, "-fuck-") != -1
         StartGroupSex(akSpeaker, akTarget, Player, bPlayerInScene, actorsFromFormList)
       EndIf
@@ -225,13 +220,8 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   elseif command == "ExtCmdStartHandjob"
     StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Handjob")
   elseIf command == "ExtCmdOrgy"
-    if bHasOstim
-      Actor[] sexActors = OActorUtil.GetActorsInRange(akSpeaker, 300, true, true)
-	  StartGroupSex(akSpeaker, akTarget, PlayerRef, bPlayerInScene, sexActors)
-	else
-      Debug.Notification("SL Orgy is broken until I figure out how to get all AI actors")
-      ; StartGroupSex(akSpeaker, akTarget, PlayerRef, bPlayerInScene, actorsFromFormList)
-	EndIf
+    Debug.Notification("Orgy is broken until I figure out how to get all AI actors")
+    ; StartGroupSex(akSpeaker, akTarget, PlayerRef, bPlayerInScene, actorsFromFormList)
   EndIf
 EndEvent
 
@@ -549,4 +539,3 @@ string Function GetFactionsForActor(actor akTarget)
 
   return ret
 EndFunction
-

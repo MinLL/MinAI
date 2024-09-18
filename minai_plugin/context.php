@@ -13,7 +13,7 @@ Function GetArousalContext($name) {
   $ret = "";
   $arousal = GetActorValue($name, "arousal");
   if ($arousal != "") {
-    $ret .= "{$name}'s sexual arousal is {$arousal}%.";
+    $ret .= "{$name}'s sexual arousal is {$arousal} percent.";
   }
   return $ret;
 }
@@ -36,10 +36,10 @@ Function GetPhysicalDescription($name) {
     $ret .= "Her overall beauty is a {$beautyScore} out of 10. ";
   }
   if($breastsScore != "") {
-    $ret .= "The sexual attractiveness of her breasts is a {$breastsScore}%. ";
+    $ret .= "The sexual attractiveness of her breasts is a {$breastsScore} percent. ";
   }
   if($buttScore != "") {
-    $ret .= "The sexual attractiveness of her ass is a {$buttScore}%. ";
+    $ret .= "The sexual attractiveness of her ass is a {$buttScore} percent. ";
   }
   $ret  .= GetPenisSize($name);
   return $ret;
