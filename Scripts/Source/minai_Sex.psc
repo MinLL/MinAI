@@ -87,12 +87,6 @@ Function Start2pSex(actor akSpeaker, actor akTarget, actor Player, bool bPlayerI
 	int ActiveOstimThreadID = OThreadBuilder.Create(ostimActors)
 	OThreadBuilder.SetStartingAnimation(ActiveOstimThreadID, OLibrary.GetRandomSceneWithSceneTag(ostimActors, tags))
 	OThreadBuilder.Start(ActiveOstimThreadID)
-    Utility.Wait(2)
-    bool AutoMode = OThread.IsInAutoMode(ActiveOstimThreadID)
-    if AutoMode == False
-      OThreadBuilder.NoPlayerControl(ActiveOstimThreadID)
-      OThread.StartAutoMode(ActiveOstimThreadID)
-    EndIf
   Else
     slf.Quickstart(akTarget,akSpeaker, animationTags=tags)
   EndIf
