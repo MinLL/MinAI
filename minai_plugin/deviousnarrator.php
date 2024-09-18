@@ -8,10 +8,7 @@ Function SetDeviousNarrator() {
     $eyepenalty = GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleEyePenalty");       
     $eyereward = GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleEyeReward");
     $eyescore = GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleEyeScore");
-    if($eyescore == 0 && $eyereward == -1) {
-        // Not currently in quest
-        return;
-    }
+    
     // Overwrite narrator personality
     $personality = "";
     $personality .= "You are The Narrator in a Skyrim adventure. You will only talk to {$GLOBALS["PLAYER_NAME"]}. You refer to yourself as 'The Narrator'. Only {$GLOBALS["PLAYER_NAME"]} can hear you. ";
@@ -40,7 +37,25 @@ Function SetDeviousNarrator() {
         
     $GLOBALS["HERIKA_PERS"] = $personality;
 }
-    
 
+
+Function ShouldUseDeviousNarrator() {
+    $eyereward = GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleEyeReward");
+    $eyescore = GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleEyeScore");
+    return (IsModEnabled("DeviouslyAccessible") && $GLOBALS["HERIKA_NAME"] == "The Narrator" && !($eyescore == 0 && $eyereward == -1));
+}
+
+
+Function EnableDeviousNarratorActions() {
+    $GLOBALS["FUNCTIONS_ARE_ENABLED"]=true;
+    // Enable a few specific actions for the devious narrator
+    $GLOBALS["ENABLED_FUNCTIONS"] = array();
+    if (IsModEnabled("DeviousFollowers")) {
+        $GLOBALS["ENABLED_FUNCTIONS"][] = "ExtCmdSpankAss";
+        $GLOBALS["ENABLED_FUNCTIONS"][] = "ExtCmdSpankTits";
+    }
+    $GLOBALS["ENABLED_FUNCTIONS"][] = "ExtCmdGrope";
+    $GLOBALS["ENABLED_FUNCTIONS"][] = "ExtCmdPinchNipples";
+}
 
 ?>

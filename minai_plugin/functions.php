@@ -47,4 +47,11 @@ if ($force_voice_type) {
     require "fix_xtts.php";
 }
 
+if (!$disable_nsfw) {
+    require_once("deviousnarrator.php");
+    if (ShouldUseDeviousNarrator()) {
+        EnableDeviousNarratorActions();
+    }
+}
+
 ?>

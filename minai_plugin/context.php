@@ -260,6 +260,10 @@ foreach ($locaLastElement as $n) {
   unset($GLOBALS["contextDataFull"][$n]); 
 }
 
+require_once("deviousnarrator.php");
+if (ShouldUseDeviousNarrator()) {
+    SetDeviousNarrator();
+}
 
 require "command_prompt_custom.php";
 ?>
