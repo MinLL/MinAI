@@ -211,6 +211,11 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     carriageScript.Travel(destination, akSpeaker)
     Main.RegisterEvent(""+speakerName+" gave " + targetName + " a ride in a carriage to " + destination + ".")
   EndIf
+    if command == "ExtCmdTrainSkill"
+    Main.Debug(speakerName + " is training the player")
+    Game.ShowTrainingMenu(akSpeaker)
+    Main.RegisterEvent(""+speakerName+" gave " + targetName + " some training.")
+  EndIf
 EndEvent
 
 
