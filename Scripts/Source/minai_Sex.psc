@@ -153,7 +153,8 @@ Function StartGroupSex(actor akSpeaker, actor akTarget, actor Player, bool bPlay
       ;   OThread.StartAutoMode(ActiveOstimThreadID)
       ; EndIf
     else
-    StartSexSmart(bPlayerInScene, actorsFromFormList, "")
+      StartSexSmart(bPlayerInScene, actorsFromFormList, "")
+    EndIf
   EndIf
 EndFunction
 
