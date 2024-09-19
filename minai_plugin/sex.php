@@ -7,6 +7,7 @@ if (IsModEnabled("Sexlab") || IsModEnabled("Ostim")) {
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartVaginal";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartAnal";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartBlowjob";
+        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartHandjob";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartAggressive";
         /*}
     else {
@@ -16,7 +17,7 @@ if (IsModEnabled("Sexlab") || IsModEnabled("Ostim")) {
 
 
 $GLOBALS["F_NAMES"]["ExtCmdStartSexScene"]="StartSexScene";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartSexScene"]="Start having sex (or a blowjob) with the target";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartSexScene"]="Engage in sexual activity with the target";
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdStartSexScene"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartSexScene"],
@@ -62,7 +63,7 @@ $GLOBALS["FUNCRET"]["ExtCmdMasturbate"]=$GenericFuncRet;
 
 
 $GLOBALS["F_NAMES"]["ExtCmdStartOrgy"]="StartOrgy";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartOrgy"]="Start having an orgy with all nearby participants";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartOrgy"]="Start an orgy with all nearby participants";
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdStartOrgy"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartOrgy"],
@@ -136,6 +137,25 @@ $GLOBALS["FUNCTIONS"][] = [
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartBlowjob"]=$GenericFuncRet;
+
+$GLOBALS["F_NAMES"]["ExtCmdStartHandjob"]="StartHandjob";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartHandjob"]="Engage in manual stimulation with the target by either giving or receiving a handjob";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdStartHandjob"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartHandjob"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdStartHandjob"]=$GenericFuncRet;
 
 ?>
 
