@@ -50,7 +50,17 @@ function Maintenance(minai_MainQuestController _main)
   aiff.SetModAvailable("Sexlab", slf != None)
 EndFunction
 
-
+string Function ConvertTagsOstim(string tags)
+      ; Convert sexlab tags to ostim tags
+      if tags == "anal"
+        tags = "analsex"
+      elseif tags == "vaginal"
+        tags = "vaginalsex"
+      elseif tags == "oral"
+        tags = "blowjob"
+      EndIf
+	  return tags
+EndFunction
 
 bool Function CanAnimate(actor akTarget, actor akSpeaker)
   if bHasOstim && (minai_UseOStim.GetValue() == 1.0 && !OActor.IsInOStim(akTarget) && !OActor.IsInOStim(akSpeaker))
@@ -73,14 +83,7 @@ EndFunction
 Function Start2pSex(actor akSpeaker, actor akTarget, actor Player, bool bPlayerInScene, string tags="")
   if CanAnimate(akTarget, akSpeaker)
     if bHasOstim && minai_UseOStim.GetValue() == 1.0
-      ; Convert sexlab tags to ostim tags
-      if tags == "anal"
-          tags = "analsex"
-        elseif tags == "vaginal"
-          tags = "vaginalsex"
-        elseif tags == "oral"
-          tags = "blowjob"
-        EndIf
+      tags = ConvertTagsOstim(tags)
 	  Actor[] ostimActors = new Actor[2]
 	  if bPlayerInScene
 	    ostimActors = OActorUtil.ToArray(Player, akSpeaker) as Actor[]
@@ -98,18 +101,14 @@ Function Start2pSex(actor akSpeaker, actor akTarget, actor Player, bool bPlayerI
 	  OThreadBuilder.SetStartingAnimation(ActiveOstimThreadID, newScene)
 	  OThreadBuilder.Start(ActiveOstimThreadID)
     Else
-      slf.Quickstart(akTarget,akSpeaker, animationTags=tags)
-	EndIf
-	int ActiveOstimThreadID = OThreadBuilder.Create(ostimActors)
-	OThreadBuilder.SetStartingAnimation(ActiveOstimThreadID, OLibrary.GetRandomSceneWithSceneTag(ostimActors, tags))
-	OThreadBuilder.Start(ActiveOstimThreadID)
-  Else
     actor[] actors = new actor[2]
     actors[0] = akTarget
     actors[1] = akSpeaker
     StartSexSmart(bPlayerInScene, actors, tags)
+	EndIf
   EndIf
 EndFunction
+
 
 Function StartSexOrSwitchTo(actor akSpeaker, actor akTarget, actor Player, bool bPlayerInScene, string tags)
 	  AIFF.ChillOut()
@@ -118,13 +117,7 @@ Function StartSexOrSwitchTo(actor akSpeaker, actor akTarget, actor Player, bool 
         main.RegisterEvent(akSpeaker.GetDisplayName() + " and " + akTarget.GetDisplayName() + " started having sex." + tags, "info_sexscene")
 	  elseif bHasOstim && minai_UseOStim.GetValue() == 1.0 && OActor.IsInOStim(akSpeaker)
 	    Main.Debug(akSpeaker.GetDisplayName() + " is switching Ostim scene.")
-   	    if tags == "anal"
-          tags = "analsex"
-        elseif tags == "vaginal"
-          tags = "vaginalsex"
-        elseif tags == "oral"
-          tags = "blowjob"
-        EndIf
+   	    tags = ConvertTagsOstim(tags)
         Main.Debug("Searching for random " + tags + " scene.")
 		int ActiveOstimThreadID = OActor.GetSceneID(akSpeaker)
         Actor[] ostimActors = new Actor[2]
@@ -178,6 +171,7 @@ bool Function CompareActorSex(actor actor1, actor actor2)
   ; 2 = other
   return actor1.GetActorBase().GetSex() < actor2.GetActorBase().GetSex()
 EndFunction
+
 
 Function StartSexSmart(bool bPlayerInScene, actor[] actorsToSort, string tags)
   Main.Debug("SortActorsForSex(" + bPlayerInScene +")")
@@ -362,9 +356,6 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
     Main.Info("Ended intimate scene")
   endif
 EndEvent
-
-
-
 
 
 Function LoadSexlabDescriptions()
