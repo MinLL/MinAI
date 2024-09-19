@@ -114,7 +114,7 @@ Function StartSexOrSwitchTo(actor akSpeaker, actor akTarget, actor Player, bool 
     main.RegisterEvent(akSpeaker.GetDisplayName() + " and " + akTarget.GetDisplayName() + " started having sex." + tags, "info_sexscene")
   elseif bHasOstim && minai_UseOStim.GetValue() == 1.0 && OActor.IsInOStim(akSpeaker)
     Main.Debug(akSpeaker.GetDisplayName() + " is switching Ostim scene.")
- 	  tags = ConvertTagsOstim(tags)
+    tags = ConvertTagsOstim(tags)
     Main.Debug("Searching for random " + tags + " scene.")
     int ActiveOstimThreadID = OActor.GetSceneID(akSpeaker)
     Actor[] ostimActors = new Actor[2]
@@ -143,17 +143,17 @@ EndFunction
 
 Function StartGroupSex(actor akSpeaker, actor akTarget, actor Player, bool bPlayerInScene, Actor[] actorsFromFormList)
   if CanAnimate(akTarget, akSpeaker)
-  if bHasOstim && minai_UseOStim.GetValue() == 1.0
-    int ActiveOstimThreadID
-    ActiveOstimThreadID = OThread.QuickStart(OActorUtil.ToArray(actorsFromFormList[0],actorsFromFormList[1],actorsFromFormList[2],actorsFromFormList[3],actorsFromFormList[4],actorsFromFormList[5],actorsFromFormList[6],actorsFromFormList[7],actorsFromFormList[8],actorsFromFormList[9]))
-    Utility.Wait(1)
-    bool AutoMode = OThread.IsInAutoMode(ActiveOstimThreadID)
-    if AutoMode == False
-      OThreadBuilder.NoPlayerControl(ActiveOstimThreadID)
-      OThread.StartAutoMode(ActiveOstimThreadID)
-    EndIf
+    if bHasOstim && minai_UseOStim.GetValue() == 1.0
+      int ActiveOstimThreadID
+      ActiveOstimThreadID = OThread.QuickStart(OActorUtil.ToArray(actorsFromFormList[0],actorsFromFormList[1],actorsFromFormList[2],actorsFromFormList[3],actorsFromFormList[4],actorsFromFormList[5],actorsFromFormList[6],actorsFromFormList[7],actorsFromFormList[8],actorsFromFormList[9]))
+      ; Utility.Wait(1)
+      ; bool AutoMode = OThread.IsInAutoMode(ActiveOstimThreadID)
+      ; if AutoMode == False
+      ;   OThreadBuilder.NoPlayerControl(ActiveOstimThreadID)
+      ;   OThread.StartAutoMode(ActiveOstimThreadID)
+      ; EndIf
+    else
     StartSexSmart(bPlayerInScene, actorsFromFormList, "")
-  EndIf
   EndIf
 EndFunction
 
