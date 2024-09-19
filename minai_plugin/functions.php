@@ -35,14 +35,24 @@ EndEvent
 
 
 require_once("config.php");
-require "generalperverted.php";
-require "deviousdevices.php";
-require "arousal.php";
+if (!$disable_nsfw) {
+    require "arousal.php";
+    require "sex.php";
+    require "slapp.php";
+}
 require "survival.php";
-require "sex.php";
-require "slapp.php";
 if ($force_voice_type) {
     require "fix_xtts.php";
+}
+
+if (!$disable_nsfw) {
+    require_once("deviousnarrator.php");
+    if (ShouldUseDeviousNarrator()) {
+        // Anything loaded after this will have functions enabled for the narrator
+        EnableDeviousNarratorActions();
+    }
+    require "generalperverted.php";
+    require "deviousdevices.php";
 }
 
 ?>

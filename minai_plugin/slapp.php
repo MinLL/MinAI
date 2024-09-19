@@ -59,7 +59,7 @@ $GLOBALS["FUNCRET"]["ExtCmdKiss"]=$GenericFuncRet;
 
 
 $GLOBALS["F_NAMES"]["ExtCmdMolest"]="Molest";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdMolest"]="Sexually assault / molest the target";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdMolest"]="Force yourself on the target sexually";
 
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdMolest"],
