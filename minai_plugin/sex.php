@@ -7,7 +7,7 @@ if (IsModEnabled("Sexlab") || IsModEnabled("Ostim")) {
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartVaginal";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartAnal";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartBlowjob";
-		$GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartHandjob";
+        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartHandjob";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartAggressive";
         /*}
     else {
