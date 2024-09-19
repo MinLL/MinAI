@@ -239,12 +239,13 @@ Function GetDDContext($name) {
   return $ret;
 }
 
-
-$GLOBALS["COMMAND_PROMPT"].= BuildContext($GLOBALS["PLAYER_NAME"]);
-$GLOBALS["COMMAND_PROMPT"].= BuildContext($GLOBALS["HERIKA_NAME"]);
-$GLOBALS["COMMAND_PROMPT"].="
+if (!$disable_nsfw) {
+    $GLOBALS["COMMAND_PROMPT"].= BuildContext($GLOBALS["PLAYER_NAME"]);
+    $GLOBALS["COMMAND_PROMPT"].= BuildContext($GLOBALS["HERIKA_NAME"]);
+    $GLOBALS["COMMAND_PROMPT"].="
 
 ";
+}
 
 // Remove all references to sex scene, and only keep the last one.
 $locaLastElement=[];
@@ -259,4 +260,10 @@ foreach ($locaLastElement as $n) {
   unset($GLOBALS["contextDataFull"][$n]); 
 }
 
+require_once("deviousnarrator.php");
+if (ShouldUseDeviousNarrator()) {
+    SetDeviousNarrator();
+}
+
+require "command_prompt_custom.php";
 ?>

@@ -182,31 +182,39 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   if !akTarget
     akTarget = PlayerRef
   EndIf
+  Main.Debug("Survival - CommandDispatcher(" + speakerName +", " + command +", " + parameter + ")")
   string targetName = main.GetActorName(akTarget)
   ; Sunhelm
   if command == "ExtCmdServeFood"
+    Main.Debug("Feeding Player")
     FeedPlayer(akSpeaker, PlayerRef)
-    AIAgentFunctions.logMessageForActor("command@ExtCmdFeedPlayer@@"+speakerName+" served " + targetName + " a meal.","funcret",speakerName)
+    Main.RegisterEvent(""+speakerName+" served " + targetName + " a meal.")
   EndIf
   ; Vanilla functionality
   if command == "ExtCmdRentRoom"
+    Main.Debug("Renting Room")
     if playerRef.GetItemCount(Gold) < (DialogueGeneric as DialogueGenericScript).RoomRentalCost.GetValue() as Int
       Debug.Notification("AI: Player does not have enough gold to rent room.")
-      AIAgentFunctions.logMessageForActor("command@ExtCmdRentRoom@@" + targetName + " did not have enough gold for the room.","funcret", speakerName)
+      Main.RegisterEvent("" + targetName + " did not have enough gold for the room.")
     Else
       (akSpeaker as RentRoomScript).RentRoom(DialogueGeneric as DialogueGenericScript)
-      AIAgentFunctions.logMessageForActor("command@ExtCmdRentRoom@@"+speakerName+" provided " + targetName + " a room for the night.","funcret",speakerName)
+      Main.RegisterEvent(""+speakerName+" provided " + targetName + " a room for the night.")
     EndIf
   EndIf
   if command == "ExtCmdTrade"
     akSpeaker.showbartermenu()
-    AIAgentFunctions.logMessageForActor("command@ExtCmdTrade@@"+speakerName+" started trading goods with " + targetName + ".","funcret",speakerName)
+    Main.RegisterEvent(""+speakerName+" started trading goods with " + targetName + ".")
   EndIf
   if command == "ExtCmdCarriageRide"
     ; Parameter has destination
     int destination = GetDestination(parameter)
     carriageScript.Travel(destination, akSpeaker)
-    AIAgentFunctions.logMessageForActor("command@ExtCmdCarriageTrip@@"+speakerName+" gave " + targetName + " a ride in a carriage to " + destination + ".","funcret",speakerName)
+    Main.RegisterEvent(""+speakerName+" gave " + targetName + " a ride in a carriage to " + destination + ".")
+  EndIf
+    if command == "ExtCmdTrainSkill"
+    Main.Debug(speakerName + " is training the player")
+    Game.ShowTrainingMenu(akSpeaker)
+    Main.RegisterEvent(""+speakerName+" gave " + targetName + " some training.")
   EndIf
 EndEvent
 
