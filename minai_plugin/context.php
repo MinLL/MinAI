@@ -33,13 +33,12 @@ Function GetPhysicalDescription($name) {
   }
   if($beautyScore != "") {
     $beautyScore = ceil(intval($beautyScore)/10);
-    $ret .= "Her overall beauty is a {$beautyScore} out of 10. ";
+    $ret .= "She is a {$beautyScore}/10 in terms of beauty ";
   }
-  if($breastsScore != "") {
-    $ret .= "The sexual attractiveness of her breasts is a {$breastsScore} percent. ";
-  }
-  if($buttScore != "") {
-    $ret .= "The sexual attractiveness of her ass is a {$buttScore} percent. ";
+  if($breastsScore != "" && $buttScore != "") {
+      $breastsScore = ceil(intval($breastsScore)/10);
+      $buttScore = ceil(intval($buttScore)/10);
+      $ret .= "with {$breastsScore}/10 tits and a {$buttScore}/10 ass. ";
   }
   $ret  .= GetPenisSize($name);
   return $ret;

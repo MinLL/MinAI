@@ -461,62 +461,71 @@ EndFunction
 
 string Function GetKeywordsForActor(actor akTarget)
   string ret = ""
-	if bHasArousedKeywords
-	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_HalfNakedBikini", SLA_HalfNakedBikini)
-	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorHalfNaked", SLA_ArmorHalfNaked)
-	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_Brabikini", SLA_Brabikini)
-	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_Thong", SLA_ThongT)
-	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_Thong", SLA_ThongLowLeg)
-	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_Thong", SLA_ThongCString)
-	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_Thong", SLA_ThongGstring)
-	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_PantiesNormal", SLA_PantiesNormal)
-	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_Heels", SLA_KillerHeels)
-	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_Heels", SLA_BootsHeels)
-	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_PantsNormal", SLA_PantsNormal)
-	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_MicroHotPants", SLA_MicroHotPants)
-	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorHarness", SLA_ArmorHarness)
-	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorSpendex", SLA_ArmorSpendex)
-	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorTransparent", SLA_ArmorTransparent)
-	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorLewdLeotard", SLA_ArmorLewdLeotard)
-	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_PelvicCurtain", SLA_PelvicCurtain)
-	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_FullSkirt", SLA_FullSkirt)
-	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_MiniSkirt", SLA_MiniSkirt)
-	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_MiniSkirt", SLA_MicroSkirt)
-	  ret += aiff.GetKeywordIfExists(akTarget, "EroticArmor", EroticArmor)
-	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_PiercingVulva", SLA_PiercingVulva)
-	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_PiercingBelly", SLA_PiercingBelly)
-	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_PiercingNipple", SLA_PiercingNipple)
-	  ret += aiff.GetKeywordIfExists(akTarget, "SLA_PiercingClit", SLA_PiercingClit)
-	EndIf
-	if bHasTNG
-	  if akTarget.HasKeyword(TNG_Gentlewoman)
-	    ret += "TNG_Gentlewoman,"
-	  EndIf
-	  if akTarget.HasKeyword(TNG_XS)
-	    ret += "TNG_XS,"
-	  elseif akTarget.HasKeyword(TNG_S)
-  	    ret += "TNG_S,"
-	  elseif akTarget.HasKeyword(TNG_M)
-	    ret += "TNG_M,"
-	  elseif akTarget.HasKeyword(TNG_L)
-	    ret += "TNG_L,"
-	  elseif akTarget.HasKeyword(TNG_XL)
-	    ret += "TNG_XL,"
-	  elseif akTarget.HasKeyword(TNG_DefaultSize)
-	    ret += "TNG_DefaultSize,"
-	  EndIf
-	  if akTarget.HasKeywordString("TNG_ActorAddnAuto:01")
-		ret += "TNG_ActorAddnAuto:01,"
-	  elseif akTarget.HasKeywordString("TNG_ActorAddnAuto:02")
-		ret += "TNG_ActorAddnAuto:02,"
-	  elseif akTarget.HasKeywordString("TNG_ActorAddnAuto:03")
-		ret += "TNG_ActorAddnAuto:03,"
-	  elseif akTarget.HasKeywordString("TNG_ActorAddnAuto:04")
-		ret += "TNG_ActorAddnAuto:04,"
-	  elseif akTarget.HasKeywordString("TNG_ActorAddnAuto:05")
-		ret += "TNG_ActorAddnAuto:05,"
-	  EndIf
-	EndIf
+  if bHasArousedKeywords
+    ret += aiff.GetKeywordIfExists(akTarget, "SLA_HalfNakedBikini", SLA_HalfNakedBikini)
+    ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorHalfNaked", SLA_ArmorHalfNaked)
+    ret += aiff.GetKeywordIfExists(akTarget, "SLA_Brabikini", SLA_Brabikini)
+    ret += aiff.GetKeywordIfExists(akTarget, "SLA_Thong", SLA_ThongT)
+    ret += aiff.GetKeywordIfExists(akTarget, "SLA_Thong", SLA_ThongLowLeg)
+    ret += aiff.GetKeywordIfExists(akTarget, "SLA_Thong", SLA_ThongCString)
+    ret += aiff.GetKeywordIfExists(akTarget, "SLA_Thong", SLA_ThongGstring)
+    ret += aiff.GetKeywordIfExists(akTarget, "SLA_PantiesNormal", SLA_PantiesNormal)
+    ret += aiff.GetKeywordIfExists(akTarget, "SLA_Heels", SLA_KillerHeels)
+    ret += aiff.GetKeywordIfExists(akTarget, "SLA_Heels", SLA_BootsHeels)
+    ret += aiff.GetKeywordIfExists(akTarget, "SLA_PantsNormal", SLA_PantsNormal)
+    ret += aiff.GetKeywordIfExists(akTarget, "SLA_MicroHotPants", SLA_MicroHotPants)
+    ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorHarness", SLA_ArmorHarness)
+    ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorSpendex", SLA_ArmorSpendex)
+    ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorTransparent", SLA_ArmorTransparent)
+    ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorLewdLeotard", SLA_ArmorLewdLeotard)
+    ret += aiff.GetKeywordIfExists(akTarget, "SLA_PelvicCurtain", SLA_PelvicCurtain)
+    ret += aiff.GetKeywordIfExists(akTarget, "SLA_FullSkirt", SLA_FullSkirt)
+    ret += aiff.GetKeywordIfExists(akTarget, "SLA_MiniSkirt", SLA_MiniSkirt)
+    ret += aiff.GetKeywordIfExists(akTarget, "SLA_MiniSkirt", SLA_MicroSkirt)
+    ret += aiff.GetKeywordIfExists(akTarget, "EroticArmor", EroticArmor)
+    ret += aiff.GetKeywordIfExists(akTarget, "SLA_PiercingVulva", SLA_PiercingVulva)
+    ret += aiff.GetKeywordIfExists(akTarget, "SLA_PiercingBelly", SLA_PiercingBelly)
+    ret += aiff.GetKeywordIfExists(akTarget, "SLA_PiercingNipple", SLA_PiercingNipple)
+    ret += aiff.GetKeywordIfExists(akTarget, "SLA_PiercingClit", SLA_PiercingClit)
+  EndIf
+  if bHasTNG
+    if akTarget.HasKeyword(TNG_Gentlewoman)
+      ret += "TNG_Gentlewoman,"
+    EndIf
+    if akTarget.HasKeyword(TNG_XS)
+      ret += "TNG_XS,"
+    elseif akTarget.HasKeyword(TNG_S)
+   	    ret += "TNG_S,"
+    elseif akTarget.HasKeyword(TNG_M)
+      ret += "TNG_M,"
+    elseif akTarget.HasKeyword(TNG_L)
+      ret += "TNG_L,"
+    elseif akTarget.HasKeyword(TNG_XL)
+      ret += "TNG_XL,"
+    elseif akTarget.HasKeyword(TNG_DefaultSize)
+      ret += "TNG_DefaultSize,"
+    EndIf
+    if akTarget.HasKeywordString("TNG_ActorAddnAuto:01")
+  	ret += "TNG_ActorAddnAuto:01,"
+    elseif akTarget.HasKeywordString("TNG_ActorAddnAuto:02")
+  	ret += "TNG_ActorAddnAuto:02,"
+    elseif akTarget.HasKeywordString("TNG_ActorAddnAuto:03")
+  	ret += "TNG_ActorAddnAuto:03,"
+    elseif akTarget.HasKeywordString("TNG_ActorAddnAuto:04")
+  	ret += "TNG_ActorAddnAuto:04,"
+    elseif akTarget.HasKeywordString("TNG_ActorAddnAuto:05")
+  	ret += "TNG_ActorAddnAuto:05,"
+    EndIf
+  EndIf
+  int actorSex = akTarget.GetActorBase().GetSex()
+  if (actorSex == 0)
+    ret += "ActorSexMale,"
+  elseif (actorSex == 1)
+    ret += "ActorSexFemale,"
+  else
+    ret += "ActorSexOther,"
+  EndIf
+  ret += akTarget.GetActorBase().GetRace() + ","
   return ret
 EndFunction
 
