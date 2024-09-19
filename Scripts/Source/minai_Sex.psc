@@ -88,7 +88,10 @@ Function Start2pSex(actor akSpeaker, actor akTarget, actor Player, bool bPlayerI
 	OThreadBuilder.SetStartingAnimation(ActiveOstimThreadID, OLibrary.GetRandomSceneWithSceneTag(ostimActors, tags))
 	OThreadBuilder.Start(ActiveOstimThreadID)
   Else
-    slf.Quickstart(akTarget,akSpeaker, animationTags=tags)
+    actor[] actors = new actor[2]
+    actors[0] = akTarget
+    actors[1] = akSpeaker
+    StartSexSmart(bPlayerInScene, actors, tags)
   EndIf
 EndFunction
 
@@ -121,38 +124,55 @@ Function StartGroupSex(actor akSpeaker, actor akTarget, actor Player, bool bPlay
       OThreadBuilder.NoPlayerControl(ActiveOstimThreadID)
       OThread.StartAutoMode(ActiveOstimThreadID)
     EndIf
-  Else
-    int numMales = 0
-    int numFemales = 0
-    Actor[] sortedActors = new Actor[12]
-    int i = 0
-    ; If the player is a female actor and is in the scene, put them in slot 0
-    if bPlayerInScene && player.GetActorBase().GetSex() != 0
-      sortedActors[0] = Player
-    EndIf
-    while i < actorsFromFormList.Length
-      if actorsFromFormList[i].GetActorBase().GetSex() == 0
-        numMales += 1
-      else
-        numFemales += 1
-        if sortedActors[0] == None
-        ; If there's a female actor in the scene, put them in slot 0
-          sortedActors[0] = actorsFromFormList[i]
-        EndIf
-      EndIf
-      if i != 0
-        sortedActors[i] = actorsFromFormList[i]
-      EndIf
-      i += 1
-    EndWhile
-    if sortedActors[0] == None
-      ; No female actors in scene, just use the first one that we skipped before
-      sortedActors[0] = actorsFromFormList[0]
-    EndIf
-    slf.StartSex(actorsFromFormList, slf.GetAnimationsByDefault(numMales, numFemales))
+    StartSexSmart(bPlayerInScene, actorsFromFormList, "")
   EndIf
 EndFunction
 
+
+bool Function CompareActorSex(actor actor1, actor actor2)
+  ; We want to sort males to the end, and females to the front.
+  ; 0 = male
+  ; 1 = female
+  ; 2 = other
+  return actor1.GetActorBase().GetSex() < actor2.GetActorBase().GetSex()
+EndFunction
+
+Function StartSexSmart(bool bPlayerInScene, actor[] actorsToSort, string tags)
+  Main.Debug("SortActorsForSex(" + bPlayerInScene +")")
+  Main.Debug("Sorting actors: " + actorsToSort)
+  ; Basic insertion sort implmentation to sort female actors to start of list
+  int index = 1
+  actor currentActor
+  While index < actorsToSort.Length
+    currentActor = actorsToSort[index]
+    int position = index
+    While (position > 0 && CompareActorSex(actorsToSort[position - 1], currentActor))
+      actorsToSort[position] = actorsToSort[position - 1]
+      position = position - 1
+    EndWhile
+    actorsToSort[position] = currentActor
+    index += 1
+  EndWhile
+
+  int i = 0
+  int numMales = 0
+  int numFemales = 0
+  while i < actorsToSort.Length
+    if actorsToSort[i].GetActorBase().GetSex() == 0
+      numMales += 1
+    else
+      numFemales += 1
+    EndIf
+    i += 1
+  EndWhile
+  
+  Main.Debug("Done Sorting actors (" + numMales + " males, " + numFemales + " females): " + actorsToSort)
+  if tags == ""
+    slf.StartSex(actorsToSort, slf.GetAnimationsByDefault(numMales, numFemales))
+  else
+    slf.StartSex(actorsToSort, slf.GetAnimationsByTags(numMales +  numFemales, tags))
+  EndIf
+EndFunction
 
 bool function UseSex()
   return slf != None || bHasOstim

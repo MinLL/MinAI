@@ -589,7 +589,7 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     bDeviousFollowerInScene =  (akSpeaker == deviousFollower)
   EndIf
   
-  if bHasDD && CanVibrate(akTarget)
+  if bHasDD ;  && CanVibrate(akTarget)
     int vibTime = Utility.RandomInt(20,60)
     if (command == "ExtCmdForceOrgasm")
       libs.ActorOrgasm(akTarget)
