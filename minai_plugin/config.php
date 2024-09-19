@@ -1,3 +1,4 @@
 <?php
-    $force_voice_type = true;
+$force_voice_type = true;
+$disable_nsfw = false;
 ?>

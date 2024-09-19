@@ -60,29 +60,45 @@ bool Function CanAnimate(actor akTarget, actor akSpeaker)
 EndFunction
 
 Function Start1pSex(actor akSpeaker)
-  if bHasOstim && minai_UseOStim.GetValue() == 1.0
-    OThread.QuickStart(OActorUtil.ToArray(akSpeaker))
-  else
-    slf.Quickstart(akSpeaker)
+  if CanAnimate(akSpeaker, akSpeaker)
+    if bHasOstim && minai_UseOStim.GetValue() == 1.0
+      OThread.QuickStart(OActorUtil.ToArray(akSpeaker))
+    else
+      slf.Quickstart(akSpeaker)
+	EndIf
   EndIf
 EndFunction
 
 
 Function Start2pSex(actor akSpeaker, actor akTarget, actor Player, bool bPlayerInScene, string tags="")
-  if bHasOstim && minai_UseOStim.GetValue() == 1.0
-    ; Convert sexlab tags to ostim tags
-    if tags == "Anal"
-      tags = "analsex"
-    elseif tags == "vaginal"
-      tags = "vaginalsex"
-    elseif tags == "oral"
-      tags = "blowjob"
-    EndIf
-	Actor[] ostimActors = new Actor[2]
-	if bPlayerInScene
-	  ostimActors = OActorUtil.ToArray(Player, akSpeaker) as Actor[]
-	else
-	  ostimActors = OActorUtil.ToArray(akTarget, akSpeaker) as Actor[]
+  if CanAnimate(akTarget, akSpeaker)
+    if bHasOstim && minai_UseOStim.GetValue() == 1.0
+      ; Convert sexlab tags to ostim tags
+      if tags == "anal"
+          tags = "analsex"
+        elseif tags == "vaginal"
+          tags = "vaginalsex"
+        elseif tags == "oral"
+          tags = "blowjob"
+        EndIf
+	  Actor[] ostimActors = new Actor[2]
+	  if bPlayerInScene
+	    ostimActors = OActorUtil.ToArray(Player, akSpeaker) as Actor[]
+	  else
+	    ostimActors = OActorUtil.ToArray(akTarget, akSpeaker) as Actor[]
+	  EndIf
+;	  ostimActors = OActorUtil.Sort(ostimActors, OActorUtil.EmptyArray())
+	  string newScene = OLibrary.GetRandomSceneWithAction(ostimActors, tags)
+	  ;Utility.Wait(2)
+	  int ActiveOstimThreadID = OThreadBuilder.Create(ostimActors)
+;	  if newScene == ""
+;	    newScene = OLibrary.GetRandomSceneWithAnySceneTagCSV(ostimActors, tags)
+;	  EndIf
+	  Main.Debug("Found " + tags + " scene: " + newScene + " for OStim Thread [" + ActiveOstimThreadID + "].")
+	  OThreadBuilder.SetStartingAnimation(ActiveOstimThreadID, newScene)
+	  OThreadBuilder.Start(ActiveOstimThreadID)
+    Else
+      slf.Quickstart(akTarget,akSpeaker, animationTags=tags)
 	EndIf
 	int ActiveOstimThreadID = OThreadBuilder.Create(ostimActors)
 	OThreadBuilder.SetStartingAnimation(ActiveOstimThreadID, OLibrary.GetRandomSceneWithSceneTag(ostimActors, tags))
@@ -100,14 +116,38 @@ EndFunction
 
 Function StartSexOrSwitchTo(actor akSpeaker, actor akTarget, actor Player, bool bPlayerInScene, string tags)
 	  AIFF.ChillOut()
-      if CanAnimate(akTarget, akSpeaker)
+	  if CanAnimate(akTarget, akSpeaker)
         Start2pSex(akSpeaker, akTarget, PlayerRef, bPlayerInScene, tags)
-        main.RegisterEvent(akSpeaker.GetDisplayName() + " and " + akTarget.GetDisplayName() + " started having sex.", "info_sexscene")
-      else
-        if akSpeaker != playerRef && akTarget != playerRef
-          Return
+        main.RegisterEvent(akSpeaker.GetDisplayName() + " and " + akTarget.GetDisplayName() + " started having sex." + tags, "info_sexscene")
+	  elseif bHasOstim && minai_UseOStim.GetValue() == 1.0 && OActor.IsInOStim(akSpeaker)
+	    Main.Debug(akSpeaker.GetDisplayName() + " is switching Ostim scene.")
+   	    if tags == "anal"
+          tags = "analsex"
+        elseif tags == "vaginal"
+          tags = "vaginalsex"
+        elseif tags == "oral"
+          tags = "blowjob"
         EndIf
-		int threadID = slf.FindPlayerController()
+        Main.Debug("Searching for random " + tags + " scene.")
+		int ActiveOstimThreadID = OActor.GetSceneID(akSpeaker)
+        Actor[] ostimActors = new Actor[2]
+        ostimActors = OThread.GetActors(ActiveOstimThreadID)
+;        ostimActors = OActorUtil.Sort(ostimActors, OActorUtil.EmptyArray())
+		string newScene = OLibrary.GetRandomSceneWithAction(ostimActors, tags)
+	    ;Utility.Wait(2)
+;		if newScene == ""
+;		  newScene = OLibrary.GetRandomSceneWithAnySceneTagCSV(ostimActors, tags)
+;		EndIf
+		Main.Debug("Ostim scene transition to: " + newScene + " for OStim Thread [" + ActiveOstimThreadID + "].")
+		if OThread.IsRunning(ActiveOstimThreadID)
+          OThread.NavigateTo(ActiveOstimThreadID, newScene)
+		EndIf
+		main.RegisterEvent(akSpeaker.GetDisplayName() + " attempted to change the scene to " + tags + " instead: " + newScene, "info_sexscene")
+		Return
+	  elseif akSpeaker != playerRef && akTarget != playerRef
+        Return
+      else
+	    int threadID = slf.FindPlayerController()
 		sslThreadController Controller = slf.ThreadSlots.GetController(threadID)
 		sslBaseAnimation[] animations = slf.GetAnimationsByTags(2, tags)
 		Controller.SetForcedAnimations(animations)
@@ -118,10 +158,11 @@ EndFunction
 
 
 Function StartGroupSex(actor akSpeaker, actor akTarget, actor Player, bool bPlayerInScene, Actor[] actorsFromFormList)
+  if CanAnimate(akTarget, akSpeaker)
   if bHasOstim && minai_UseOStim.GetValue() == 1.0
     int ActiveOstimThreadID
     ActiveOstimThreadID = OThread.QuickStart(OActorUtil.ToArray(actorsFromFormList[0],actorsFromFormList[1],actorsFromFormList[2],actorsFromFormList[3],actorsFromFormList[4],actorsFromFormList[5],actorsFromFormList[6],actorsFromFormList[7],actorsFromFormList[8],actorsFromFormList[9]))
-    Utility.Wait(2)
+    Utility.Wait(1)
     bool AutoMode = OThread.IsInAutoMode(ActiveOstimThreadID)
     if AutoMode == False
       OThreadBuilder.NoPlayerControl(ActiveOstimThreadID)
@@ -157,6 +198,7 @@ Function StartGroupSex(actor akSpeaker, actor akTarget, actor Player, bool bPlay
     EndIf
     slf.StartSex(actorsFromFormList, slf.GetAnimationsByDefault(numMales, numFemales))
   EndIf
+  EndIf
 EndFunction
 
 
@@ -169,7 +211,6 @@ EndFunction
 Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[] actorsFromFormList, bool bPlayerInScene)
   actor Player = game.GetPlayer()
     ; Mutually Exclusive keywords
-    if CanAnimate(akTarget, akSpeaker)
       If stringutil.Find(sayLine, "-masturbate-") != -1
         Start1pSex(akSpeaker)
       elseif stringutil.Find(sayLine, "-startsex-") != -1 || stringUtil.Find(sayLine, "-have sex-") != -1 || stringUtil.Find(sayLine, "-sex-") != -1 || stringUtil.Find(sayLine, "-having sex-") != -1
@@ -185,10 +226,6 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
       elseIf stringutil.Find(sayLine, "-groupsex-") != -1 || stringUtil.Find(sayLine, "-orgy-") != -1 || stringUtil.Find(sayLine, "-threesome-") != -1 || stringUtil.Find(sayLine, "-fuck-") != -1
         StartGroupSex(akSpeaker, akTarget, Player, bPlayerInScene, actorsFromFormList)
       EndIf
-    Else
-      Main.Warn("Not processing keywords for exclusive scene - Conflicting scene is running")
-    EndIf
-    
 EndFunction
 
 
