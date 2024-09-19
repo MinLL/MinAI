@@ -35,6 +35,7 @@ EndEvent
 
 
 require_once("config.php");
+require_once("util.php");
 if (!$disable_nsfw) {
     require "arousal.php";
     require "sex.php";

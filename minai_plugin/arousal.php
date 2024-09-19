@@ -1,5 +1,6 @@
 <?php
 
+require_once("util.php");
 if (IsModEnabled("OSL") || IsModEnabled("Aroused")) {
     $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdIncreaseArousal";
     $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdDecreaseArousal";
