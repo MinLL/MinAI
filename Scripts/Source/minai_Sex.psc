@@ -121,23 +121,23 @@ Function StartSexOrSwitchTo(actor akSpeaker, actor akTarget, actor Player, bool 
     ostimActors = OThread.GetActors(ActiveOstimThreadID)
     ; ostimActors = OActorUtil.Sort(ostimActors, OActorUtil.EmptyArray())
     string newScene = OLibrary.GetRandomSceneWithAction(ostimActors, tags)
-	  ; Utility.Wait(2)
-	  Main.Debug("Ostim scene transition to: " + newScene + " for OStim Thread [" + ActiveOstimThreadID + "].")
-	  if OThread.IsRunning(ActiveOstimThreadID)
+    ; Utility.Wait(2)
+    Main.Debug("Ostim scene transition to: " + newScene + " for OStim Thread [" + ActiveOstimThreadID + "].")
+    if OThread.IsRunning(ActiveOstimThreadID)
       OThread.NavigateTo(ActiveOstimThreadID, newScene)
-	  EndIf
-	  main.RegisterEvent(akSpeaker.GetDisplayName() + " attempted to change the scene to " + tags + " instead: " + newScene, "info_sexscene")
-	  Return
+    EndIf
+    main.RegisterEvent(akSpeaker.GetDisplayName() + " attempted to change the scene to " + tags + " instead: " + newScene, "info_sexscene")
+    Return
   elseif akSpeaker != playerRef && akTarget != playerRef
     Return
   else
-	  int threadID = slf.FindPlayerController()
-		sslThreadController Controller = slf.ThreadSlots.GetController(threadID)
-		sslBaseAnimation[] animations = slf.GetAnimationsByTags(2, tags)
-		Controller.SetForcedAnimations(animations)
-		Controller.SetAnimation()
-		main.RegisterEvent(akSpeaker.GetDisplayName() + " and " + akTarget.GetDisplayName() + " changed up the sex to " + tags + " instead.", "info_sexscene")
-	EndIf
+    int threadID = slf.FindPlayerController()
+    sslThreadController Controller = slf.ThreadSlots.GetController(threadID)
+    sslBaseAnimation[] animations = slf.GetAnimationsByTags(2, tags)
+    Controller.SetForcedAnimations(animations)
+    Controller.SetAnimation()
+    main.RegisterEvent(akSpeaker.GetDisplayName() + " and " + akTarget.GetDisplayName() + " changed up the sex to " + tags + " instead.", "info_sexscene")
+  EndIf
 EndFunction
 
 
