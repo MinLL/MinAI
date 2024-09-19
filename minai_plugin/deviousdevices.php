@@ -2,7 +2,7 @@
 
 require_once("util.php");
 
-$canVibrate = (CanVibrate($GLOBALS["PLAYER_NAME"]) || ShouldUseDeviousNarrator());
+$canVibrate = CanVibrate($GLOBALS["PLAYER_NAME"]);
 
   
 $GLOBALS["F_NAMES"]["ExtCmdShock"]="Shock";
