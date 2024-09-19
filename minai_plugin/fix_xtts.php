@@ -8,7 +8,7 @@
 require_once("util.php");
 function parseVoiceType($voiceTypeRaw) {
     if (str_starts_with($GLOBALS["TTS"]["XTTSFASTAPI"]["voiceid"], "#")) {
-        return ltrim($GLOBALS["TTS"]["XTTSFASTAPI"]["voiceid"]);
+        return ltrim($GLOBALS["TTS"]["XTTSFASTAPI"]["voiceid"], "#");
     }
     if ($voiceTypeRaw == "") {
         return "malecommoner"; // Don't know what their gender is here. Hmmm.
