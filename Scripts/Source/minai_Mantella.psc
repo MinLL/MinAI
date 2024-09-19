@@ -144,7 +144,7 @@ EndFunction
 
 
 String Function BuildReminderStr(Actor akActor)
-  string reminderStart = "Respond only with spoken dialog and defined -keywords- for your actions. Avoid narration and internal dialog. There are action -keywords- for "
+  string reminderStart = "Remember to respond using only direct dialogue and keywords. NEVER use any descriptions, actions or thoughts. No narrative or storytelling, just your dialogue. Never use keywords narratively. ONLY use the keywords that have been previously defined for you, do not invent new keywords. Using a keyword indicates that you want to immediately perform that action. Remember to use the previously identified keywords in your response when you want to perform an action such as "
   string reminderStr = ""
   if survival.useVanilla()
     reminderStr += "trading with, "
@@ -175,7 +175,7 @@ String Function BuildReminderStr(Actor akActor)
     reminderStr += "having sex with "
   EndIf
   reminderStr = reminderStart + reminderStr + main.GetActorName(akActor) + "."
-  return reminderStr ;+ "\n!" + reminderStr + "!"
+  return reminderStr + "\n!" + reminderStr + "!"
 EndFunction
 
 
@@ -200,11 +200,12 @@ Function ActionResponse(Form actorToSpeakTo,Form actorSpeaking, string sayLine)
     bPlayerInScene = True
   EndIf
   Actor[] actorsFromFormList = GetActorsFromFormList()
-  Main.Info("ActionResponse(" + akSpeaker.GetActorBase().GetName() + ", " + akTarget.GetActorBase().GetName() + ", playerInScene="+bPlayerInScene+"): " + sayLine) 
+
+  Main.Info("ActionResponse(" + akSpeaker.GetActorBase().GetName() + ", " + akTarget.GetActorBase().GetName() + ", playerInScene="+bPlayerInScene+"): " + sayLine)
+  devious.ActionResponse(akTarget, akSpeaker, sayLine, actorsFromFormList)
   arousal.ActionResponse(akTarget, akSpeaker, sayLine, actorsFromFormList)
   sex.ActionResponse(akTarget, akSpeaker, sayLine, actorsFromFormList, bPlayerInScene)
   survival.ActionResponse(akTarget, akSpeaker, sayLine, actorsFromFormList)
-  devious.ActionResponse(akTarget, akSpeaker, sayLine, actorsFromFormList)
   UpdateEvents(actorToSpeakTo as Actor, actorSpeaking as Actor, actorsFromFormList)
 EndFunction 
 
