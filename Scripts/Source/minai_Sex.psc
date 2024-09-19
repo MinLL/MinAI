@@ -84,25 +84,25 @@ Function Start2pSex(actor akSpeaker, actor akTarget, actor Player, bool bPlayerI
   if CanAnimate(akTarget, akSpeaker)
     if bHasOstim && minai_UseOStim.GetValue() == 1.0
       tags = ConvertTagsOstim(tags)
-	  Actor[] ostimActors = new Actor[2]
-	  if bPlayerInScene
-	    ostimActors = OActorUtil.ToArray(Player, akSpeaker) as Actor[]
-	  else
-	    ostimActors = OActorUtil.ToArray(akTarget, akSpeaker) as Actor[]
-	  EndIf
-	  ; ostimActors = OActorUtil.Sort(ostimActors, OActorUtil.EmptyArray())
-	  string newScene = OLibrary.GetRandomSceneWithAction(ostimActors, tags)
-	  ; Utility.Wait(2)
-	  int ActiveOstimThreadID = OThreadBuilder.Create(ostimActors)
-	  Main.Debug("Found " + tags + " scene: " + newScene + " for OStim Thread [" + ActiveOstimThreadID + "].")
-	  OThreadBuilder.SetStartingAnimation(ActiveOstimThreadID, newScene)
-	  OThreadBuilder.Start(ActiveOstimThreadID)
-    Else
-    actor[] actors = new actor[2]
-    actors[0] = akTarget
-    actors[1] = akSpeaker
-    StartSexSmart(bPlayerInScene, actors, tags)
-	EndIf
+      Actor[] ostimActors = new Actor[2]
+      if bPlayerInScene
+        ostimActors = OActorUtil.ToArray(Player, akSpeaker) as Actor[]
+      else
+        ostimActors = OActorUtil.ToArray(akTarget, akSpeaker) as Actor[]
+      EndIf
+      ; ostimActors = OActorUtil.Sort(ostimActors, OActorUtil.EmptyArray())
+      string newScene = OLibrary.GetRandomSceneWithAction(ostimActors, tags)
+      ; Utility.Wait(2)
+      int ActiveOstimThreadID = OThreadBuilder.Create(ostimActors)
+      Main.Debug("Found " + tags + " scene: " + newScene + " for OStim Thread [" + ActiveOstimThreadID + "].")
+      OThreadBuilder.SetStartingAnimation(ActiveOstimThreadID, newScene)
+      OThreadBuilder.Start(ActiveOstimThreadID)
+    else
+      actor[] actors = new actor[2]
+      actors[0] = akTarget
+      actors[1] = akSpeaker
+      StartSexSmart(bPlayerInScene, actors, tags)
+    EndIf
   EndIf
 EndFunction
 
