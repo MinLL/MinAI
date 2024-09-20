@@ -31,11 +31,11 @@ Function GetPhysicalDescription($name) {
   if (!IsPlayer($name)) {
     return $ret;
   }
-  if($beautyScore != "") {
+  if (!empty($beautyScore) && $beautyScore != "0") {
     $beautyScore = ceil(intval($beautyScore)/10);
     $ret .= "She is a {$beautyScore}/10 in terms of beauty ";
   }
-  if($breastsScore != "" && $buttScore != "") {
+  if((!empty($breastsScore) && $breastsScore != "0") && (!empty($buttScore) && $buttScore != "0")) {
       $breastsScore = ceil(intval($breastsScore)/10);
       $buttScore = ceil(intval($buttScore)/10);
       $ret .= "with {$breastsScore}/10 tits and a {$buttScore}/10 ass. ";
@@ -61,7 +61,7 @@ Function GetPenisSize($name) {
     elseif (HasKeyword($name, "TNG_ActorAddnAuto:01")) {
         $sizeDescription = "an embarrassingly tiny prick";
     }
-	elseif (HasKeyword($name, "TNG_XL")) {
+    elseif (HasKeyword($name, "TNG_XL")) {
         $sizeDescription = "one of the biggest cocks you've ever seen";
     }
     elseif(HasKeyword($name, "TNG_L")) {
@@ -77,12 +77,11 @@ Function GetPenisSize($name) {
         $sizeDescription = "an embarrassingly tiny prick";
     }
     if ($sizeDescription != "") {
-        return "{$GLOBALS["HERIKA_NAME"]} has {$sizeDescription}. ";
+        return "{$name} has {$sizeDescription}. ";
     }
     return "";
 }
 
-                            
 Function GetClothingContext($name) {
   $ret = "";
   if (HasKeyword($name, "SLA_HalfNakedBikini")) {
