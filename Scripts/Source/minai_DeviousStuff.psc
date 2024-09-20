@@ -741,7 +741,9 @@ Function SetContext(actor akTarget)
       while j < rules.Length
        String ruleDesc = DealManager.GetRuleInfo(rules[j])
        ruleList += ruleDesc + "\n";
+       j += 1
       EndWhile
+      i += 1
     EndWhile
     aiff.SetActorVariable(playerRef, "deviousFollowerRules", ruleList)
     aiff.SetActorVariable(playerRef, "deviousTimeForSpanks",  dftools.SpankingTimer <= Utility.GetCurrentGameTime())
