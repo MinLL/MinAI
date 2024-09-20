@@ -9,6 +9,8 @@ if (IsModEnabled("Sexlab") || IsModEnabled("Ostim")) {
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartBlowjob";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartHandjob";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartAggressive";
+        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdPutOnClothes";
+        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdRemoveClothes";
         /*}
     else {
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartSexScene";
@@ -156,6 +158,45 @@ $GLOBALS["FUNCTIONS"][] = [
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartHandjob"]=$GenericFuncRet;
+
+$GLOBALS["F_NAMES"]["ExtCmdRemoveClothes"]="RemoveClothes";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdRemoveClothes"]="Remove all of your clothes and armor";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdRemoveClothes"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdRemoveClothes"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdRemoveClothes"]=$GenericFuncRet;
+
+
+$GLOBALS["F_NAMES"]["ExtCmdPutOnClothes"]="PutOnClothes";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdPutOnClothes"]="Put on your clothes and armor";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdPutOnClothes"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdPutOnClothes"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdPutOnClothes"]=$GenericFuncRet;
 
 ?>
 
