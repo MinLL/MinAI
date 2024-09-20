@@ -13,6 +13,8 @@ minai_AIFF aiff
 minai_MainQuestController main
 Actor PlayerRef
 
+float lastDirtyTalk
+
 function Maintenance(minai_MainQuestController _main)
   playerRef = Game.GetPlayer()
   main = _main
@@ -46,6 +48,7 @@ function Maintenance(minai_MainQuestController _main)
   ; Reset incase the player quit during a sex scene or this got stuck
   SetSexSceneState("off")
   InitializeSexDescriptions()
+  lastDirtyTalk = 0.0
   aiff.SetModAvailable("Ostim", bHasOstim)
   aiff.SetModAvailable("Sexlab", slf != None)
 EndFunction
@@ -466,7 +469,15 @@ Function DirtyTalk(string lineToSay, string lineType, string name)
   if !bHasAIFF
     return
   EndIf
-  AIAgentFunctions.requestMessageForActor(lineToSay, lineType, name)
+  ; Throttle on how often we should dirty talk incase people are switching animations
+  float currentTime = Utility.GetCurrentRealTime()
+  if currentTime - lastDirtyTalk > 5
+    lastDirtyTalk = currentTime
+    Main.Debug("DirtyTalk(" + lineToSay + ", " + lineType +", " + name +")")
+    AIAgentFunctions.requestMessageForActor(lineToSay, lineType, name)
+  Else
+    Main.Debug("DirtyTalk - THROTTLED")
+  EndIf
 EndFunction
 
 
