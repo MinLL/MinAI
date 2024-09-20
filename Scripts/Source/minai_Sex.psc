@@ -78,7 +78,10 @@ bool Function CanAnimate(actor akTarget, actor akSpeaker)
   if bHasOstim && (minai_UseOStim.GetValue() == 1.0 && !OActor.IsInOStim(akTarget) && !OActor.IsInOStim(akSpeaker))
     return True
   EndIf
-  return slf && (!slf.IsActorActive(akTarget) && !slf.IsActorActive(akSpeaker))
+  if slf && (!slf.IsActorActive(akTarget) && !slf.IsActorActive(akSpeaker))
+    return True
+  EndIf
+  return False
 EndFunction
 
 Function Start1pSex(actor akSpeaker)

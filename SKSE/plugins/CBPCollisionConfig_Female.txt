@@ -1,0 +1,234 @@
+# This is Collision Config file for CBPC
+#
+# Designed to work with CBBE Curvy
+#
+##############################################################################
+# Extra Options
+##############################################################################
+[ExtraOptions]
+
+BellyBulge=1.0     #This is the multiplier for the new special belly bulge for vagina penetration. Higher values would cause a bigger lump on the belly. 0 would disable this special setting.
+
+BellyBulgeMax=10.0        #This is the horizontal max position of the belly bulge
+
+BellyBulgePosLowest=4.0     #This is the vertical position of the belly bulge
+
+BellyBulgeSpeed = 0.5   #This is the speed of belly bulge to return to its original position. Used in smoothing function.
+
+BellyBulgeNodes=    #This is the whitelist of node names to match for belly bulge collision with spine1 node. No nodes written means all nodes. You can add more than one separated with ","
+
+BellyBulgeNodesBlackList=    #This is the blacklist of node names that won't be used for belly bulge collision with spine1 node. You can add more than one separated with ","
+
+VaginaOpeningMultiplier=3.0  #This is the multiplier for vagina opening.
+
+VaginaOpeningLimit=8.0  #This is the limit for vagina opening.
+
+AnusOpeningMultiplier=3.0		#This is the multiplier for anus opening.
+
+AnusOpeningLimit=10.0	  #This is the limit for anus opening.
+##############################################################################
+# Node Lists
+##############################################################################
+
+[PlayerNodes] #These are predefined, so adding wouldn't have any effect. But if you remove them, you won't get collision for that node.
+LeftWandNode
+RightWandNode
+
+[AffectedNodes] #Define nodes here first, then set the collision spheres down. You can define excluded colliders in paranthesis: NodeName (ColliderName1, ColliderName2) -- @ means all self nodes: NodeName (@) -- @ in front of a node name means self node: NodeName (@ColliderName) -- NodeName (@ColliderName1, ColliderName2) meaning self ColliderName1 and all ColliderName2 are excluded.
+NPC L Breast
+NPC R Breast
+NPC L Butt
+NPC R Butt
+NPC Pelvis [Pelv]
+NPC Spine1 [Spn1]
+#Anal	#Except for 3BA, BHUNP, COCOBODY, there is no body to open anus, so it's commented out by default
+
+CME L Foot [Lft ] (@)
+CME R Foot [Rft ] (@)
+CME L Calf [LClf] (@)
+CME R Calf [RClf] (@)
+CME L Knee [LKne] (@)
+CME R Knee [RKne] (@)
+CME L Thigh [LThg] (@)
+CME R Thigh [RThg] (@)
+CME Spine1 [Spn1] (@)
+CME Spine2 [Spn2] (@)
+CME Neck [Neck] (@)
+NPCEyeBone (@)
+CME L UpperArm [LUar] (@)
+CME R UpperArm [RUar] (@)
+CME L Forearm [LLar] (@)
+CME R Forearm [RLar] (@)
+CME L Hand [LHnd] (@)
+CME R Hand [RHnd] (@)
+CME L Finger21 [LF21] (@)
+CME R Finger21 [RF21] (@)
+
+
+[ColliderNodes] #Define nodes here first, then set the collision spheres down
+NPC L Hand [LHnd]
+NPC R Hand [RHnd]
+NPC L Finger02 [LF02]
+NPC L Finger12 [LF12]
+NPC L Finger22 [LF22]
+NPC L Finger32 [LF32]
+NPC L Finger42 [LF42]
+NPC R Finger02 [RF02]
+NPC R Finger12 [RF12]
+NPC R Finger22 [RF22]
+NPC R Finger32 [RF32]
+NPC R Finger42 [RF42]
+NPC Genitals01 [Gen01]
+
+##############################################################################
+# Collision spheres
+#
+# Multiple lines are supported.
+# You can include 0 and 100 weight settings for npcs separating them with |
+# Format is: x0,y0,z0,radius0 | x100,y100,z100,radius100
+#
+##############################################################################
+# Collision capsules
+#
+# Multiple lines are supported.
+# You can include 0 and 100 weight settings for npcs separating them with |
+# The two end points are combined with "&" then create one capsule
+# Format is: EndPoint1 x0,y0,z0,Radius0  & EndPoint2 x0,y0,z0,Radius0 | EndPoint1 x100,y100,z100,Radius100  & EndPoint2 x100,y100,z100,Radius100
+#
+##############################################################################
+# Affected Nodes
+
+[NPC L Breast]
+0.0,4.0,-4.0,3.4 | 0.0,5.0,-4.5,4.0
+
+[NPC R Breast]
+0.0,4.0,-4.0,3.4 | 0.0,5.0,-4.5,4.0
+
+[NPC L Butt]
+-2.5,3.8,-3.0,5.2 | -3.0,2.5,-3.0,5.0
+
+[NPC R Butt]
+2.5,3.8,-3.0,5.2 | 3.0,2.5,-3.0,5.0
+
+[HDT Belly]
+0,2.0,0,2.8 | 0,2.0,0,2.8
+
+[NPC Pelvis [Pelv]] #For Female Genitals
+0.0,0.0,-2.0,3.5 | 0.0,0.0,-2.0,3.5
+
+[NPC Spine1 [Spn1]] #For Female Belly
+0.0,3.0,-5.0,6.0 | 0.0,3.0,-5.0,6.0
+
+[Anal] #For Female Anus
+0,-6,-2,1.75 | 0,-6,-2,1.75
+
+
+[CME L Foot [Lft ]]
+0,0,10,4 & 0,0,0,5 | 0,0,10,4 & 0,0,0,5
+
+[CME R Foot [Rft ]]
+0,0,10,4 & 0,0,0,5 | 0,0,10,4 & 0,0,0,5
+
+[CME L Calf [LClf]]
+0,0,20,5 & 0,0,10,5 | 0,0,20,5 & 0,0,10,5
+
+[CME R Calf [RClf]]
+0,0,20,5 & 0,0,10,5 | 0,0,20,5 & 0,0,10,5
+
+[CME L Knee [LKne]]
+0,-3,-3,5 | 0,-3,-3,5
+
+[CME R Knee [RKne]]
+0,-2,-3,5 | 0,-2,-3,5
+
+[CME L Thigh [LThg]]
+0,0,20,5 & 0,0,10,6 | 0,0,20,5 & 0,0,10,6
+
+[CME R Thigh [RThg]]
+0,0,20,5 & 0,0,10,6 | 0,0,20,5 & 0,0,10,6
+
+[CME Spine1 [Spn1]]
+0,4,0,9 | 0,4,0,9
+
+[CME Spine2 [Spn2]]
+0,5,0,10 & 0,2,15,10 | 0,5,0,10 & 0,2,15,10
+
+[CME Neck [Neck]]
+0,0,0,3 | 0,0,0,3
+
+[NPCEyeBone]
+0,-3.5,0,8 | 0,-3.5,0,8
+
+[CME L UpperArm [LUar]]
+-3,0,0,4 & 0,0,12,4 | -3,0,0,4 & 0,0,12,3
+
+[CME R UpperArm [RUar]]
+3,0,0,4 & 0,0,12,4 | 3,0,0,4 & 0,0,12,4
+
+[CME L Forearm [LLar]]
+0,0,0,3 & 0,0,5,3 | 0,0,0,3 & 0,0,5,3
+
+[CME R Forearm [RLar]]
+0,0,0,3 & 0,0,5,3 | 0,0,0,3 & 0,0,5,3
+
+[CME L Hand [LHnd]]
+0,0,0,3 | 0,0,0,3
+
+[CME R Hand [RHnd]]
+0,0,0,3 | 0,0,0,3
+
+[CME L Finger21 [LF21]]
+0,0,0,3 | 0,0,0,3
+
+[CME R Finger21 [RF21]]
+0,0,0,3 | 0,0,0,3
+
+##############################################################################
+# Collider Nodes
+
+[LeftWandNode]
+0,-6.0,-2.0,3.0
+
+[RightWandNode]
+0,-6.0,-2.0,3.0
+
+[NPC L Hand [LHnd]]
+0,0,0,2.5 | 0,0,0,2.5
+
+[NPC R Hand [RHnd]]
+0,0,0,2.5 | 0,0,0,2.5
+
+[NPC L Finger02 [LF02]]
+0,0,0,2 | 0,0,0,2
+
+[NPC L Finger12 [LF12]]
+0,0,0,2 | 0,0,0,2
+
+[NPC L Finger22 [LF22]]
+0,0,0,2 | 0,0,0,2
+
+[NPC L Finger32 [LF32]]
+0,0,0,2 | 0,0,0,2
+
+[NPC L Finger42 [LF42]]
+0,0,0,2 | 0,0,0,2
+
+[NPC R Finger02 [RF02]]
+0,0,0,2 | 0,0,0,2
+
+[NPC R Finger12 [RF12]]
+0,0,0,2 | 0,0,0,2
+
+[NPC R Finger22 [RF22]]
+0,0,0,2 | 0,0,0,2
+
+[NPC R Finger32 [RF32]]
+0,0,0,2 | 0,0,0,2
+
+[NPC R Finger42 [RF42]]
+0,0,0,2 | 0,0,0,2
+
+[NPC Genitals01 [Gen01]]
+0,0,0,1.75 & 0,7.5,0,1.5 | 0,0,0,1.75 & 0,7.5,0,1.5
+
+

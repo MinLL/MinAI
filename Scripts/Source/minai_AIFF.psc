@@ -94,7 +94,6 @@ Function SetActorVariable(Actor akActor, string variable, string value)
   EndIf
   Main.Debug("Set actor value for actor " + actorName + " "+ variable + " to " + value)
   AIAgentFunctions.logMessage("_minai_" + actorName + "//" + variable + "@" + value, "setconf")
-  Main.Debug("Done Setting Variable") ; Is this what's causing AIAgent.dll to crash?
 EndFunction
 
 

@@ -1,0 +1,44 @@
+[ConfigMap]                   #You can create multiple CBPCMasterConfig***.txt files to include more configmap lines.
+CME L Foot [Lft ]
+CME R Foot [Rft ]
+
+CME L Calf [LClf]
+CME R Calf [RClf]
+
+CME L Knee [LKne]
+CME R Knee [RKne]
+
+CME L Thigh [LThg]
+CME R Thigh [RThg]
+
+CME Spine1 [Spn1]
+
+CME Spine2 [Spn2]
+
+CME Neck [Neck]
+
+CME L UpperArm [LUar]
+CME R UpperArm [RUar]
+
+CME L Forearm [LLar]
+CME R Forearm [RLar]
+
+CME L Hand [LHnd]
+CME R Hand [RHnd]
+
+CME L Finger21 [LF21]
+CME R Finger21 [RF21]
+
+NPC Genitals01 [Gen01]=NSOS01
+NPC Genitals02 [Gen02]=NSOS02
+NPC Genitals03 [Gen03]=NSOS03
+NPC Genitals04 [Gen04]=NSOS04
+NPC Genitals05 [Gen05]=NSOS05
+NPC Genitals06 [Gen06]=NSOS06
+
+GenitalsLag01=SOS01
+GenitalsLag02=SOS02
+GenitalsLag03=SOS03
+GenitalsLag04=SOS04
+GenitalsLag05=SOS05
+GenitalsLag06=SOS06

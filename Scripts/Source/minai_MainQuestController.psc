@@ -14,6 +14,7 @@ minai_Sex sex
 minai_Survival survival
 minai_Arousal arousal
 minai_DeviousStuff devious
+minai_VR vr
 
 bool bHasMantella = False;
 bool bHasAIFF = False;
@@ -44,12 +45,14 @@ Function Maintenance()
   survival = (Self as Quest) as minai_Survival
   arousal = (Self as Quest) as minai_Arousal
   devious = (Self as Quest) as minai_DeviousStuff
+  vr = (Self as Quest) as minai_VR
   
   sex.Maintenance(Self)
   survival.Maintenance(Self)
   arousal.Maintenance(Self)
   devious.Maintenance(Self)
-
+  vr.Maintenance(Self)
+  
   bHasMantella = (Game.GetModByName("Mantella.esp") != 255)
   bHasAIFF = (Game.GetModByName("AIAgent.esp") != 255)
   
