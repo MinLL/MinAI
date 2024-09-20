@@ -5,12 +5,13 @@ SexLabFramework slf
 
 bool bHasOstim = False
 GlobalVariable minai_UseOstim
-int map 
+int clothingMap = 0
 int descriptionsMap
 bool bHasAIFF
 
 minai_AIFF aiff
 minai_MainQuestController main
+minai_DeviousStuff devious
 Actor PlayerRef
 
 float lastDirtyTalk
@@ -19,6 +20,7 @@ function Maintenance(minai_MainQuestController _main)
   playerRef = Game.GetPlayer()
   main = _main
   aiff = (Self as Quest) as minai_AIFF
+  devious = (Self as Quest) as minai_DeviousStuff
   Main.Info("- Initializing Sex Module.")
   bHasAIFF = (Game.GetModByName("AIAgent.esp") != 255)
   
@@ -49,6 +51,13 @@ function Maintenance(minai_MainQuestController _main)
   SetSexSceneState("off")
   InitializeSexDescriptions()
   lastDirtyTalk = 0.0
+  if (clothingMap == 0)
+    Main.Debug("Initializing clothing map")
+    clothingMap = JMap.object()
+    JValue.retain(clothingMap)
+  Else
+    Main.Debug("Clothing map already initialized, id=" + clothingMap)
+  EndIf
   aiff.SetModAvailable("Ostim", bHasOstim)
   aiff.SetModAvailable("Sexlab", slf != None)
 EndFunction
@@ -266,7 +275,39 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   elseIf command == "ExtCmdOrgy"
     Debug.Notification("Orgy is broken until I figure out how to get all AI actors")
     ; StartGroupSex(akSpeaker, akTarget, PlayerRef, bPlayerInScene, actorsFromFormList)
-  EndIf
+  elseif (command=="ExtCmdRemoveClothes")
+    Form[] equippedItems=PO3_SKSEFunctions.AddAllEquippedItemsToArray(akSpeaker);
+    int equippedArmor = JArray.Object()
+    JValue.retain(equippedArmor)
+    Int iElement = equippedItems.Length
+    Main.Debug("Removing clothes (clothingMap=" + clothingMap + ",id=" + equippedArmor + " + " + JValue.Count(equippedArmor) + " ) for " + speakerName)
+    Int iIndex = 0
+    While iIndex < iElement
+      if devious.HasDD() && equippedItems[iIndex].HasKeyword(devious.libs.zad_Lockable)
+        Main.Debug("Not removing " + equippedItems[iIndex] + " - Lockable DD")
+      Else
+        Main.Debug("Removing " + equippedItems[iIndex].GetName())
+        JArray.AddForm(equippedArmor, equippedItems[iIndex])
+        akSpeaker.UnequipItem(equippedItems[iIndex])
+      EndIf
+      iIndex += 1
+    EndWhile
+    JMap.setObj(clothingMap, speakerName, equippedArmor)
+    AIAgentFunctions.logMessageForActor("command@ExtCmdRemoveClothes@@"+speakerName+" removes clothes and armor","funcret",speakerName)
+  elseif (command=="ExtCmdPutOnClothes")
+    int equippedItems=JMap.getObj(clothingMap,speakerName) as Int;
+    Int iElement = JValue.count(equippedItems)
+    Main.Debug("Equipping clothes (clothingMap=" + clothingMap + ",id=" + equippedItems + " + " + JValue.Count(equippedItems) + " ) for " + speakerName)
+    Int iIndex = 0
+    While iIndex < iElement
+      Form item=JArray.GetForm(equippedItems, iIndex)
+      main.Debug("Equipping " + item.GetName())
+      akSpeaker.EquipItem(item);
+      iIndex += 1
+    EndWhile
+    equippedItems = JValue.release(equippedItems)
+    AIAgentFunctions.logMessageForActor("command@ExtCmdPutOnClothes@@"+speakerName+" puts on clothes and armor","funcret",speakerName)
+    EndIf
 EndEvent
 
 
