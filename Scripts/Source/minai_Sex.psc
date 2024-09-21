@@ -520,9 +520,9 @@ Event OnStageStart(int tid, bool HasPlayer)
     string[] Tags = controller.Animation.GetRawTags()
     ; Send event, AI can be aware SEX is happening here
     if (Tags.Find("forced")!= -1)
-      main.RegisterEvent(sexPos+sceneTags+sortedActorList[0].GetActorBase().GetName()+ " is being raped by  "+sortedActorList[1].GetActorBase().GetName()+ ", ("+actorList[0].GetActorBase().GetName()+" feels a mix of pain and pleasure) ."+description+description2+"("+pleasureFull+")","info_sexscene")
+      main.RegisterEvent(sexPos+sceneTags+sortedActorList[0].GetActorBase().GetName()+ " is being raped by  "+sortedActorList[1].GetActorBase().GetName()+ ", ("+sortedActorList[0].GetActorBase().GetName()+" feels a mix of pain and pleasure) ."+description+description2+"("+pleasureFull+")","info_sexscene")
     else
-      main.RegisterEvent(sexPos+sceneTags+actorList[0].GetActorBase().GetName()+ " and "+actorList[1].GetActorBase().GetName()+ " are having sex. "+description+description2+"("+pleasureFull+")","info_sexscene")
+      main.RegisterEvent(sexPos+sceneTags+sortedActorList[0].GetActorBase().GetName()+ " and "+sortedActorList[1].GetActorBase().GetName()+ " are having sex. "+description+description2+"("+pleasureFull+")","info_sexscene")
     endif
 
     ; main.RegisterEvent(controller.Animation.FetchStage(controller.Stage)[0]+"@"+sceneTags,"info_sexscenelog")

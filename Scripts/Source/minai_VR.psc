@@ -144,9 +144,14 @@ Function TrackTouch(string nodeType, float collisionDuration, string actorName)
   ; Does not track multiple actors at once. Good enough for now? Do we need this? Update interval is pretty quick.
   Float currentValue = JMap.GetFlt(touchedLocations, nodeType)
   Float newValue = currentValue + collisionDuration ; The longer the location is touched, the more it's weighted for the response
-  Main.Debug("Tracking Touched Location (" + nodeType + ") Before=" + currentValue + ", after=" + newValue)
+  Main.Debug("Tracking Touched Location (" + nodeType + ") for actor [" + actorName + "]: Before=" + currentValue + ", after=" + newValue)
   JMap.SetFlt(touchedLocations, nodeType, newValue)
-  JMap.SetStr(touchedLocations, ACTOR_KEY, actorName)
+  if actorName == ""
+    Main.Warn("TrackTouch received empty name - Defaulting to 'Someone'")
+    JMap.SetStr(touchedLocations, ACTOR_KEY, "someone")
+  Else
+    JMap.SetStr(touchedLocations, ACTOR_KEY, actorName)
+  EndIf
 EndFunction
 
 
@@ -157,7 +162,10 @@ Function OnCollision(string eventName, string nodeName, float collisionDuration,
   
   string debugStr = "OnCollision(" + eventName + ", " + nodeName + ", " + collisionDuration + ", " + actorName + ")"
   main.Debug(debugStr)
-  
+  if actorName == "" ; This is not provided for non-VR users when they bump into an actor.
+    Main.Warn("OnCollision() received empty actor name - Doing nothing.")
+    return
+  EndIf
   ; Debug.Notification(debugStr)
   if BreastNodes.Find(nodeName) >= 0
     TrackTouch(BREASTS_KEY, collisionDuration, actorName)
@@ -174,7 +182,7 @@ Function OnCollision(string eventName, string nodeName, float collisionDuration,
   else
     TrackTouch(OTHER_KEY, collisionDuration, actorName)
   EndIf
-  if eventName == "CBPCPlayerGenitalCollisionWithFemaleEvent" || eventName == "CBPCPlayerGenitalCollisionWithMaleeEvent"
+  if eventName == "CBPCPlayerGenitalCollisionWithFemaleEvent" || eventName == "CBPCPlayerGenitalCollisionWithMaleEvent"
     JMap.setInt(touchedLocations, GENITAL_COLLISION_KEY, 1)
   EndIf
 EndFunction

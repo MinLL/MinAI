@@ -434,7 +434,9 @@ EndFunction
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 Function AddIngameEvent(string eventText)
-    if (eventText != "")
+    ;; MINAI PATCH START
+    if (eventText != "" && stringUtil.Find(_inGameEvents, eventText) == -1 )
+    ;; MINAI PATCH END
         if(!_ingameEvents)
             _ingameEvents = Utility.CreateStringArray(1)
         Else
