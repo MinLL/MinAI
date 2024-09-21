@@ -37,8 +37,8 @@ string ACTOR_KEY = "ActorName"
 string GENITAL_COLLISION_KEY = "GenitalCollision"
 
 ; How long a part has to be touched cumulatively within a collisionCooldown window to count
-float TOUCH_THRESHOLD = 1.0
-float PLAYER_TOUCH_THRESHOLD = 4.0
+float TOUCH_THRESHOLD = 5.0
+float PLAYER_TOUCH_THRESHOLD = 10.0
 
 function Maintenance(minai_MainQuestController _main)
   playerRef = Game.GetPlayer()
@@ -55,6 +55,9 @@ function Maintenance(minai_MainQuestController _main)
 
   if useCBPC.GetValueInt() == 1
     Main.Info("Enabling CBPC")
+    TOUCH_THRESHOLD = 10.0
+    PLAYER_TOUCH_THRESHOLD = 20.0
+    
     RegisterForModEvent("CBPCPlayerCollisionWithFemaleEvent", "OnCollision")
     RegisterForModEvent("CBPCPlayerCollisionWithMaleEvent", "OnCollision")  
     RegisterForModEvent("CBPCPlayerGenitalCollisionWithFemaleEvent", "OnCollision")
