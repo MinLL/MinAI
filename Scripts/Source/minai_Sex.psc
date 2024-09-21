@@ -92,7 +92,11 @@ Function Start1pSex(actor akSpeaker)
     if bHasOstim && minai_UseOStim.GetValue() == 1.0
       OThread.QuickStart(OActorUtil.ToArray(akSpeaker))
     else
-      slf.Quickstart(akSpeaker)
+      if devious.HasDD()
+        devious.libs.Masturbate(akSpeaker)
+      else	
+        slf.Quickstart(akSpeaker)
+      endif
     EndIf
   EndIf
 EndFunction
@@ -216,11 +220,32 @@ Function StartSexSmart(bool bPlayerInScene, actor[] actorsToSort, string tags)
   EndWhile
   
   Main.Debug("Done Sorting actors (" + numMales + " males, " + numFemales + " females): " + actorsToSort)
-  if tags == ""
-    slf.StartSex(actorsToSort, slf.GetAnimationsByDefault(numMales, numFemales))
-  else
-    slf.StartSex(actorsToSort, slf.GetAnimationsByTags(numMales +  numFemales, tags))
+  slf.StartSex(actorsToSort, FindSexlabAnimations(actorsToSort, numMales, numFemales, tags))
+EndFunction
+
+sslBaseAnimation[] Function FindSexlabAnimations(actor[] actors, int numMales, int numFemales, string tags, bool forceaggressive = false)
+  sslBaseAnimation[] ret
+  if devious.HasDD()
+    main.Debug("FindValidSexlabAnimations: Using DD's SelectValidDDAnimations")
+    string suppressTag = "forced"
+    ret = devious.libs.SelectValidDDAnimations(actors, numMales + numFemales, forceaggressive, tags, suppressTag)
   EndIf
+  if !ret
+    Main.Debug("FindValidSexlabAnimations: Falling back to slf getanimation functions")
+    if tags == ""
+      return slf.GetAnimationsByDefault(numMales, numFemales)
+    else
+      string suppressStr = "forced,"
+      if numMales == 0
+        suppressStr += "MM,"
+      EndIf
+      if numFemales == 0
+        suppressStr += "FF,"
+      EndIf
+      return slf.GetAnimationsByTags(numMales +  numFemales, tags, suppressStr)
+    EndIf
+  EndIf
+  return ret
 EndFunction
 
 bool function UseSex()
@@ -495,7 +520,7 @@ Event OnStageStart(int tid, bool HasPlayer)
     string[] Tags = controller.Animation.GetRawTags()
     ; Send event, AI can be aware SEX is happening here
     if (Tags.Find("forced")!= -1)
-      main.RegisterEvent(sexPos+sceneTags+actorList[0].GetDisplayName()+ " is being raped by  "+actorList[1].GetDisplayName()+ ", ("+actorList[0].GetDisplayName()+" feels a mix of pain and pleasure) ."+description+description2+"("+pleasureFull+")","info_sexscene")
+      main.RegisterEvent(sexPos+sceneTags+sortedActorList[0].GetDisplayName()+ " is being raped by  "+sortedActorList[1].GetDisplayName()+ ", ("+actorList[0].GetDisplayName()+" feels a mix of pain and pleasure) ."+description+description2+"("+pleasureFull+")","info_sexscene")
     else
       main.RegisterEvent(sexPos+sceneTags+actorList[0].GetDisplayName()+ " and "+actorList[1].GetDisplayName()+ " are having sex. "+description+description2+"("+pleasureFull+")","info_sexscene")
     endif
@@ -505,14 +530,14 @@ Event OnStageStart(int tid, bool HasPlayer)
     aiff.setAnimationBusy(1,otherActor.GetDisplayName())
     if (!slf.isMouthOpen(otherActor) && otherActor != playerRef)
       if (controller.Stage < (controller.Animation.StageCount()))
-        if AiAgentFunctions.isGameVR() 
+        if bHasAIFF && AiAgentFunctions.isGameVR() 
 	  ; VR users will have dirty talk through physics integration instead
 	Else
           DirtyTalk("ohh... yes.","chatnf_sl",sortedActorList[1].GetDisplayName())
 	EndIf
       endif
     else
-      main.RegisterEvent(otherActor.GetDisplayName()+ " is now using mouth with "+actorList[1].GetDisplayName(),"info_sexscene")
+      main.RegisterEvent(otherActor.GetDisplayName()+ " is now using mouth with "+sortedActorList[1].GetDisplayName(),"info_sexscene")
     endif
 EndEvent
 

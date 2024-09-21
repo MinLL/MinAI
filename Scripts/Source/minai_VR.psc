@@ -26,7 +26,7 @@ int touchedLocations = 0
 
 string BREASTS_KEY = "Breasts"
 string BUTT_KEY = "Ass"
-string VAGINAL_KEY = "Vaginal"
+string VAGINAL_KEY = "Pussy"
 string ANAL_KEY = "Anal"
 string BELLY_KEY = "Belly"
 string PENIS_KEY = "Penis"
@@ -152,7 +152,7 @@ EndFunction
 
 Function OnCollision(string eventName, string nodeName, float collisionDuration, Form actorForm)
   Actor akActor = actorForm as Actor
-  string actorName = akActor.GetDisplayName()
+  string actorName = akActor.GetActorBase().GetName()
   string playerName = playerRef.GetActorBase().GetName()
   
   string debugStr = "OnCollision(" + eventName + ", " + nodeName + ", " + collisionDuration + ", " + actorName + ")"
