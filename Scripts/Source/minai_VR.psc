@@ -187,6 +187,10 @@ Function OnCollision(string eventName, string nodeName, float collisionDuration,
     Main.Debug("Not processing self-collision data for player: Has DD heavy bondage on")
     return
   EndIf
+  if akActor == playerRef && playerRef.IsWeaponDrawn()
+    Main.Debug("Not processing self-collision data for player: Has weapon drawn")
+    return
+  EndIf
   ; Debug.Notification(debugStr)
   if BreastNodes.Find(nodeName) >= 0
     TrackTouch(BREASTS_KEY, collisionDuration, actorName)
