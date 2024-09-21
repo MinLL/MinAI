@@ -21,7 +21,7 @@ function Maintenance(minai_MainQuestController _main)
   main = _main
   aiff = (Self as Quest) as minai_AIFF
   devious = (Self as Quest) as minai_DeviousStuff
-  Main.Info("- Initializing Sex Module.")
+  Main.Info("Initializing Sex Module.")
   bHasAIFF = (Game.GetModByName("AIAgent.esp") != 255)
   
   RegisterForModEvent("HookStageStart", "OnStageStart")
@@ -75,6 +75,9 @@ string Function ConvertTagsOstim(string tags)
 EndFunction
 
 bool Function CanAnimate(actor akTarget, actor akSpeaker)
+  if ((akTarget.IsOnMount() || akSpeaker.IsOnMount()) || (akTarget.GetSitState() >= 3 || akSpeaker.GetSitState() >= 3))
+    return False
+  EndIf
   if bHasOstim && (minai_UseOStim.GetValue() == 1.0 && !OActor.IsInOStim(akTarget) && !OActor.IsInOStim(akSpeaker))
     return True
   EndIf
