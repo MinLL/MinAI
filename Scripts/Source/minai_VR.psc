@@ -169,7 +169,7 @@ EndFunction
 
 
 Function OnCollision(string eventName, string nodeName, float collisionDuration, Form actorForm)
-  if useCBPC.GetValueInt() != 1
+  if !useCBPC || useCBPC.GetValueInt() != 1
     Main.Warn("CBPC: Aborting OnCollision(), cbpc is disabled")
     return
   EndIf
