@@ -8,6 +8,15 @@ if (IsModEnabled("Sexlab") || IsModEnabled("Ostim")) {
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartAnal";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartBlowjob";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartHandjob";
+        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartFootjob";
+        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartBoobjob";
+        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdCunnilingus";
+        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdFacial";
+        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdCumonchest";
+        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdRubbingclitoris";
+        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartDeepthroat";
+        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdRimjob";
+        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdVaginalfingering";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartAggressive";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdPutOnClothes";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdRemoveClothes";
@@ -158,6 +167,177 @@ $GLOBALS["FUNCTIONS"][] = [
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartHandjob"]=$GenericFuncRet;
+
+$GLOBALS["F_NAMES"]["ExtCmdStartFootjob"]="StartFootjob";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartFootjob"]="Engage in a footjob with target";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdStartFootjob"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartFootjob"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdStartFootjob"]=$GenericFuncRet;
+
+$GLOBALS["F_NAMES"]["ExtCmdStartBoobjob"]="StartBoobjob";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartBoobjob"]="Engage in a boobjob with target";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdStartBoobjob"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartBoobjob"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdStartBoobjob"]=$GenericFuncRet;
+
+$GLOBALS["F_NAMES"]["ExtCmdStartCunnilingus"]="StartCunnilingus";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartCunnilingus"]="Engage in cunnilingus with target";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdStartCunnilingus"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartCunnilingus"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdStartCunnilingus"]=$GenericFuncRet;
+
+$GLOBALS["F_NAMES"]["ExtCmdStartFacial"]="StartFacial";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartFacial"]="Engage in a facial cumshot with target";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdStartFacial"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartFacial"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdStartFacial"]=$GenericFuncRet;
+
+$GLOBALS["F_NAMES"]["ExtCmdStartCumonchest"]="StartCumonchest";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartCumonchest"]="Engage in a chest cumshot with target";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdStartCumonchest"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartCumonchest"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdStartCumonchest"]=$GenericFuncRet;
+
+$GLOBALS["F_NAMES"]["ExtCmdStartRubbingclitoris"]="StartRubbingclitoris";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartRubbingclitoris"]="Engage in manual stimulation with the target by rubbing the clitoris";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdStartRubbingclitoris"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartRubbingclitoris"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdStartRubbingclitoris"]=$GenericFuncRet;
+
+$GLOBALS["F_NAMES"]["ExtCmdStartDeepthroat"]="StartDeepthroat";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartDeepthroat"]="Engage in extra deep blowjob or facefucking with target";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdStartDeepthroat"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartDeepthroat"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdStartDeepthroat"]=$GenericFuncRet;
+
+$GLOBALS["F_NAMES"]["ExtCmdStartRimjob"]="StartRimjob";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartRimjob"]="Engage in a rimjob with target";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdStartRimjob"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartRimjob"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdStartRimjob"]=$GenericFuncRet;
+
+$GLOBALS["F_NAMES"]["ExtCmdStartVaginalfingering"]="StartVaginalfingering";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartVaginalfingering"]="Engage in manual stimulation with the target by fingering the vagina";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdStartVaginalfingering"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartVaginalfingering"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdStartVaginalfingering"]=$GenericFuncRet;
 
 $GLOBALS["F_NAMES"]["ExtCmdRemoveClothes"]="RemoveClothes";
 $GLOBALS["F_TRANSLATIONS"]["ExtCmdRemoveClothes"]="Remove all of your clothes and armor";

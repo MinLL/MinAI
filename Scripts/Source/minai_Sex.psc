@@ -269,8 +269,32 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "blowjob")
   elseif stringutil.Find(sayLine, "-handjob-") != -1
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "handjob")
-  elseIf stringutil.Find(sayLine, "-groupsex-") != -1 || stringUtil.Find(sayLine, "-orgy-") != -1 || stringUtil.Find(sayLine, "-threesome-") != -1 || stringUtil.Find(sayLine, "-fuck-") != -1
+  elseif stringutil.Find(sayLine, "-footjob-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "footjob")
+  elseif stringutil.Find(sayLine, "-boobjob-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "boobjob")
+  elseif stringutil.Find(sayLine, "-cunnilingus-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "cunnilingus")
+  elseif stringutil.Find(sayLine, "-facial-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "facial")
+  elseif stringutil.Find(sayLine, "-cumonchest-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "cumonchest")
+  elseif stringutil.Find(sayLine, "-rubbingclitoris-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "rubbingclitoris")
+  elseif stringutil.Find(sayLine, "-deepthroat-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "deepthroat")
+  elseif stringutil.Find(sayLine, "-rimjob-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "rimjob")
+  elseif stringutil.Find(sayLine, "-vaginalfingering-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "vaginalfingering")
+  elseif stringutil.Find(sayLine, "-vampirebite-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "vampirebite")
+  elseIf stringutil.Find(sayLine, "-groupsex-") != -1 || stringUtil.Find(sayLine, "-orgy-") != -1 || stringUtil.Find(sayLine, "-threesome-") != -1
     StartGroupSex(akSpeaker, akTarget, Player, bPlayerInScene, actorsFromFormList)
+  elseif stringutil.Find(sayLine, "-cuddling-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "cuddling")
+  elseif stringutil.Find(sayLine, "-frenchkissing-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "frenchkissing")
   EndIf
 EndFunction
 
@@ -303,6 +327,24 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Vaginal")
   elseif command == "ExtCmdStartHandjob"
     StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Handjob")
+  elseif command == "ExtCmdStartFootjob"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Footjob")
+  elseif command == "ExtCmdStartBoobjob"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Boobjob")
+  elseif command == "ExtCmdStartCunnilingus"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Cunnilingus")
+  elseif command == "ExtCmdStartFacial"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Facial")
+  elseif command == "ExtCmdStartCumonchest"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Cumonchest")
+  elseif command == "ExtCmdStartRubbingclitoris"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Rubbingclitoris")
+  elseif command == "ExtCmdStartDeepthroat"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Deepthroat")
+  elseif command == "ExtCmdStartRimjob"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Rimjob")
+  elseif command == "ExtCmdStartVaginalfingering"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Vaginalfingering")
   elseIf command == "ExtCmdOrgy"
     Debug.Notification("Orgy is broken until I figure out how to get all AI actors")
     ; StartGroupSex(akSpeaker, akTarget, PlayerRef, bPlayerInScene, actorsFromFormList)
