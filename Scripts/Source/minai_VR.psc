@@ -22,6 +22,7 @@ float lastCollisionSpeechTime
 GlobalVariable collisionCooldown
 GlobalVariable collisionSpeechCooldown
 GlobalVariable collisionSexCooldown
+GlobalVariable useCBPC
 
 int touchedLocations = 0
 
@@ -36,34 +37,44 @@ string ACTOR_KEY = "ActorName"
 string GENITAL_COLLISION_KEY = "GenitalCollision"
 
 ; How long a part has to be touched cumulatively within a collisionCooldown window to count
-float TOUCH_THRESHOLD = 1.0
-float PLAYER_TOUCH_THRESHOLD = 4.0
+float TOUCH_THRESHOLD = 5.0
+float PLAYER_TOUCH_THRESHOLD = 10.0
 
 function Maintenance(minai_MainQuestController _main)
   playerRef = Game.GetPlayer()
   main = _main
-  aiff = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_AIFF
-  sex = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_Sex
-  devious = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_DeviousStuff
+  aiff = Game.GetFormFromFile(0x802, "MinAI.esp") as minai_AIFF
+  sex = Game.GetFormFromFile(0x802, "MinAI.esp") as minai_Sex
+  devious = Game.GetFormFromFile(0x802, "MinAI.esp") as minai_DeviousStuff
   Main.Info("Initializing VR Module.")
   bHasAIFF = (Game.GetModByName("AIAgent.esp") != 255)
-  collisionCooldown = Game.GetFormFromFile(0x090C, "MinAI.esp") as GlobalVariable
-  collisionSpeechCooldown = Game.GetFormFromFile(0x090D, "MinAI.esp") as GlobalVariable
-  collisionSexCooldown = Game.GetFormFromFile(0x090F, "MinAI.esp") as GlobalVariable
-  
-  RegisterForModEvent("CBPCPlayerCollisionWithFemaleEvent", "OnCollision")
-  RegisterForModEvent("CBPCPlayerCollisionWithMaleEvent", "OnCollision")  
-  RegisterForModEvent("CBPCPlayerGenitalCollisionWithFemaleEvent", "OnCollision")
-  RegisterForModEvent("CBPCPlayerGenitalCollisionWithMaleEvent", "OnCollision")
-  InitNodeDefinitions()
-  lastCollisionSpeechTime = 0.0
-  if (touchedLocations == 0)
-    Main.Debug("Initializing touched locations map")
-    touchedLocations = JMap.Object()
-    JValue.Retain(touchedLocations)
+  collisionCooldown = Game.GetFormFromFile(0x90C, "MinAI.esp") as GlobalVariable
+  collisionSpeechCooldown = Game.GetFormFromFile(0x90D, "MinAI.esp") as GlobalVariable
+  collisionSexCooldown = Game.GetFormFromFile(0x90F, "MinAI.esp") as GlobalVariable
+  useCBPC = Game.GetFormFromFile(0x910, "MinAI.esp") as GlobalVariable
+
+  if useCBPC.GetValueInt() == 1
+    Main.Info("Enabling CBPC")
+    TOUCH_THRESHOLD = 10.0
+    PLAYER_TOUCH_THRESHOLD = 20.0
+    
+    RegisterForModEvent("CBPCPlayerCollisionWithFemaleEvent", "OnCollision")
+    RegisterForModEvent("CBPCPlayerCollisionWithMaleEvent", "OnCollision")  
+    RegisterForModEvent("CBPCPlayerGenitalCollisionWithFemaleEvent", "OnCollision")
+    RegisterForModEvent("CBPCPlayerGenitalCollisionWithMaleEvent", "OnCollision")
+    InitNodeDefinitions()
+    lastCollisionSpeechTime = 0.0
+    if (touchedLocations == 0)
+      Main.Debug("Initializing touched locations map")
+      touchedLocations = JMap.Object()
+      JValue.Retain(touchedLocations)
+    EndIf
+    ClearTouchedLocations()
+    
+    RegisterForSingleUpdate(collisionCooldown.GetValue())
+  Else
+    Main.Info("CBPC is disabled")
   EndIf
-  ClearTouchedLocations()
-  RegisterForSingleUpdate(collisionCooldown.GetValue())
 EndFunction
 
 
@@ -158,6 +169,10 @@ EndFunction
 
 
 Function OnCollision(string eventName, string nodeName, float collisionDuration, Form actorForm)
+  if !useCBPC || useCBPC.GetValueInt() != 1
+    Main.Warn("CBPC: Aborting OnCollision(), cbpc is disabled")
+    return
+  EndIf
   Actor akActor = actorForm as Actor
   string actorName = akActor.GetActorBase().GetName()
   string playerName = playerRef.GetActorBase().GetName()
@@ -195,18 +210,30 @@ EndFunction
 
 
 Function ClearTouchedLocations()
+  JMap.SetStr(touchedLocations, ACTOR_KEY, "")
   JMap.SetFlt(touchedLocations, BREASTS_KEY, 0.0)
   JMap.SetFlt(touchedLocations, VAGINAL_KEY, 0.0)
   JMap.SetFlt(touchedLocations, ANAL_KEY, 0.0)
   JMap.SetFlt(touchedLocations, BELLY_KEY, 0.0)
   JMap.SetFlt(touchedLocations, PENIS_KEY, 0.0)
   JMap.SetFlt(touchedLocations, OTHER_KEY, 0.0)
-  JMap.SetStr(touchedLocations, ACTOR_KEY, "")
   JMap.setInt(touchedLocations, GENITAL_COLLISION_KEY, 0)
 EndFunction
 
 
 Event OnUpdate()
+  if useCBPC.GetValueInt() != 1
+    Main.Warn("CBPC: Aborting update, cbpc is disabled")
+    return
+  EndIf
+  string actorName = JMap.GetStr(touchedLocations, ACTOR_KEY)
+  string playerName = playerRef.GetActorBase().GetName()
+  if actorName == ""
+    Main.Debug("No actor touched for collision")
+    ClearTouchedLocations()
+    RegisterForSingleUpdate(collisionCooldown.GetValue())
+    return
+  EndIf
   int[] locations = new int[7]
   string[] locationStr = new String[7]
   locations[0] = JMap.GetInt(touchedLocations, BREASTS_KEY)
@@ -216,6 +243,7 @@ Event OnUpdate()
   locations[4] = JMap.GetInt(touchedLocations, ANAL_KEY)
   locations[5] = JMap.GetInt(touchedLocations, VAGINAL_KEY)
   locations[6] = JMap.GetInt(touchedLocations, OTHER_KEY)
+  ClearTouchedLocations()
   locationStr[0] = BREASTS_KEY
   locationStr[1] = BUTT_KEY
   locationStr[2] = BELLY_KEY
@@ -223,8 +251,6 @@ Event OnUpdate()
   locationStr[4] = ANAL_KEY
   locationStr[5] = VAGINAL_KEY
   locationStr[6] = OTHER_KEY
-  string actorName = JMap.GetStr(touchedLocations, ACTOR_KEY)
-  string playerName = playerRef.GetActorBase().GetName()
   
   ; Find most touched locations
   int index = 1
@@ -283,7 +309,6 @@ Event OnUpdate()
       lastCollisionSpeechTime = currentTime
     EndIf
   EndIf
-  ClearTouchedLocations()
   RegisterForSingleUpdate(collisionCooldown.GetValue())
 EndEvent
 
