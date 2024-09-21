@@ -168,14 +168,6 @@ EndFunction
 
 
 
-
-
-
-
-
-
-
-
 Event CommandDispatcher(String speakerName,String  command, String parameter)
   Actor akSpeaker=AIAgentFunctions.getAgentByName(speakerName)
   actor akTarget= AIAgentFunctions.getAgentByName(parameter)
@@ -211,10 +203,15 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     carriageScript.Travel(destination, akSpeaker)
     Main.RegisterEvent(""+speakerName+" gave " + targetName + " a ride in a carriage to " + destination + ".")
   EndIf
-    if command == "ExtCmdTrainSkill"
+  if command == "ExtCmdTrainSkill"
     Main.Debug(speakerName + " is training the player")
     Game.ShowTrainingMenu(akSpeaker)
     Main.RegisterEvent(""+speakerName+" gave " + targetName + " some training.")
+  EndIf
+  if command == "ExtCmdInventory"
+    Main.Debug(speakerName + " opened their inventory")
+    akSpeaker.OpenInventory(true)
+    Main.RegisterEvent(speakerName + " opened their inventory for " + targetName + ".")
   EndIf
 EndEvent
 
