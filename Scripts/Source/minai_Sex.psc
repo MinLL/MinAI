@@ -505,7 +505,11 @@ Event OnStageStart(int tid, bool HasPlayer)
     aiff.setAnimationBusy(1,otherActor.GetDisplayName())
     if (!slf.isMouthOpen(otherActor) && otherActor != playerRef)
       if (controller.Stage < (controller.Animation.StageCount()))
-        DirtyTalk("ohh... yes.","chatnf_sl",sortedActorList[1].GetDisplayName())
+        if AiAgentFunctions.isGameVR() 
+	  ; VR users will have dirty talk through physics integration instead
+	Else
+          DirtyTalk("ohh... yes.","chatnf_sl",sortedActorList[1].GetDisplayName())
+	EndIf
       endif
     else
       main.RegisterEvent(otherActor.GetDisplayName()+ " is now using mouth with "+actorList[1].GetDisplayName(),"info_sexscene")

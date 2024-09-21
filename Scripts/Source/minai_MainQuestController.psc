@@ -45,7 +45,7 @@ Function Maintenance()
   survival = (Self as Quest) as minai_Survival
   arousal = (Self as Quest) as minai_Arousal
   devious = (Self as Quest) as minai_DeviousStuff
-  vr = (Self as Quest) as minai_VR
+  vr = Game.GetFormFromFile(0x090E, "MinAI.esp") as minai_VR
   
   sex.Maintenance(Self)
   survival.Maintenance(Self)
