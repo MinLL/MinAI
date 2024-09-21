@@ -1,6 +1,6 @@
 scriptname minai_DeviousStuff extends Quest
 
-zadLibs libs
+zadLibs Property libs Auto
 SLAppPCSexQuestScript slapp
 _DFtools dftools
 _DFDealUberController dfDealController
@@ -39,7 +39,7 @@ function Maintenance(minai_MainQuestController _main)
   arousal = (Self as Quest) as minai_Arousal
   sex = (Self as Quest) as minai_Sex
   aiff = (Self as Quest) as minai_AIFF
-  
+    
   RegisterForModEvent("DeviceActorOrgasm", "OnOrgasm")
   RegisterForModEvent("DeviceActorEdged", "OnEdged")
   RegisterForModEvent("DeviceVibrateEffectSta", "OnVibrateStart")
@@ -802,3 +802,7 @@ string Function GetFactionsForActor(actor akTarget)
   return ret
 EndFunction
 
+
+bool Function HasDD()
+  return bHasDD
+EndFunction
