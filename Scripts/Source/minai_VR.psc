@@ -4,6 +4,7 @@
 minai_MainQuestController main
 minai_AIFF aiff
 minai_Sex  sex
+minai_DeviousStuff devious
 
 actor playerRef
 bool bHasAIFF
@@ -43,6 +44,7 @@ function Maintenance(minai_MainQuestController _main)
   main = _main
   aiff = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_AIFF
   sex = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_Sex
+  devious = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_DeviousStuff
   Main.Info("Initializing VR Module.")
   bHasAIFF = (Game.GetModByName("AIAgent.esp") != 255)
   collisionCooldown = Game.GetFormFromFile(0x090C, "MinAI.esp") as GlobalVariable
@@ -164,6 +166,10 @@ Function OnCollision(string eventName, string nodeName, float collisionDuration,
   main.Debug(debugStr)
   if actorName == "" ; This is not provided for non-VR users when they bump into an actor.
     Main.Warn("OnCollision() received empty actor name - Doing nothing.")
+    return
+  EndIf
+  if akActor == playerRef && playerRef.WornHasKeyword(devious.libs.zad_DeviousHeavyBondage)
+    Main.Debug("Not processing self-collision data for player: Has DD heavy bondage on")
     return
   EndIf
   ; Debug.Notification(debugStr)
