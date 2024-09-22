@@ -153,4 +153,51 @@ foreach ($vibSettings as $strength) {
 }
 
 
+
+
+
+$GLOBALS["F_NAMES"]["ExtCmdEquipCollar"]="EquipCollar";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdEquipCollar"]="Lock a collar on the target";
+$GLOBALS["FUNCTIONS"][] = [
+    "name" => $GLOBALS["F_NAMES"]["ExtCmdEquipCollar"],
+    "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdEquipCollar"],
+    "parameters" => [
+        "type" => "object",
+        "properties" => [
+            "target" => [
+                "type" => "string",
+                "description" => "Target NPC, Actor, or being",
+                "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+            ]
+        ],
+        "required" => [],
+    ],
+];
+
+$GLOBALS["F_NAMES"]["ExtCmdUnequipCollar"]="UnequipCollar";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdUnequipCollar"]="Remove a collar from the target";
+$GLOBALS["FUNCTIONS"][] = [
+    "name" => $GLOBALS["F_NAMES"]["ExtCmdUnequipCollar"],
+    "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdUnequipCollar"],
+    "parameters" => [
+        "type" => "object",
+        "properties" => [
+            "target" => [
+                "type" => "string",
+                "description" => "Target NPC, Actor, or being",
+                "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+            ]
+        ],
+        "required" => [],
+    ],
+];
+
+if (IsConfigEnabled("allowDeviceLock")) {
+    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdEquipCollar";    
+}
+
+if (IsConfigEnabled("allowDeviceUnlock")) {
+    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdUnequipCollar";
+}
+
 ?>

@@ -1,6 +1,7 @@
 scriptname minai_DeviousStuff extends Quest
 
 zadLibs Property libs Auto
+zadDeviceLists ddLists
 SLAppPCSexQuestScript slapp
 _DFtools dftools
 _DFDealUberController dfDealController
@@ -11,6 +12,7 @@ bool bHasSTA = False
 bool bHasSLHH = False
 bool bHasSLApp = False
 bool bHasDeviouslyAccessible = False
+bool bHasDDExpansion = False
 
 Keyword SLHHScriptEventKeyword
 GlobalVariable Debt
@@ -22,6 +24,7 @@ minai_MainQuestController main
 minai_Arousal arousal
 minai_Sex sex
 minai_AIFF aiff
+minai_Config config
 
 GlobalVariable eyefucktrack
 GlobalVariable eyepenalty
@@ -35,6 +38,10 @@ function Maintenance(minai_MainQuestController _main)
   Main.Info("Initializing Devious Module")
   playerRef = game.GetPlayer()
   main = _main
+  config = Game.GetFormFromFile(0x0912, "MinAI.esp") as minai_Config
+  if !config
+    Main.Fatal("Could not load configuration - script version mismatch with esp")
+  EndIf
   
   arousal = (Self as Quest) as minai_Arousal
   sex = (Self as Quest) as minai_Sex
@@ -54,7 +61,12 @@ function Maintenance(minai_MainQuestController _main)
   libs = Game.GetFormFromFile(0x00F624, "Devious Devices - Integration.esm") as zadlibs
     if libs
     bHasDD = True
-    Main.Info("Found Devious Devices")    
+    Main.Info("Found Devious Devices")
+    ddLists = (Game.GetFormFromFile(0x00CA01, "Devious Devices - Expansion.esm") as Quest) as zadDeviceLists
+    if ddLists
+      bHasDDExpansion = True
+      Main.Info("Found Devious Devices Expansion")
+    EndIf
   EndIf
   
   if Game.GetModByName("DeviousFollowers.esp") != 255
@@ -118,6 +130,7 @@ function Maintenance(minai_MainQuestController _main)
   aiff.SetModAvailable("SLHH", bHasSLHH)
   aiff.SetModAvailable("SLApp", bHasSLApp)
   aiff.SetModAvailable("DeviouslyAccessible", bHasDeviouslyAccessible)
+  config.StoreAllConfigs()
 EndFunction
 
 Function ResetSpankRule()
@@ -640,6 +653,16 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     elseIf (command == "ExtCmdshock")
       libs.ShockActor(akTarget)
       Main.RegisterEvent(""+speakerName+" remotely shocks  " + targetName + ".")
+    EndIf
+    ; Device equip events
+    if bHasDDExpansion
+      if (command == "ExtCmdEquipCollar")
+        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_collars)
+        Main.RegisterEvent(""+speakerName+" locked a collar on " + targetName)
+      elseif (command == "ExtCmdUnequipCollar")
+        libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousCollar)
+        Main.RegisterEvent(""+speakerName+" removed a collar from " + targetName)
+      EndIf
     EndIf
   EndIf
   ;  Generic actions
