@@ -34,6 +34,10 @@ string OTHER_KEY = "Body Non-Sexually"
 string ACTOR_KEY = "ActorName"
 string GENITAL_COLLISION_KEY = "GenitalCollision"
 
+bool hitThreshold
+float hitValue
+string locationHit
+bool collisionMutex
 ; How long a part has to be touched cumulatively within a collisionCooldown window to count
 
 function Maintenance(minai_MainQuestController _main)
@@ -54,11 +58,6 @@ function Maintenance(minai_MainQuestController _main)
   if useCBPC.GetValueInt() == 1
     Main.Info("Enabling CBPC")
     
-    RegisterForModEvent("CBPCPlayerCollisionWithFemaleEvent", "OnCollision")
-    RegisterForModEvent("CBPCPlayerCollisionWithMaleEvent", "OnCollision")  
-    RegisterForModEvent("CBPCPlayerGenitalCollisionWithFemaleEvent", "OnCollision")
-    RegisterForModEvent("CBPCPlayerGenitalCollisionWithMaleEvent", "OnCollision")
-    InitNodeDefinitions()
     lastCollisionSpeechTime = 0.0
     if (touchedLocations == 0)
       Main.Debug("Initializing touched locations map")
@@ -67,6 +66,11 @@ function Maintenance(minai_MainQuestController _main)
     EndIf
     ClearTouchedLocations()
     
+    InitNodeDefinitions()
+    RegisterForModEvent("CBPCPlayerCollisionWithFemaleEvent", "OnCollision")
+    RegisterForModEvent("CBPCPlayerCollisionWithMaleEvent", "OnCollision")  
+    RegisterForModEvent("CBPCPlayerGenitalCollisionWithFemaleEvent", "OnCollision")
+    RegisterForModEvent("CBPCPlayerGenitalCollisionWithMaleEvent", "OnCollision")
     RegisterForSingleUpdate(config.collisionCooldown)
   Else
     Main.Info("CBPC is disabled")
@@ -149,12 +153,28 @@ string Function GetFactionsForActor(actor akTarget)
 EndFunction
 
 
-Function TrackTouch(string nodeType, float collisionDuration, string actorName)
+Function TrackTouch(string nodeType, float collisionDuration, actor akActor)
   ; Does not track multiple actors at once. Good enough for now? Do we need this? Update interval is pretty quick.
+  if hitThreshold
+    return
+  EndIf
+  string actorName = akActor.GetActorBase().GetName()
   Float currentValue = JMap.GetFlt(touchedLocations, nodeType)
   Float newValue = currentValue + collisionDuration ; The longer the location is touched, the more it's weighted for the response
   Main.Debug("Tracking Touched Location (" + nodeType + ") for actor [" + actorName + "]: Before=" + currentValue + ", after=" + newValue)
   JMap.SetFlt(touchedLocations, nodeType, newValue)
+  if akActor == playerRef && newValue > config.cbpcSelfTouchThreshold
+    hitThreshold = True
+    hitValue = newValue
+    locationHit = nodeType
+    Main.Debug("Hit Threshold (Player): "  + locationHit + "=" + hitValue)
+  EndIf
+  if akActor != playerRef && newValue > config.cbpcOtherTouchThreshold
+    hitThreshold = True
+    hitValue = newValue
+    locationHit = nodeType
+    Main.Debug("Hit Threshold (NPC): "  + locationHit + "=" + hitValue)
+  EndIf
   if actorName == ""
     Main.Warn("TrackTouch received empty name - Defaulting to 'Someone'")
     JMap.SetStr(touchedLocations, ACTOR_KEY, "someone")
@@ -165,8 +185,15 @@ EndFunction
 
 
 Function OnCollision(string eventName, string nodeName, float collisionDuration, Form actorForm)
+  if collisionMutex
+    return
+  EndIf
+  collisionMutex = True
   if !useCBPC || useCBPC.GetValueInt() != 1
-    Main.Warn("CBPC: Aborting OnCollision(), cbpc is disabled")
+    UnregisterForUpdate()
+    return
+  EndIf
+  if hitThreshold
     return
   EndIf
   Actor akActor = actorForm as Actor
@@ -193,25 +220,26 @@ Function OnCollision(string eventName, string nodeName, float collisionDuration,
   EndIf
   ; Debug.Notification(debugStr)
   if BreastNodes.Find(nodeName) >= 0
-    TrackTouch(BREASTS_KEY, collisionDuration, actorName)
+    TrackTouch(BREASTS_KEY, collisionDuration, akActor)
   elseif ButtNodes.Find(nodeName) >= 0
     if akActor == playerRef && !config.cbpcDisableSelfAssTouch
-      TrackTouch(BUTT_KEY, collisionDuration, actorName)
+      TrackTouch(BUTT_KEY, collisionDuration, akActor)
     EndIf
   elseif BellyNodes.Find(nodeName) >= 0
-    TrackTouch(BELLY_KEY, collisionDuration, actorName)
+    TrackTouch(BELLY_KEY, collisionDuration, akActor)
   elseif PenisNodes.Find(nodeName) >= 0
-    TrackTouch(PENIS_KEY, collisionDuration, actorName)
+    TrackTouch(PENIS_KEY, collisionDuration, akActor)
   elseif AnalNodes.Find(nodeName) >= 0
-    TrackTouch(ANAL_KEY, collisionDuration, actorName)
+    TrackTouch(ANAL_KEY, collisionDuration, akActor)
   elseif VaginalNodes.Find(nodeName) >= 0
-    TrackTouch(VAGINAL_KEY, collisionDuration, actorName)
+    TrackTouch(VAGINAL_KEY, collisionDuration, akActor)
   else
-    TrackTouch(OTHER_KEY, collisionDuration, actorName)
+    TrackTouch(OTHER_KEY, collisionDuration, akActor)
   EndIf
   if eventName == "CBPCPlayerGenitalCollisionWithFemaleEvent" || eventName == "CBPCPlayerGenitalCollisionWithMaleEvent"
     JMap.setInt(touchedLocations, GENITAL_COLLISION_KEY, 1)
   EndIf
+  collisionMutex = False
 EndFunction
 
 
@@ -224,12 +252,21 @@ Function ClearTouchedLocations()
   JMap.SetFlt(touchedLocations, PENIS_KEY, 0.0)
   JMap.SetFlt(touchedLocations, OTHER_KEY, 0.0)
   JMap.setInt(touchedLocations, GENITAL_COLLISION_KEY, 0)
+  hitThreshold = False
+  locationHit = ""
+  hitValue = 0.0
+  collisionMutex = False
 EndFunction
 
 
 Event OnUpdate()
   if useCBPC.GetValueInt() != 1
     Main.Warn("CBPC: Aborting update, cbpc is disabled")
+    return
+  EndIf
+  if !hitThreshold
+    ClearTouchedLocations()
+    RegisterForSingleUpdate(config.collisionCooldown)
     return
   EndIf
   string actorName = JMap.GetStr(touchedLocations, ACTOR_KEY)
@@ -240,81 +277,42 @@ Event OnUpdate()
     RegisterForSingleUpdate(config.collisionCooldown)
     return
   EndIf
-  int[] locations = new int[7]
-  string[] locationStr = new String[7]
-  locations[0] = JMap.GetInt(touchedLocations, BREASTS_KEY)
-  locations[1] = JMap.GetInt(touchedLocations, BUTT_KEY)
-  locations[2] = JMap.GetInt(touchedLocations, BELLY_KEY)
-  locations[3] = JMap.GetInt(touchedLocations, PENIS_KEY)
-  locations[4] = JMap.GetInt(touchedLocations, ANAL_KEY)
-  locations[5] = JMap.GetInt(touchedLocations, VAGINAL_KEY)
-  locations[6] = JMap.GetInt(touchedLocations, OTHER_KEY)
-  ClearTouchedLocations()
-  locationStr[0] = BREASTS_KEY
-  locationStr[1] = BUTT_KEY
-  locationStr[2] = BELLY_KEY
-  locationStr[3] = PENIS_KEY
-  locationStr[4] = ANAL_KEY
-  locationStr[5] = VAGINAL_KEY
-  locationStr[6] = OTHER_KEY
+
+  if config.cbpcDisableSelfAssTouch && locationHit == BUTT_KEY && actorName == playerName
+    Main.Debug("Self ass touch is disabled and target node is butt key. Doing nothing.")
+    RegisterForSingleUpdate(config.collisionCooldown)
+    return
+  EndIf
   
-  ; Find most touched locations
-  int index = 1
-  int currentValue
-  string currentValueStr
-  While index < locations.Length
-    currentValue = locations[index]
-    currentValueStr = locationStr[index]
-    int position = index
-    While (position > 0 && locations[position - 1] < currentValue)
-      locations[position] = locations[position - 1]
-      locationStr[position] = locationStr[position - 1]
-      position = position - 1
-    EndWhile
-    locations[position] = currentValue
-    locationStr[position] = currentValueStr
-    index += 1
-  EndWhile
-
-  string targetNode = locationStr[0]
-  int targetValue = locations[0]
-  ; Prefer non-generic locations
-  if locationStr[0] == OTHER_KEY && locations[1] != 0.0
-    targetNode = locationStr[1]
-    targetValue = locations[1]
+  Main.Debug("Most touched location (" + actorName + "): " + hitThreshold + " = " + hitValue)
+  string lineToSay = ""
+  bool wasPenetration = (JMap.GetInt(touchedLocations, GENITAL_COLLISION_KEY) == 1)
+  if actorName == playerName
+    lineToSay = playerName + " touched their " + locationHit
+  Else
+    if wasPenetration && playerRef.GetActorBase().GetSex() == 0
+      lineToSay = playerName + "'s " + PENIS_KEY + " touched " + actorName + "'s " + locationHit
+    elseif wasPenetration && playerRef.GetActorBase().GetSex() >= 1
+      lineToSay = playerName + "'s " + VAGINAL_KEY + " was touched by " + actorName + "'s " + locationHit
+    else
+      lineToSay = playerName + " touched " + actorName + "'s " + locationHit
+    endif
   EndIf
-
-  if ((targetValue > config.cbpcOtherTouchThreshold && actorName != playerName) || (targetValue > config.cbpcSelfTouchThreshold && actorName == playerName ) && actorName != "")
-    Main.Debug("Most touched location (" + actorName + "): " + locationStr[0] + " = " + locations[0])
-    string lineToSay = ""
-    bool wasPenetration = (JMap.GetInt(touchedLocations, GENITAL_COLLISION_KEY) == 1)
-    if actorName == playerName
-      lineToSay = playerName + " touched their " + targetNode
-    Else
-      if wasPenetration && playerRef.GetActorBase().GetSex() == 0
-        lineToSay = playerName + "'s " + PENIS_KEY + " touched " + actorName + "'s " + targetNode
-      elseif wasPenetration && playerRef.GetActorBase().GetSex() >= 1
-        lineToSay = playerName + "'s " + VAGINAL_KEY + " was touched by " + actorName + "'s " + targetNode
-      else
-        lineToSay = playerName + " touched " + actorName + "'s " + targetNode
-      endif
-    EndIf
-    float currentTime = Utility.GetCurrentRealTime()
-    float cooldown = 0.0
-    if !sex.CanAnimate(playerRef, playerRef) ; Enforce different cooldown during sex
-      cooldown = config.collisionSexCooldown
-    Else
-      cooldown = config.collisionSpeechCooldown
-    EndIf
-    if currentTime - lastCollisionSpeechTime < cooldown || !(PromptKeys.Find(targetNode) >= 0) || !bHasAIFF
-      Main.RegisterEvent(lineToSay)
-    Else
-      ; Prompt AIFF to comment on it.
-      Main.Debug("Requesting reaction from AI for: " + lineToSay)
-      AIAgentFunctions.requestMessageForActor(lineToSay, "chatnf_vr_1", actorName)
-      lastCollisionSpeechTime = currentTime
-    EndIf
+  float currentTime = Utility.GetCurrentRealTime()
+  float cooldown = 0.0
+  if !sex.CanAnimate(playerRef, playerRef) ; Enforce different cooldown during sex
+    cooldown = config.collisionSexCooldown
+  Else
+    cooldown = config.collisionSpeechCooldown
   EndIf
+  if currentTime - lastCollisionSpeechTime < cooldown || !(PromptKeys.Find(locationHit) >= 0) || !bHasAIFF
+    Main.RegisterEvent(lineToSay)
+  Else
+    ; Prompt AIFF to comment on it.
+    main.RequestLLMResponse(lineToSay, "chatnf_vr_1", actorName)
+    lastCollisionSpeechTime = currentTime
+  EndIf
+  ClearTouchedLocations()
   RegisterForSingleUpdate(config.collisionCooldown)
 EndEvent
 
