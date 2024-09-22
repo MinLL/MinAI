@@ -120,6 +120,13 @@ Function Log(String str, string lvl)
   Debug.Trace("[minai (" + lvl + ")]: " + str)
 EndFunction
 
+Function Fatal(String str)
+  ; Always log fatals
+  Log(str, "FATAL")
+  Debug.MessageBox(str)
+EndFunction
+
+
 Function Error(String str)
   if logLevel.GetValueInt() >= 1
     Log(str, "ERROR")
