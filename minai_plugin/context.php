@@ -65,7 +65,7 @@ Function GetPhysicalDescription($name) {
       $buttScore = ceil(intval($buttScore)/10);
       $ret .= "with {$breastsScore}/10 tits and a {$buttScore}/10 ass. ";
   }
-  if ($isexposed == True) {
+  if IsEnabled($name, "isexposed") {
     $ret  .= GetPenisSize($name);
   }
   return $ret;
