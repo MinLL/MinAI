@@ -5,6 +5,7 @@ minai_MainQuestController main
 minai_AIFF aiff
 minai_Sex  sex
 minai_DeviousStuff devious
+minai_Config config
 
 actor playerRef
 bool bHasAIFF
@@ -19,9 +20,6 @@ string[] PromptKeys ; List of keys to trigger an AI reaction
 
 float lastCollisionSpeechTime
 
-GlobalVariable collisionCooldown
-GlobalVariable collisionSpeechCooldown
-GlobalVariable collisionSexCooldown
 GlobalVariable useCBPC
 
 int touchedLocations = 0
@@ -37,26 +35,24 @@ string ACTOR_KEY = "ActorName"
 string GENITAL_COLLISION_KEY = "GenitalCollision"
 
 ; How long a part has to be touched cumulatively within a collisionCooldown window to count
-float TOUCH_THRESHOLD = 5.0
-float PLAYER_TOUCH_THRESHOLD = 10.0
 
 function Maintenance(minai_MainQuestController _main)
   playerRef = Game.GetPlayer()
   main = _main
+  config = Game.GetFormFromFile(0x0912, "MinAI.esp") as minai_Config
+  if !config
+    Main.Fatal("Could not load configuration - script version mismatch with esp")
+  EndIf
   aiff = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_AIFF
   sex = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_Sex
   devious = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_DeviousStuff
   Main.Info("Initializing VR Module.")
   bHasAIFF = (Game.GetModByName("AIAgent.esp") != 255)
-  collisionCooldown = Game.GetFormFromFile(0x090C, "MinAI.esp") as GlobalVariable
-  collisionSpeechCooldown = Game.GetFormFromFile(0x090D, "MinAI.esp") as GlobalVariable
-  collisionSexCooldown = Game.GetFormFromFile(0x090F, "MinAI.esp") as GlobalVariable
+
   useCBPC = Game.GetFormFromFile(0x0910, "MinAI.esp") as GlobalVariable
 
   if useCBPC.GetValueInt() == 1
     Main.Info("Enabling CBPC")
-    TOUCH_THRESHOLD = 10.0
-    PLAYER_TOUCH_THRESHOLD = 20.0
     
     RegisterForModEvent("CBPCPlayerCollisionWithFemaleEvent", "OnCollision")
     RegisterForModEvent("CBPCPlayerCollisionWithMaleEvent", "OnCollision")  
@@ -71,7 +67,7 @@ function Maintenance(minai_MainQuestController _main)
     EndIf
     ClearTouchedLocations()
     
-    RegisterForSingleUpdate(collisionCooldown.GetValue())
+    RegisterForSingleUpdate(config.collisionCooldown)
   Else
     Main.Info("CBPC is disabled")
   EndIf
@@ -183,6 +179,10 @@ Function OnCollision(string eventName, string nodeName, float collisionDuration,
     Main.Warn("OnCollision() received empty actor name - Doing nothing.")
     return
   EndIf
+  if akActor == playerRef && config.cbpcDisableSelfTouch
+    Main.Debug("Self touch is disabled.")
+    return
+  EndIf  
   if akActor == playerRef && playerRef.WornHasKeyword(devious.libs.zad_DeviousHeavyBondage)
     Main.Debug("Not processing self-collision data for player: Has DD heavy bondage on")
     return
@@ -195,7 +195,9 @@ Function OnCollision(string eventName, string nodeName, float collisionDuration,
   if BreastNodes.Find(nodeName) >= 0
     TrackTouch(BREASTS_KEY, collisionDuration, actorName)
   elseif ButtNodes.Find(nodeName) >= 0
-    TrackTouch(BUTT_KEY, collisionDuration, actorName)
+    if akActor == playerRef && !config.cbpcDisableSelfAssTouch
+      TrackTouch(BUTT_KEY, collisionDuration, actorName)
+    EndIf
   elseif BellyNodes.Find(nodeName) >= 0
     TrackTouch(BELLY_KEY, collisionDuration, actorName)
   elseif PenisNodes.Find(nodeName) >= 0
@@ -235,7 +237,7 @@ Event OnUpdate()
   if actorName == ""
     Main.Debug("No actor touched for collision")
     ClearTouchedLocations()
-    RegisterForSingleUpdate(collisionCooldown.GetValue())
+    RegisterForSingleUpdate(config.collisionCooldown)
     return
   EndIf
   int[] locations = new int[7]
@@ -282,7 +284,7 @@ Event OnUpdate()
     targetValue = locations[1]
   EndIf
 
-  if ((targetValue > TOUCH_THRESHOLD && actorName != playerName) || (targetValue > PLAYER_TOUCH_THRESHOLD && actorName == playerName ) && actorName != "")
+  if ((targetValue > config.cbpcOtherTouchThreshold && actorName != playerName) || (targetValue > config.cbpcSelfTouchThreshold && actorName == playerName ) && actorName != "")
     Main.Debug("Most touched location (" + actorName + "): " + locationStr[0] + " = " + locations[0])
     string lineToSay = ""
     bool wasPenetration = (JMap.GetInt(touchedLocations, GENITAL_COLLISION_KEY) == 1)
@@ -300,9 +302,9 @@ Event OnUpdate()
     float currentTime = Utility.GetCurrentRealTime()
     float cooldown = 0.0
     if !sex.CanAnimate(playerRef, playerRef) ; Enforce different cooldown during sex
-      cooldown = collisionSexCooldown.GetValue()
+      cooldown = config.collisionSexCooldown
     Else
-      cooldown = collisionSpeechCooldown.GetValue()
+      cooldown = config.collisionSpeechCooldown
     EndIf
     if currentTime - lastCollisionSpeechTime < cooldown || !(PromptKeys.Find(targetNode) >= 0) || !bHasAIFF
       Main.RegisterEvent(lineToSay)
@@ -313,7 +315,7 @@ Event OnUpdate()
       lastCollisionSpeechTime = currentTime
     EndIf
   EndIf
-  RegisterForSingleUpdate(collisionCooldown.GetValue())
+  RegisterForSingleUpdate(config.collisionCooldown)
 EndEvent
 
 

@@ -1,0 +1,238 @@
+Scriptname minai_Config extends SKI_ConfigBase Conditional
+
+minai_MainQuestController main
+minai_AIFF aiff
+minai_Sex  sex
+minai_DeviousStuff devious
+
+; OID definitions
+int logLevelOID
+int useCBPCOID
+int cbpcDisableSelfAssTouchOID
+int cbpcDisableSelfTouchOID
+int cbpcSelfTouchThresholdOID
+int cbpcOtherTouchThresholdOID
+int collisionCooldownOID
+int collisionSpeechCooldownOID
+int collisionSexCooldownOID
+
+; Legacy globals
+GlobalVariable useCBPC
+GlobalVariable minai_UseOstim
+
+
+; New configs
+Bool cbpcDisableSelfAssTouchDefault = True
+Bool Property cbpcDisableSelfAssTouch = True Auto
+
+Bool cbpcDisableSelfTouchDefault = False 
+Bool Property cbpcDisableSelfTouch = False Auto
+
+float cbpcOtherTouchThresholdDefault = 10.0
+float Property cbpcOtherTouchThreshold = 10.0 Auto
+
+float cbpcSelfTouchThresholdDefault = 20.0 
+float Property cbpcSelfTouchThreshold = 20.0 Auto
+
+
+float collisionCooldownDefault = 2.0
+float Property collisionCooldown = 2.0 Auto
+float collisionSpeechCooldownDefault = 8.0
+float Property collisionSpeechCooldown = 8.0 Auto
+float collisionSexCooldownDefault = 14.0
+float Property collisionSexCooldown = 14.0 Auto
+
+
+
+Event OnConfigInit()
+  main.Info("Building mcm menu.")
+  InitializeMCM()
+EndEvent
+
+Function InitializeMCM()
+  minai_UseOStim = Game.GetFormFromFile(0x0906, "MinAI.esp") as GlobalVariable
+  aiff = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_AIFF
+  sex = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_Sex
+  main = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_MainQuestController
+  devious = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_DeviousStuff
+  Main.Info("Initializing VR Module.")
+  useCBPC = Game.GetFormFromFile(0x0910, "MinAI.esp") as GlobalVariable
+  SetupPages()
+EndFunction
+
+int Function GetVersion()
+	return 2 ; mcm menu version
+EndFunction
+
+Function SetupPages()
+  Pages = new string[7]	
+  Pages[0] = "General"
+  pages[1] = "Physics (CBPC)"
+  Pages[2] = "Devious Stuff"
+  Pages[3] = "Survival"
+  Pages[4] = "Arousal and Appearance"
+  Pages[5] = "Sex"
+  Pages[6] = "LLM"
+EndFunction
+
+Event OnVersionUpdate(int newVersion)
+  if newVersion != CurrentVersion
+    InitializeMCM()
+  EndIf
+EndEvent
+
+Event OnPageReset(string page)
+  Main.Info("OnPageReset(" + page + ")")
+  If page == "Physics (CBPC)" || page == ""
+    RenderPhysicsPage()
+  Else
+    RenderPlaceholderPage()
+  EndIf
+EndEvent
+
+
+Function RenderPhysicsPage()
+  SetCursorFillMode(TOP_TO_BOTTOM)		
+  AddHeaderOption("CBPC Settings")
+  UseCBPCOID = AddToggleOption("Enable CBPC", useCBPC.GetValueInt() == 1)
+  cbpcDisableSelfTouchOID = AddToggleOption("Disable Self Touch", cbpcDisableSelfTouch)
+  cbpcDisableSelfAssTouchOID = AddToggleOption("Disable Self Ass Touch", cbpcDisableSelfAssTouch)
+  collisionCooldownOID = AddSliderOption("Physics Calculation Rate", collisionCooldown, "{1}")
+  collisionSpeechCooldownOID = AddSliderOption("Physics Speech Comment Rate", collisionSpeechCooldown, "{1}")
+  collisionSexCooldownOID = AddSliderOption("Physics Speech Comment Rate (Sex)", collisionSexCooldown, "{1}")
+EndFunction
+
+Function RenderPlaceholderPage()
+  AddHeaderOption("Not Yet Implemented") 
+EndFunction
+
+
+Function SetGlobalToggle(int oid, GlobalVariable var, bool value)
+  if value
+    var.SetValue(1)
+  else
+    var.SetValue(0)
+  EndIf
+  SetToggleOptionValue(oid, var.GetValueInt() == 1)
+EndFunction
+
+Function ToggleGlobal(int oid, GlobalVariable var)
+  if var.GetValueInt() == 1
+    var.SetValue(0)
+  else
+    var.SetValue(1)
+  EndIf
+  SetToggleOptionValue(oid, var.GetValueInt() == 1)
+EndFunction
+
+
+Event OnOptionSelect(int oid)
+  if oid == UseCBPCOID
+    toggleGlobal(oid, useCBPC)
+  elseif oid == cbpcDisableSelfTouchOID
+    cbpcDisableSelfTouch = !cbpcDisableSelfTouch
+    SetToggleOptionValue(oid, cbpcDisableSelfTouch)
+  elseif oid == cbpcDisableSelfAssTouchOID
+    cbpcDisableSelfAssTouch = !cbpcDisableSelfAssTouch
+    SetToggleOptionValue(oid, cbpcDisableSelfAssTouch)
+  EndIf
+EndEvent
+
+
+Event OnOptionDefault(int oid)
+  if oid == UseCBPCOID
+    SetGlobalToggle(oid, UseCBPC, true)
+  elseif oid == cbpcDisableSelfTouchOID
+    cbpcDisableSelfTouch = cbpcDisableSelfTouchDefault
+    SetToggleOptionValue(oid, cbpcDisableSelfTouchDefault)
+  elseif oid == cbpcDisableSelfAssTouchOID
+    cbpcDisableSelfAssTouch = cbpcDisableSelfAssTouchDefault
+    SetToggleOptionValue(oid, cbpcDisableSelfAssTouchDefault)
+  elseif oid == cbpcSelfTouchThresholdOID
+    cbpcSelfTouchThreshold = cbpcSelfTouchThresholdDefault
+    SetSliderOptionValue(cbpcSelfTouchThresholdOID, cbpcSelfTouchThresholdDefault, "{1}")
+  elseif oid == cbpcOtherTouchThresholdOID
+    cbpcOtherTouchThreshold = cbpcOtherTouchThresholdDefault
+    SetSliderOptionValue(cbpcOtherTouchThresholdOID, cbpcOtherTouchThresholdDefault, "{1}")
+  elseif oid ==  collisionCooldownOID
+    collisionCooldown = collisionCooldownDefault
+    SetSliderOptionValue(collisionCooldownOID, collisionCooldownDefault, "{1}")
+  elseif oid ==  collisionSpeechCooldownOID
+    collisionSpeechCooldown = collisionSpeechCooldownDefault
+    SetSliderOptionValue(collisionSpeechCooldownOID, collisionSpeechCooldownDefault, "{1}")
+  elseif oid ==  collisionSexCooldownOID
+    collisionSexCooldown = collisionSexCooldownDefault
+    SetSliderOptionValue(collisionSexCooldownOID, collisionSexCooldownDefault, "{1}")
+  EndIf
+EndEvent
+
+
+Event OnOptionHighlight(int oid)
+  if oid == UseCBPCOID
+    SetInfoText("Enables or disables CBPC globally")
+  elseif oid == cbpcDisableSelfTouchOID
+    SetInfoText("Enables or disables collision detection on self")
+  elseif oid == cbpcDisableSelfAssTouchOID
+    SetInfoText("Enables or disables collision detection on one's own ass. Useful to avoid detection events in VR")
+  elseif oid == cbpcOtherTouchThresholdOID
+    SetInfoText("How long (Cumulatively) within a given period a part must be touched for collision to register for touching others")
+  elseif oid == cbpcSelfTouchThresholdOID
+    SetInfoText("How long (Cumulatively) within a given period a part must be touched for collision to register for touching oneself")
+  elseif oid == collisionCooldownOID
+    SetInfoText("How often physics are calculated in seconds. Lower = more responsive, higher = less script load")
+  elseif oid == collisionSpeechCooldownOID
+    SetInfoText("How often the AI should be prompted to react to physics in seconds (outside of sex)")
+  elseif oid == collisionSexCooldownOID
+    SetInfoText("How often the AI should be prompted to react to physics in seconds (during sex)")
+  EndIf
+EndEvent
+
+Event OnOptionSliderOpen(int oid)
+  if oid == cbpcSelfTouchThresholdOID
+    SetSliderDialogStartValue(cbpcSelfTouchThreshold)
+    SetSliderDialogDefaultValue(cbpcSelfTouchThresholdDefault)
+    SetSliderDialogRange(1,100)
+    SetSliderDialogInterval(1)
+  elseif oid == cbpcOtherTouchThresholdOID
+    SetSliderDialogStartValue(cbpcOtherTouchThreshold)
+    SetSliderDialogDefaultValue(cbpcOtherTouchThresholdDefault)
+    SetSliderDialogRange(1,100)
+    SetSliderDialogInterval(1)
+  elseif oid == collisionCooldownOID
+    SetSliderDialogStartValue(collisionCooldown)
+    SetSliderDialogDefaultValue(collisionCooldownDefault)
+    SetSliderDialogRange(1, 100)
+    SetSliderDialogInterval(0.5)
+  elseif oid == collisionSpeechCooldownOID
+    SetSliderDialogStartValue(collisionSpeechCooldown)
+    SetSliderDialogDefaultValue(collisionSpeechCooldownDefault)
+    SetSliderDialogRange(1, 100)
+    SetSliderDialogInterval(0.5)
+  elseif oid == collisionSexCooldownOID
+    SetSliderDialogStartValue(collisionSexCooldown)
+    SetSliderDialogDefaultValue(collisionSexCooldownDefault)
+    SetSliderDialogRange(1, 100)
+    SetSliderDialogInterval(0.5)
+  EndIf
+EndEvent
+
+
+
+Event OnOptionSliderAccept(int oid, float value)
+  if oid == cbpcSelfTouchThresholdOID
+    cbpcSelfTouchThreshold = value
+    SetSliderOptionValue(oid, value, "{0}")
+  elseif oid == cbpcOtherTouchThresholdOID
+    cbpcOtherTouchThreshold = value
+    SetSliderOptionValue(oid, value, "{0}")
+  elseif oid == collisionCooldownOID
+    collisionCooldown = value
+    SetSliderOptionValue(oid, value, "{1}")
+  elseif oid == collisionSpeechCooldownOID
+    collisionSpeechCooldown = value
+    SetSliderOptionValue(oid, value, "{1}")
+  elseif oid == collisionSexCooldownOID
+    collisionSexCooldown = value
+    SetSliderOptionValue(oid, value, "{1}")
+  EndIf  
+EndEvent
