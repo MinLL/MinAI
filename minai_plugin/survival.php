@@ -149,7 +149,7 @@ $GLOBALS["FUNCTIONS"][] = [
             "properties" => [
                 "target" => [
                     "type" => "string",
-                    "description" => "The destination you are taking {$GLOBALS["PLAYER_NAME"]}",
+                    "description" => "The skill you are teaching to {$GLOBALS["PLAYER_NAME"]}",
                     "enum" => $destinations
                 ]
             ],
