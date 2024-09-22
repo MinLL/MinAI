@@ -1,4 +1,5 @@
 <?php
+require_once("config.php");
 require_once("util.php");
 require_once("deviousfollower.php");
     
@@ -18,13 +19,16 @@ Function GetSurvivalContext($name) {
     $thirst = GetActorValue($name, "thirst");
     $fatigue = GetActorValue($name, "fatigue");
     if ($hunger > 0) {
-        $ret .= "{$name}'s hunger level is at {$hunger}/5. ";
+        $hunger = (floatval($hunger)/5) * 100;
+        $ret .= "{$name}'s hunger level is at {$hunger}%. ";
     }
     if ($thirst > 0) {
-        $ret .= "{$name}'s thirst level is at {$thirst}/5. ";
+        $thirst = (floatval($thirst)/5) * 100;
+        $ret .= "{$name}'s thirst level is at {$thirst}%. ";
     }
     if ($fatigue > 0) {
-        $ret .= "{$name}'s fatigue level is at {$fatigue}/5. ";
+        $fatigue = (floatval($fatigue)/5) * 100;
+        $ret .= "{$name}'s fatigue level is at {$fatigue}%. ";
     }
     return $ret;
 }
@@ -33,7 +37,7 @@ Function GetArousalContext($name) {
   $ret = "";
   $arousal = GetActorValue($name, "arousal");
   if ($arousal != "") {
-    $ret .= "{$name}'s sexual arousal level is {$arousal}/100.";
+      $ret .= "{$name}'s sexual arousal level is {$arousal}/100, where 0 is not aroused at all, and 100 is desperate for sex. ";
   }
   return $ret;
 }
@@ -257,7 +261,7 @@ Function GetDDContext($name) {
   return $ret;
 }
 
-if (!$disable_nsfw) {
+if (!$GLOBALS["disable_nsfw"]) {
     $GLOBALS["COMMAND_PROMPT"].= BuildContext($GLOBALS["PLAYER_NAME"]);
     $GLOBALS["COMMAND_PROMPT"].= BuildContext($GLOBALS["HERIKA_NAME"]);
     $GLOBALS["COMMAND_PROMPT"].="

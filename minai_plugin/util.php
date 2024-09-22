@@ -45,7 +45,7 @@ Function IsPlayer($name) {
     return ($GLOBALS["PLAYER_NAME"] == $name);
 }
 
-$GenericFuncRet =function($gameRequest) {
+$GLOBALS["GenericFuncRet"] =function($gameRequest) {
     // Example, if papyrus execution gives some error, we will need to rewrite request her.
     // BY default, request will be $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdSpankAss"]
     // $gameRequest = [type of message,localts,gamets,data]
