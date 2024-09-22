@@ -339,6 +339,7 @@ $GLOBALS["FUNCTIONS"][] = [
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartVaginalfingering"]=$GLOBALS["GenericFuncRet"];
 
+
 $GLOBALS["F_NAMES"]["ExtCmdRemoveClothes"]="RemoveClothes";
 $GLOBALS["F_TRANSLATIONS"]["ExtCmdRemoveClothes"]="Remove all of your clothes and armor";
 $GLOBALS["FUNCTIONS"][] = [
