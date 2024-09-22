@@ -3,6 +3,7 @@ scriptname minai_Survival extends Quest
 bool bHasSunhelm = False
 bool bUseVanilla = True
 bool bHasBFT = False
+bool bHasCampfire = False
 
 _shweathersystem sunhelmWeather
 _SunHelmMain property sunhelmMain auto
@@ -41,7 +42,10 @@ function Maintenance(minai_MainQuestController _main)
       Main.Error("Could not load all sunhelm references")
     EndIf    
   EndIf
-
+  if Game.GetModByName("Campfire.esm") != 255
+    bHasCampfire = True
+    RegisterForModEvent("Campfire_OnObjectPlaced", "Campfire_OnObjectPlaced")
+  EndIf
   carriageScript = Game.GetFormFromFile(0x17F01, "Skyrim.esm") as CarriageSystemScript
   if !carriageScript
     Main.Error("Could not get reference to carriageScript")
@@ -311,3 +315,10 @@ string Function GetFactionsForActor(actor akTarget)
   return ret
 EndFunction
 
+
+Event Campfire_OnObjectPlaced(Form akPlacedObject, float afPositionX, float afPositionY, float afPositionZ, float afAngleX, float afAngleY, float afAngleZ, bool abIsTent)
+  string playerName = playerRef.GetActorBase().GetName()
+  if abIsTent
+    Main.RegisterEvent(playerName + " just set up a tent.", "chatnf_survival_1")
+  EndIf
+EndEvent

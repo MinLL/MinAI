@@ -1,19 +1,33 @@
 <?php
 require_once("util.php");
 require_once("deviousfollower.php");
-
+    
 Function BuildContext($name) {
   if ($name == "The Narrator") {
     return "";
   }
- return "\n" . GetPhysicalDescription($name) . "\n" . GetClothingContext($name) . "\n" . GetDDContext($name) . "\n" . GetArousalContext($name) . "\n" . GetDeviousFollowerContext($name) . "\n";
+  return "\n" . GetPhysicalDescription($name) . "\n" . GetClothingContext($name) . "\n" . GetDDContext($name) . "\n" . GetArousalContext($name) . "\n" . GetDeviousFollowerContext($name) . "\n" . GetSurvivalContext($name) . "\n";
+}
+
+Function GetSurvivalContext($name) {
+    $ret = "";
+    if (!IsPlayer($name) || !IsModEnabled("Sunhelm")) {
+        return $ret;
+    }
+    $hunger = GetActorValue($name, "hunger");
+    $thirst = GetActorValue($name, "thirst");
+    $fatigue = GetActorValue($name, "fatigue");
+    $ret .= "{$name}'s hunger level is at {$hunger}/5. ";
+    $ret .= "{$name}'s thirst level is at {$thirst}/5. ";
+    $ret .= "{$name}'s fatigue level is at {$fatigue}/5. ";
+    return $ret;
 }
 
 Function GetArousalContext($name) {
   $ret = "";
   $arousal = GetActorValue($name, "arousal");
   if ($arousal != "") {
-    $ret .= "{$name}'s sexual arousal is {$arousal} percent.";
+    $ret .= "{$name}'s sexual arousal level is {$arousal}/100.";
   }
   return $ret;
 }
