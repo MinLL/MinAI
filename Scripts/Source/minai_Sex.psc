@@ -553,7 +553,7 @@ Function DirtyTalk(string lineToSay, string lineType, string name)
   if currentTime - lastDirtyTalk > 5
     lastDirtyTalk = currentTime
     Main.Debug("DirtyTalk(" + lineToSay + ", " + lineType +", " + name +")")
-    AIAgentFunctions.requestMessageForActor(lineToSay, lineType, name)
+    Main.RequestLLMResponse(lineToSay, lineType, name)
   Else
     Main.Debug("DirtyTalk - THROTTLED")
   EndIf

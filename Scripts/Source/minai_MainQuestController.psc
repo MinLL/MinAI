@@ -15,9 +15,11 @@ minai_Survival survival
 minai_Arousal arousal
 minai_DeviousStuff devious
 minai_VR vr
+minai_Config config
 
 bool bHasMantella = False;
 bool bHasAIFF = False;
+float lastRequestTime
 
 Event OnInit()
   Maintenance()
@@ -30,6 +32,10 @@ EndFunction
 
 Function Maintenance()
   playerRef = game.GetPlayer()
+  config = Game.GetFormFromFile(0x0912, "MinAI.esp") as minai_Config
+  if !config
+    Fatal("Could not load configuration - script version mismatch with esp")
+  EndIf
   logLevel = Game.GetFormFromFile(0x090B, "MinAI.esp") as GlobalVariable
   if (!logLevel)
     Debug.MessageBox("Mismatched MinAI.esp and minai_MainQuestController version")
@@ -66,6 +72,7 @@ Function Maintenance()
       minAIFF.SetInitialized()
     EndIf
   EndIf
+  lastRequestTime = 0.0
   Info("Initialization complete.")
 EndFunction
 
@@ -91,6 +98,22 @@ Function RegisterEvent(String eventLine, string eventType = "")
     minAIFF.RegisterEvent(eventLine, eventType)
   EndIf
   
+EndFunction
+
+
+Function RequestLLMResponse(string eventLine, string eventType, string name)
+  if bHasAIFF
+    float currentTime = Utility.GetCurrentRealTime()
+    if currentTime - lastRequestTime > config.requestResponseCooldown
+      lastRequestTime = currentTime
+      Info("Requesting response from LLM: " + eventLine)
+      AIAgentFunctions.requestMessageForActor(eventLine, eventType, name)
+    Else
+      RegisterEvent(eventLine, eventType)
+    EndIf
+  elseif bHasMantella
+    RegisterEvent(eventLine, eventType)
+   EndIf
 EndFunction
 
 string Function GetActorName(actor akActor)
