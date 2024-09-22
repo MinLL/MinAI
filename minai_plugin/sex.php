@@ -28,7 +28,7 @@ if (IsModEnabled("Sexlab") || IsModEnabled("Ostim")) {
 
 
 $GLOBALS["F_NAMES"]["ExtCmdStartSexScene"]="StartSexScene";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartSexScene"]="Engage in sexual activity with the target";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartSexScene"]="Immediately engage in sexual activity with the target";
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdStartSexScene"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartSexScene"],
@@ -93,7 +93,7 @@ $GLOBALS["FUNCTIONS"][] = [
 $GLOBALS["FUNCRET"]["ExtCmdStartOrgy"]=$GLOBALS["GenericFuncRet"];
 
 $GLOBALS["F_NAMES"]["ExtCmdStartVaginal"]="StartVaginal";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartVaginal"]="Engage in vaginal sex with the target";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartVaginal"]="Immediately engage in vaginal sex with the target";
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdStartVaginal"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartVaginal"],
@@ -112,7 +112,7 @@ $GLOBALS["FUNCTIONS"][] = [
 $GLOBALS["FUNCRET"]["ExtCmdStartVaginal"]=$GLOBALS["GenericFuncRet"];
 
 $GLOBALS["F_NAMES"]["ExtCmdStartAnal"]="StartAnal";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartAnal"]="Engage in anal sex with the target";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartAnal"]="Immediately engage in anal sex with the target";
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdStartAnal"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartAnal"],
@@ -131,7 +131,7 @@ $GLOBALS["FUNCTIONS"][] = [
 $GLOBALS["FUNCRET"]["ExtCmdStartAnal"]=$GLOBALS["GenericFuncRet"];
 
 $GLOBALS["F_NAMES"]["ExtCmdStartBlowjob"]="StartBlowjob";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartBlowjob"]="Engage in oral sex with the target by either giving or receiving a blowjob";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartBlowjob"]="Immediately engage in oral sex with the target by either giving or receiving a blowjob";
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdStartBlowjob"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartBlowjob"],
@@ -150,7 +150,7 @@ $GLOBALS["FUNCTIONS"][] = [
 $GLOBALS["FUNCRET"]["ExtCmdStartBlowjob"]=$GLOBALS["GenericFuncRet"];
 
 $GLOBALS["F_NAMES"]["ExtCmdStartHandjob"]="StartHandjob";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartHandjob"]="Engage in manual stimulation with the target by either giving or receiving a handjob";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartHandjob"]="Immediately engage in manual stimulation with the target by either giving or receiving a handjob";
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdStartHandjob"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartHandjob"],
@@ -169,7 +169,7 @@ $GLOBALS["FUNCTIONS"][] = [
 $GLOBALS["FUNCRET"]["ExtCmdStartHandjob"]=$GLOBALS["GenericFuncRet"];
 
 $GLOBALS["F_NAMES"]["ExtCmdStartFootjob"]="StartFootjob";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartFootjob"]="Engage in a footjob with target";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartFootjob"]="Immediately engage in a footjob with target";
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdStartFootjob"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartFootjob"],
@@ -188,7 +188,7 @@ $GLOBALS["FUNCTIONS"][] = [
 $GLOBALS["FUNCRET"]["ExtCmdStartFootjob"]=$GLOBALS["GenericFuncRet"];
 
 $GLOBALS["F_NAMES"]["ExtCmdStartBoobjob"]="StartBoobjob";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartBoobjob"]="Engage in a boobjob with target";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartBoobjob"]="Immediately engage in a boobjob with target";
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdStartBoobjob"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartBoobjob"],
@@ -207,7 +207,7 @@ $GLOBALS["FUNCTIONS"][] = [
 $GLOBALS["FUNCRET"]["ExtCmdStartBoobjob"]=$GLOBALS["GenericFuncRet"];
 
 $GLOBALS["F_NAMES"]["ExtCmdStartCunnilingus"]="StartCunnilingus";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartCunnilingus"]="Engage in cunnilingus with target";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartCunnilingus"]="Immediately engage in cunnilingus with target";
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdStartCunnilingus"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartCunnilingus"],
@@ -226,7 +226,7 @@ $GLOBALS["FUNCTIONS"][] = [
 $GLOBALS["FUNCRET"]["ExtCmdStartCunnilingus"]=$GLOBALS["GenericFuncRet"];
 
 $GLOBALS["F_NAMES"]["ExtCmdStartFacial"]="StartFacial";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartFacial"]="Engage in a facial cumshot with target";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartFacial"]="Immediately engage in a facial cumshot with target";
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdStartFacial"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartFacial"],
@@ -245,7 +245,7 @@ $GLOBALS["FUNCTIONS"][] = [
 $GLOBALS["FUNCRET"]["ExtCmdStartFacial"]=$GLOBALS["GenericFuncRet"];
 
 $GLOBALS["F_NAMES"]["ExtCmdStartCumonchest"]="StartCumonchest";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartCumonchest"]="Engage in a chest cumshot with target";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartCumonchest"]="Immediately engage in a chest cumshot with target";
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdStartCumonchest"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartCumonchest"],
@@ -264,7 +264,7 @@ $GLOBALS["FUNCTIONS"][] = [
 $GLOBALS["FUNCRET"]["ExtCmdStartCumonchest"]=$GLOBALS["GenericFuncRet"];
 
 $GLOBALS["F_NAMES"]["ExtCmdStartRubbingclitoris"]="StartRubbingclitoris";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartRubbingclitoris"]="Engage in manual stimulation with the target by rubbing the clitoris";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartRubbingclitoris"]="Immediately engage in manual stimulation with the target by rubbing the clitoris";
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdStartRubbingclitoris"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartRubbingclitoris"],
@@ -283,7 +283,7 @@ $GLOBALS["FUNCTIONS"][] = [
 $GLOBALS["FUNCRET"]["ExtCmdStartRubbingclitoris"]=$GLOBALS["GenericFuncRet"];
 
 $GLOBALS["F_NAMES"]["ExtCmdStartDeepthroat"]="StartDeepthroat";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartDeepthroat"]="Engage in extra deep blowjob or facefucking with target";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartDeepthroat"]="Immediately engage in extra deep blowjob or facefucking with target";
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdStartDeepthroat"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartDeepthroat"],
@@ -302,7 +302,7 @@ $GLOBALS["FUNCTIONS"][] = [
 $GLOBALS["FUNCRET"]["ExtCmdStartDeepthroat"]=$GLOBALS["GenericFuncRet"];
 
 $GLOBALS["F_NAMES"]["ExtCmdStartRimjob"]="StartRimjob";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartRimjob"]="Engage in a rimjob with target";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartRimjob"]="Immediately engage in a rimjob with target";
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdStartRimjob"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartRimjob"],
@@ -321,7 +321,7 @@ $GLOBALS["FUNCTIONS"][] = [
 $GLOBALS["FUNCRET"]["ExtCmdStartRimjob"]=$GLOBALS["GenericFuncRet"];
 
 $GLOBALS["F_NAMES"]["ExtCmdStartFingering"]="StartFingering";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartFingering"]="Engage in manual stimulation with the target by fingering the vagina";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartFingering"]="Immediately engage in manual stimulation with the target by fingering the vagina";
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdStartFingering"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartFingering"],
