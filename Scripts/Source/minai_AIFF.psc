@@ -208,3 +208,7 @@ Event OnUpdate()
   SetContext(player)
   RegisterForSingleUpdate(playerContextUpdateInterval)
 EndEvent
+
+bool Function HasAIFF()
+  return bHasAIFF
+EndFunction
