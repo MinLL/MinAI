@@ -323,7 +323,7 @@ EndFunction
 Event Campfire_OnObjectPlaced(Form akPlacedObject, float afPositionX, float afPositionY, float afPositionZ, float afAngleX, float afAngleY, float afAngleZ, bool abIsTent)
   string playerName = playerRef.GetActorBase().GetName()
   if abIsTent
-    Main.RegisterEvent(playerName + " set up a tent.", "info_survival_1")
+    Main.RequestLLMResponse(playerName + " set up a tent.", "chatnf_survival_1", playerName)
   EndIf
 EndEvent
 
@@ -331,16 +331,17 @@ EndEvent
 Event Campfire_OnObjectRemoved(Form akBaseObject, float afPositionX, float afPositionY, float afPositionZ, float afAngleX, float afAngleY, float afAngleZ, bool abIsTent)
   string playerName = playerRef.GetActorBase().GetName()
   if abIsTent
-    Main.RegisterEvent(playerName + " took down a tent.", "info_survival_1")
+    Main.RequestLLMResponse(playerName + " took down a tent.", "chatnf_survival_1", playerName)
   EndIf
 EndEvent
 
 Event Campfire_OnBedrollSitLay(Form akTent, bool abGettingUp)
   string playerName = playerRef.GetActorBase().GetName()
-  if abGettingUp
-    Main.RegisterEvent(playerName + " laid down on a bedroll.", "info_survival_1")
+  if !abGettingUp
+    Main.RequestLLMResponse(playerName + " laid down on a bedroll.", "chatnf_survival_1", playerName)
   else
-    Main.RegisterEvent(playerName + " got up from a bedroll.", "info_survival_1")
+    ; This might be too spammy if it's chat, since they'll also get the "goodmorning" message at the same time
+    Main.RequestLLMResponse(playerName + " got up from a bedroll.", "chatnf_survival_1", playerName)
   endif
 endEvent
 
@@ -348,13 +349,14 @@ endEvent
 Event Campfire_OnTentEnter(Form akTent, bool abHasShelter)
   string playerName = playerRef.GetActorBase().GetName()
   if abHasShelter
-    Main.RegisterEvent(playerName + " entered their tent, which has adequate shelter.", "info_survival_1")
+    Main.RequestLLMResponse(playerName + " entered their tent, which has adequate shelter.", "chatnf_survival_1", playerName)
   else
-    Main.RegisterEvent(playerName + " entered their tent, which is unsheltered from the elements.", "info_survival_1")
+    Main.RequestLLMResponse(playerName + " entered their tent, which is unsheltered from the elements.", "chatnf_survival_1", playerName)
   endif
 endEvent
 
 Event Campfire_OnTentLeave()
-  string playerName = playerRef.GetActorBase().GetName()
-  Main.RegisterEvent(playerName + " left their tent.", "info_survival_1")
+  ; This seems to fire at inappropriate times
+  ; string playerName = playerRef.GetActorBase().GetName()
+  ; Main.RequestLLMResponse(playerName + " left their tent.", "chatnf_survival_1", playerName)
 endEvent
