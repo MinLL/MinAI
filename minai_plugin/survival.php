@@ -50,7 +50,7 @@ $GLOBALS["FUNCTIONS"][] = [
             "required" => [],
         ],
     ];
-$GLOBALS["FUNCRET"]["ExtCmdServeFood"]=$GenericFuncRet;
+$GLOBALS["FUNCRET"]["ExtCmdServeFood"]=$GLOBALS["GenericFuncRet"];
 
 $GLOBALS["F_NAMES"]["ExtCmdTrade"]="BeginTrading";
 $GLOBALS["F_TRANSLATIONS"]["ExtCmdTrade"]="Buy from or sell items to {$GLOBALS["PLAYER_NAME"]}";
