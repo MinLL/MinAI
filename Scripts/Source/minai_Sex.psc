@@ -280,9 +280,9 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
   elseif stringutil.Find(sayLine, "-startsex-") != -1 || stringUtil.Find(sayLine, "-sex-") != -1 || stringUtil.Find(sayLine, "-fuck-") != -1
     Start2pSex(akSpeaker, akTarget, Player, bPlayerInScene)
   elseif stringutil.Find(sayLine, "-vaginalsex-") != -1
-    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "vaginalsex")
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "vaginal")
   elseif stringutil.Find(sayLine, "-analsex-") != -1
-    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "analsex")
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "anal")
   elseif stringutil.Find(sayLine, "-blowjob-") != -1
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "blowjob")
   elseif stringutil.Find(sayLine, "-handjob-") != -1
