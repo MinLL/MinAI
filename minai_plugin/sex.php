@@ -35,7 +35,7 @@ $GLOBALS["FUNCTIONS"][] = [
             "required" => [],
         ],
     ];
-$GLOBALS["FUNCRET"]["ExtCmdStartSexScene"]=$GenericFuncRet;
+$GLOBALS["FUNCRET"]["ExtCmdStartSexScene"]=$GLOBALS["GenericFuncRet"];
 
 
 $GLOBALS["F_NAMES"]["ExtCmdMasturbate"]="Masturbate";
@@ -60,7 +60,7 @@ $GLOBALS["FUNCTIONS"][] = [
 
 
 
-$GLOBALS["FUNCRET"]["ExtCmdMasturbate"]=$GenericFuncRet;
+$GLOBALS["FUNCRET"]["ExtCmdMasturbate"]=$GLOBALS["GenericFuncRet"];
 
 
 
@@ -81,7 +81,7 @@ $GLOBALS["FUNCTIONS"][] = [
             "required" => [],
         ],
     ];
-$GLOBALS["FUNCRET"]["ExtCmdStartOrgy"]=$GenericFuncRet;
+$GLOBALS["FUNCRET"]["ExtCmdStartOrgy"]=$GLOBALS["GenericFuncRet"];
 
 $GLOBALS["F_NAMES"]["ExtCmdStartVaginal"]="StartVaginal";
 $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartVaginal"]="Immediately engage in vaginal sex with the target";
@@ -100,7 +100,7 @@ $GLOBALS["FUNCTIONS"][] = [
             "required" => [],
         ],
     ];
-$GLOBALS["FUNCRET"]["ExtCmdStartVaginal"]=$GenericFuncRet;
+$GLOBALS["FUNCRET"]["ExtCmdStartVaginal"]=$GLOBALS["GenericFuncRet"];
 
 $GLOBALS["F_NAMES"]["ExtCmdStartAnal"]="StartAnal";
 $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartAnal"]="Immediately engage in anal sex with the target";
@@ -119,7 +119,7 @@ $GLOBALS["FUNCTIONS"][] = [
             "required" => [],
         ],
     ];
-$GLOBALS["FUNCRET"]["ExtCmdStartAnal"]=$GenericFuncRet;
+$GLOBALS["FUNCRET"]["ExtCmdStartAnal"]=$GLOBALS["GenericFuncRet"];
 
 $GLOBALS["F_NAMES"]["ExtCmdStartBlowjob"]="StartBlowjob";
 $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartBlowjob"]="Immediately engage in oral sex with the target by either giving or receiving a blowjob";
@@ -138,7 +138,7 @@ $GLOBALS["FUNCTIONS"][] = [
             "required" => [],
         ],
     ];
-$GLOBALS["FUNCRET"]["ExtCmdStartBlowjob"]=$GenericFuncRet;
+$GLOBALS["FUNCRET"]["ExtCmdStartBlowjob"]=$GLOBALS["GenericFuncRet"];
 
 $GLOBALS["F_NAMES"]["ExtCmdStartHandjob"]="StartHandjob";
 $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartHandjob"]="Immediately engage in manual stimulation with the target by either giving or receiving a handjob";
@@ -157,7 +157,7 @@ $GLOBALS["FUNCTIONS"][] = [
             "required" => [],
         ],
     ];
-$GLOBALS["FUNCRET"]["ExtCmdStartHandjob"]=$GenericFuncRet;
+$GLOBALS["FUNCRET"]["ExtCmdStartHandjob"]=$GLOBALS["GenericFuncRet"];
 
 $GLOBALS["F_NAMES"]["ExtCmdRemoveClothes"]="RemoveClothes";
 $GLOBALS["F_TRANSLATIONS"]["ExtCmdRemoveClothes"]="Remove all of your clothes and armor";
@@ -176,7 +176,7 @@ $GLOBALS["FUNCTIONS"][] = [
             "required" => [],
         ],
     ];
-$GLOBALS["FUNCRET"]["ExtCmdRemoveClothes"]=$GenericFuncRet;
+$GLOBALS["FUNCRET"]["ExtCmdRemoveClothes"]=$GLOBALS["GenericFuncRet"];
 
 
 $GLOBALS["F_NAMES"]["ExtCmdPutOnClothes"]="PutOnClothes";
@@ -196,7 +196,7 @@ $GLOBALS["FUNCTIONS"][] = [
             "required" => [],
         ],
     ];
-$GLOBALS["FUNCRET"]["ExtCmdPutOnClothes"]=$GenericFuncRet;
+$GLOBALS["FUNCRET"]["ExtCmdPutOnClothes"]=$GLOBALS["GenericFuncRet"];
 
 ?>
 
