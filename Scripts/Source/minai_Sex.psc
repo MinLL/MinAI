@@ -225,9 +225,21 @@ EndFunction
 
 sslBaseAnimation[] Function FindSexlabAnimations(actor[] actors, int numMales, int numFemales, string tags, bool forceaggressive = false)
   sslBaseAnimation[] ret
+  string suppressTag = "forced,"
+  if numMales == 0
+    suppressTag += "MM,MF"
+  EndIf
+  if numFemales == 0
+    suppressTag += "FF,MF,"
+  EndIf
+  if numMales == 1
+    suppressTag += "MM,"
+  EndIf
+  if numFemales == 1
+    suppressTag += "FF,"
+  EndIf
   if devious.HasDD()
     main.Debug("FindValidSexlabAnimations: Using DD's SelectValidDDAnimations")
-    string suppressTag = "forced"
     ret = devious.libs.SelectValidDDAnimations(actors, numMales + numFemales, forceaggressive, tags, suppressTag)
   EndIf
   if !ret
@@ -235,14 +247,7 @@ sslBaseAnimation[] Function FindSexlabAnimations(actor[] actors, int numMales, i
     if tags == ""
       return slf.GetAnimationsByDefault(numMales, numFemales)
     else
-      string suppressStr = "forced,"
-      if numMales == 0
-        suppressStr += "MM,"
-      EndIf
-      if numFemales == 0
-        suppressStr += "FF,"
-      EndIf
-      return slf.GetAnimationsByTags(numMales +  numFemales, tags, suppressStr)
+      return slf.GetAnimationsByTags(numMales +  numFemales, tags, suppressTag)
     EndIf
   EndIf
   return ret
