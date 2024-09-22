@@ -47,26 +47,35 @@ if (ShouldClearFollowerFunctions()) {
     $GLOBALS["ENABLED_FUNCTIONS"][] = 'SearchMemory';
     $GLOBALS["ENABLED_FUNCTIONS"][] = 'Attack'; // Should this be enabled?
 }
-
-
-if (!$GLOBALS["disable_nsfw"]) {
-    require "arousal.php";
-    require "sex.php";
-    require "slapp.php";
+else {
+    // Follower specific commands
+    require "followers.php";
 }
 require "survival.php";
-require "followers.php";
+
 if ($GLOBALS["force_voice_type"]) {
     require "fix_xtts.php";
 }
 
+
 if (!$GLOBALS["disable_nsfw"]) {
+    // NSFW comands
+    require "arousal.php";
+    if (ShouldEnableSexFunctions($GLOBALS["HERIKA_NAME"])) {
+        require "sex.php";
+    }
+    if (ShouldEnableHarassFunctions($GLOBALS["HERIKA_NAME"])) {
+        require "slapp.php";
+    }
     require_once("deviousnarrator.php");
     if (ShouldUseDeviousNarrator()) {
         // Anything loaded after this will have functions enabled for the narrator
         EnableDeviousNarratorActions();
+        require_once("generalperverted.php");
     }
-    require "generalperverted.php";
+    if (ShouldEnableHarassFunctions($GLOBALS["HERIKA_NAME"])) {
+        require_once("generalperverted.php");
+    }
     require "deviousdevices.php";
 }
 

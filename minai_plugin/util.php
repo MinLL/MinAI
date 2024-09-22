@@ -85,4 +85,25 @@ Function ShouldClearFollowerFunctions() {
     return ($GLOBALS["restrict_nonfollower_functions"] && !IsFollower($GLOBALS["HERIKA_NAME"]));
 }
 
-?>
+Function ShouldEnableSexFunctions($name) {
+    $arousalThreshold = GetActorValue($GLOBALS['PLAYER_NAME'], "arousalForSex");
+    $arousal = GetActorValue($name, "arousal");
+    if (empty($arousalThreshold) || empty($arousal)) {
+        // If the config isn't set, default to enabled.
+        // User may also not have arousal mod, so default to enabled
+        return true;
+    }
+    return (intval($arousal) >= intval($arousalThreshold));
+}
+
+
+Function ShouldEnableHarassFunctions($name) {
+    $arousalThreshold = GetActorValue($GLOBALS['PLAYER_NAME'], "arousalForHarass");
+    $arousal = GetActorValue($name, "arousal");
+    if (empty($arousalThreshold) || empty($arousal)) {
+        // If the config isn't set, default to enabled.
+        // User may also not have arousal mod, so default to enabled
+        return true;
+    }
+    return (intval($arousal) >= intval($arousalThreshold));
+}

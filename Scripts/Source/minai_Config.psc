@@ -18,6 +18,8 @@ int collisionSexCooldownOID
 int allowDeviceLockOID
 int allowDeviceUnlockOID
 int requestResponseCooldownOID
+int arousalForSexOID
+int arousalForHarassOID
 
 ; Legacy globals
 GlobalVariable useCBPC
@@ -55,6 +57,12 @@ bool Property allowDeviceUnlock = False Auto
 float requestResponseCooldownDefault = 5.0
 Float Property requestResponseCooldown = 5.0 Auto
 
+float arousalForSexDefault = 0.0
+Float Property arousalForSex = 0.0 Auto
+
+float arousalForHarassDefault = 0.0
+Float Property arousalForHarass = 0.0 Auto
+
 Event OnConfigInit()
   main.Info("Building mcm menu.")
   InitializeMCM()
@@ -72,14 +80,15 @@ Function InitializeMCM()
 EndFunction
 
 int Function GetVersion()
-	return 4 ; mcm menu version
+	return 6 ; mcm menu version
 EndFunction
 
 Function SetupPages()
-  Pages = new string[3]
+  Pages = new string[4]
   Pages[0] = "General"
   Pages[1] = "Physics (CBPC)"
   Pages[2] = "Devious Stuff"
+  Pages[3] = "Sex Settings"
 EndFunction
 
 Event OnVersionUpdate(int newVersion)
@@ -96,6 +105,8 @@ Event OnPageReset(string page)
     RenderPhysicsPage()
   elseif page == "Devious Stuff"
     RenderDeviousPage()
+  elseif page == "Sex"
+    RenderSexPage()
   Else
     RenderPlaceholderPage()
   EndIf
@@ -118,6 +129,15 @@ Function RenderPhysicsPage()
   collisionSexCooldownOID = AddSliderOption("Physics Speech Comment Rate (Sex)", collisionSexCooldown, "{1}")
   cbpcSelfTouchThresholdOID = AddSliderOption("Self Touch Threshold", cbpcSelfTouchThreshold, "{1}")
   cbpcOtherTouchThresholdOID = AddSliderOption("NPC Touch Threshold", cbpcOtherTouchThreshold, "{1}")
+  collisionCooldownOID = AddSliderOption("Physics Calculation Rate", collisionCooldown, "{1}")
+EndFunction
+
+
+Function RenderSexPage()
+  SetCursorFillMode(TOP_TO_BOTTOM)
+  AddHeaderOption("Arousal Settings ")
+  arousalForSexOID = AddSliderOption("Arousal Threshold for Sex", arousalForSex, "{0}")
+  arousalForHarassOID = AddSliderOption("Arousal Threshold for Flirting/Harassment", arousalForHarass, "{0}")
 EndFunction
 
 
@@ -167,6 +187,8 @@ EndFunction
 Function StoreAllConfigs()
   StoreConfig("allowDeviceLock", allowDeviceLock)
   StoreConfig("allowDeviceUnlock", allowDeviceUnlock)
+  StoreConfig("arousalForSex", arousalForSex)
+  StoreConfig("arousalForHarass", arousalForHarass)
 EndFunction
 
 Event OnOptionSelect(int oid)
@@ -227,6 +249,12 @@ Event OnOptionDefault(int oid)
   elseif oid == requestResponseCooldownOID
     requestResponseCooldown = requestResponseCooldownDefault
     SetSliderOptionValue(requestResponseCooldownOID, requestResponseCooldownDefault, "{1}")
+  elseif oid ==  arousalForSexOID
+    arousalForSex = arousalForSexDefault
+    SetSliderOptionValue(arousalForSexOID, arousalForSexDefault, "{0}")
+  elseif oid ==  arousalForHarassOID
+    arousalForHarass = arousalForHarassDefault
+    SetSliderOptionValue(arousalForHarassOID, arousalForHarassDefault, "{0}")
   EndIf
 EndEvent
 
@@ -254,6 +282,10 @@ Event OnOptionHighlight(int oid)
     SetInfoText("Should the AI be allowed to unlock devices from actors?")
   elseif oid == requestResponseCooldownOID
     SetInfoText("The minimum time in seconds inbetween requests for the LLM to react to an in-game event")
+  elseif oid == arousalForSexOID
+    SetInfoText("Minimum Arousal level required for the Sex related actions to be exposed to the LLM")
+  elseif oid == arousalForHarassOID
+    SetInfoText("Minimum Arousal level required for actions like spanking, groping, kissing to be exposed to the LLM")
   EndIf
 EndEvent
 
@@ -288,6 +320,16 @@ Event OnOptionSliderOpen(int oid)
     SetSliderDialogDefaultValue(requestResponseCooldownDefault)
     SetSliderDialogRange(4, 60)
     SetSliderDialogInterval(0.5)
+  elseif oid == arousalForSexOID
+    SetSliderDialogStartValue(arousalForSex)
+    SetSliderDialogDefaultValue(arousalForSexDefault)
+    SetSliderDialogRange(1, 100)
+    SetSliderDialogInterval(1.0)
+  elseif oid == arousalForHarassOID
+    SetSliderDialogStartValue(arousalForHarass)
+    SetSliderDialogDefaultValue(arousalForHarassDefault)
+    SetSliderDialogRange(1, 100)
+    SetSliderDialogInterval(1.0)
   EndIf
 EndEvent
 
@@ -312,5 +354,13 @@ Event OnOptionSliderAccept(int oid, float value)
   elseif oid == requestResponseCooldownOID
     requestResponseCooldown = value
     SetSliderOptionValue(oid, value, "{1}")
+  elseif oid == arousalForSexOID
+    arousalForSex = value
+    SetSliderOptionValue(oid, value, "{0}")
+    StoreConfig("arousalForSex", arousalForSex)
+  elseif oid == arousalForHarassOID
+    arousalForHarass = value
+    SetSliderOptionValue(oid, value, "{0}")
+    StoreConfig("arousalForHarass", arousalForHarass)
   EndIf  
 EndEvent
