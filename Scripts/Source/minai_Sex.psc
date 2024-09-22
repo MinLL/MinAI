@@ -114,7 +114,7 @@ Function Start2pSex(actor akSpeaker, actor akTarget, actor Player, bool bPlayerI
       EndIf
       ; ostimActors = OActorUtil.Sort(ostimActors, OActorUtil.EmptyArray())
       string newScene = OLibrary.GetRandomSceneWithAction(ostimActors, tags)
-      ; Utility.Wait(2)
+      Utility.Wait(0.2)
       int ActiveOstimThreadID = OThreadBuilder.Create(ostimActors)
       Main.Debug("Found " + tags + " scene: " + newScene + " for OStim Thread [" + ActiveOstimThreadID + "].")
       OThreadBuilder.SetStartingAnimation(ActiveOstimThreadID, newScene)
@@ -143,7 +143,7 @@ Function StartSexOrSwitchTo(actor akSpeaker, actor akTarget, actor Player, bool 
     ostimActors = OThread.GetActors(ActiveOstimThreadID)
     ; ostimActors = OActorUtil.Sort(ostimActors, OActorUtil.EmptyArray())
     string newScene = OLibrary.GetRandomSceneWithAction(ostimActors, tags)
-    ; Utility.Wait(2)
+    Utility.Wait(0.2)
     Main.Debug("Ostim scene transition to: " + newScene + " for OStim Thread [" + ActiveOstimThreadID + "].")
     if OThread.IsRunning(ActiveOstimThreadID)
       OThread.NavigateTo(ActiveOstimThreadID, newScene)
