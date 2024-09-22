@@ -172,6 +172,7 @@ EndFunction
 Event OnOptionSelect(int oid)
   if oid == UseCBPCOID
     toggleGlobal(oid, useCBPC)
+    Debug.Notification("CBPC setting changed. Save/Reload to take effect")
   elseif oid == cbpcDisableSelfTouchOID
     cbpcDisableSelfTouch = !cbpcDisableSelfTouch
     SetToggleOptionValue(oid, cbpcDisableSelfTouch)
@@ -193,6 +194,7 @@ EndEvent
 Event OnOptionDefault(int oid)
   if oid == UseCBPCOID
     SetGlobalToggle(oid, UseCBPC, true)
+    Debug.Notification("CBPC setting changed. Save/Reload to take effect")
   elseif oid == cbpcDisableSelfTouchOID
     cbpcDisableSelfTouch = cbpcDisableSelfTouchDefault
     SetToggleOptionValue(oid, cbpcDisableSelfTouchDefault)
@@ -231,7 +233,7 @@ EndEvent
 
 Event OnOptionHighlight(int oid)
   if oid == UseCBPCOID
-    SetInfoText("Enables or disables CBPC globally")
+    SetInfoText("Enables or disables CBPC globally. Requires save/reload to take effect")
   elseif oid == cbpcDisableSelfTouchOID
     SetInfoText("Enables or disables collision detection on self")
   elseif oid == cbpcDisableSelfAssTouchOID
