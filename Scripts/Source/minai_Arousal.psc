@@ -206,41 +206,41 @@ function WriteClothingString(actor akActor, actor player, bool isYou=false, acto
 			EndIf
 			if bHasTNG
 				bool exposed = IsTNGExposed(currentActor)
-				if currentActor.GetActorBase().GetSex() == 0 && exposed == True || currentActor.HasKeyword(TNG_Gentlewoman) && exposed == True
+				if (currentActor.GetActorBase().GetSex() == 0 && exposed == True) || (currentActor.HasKeyword(TNG_Gentlewoman) && exposed == True)
 					if exposed == True && cuirass != None || cuirass == None
 						main.RegisterAction(actorName + "'s genitals are exposed.")
-					EndIf
-					string sizeDescription = ""
-					Main.Debug("TNG Dick Check on "+ actorName)
-					; Check for auto-assigned first
-					if currentActor.HasKeywordString("TNG_ActorAddnAuto:05")
-						sizeDescription = "one of the biggest cocks you've ever seen"
-					elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:04")
-						sizeDescription = "a large cock"
-					elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:03")
-						sizeDescription = "an average sized cock"
-					elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:02")
-						sizeDescription = "a very small cock"
-					elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:01")
-						sizeDescription = "an embarrassingly tiny prick"
-					EndIf
-					; Supersede if manually set
-					if currentActor.HasKeyword(TNG_XL)
-						sizeDescription = "one of the biggest cocks you've ever seen"
-					elseif currentActor.HasKeyword(TNG_L)
-						sizeDescription = "a large cock"
-					elseif currentActor.HasKeyword(TNG_M) || currentActor.HasKeyword(TNG_DefaultSize)
-						sizeDescription = "an average sized cock"
-					elseif currentActor.HasKeyword(TNG_S)
-						sizeDescription = "a very small cock"
-					elseif currentActor.HasKeyword(TNG_XS)
-						sizeDescription = "an embarrassingly tiny prick"
-					EndIf
-					if sizeDescription != ""
-						main.RegisterAction("You can see that " + actorName + " has " + sizeDescription + ".")
-					else
-						Main.Info("TNG Dick Check Failed on " + actorName)
-					EndIf
+            string sizeDescription = ""
+            Main.Debug("TNG Dick Check on "+ actorName)
+            ; Check for auto-assigned first
+            if currentActor.HasKeywordString("TNG_ActorAddnAuto:05")
+              sizeDescription = "one of the biggest cocks you've ever seen"
+            elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:04")
+              sizeDescription = "a large cock"
+            elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:03")
+              sizeDescription = "an average sized cock"
+            elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:02")
+              sizeDescription = "a very small cock"
+            elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:01")
+              sizeDescription = "an embarrassingly tiny prick"
+            EndIf
+            ; Supersede if manually set
+            if currentActor.HasKeyword(TNG_XL)
+              sizeDescription = "one of the biggest cocks you've ever seen"
+            elseif currentActor.HasKeyword(TNG_L)
+              sizeDescription = "a large cock"
+            elseif currentActor.HasKeyword(TNG_M) || currentActor.HasKeyword(TNG_DefaultSize)
+              sizeDescription = "an average sized cock"
+            elseif currentActor.HasKeyword(TNG_S)
+              sizeDescription = "a very small cock"
+            elseif currentActor.HasKeyword(TNG_XS)
+              sizeDescription = "an embarrassingly tiny prick"
+            EndIf
+            if sizeDescription != ""
+              main.RegisterAction("You can see that " + actorName + " has " + sizeDescription + ".")
+            else
+              Main.Info("TNG Dick Check Failed on " + actorName)
+            EndIf
+          EndIf
 				EndIf
 			EndIf
 			if !bHasArousedKeywords
