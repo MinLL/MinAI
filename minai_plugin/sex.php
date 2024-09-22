@@ -16,7 +16,7 @@ if (IsModEnabled("Sexlab") || IsModEnabled("Ostim")) {
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartRubbingclitoris";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartDeepthroat";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartRimjob";
-        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartVaginalfingering";
+        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartFingering";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartAggressive";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdPutOnClothes";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdRemoveClothes";
