@@ -78,6 +78,10 @@ string Function ConvertTagsOstim(string tags)
     tags = "rubbingclitoris"
   elseif tags == "vampire"
     tags = "vampirebite"
+  elseif tags == "hugging"
+    tags = "cuddling"
+  elseif tags == "kissing"
+    tags = "frenchkissing"
   EndIf
   return tags
 EndFunction
@@ -305,14 +309,14 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "rimjob")
   elseif stringutil.Find(sayLine, "-fingering-") != -1
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "fingering")
-  elseif stringutil.Find(sayLine, "-vampire-") != -1
+  elseif stringutil.Find(sayLine, "-vampirebite-") != -1
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "vampire")
   elseIf stringutil.Find(sayLine, "-groupsex-") != -1 || stringUtil.Find(sayLine, "-orgy-") != -1 || stringUtil.Find(sayLine, "-threesome-") != -1
     StartGroupSex(akSpeaker, akTarget, Player, bPlayerInScene, actorsFromFormList)
   elseif stringutil.Find(sayLine, "-cuddling-") != -1
-    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "cuddling")
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "hugging")
   elseif stringutil.Find(sayLine, "-frenchkissing-") != -1
-    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "frenchkissing")
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "kissing")
   EndIf
 EndFunction
 
