@@ -6,6 +6,7 @@ minai_AIFF aiff
 minai_Sex  sex
 minai_DeviousStuff devious
 minai_Config config
+minai_Arousal arousal
 
 actor playerRef
 bool bHasAIFF
@@ -32,6 +33,7 @@ string BELLY_KEY = "Belly"
 string PENIS_KEY = "Penis"
 string OTHER_KEY = "Body Non-Sexually"
 string ACTOR_KEY = "ActorName"
+string ACTORREF_KEY = "ActorRef"
 string GENITAL_COLLISION_KEY = "GenitalCollision"
 
 bool hitThreshold
@@ -50,6 +52,7 @@ function Maintenance(minai_MainQuestController _main)
   aiff = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_AIFF
   sex = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_Sex
   devious = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_DeviousStuff
+  arousal = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_Arousal
   Main.Info("Initializing VR Module.")
   bHasAIFF = (Game.GetModByName("AIAgent.esp") != 255)
 
@@ -180,6 +183,7 @@ Function TrackTouch(string nodeType, float collisionDuration, actor akActor)
     JMap.SetStr(touchedLocations, ACTOR_KEY, "someone")
   Else
     JMap.SetStr(touchedLocations, ACTOR_KEY, actorName)
+    JMap.SetForm(touchedLocations, ACTORREF_KEY, akActor)
   EndIf
 EndFunction
 
@@ -245,6 +249,7 @@ EndFunction
 
 Function ClearTouchedLocations()
   JMap.SetStr(touchedLocations, ACTOR_KEY, "")
+  JMap.SetStr(touchedLocations, ACTORREF_KEY, None)
   JMap.SetFlt(touchedLocations, BREASTS_KEY, 0.0)
   JMap.SetFlt(touchedLocations, VAGINAL_KEY, 0.0)
   JMap.SetFlt(touchedLocations, ANAL_KEY, 0.0)
@@ -270,6 +275,7 @@ Event OnUpdate()
     return
   EndIf
   string actorName = JMap.GetStr(touchedLocations, ACTOR_KEY)
+  Actor akActor = JMap.GetForm(touchedLocations, ACTORREF_KEY) as Actor
   string playerName = playerRef.GetActorBase().GetName()
   if actorName == ""
     Main.Debug("No actor touched for collision")
@@ -312,10 +318,28 @@ Event OnUpdate()
     main.RequestLLMResponse(lineToSay, "chatnf_vr_1", actorName)
     lastCollisionSpeechTime = currentTime
   EndIf
+  ProcessArousal(akActor)
   ClearTouchedLocations()
   RegisterForSingleUpdate(config.collisionCooldown)
 EndEvent
 
+Function ProcessArousal(actor akActor)
+  if !akActor
+    return
+  EndIf
+  Main.Debug("CBPC: Updating arousal for actor " + akActor.GetActorBase().GetName())
+  if locationHit == VAGINAL_KEY
+    arousal.UpdateArousal(akActor, 2)
+  elseif locationHit == ANAL_KEY
+    arousal.UpdateArousal(akActor, 2)
+  elseif locationHit == PENIS_KEY
+    arousal.UpdateArousal(akActor, 2)
+  elseif locationHit == BREASTS_KEY
+    arousal.UpdateArousal(akActor, 1)
+  elseif locationHit == BUTT_KEY
+    arousal.UpdateArousal(akActor, 1)
+  EndIf
+EndFunction
 
 function ResetSpeechCooldowns()
   lastCollisionSpeechTime = 0
