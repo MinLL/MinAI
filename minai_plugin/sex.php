@@ -320,11 +320,11 @@ $GLOBALS["FUNCTIONS"][] = [
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartRimjob"]=$GLOBALS["GenericFuncRet"];
 
-$GLOBALS["F_NAMES"]["ExtCmdStartVaginalfingering"]="StartVaginalfingering";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartVaginalfingering"]="Engage in manual stimulation with the target by fingering the vagina";
+$GLOBALS["F_NAMES"]["ExtCmdStartFingering"]="StartFingering";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartFingering"]="Engage in manual stimulation with the target by fingering the vagina";
 $GLOBALS["FUNCTIONS"][] = [
-        "name" => $GLOBALS["F_NAMES"]["ExtCmdStartVaginalfingering"],
-        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartVaginalfingering"],
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdStartFingering"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartFingering"],
         "parameters" => [
             "type" => "object",
             "properties" => [
@@ -337,7 +337,7 @@ $GLOBALS["FUNCTIONS"][] = [
             "required" => [],
         ],
     ];
-$GLOBALS["FUNCRET"]["ExtCmdStartVaginalfingering"]=$GLOBALS["GenericFuncRet"];
+$GLOBALS["FUNCRET"]["ExtCmdStartFingering"]=$GLOBALS["GenericFuncRet"];
 
 $GLOBALS["F_NAMES"]["ExtCmdRemoveClothes"]="RemoveClothes";
 $GLOBALS["F_TRANSLATIONS"]["ExtCmdRemoveClothes"]="Remove all of your clothes and armor";
