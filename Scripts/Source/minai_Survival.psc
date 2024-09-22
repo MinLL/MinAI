@@ -3,6 +3,7 @@ scriptname minai_Survival extends Quest
 bool bHasSunhelm = False
 bool bUseVanilla = True
 bool bHasBFT = False
+bool bHasCampfire = False
 
 _shweathersystem sunhelmWeather
 _SunHelmMain property sunhelmMain auto
@@ -41,7 +42,14 @@ function Maintenance(minai_MainQuestController _main)
       Main.Error("Could not load all sunhelm references")
     EndIf    
   EndIf
-
+  if Game.GetModByName("Campfire.esm") != 255
+    bHasCampfire = True
+    RegisterForModEvent("Campfire_OnObjectPlaced", "Campfire_OnObjectPlaced")
+    RegisterForModEvent("Campfire_OnObjectRemoved", "Campfire_OnObjectRemoved")
+    RegisterForModEvent("Campfire_OnBedrollSitLay", "Campfire_OnBedrollSitLay")
+    RegisterForModEvent("Campfire_OnTentEnter", "Campfire_OnTentEnter")
+    RegisterForModEvent("Campfire_OnTentLeave", "Campfire_OnTentLeave")
+  EndIf
   carriageScript = Game.GetFormFromFile(0x17F01, "Skyrim.esm") as CarriageSystemScript
   if !carriageScript
     Main.Error("Could not get reference to carriageScript")
@@ -168,6 +176,14 @@ EndFunction
 
 
 
+
+
+
+
+
+
+
+
 Event CommandDispatcher(String speakerName,String  command, String parameter)
   Actor akSpeaker=AIAgentFunctions.getAgentByName(speakerName)
   actor akTarget= AIAgentFunctions.getAgentByName(parameter)
@@ -203,15 +219,10 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     carriageScript.Travel(destination, akSpeaker)
     Main.RegisterEvent(""+speakerName+" gave " + targetName + " a ride in a carriage to " + destination + ".")
   EndIf
-  if command == "ExtCmdTrainSkill"
+    if command == "ExtCmdTrainSkill"
     Main.Debug(speakerName + " is training the player")
     Game.ShowTrainingMenu(akSpeaker)
     Main.RegisterEvent(""+speakerName+" gave " + targetName + " some training.")
-  EndIf
-  if command == "ExtCmdInventory"
-    Main.Debug(speakerName + " opened their inventory")
-    akSpeaker.OpenInventory(true)
-    Main.RegisterEvent(speakerName + " opened their inventory for " + targetName + ".")
   EndIf
 EndEvent
 
@@ -308,3 +319,44 @@ string Function GetFactionsForActor(actor akTarget)
   return ret
 EndFunction
 
+
+Event Campfire_OnObjectPlaced(Form akPlacedObject, float afPositionX, float afPositionY, float afPositionZ, float afAngleX, float afAngleY, float afAngleZ, bool abIsTent)
+  string playerName = playerRef.GetActorBase().GetName()
+  if abIsTent
+    Main.RequestLLMResponse(playerName + " set up a tent.", "chatnf_survival_1", playerName)
+  EndIf
+EndEvent
+
+
+Event Campfire_OnObjectRemoved(Form akBaseObject, float afPositionX, float afPositionY, float afPositionZ, float afAngleX, float afAngleY, float afAngleZ, bool abIsTent)
+  string playerName = playerRef.GetActorBase().GetName()
+  if abIsTent
+    Main.RequestLLMResponse(playerName + " took down a tent.", "chatnf_survival_1", playerName)
+  EndIf
+EndEvent
+
+Event Campfire_OnBedrollSitLay(Form akTent, bool abGettingUp)
+  string playerName = playerRef.GetActorBase().GetName()
+  if !abGettingUp
+    Main.RequestLLMResponse(playerName + " laid down on a bedroll.", "chatnf_survival_1", playerName)
+  else
+    ; This might be too spammy if it's chat, since they'll also get the "goodmorning" message at the same time
+    Main.RequestLLMResponse(playerName + " got up from a bedroll.", "chatnf_survival_1", playerName)
+  endif
+endEvent
+
+
+Event Campfire_OnTentEnter(Form akTent, bool abHasShelter)
+  string playerName = playerRef.GetActorBase().GetName()
+  if abHasShelter
+    Main.RequestLLMResponse(playerName + " entered their tent, which has adequate shelter.", "chatnf_survival_1", playerName)
+  else
+    Main.RequestLLMResponse(playerName + " entered their tent, which is unsheltered from the elements.", "chatnf_survival_1", playerName)
+  endif
+endEvent
+
+Event Campfire_OnTentLeave()
+  ; This seems to fire at inappropriate times
+  ; string playerName = playerRef.GetActorBase().GetName()
+  ; Main.RequestLLMResponse(playerName + " left their tent.", "chatnf_survival_1", playerName)
+endEvent
