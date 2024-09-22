@@ -75,7 +75,7 @@ string Function ConvertTagsOstim(string tags)
 EndFunction
 
 bool Function CanAnimate(actor akTarget, actor akSpeaker)
-  if ((akTarget.IsOnMount() || akSpeaker.IsOnMount()))
+  if (akTarget.IsOnMount() || akSpeaker.IsOnMount())
     return False
   EndIf
   if bHasOstim && (minai_UseOStim.GetValue() == 1.0 && !OActor.IsInOStim(akTarget) && !OActor.IsInOStim(akSpeaker))
