@@ -45,6 +45,10 @@ function Maintenance(minai_MainQuestController _main)
   if Game.GetModByName("Campfire.esm") != 255
     bHasCampfire = True
     RegisterForModEvent("Campfire_OnObjectPlaced", "Campfire_OnObjectPlaced")
+    RegisterForModEvent("Campfire_OnObjectRemoved", "Campfire_OnObjectRemoved")
+    RegisterForModEvent("Campfire_OnBedrollSitLay", "Campfire_OnBedrollSitLay")
+    RegisterForModEvent("Campfire_OnTentEnter", "Campfire_OnTentEnter")
+    RegisterForModEvent("Campfire_OnTentLeave", "Campfire_OnTentLeave")
   EndIf
   carriageScript = Game.GetFormFromFile(0x17F01, "Skyrim.esm") as CarriageSystemScript
   if !carriageScript
@@ -319,6 +323,38 @@ EndFunction
 Event Campfire_OnObjectPlaced(Form akPlacedObject, float afPositionX, float afPositionY, float afPositionZ, float afAngleX, float afAngleY, float afAngleZ, bool abIsTent)
   string playerName = playerRef.GetActorBase().GetName()
   if abIsTent
-    Main.RegisterEvent(playerName + " just set up a tent.", "chatnf_survival_1")
+    Main.RegisterEvent(playerName + " set up a tent.", "info_survival_1")
   EndIf
 EndEvent
+
+
+Event Campfire_OnObjectRemoved(Form akBaseObject, float afPositionX, float afPositionY, float afPositionZ, float afAngleX, float afAngleY, float afAngleZ, bool abIsTent)
+  string playerName = playerRef.GetActorBase().GetName()
+  if abIsTent
+    Main.RegisterEvent(playerName + " took down a tent.", "info_survival_1")
+  EndIf
+EndEvent
+
+Event Campfire_OnBedrollSitLay(Form akTent, bool abGettingUp)
+  string playerName = playerRef.GetActorBase().GetName()
+  if abGettingUp
+    Main.RegisterEvent(playerName + " laid down on a bedroll.", "info_survival_1")
+  else
+    Main.RegisterEvent(playerName + " got up from a bedroll.", "info_survival_1")
+  endif
+endEvent
+
+
+Event Campfire_OnTentEnter(Form akTent, bool abHasShelter)
+  string playerName = playerRef.GetActorBase().GetName()
+  if abHasShelter
+    Main.RegisterEvent(playerName + " entered their tent, which has adequate shelter.", "info_survival_1")
+  else
+    Main.RegisterEvent(playerName + " entered their tent, which is unsheltered from the elements.", "info_survival_1")
+  endif
+endEvent
+
+Event Campfire_OnTentLeave()
+  string playerName = playerRef.GetActorBase().GetName()
+  Main.RegisterEvent(playerName + " left their tent.", "info_survival_1")
+endEvent
