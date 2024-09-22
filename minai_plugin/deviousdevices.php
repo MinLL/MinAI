@@ -83,9 +83,9 @@ $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdStopStimulation"]="{$GLOBALS["HER
 
 
 
-$GLOBALS["FUNCRET"]["ExtCmdShock"]=$GenericFuncRet;
-$GLOBALS["FUNCRET"]["ExtCmdForceOrgasm"]=$GenericFuncRet;
-$GLOBALS["FUNCRET"]["ExtCmdStopStimulation"]=$GenericFuncRet;
+$GLOBALS["FUNCRET"]["ExtCmdShock"]=$GLOBALS["GenericFuncRet"];
+$GLOBALS["FUNCRET"]["ExtCmdForceOrgasm"]=$GLOBALS["GenericFuncRet"];
+$GLOBALS["FUNCRET"]["ExtCmdStopStimulation"]=$GLOBALS["GenericFuncRet"];
 
 
 

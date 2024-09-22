@@ -147,9 +147,9 @@ $GLOBALS["FUNCRET"]["ExtCmdSpankAss"]=function($gameRequest) {
     
 };
 
-$GLOBALS["FUNCRET"]["ExtCmdSpankTits"]=$GenericFuncRet;
-$GLOBALS["FUNCRET"]["ExtCmdGrope"]=$GenericFuncRet;
-$GLOBALS["FUNCRET"]["ExtCmdPinchNipples"]=$GenericFuncRet;
+$GLOBALS["FUNCRET"]["ExtCmdSpankTits"]=$GLOBALS["GenericFuncRet"];
+$GLOBALS["FUNCRET"]["ExtCmdGrope"]=$GLOBALS["GenericFuncRet"];
+$GLOBALS["FUNCRET"]["ExtCmdPinchNipples"]=$GLOBALS["GenericFuncRet"];
 
 
 ?>

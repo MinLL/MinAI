@@ -36,17 +36,17 @@ EndEvent
 
 require_once("config.php");
 require_once("util.php");
-if (!$disable_nsfw) {
+if (!$GLOBALS["disable_nsfw"]) {
     require "arousal.php";
     require "sex.php";
     require "slapp.php";
 }
 require "survival.php";
-if ($force_voice_type) {
+if ($GLOBALS["force_voice_type"]) {
     require "fix_xtts.php";
 }
 
-if (!$disable_nsfw) {
+if (!$GLOBALS["disable_nsfw"]) {
     require_once("deviousnarrator.php");
     if (ShouldUseDeviousNarrator()) {
         // Anything loaded after this will have functions enabled for the narrator
