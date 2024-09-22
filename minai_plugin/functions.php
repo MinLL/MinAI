@@ -36,12 +36,26 @@ EndEvent
 
 require_once("config.php");
 require_once("util.php");
+
+if (ShouldClearFollowerFunctions()) {
+    $GLOBALS["ENABLED_FUNCTIONS"] = array();
+    // Enable baseline set of functions
+    $GLOBALS["ENABLED_FUNCTIONS"][] = 'Inspect';
+    $GLOBALS["ENABLED_FUNCTIONS"][] = 'LookAt';
+    $GLOBALS["ENABLED_FUNCTIONS"][] = 'InspectSurroundings';
+    $GLOBALS["ENABLED_FUNCTIONS"][] = 'TakeASeat';
+    $GLOBALS["ENABLED_FUNCTIONS"][] = 'SearchMemory';
+    $GLOBALS["ENABLED_FUNCTIONS"][] = 'Attack'; // Should this be enabled?
+}
+
+
 if (!$GLOBALS["disable_nsfw"]) {
     require "arousal.php";
     require "sex.php";
     require "slapp.php";
 }
 require "survival.php";
+require "followers.php";
 if ($GLOBALS["force_voice_type"]) {
     require "fix_xtts.php";
 }
