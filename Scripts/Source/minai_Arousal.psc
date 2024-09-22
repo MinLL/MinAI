@@ -435,6 +435,8 @@ Function SetContext(actor akTarget)
   String actorName = main.GetActorName(akTarget)
   Armor cuirass = akTarget.GetWornForm(cuirassSlot) as Armor
   aiff.SetActorVariable(akTarget, "isnaked", !cuirass)
+  aiff.SetActorVariable(akTarget, "isexposed", IsTNGExposed(akTarget))
+  aiff.SetActorVariable(akTarget, "cuirass", cuirass.GetName())
   aiff.SetActorVariable(akTarget, "arousal", GetActorArousal(akTarget))
   
   if !bHasArousedKeywords
