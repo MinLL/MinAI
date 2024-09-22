@@ -17,9 +17,15 @@ Function GetSurvivalContext($name) {
     $hunger = GetActorValue($name, "hunger");
     $thirst = GetActorValue($name, "thirst");
     $fatigue = GetActorValue($name, "fatigue");
-    $ret .= "{$name}'s hunger level is at {$hunger}/5. ";
-    $ret .= "{$name}'s thirst level is at {$thirst}/5. ";
-    $ret .= "{$name}'s fatigue level is at {$fatigue}/5. ";
+    if ($hunger > 0) {
+        $ret .= "{$name}'s hunger level is at {$hunger}/5. ";
+    }
+    if ($thirst > 0) {
+        $ret .= "{$name}'s thirst level is at {$thirst}/5. ";
+    }
+    if ($fatigue > 0) {
+        $ret .= "{$name}'s fatigue level is at {$fatigue}/5. ";
+    }
     return $ret;
 }
 
