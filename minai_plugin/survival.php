@@ -53,7 +53,7 @@ $GLOBALS["FUNCTIONS"][] = [
 $GLOBALS["FUNCRET"]["ExtCmdServeFood"]=$GenericFuncRet;
 
 $GLOBALS["F_NAMES"]["ExtCmdTrade"]="BeginTrading";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdTrade"]="Trade in order to buy or sell items from {$GLOBALS["PLAYER_NAME"]}";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdTrade"]="Buy from or sell items to {$GLOBALS["PLAYER_NAME"]}";
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdTrade"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdTrade"],
@@ -131,7 +131,7 @@ $GLOBALS["FUNCTIONS"][] = [
             "properties" => [
                 "target" => [
                     "type" => "string",
-                    "description" => "The destination you are taking {$GLOBALS["PLAYER_NAME"]}",
+                    "description" => "The skill you are teaching to {$GLOBALS["PLAYER_NAME"]}",
                     "enum" => $destinations
                 ]
             ],

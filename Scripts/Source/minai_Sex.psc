@@ -114,7 +114,7 @@ Function Start2pSex(actor akSpeaker, actor akTarget, actor Player, bool bPlayerI
       EndIf
       ; ostimActors = OActorUtil.Sort(ostimActors, OActorUtil.EmptyArray())
       string newScene = OLibrary.GetRandomSceneWithAction(ostimActors, tags)
-      ; Utility.Wait(2)
+      Utility.Wait(0.2)
       int ActiveOstimThreadID = OThreadBuilder.Create(ostimActors)
       Main.Debug("Found " + tags + " scene: " + newScene + " for OStim Thread [" + ActiveOstimThreadID + "].")
       OThreadBuilder.SetStartingAnimation(ActiveOstimThreadID, newScene)
@@ -143,7 +143,7 @@ Function StartSexOrSwitchTo(actor akSpeaker, actor akTarget, actor Player, bool 
     ostimActors = OThread.GetActors(ActiveOstimThreadID)
     ; ostimActors = OActorUtil.Sort(ostimActors, OActorUtil.EmptyArray())
     string newScene = OLibrary.GetRandomSceneWithAction(ostimActors, tags)
-    ; Utility.Wait(2)
+    Utility.Wait(0.2)
     Main.Debug("Ostim scene transition to: " + newScene + " for OStim Thread [" + ActiveOstimThreadID + "].")
     if OThread.IsRunning(ActiveOstimThreadID)
       OThread.NavigateTo(ActiveOstimThreadID, newScene)
@@ -225,21 +225,9 @@ EndFunction
 
 sslBaseAnimation[] Function FindSexlabAnimations(actor[] actors, int numMales, int numFemales, string tags, bool forceaggressive = false)
   sslBaseAnimation[] ret
-  string suppressTag = "forced,"
-  if numMales == 0
-    suppressTag += "MM,MF"
-  EndIf
-  if numFemales == 0
-    suppressTag += "FF,MF,"
-  EndIf
-  if numMales == 1
-    suppressTag += "MM,"
-  EndIf
-  if numFemales == 1
-    suppressTag += "FF,"
-  EndIf
   if devious.HasDD()
     main.Debug("FindValidSexlabAnimations: Using DD's SelectValidDDAnimations")
+    string suppressTag = "forced"
     ret = devious.libs.SelectValidDDAnimations(actors, numMales + numFemales, forceaggressive, tags, suppressTag)
   EndIf
   if !ret
@@ -247,7 +235,14 @@ sslBaseAnimation[] Function FindSexlabAnimations(actor[] actors, int numMales, i
     if tags == ""
       return slf.GetAnimationsByDefault(numMales, numFemales)
     else
-      return slf.GetAnimationsByTags(numMales +  numFemales, tags, suppressTag)
+      string suppressStr = "forced,"
+      if numMales == 0
+        suppressStr += "MM,"
+      EndIf
+      if numFemales == 0
+        suppressStr += "FF,"
+      EndIf
+      return slf.GetAnimationsByTags(numMales +  numFemales, tags, suppressStr)
     EndIf
   EndIf
   return ret
@@ -264,7 +259,7 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
   ; Mutually Exclusive keywords
   If stringutil.Find(sayLine, "-masturbate-") != -1
     Start1pSex(akSpeaker)
-  elseif stringutil.Find(sayLine, "-startsex-") != -1 || stringUtil.Find(sayLine, "-have sex-") != -1 || stringUtil.Find(sayLine, "-sex-") != -1 || stringUtil.Find(sayLine, "-having sex-") != -1
+  elseif stringutil.Find(sayLine, "-startsex-") != -1 || stringUtil.Find(sayLine, "-sex-") != -1 || stringUtil.Find(sayLine, "-fuck-") != -1
     Start2pSex(akSpeaker, akTarget, Player, bPlayerInScene)
   elseif stringutil.Find(sayLine, "-vaginalsex-") != -1
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "vaginalsex")
@@ -274,8 +269,32 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "blowjob")
   elseif stringutil.Find(sayLine, "-handjob-") != -1
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "handjob")
-  elseIf stringutil.Find(sayLine, "-groupsex-") != -1 || stringUtil.Find(sayLine, "-orgy-") != -1 || stringUtil.Find(sayLine, "-threesome-") != -1 || stringUtil.Find(sayLine, "-fuck-") != -1
+  elseif stringutil.Find(sayLine, "-footjob-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "footjob")
+  elseif stringutil.Find(sayLine, "-boobjob-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "boobjob")
+  elseif stringutil.Find(sayLine, "-cunnilingus-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "cunnilingus")
+  elseif stringutil.Find(sayLine, "-facial-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "facial")
+  elseif stringutil.Find(sayLine, "-cumonchest-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "cumonchest")
+  elseif stringutil.Find(sayLine, "-rubbingclitoris-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "rubbingclitoris")
+  elseif stringutil.Find(sayLine, "-deepthroat-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "deepthroat")
+  elseif stringutil.Find(sayLine, "-rimjob-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "rimjob")
+  elseif stringutil.Find(sayLine, "-vaginalfingering-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "vaginalfingering")
+  elseif stringutil.Find(sayLine, "-vampirebite-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "vampirebite")
+  elseIf stringutil.Find(sayLine, "-groupsex-") != -1 || stringUtil.Find(sayLine, "-orgy-") != -1 || stringUtil.Find(sayLine, "-threesome-") != -1
     StartGroupSex(akSpeaker, akTarget, Player, bPlayerInScene, actorsFromFormList)
+  elseif stringutil.Find(sayLine, "-cuddling-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "cuddling")
+  elseif stringutil.Find(sayLine, "-frenchkissing-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "frenchkissing")
   EndIf
 EndFunction
 
@@ -308,6 +327,24 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Vaginal")
   elseif command == "ExtCmdStartHandjob"
     StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Handjob")
+  elseif command == "ExtCmdStartFootjob"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Footjob")
+  elseif command == "ExtCmdStartBoobjob"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Boobjob")
+  elseif command == "ExtCmdStartCunnilingus"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Cunnilingus")
+  elseif command == "ExtCmdStartFacial"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Facial")
+  elseif command == "ExtCmdStartCumonchest"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Cumonchest")
+  elseif command == "ExtCmdStartRubbingclitoris"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Rubbingclitoris")
+  elseif command == "ExtCmdStartDeepthroat"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Deepthroat")
+  elseif command == "ExtCmdStartRimjob"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Rimjob")
+  elseif command == "ExtCmdStartVaginalfingering"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "Vaginalfingering")
   elseIf command == "ExtCmdOrgy"
     Debug.Notification("Orgy is broken until I figure out how to get all AI actors")
     ; StartGroupSex(akSpeaker, akTarget, PlayerRef, bPlayerInScene, actorsFromFormList)
@@ -558,7 +595,7 @@ Function DirtyTalk(string lineToSay, string lineType, string name)
   if currentTime - lastDirtyTalk > 5
     lastDirtyTalk = currentTime
     Main.Debug("DirtyTalk(" + lineToSay + ", " + lineType +", " + name +")")
-    Main.RequestLLMResponse(lineToSay, lineType, name)
+    AIAgentFunctions.requestMessageForActor(lineToSay, lineType, name)
   Else
     Main.Debug("DirtyTalk - THROTTLED")
   EndIf
