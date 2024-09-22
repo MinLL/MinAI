@@ -19,7 +19,7 @@ if (IsModEnabled("Sexlab") || IsModEnabled("Ostim")) {
 
 
 $GLOBALS["F_NAMES"]["ExtCmdStartSexScene"]="StartSexScene";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartSexScene"]="Engage in sexual activity with the target";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartSexScene"]="Immediately engage in sexual activity with the target";
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdStartSexScene"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartSexScene"],
@@ -84,7 +84,7 @@ $GLOBALS["FUNCTIONS"][] = [
 $GLOBALS["FUNCRET"]["ExtCmdStartOrgy"]=$GenericFuncRet;
 
 $GLOBALS["F_NAMES"]["ExtCmdStartVaginal"]="StartVaginal";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartVaginal"]="Engage in vaginal sex with the target";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartVaginal"]="Immediately engage in vaginal sex with the target";
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdStartVaginal"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartVaginal"],
@@ -103,7 +103,7 @@ $GLOBALS["FUNCTIONS"][] = [
 $GLOBALS["FUNCRET"]["ExtCmdStartVaginal"]=$GenericFuncRet;
 
 $GLOBALS["F_NAMES"]["ExtCmdStartAnal"]="StartAnal";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartAnal"]="Engage in anal sex with the target";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartAnal"]="Immediately engage in anal sex with the target";
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdStartAnal"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartAnal"],
@@ -122,7 +122,7 @@ $GLOBALS["FUNCTIONS"][] = [
 $GLOBALS["FUNCRET"]["ExtCmdStartAnal"]=$GenericFuncRet;
 
 $GLOBALS["F_NAMES"]["ExtCmdStartBlowjob"]="StartBlowjob";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartBlowjob"]="Engage in oral sex with the target by either giving or receiving a blowjob";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartBlowjob"]="Immediately engage in oral sex with the target by either giving or receiving a blowjob";
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdStartBlowjob"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartBlowjob"],
@@ -141,7 +141,7 @@ $GLOBALS["FUNCTIONS"][] = [
 $GLOBALS["FUNCRET"]["ExtCmdStartBlowjob"]=$GenericFuncRet;
 
 $GLOBALS["F_NAMES"]["ExtCmdStartHandjob"]="StartHandjob";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartHandjob"]="Engage in manual stimulation with the target by either giving or receiving a handjob";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartHandjob"]="Immediately engage in manual stimulation with the target by either giving or receiving a handjob";
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdStartHandjob"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartHandjob"],
