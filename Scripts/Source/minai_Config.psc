@@ -287,7 +287,7 @@ Event OnOptionSliderOpen(int oid)
     SetSliderDialogStartValue(requestResponseCooldown)
     SetSliderDialogDefaultValue(requestResponseCooldownDefault)
     SetSliderDialogRange(4, 60)
-    SetSliderDialogInterval(1.0)
+    SetSliderDialogInterval(0.5)
   EndIf
 EndEvent
 
@@ -296,10 +296,10 @@ EndEvent
 Event OnOptionSliderAccept(int oid, float value)
   if oid == cbpcSelfTouchThresholdOID
     cbpcSelfTouchThreshold = value
-    SetSliderOptionValue(oid, value, "{0}")
+    SetSliderOptionValue(oid, value, "{1}")
   elseif oid == cbpcOtherTouchThresholdOID
     cbpcOtherTouchThreshold = value
-    SetSliderOptionValue(oid, value, "{0}")
+    SetSliderOptionValue(oid, value, "{1}")
   elseif oid == collisionCooldownOID
     collisionCooldown = value
     SetSliderOptionValue(oid, value, "{1}")
@@ -308,6 +308,9 @@ Event OnOptionSliderAccept(int oid, float value)
     SetSliderOptionValue(oid, value, "{1}")
   elseif oid == collisionSexCooldownOID
     collisionSexCooldown = value
+    SetSliderOptionValue(oid, value, "{1}")
+  elseif oid == requestResponseCooldownOID
+    requestResponseCooldown = value
     SetSliderOptionValue(oid, value, "{1}")
   EndIf  
 EndEvent
