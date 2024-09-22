@@ -72,4 +72,7 @@ Function HasKeyword($name, $keyword) {
     return str_contains(GetActorValue($name, "AllKeywords"), $keyword);
 }
 
+Function IsConfigEnabled($configKey) {
+    return IsEnabled($GLOBALS['PLAYER_NAME'], $configKey);
+}
 ?>

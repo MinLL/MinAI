@@ -15,6 +15,9 @@ int cbpcOtherTouchThresholdOID
 int collisionCooldownOID
 int collisionSpeechCooldownOID
 int collisionSexCooldownOID
+int allowDeviceLockOID
+int allowDeviceUnlockOID
+int requestResponseCooldownOID
 
 ; Legacy globals
 GlobalVariable useCBPC
@@ -31,18 +34,26 @@ Bool Property cbpcDisableSelfTouch = False Auto
 float cbpcOtherTouchThresholdDefault = 10.0
 float Property cbpcOtherTouchThreshold = 10.0 Auto
 
-float cbpcSelfTouchThresholdDefault = 20.0 
-float Property cbpcSelfTouchThreshold = 20.0 Auto
-
+float cbpcSelfTouchThresholdDefault = 10.0 
+float Property cbpcSelfTouchThreshold = 10.0 Auto
 
 float collisionCooldownDefault = 2.0
 float Property collisionCooldown = 2.0 Auto
+
 float collisionSpeechCooldownDefault = 8.0
 float Property collisionSpeechCooldown = 8.0 Auto
+
 float collisionSexCooldownDefault = 14.0
 float Property collisionSexCooldown = 14.0 Auto
 
+bool allowDeviceLockDefault = False
+bool Property allowDeviceLock = False Auto
 
+bool allowDeviceUnlockDefault = False
+bool Property allowDeviceUnlock = False Auto
+
+float requestResponseCooldownDefault = 5.0
+Float Property requestResponseCooldown = 5.0 Auto
 
 Event OnConfigInit()
   main.Info("Building mcm menu.")
@@ -61,18 +72,14 @@ Function InitializeMCM()
 EndFunction
 
 int Function GetVersion()
-	return 2 ; mcm menu version
+	return 4 ; mcm menu version
 EndFunction
 
 Function SetupPages()
-  Pages = new string[7]	
+  Pages = new string[3]
   Pages[0] = "General"
-  pages[1] = "Physics (CBPC)"
+  Pages[1] = "Physics (CBPC)"
   Pages[2] = "Devious Stuff"
-  Pages[3] = "Survival"
-  Pages[4] = "Arousal and Appearance"
-  Pages[5] = "Sex"
-  Pages[6] = "LLM"
 EndFunction
 
 Event OnVersionUpdate(int newVersion)
@@ -83,13 +90,22 @@ EndEvent
 
 Event OnPageReset(string page)
   Main.Info("OnPageReset(" + page + ")")
-  If page == "Physics (CBPC)" || page == ""
+  if page == "" || page == "General"
+    RenderGeneralPage()
+  elseIf page == "Physics (CBPC)"
     RenderPhysicsPage()
+  elseif page == "Devious Stuff"
+    RenderDeviousPage()
   Else
     RenderPlaceholderPage()
   EndIf
 EndEvent
 
+Function RenderGeneralPage()
+  SetCursorFillMode(TOP_TO_BOTTOM)		
+  AddHeaderOption("LLM Settings")
+  requestResponseCooldownOID = AddSliderOption("LLM Response Request Cooldown", requestResponseCooldown, "{1}")
+EndFunction
 
 Function RenderPhysicsPage()
   SetCursorFillMode(TOP_TO_BOTTOM)		
@@ -100,6 +116,20 @@ Function RenderPhysicsPage()
   collisionCooldownOID = AddSliderOption("Physics Calculation Rate", collisionCooldown, "{1}")
   collisionSpeechCooldownOID = AddSliderOption("Physics Speech Comment Rate", collisionSpeechCooldown, "{1}")
   collisionSexCooldownOID = AddSliderOption("Physics Speech Comment Rate (Sex)", collisionSexCooldown, "{1}")
+  cbpcSelfTouchThresholdOID = AddSliderOption("Self Touch Threshold", cbpcSelfTouchThreshold, "{1}")
+  cbpcOtherTouchThresholdOID = AddSliderOption("NPC Touch Threshold", cbpcOtherTouchThreshold, "{1}")
+EndFunction
+
+
+Function RenderDeviousPage()
+  SetCursorFillMode(TOP_TO_BOTTOM)		
+  AddHeaderOption("DD Settings")
+  if (!devious.HasDD())
+    AddHeaderOption("Devious Devices not detected")
+    return
+  EndIf
+  AllowDeviceLockOID = AddToggleOption("Allow the LLM to lock devices on actors", allowDeviceLock)
+  AllowDeviceUnlockOID = AddToggleOption("Allow the LLM to unlock devices on actors", allowDeviceUnlock)
 EndFunction
 
 Function RenderPlaceholderPage()
@@ -126,6 +156,19 @@ Function ToggleGlobal(int oid, GlobalVariable var)
 EndFunction
 
 
+Function StoreConfig(string var, string value)
+  actor Player = Game.GetPlayer()
+  string playerName = player.GetActorBase().GetName()
+  if aiff.HasAIFF()
+    aiff.SetActorVariable(Player, var, value)
+  EndIf
+EndFunction
+
+Function StoreAllConfigs()
+  StoreConfig("allowDeviceLock", allowDeviceLock)
+  StoreConfig("allowDeviceUnlock", allowDeviceUnlock)
+EndFunction
+
 Event OnOptionSelect(int oid)
   if oid == UseCBPCOID
     toggleGlobal(oid, useCBPC)
@@ -135,6 +178,14 @@ Event OnOptionSelect(int oid)
   elseif oid == cbpcDisableSelfAssTouchOID
     cbpcDisableSelfAssTouch = !cbpcDisableSelfAssTouch
     SetToggleOptionValue(oid, cbpcDisableSelfAssTouch)
+  elseif oid == allowDeviceLockOID
+    allowDeviceLock = !allowDeviceLock
+    SetToggleOptionValue(oid, allowDeviceLock)
+    StoreConfig("allowDeviceLock", allowDeviceLock)
+  elseif oid == allowDeviceUnlockOID
+    allowDeviceUnlock = !allowDeviceUnlock
+    SetToggleOptionValue(oid, allowDeviceUnlock)
+    StoreConfig("allowDeviceUnlock", allowDeviceUnlock)
   EndIf
 EndEvent
 
@@ -163,6 +214,17 @@ Event OnOptionDefault(int oid)
   elseif oid ==  collisionSexCooldownOID
     collisionSexCooldown = collisionSexCooldownDefault
     SetSliderOptionValue(collisionSexCooldownOID, collisionSexCooldownDefault, "{1}")
+  elseif oid ==  allowDeviceLockOID
+    allowDeviceLock = allowDeviceLockDefault
+    SetToggleOptionValue(oid, allowDeviceLock)
+    StoreConfig("allowDeviceLock", allowDeviceLock)
+  elseif oid ==  allowDeviceUnlockOID
+    allowDeviceUnlock = allowDeviceUnlockDefault
+    SetToggleOptionValue(oid, allowDeviceUnlock)
+    StoreConfig("allowDeviceUnlock", allowDeviceUnlock)
+  elseif oid == requestResponseCooldownOID
+    requestResponseCooldown = requestResponseCooldownDefault
+    SetSliderOptionValue(requestResponseCooldownOID, requestResponseCooldownDefault, "{1}")
   EndIf
 EndEvent
 
@@ -184,6 +246,12 @@ Event OnOptionHighlight(int oid)
     SetInfoText("How often the AI should be prompted to react to physics in seconds (outside of sex)")
   elseif oid == collisionSexCooldownOID
     SetInfoText("How often the AI should be prompted to react to physics in seconds (during sex)")
+  elseif oid == allowDeviceLockOID
+    SetInfoText("Should the AI be allowed to lock devices on actors?")
+  elseif oid == allowDeviceUnlockOID
+    SetInfoText("Should the AI be allowed to unlock devices from actors?")
+  elseif oid == requestResponseCooldownOID
+    SetInfoText("The minimum time in seconds inbetween requests for the LLM to react to an in-game event")
   EndIf
 EndEvent
 
@@ -213,6 +281,11 @@ Event OnOptionSliderOpen(int oid)
     SetSliderDialogDefaultValue(collisionSexCooldownDefault)
     SetSliderDialogRange(1, 100)
     SetSliderDialogInterval(0.5)
+  elseif oid == requestResponseCooldownOID
+    SetSliderDialogStartValue(requestResponseCooldown)
+    SetSliderDialogDefaultValue(requestResponseCooldownDefault)
+    SetSliderDialogRange(4, 60)
+    SetSliderDialogInterval(1.0)
   EndIf
 EndEvent
 
