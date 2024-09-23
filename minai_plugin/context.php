@@ -113,7 +113,7 @@ Function GetClothingContext($name) {
   $cuirass = GetActorValue($name, "cuirass");
   $ret = "";
   if (!empty($cuirass)) {
-    $ret = "{$name} is wearing {$cuirass}.\n";
+    $ret .= "{$name} is wearing {$cuirass}.\n";
   }
   if (HasKeyword($name, "SLA_HalfNakedBikini")) {
     $ret .= "{$name} is wearing a set of revealing bikini armor.\n";
