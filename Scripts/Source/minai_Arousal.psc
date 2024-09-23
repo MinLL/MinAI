@@ -148,45 +148,45 @@ EndFunction
 
 
 Function WriteArousedString(bool bPlayerInScene, actor Player, actor[] actorsFromFormList)
-	int numActors = actorsFromFormList.Length
-	int i = 0
-	while (i < numActors)
-		Actor currentActor = actorsFromFormList[i]
-		if (currentActor != None)
-			String actorName = main.GetActorName(currentActor)
-			int arousal = GetActorArousal(currentActor)
-			if currentActor != Player
-			  main.RegisterAction(actorName + "'s sexual arousal is " + arousal + "%")
-			Else
-			  main.RegisterAction(actorName + "'s sexual arousal is " + arousal + "%.")
-			EndIf
-		EndIf
-		i += 1
-	EndWhile
-	if bPlayerInScene
-	  String actorName = main.GetActorName(player)
-	  int exposure = GetActorArousal(player)
-	  if player.getActorBase().getSex() == 0 ; Male
-            If exposure >= 99
-              main.RegisterAction(actorName + " appears to have a raging erection that is difficult to hide. " + actorName + " appears to be absolutely desperate for sex.")
-            ElseIf exposure >= 85
-              main.RegisterAction(actorName + " appears to have a raging erection that is difficult to hide.")
-            ElseIf exposure >= 70
-              main.RegisterAction(actorName + " appears to be aroused, and has flushed cheeks. ")
-            Elseif exposure >= 50
-              main.RegisterAction(actorName + " appears to be mildly turned on, and is blushing slightly.")
-            EndIf
-          else ; Female, or other
-            If exposure >= 99
-              main.RegisterAction(actorName + " appears to be extremely aroused, and looks to be absolutely desperate for sex. She has heavy breathing, pointy nipples, and flushed cheeks.")
-            ElseIf exposure >= 85
-              main.RegisterAction(actorName + " appears to be very aroused, with pointy nipples and heavy breathing.")
-            ElseIf exposure >= 70
-              main.RegisterAction(actorName + " appears to be aroused, and has flushed cheeks.")
-            Elseif exposure >= 50
-              main.RegisterAction(actorName + " appears to be mildly turned on, and is blushing slightly.")
-            EndIf
-          EndIf
+  int numActors = actorsFromFormList.Length
+  int i = 0
+  while (i < numActors)
+    Actor currentActor = actorsFromFormList[i]
+    if (currentActor != None)
+      String actorName = main.GetActorName(currentActor)
+      int arousal = GetActorArousal(currentActor)
+      if currentActor != Player
+        main.RegisterAction(actorName + "'s sexual arousal is " + arousal + "%")
+      Else
+        main.RegisterAction(actorName + "'s sexual arousal is " + arousal + "%.")
+      EndIf
+    EndIf
+    i += 1
+  EndWhile
+  if bPlayerInScene
+    String actorName = main.GetActorName(player)
+    int exposure = GetActorArousal(player)
+    if player.getActorBase().getSex() == 0 ; Male
+      If exposure >= 99
+        main.RegisterAction(actorName + " appears to have a raging erection that is difficult to hide. " + actorName + " appears to be absolutely desperate for sex.")
+      ElseIf exposure >= 85
+        main.RegisterAction(actorName + " appears to have a raging erection that is difficult to hide.")
+      ElseIf exposure >= 70
+        main.RegisterAction(actorName + " appears to be aroused, and has flushed cheeks. ")
+      Elseif exposure >= 50
+        main.RegisterAction(actorName + " appears to be mildly turned on, and is blushing slightly.")
+      EndIf
+    else ; Female, or other
+      If exposure >= 99
+        main.RegisterAction(actorName + " appears to be extremely aroused, and looks to be absolutely desperate for sex. She has heavy breathing, pointy nipples, and flushed cheeks.")
+      ElseIf exposure >= 85
+        main.RegisterAction(actorName + " appears to be very aroused, with pointy nipples and heavy breathing.")
+      ElseIf exposure >= 70
+        main.RegisterAction(actorName + " appears to be aroused, and has flushed cheeks.")
+      Elseif exposure >= 50
+        main.RegisterAction(actorName + " appears to be mildly turned on, and is blushing slightly.")
+      EndIf
+    EndIf
 	EndIf
 EndFunction
 
