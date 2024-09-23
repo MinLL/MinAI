@@ -4,6 +4,8 @@
 $GLOBALS["force_voice_type"] = false;
 // Globally disable all NSFW features
 $GLOBALS["disable_nsfw"] = false;
+// Restrict actions that only make sense for followers to followers
+$GLOBALS["restrict_nonfollower_functions"] = true;
 // Set this to override the prompt head for all profiles
 $GLOBALS["PROMPT_HEAD_OVERRIDE"] = "";
 ?>
