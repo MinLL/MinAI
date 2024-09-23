@@ -206,40 +206,38 @@ function WriteClothingString(actor akActor, actor player, bool isYou=false, acto
 			EndIf
 			if bHasTNG
 				bool exposed = IsTNGExposed(currentActor)
-				if (currentActor.GetActorBase().GetSex() == 0 && exposed == True) || (currentActor.HasKeyword(TNG_Gentlewoman) && exposed == True)
-					if exposed == True && cuirass != None || cuirass == None
-						main.RegisterAction(actorName + "'s genitals are exposed.")
-            string sizeDescription = ""
-            Main.Debug("TNG Dick Check on "+ actorName)
-            ; Check for auto-assigned first
-            if currentActor.HasKeywordString("TNG_ActorAddnAuto:05")
-              sizeDescription = "one of the biggest cocks you've ever seen"
-            elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:04")
-              sizeDescription = "a large cock"
-            elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:03")
-              sizeDescription = "an average sized cock"
-            elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:02")
-              sizeDescription = "a very small cock"
-            elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:01")
-              sizeDescription = "an embarrassingly tiny prick"
-            EndIf
-            ; Supersede if manually set
-            if currentActor.HasKeyword(TNG_XL)
-              sizeDescription = "one of the biggest cocks you've ever seen"
-            elseif currentActor.HasKeyword(TNG_L)
-              sizeDescription = "a large cock"
-            elseif currentActor.HasKeyword(TNG_M) || currentActor.HasKeyword(TNG_DefaultSize)
-              sizeDescription = "an average sized cock"
-            elseif currentActor.HasKeyword(TNG_S)
-              sizeDescription = "a very small cock"
-            elseif currentActor.HasKeyword(TNG_XS)
-              sizeDescription = "an embarrassingly tiny prick"
-            EndIf
-            if sizeDescription != ""
-              main.RegisterAction("You can see that " + actorName + " has " + sizeDescription + ".")
-            else
-              Main.Info("TNG Dick Check Failed on " + actorName)
-            EndIf
+				if exposed && ((currentActor.GetActorBase().GetSex() == 0) || currentActor.HasKeyword(TNG_Gentlewoman))
+					main.RegisterAction(actorName + "'s genitals are exposed.")
+          string sizeDescription = ""
+          Main.Debug("TNG Dick Check on "+ actorName)
+          ; Check for auto-assigned first
+          if currentActor.HasKeywordString("TNG_ActorAddnAuto:05")
+            sizeDescription = "one of the biggest cocks you've ever seen"
+          elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:04")
+            sizeDescription = "a large cock"
+          elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:03")
+            sizeDescription = "an average sized cock"
+          elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:02")
+            sizeDescription = "a very small cock"
+          elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:01")
+            sizeDescription = "an embarrassingly tiny prick"
+          EndIf
+          ; Supersede if manually set
+          if currentActor.HasKeyword(TNG_XL)
+            sizeDescription = "one of the biggest cocks you've ever seen"
+          elseif currentActor.HasKeyword(TNG_L)
+            sizeDescription = "a large cock"
+          elseif currentActor.HasKeyword(TNG_M) || currentActor.HasKeyword(TNG_DefaultSize)
+            sizeDescription = "an average sized cock"
+          elseif currentActor.HasKeyword(TNG_S)
+            sizeDescription = "a very small cock"
+          elseif currentActor.HasKeyword(TNG_XS)
+            sizeDescription = "an embarrassingly tiny prick"
+          EndIf
+          if sizeDescription != ""
+            main.RegisterAction("You can see that " + actorName + " has " + sizeDescription + ".")
+          else
+            Main.Info("TNG Dick Check Failed on " + actorName)
           EndIf
 				EndIf
 			EndIf
@@ -255,7 +253,7 @@ function WriteClothingString(actor akActor, actor player, bool isYou=false, acto
 			if currentActor.WornHasKeyword(SLA_Brabikini)
 			  main.RegisterAction(actorName + " is wearing a bra underneath her other equipment.")
 			EndIf
-			  if currentActor.WornHasKeyword(SLA_ThongT) || currentActor.WornHasKeyword(SLA_ThongLowLeg) || currentActor.WornHasKeyword(SLA_ThongCString) || currentActor.WornHasKeyword(SLA_ThongGstring)
+      if currentActor.WornHasKeyword(SLA_ThongT) || currentActor.WornHasKeyword(SLA_ThongLowLeg) || currentActor.WornHasKeyword(SLA_ThongCString) || currentActor.WornHasKeyword(SLA_ThongGstring)
 			  main.RegisterAction(actorName + " is wearing a thong underneath her other equipment.")
 			EndIf
 			if currentActor.WornHasKeyword(SLA_PantiesNormal)
@@ -542,7 +540,7 @@ bool Function IsTNGExposed(Actor akTarget)
 	Armor armorItem = akTarget.GetWornForm(cuirassSlot) as Armor
 	if armorItem != None
 		if !armorItem.HasKeyword(TNG_Revealing) && !armorItem.HasKeywordString("TNG_Revealing")
-			Main.Debug(main.GetActorName(akTarget) + "is wearing concealing armor")
+			Main.Debug(main.GetActorName(akTarget) + " is wearing concealing armor")
 			return False
 		EndIf
 	EndIf
