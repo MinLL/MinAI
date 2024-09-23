@@ -20,7 +20,8 @@ string[] AnalNodes
 string[] PromptKeys ; List of keys to trigger an AI reaction
 
 float lastCollisionSpeechTime
-
+float lastMoanTime
+ 
 GlobalVariable useCBPC
 
 int touchedLocations = 0
@@ -62,6 +63,7 @@ function Maintenance(minai_MainQuestController _main)
     Main.Info("Enabling CBPC")
     
     lastCollisionSpeechTime = 0.0
+    lastMoanTime = 0.0
     if (touchedLocations == 0)
       Main.Debug("Initializing touched locations map")
       touchedLocations = JMap.Object()
@@ -338,6 +340,14 @@ Function ProcessArousal(actor akActor)
     arousal.UpdateArousal(akActor, 1)
   elseif locationHit == BUTT_KEY
     arousal.UpdateArousal(akActor, 1)
+  EndIf
+  if devious.HasDD()
+    float currentTime = Utility.GetCurrentRealTime()
+    if currentTime - lastMoanTime > 8
+      Main.RegisterEvent(akActor.GetActorBase().GetName() + " moaned due to being touched")
+      lastMoanTime = currentTime
+      devious.libs.Moan(akActor)
+    EndIf
   EndIf
 EndFunction
 
