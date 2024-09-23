@@ -111,10 +111,10 @@ Function GetPenisSize($name) {
 
 Function GetClothingContext($name) {
   $cuirass = GetActorValue($name, "cuirass");
+  $ret = "";
   if (!empty($cuirass)) {
     $ret = "{$name} is wearing {$cuirass}.\n";
   }
-  $ret = "";
   if (HasKeyword($name, "SLA_HalfNakedBikini")) {
     $ret .= "{$name} is wearing a set of revealing bikini armor.\n";
   }
@@ -168,6 +168,9 @@ Function GetClothingContext($name) {
   }
   if (HasKeyword($name, "EroticArmor")) {
       $ret .= "{$name} is wearing a sexy revealing outfit.\n";
+  }
+  if (HasKeyword($name, "TNG_Revealing")) {
+      $ret .= "This outfit exposes {$name}'s genitals.\n";
   }
   if (HasKeyword($name, "SLA_PiercingVulva")) {
       $ret .= "{$name} has labia piercings.\n";
