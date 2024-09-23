@@ -15,7 +15,6 @@ Actor player
 VoiceType NullVoiceType
 bool isInitialized
 minai_MainQuestController main
-minai_Followers followers
 
 Function Maintenance(minai_MainQuestController _main)
   contextUpdateInterval = 30
@@ -31,10 +30,6 @@ Function Maintenance(minai_MainQuestController _main)
   survival = (Self as Quest)as minai_Survival
   arousal = (Self as Quest)as minai_Arousal
   devious = (Self as Quest)as minai_DeviousStuff
-  followers = Game.GetFormFromFile(0x0913, "MinAI.esp") as minai_Followers
-  if (!followers)
-    Main.Fatal("Could not load followers script - Mismatched script and esp versions")
-  EndIf
   bHasAIFF = True
   RegisterForModEvent("AIFF_CommandReceived", "CommandDispatcher") ; Hook into AIFF
   NullVoiceType = Game.GetFormFromFile(0x01D70E, "AIAgent.esp") as VoiceType
@@ -75,7 +70,6 @@ Function SetContext(actor akTarget)
   devious.SetContext(akTarget)
   arousal.SetContext(akTarget)
   survival.SetContext(akTarget)
-  followers.SetContext(akTarget)
   StoreActorVoice(akTarget)
   StoreKeywords(akTarget)
   StoreFactions(akTarget)
@@ -155,7 +149,7 @@ Function StoreFactions(actor akTarget)
   allFactions += arousal.GetFactionsForActor(akTarget)
   allFactions += survival.GetFactionsForActor(akTarget)
   allFactions += sex.GetFactionsForActor(akTarget)
-  allFactions += followers.GetFactionsForActor(akTarget)
+
   ; Causing illegal characters that break sql too often
   Faction[] factions = akTarget.GetFactions(-128, 127)
   int i = 0
@@ -192,7 +186,6 @@ Function StoreKeywords(actor akTarget)
   keywords += arousal.GetKeywordsForActor(akTarget)
   keywords += survival.GetKeywordsForActor(akTarget)
   keywords += sex.GetKeywordsForActor(akTarget)
-  keywords += followers.GetKeywordsForActor(akTarget)
   SetActorVariable(akTarget, "AllKeywords", keywords)
 EndFunction
 

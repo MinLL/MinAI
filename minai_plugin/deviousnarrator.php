@@ -41,7 +41,9 @@ Function SetDeviousNarrator() {
 
 
 Function ShouldUseDeviousNarrator() {
-    return (IsModEnabled("DeviouslyAccessible") && IsEnabled($GLOBALS["PLAYER_NAME"], "deviouslyAccessibleBeingWatched") && $GLOBALS["HERIKA_NAME"] == "The Narrator");
+    $eyereward = GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleEyeReward");
+    $eyescore = GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleEyeScore");
+    return (IsModEnabled("DeviouslyAccessible") && $GLOBALS["HERIKA_NAME"] == "The Narrator" && !($eyescore == 0 && $eyereward == -1));
 }
 
 

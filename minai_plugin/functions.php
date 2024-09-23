@@ -36,50 +36,23 @@ EndEvent
 
 require_once("config.php");
 require_once("util.php");
-
-if (ShouldClearFollowerFunctions()) {
-    $GLOBALS["ENABLED_FUNCTIONS"] = array();
-    // Enable baseline set of functions
-    $GLOBALS["ENABLED_FUNCTIONS"][] = 'Inspect';
-    $GLOBALS["ENABLED_FUNCTIONS"][] = 'LookAt';
-    $GLOBALS["ENABLED_FUNCTIONS"][] = 'InspectSurroundings';
-    $GLOBALS["ENABLED_FUNCTIONS"][] = 'TakeASeat';
-    $GLOBALS["ENABLED_FUNCTIONS"][] = 'SearchMemory';
-    $GLOBALS["ENABLED_FUNCTIONS"][] = 'Attack'; // Should this be enabled?
-}
-else {
-    // Follower specific commands
-    require "followers.php";
-}
-else {
-    // Follower specific commands
-    require "followers.php";
+if (!$GLOBALS["disable_nsfw"]) {
+    require "arousal.php";
+    require "sex.php";
+    require "slapp.php";
 }
 require "survival.php";
-
 if ($GLOBALS["force_voice_type"]) {
     require "fix_xtts.php";
 }
 
-
 if (!$GLOBALS["disable_nsfw"]) {
-    // NSFW comands
-    require "arousal.php";
-    if (ShouldEnableSexFunctions($GLOBALS["HERIKA_NAME"])) {
-        require "sex.php";
-    }
-    if (ShouldEnableHarassFunctions($GLOBALS["HERIKA_NAME"])) {
-        require "slapp.php";
-    }
     require_once("deviousnarrator.php");
     if (ShouldUseDeviousNarrator()) {
         // Anything loaded after this will have functions enabled for the narrator
         EnableDeviousNarratorActions();
-        require_once("generalperverted.php");
     }
-    if (ShouldEnableHarassFunctions($GLOBALS["HERIKA_NAME"])) {
-        require_once("generalperverted.php");
-    }
+    require "generalperverted.php";
     require "deviousdevices.php";
 }
 
