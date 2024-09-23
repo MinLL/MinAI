@@ -529,6 +529,20 @@ Event OnAnimationStart(int tid, bool HasPlayer)
 EndEvent
 
 
+String Function GetActorNameForSex(actor akActor)
+  ; Prefer base name, fall back to display name, and then other.
+  string ret = akActor.GetActorBase().GetName()
+  if ret
+    return ret
+  endif
+  ret = akActor.GetDisplayName()
+  if ret
+    return ret
+  endif
+  return "a monster"
+EndFunction
+
+
 Event OnStageStart(int tid, bool HasPlayer)
   sslThreadController controller = slf.GetController(tid)
   
@@ -549,7 +563,7 @@ Event OnStageStart(int tid, bool HasPlayer)
   int i = sortedActorList.Length
   while(i > 0)
     i -= 1
-    pleasure=pleasure+sortedActorList[i].GetActorBase().GetName()+" pleasure score "+slf.GetEnjoyment(tid,sortedActorList[i])+","
+    pleasure=pleasure+GetActorNameForSex(sortedActorList[i])+" pleasure score "+slf.GetEnjoyment(tid,sortedActorList[i])+","
   endwhile
   String sceneTags="'. Scene tags: "+controller.Animation.GetRawTags()+"."
     if (controller.Animation.GetRawTags()=="")
@@ -563,8 +577,8 @@ Event OnStageStart(int tid, bool HasPlayer)
     String stageDesc1 = GetSexStageDescription(controller.Animation.FetchStage(controller.Stage)[0])
     string stageDesc2 = GetSexStageDescription(controller.Animation.FetchStage(controller.Stage)[1])
     
-    String description=sortedActorList[0].GetActorBase().GetName()+" is "+ stageDesc1
-    String description2=sortedActorList[1].GetActorBase().GetName()+" is "+ stageDesc2
+    String description=GetActorNameForSex(sortedActorList[0])+" is "+ stageDesc1
+    String description2=GetActorNameForSex(sortedActorList[1])+" is "+ stageDesc2
 
     if (stageDesc1 == "")
       description="";
@@ -584,27 +598,27 @@ Event OnStageStart(int tid, bool HasPlayer)
     string[] Tags = controller.Animation.GetRawTags()
     ; Send event, AI can be aware SEX is happening here
     if (Tags.Find("forced")!= -1)
-      main.RegisterEvent(sexPos+sceneTags+sortedActorList[0].GetActorBase().GetName()+ " is being raped by  "+sortedActorList[1].GetActorBase().GetName()+ ", ("+sortedActorList[0].GetActorBase().GetName()+" feels a mix of pain and pleasure) ."+description+description2+"("+pleasureFull+")","info_sexscene")
+      main.RegisterEvent(sexPos+sceneTags+GetActorNameForSex(sortedActorList[0])+ " is being raped by  "+GetActorNameForSex(sortedActorList[1])+ ", ("+GetActorNameForSex(sortedActorList[0])+" feels a mix of pain and pleasure) ."+description+description2+"("+pleasureFull+")","info_sexscene")
     else
-      main.RegisterEvent(sexPos+sceneTags+sortedActorList[0].GetActorBase().GetName()+ " and "+sortedActorList[1].GetActorBase().GetName()+ " are having sex. "+description+description2+"("+pleasureFull+")","info_sexscene")
+      main.RegisterEvent(sexPos+sceneTags+GetActorNameForSex(sortedActorList[0])+ " and "+GetActorNameForSex(sortedActorList[1])+ " are having sex. "+description+description2+"("+pleasureFull+")","info_sexscene")
     endif
 
     ; main.RegisterEvent(controller.Animation.FetchStage(controller.Stage)[0]+"@"+sceneTags,"info_sexscenelog")
 
-    aiff.setAnimationBusy(1,otherActor.GetActorBase().GetName())
+    aiff.setAnimationBusy(1, otherActor.GetActorBase().GetName())
     if (!slf.isMouthOpen(otherActor) && otherActor != playerRef)
       if (controller.Stage < (controller.Animation.StageCount()))
         if bHasAIFF && AiAgentFunctions.isGameVR() 
 	  ; VR users will have dirty talk through physics integration instead
 	  ; Reenabled this temporarily while figuring out female player character collisions during sex.
 	  ; Works much better for male atm, need to add different colliders
-	  DirtyTalk("ohh... yes.","chatnf_sl",sortedActorList[1].GetActorBase().GetName())
+	  DirtyTalk("ohh... yes.","chatnf_sl",GetActorNameForSex(sortedActorList[1]))
 	Else
-          DirtyTalk("ohh... yes.","chatnf_sl",sortedActorList[1].GetActorBase().GetName())
+          DirtyTalk("ohh... yes.","chatnf_sl",GetActorNameForSex(sortedActorList[1]))
 	EndIf
       endif
     else
-      main.RegisterEvent(otherActor.GetActorBase().GetName()+ " is now using mouth with "+sortedActorList[1].GetActorBase().GetName(),"info_sexscene")
+      main.RegisterEvent(GetActorNameForSex(otherActor)+ " is now using mouth with "+sortedActorList[1].GetActorBase().GetName(),"info_sexscene")
     endif
 EndEvent
 
