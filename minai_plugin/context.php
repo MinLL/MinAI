@@ -65,7 +65,7 @@ Function GetPhysicalDescription($name) {
       $buttScore = ceil(intval($buttScore)/10);
       $ret .= "with {$breastsScore}/10 tits and a {$buttScore}/10 ass. ";
   }
-  if IsEnabled($name, "isexposed") {
+  if (IsEnabled($name, "isexposed")) {
     $ret  .= GetPenisSize($name);
   }
   return $ret;
@@ -111,7 +111,7 @@ Function GetPenisSize($name) {
 
 Function GetClothingContext($name) {
   $cuirass = GetActorValue($name, "cuirass")
-  if !empty($cuirass) {
+  if (!empty($cuirass)) {
     $ret = "{$name} is wearing {$cuirass}.\n";
   {
   $ret = "";
