@@ -110,7 +110,7 @@ Function GetPenisSize($name) {
 }
 
 Function GetClothingContext($name) {
-  $cuirass = GetActorValue($name, "cuirass")
+  $cuirass = GetActorValue($name, "cuirass");
   if (!empty($cuirass)) {
     $ret = "{$name} is wearing {$cuirass}.\n";
   {
