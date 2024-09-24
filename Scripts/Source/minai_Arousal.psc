@@ -450,7 +450,7 @@ Function SetContext(actor akTarget)
     gender = "female"
   endif
   aiff.SetActorVariable(akTarget, "gender", gender)
-  string actorRace = (akTarget.GetActorBase().GetRace() as Form).GetName()
+  string actorRace = (playerRef.GetActorBase().GetRace() as Form).GetName()
   int cotrIndex = StringUtil.Find(actorRace, " DZ")
   if cotrIndex != -1
     actorRace = StringUtil.Substring(actorRace, 0, cotrIndex)

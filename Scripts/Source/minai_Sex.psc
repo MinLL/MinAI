@@ -278,6 +278,7 @@ EndFunction
 
 Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[] actorsFromFormList, bool bPlayerInScene)
   actor Player = game.GetPlayer()
+  actor[] actorsFromFormList = AiAgentFunctions.findAllNearbyAgents()
   ; Mutually Exclusive keywords
   If stringutil.Find(sayLine, "-masturbate-") != -1
     Start1pSex(akSpeaker)
@@ -327,8 +328,9 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     return
   EndIf
   Main.Debug("Sex - CommandDispatcher(" + speakerName +", " + command +", " + parameter + ")")
-  Actor akSpeaker = AIAgentFunctions.getAgentByName(speakerName)
+  actor akSpeaker = AIAgentFunctions.getAgentByName(speakerName)
   actor akTarget = AIAgentFunctions.getAgentByName(parameter)
+  actor[] actorsFromFormList = AIAgentFunctions.findAllNearbyAgents()
   if !akTarget
     akTarget = PlayerRef
   EndIf
@@ -368,8 +370,7 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   elseif command == "ExtCmdStartFingering"
     StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "fingering")
   elseIf command == "ExtCmdOrgy"
-    Debug.Notification("Orgy is broken until I figure out how to get all AI actors")
-    ; StartGroupSex(akSpeaker, akTarget, PlayerRef, bPlayerInScene, actorsFromFormList)
+    StartGroupSex(akSpeaker, akTarget, PlayerRef, bPlayerInScene, actorsFromFormList)
   elseif (command=="ExtCmdRemoveClothes")
     Form[] equippedItems=PO3_SKSEFunctions.AddAllEquippedItemsToArray(akSpeaker);
     int equippedArmor = JArray.Object()
