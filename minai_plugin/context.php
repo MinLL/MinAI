@@ -48,6 +48,7 @@ Function GetPhysicalDescription($name) {
   $beautyScore = GetActorValue($name, "beautyScore");
   $breastsScore = GetActorValue($name, "breastsScore");
   $buttScore = GetActorValue($name, "buttScore");
+  $isexposed = GetActorValue($name, "isexposed");
   $ret = "";
   if ($gender != "" && $race != "") {
     $ret .= "{$name} is a {$gender} {$race}. ";
@@ -64,7 +65,9 @@ Function GetPhysicalDescription($name) {
       $buttScore = ceil(intval($buttScore)/10);
       $ret .= "with {$breastsScore}/10 tits and a {$buttScore}/10 ass. ";
   }
-  $ret  .= GetPenisSize($name);
+  if (IsEnabled($name, "isexposed")) {
+    $ret  .= GetPenisSize($name);
+  }
   return $ret;
 }
 
@@ -107,7 +110,11 @@ Function GetPenisSize($name) {
 }
 
 Function GetClothingContext($name) {
+  $cuirass = GetActorValue($name, "cuirass");
   $ret = "";
+  if (!empty($cuirass)) {
+    $ret .= "{$name} is wearing {$cuirass}.\n";
+  }
   if (HasKeyword($name, "SLA_HalfNakedBikini")) {
     $ret .= "{$name} is wearing a set of revealing bikini armor.\n";
   }
