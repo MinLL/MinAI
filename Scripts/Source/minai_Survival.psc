@@ -301,8 +301,6 @@ Function SetContext(actor akTarget)
   actor[] actors = new actor[2]
   actors[0] = akTarget
   actors[1] = playerRef
-  
-  aiff.StoreFactions(akTarget)
 EndFunction
 
 
