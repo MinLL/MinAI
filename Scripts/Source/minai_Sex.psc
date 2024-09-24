@@ -278,7 +278,6 @@ EndFunction
 
 Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[] actorsFromFormList, bool bPlayerInScene)
   actor Player = game.GetPlayer()
-  actor[] actorsFromFormList = AiAgentFunctions.findAllNearbyAgents()
   ; Mutually Exclusive keywords
   If stringutil.Find(sayLine, "-masturbate-") != -1
     Start1pSex(akSpeaker)
