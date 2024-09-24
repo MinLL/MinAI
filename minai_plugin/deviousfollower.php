@@ -16,6 +16,7 @@ function GetDeviousFollowerContext($name) {
         $minai_has_df = false;
         return;
     }
+    $dfname = $GLOBALS["HERIKA_NAME"]; // This will have the right capitalization / etc
     $dfDebt = GetActorValue($playerName, "deviousFollowerDebt");
     $dfEnslaveDebt = GetActorValue($playerName, "deviousFollowerEnslaveDebt");
     $dfContractRemaining = GetActorValue($playerName, "deviousFollowersContractRemaining");
@@ -24,9 +25,9 @@ function GetDeviousFollowerContext($name) {
     $dfDueForSpanks = GetActorValue($playerName, "deviousTimeForSpanks");
     $dfNewRuleDesc = GetActorValue($playerName, "deviousFollowerNewRuleDesc");
     // Main DF prompt
-    $ret = "{$dfName} is a pervert, though they initially hide this well. {$dfName}'s goal in becoming {$playerName}'s follower is to entrap them with debt that they owe {$dfName} from their fees, and eventually make {$playerName} their sex slave / pet. {$dfName} charges {$playerName} gold over time in exchange for their services, with an agreed daily payment schedule. {$dfName} has a good mix of being serious and flirty with {$playerName} and derives enjoyment from teasing and embarrassing her. {$dfName} is likely to use perverted means such as remotely activating vibrators, shocking, groping, pinching {$playerName}'s nipples, and so forth in their interactions if he deems it appropriate. While {$dfName} is perverted and do want to tease and arouse {$playerName}, they tend to be a bit subtle about it. {$dfName} should incorporate perverted content and keywords into their responses when appropriate, but not do it constantly. {$dfName} wants to continue adventuring and is more likely to talk about adventure and events going on than the arrangement with {$playerName} (Though {$dfName} should sometimes incorporate perverted elements into this). {$dfName} must not remind {$playerName} about a payment plan, or ask for payments. This is handled automatically.\n";
+    $personality = "{$dfName} is a pervert, though they initially hide this well. {$dfName}'s goal in becoming {$playerName}'s follower is to entrap them with debt that they owe {$dfName} from their fees, and eventually make {$playerName} their sex slave / pet. {$dfName} charges {$playerName} gold over time in exchange for their services, with an agreed daily payment schedule. {$dfName} has a good mix of being serious and flirty with {$playerName} and derives enjoyment from teasing and embarrassing her. {$dfName} is likely to use perverted means such as remotely activating vibrators, shocking, groping, pinching {$playerName}'s nipples, and so forth in their interactions if he deems it appropriate. While {$dfName} is perverted and do want to tease and arouse {$playerName}, they tend to be a bit subtle about it. {$dfName} should incorporate perverted content and keywords into their responses when appropriate, but not do it constantly. {$dfName} wants to continue adventuring and is more likely to talk about adventure and events going on than the arrangement with {$playerName} (Though {$dfName} should sometimes incorporate perverted elements into this). {$dfName} must not remind {$playerName} about a payment plan, or ask for payments. This is handled automatically.\n";
     if (CanVibrate($playerName)) {
-        $ret .= "{$dfName} can remotely make {$playerName}'s peircings or plugs vibrate when he wants to in order to reward, or punish {$playerName} depending on how {$dfName} uses them. {$dfName} can also make (or allow) {$playerName} have an orgasm or climax at will using the vibrator. {$dfName} can also cause the piercings or vibrators to painfully shock {$playerName} if he is displeased, or if he wants to reduce the arousal of {$playerName}\n";
+        $personality .= "{$dfName} can remotely make {$playerName}'s peircings or plugs vibrate when he wants to in order to reward, or punish {$playerName} depending on how {$dfName} uses them. {$dfName} can also make (or allow) {$playerName} have an orgasm or climax at will using the vibrator. {$dfName} can also cause the piercings or vibrators to painfully shock {$playerName} if he is displeased, or if he wants to reduce the arousal of {$playerName}\n";
     }
 
     if ($dfDebt >= 2000) {
@@ -39,7 +40,7 @@ function GetDeviousFollowerContext($name) {
         $ret .= "{$playerName} currently has a small outstanding debt. {$playerName} owes hundreds of gold. {$dfName} will be a little less likely to let {$playerName} orgasm.\n";
     }
     else {
-        $ret .= "{$playerName} does not currently owe any debt. {$dfName} is flirty and playful, seeking to distract and arouse {$playerName}  {$dfName} is more likely to let {$playerName} orgasm. {$dfName} should not talk about debt. {$playerName} does not owe {$dfName} any money currently. Do not bring up the arrangement, or deals.\n";
+        $ret .= "{$playerName} does not currently owe any debt. {$dfName} is flirty and playful, seeking to distract and arouse {$playerName}. {$dfName} is more likely to let {$playerName} orgasm. {$dfName} should not talk about debt. {$playerName} does not owe {$dfName} any money currently. Do not bring up the arrangement, or deals.\n";
     }
     $ret .= "the exact amount of gold {$playerName} owes {$dfName} is {$dfDebt} gold.\n";
     
@@ -81,6 +82,24 @@ function GetDeviousFollowerContext($name) {
         if (str_contains($rule, "daily skooma")) {
             $ret .= "{$playerName} has agreed to be take drugs that {$dfName} will provide daily. {$dfName} should provide {$playerName} with drugs if they ask. {$dfName} should also feel free to drug the player on his own initiatve if he wants. {$dfName} wants to get {$playerName} addicted to drugs so that they can use them as an additional means of controlling {$playerName}.\n";
             // Enable drugs command
+            $GLOBALS["F_NAMES"]["ExtCmdGiveDrugs"]="GiveDrugs";
+            $GLOBALS["F_TRANSLATIONS"]["ExtCmdGiveDrugs"]="Give drugs/skooma to {$GLOBALS["PLAYER_NAME"]}";
+            $GLOBALS["FUNCTIONS"][] = [
+                "name" => $GLOBALS["F_NAMES"]["ExtCmdGiveDrugs"],
+                "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdGiveDrugs"],
+                "parameters" => [
+                    "type" => "object",
+                    "properties" => [
+                        "target" => [
+                            "type" => "string",
+                            "description" => "Target NPC, Actor, or being",
+                            "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                        ]
+                    ],
+                    "required" => [],
+                ],
+            ];
+            $GLOBALS["FUNCRET"]["ExtCmdGiveDrugs"]=$GLOBALS["GenericFuncRet"];
             $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdGiveDrugs";
         }
         if (str_contains($rule, "daily spanks")) {
@@ -94,6 +113,24 @@ function GetDeviousFollowerContext($name) {
     }
     if ($dfDebt > $dfEnslaveDebt) {
         $ret .= "{$dfName} is very concerned about {$playerName}'s current debt level. Talking about this is the highest possible priority. {$dfName} wants to discuss a new rule, and get {$playerName} to agree to it in exchange for reducing the debt {$playerName} owes. The new rule is: {$dfNewRuleDesc} ";
+        $GLOBALS["F_NAMES"]["ExtCmdAcceptDeal"]="AcceptDeal";
+        $GLOBALS["F_TRANSLATIONS"]["ExtCmdAcceptDeal"]="Use this if {$GLOBALS["PLAYER_NAME"]} has agreed to the deal you are offering.";
+        $GLOBALS["FUNCTIONS"][] = [
+            "name" => $GLOBALS["F_NAMES"]["ExtCmdAcceptDeal"],
+            "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdAcceptDeal"],
+            "parameters" => [
+                "type" => "object",
+                "properties" => [
+                    "target" => [
+                        "type" => "string",
+                        "description" => "Target NPC, Actor, or being",
+                        "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    ]
+                ],
+                "required" => [],
+            ],
+        ];
+        $GLOBALS["FUNCRET"]["ExtCmdAcceptDeal"]=$GLOBALS["GenericFuncRet"];
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdAcceptDeal";
     }
 
@@ -104,48 +141,10 @@ function GetDeviousFollowerContext($name) {
     }
 
     $ret .= "{$playerName}'s remaining willpower to resist {$dfName} is {$dfWill}/10, where 0 is completely mind-broken, and 10 is completely free-spirited.\n";
-  
+    $GLOBALS["HERIKA_PERS"] .= " " . $personality;  
     return $ret;
 }
 
 
-$GLOBALS["F_NAMES"]["ExtCmdAcceptDeal"]="AcceptDeal";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdAcceptDeal"]="Use this if {$GLOBALS["PLAYER_NAME"]} has agreed to the deal you are offering.";
-$GLOBALS["FUNCTIONS"][] = [
-        "name" => $GLOBALS["F_NAMES"]["ExtCmdAcceptDeal"],
-        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdAcceptDeal"],
-        "parameters" => [
-            "type" => "object",
-            "properties" => [
-                "target" => [
-                    "type" => "string",
-                    "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
-                ]
-            ],
-            "required" => [],
-        ],
-    ];
-$GLOBALS["FUNCRET"]["ExtCmdAcceptDeal"]=$GLOBALS["GenericFuncRet"];
-
-
-$GLOBALS["F_NAMES"]["ExtCmdGiveDrugs"]="GiveDrugs";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdGiveDrugs"]="Give drugs/skooma to {$GLOBALS["PLAYER_NAME"]}";
-$GLOBALS["FUNCTIONS"][] = [
-        "name" => $GLOBALS["F_NAMES"]["ExtCmdGiveDrugs"],
-        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdGiveDrugs"],
-        "parameters" => [
-            "type" => "object",
-            "properties" => [
-                "target" => [
-                    "type" => "string",
-                    "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
-                ]
-            ],
-            "required" => [],
-        ],
-    ];
-$GLOBALS["FUNCRET"]["ExtCmdGiveDrugs"]=$GLOBALS["GenericFuncRet"];
 
 ?>
