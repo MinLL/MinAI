@@ -717,7 +717,7 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
       Main.RegisterEvent(""+targetName+" agreed to obey a new rule: \"" + ruleDesc + "\".")
       ClearTargetRule()
     EndIf
-    if (command == "ExtCmdDrugPlayer") 
+    if (command == "ExtCmdGiveDrugs") 
       Debug.Notification("AI: Drinking Skooma")
       Main.Info("Player Drinking Skooma")
       dfDealController.MDC.DrinkSkooma()
@@ -771,6 +771,17 @@ Function SetContext(actor akTarget)
     EndWhile
     aiff.SetActorVariable(playerRef, "deviousFollowerRules", ruleList)
     aiff.SetActorVariable(playerRef, "deviousTimeForSpanks",  dftools.SpankingTimer <= Utility.GetCurrentGameTime())
+    if Debt.GetValueInt() >= EnslaveDebt.GetValueInt()
+      if targetRule  == ""
+        targetRule  = dfDealController.GetPotentialDeal()
+      EndIf
+      Main.Info("Devious Follower targetRule="+targetRule)
+      String ruleDesc = DealManager.GetRuleInfo(targetRule)
+      Main.Info("Devious Follower ruleInfo=" + ruleDesc)
+      aiff.SetActorVariable(playerRef, "deviousFollowerNewRuleDesc",  ruleDesc)
+    Else
+      aiff.SetActorVariable(playerRef, "deviousFollowerNewRuleDesc",  "")
+    EndIf
   EndIf
   if bHasDeviouslyAccessible && akTarget == PlayerRef
     aiff.SetActorVariable(playerRef, "deviouslyAccessibleEyeFuckTrack", eyefucktrack.GetValueInt())
