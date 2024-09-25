@@ -36,7 +36,9 @@ Function Maintenance(minai_MainQuestController _main)
     Main.Fatal("Could not load followers script - Mismatched script and esp versions")
   EndIf
   bHasAIFF = True
-  RegisterForModEvent("AIFF_CommandReceived", "CommandDispatcher") ; Hook into AIFF
+  ; Hook into AIFF
+  RegisterForModEvent("AIFF_CommandReceived", "CommandDispatcher")
+  RegisterForModEvent("AIFF_TextReceived", "OnTextReceived")
   NullVoiceType = Game.GetFormFromFile(0x01D70E, "AIAgent.esp") as VoiceType
   if (!NullVoiceType)
     Main.Error("Could not load null voice type")
@@ -110,6 +112,10 @@ Function RegisterEvent(string eventLine, string eventType)
   EndIf
   AIAgentFunctions.logMessage(eventLine, eventType)
 EndFunction
+
+Event OnTextReceived(String speakerName, String sayLine)
+  Main.Info("OnTextReceived(" + speakerName + "): " + sayLine)
+EndEvent
 
 
 Event CommandDispatcher(String speakerName,String  command, String parameter)
@@ -218,4 +224,15 @@ EndEvent
 
 bool Function HasAIFF()
   return bHasAIFF
+EndFunction
+
+
+actor[] Function GetNearbyAI()
+  actor[] actors = AiAgentFunctions.findAllNearbyAgents()
+  int i = 0
+  while i < actors.length
+    main.Info("Found nearby actor: " + actors[i].GetActorBase().GetName())
+    i += 1
+  endwhile
+  return actors
 EndFunction

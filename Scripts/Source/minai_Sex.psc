@@ -681,12 +681,12 @@ Event OnStageStart(int tid, bool HasPlayer)
   if (!slf.isMouthOpen(otherActor) && otherActor != playerRef)
     if (controller.Stage < (controller.Animation.StageCount()))
       if bHasAIFF && AiAgentFunctions.isGameVR() 
-      ; VR users will have dirty talk through physics integration instead
-      ; Reenabled this temporarily while figuring out female player character collisions during sex.
-      ; Works much better for male atm, need to add different colliders
-        DirtyTalk("ohh... yes.","chatnf_sl",GetActorNameForSex(sortedActorList[1]))
+       ; VR users will have dirty talk through physics integration instead
+       ; Reenabled this temporarily while figuring out female player character collisions during sex.
+       ; Works much better for male atm, need to add different colliders
+        DirtyTalk("ohh... yes.","chatnf_sl",GetActorNameForSex(otherActor))
       else
-        DirtyTalk("ohh... yes.","chatnf_sl",GetActorNameForSex(sortedActorList[1]))
+        DirtyTalk("ohh... yes.","chatnf_sl",GetActorNameForSex(otherActor))
       EndIf
     EndIf
   else
@@ -742,9 +742,9 @@ Event PostSexScene(int tid, bool HasPlayer)
     otherActor = sortedActorList[1]
   EndIf
   
-   main.RegisterEvent(otherActor.GetActorBase().GetName()+ ": Oh yeah! I'm having an orgasm!.","chat")
-   if (!slf.isMouthOpen(otherActor))
-    DirtyTalk("I'm cumming!","chatnf_sl_2",otherActor.GetActorBase().GetName())
+  main.RegisterEvent(otherActor.GetActorBase().GetName()+ ": Oh yeah! I'm having an orgasm!.","chat")
+  if (!slf.isMouthOpen(otherActor))
+    DirtyTalk("I'm cumming!","chatnf_sl_2",GetActorNameForSex(otherActor))
   EndIf
 EndEvent
 
@@ -769,7 +769,7 @@ Event EndSexScene(int tid, bool HasPlayer)
 
     main.RegisterEvent(sortedActorList[0].GetActorBase().GetName()+ " and "+sortedActorList[1].GetActorBase().GetName()+ " ended the intimate moment","info_sexscene")
     if bHasAIFF
-      DirtyTalk("That was awesome, what do you think?","inputtext",otherActor.GetActorBase().GetName())
+      DirtyTalk("That was awesome, what do you think?","inputtext",GetActorNameForSex(otherActor))
       AIFF.SetAnimationBusy(0, otherActor.GetActorBase().GetName())
     EndIf
     SetSexSceneState("off")

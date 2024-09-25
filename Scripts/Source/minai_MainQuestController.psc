@@ -22,7 +22,7 @@ minai_CombatManager combat
 bool bHasMantella = False;
 bool bHasAIFF = False;
 float lastRequestTime
-
+actor[] nearbyAI
 Event OnInit()
   Maintenance()
 EndEvent
@@ -79,6 +79,8 @@ Function Maintenance()
     if (!minAIFF.IsInitialized())
       Debug.Notification("MinAI - First time setup complete. Save/reload to enable mod functionality")
       minAIFF.SetInitialized()
+    Else
+      nearbyAI = minAIFF.GetNearbyAI()
     EndIf
   EndIf
   lastRequestTime = 0.0

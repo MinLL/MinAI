@@ -153,8 +153,10 @@ if (IsInFaction($GLOBALS['HERIKA_NAME'], "Carriage System Vendors")) {
     $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdCarriageRide";
 }
 
-// Allow anyone to buy or sell. Don't restrict this to shop-keepers.
-$GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdTrade";
+if (!IsFollower($GLOBALS["HERIKA_NAME"])) {
+    // Allow anyone that isn't a follower to buy or sell. Don't restrict this to shop-keepers.
+    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdTrade";
+}
 // Allow anyone to offer training.
 $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdTrainSkill";
 ?>
