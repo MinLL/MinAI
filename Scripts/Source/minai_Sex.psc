@@ -445,18 +445,6 @@ EndEvent
 
 
 
-Function SetContext(actor akTarget)
-  if !aiff
-    return
-  elseif OActor.IsInOStim(akTarget)
-    String actorName = main.GetActorName(akTarget)
-    aiff.SetActorVariable(akTarget, "excitement", OActor.GetExcitement(akTarget))
-    aiff.SetActorVariable(akTarget, "orgasmcount", OActor.GetTimesClimaxed(akTarget))
-  EndIf
-EndFunction
-
-
-
 string Function ConvertTagsOstim(string tags)
   ; Convert sexlab tags to ostim tags
   if tags == "anal"
@@ -529,11 +517,16 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
     int i = actors.Length
     bool playerInvolved=false
     while(i > 0)
-        i -= 1
-        actorString=actorString+actors[i].GetActorBase().GetName()+",";
-        if (actors[i] == playerRef)
-          playerInvolved=true;
-        EndIf
+      i -= 1
+      actorString=actorString+actors[i].GetActorBase().GetName()+",";
+      if (actors[i] == playerRef)
+        playerInvolved=true;
+      EndIf
+      string actorName = main.GetActorName(actors[i])
+      int excitement = OActor.GetExcitement(actors[i]) as int
+      int orgasmcount = OActor.GetTimesClimaxed(actors[i])
+      Main.RegisterEvent(actorName + " is " + excitement + "% of the way toward their next orgasm and has already climaxed " + orgasmcount + " times during this encounter.")
+      Main.Debug(actorName + " is " + excitement + "% of the way toward their next orgasm and has already climaxed " + orgasmcount + " times during this encounter.")
     Endwhile
     
     if (playerInvolved)
