@@ -216,7 +216,7 @@ Function OnCollision(string eventName, string nodeName, float collisionDuration,
     Main.Debug("Self touch is disabled.")
     return
   EndIf  
-  if akActor == playerRef && playerRef.WornHasKeyword(devious.libs.zad_DeviousHeavyBondage)
+  if devious.hasDD() && akActor == playerRef && playerRef.WornHasKeyword(devious.libs.zad_DeviousHeavyBondage)
     Main.Debug("Not processing self-collision data for player: Has DD heavy bondage on")
     return
   EndIf
