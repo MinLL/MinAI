@@ -314,6 +314,7 @@ string Function GetFactionsForActor(actor akTarget)
   string ret = ""
   ret += aiff.GetFactionIfExists(akTarget, "JobInnServer", JobInnServer)
   ret += aiff.GetFactionIfExists(akTarget, "JobInnKeeper", JobInnKeeper)
+  aiff.SetActorVariable(akTarget, "isChild", akTarget.IsChild())
   return ret
 EndFunction
 

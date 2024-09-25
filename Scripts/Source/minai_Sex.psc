@@ -365,7 +365,10 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   if !akTarget
     akTarget = PlayerRef
   EndIf
-
+  if (akTarget.IsChild())
+    Main.Warn(akTarget.GetDisplayName() + " is a child actor. Not processing actions.")
+    return
+  EndIf
   bool bPlayerInScene = (akTarget == PlayerRef || akSpeaker == PlayerRef)
 
   string targetName = main.GetActorName(akTarget)

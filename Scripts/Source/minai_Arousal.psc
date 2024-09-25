@@ -481,6 +481,10 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   if !akTarget
     akTarget = PlayerRef
   EndIf
+  if (akTarget.IsChild())
+    Main.Warn(akTarget.GetDisplayName() + " is a child actor. Not processing actions.")
+    return
+  EndIf
   Main.Debug("Arousal - CommandDispatcher(" + speakerName +", " + command +", " + parameter + ")")
   string targetName = main.GetActorName(akTarget)
   if command == "ExtCmdIncreaseArousal"

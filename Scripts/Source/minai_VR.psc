@@ -203,6 +203,10 @@ Function OnCollision(string eventName, string nodeName, float collisionDuration,
     return
   EndIf
   Actor akActor = actorForm as Actor
+  if (akActor.IsChild())
+    Main.Warn(akActor.GetDisplayName() + " is a child actor. Not processing collision.")
+    return
+  EndIf
   string actorName = akActor.GetActorBase().GetName()
   string playerName = playerRef.GetActorBase().GetName()
   

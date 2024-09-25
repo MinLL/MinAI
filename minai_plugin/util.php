@@ -107,3 +107,12 @@ Function ShouldEnableHarassFunctions($name) {
     }
     return (intval($arousal) >= intval($arousalThreshold));
 }
+
+Function IsChildActor($name) {
+    return str_contains(GetActorValue($name, "Race"), "child") || IsEnabled($name, "isChild");
+}
+
+
+if (IsChildActor($GLOBALS['HERIKA_NAME'])) {
+    $GLOBALS["disable_nsfw"] = true;
+}
