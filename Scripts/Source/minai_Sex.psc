@@ -744,7 +744,7 @@ Event PostSexScene(int tid, bool HasPlayer)
   
    main.RegisterEvent(otherActor.GetActorBase().GetName()+ ": Oh yeah! I'm having an orgasm!.","chat")
    if (!slf.isMouthOpen(otherActor))
-    DirtyTalk("I'm cumming!","chatnf_sl_2",otherActor.GetActorBase().GetActorName())
+    DirtyTalk("I'm cumming!","chatnf_sl_2",otherActor.GetActorBase().GetName())
   EndIf
 EndEvent
 
@@ -769,7 +769,7 @@ Event EndSexScene(int tid, bool HasPlayer)
 
     main.RegisterEvent(sortedActorList[0].GetActorBase().GetName()+ " and "+sortedActorList[1].GetActorBase().GetName()+ " ended the intimate moment","info_sexscene")
     if bHasAIFF
-      DirtyTalk("That was awesome, what do you think?","inputtext",GetActorNameForSex(otherActor))
+      DirtyTalk("That was awesome, what do you think?","inputtext",otherActor.GetActorBase().GetName())
       AIFF.SetAnimationBusy(0, otherActor.GetActorBase().GetName())
     EndIf
     SetSexSceneState("off")
