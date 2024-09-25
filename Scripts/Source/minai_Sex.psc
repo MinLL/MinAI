@@ -187,6 +187,19 @@ EndFunction
 
 
 
+Function StopSex(actor akSpeaker)
+  if OActor.IsInOStim(akSpeaker)
+    int ActiveOstimThreadID = OActor.GetSceneID(akSpeaker)
+    if OThread.IsRunning(ActiveOstimThreadID)
+      OThread.Stop(ActiveOstimThreadID)
+    EndIf
+  else
+    ; add SL Stop
+  EndIf
+EndFunction
+
+
+
 bool Function CompareActorSex(actor actor1, actor actor2)
   ; We want to sort males to the end, and females to the front.
   ; 0 = male
@@ -334,6 +347,9 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
     
   elseIf stringutil.Find(sayLine, "-groupsex-") != -1 || stringUtil.Find(sayLine, "-orgy-") != -1 || stringUtil.Find(sayLine, "-threesome-") != -1
     StartGroupSex(akSpeaker, akTarget, Player, bPlayerInScene, actorsFromFormList)
+    
+  elseif stringutil.Find(sayLine, "-endsex-") != -1 || stringutil.Find(sayLine, "-end sex-") != -1
+    StopSex(akSpeaker)
   EndIf
 EndFunction
 
@@ -387,6 +403,8 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "fingering")
   elseIf command == "ExtCmdOrgy"
     StartGroupSex(akSpeaker, akTarget, PlayerRef, bPlayerInScene, actorsFromFormList)
+  elseif command == "ExtCmdStopSex"
+    StopSex(akSpeaker)
   elseif (command=="ExtCmdRemoveClothes")
     Form[] equippedItems=PO3_SKSEFunctions.AddAllEquippedItemsToArray(akSpeaker);
     int equippedArmor = JArray.Object()
