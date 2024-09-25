@@ -80,11 +80,12 @@ $GLOBALS["FUNCTIONS"][] = [
 
 $GLOBALS["FUNCRET"]["ExtCmdMolest"]=$GLOBALS["GenericFuncRet"];
 
-if (IsModEnabled("SLAPP")) {
+require_once("deviousfollower.php");
+if (IsModEnabled("SLAPP") && !IsDeviousFollower($GLOBALS['HERIKA_NAME'])) {
     $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdHug";
     $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdKiss";
 }
-if (IsModEnabled("SLHH")) {
+if (IsModEnabled("SLHH") && !IsDeviousFollower($GLOBALS['HERIKA_NAME'])) {
     $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdMolest";
 }
 

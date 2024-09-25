@@ -78,6 +78,11 @@ if (!$GLOBALS["disable_nsfw"]) {
         require_once("generalperverted.php");
     }
     require "deviousdevices.php";
+    require_once("deviousfollower.php");
+    if (IsDeviousFollower($GLOBALS["HERIKA_NAME"])) {
+        // Always enable actions for devious follower (During rechats and such)
+        $GLOBALS["FUNCTIONS_ARE_ENABLED"]=true;
+    }
 }
 
 ?>
