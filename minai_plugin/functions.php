@@ -51,6 +51,7 @@ else {
     // Follower specific commands
     require "followers.php";
 }
+
 require "survival.php";
 
 if ($GLOBALS["force_voice_type"]) {
