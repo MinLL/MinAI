@@ -575,17 +575,16 @@ string Function GetKeywordsForActor(actor akTarget)
       ret += "TNG_XL,"
     elseif akTarget.HasKeyword(TNG_DefaultSize)
       ret += "TNG_DefaultSize,"
-    EndIf
-    if akTarget.HasKeywordString("TNG_ActorAddnAuto:01")
-  	ret += "TNG_ActorAddnAuto:01,"
+    elseif akTarget.HasKeywordString("TNG_ActorAddnAuto:01")
+      ret += "TNG_ActorAddnAuto:01,"
     elseif akTarget.HasKeywordString("TNG_ActorAddnAuto:02")
-  	ret += "TNG_ActorAddnAuto:02,"
+      ret += "TNG_ActorAddnAuto:02,"
     elseif akTarget.HasKeywordString("TNG_ActorAddnAuto:03")
-  	ret += "TNG_ActorAddnAuto:03,"
+      ret += "TNG_ActorAddnAuto:03,"
     elseif akTarget.HasKeywordString("TNG_ActorAddnAuto:04")
-  	ret += "TNG_ActorAddnAuto:04,"
+      ret += "TNG_ActorAddnAuto:04,"
     elseif akTarget.HasKeywordString("TNG_ActorAddnAuto:05")
-  	ret += "TNG_ActorAddnAuto:05,"
+      ret += "TNG_ActorAddnAuto:05,"
     EndIf
   EndIf
   int actorSex = akTarget.GetActorBase().GetSex()

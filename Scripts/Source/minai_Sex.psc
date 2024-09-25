@@ -16,7 +16,9 @@ Actor PlayerRef
 
 float lastDirtyTalk
 
-function Maintenance(minai_MainQuestController _main)
+
+
+Function Maintenance(minai_MainQuestController _main)
   playerRef = Game.GetPlayer()
   main = _main
   aiff = (Self as Quest) as minai_AIFF
@@ -55,36 +57,14 @@ function Maintenance(minai_MainQuestController _main)
     Main.Debug("Initializing clothing map")
     clothingMap = JMap.object()
     JValue.retain(clothingMap)
-  Else
+  else
     Main.Debug("Clothing map already initialized, id=" + clothingMap)
   EndIf
   aiff.SetModAvailable("Ostim", bHasOstim)
   aiff.SetModAvailable("Sexlab", slf != None)
 EndFunction
 
-string Function ConvertTagsOstim(string tags)
-  ; Convert sexlab tags to ostim tags
-  if tags == "anal"
-    tags = "analsex"
-  elseif tags == "vaginal"
-    tags = "vaginalsex"
-  elseif tags == "oral"
-    tags = "deepthroat"
-  elseif tags == "fingering"
-    tags = "vaginalfingering"
-  elseif tags == "chestcum"
-    tags = "cumonchest"
-  elseif tags == "pussy"
-    tags = "rubbingclitoris"
-  elseif tags == "vampire"
-    tags = "vampirebite"
-  elseif tags == "hugging"
-    tags = "cuddling"
-  elseif tags == "kissing"
-    tags = "frenchkissing"
-  EndIf
-  return tags
-EndFunction
+
 
 bool Function CanAnimate(actor akTarget, actor akSpeaker)
   if (akTarget.IsOnMount() || akSpeaker.IsOnMount())
@@ -99,6 +79,8 @@ bool Function CanAnimate(actor akTarget, actor akSpeaker)
   return False
 EndFunction
 
+
+
 Function Start1pSex(actor akSpeaker)
   if CanAnimate(akSpeaker, akSpeaker)
     if bHasOstim && minai_UseOStim.GetValue() == 1.0
@@ -108,52 +90,62 @@ Function Start1pSex(actor akSpeaker)
         devious.libs.Masturbate(akSpeaker)
       else	
         slf.Quickstart(akSpeaker)
-      endif
+      EndIf
     EndIf
   EndIf
 EndFunction
+
 
 
 Function Start2pSex(actor akSpeaker, actor akTarget, actor Player, bool bPlayerInScene, string tags="")
-  if CanAnimate(akTarget, akSpeaker)
-    if bHasOstim && minai_UseOStim.GetValue() == 1.0
-      tags = ConvertTagsOstim(tags)
-      Actor[] ostimActors = new Actor[2]
-      if bPlayerInScene
-        ostimActors = OActorUtil.ToArray(Player, akSpeaker) as Actor[]
-      else
-        ostimActors = OActorUtil.ToArray(akTarget, akSpeaker) as Actor[]
-      EndIf
-      ; ostimActors = OActorUtil.Sort(ostimActors, OActorUtil.EmptyArray())
-      string newScene = OLibrary.GetRandomSceneWithAction(ostimActors, tags)
-      Utility.Wait(0.2)
-      int ActiveOstimThreadID = OThread.Quickstart(ostimActors, newScene)
-      Main.Debug("Found " + tags + " scene: " + newScene + " for OStim Thread [" + ActiveOstimThreadID + "].")
+  if bHasOstim && minai_UseOStim.GetValue() == 1.0
+    tags = ConvertTagsOstim(tags)
+    Actor[] ostimActors = new Actor[2]
+    if bPlayerInScene
+      ostimActors = OActorUtil.ToArray(Player, akSpeaker) as Actor[]
     else
-      actor[] actors = new actor[2]
-      actors[0] = akTarget
-      actors[1] = akSpeaker
-      StartSexSmart(bPlayerInScene, actors, tags)
+      ostimActors = OActorUtil.ToArray(akTarget, akSpeaker) as Actor[]
     EndIf
+    ostimActors = OActorUtil.Sort(ostimActors, OActorUtil.EmptyArray())
+    string newScene = OLibrary.GetRandomSceneWithAnyActionCSV(ostimActors, tags)
+    Utility.Wait(0.5)
+    if newScene == ""
+      newScene = OLibrary.GetRandomSceneWithAnySceneTagCSV(ostimActors, tags)
+      Utility.Wait(1)
+      if newScene == ""
+        Main.Debug("No OStim scene found for: " + tags)
+      EndIf
+    EndIf
+    int ActiveOstimThreadID = OThread.Quickstart(ostimActors, newScene)
+    Main.Debug("Found " + tags + " scene: " + newScene + " for OStim Thread [" + ActiveOstimThreadID + "].")
+  else
+    actor[] actors = new actor[2]
+    actors[0] = akTarget
+    actors[1] = akSpeaker
+    StartSexSmart(bPlayerInScene, actors, tags)
   EndIf
+  main.RegisterEvent(akSpeaker.GetActorBase().GetName() + " and " + akTarget.GetActorBase().GetName() + " started having sex. (" + tags +") ", "info_sexscene")
 EndFunction
+
 
 
 Function StartSexOrSwitchTo(actor akSpeaker, actor akTarget, actor Player, bool bPlayerInScene, string tags)
   AIFF.ChillOut()
   if CanAnimate(akTarget, akSpeaker)
     Start2pSex(akSpeaker, akTarget, PlayerRef, bPlayerInScene, tags)
-    main.RegisterEvent(akSpeaker.GetActorBase().GetName() + " and " + akTarget.GetActorBase().GetName() + " started having sex." + tags, "info_sexscene")
   elseif bHasOstim && minai_UseOStim.GetValue() == 1.0 && OActor.IsInOStim(akSpeaker)
     Main.Debug(akSpeaker.GetActorBase().GetName() + " is switching Ostim scene.")
     tags = ConvertTagsOstim(tags)
     Main.Debug("Searching for random " + tags + " scene.")
     int ActiveOstimThreadID = OActor.GetSceneID(akSpeaker)
-    Actor[] ostimActors = new Actor[2]
+    Actor[] ostimActors = new Actor[5]
     ostimActors = OThread.GetActors(ActiveOstimThreadID)
-    ; ostimActors = OActorUtil.Sort(ostimActors, OActorUtil.EmptyArray())
-    string newScene = OLibrary.GetRandomSceneWithAction(ostimActors, tags)
-    Utility.Wait(0.2)
+    string newScene = OLibrary.GetRandomSceneWithAnyActionCSV(ostimActors, tags)
+    Utility.Wait(0.5)
+    if newScene == ""
+      newScene = OLibrary.GetRandomSceneWithAnySceneTagCSV(ostimActors, tags)
+      Utility.Wait(1)
+    EndIf
     Main.Debug("Ostim scene transition to: " + newScene + " for OStim Thread [" + ActiveOstimThreadID + "].")
     if OThread.IsRunning(ActiveOstimThreadID)
       OThread.NavigateTo(ActiveOstimThreadID, newScene)
@@ -178,22 +170,21 @@ Function StartSexOrSwitchTo(actor akSpeaker, actor akTarget, actor Player, bool 
 EndFunction
 
 
-Function StartGroupSex(actor akSpeaker, actor akTarget, actor Player, bool bPlayerInScene, Actor[] actorsFromFormList)
+
+Function StartGroupSex(actor akSpeaker, actor akTarget, actor Player, bool bPlayerInScene, Actor[] actorsFromFormList, string tags="")
   if CanAnimate(akTarget, akSpeaker)
     if bHasOstim && minai_UseOStim.GetValue() == 1.0
+      Actor[] ostimActors = new Actor[10]
+      ostimActors = OActorUtil.ToArray(actorsFromFormList[0],actorsFromFormList[1],actorsFromFormList[2],actorsFromFormList[3],actorsFromFormList[4],actorsFromFormList[5],actorsFromFormList[6],actorsFromFormList[7],actorsFromFormList[8],actorsFromFormList[9])
+      ostimActors = OActorUtil.Sort(ostimActors, OActorUtil.EmptyArray()) ; 2nd param is list of Dominant Actors
       int ActiveOstimThreadID
-      ActiveOstimThreadID = OThread.QuickStart(OActorUtil.ToArray(actorsFromFormList[0],actorsFromFormList[1],actorsFromFormList[2],actorsFromFormList[3],actorsFromFormList[4],actorsFromFormList[5],actorsFromFormList[6],actorsFromFormList[7],actorsFromFormList[8],actorsFromFormList[9]))
-      ; Utility.Wait(1)
-      ; bool AutoMode = OThread.IsInAutoMode(ActiveOstimThreadID)
-      ; if AutoMode == False
-      ;   OThreadBuilder.NoPlayerControl(ActiveOstimThreadID)
-      ;   OThread.StartAutoMode(ActiveOstimThreadID)
-      ; EndIf
+      ActiveOstimThreadID = OThread.QuickStart(ostimActors, tags)
     else
-      StartSexSmart(bPlayerInScene, actorsFromFormList, "")
+      StartSexSmart(bPlayerInScene, actorsFromFormList, tags)
     EndIf
   EndIf
 EndFunction
+
 
 
 bool Function CompareActorSex(actor actor1, actor actor2)
@@ -205,22 +196,23 @@ bool Function CompareActorSex(actor actor1, actor actor2)
 EndFunction
 
 
+
 Function StartSexSmart(bool bPlayerInScene, actor[] actorsToSort, string tags)
   Main.Debug("SortActorsForSex(" + bPlayerInScene +")")
   Main.Debug("Sorting actors: " + actorsToSort)
   ; Basic insertion sort implmentation to sort female actors to start of list
   int index = 1
   actor currentActor
-  While index < actorsToSort.Length
+  while index < actorsToSort.Length
     currentActor = actorsToSort[index]
     int position = index
-    While (position > 0 && CompareActorSex(actorsToSort[position - 1], currentActor))
+    while (position > 0 && CompareActorSex(actorsToSort[position - 1], currentActor))
       actorsToSort[position] = actorsToSort[position - 1]
       position = position - 1
-    EndWhile
+    Endwhile
     actorsToSort[position] = currentActor
     index += 1
-  EndWhile
+  Endwhile
 
   int i = 0
   int numMales = 0
@@ -232,11 +224,13 @@ Function StartSexSmart(bool bPlayerInScene, actor[] actorsToSort, string tags)
       numFemales += 1
     EndIf
     i += 1
-  EndWhile
+  Endwhile
   
   Main.Debug("Done Sorting actors (" + numMales + " males, " + numFemales + " females): " + actorsToSort)
   slf.StartSex(actorsToSort, FindSexlabAnimations(actorsToSort, numMales, numFemales, tags))
 EndFunction
+
+
 
 sslBaseAnimation[] Function FindSexlabAnimations(actor[] actors, int numMales, int numFemales, string tags, bool forceaggressive = false)
   sslBaseAnimation[] ret
@@ -268,7 +262,9 @@ sslBaseAnimation[] Function FindSexlabAnimations(actor[] actors, int numMales, i
   return ret
 EndFunction
 
-bool function UseSex()
+
+
+bool Function UseSex()
   return slf != None || bHasOstim
 EndFunction
 
@@ -277,14 +273,26 @@ EndFunction
 Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[] actorsFromFormList, bool bPlayerInScene)
   actor Player = game.GetPlayer()
   ; Mutually Exclusive keywords
-  If stringutil.Find(sayLine, "-masturbate-") != -1
+  if stringutil.Find(sayLine, "-masturbate-") != -1
     Start1pSex(akSpeaker)
+    
   elseif stringutil.Find(sayLine, "-startsex-") != -1 || stringUtil.Find(sayLine, "-sex-") != -1 || stringUtil.Find(sayLine, "-fuck-") != -1
     Start2pSex(akSpeaker, akTarget, Player, bPlayerInScene)
+    
   elseif stringutil.Find(sayLine, "-vaginalsex-") != -1
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "vaginal")
   elseif stringutil.Find(sayLine, "-analsex-") != -1
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "anal")
+  elseif stringutil.Find(sayLine, "-missionary-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "missionary")
+  elseif stringutil.Find(sayLine, "-cowgirl-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "cowgirl")
+  elseif stringutil.Find(sayLine, "-reversecowgirl-") != -1 || stringutil.Find(sayLine, "-reversedcowgirl-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "reversecowgirl")
+  elseif stringutil.Find(sayLine, "-doggystyle-") != -1 || stringutil.Find(sayLine, "-kittystyle-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "doggystyle")
+  elseif stringutil.Find(sayLine, "-sixtynine-") != -1 || stringutil.Find(sayLine, "-69-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "sixtynine,69")
   elseif stringutil.Find(sayLine, "-blowjob-") != -1
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "blowjob")
   elseif stringutil.Find(sayLine, "-handjob-") != -1
@@ -295,6 +303,8 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "boobjob")
   elseif stringutil.Find(sayLine, "-cunnilingus-") != -1
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "cunnilingus")
+  elseif stringutil.Find(sayLine, "-facesitting-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "facesitting")
   elseif stringutil.Find(sayLine, "-facial-") != -1
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "facial")
   elseif stringutil.Find(sayLine, "-cumonchest-") != -1
@@ -309,12 +319,23 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "fingering")
   elseif stringutil.Find(sayLine, "-vampirebite-") != -1
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "vampire")
-  elseIf stringutil.Find(sayLine, "-groupsex-") != -1 || stringUtil.Find(sayLine, "-orgy-") != -1 || stringUtil.Find(sayLine, "-threesome-") != -1
-    StartGroupSex(akSpeaker, akTarget, Player, bPlayerInScene, actorsFromFormList)
+  elseif stringutil.Find(sayLine, "-suckingnipple-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "breastfeeding")
+  ; Could not find SL equivalent for these
+  elseif stringutil.Find(sayLine, "-gropingtesticles-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "gropingtesticles")
+  elseif stringutil.Find(sayLine, "-grinding-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "grindingpenis,buttjob")
+  elseif stringutil.Find(sayLine, "-thighjob-") != -1
+    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "thighjob")
+  ; Kissing/Cuddling experimental alternates
   elseif stringutil.Find(sayLine, "-cuddling-") != -1
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "hugging")
   elseif stringutil.Find(sayLine, "-frenchkissing-") != -1
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "kissing")
+    
+  elseIf stringutil.Find(sayLine, "-groupsex-") != -1 || stringUtil.Find(sayLine, "-orgy-") != -1 || stringUtil.Find(sayLine, "-threesome-") != -1
+    StartGroupSex(akSpeaker, akTarget, Player, bPlayerInScene, actorsFromFormList)
   EndIf
 EndFunction
 
@@ -375,16 +396,16 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     Int iElement = equippedItems.Length
     Main.Debug("Removing clothes (clothingMap=" + clothingMap + ",id=" + equippedArmor + " + " + JValue.Count(equippedArmor) + " ) for " + speakerName)
     Int iIndex = 0
-    While iIndex < iElement
+    while iIndex < iElement
       if devious.HasDD() && equippedItems[iIndex].HasKeyword(devious.libs.zad_Lockable)
         Main.Debug("Not removing " + equippedItems[iIndex] + " - Lockable DD")
-      Else
+      else
         Main.Debug("Removing " + equippedItems[iIndex].GetName())
         JArray.AddForm(equippedArmor, equippedItems[iIndex])
         akSpeaker.UnequipItem(equippedItems[iIndex])
       EndIf
       iIndex += 1
-    EndWhile
+    Endwhile
     JMap.setObj(clothingMap, speakerName, equippedArmor)
     AIAgentFunctions.logMessageForActor("command@ExtCmdRemoveClothes@@"+speakerName+" removes clothes and armor","funcret",speakerName)
   elseif (command=="ExtCmdPutOnClothes")
@@ -392,16 +413,46 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     Int iElement = JValue.count(equippedItems)
     Main.Debug("Equipping clothes (clothingMap=" + clothingMap + ",id=" + equippedItems + " + " + JValue.Count(equippedItems) + " ) for " + speakerName)
     Int iIndex = 0
-    While iIndex < iElement
+    while iIndex < iElement
       Form item=JArray.GetForm(equippedItems, iIndex)
       main.Debug("Equipping " + item.GetName())
       akSpeaker.EquipItem(item);
       iIndex += 1
-    EndWhile
+    Endwhile
     equippedItems = JValue.release(equippedItems)
     AIAgentFunctions.logMessageForActor("command@ExtCmdPutOnClothes@@"+speakerName+" puts on clothes and armor","funcret",speakerName)
-    EndIf
+  EndIf
 EndEvent
+
+
+
+string Function ConvertTagsOstim(string tags)
+  ; Convert sexlab tags to ostim tags
+  if tags == "anal"
+    tags = "analsex"
+  elseif tags == "vaginal"
+    tags = "vaginalsex"
+  elseif tags == "oral"
+    tags = "deepthroat"
+  elseif tags == "fingering"
+    tags = "vaginalfingering"
+  elseif tags == "cunnilingus"
+    tags = "cunnilingus,lickingvagina,oralfingering"
+  elseif tags == "breastfeeding"
+    tags = "suckingnipple"
+  elseif tags == "chestcum"
+    tags = "cumonchest"
+  elseif tags == "pussy"
+    tags = "rubbingclitoris"
+  elseif tags == "vampire"
+    tags = "vampirebite"
+  elseif tags == "hugging"
+    tags = "cuddling"
+  elseif tags == "kissing"
+    tags = "frenchkissing"
+  EndIf
+  return tags
+EndFunction
 
 
 
@@ -426,12 +477,12 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
         actorString=actorString+actors[i].GetActorBase().GetName()+",";
         if (actors[i] == playerRef) 
           playerInvolved=true;
-        endif
-    endwhile
+        EndIf
+    Endwhile
     
     if (playerInvolved)
       AIFF.ChillOut()
-    endif
+    EndIf
     SetSexSceneState("on")
     if bHasAIFF
       AIAgentFunctions.logMessage("ostim@"+sceneName+" "+isRunning+" "+actorString,"setconf")
@@ -451,12 +502,12 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
         actorString=actorString+actors[i].GetActorBase().GetName()+",";
         if (actors[i] == playerRef)
           playerInvolved=true;
-        endif
-    endwhile
+        EndIf
+    Endwhile
     
     if (playerInvolved)
       AIFF.ChillOut()
-    endif
+    EndIf
     main.RegisterEvent(""+sceneName+" id:"+sceneId+" isRunning:"+isRunning+" Actors:"+actorString,"info_sexscene")
     Main.Info("Ostim Scene changed")
 
@@ -478,16 +529,17 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
       actorString=actorString+actors[i].GetActorBase().GetName()+",";
       if (actors[i] == playerRef) 
         playerInvolved=true;
-      endif
+      EndIf
     endwhile
     
     if (playerInvolved)
       AIFF.ChillOut()
-    endif
+    EndIf
     SetSexSceneState("off")
     Main.Info("Ended intimate scene")
-  endif
+  EndIf
 EndEvent
+
 
 
 Function LoadSexlabDescriptions()
@@ -496,8 +548,9 @@ Function LoadSexlabDescriptions()
     descriptionsMap=JValue.readFromFile( "Data/Data/minai/sexlab_descriptions.json");
     JValue.retain(descriptionsMap)
     Main.Info("Descriptions set: "+JMap.count(descriptionsMap)+" using map: "+descriptionsMap+ " Data/Data/minai/sexlab_descriptions.json")
-  endif
+  EndIf
 EndFunction
+
 
 
 Function SetSexSceneState(string sexState)
@@ -505,6 +558,7 @@ Function SetSexSceneState(string sexState)
     AIAgentFunctions.logMessage("sexscene@" + sexState,"setconf")
   EndIf
 EndFunction
+
 
 
 Event OnAnimationStart(int tid, bool HasPlayer)
@@ -518,13 +572,14 @@ Event OnAnimationStart(int tid, bool HasPlayer)
     if (sortedActorList[i]==playerRef) 
       bPlayerInScene=true;
     EndIf
-  EndWhile
+  Endwhile
   if (bPlayerInScene)
     AIFF.ChillOut()
-  endif
+  EndIf
   SetSexSceneState("on")
   Main.Info("Started Sex Scene")
 EndEvent
+
 
 
 String Function GetActorNameForSex(actor akActor)
@@ -532,13 +587,14 @@ String Function GetActorNameForSex(actor akActor)
   string ret = akActor.GetActorBase().GetName()
   if ret
     return ret
-  endif
+  EndIf
   ret = akActor.GetDisplayName()
   if ret
     return ret
-  endif
+  EndIf
   return "a monster"
 EndFunction
+
 
 
 Event OnStageStart(int tid, bool HasPlayer)
@@ -546,16 +602,16 @@ Event OnStageStart(int tid, bool HasPlayer)
   
   if (controller.Stage==1) 
     LoadSexlabDescriptions()
-  endif
+  EndIf
   
   Actor[] actorList = slf.GetController(tid).Positions
   Actor[] targetactorList = actorList
 
-  If (actorList.length < 1)
+  if (actorList.length < 1)
     return
   EndIf
   
-  String pleasure=""
+  string pleasure=""
   Actor[] sortedActorList = slf.SortActors(actorList,true)
   
   int i = sortedActorList.Length
@@ -563,62 +619,63 @@ Event OnStageStart(int tid, bool HasPlayer)
     i -= 1
     pleasure=pleasure+GetActorNameForSex(sortedActorList[i])+" pleasure score "+slf.GetEnjoyment(tid,sortedActorList[i])+","
   endwhile
-  String sceneTags="'. Scene tags: "+controller.Animation.GetRawTags()+"."
-    if (controller.Animation.GetRawTags()=="")
-      sceneTags="";
+  string sceneTags="'. Scene tags: "+controller.Animation.GetRawTags()+"."
+  if (controller.Animation.GetRawTags()=="")
+    sceneTags="";
+  EndIf
+  
+  ;Animations[StageIndex(Position, Stage)]
+  string sexPos="#SEX_SCENARIO: Position '" +controller.Animation.Name+"'. ";
+  string pleasureFull=pleasure
+
+  string stageDesc1 = GetSexStageDescription(controller.Animation.FetchStage(controller.Stage)[0])
+  string stageDesc2 = GetSexStageDescription(controller.Animation.FetchStage(controller.Stage)[1])
+  
+  string description=GetActorNameForSex(sortedActorList[0])+" is "+ stageDesc1
+  string description2=GetActorNameForSex(sortedActorList[1])+" is "+ stageDesc2
+
+  if (stageDesc1 == "")
+    description="";
+  EndIf
+  
+  if (stageDesc2 == "")
+    description2="";
+  EndIf
+
+  ; Select an actor that's not the player, and have them talk.
+  actor otherActor = sortedActorList[0]
+  if otherActor == playerRef && sortedActorList.Length > 1
+    otherActor = sortedActorList[1]
+  EndIf
+
+  string[] Tags = controller.Animation.GetRawTags()
+  ; Send event, AI can be aware SEX is happening here
+  if (Tags.Find("forced")!= -1)
+    main.RegisterEvent(sexPos+sceneTags+GetActorNameForSex(sortedActorList[0])+ " is being raped by  "+GetActorNameForSex(sortedActorList[1])+ ", ("+GetActorNameForSex(sortedActorList[0])+" feels a mix of pain and pleasure) ."+description+description2+"("+pleasureFull+")","info_sexscene")
+  else
+    main.RegisterEvent(sexPos+sceneTags+GetActorNameForSex(sortedActorList[0])+ " and "+GetActorNameForSex(sortedActorList[1])+ " are having sex. "+description+description2+"("+pleasureFull+")","info_sexscene")
+  EndIf
+
+  ; main.RegisterEvent(controller.Animation.FetchStage(controller.Stage)[0]+"@"+sceneTags,"info_sexscenelog")
+
+  aiff.setAnimationBusy(1, otherActor.GetActorBase().GetName())
+  if (!slf.isMouthOpen(otherActor) && otherActor != playerRef)
+    if (controller.Stage < (controller.Animation.StageCount()))
+      if bHasAIFF && AiAgentFunctions.isGameVR() 
+        ; VR users will have dirty talk through physics integration instead
+        ; Reenabled this temporarily while figuring out female player character collisions during sex.
+        ; Works much better for male atm, need to add different colliders
+        DirtyTalk("ohh... yes.","chatnf_sl",GetActorNameForSex(sortedActorList[1]))
+      else
+        DirtyTalk("ohh... yes.","chatnf_sl",GetActorNameForSex(sortedActorList[1]))
+      EndIf
     EndIf
-    
-    ;Animations[StageIndex(Position, Stage)]
-    String sexPos="#SEX_SCENARIO: Position '" +controller.Animation.Name+"'. ";
-    String pleasureFull=pleasure
-
-    String stageDesc1 = GetSexStageDescription(controller.Animation.FetchStage(controller.Stage)[0])
-    string stageDesc2 = GetSexStageDescription(controller.Animation.FetchStage(controller.Stage)[1])
-    
-    String description=GetActorNameForSex(sortedActorList[0])+" is "+ stageDesc1
-    String description2=GetActorNameForSex(sortedActorList[1])+" is "+ stageDesc2
-
-    if (stageDesc1 == "")
-      description="";
-    EndIf
-    
-    if (stageDesc2 == "")
-      description2="";
-    EndIf
-      
-
-    ; Select an actor that's not the player, and have them talk.
-    actor otherActor = sortedActorList[0]
-    if otherActor == playerRef && sortedActorList.Length > 1
-      otherActor = sortedActorList[1]
-    EndIf
-
-    string[] Tags = controller.Animation.GetRawTags()
-    ; Send event, AI can be aware SEX is happening here
-    if (Tags.Find("forced")!= -1)
-      main.RegisterEvent(sexPos+sceneTags+GetActorNameForSex(sortedActorList[0])+ " is being raped by  "+GetActorNameForSex(sortedActorList[1])+ ", ("+GetActorNameForSex(sortedActorList[0])+" feels a mix of pain and pleasure) ."+description+description2+"("+pleasureFull+")","info_sexscene")
-    else
-      main.RegisterEvent(sexPos+sceneTags+GetActorNameForSex(sortedActorList[0])+ " and "+GetActorNameForSex(sortedActorList[1])+ " are having sex. "+description+description2+"("+pleasureFull+")","info_sexscene")
-    endif
-
-    ; main.RegisterEvent(controller.Animation.FetchStage(controller.Stage)[0]+"@"+sceneTags,"info_sexscenelog")
-
-    aiff.setAnimationBusy(1, otherActor.GetActorBase().GetName())
-    if (!slf.isMouthOpen(otherActor) && otherActor != playerRef)
-      if (controller.Stage < (controller.Animation.StageCount()))
-        if bHasAIFF && AiAgentFunctions.isGameVR() 
-	  ; VR users will have dirty talk through physics integration instead
-	  ; Reenabled this temporarily while figuring out female player character collisions during sex.
-	  ; Works much better for male atm, need to add different colliders
-	  DirtyTalk("ohh... yes.","chatnf_sl",GetActorNameForSex(sortedActorList[1]))
-	Else
-          DirtyTalk("ohh... yes.","chatnf_sl",GetActorNameForSex(sortedActorList[1]))
-	EndIf
-      endif
-    else
-      main.RegisterEvent(GetActorNameForSex(otherActor)+ " is now using mouth with "+sortedActorList[1].GetActorBase().GetName(),"info_sexscene")
-    endif
+  else
+    main.RegisterEvent(GetActorNameForSex(otherActor)+ " is now using mouth with "+sortedActorList[1].GetActorBase().GetName(),"info_sexscene")
+  EndIf
 EndEvent
+
+
 
 Function DirtyTalk(string lineToSay, string lineType, string name)
   if !bHasAIFF
@@ -630,7 +687,7 @@ Function DirtyTalk(string lineToSay, string lineType, string name)
     lastDirtyTalk = currentTime
     Main.Debug("DirtyTalk(" + lineToSay + ", " + lineType +", " + name +")")
     Main.RequestLLMResponse(lineToSay, lineType, name)
-  Else
+  else
     Main.Debug("DirtyTalk - THROTTLED")
   EndIf
 EndFunction
@@ -641,17 +698,17 @@ Event PostSexScene(int tid, bool HasPlayer)
   sslThreadController controller = slf.GetController(tid)
   Actor[] actorList = slf.HookActors(tid)
   Actor[] targetactorList = actorList
-  If (actorList.length < 1)
+  if (actorList.length < 1)
     return
   EndIf
   
-  String pleasure=""
-   int i = actorList.Length
+  string pleasure=""
+    int i = actorList.Length
   while(i > 0)
     i -= 1
     pleasure=pleasure+actorList[i].GetActorBase().GetName()+" is reaching orgasm,"
-  EndWhile
-  String pleasureFull="Pleasure:"+pleasure
+  Endwhile
+  string pleasureFull="Pleasure:"+pleasure
   ; Send event, AI can be aware SEX is happening here
   main.RegisterEvent(pleasureFull,"info_sexscene")
   
@@ -662,11 +719,13 @@ Event PostSexScene(int tid, bool HasPlayer)
     otherActor = sortedActorList[1]
   EndIf
   
-   main.RegisterEvent(otherActor.GetActorBase().GetName()+ ": Oh yeah! I'm having an orgasm!.","chat")
-   if (!slf.isMouthOpen(otherActor))
+  main.RegisterEvent(otherActor.GetActorBase().GetName()+ ": Oh yeah! I'm having an orgasm!.","chat")
+  if (!slf.isMouthOpen(otherActor))
     DirtyTalk("I'm cumming!","chatnf_sl_2",otherActor.GetActorBase().GetName())
   EndIf
 EndEvent
+
+
 
 Event EndSexScene(int tid, bool HasPlayer)
     JValue.release(descriptionsMap)
@@ -694,13 +753,15 @@ Event EndSexScene(int tid, bool HasPlayer)
 EndEvent
 
 
-String function GetSexStageDescription(String animationStageName) 
-    Main.Info("Obtaining description for: <"+animationStageName+"> using map: "+descriptionsMap)
+
+string Function GetSexStageDescription(string animationStageName) 
+  Main.Info("Obtaining description for: <"+animationStageName+"> using map: "+descriptionsMap)
   return JMap.getStr(descriptionsMap,animationStageName)
-endFunction
+EndFunction
 
 
-function InitializeSexDescriptions()
+
+Function InitializeSexDescriptions()
   if (JMap.count(descriptionsMap) != 0 || descriptionsMap != 0)
     Main.Info("Not reinitializing sexlab descriptions - data already exists.")
     return
@@ -728,7 +789,7 @@ function InitializeSexDescriptions()
   JMap.setStr(descriptionsMap,"Leito_Cowgirl_A2_S5","lying down in a passive stance. Trembling with Pleasure.")
   Main.Info("Descriptions set: "+JMap.count(descriptionsMap)+" using map: "+descriptionsMap)
   JValue.writeToFile(descriptionsMap, "Data/Data/minai/sexlab_descriptions.json")
-endFunction
+EndFunction
 
 
 
@@ -737,6 +798,8 @@ string Function GetKeywordsForActor(actor akTarget)
 
   return ret
 EndFunction
+
+
 
 string Function GetFactionsForActor(actor akTarget)
   string ret = ""
