@@ -677,21 +677,21 @@ Event OnStageStart(int tid, bool HasPlayer)
 
   ; main.RegisterEvent(controller.Animation.FetchStage(controller.Stage)[0]+"@"+sceneTags,"info_sexscenelog")
 
-    aiff.setAnimationBusy(1, otherActor.GetActorBase().GetName())
-    if (!slf.isMouthOpen(otherActor) && otherActor != playerRef)
-      if (controller.Stage < (controller.Animation.StageCount()))
-        if bHasAIFF && AiAgentFunctions.isGameVR() 
-	  ; VR users will have dirty talk through physics integration instead
-	  ; Reenabled this temporarily while figuring out female player character collisions during sex.
-	  ; Works much better for male atm, need to add different colliders
-	  DirtyTalk("ohh... yes.","chatnf_sl",GetActorNameForSex(otherActor))
-	Else
-          DirtyTalk("ohh... yes.","chatnf_sl",GetActorNameForSex(otherActor))
-	EndIf
-      endif
-    else
-      main.RegisterEvent(GetActorNameForSex(otherActor)+ " is now using mouth with "+sortedActorList[1].GetActorBase().GetName(),"info_sexscene")
-    endif
+  aiff.setAnimationBusy(1, otherActor.GetActorBase().GetName())
+  if (!slf.isMouthOpen(otherActor) && otherActor != playerRef)
+    if (controller.Stage < (controller.Animation.StageCount()))
+      if bHasAIFF && AiAgentFunctions.isGameVR() 
+      ; VR users will have dirty talk through physics integration instead
+      ; Reenabled this temporarily while figuring out female player character collisions during sex.
+      ; Works much better for male atm, need to add different colliders
+        DirtyTalk("ohh... yes.","chatnf_sl",GetActorNameForSex(sortedActorList[1]))
+      else
+        DirtyTalk("ohh... yes.","chatnf_sl",GetActorNameForSex(sortedActorList[1]))
+      EndIf
+    EndIf
+  else
+    main.RegisterEvent(GetActorNameForSex(otherActor)+ " is now using mouth with "+sortedActorList[1].GetActorBase().GetName(),"info_sexscene")
+  EndIf
 EndEvent
 
 
@@ -744,7 +744,7 @@ Event PostSexScene(int tid, bool HasPlayer)
   
    main.RegisterEvent(otherActor.GetActorBase().GetName()+ ": Oh yeah! I'm having an orgasm!.","chat")
    if (!slf.isMouthOpen(otherActor))
-    DirtyTalk("I'm cumming!","chatnf_sl_2",GetActorNameForSex(otherActor))
+    DirtyTalk("I'm cumming!","chatnf_sl_2",otherActor.GetActorBase().GetActorName())
   EndIf
 EndEvent
 
