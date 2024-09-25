@@ -127,10 +127,8 @@ Function Start2pSex(actor akSpeaker, actor akTarget, actor Player, bool bPlayerI
       ; ostimActors = OActorUtil.Sort(ostimActors, OActorUtil.EmptyArray())
       string newScene = OLibrary.GetRandomSceneWithAction(ostimActors, tags)
       Utility.Wait(0.2)
-      int ActiveOstimThreadID = OThreadBuilder.Create(ostimActors)
+      int ActiveOstimThreadID = OThread.Quickstart(ostimActors, newScene)
       Main.Debug("Found " + tags + " scene: " + newScene + " for OStim Thread [" + ActiveOstimThreadID + "].")
-      OThreadBuilder.SetStartingAnimation(ActiveOstimThreadID, newScene)
-      OThreadBuilder.Start(ActiveOstimThreadID)
     else
       actor[] actors = new actor[2]
       actors[0] = akTarget
@@ -327,8 +325,9 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     return
   EndIf
   Main.Debug("Sex - CommandDispatcher(" + speakerName +", " + command +", " + parameter + ")")
-  Actor akSpeaker = AIAgentFunctions.getAgentByName(speakerName)
+  actor akSpeaker = AIAgentFunctions.getAgentByName(speakerName)
   actor akTarget = AIAgentFunctions.getAgentByName(parameter)
+  actor[] actorsFromFormList = AIAgentFunctions.findAllNearbyAgents()
   if !akTarget
     akTarget = PlayerRef
   EndIf
@@ -368,8 +367,7 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   elseif command == "ExtCmdStartFingering"
     StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "fingering")
   elseIf command == "ExtCmdOrgy"
-    Debug.Notification("Orgy is broken until I figure out how to get all AI actors")
-    ; StartGroupSex(akSpeaker, akTarget, PlayerRef, bPlayerInScene, actorsFromFormList)
+    StartGroupSex(akSpeaker, akTarget, PlayerRef, bPlayerInScene, actorsFromFormList)
   elseif (command=="ExtCmdRemoveClothes")
     Form[] equippedItems=PO3_SKSEFunctions.AddAllEquippedItemsToArray(akSpeaker);
     int equippedArmor = JArray.Object()

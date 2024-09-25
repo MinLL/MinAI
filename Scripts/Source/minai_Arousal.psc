@@ -108,7 +108,7 @@ function Maintenance(minai_MainQuestController _main)
 	TNG_DefaultSize = Game.GetFormFromFile(0x03BFE0, "TheNewGentleman.esp") as Keyword
 	TNG_Gentlewoman = Game.GetFormFromFile(0x03BFF8, "TheNewGentleman.esp") as Keyword
 	TNG_Revealing = Game.GetFormFromFile(0x03BFFF, "TheNewGentleman.esp") as Keyword
-	if TNG_XS != None && TNG_S != None && TNG_M != None && TNG_L != None && TNG_XL != None && TNG_DefaultSize != None
+	if TNG_XS != None && TNG_S != None && TNG_M != None && TNG_L != None && TNG_XL != None && TNG_DefaultSize != None && TNG_Gentlewoman != None && TNG_Revealing != None
 		Main.Debug("TNG size keywords retrieved successfully.")
 	else
 		Main.Error("Failed to retrieve one or more TNG size keywords.")
@@ -148,45 +148,45 @@ EndFunction
 
 
 Function WriteArousedString(bool bPlayerInScene, actor Player, actor[] actorsFromFormList)
-	int numActors = actorsFromFormList.Length
-	int i = 0
-	while (i < numActors)
-		Actor currentActor = actorsFromFormList[i]
-		if (currentActor != None)
-			String actorName = main.GetActorName(currentActor)
-			int arousal = GetActorArousal(currentActor)
-			if currentActor != Player
-			  main.RegisterAction(actorName + "'s sexual arousal is " + arousal + "%")
-			Else
-			  main.RegisterAction(actorName + "'s sexual arousal is " + arousal + "%.")
-			EndIf
-		EndIf
-		i += 1
-	EndWhile
-	if bPlayerInScene
-	  String actorName = main.GetActorName(player)
-	  int exposure = GetActorArousal(player)
-	  if player.getActorBase().getSex() == 0 ; Male
-            If exposure >= 99
-              main.RegisterAction(actorName + " appears to have a raging erection that is difficult to hide. " + actorName + " appears to be absolutely desperate for sex.")
-            ElseIf exposure >= 85
-              main.RegisterAction(actorName + " appears to have a raging erection that is difficult to hide.")
-            ElseIf exposure >= 70
-              main.RegisterAction(actorName + " appears to be aroused, and has flushed cheeks. ")
-            Elseif exposure >= 50
-              main.RegisterAction(actorName + " appears to be mildly turned on, and is blushing slightly.")
-            EndIf
-          else ; Female, or other
-            If exposure >= 99
-              main.RegisterAction(actorName + " appears to be extremely aroused, and looks to be absolutely desperate for sex. She has heavy breathing, pointy nipples, and flushed cheeks.")
-            ElseIf exposure >= 85
-              main.RegisterAction(actorName + " appears to be very aroused, with pointy nipples and heavy breathing.")
-            ElseIf exposure >= 70
-              main.RegisterAction(actorName + " appears to be aroused, and has flushed cheeks.")
-            Elseif exposure >= 50
-              main.RegisterAction(actorName + " appears to be mildly turned on, and is blushing slightly.")
-            EndIf
-          EndIf
+  int numActors = actorsFromFormList.Length
+  int i = 0
+  while (i < numActors)
+    Actor currentActor = actorsFromFormList[i]
+    if (currentActor != None)
+      String actorName = main.GetActorName(currentActor)
+      int arousal = GetActorArousal(currentActor)
+      if currentActor != Player
+        main.RegisterAction(actorName + "'s sexual arousal is " + arousal + "%")
+      Else
+        main.RegisterAction(actorName + "'s sexual arousal is " + arousal + "%.")
+      EndIf
+    EndIf
+    i += 1
+  EndWhile
+  if bPlayerInScene
+    String actorName = main.GetActorName(player)
+    int exposure = GetActorArousal(player)
+    if player.getActorBase().getSex() == 0 ; Male
+      If exposure >= 99
+        main.RegisterAction(actorName + " appears to have a raging erection that is difficult to hide. " + actorName + " appears to be absolutely desperate for sex.")
+      ElseIf exposure >= 85
+        main.RegisterAction(actorName + " appears to have a raging erection that is difficult to hide.")
+      ElseIf exposure >= 70
+        main.RegisterAction(actorName + " appears to be aroused, and has flushed cheeks. ")
+      Elseif exposure >= 50
+        main.RegisterAction(actorName + " appears to be mildly turned on, and is blushing slightly.")
+      EndIf
+    else ; Female, or other
+      If exposure >= 99
+        main.RegisterAction(actorName + " appears to be extremely aroused, and looks to be absolutely desperate for sex. She has heavy breathing, pointy nipples, and flushed cheeks.")
+      ElseIf exposure >= 85
+        main.RegisterAction(actorName + " appears to be very aroused, with pointy nipples and heavy breathing.")
+      ElseIf exposure >= 70
+        main.RegisterAction(actorName + " appears to be aroused, and has flushed cheeks.")
+      Elseif exposure >= 50
+        main.RegisterAction(actorName + " appears to be mildly turned on, and is blushing slightly.")
+      EndIf
+    EndIf
 	EndIf
 EndFunction
 
@@ -206,109 +206,177 @@ function WriteClothingString(actor akActor, actor player, bool isYou=false, acto
 			EndIf
 			if bHasTNG
 				bool exposed = IsTNGExposed(currentActor)
-				if currentActor.GetActorBase().GetSex() == 0 && exposed == True || currentActor.HasKeyword(TNG_Gentlewoman) && exposed == True
-					if exposed == True && cuirass != None || cuirass == None
-						main.RegisterAction(actorName + "'s genitals are exposed.")
-					EndIf
-					string sizeDescription = ""
-					Main.Debug("TNG Dick Check on "+ actorName)
-					; Check for auto-assigned first
-					if currentActor.HasKeywordString("TNG_ActorAddnAuto:05")
-						sizeDescription = "one of the biggest cocks you've ever seen"
-					elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:04")
-						sizeDescription = "a large cock"
-					elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:03")
-						sizeDescription = "an average sized cock"
-					elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:02")
-						sizeDescription = "a very small cock"
-					elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:01")
-						sizeDescription = "an embarrassingly tiny prick"
-					EndIf
-					; Supersede if manually set
-					if currentActor.HasKeyword(TNG_XL)
-						sizeDescription = "one of the biggest cocks you've ever seen"
-					elseif currentActor.HasKeyword(TNG_L)
-						sizeDescription = "a large cock"
-					elseif currentActor.HasKeyword(TNG_M) || currentActor.HasKeyword(TNG_DefaultSize)
-						sizeDescription = "an average sized cock"
-					elseif currentActor.HasKeyword(TNG_S)
-						sizeDescription = "a very small cock"
-					elseif currentActor.HasKeyword(TNG_XS)
-						sizeDescription = "an embarrassingly tiny prick"
-					EndIf
-					if sizeDescription != ""
-						main.RegisterAction("You can see that " + actorName + " has " + sizeDescription + ".")
-					else
-						Main.Info("TNG Dick Check Failed on " + actorName)
-					EndIf
+				if exposed && ((currentActor.GetActorBase().GetSex() == 0) || currentActor.HasKeyword(TNG_Gentlewoman))
+					main.RegisterAction(actorName + "'s genitals are exposed.")
+          string sizeDescription = ""
+          Main.Debug("TNG Dick Check on "+ actorName)
+          ; Check for auto-assigned first
+          if currentActor.HasKeywordString("TNG_ActorAddnAuto:05")
+            sizeDescription = "one of the biggest cocks you've ever seen"
+          elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:04")
+            sizeDescription = "a large cock"
+          elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:03")
+            sizeDescription = "an average sized cock"
+          elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:02")
+            sizeDescription = "a very small cock"
+          elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:01")
+            sizeDescription = "an embarrassingly tiny prick"
+          EndIf
+          if sizeDescription == ""
+            Main.Debug("TNG_ActorAddnAuto:0x not found on " + actorName + ", checking manual size assignment.")
+          EndIf
+          ; Supersede if manually set
+          if currentActor.HasKeyword(TNG_XL)
+            sizeDescription = "one of the biggest cocks you've ever seen"
+          elseif currentActor.HasKeyword(TNG_L)
+            sizeDescription = "a large cock"
+          elseif currentActor.HasKeyword(TNG_M) || currentActor.HasKeyword(TNG_DefaultSize)
+            sizeDescription = "an average sized cock"
+          elseif currentActor.HasKeyword(TNG_S)
+            sizeDescription = "a very small cock"
+          elseif currentActor.HasKeyword(TNG_XS)
+            sizeDescription = "an embarrassingly tiny prick"
+          EndIf
+          if sizeDescription != ""
+            main.RegisterAction("You can see that " + actorName + " has " + sizeDescription + ".")
+          else
+            Main.Info("TNG Dick Check Failed on " + actorName)
+          EndIf
 				EndIf
 			EndIf
 			if !bHasArousedKeywords
 				return
-			endif
-			if currentActor.WornHasKeyword(SLA_HalfNakedBikini)
-			  main.RegisterAction(actorName + " is wearing a set of revealing bikini armor.")
 			EndIf
-			if currentActor.WornHasKeyword(SLA_ArmorHalfNaked)
-			  main.RegisterAction(actorName + " is wearing very revealing attire, leaving them half naked.")
+			if SLA_HalfNakedBikini != None
+        if currentActor.WornHasKeyword(SLA_HalfNakedBikini)
+          main.RegisterAction(actorName + " is wearing a set of revealing bikini armor.")
+        EndIf
+      EndIf
+      if SLA_ArmorHalfNaked != None
+        if currentActor.WornHasKeyword(SLA_ArmorHalfNaked)
+          main.RegisterAction(actorName + " is wearing very revealing attire, leaving them half naked.")
+        EndIf
+      EndIf
+      if SLA_Brabikini != None
+        if currentActor.WornHasKeyword(SLA_Brabikini)
+          main.RegisterAction(actorName + " is wearing a bra underneath her other equipment.")
+        EndIf
+      EndIf
+      if SLA_ThongT != None
+        if currentActor.WornHasKeyword(SLA_ThongT)
+          main.RegisterAction(actorName + " is wearing a thong underneath her other equipment.")
+        EndIf
+      EndIf
+      if SLA_ThongLowLeg != None
+        if currentActor.WornHasKeyword(SLA_ThongLowLeg)
+          main.RegisterAction(actorName + " is wearing a thong underneath her other equipment.")
+        EndIf
+      EndIf
+      if SLA_ThongCString != None
+        if currentActor.WornHasKeyword(SLA_ThongCString)
+          main.RegisterAction(actorName + " is wearing a thong underneath her other equipment.")
+        EndIf
+      EndIf
+      if SLA_ThongGstring != None
+        if currentActor.WornHasKeyword(SLA_ThongGstring)
+          main.RegisterAction(actorName + " is wearing a thong underneath her other equipment.")
+        EndIf
+      EndIf
+      if SLA_PantiesNormal != None
+        if currentActor.WornHasKeyword(SLA_PantiesNormal)
+          main.RegisterAction(actorName + " is wearing plain panties underneath her other equipment.")
+        EndIf
+      EndIf
+			if SLA_KillerHeels != None
+        if currentActor.WornHasKeyword(SLA_KillerHeels)
+          main.RegisterAction(actorName + " is wearing a set of high-heels.")
+        EndIf
+      EndIf
+      if SLA_BootsHeels != None
+        if currentActor.WornHasKeyword(SLA_BootsHeels)
+          main.RegisterAction(actorName + " is wearing a set of high-heels.")
+        EndIf
+      EndIf
+      if SLA_PantsNormal
+        if currentActor.WornHasKeyword(SLA_PantsNormal)
+          main.RegisterAction(actorName + " is wearing a set of ordinary pants.")
+        EndIf
+      EndIf
+			if SLA_MicroHotPants != None
+        if currentActor.WornHasKeyword(SLA_MicroHotPants)
+          main.RegisterAction(actorName + " is wearing a set of short hot-pants that accentuate her ass.")
+        EndIf
+      EndIf
+      if SLA_ArmorHarness != None
+        if currentActor.WornHasKeyword(SLA_ArmorHarness)
+          main.RegisterAction(actorName + " is wearing a form-fitting body harness.")
+        EndIf
+      EndIf
+      if SLA_ArmorSpendex != None
+        if currentActor.WornHasKeyword(SLA_ArmorSpendex)
+          main.RegisterAction(actorName + "'s outfit is made out of latex (Referred to as Ebonite).")
+        EndIf
+      EndIf
+			if SLA_ArmorTransparent != None
+        if currentActor.WornHasKeyword(SLA_ArmorTransparent)
+          main.RegisterAction(actorName + "'s outfit is transparent, leaving nothing to the imagination.")
+        EndIf
+      EndIf
+			if SLA_ArmorLewdLeotard != None
+        if currentActor.WornHasKeyword(SLA_ArmorLewdLeotard)
+          main.RegisterAction(actorName + " is wearing a sheer, revealing leotard leaving very little to the imagination.")
+        EndIf
+      EndIf
+      if SLA_PelvicCurtain != None
+        if currentActor.WornHasKeyword(SLA_PelvicCurtain)
+          main.RegisterAction(actorName + "'s pussy is covered only by a sheer curtain of fabric.")
+        EndIf
+      EndIf
+			if SLA_FullSkirt != None
+        if currentActor.WornHasKeyword(SLA_FullSkirt)
+          main.RegisterAction(actorName + " is wearing a full length skirt that goes down to her knees.")
+        EndIf
 			EndIf
-			if currentActor.WornHasKeyword(SLA_Brabikini)
-			  main.RegisterAction(actorName + " is wearing a bra underneath her other equipment.")
-			EndIf
-			  if currentActor.WornHasKeyword(SLA_ThongT) || currentActor.WornHasKeyword(SLA_ThongLowLeg) || currentActor.WornHasKeyword(SLA_ThongCString) || currentActor.WornHasKeyword(SLA_ThongGstring)
-			  main.RegisterAction(actorName + " is wearing a thong underneath her other equipment.")
-			EndIf
-			if currentActor.WornHasKeyword(SLA_PantiesNormal)
-			  main.RegisterAction(actorName + " is wearing plain panties underneath her other equipment.")
-			EndIf
-			if currentActor.WornHasKeyword(SLA_KillerHeels) || currentActor.WornHasKeyword(SLA_BootsHeels)
-			  main.RegisterAction(actorName + " is wearing a set of high-heels.")
-			EndIf
-			if currentActor.WornHasKeyword(SLA_PantsNormal)
-			  main.RegisterAction(actorName + " is wearing a set of ordinary pants.")
-			EndIf
-			if currentActor.WornHasKeyword(SLA_MicroHotPants)
-			  main.RegisterAction(actorName + " is wearing a set of short hot-pants that accentuate her ass.")
-			EndIf
-			if currentActor.WornHasKeyword(SLA_ArmorHarness)
-			  main.RegisterAction(actorName + " is wearing a form-fitting body harness.")
-			EndIf
-			if currentActor.WornHasKeyword(SLA_ArmorSpendex)
-			  main.RegisterAction(actorName + "'s outfit is made out of latex (Referred to as Ebonite).")
-			EndIf
-			if currentActor.WornHasKeyword(SLA_ArmorTransparent)
-			  main.RegisterAction(actorName + "'s outfit is transparent, leaving nothing to the imagination.")
-			EndIf
-			if currentActor.WornHasKeyword(SLA_ArmorLewdLeotard)
-			  main.RegisterAction(actorName + " is wearing a sheer, revealing leotard leaving very little to the imagination.")
-			EndIf
-			if currentActor.WornHasKeyword(SLA_PelvicCurtain)
-			  main.RegisterAction(actorName + "'s pussy is covered only by a sheer curtain of fabric.")
-			EndIf
-			if currentActor.WornHasKeyword(SLA_FullSkirt)
-			  main.RegisterAction(actorName + " is wearing a full length skirt that goes down to her knees.")
-			EndIf
-			if currentActor.WornHasKeyword(SLA_MiniSkirt) || currentActor.WornHasKeyword(SLA_MicroSkirt)
-			  main.RegisterAction(actorName + " is wearing a short mini-skirt that barely covers her ass. Her underwear or panties are sometimes visible underneath when she moves.")
-			EndIf
-			if currentActor.WornHasKeyword(SLA_ArmorRubber)
-			  main.RegisterAction(actorName + "'s outfit is made out of tight form-fitting rubber (Referred to as Ebonite).")
-			EndIf
-			if currentActor.WornHasKeyword(EroticArmor)
-			  main.RegisterAction(actorName + "'s outfit is sexy and revealing.")
-			EndIf
-			if currentActor.WornHasKeyword(SLA_PiercingNipple)
-			  main.RegisterAction(actorName + " has nipple piercings.")
-			EndIf
-			if currentActor.WornHasKeyword(SLA_PiercingBelly)
-			  main.RegisterAction(actorName + " has a navel piercing.")
-			EndIf
-			if currentActor.WornHasKeyword(SLA_PiercingVulva)
-			  main.RegisterAction(actorName + " has labia piercings.")
-			EndIf
-			if currentActor.WornHasKeyword(SLA_PiercingClit)
-			  main.RegisterAction(actorName + " has a clitoris piercing.")
-			EndIf
+      if SLA_MiniSkirt != None
+        if currentActor.WornHasKeyword(SLA_MiniSkirt)
+          main.RegisterAction(actorName + " is wearing a short mini-skirt that barely covers her ass. Her underwear or panties are sometimes visible underneath when she moves.")
+        EndIf
+      EndIf
+      if SLA_MicroSkirt != None
+        if currentActor.WornHasKeyword(SLA_MicroSkirt)
+          main.RegisterAction(actorName + " is wearing a micro mini-skirt exposes her ass. Her underwear or panties are visible underneath when she moves.")
+        EndIf
+      EndIf
+      if SLA_ArmorRubber != None
+        if currentActor.WornHasKeyword(SLA_ArmorRubber)
+          main.RegisterAction(actorName + "'s outfit is made out of tight form-fitting rubber (Referred to as Ebonite).")
+        EndIf
+      EndIf
+      if EroticArmor != None
+        if currentActor.WornHasKeyword(EroticArmor)
+          main.RegisterAction(actorName + "'s outfit is sexy and revealing.")
+        EndIf
+      EndIf
+			if SLA_PiercingNipple != None
+        if currentActor.WornHasKeyword(SLA_PiercingNipple)
+          main.RegisterAction(actorName + " has nipple piercings.")
+        EndIf
+      EndIf
+      if SLA_PiercingBelly != None
+        if currentActor.WornHasKeyword(SLA_PiercingBelly)
+          main.RegisterAction(actorName + " has a navel piercing.")
+        EndIf
+      EndIf
+			if SLA_PiercingVulva != None
+        if currentActor.WornHasKeyword(SLA_PiercingVulva)
+          main.RegisterAction(actorName + " has labia piercings.")
+        EndIf
+      EndIf
+      if SLA_PiercingClit != None
+        if currentActor.WornHasKeyword(SLA_PiercingClit)
+          main.RegisterAction(actorName + " has a clitoris piercing.")
+        EndIf
+      EndIf
 		EndIf
 		i += 1
 	EndWhile
@@ -436,10 +504,13 @@ Function SetContext(actor akTarget)
   Armor cuirass = akTarget.GetWornForm(cuirassSlot) as Armor
   aiff.SetActorVariable(akTarget, "isnaked", !cuirass)
   aiff.SetActorVariable(akTarget, "arousal", GetActorArousal(akTarget))
-  
+  aiff.SetActorVariable(akTarget, "isexposed", IsTNGExposed(akTarget))
+  if cuirass != None
+    aiff.SetActorVariable(akTarget, "cuirass", cuirass.GetName())
+  EndIf
   if !bHasArousedKeywords
   	return
-  endif
+  EndIf
   if bHasBabo && akTarget == PlayerRef
     aiff.SetActorVariable(akTarget, "beautyScore", baboConfigs.BeautyValue.GetValueInt())
     aiff.SetActorVariable(akTarget, "breastsScore", baboConfigs.BreastsValue.GetValueInt())
@@ -448,13 +519,13 @@ Function SetContext(actor akTarget)
   string gender = "male";
   if akTarget.GetActorBase().GetSex() != 0
     gender = "female"
-  endif
+  EndIf
   aiff.SetActorVariable(akTarget, "gender", gender)
   string actorRace = (akTarget.GetActorBase().GetRace() as Form).GetName()
   int cotrIndex = StringUtil.Find(actorRace, " DZ")
   if cotrIndex != -1
     actorRace = StringUtil.Substring(actorRace, 0, cotrIndex)
-  endif
+  EndIf
   aiff.SetActorVariable(akTarget, "race", actorRace)
 EndFunction
 
@@ -540,7 +611,7 @@ bool Function IsTNGExposed(Actor akTarget)
 	Armor armorItem = akTarget.GetWornForm(cuirassSlot) as Armor
 	if armorItem != None
 		if !armorItem.HasKeyword(TNG_Revealing) && !armorItem.HasKeywordString("TNG_Revealing")
-			Main.Debug(main.GetActorName(akTarget) + "is wearing concealing armor")
+			Main.Debug(main.GetActorName(akTarget) + " is wearing concealing armor")
 			return False
 		EndIf
 	EndIf
