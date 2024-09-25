@@ -322,8 +322,6 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
   elseif stringutil.Find(sayLine, "-suckingnipple-") != -1
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "breastfeeding")
   ; Could not find SL equivalent for these
-  elseif stringutil.Find(sayLine, "-gropingtesticles-") != -1
-    StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "gropingtesticles")
   elseif stringutil.Find(sayLine, "-grinding-") != -1
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "grindingpenis,buttjob")
   elseif stringutil.Find(sayLine, "-thighjob-") != -1
@@ -331,7 +329,7 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
   ; Kissing/Cuddling experimental alternates
   elseif stringutil.Find(sayLine, "-cuddling-") != -1
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "hugging")
-  elseif stringutil.Find(sayLine, "-frenchkissing-") != -1
+  elseif stringutil.Find(sayLine, "-frenchkissing-") != -1 || stringutil.Find(sayLine, "-frenchkiss-") != -1
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "kissing")
     
   elseIf stringutil.Find(sayLine, "-groupsex-") != -1 || stringUtil.Find(sayLine, "-orgy-") != -1 || stringUtil.Find(sayLine, "-threesome-") != -1
