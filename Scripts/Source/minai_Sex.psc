@@ -624,6 +624,10 @@ Function DirtyTalk(string lineToSay, string lineType, string name)
   if !bHasAIFF
     return
   EndIf
+  if name != PlayerRef.GetActorBase().GetName() && !AIAgentFunctions.getAgentByName(name)
+    Main.Info("Not sending dirty talk: Actor is not ai controlled and is not the player")
+    return
+  EndIf
   ; Throttle on how often we should dirty talk incase people are switching animations
   float currentTime = Utility.GetCurrentRealTime()
   if currentTime - lastDirtyTalk > 5

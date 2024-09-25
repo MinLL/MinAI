@@ -17,6 +17,7 @@ minai_DeviousStuff devious
 minai_VR vr
 minai_Config config
 minai_Followers followers
+minai_CombatManager combat
 
 bool bHasMantella = False;
 bool bHasAIFF = False;
@@ -54,6 +55,8 @@ Function Maintenance()
   devious = (Self as Quest) as minai_DeviousStuff
   vr = Game.GetFormFromFile(0x090E, "MinAI.esp") as minai_VR
   followers = Game.GetFormFromFile(0x0913, "MinAI.esp") as minai_Followers
+  combat = Game.GetFormFromFile(0x090E, "MinAI.esp") as minai_CombatManager
+
   if (!followers)
     Fatal("Could not load followers script - Mismatched script and esp versions")
   EndIf
@@ -63,6 +66,7 @@ Function Maintenance()
   devious.Maintenance(Self)
   vr.Maintenance(Self)
   followers.Maintenance(Self)
+  combat.Maintenance(Self)
   
   bHasMantella = (Game.GetModByName("Mantella.esp") != 255)
   bHasAIFF = (Game.GetModByName("AIAgent.esp") != 255)
