@@ -7,7 +7,7 @@ Function BuildContext($name) {
   if ($name == "The Narrator") {
     return "";
   }
-  return "\n" . GetPhysicalDescription($name) . "\n" . GetClothingContext($name) . "\n" . GetDDContext($name) . "\n" . GetArousalContext($name) . "\n" . GetDeviousFollowerContext($name) . "\n" . GetSurvivalContext($name) . "\n";
+  return "\n" . GetPhysicalDescription($name) . "\n" . GetClothingContext($name) . "\n" . GetDDContext($name) . "\n" . GetArousalContext($name) . "\n" . GetSexContext($name) . "\n" . GetDeviousFollowerContext($name) . "\n" . GetSurvivalContext($name) . "\n";
 }
 
 Function GetSurvivalContext($name) {
@@ -38,6 +38,18 @@ Function GetArousalContext($name) {
   $arousal = GetActorValue($name, "arousal");
   if ($arousal != "") {
       $ret .= "{$name}'s sexual arousal level is {$arousal}/100, where 0 is not aroused at all, and 100 is desperate for sex. ";
+  }
+  return $ret;
+}
+
+Function GetSexContext($name) {
+  $ret = "";
+  $excitement = GetActorValue($name, "excitement");
+  $orgasmcount = GetActorValue($name, "orgasmcount");
+  if ($excitement != "") {
+      $ret .= "{$name} is {$excitement} percent of the way to their next orgasm. ";
+  if ($orgasmcount != "") {
+      $ret .= "{$name} has already climaxed {$orgasmcount} times during this encounter. ";
   }
   return $ret;
 }

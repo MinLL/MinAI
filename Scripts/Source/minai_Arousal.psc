@@ -155,10 +155,12 @@ Function WriteArousedString(bool bPlayerInScene, actor Player, actor[] actorsFro
     if (currentActor != None)
       String actorName = main.GetActorName(currentActor)
       int arousal = GetActorArousal(currentActor)
-      if currentActor != Player
-        main.RegisterAction(actorName + "'s sexual arousal is " + arousal + "%")
-      Else
-        main.RegisterAction(actorName + "'s sexual arousal is " + arousal + "%.")
+      main.RegisterAction(actorName + "'s sexual arousal level is " + arousal + "%.")
+      if OActor.IsInOstim(currentActor)
+        float excitement = OActor.GetExcitement(currentActor)
+        int orgasmcount = OActor.GetTimesClimaxed(currentActor)
+        main.RegisterAction(actorName + " is " + excitement + " percent of the way toward their next orgasm.")
+        main.RegisterAction(actorName + " has already climaxed " + orgasmcount + " times during this encounter.")
       EndIf
     EndIf
     i += 1

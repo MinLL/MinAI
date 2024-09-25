@@ -445,6 +445,18 @@ EndEvent
 
 
 
+Function SetContext(actor akTarget)
+  if !aiff
+    return
+  elseif OActor.IsInOStim(akTarget)
+    String actorName = main.GetActorName(akTarget)
+    aiff.SetActorVariable(akTarget, "excitement", OActor.GetExcitement(akTarget))
+    aiff.SetActorVariable(akTarget, "orgasmcount", OActor.GetTimesClimaxed(akTarget))
+  EndIf
+EndFunction
+
+
+
 string Function ConvertTagsOstim(string tags)
   ; Convert sexlab tags to ostim tags
   if tags == "anal"
