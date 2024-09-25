@@ -339,16 +339,15 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "grindingpenis,buttjob")
   elseif stringutil.Find(sayLine, "-thighjob-") != -1
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "thighjob")
-  ; Kissing/Cuddling experimental alternates
+  ; Kissing/Cuddling experimental alternates - leads to sex
   elseif stringutil.Find(sayLine, "-cuddling-") != -1
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "hugging")
-  elseif stringutil.Find(sayLine, "-frenchkissing-") != -1 || stringutil.Find(sayLine, "-frenchkiss-") != -1
+  elseif stringutil.Find(sayLine, "-frenchkissing-") != -1 || stringutil.Find(sayLine, "-frenchkiss-") != -1 || stringutil.Find(sayLine, "-french kissing-") != -1 || stringutil.Find(sayLine, "-french kiss-") != -1
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "kissing")
     
   elseIf stringutil.Find(sayLine, "-groupsex-") != -1 || stringUtil.Find(sayLine, "-orgy-") != -1 || stringUtil.Find(sayLine, "-threesome-") != -1
     StartGroupSex(akSpeaker, akTarget, Player, bPlayerInScene, actorsFromFormList)
-    
-  elseif stringutil.Find(sayLine, "-endsex-") != -1 || stringutil.Find(sayLine, "-end sex-") != -1
+  elseif stringutil.Find(sayLine, "-endsex-") != -1 || stringutil.Find(sayLine, "-end sex-") != -1 || stringutil.Find(sayLine, "-stopsex-") != -1 || stringutil.Find(sayLine, "-stop sex-") != -1 || stringutil.Find(sayLine, "-red-") != -1
     StopSex(akSpeaker)
   EndIf
 EndFunction
