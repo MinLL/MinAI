@@ -84,7 +84,7 @@ Function InitializeMCM()
 EndFunction
 
 int Function GetVersion()
-	return 6 ; mcm menu version
+	return 7 ; mcm menu version
 EndFunction
 
 Function SetupPages()
@@ -109,7 +109,7 @@ Event OnPageReset(string page)
     RenderPhysicsPage()
   elseif page == "Devious Stuff"
     RenderDeviousPage()
-  elseif page == "Sex"
+  elseif page == "Sex Settings"
     RenderSexPage()
   Else
     RenderPlaceholderPage()
