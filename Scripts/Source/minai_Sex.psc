@@ -404,6 +404,28 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "rimjob")
   elseif command == "ExtCmdStartFingering"
     StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "fingering")
+  
+  elseif command == "ExtCmdStartMissionarySex"  
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "missionary")
+  elseif command == "ExtCmdStartCowgirlSex"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "cowgirl")
+  elseif command == "ExtCmdStartReverseCowgirl"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "reversecowgirl")
+  elseif command == "ExtCmdStartDoggystyle"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "doggystyle")
+  elseif command == "ExtCmdStartFacesitting"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "facesitting")
+  elseif command == "ExtCmdStart69Sex"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "sixtynine,69")
+  elseif command == "ExtCmdStartGrindingSex"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "grindingpenis,buttjob")
+  elseif command == "ExtCmdStartThighjob"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "thighjob")
+  elseif command == "ExtCmdStartCuddleSex"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "hugging")
+  elseif command == "ExtCmdStartKissingSex"
+    StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "kissing")
+    
   elseIf command == "ExtCmdOrgy"
     StartGroupSex(akSpeaker, akTarget, PlayerRef, bPlayerInScene, actorsFromFormList)
   elseif command == "ExtCmdStopSex"
@@ -526,7 +548,6 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
       int excitement = OActor.GetExcitement(actors[i]) as int
       int orgasmcount = OActor.GetTimesClimaxed(actors[i])
       Main.RegisterEvent(actorName + " is " + excitement + "% of the way toward their next orgasm and has already climaxed " + orgasmcount + " times during this encounter.")
-      Main.Debug(actorName + " is " + excitement + "% of the way toward their next orgasm and has already climaxed " + orgasmcount + " times during this encounter.")
     Endwhile
     
     if (playerInvolved)

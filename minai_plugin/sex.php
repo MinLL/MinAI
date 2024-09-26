@@ -17,6 +17,18 @@ if (IsModEnabled("Sexlab") || IsModEnabled("Ostim")) {
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartDeepthroat";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartRimjob";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartFingering";
+        
+        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartMissionarySex";
+        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartCowgirlSex";
+        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartReverseCowgirl";
+        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartDoggystyle";
+        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartFacesitting";
+        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStart69Sex";
+        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartGrindingSex";
+        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartThighjob";
+        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartCuddleSex";
+        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartKissingSex";
+
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartAggressive";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStopSex";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdPutOnClothes";
@@ -351,6 +363,199 @@ $GLOBALS["FUNCTIONS"][] = [
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartFingering"]=$GLOBALS["GenericFuncRet"];
+
+
+
+$GLOBALS["F_NAMES"]["ExtCmdStartMissionarySex"]="StartMissionarySex";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartMissionarySex"]="Immediately engage in missionary position sex.";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdStartMissionarySex"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartMissionarySex"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdStartMissionarySex"]=$GLOBALS["GenericFuncRet"];
+
+$GLOBALS["F_NAMES"]["ExtCmdStartCowgirlSex"]="StartCowgirlSex";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartCowgirlSex"]="Immediately engage in cowgirl position sex.";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdStartCowgirlSex"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartCowgirlSex"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdStartCowgirlSex"]=$GLOBALS["GenericFuncRet"];
+
+$GLOBALS["F_NAMES"]["ExtCmdStartReverseCowgirl"]="StartReverseCowgirl";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartReverseCowgirl"]="Immediately engage in reverse cowgirl position sex.";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdStartReverseCowgirl"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartReverseCowgirl"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdStartReverseCowgirl"]=$GLOBALS["GenericFuncRet"];
+
+$GLOBALS["F_NAMES"]["ExtCmdStartDoggystyle"]="StartDoggystyle";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartDoggystyle"]="Immediately engage in doggystyle position sex.";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdStartDoggystyle"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartDoggystyle"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdStartDoggystyle"]=$GLOBALS["GenericFuncRet"];
+
+$GLOBALS["F_NAMES"]["ExtCmdStartFacesitting"]="StartFacesitting";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartFacesitting"]="Immediately engage in woman on top position, grinding pussy on face.";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdStartFacesitting"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartFacesitting"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdStartFacesitting"]=$GLOBALS["GenericFuncRet"];
+
+$GLOBALS["F_NAMES"]["ExtCmdStart69Sex"]="Start69Sex";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStart69Sex"]="Immediately engage in mutual oral stimulation in the 69 position.";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdStart69Sex"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStart69Sex"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdStart69Sex"]=$GLOBALS["GenericFuncRet"];
+
+$GLOBALS["F_NAMES"]["ExtCmdStartGrindingSex"]="StartGrindingSex";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartGrindingSex"]="Immediately engage in grinding body against penis";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdStartGrindingSex"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartGrindingSex"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdStartGrindingSex"]=$GLOBALS["GenericFuncRet"];
+
+$GLOBALS["F_NAMES"]["ExtCmdStartThighjob"]="StartThighjob";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartThighjob"]="Immediately engage in grinding penis between thighs.";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdStartThighjob"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartThighjob"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdStartThighjob"]=$GLOBALS["GenericFuncRet"];
+
+$GLOBALS["F_NAMES"]["ExtCmdStartCuddleSex"]="StartCuddleSex";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartCuddleSex"]="Immediately engage in empathetic hugging that leads to sex.";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdStartCuddleSex"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartCuddleSex"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdStartCuddleSex"]=$GLOBALS["GenericFuncRet"];
+
+$GLOBALS["F_NAMES"]["ExtCmdStartKissingSex"]="StartKissingSex";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartKissingSex"]="Immediately engage in passionate, sexual kissing.";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdStartKissingSex"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartKissingSex"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdStartKissingSex"]=$GLOBALS["GenericFuncRet"];
+
 
 
 $GLOBALS["F_NAMES"]["ExtCmdRemoveClothes"]="RemoveClothes";
