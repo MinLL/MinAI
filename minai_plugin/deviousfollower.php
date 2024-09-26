@@ -3,6 +3,7 @@
 require_once("util.php");
 
 function IsDeviousFollower($name) {
+    $dfName = GetActorValue($playerName, "deviousFollowerName");
     return (strtolower($name) != strtolower($dfName) && IsModEnabled("DeviousFollowers"));
 }
 
