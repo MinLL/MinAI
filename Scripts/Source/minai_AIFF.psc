@@ -228,7 +228,7 @@ EndFunction
 
 
 actor[] Function GetNearbyAI()
-  actor[] actors = AiAgentFunctions.findAllNearbyAgents()
+  actor[] actors = AIAgentFunctions.findAllNearbyAgents()
   int i = 0
   while i < actors.length
     main.Info("Found nearby actor: " + actors[i].GetActorBase().GetName())

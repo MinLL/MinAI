@@ -155,11 +155,7 @@ Function WriteArousedString(bool bPlayerInScene, actor Player, actor[] actorsFro
     if (currentActor != None)
       String actorName = main.GetActorName(currentActor)
       int arousal = GetActorArousal(currentActor)
-      if currentActor != Player
-        main.RegisterAction(actorName + "'s sexual arousal is " + arousal + "%")
-      Else
-        main.RegisterAction(actorName + "'s sexual arousal is " + arousal + "%.")
-      EndIf
+      main.RegisterAction(actorName + "'s sexual arousal level is " + arousal + "%.")
     EndIf
     i += 1
   EndWhile
