@@ -286,7 +286,19 @@ foreach ($GLOBALS["contextDataFull"] as $n=>$ctxLine) {
 array_pop($locaLastElement);
 
 foreach ($locaLastElement as $n) {
-  unset($GLOBALS["contextDataFull"][$n]); 
+    unset($GLOBALS["contextDataFull"][$n]); 
+}
+
+if ($GLOBALS["stop_narrator_context_leak"] && $GLOBALS["HERIKA_NAME"] != "The Narrator") {
+    $narratorElements=[];
+    foreach ($GLOBALS["contextDataFull"] as $n=>$ctxLine) {
+        if (strpos($ctxLine["content"],"The Narrator:")!==false && strpos($ctxLine["content"],"(talking to")!==false) {
+            $narratorElements[]=$n;
+        }
+    }
+    foreach ($narratorElements as $n) {
+        unset($GLOBALS["contextDataFull"][$n]); 
+    }
 }
 
 require_once("deviousnarrator.php");

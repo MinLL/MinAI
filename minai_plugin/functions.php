@@ -79,7 +79,7 @@ if (!$GLOBALS["disable_nsfw"]) {
     }
     require "deviousdevices.php";
     require_once("deviousfollower.php");
-    if (IsDeviousFollower($GLOBALS["HERIKA_NAME"]) || IsFollower($GLOBALS["HERIKA_NAME"])) {
+    if ($GLOBALS["always_enable_functions"] && $GLOBALS["HERIKA_NAME"] != "The Narrator") {
         // Always enable actions for followers (During rechats and such)
         $GLOBALS["FUNCTIONS_ARE_ENABLED"]=true;
     }
