@@ -1,13 +1,21 @@
 <?php
 if (IsModEnabled("Sexlab") || IsModEnabled("Ostim")) {
-    $sexSceneActive=$GLOBALS["db"]->fetchAll("select 1 from conf_opts where id='sexscene' and value='on'");
-    // if ($sexSceneActive) {
-        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartOrgy";
-        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdMasturbate";
-        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartVaginal";
-        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartAnal";
-        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartBlowjob";
-        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartHandjob";
+    // Always enabled
+    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdMasturbate";
+    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartVaginal";
+    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartAnal";
+    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartBlowjob";
+    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartHandjob";
+    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartOrgy";
+    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdPutOnClothes";
+    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdRemoveClothes";
+    // Always enabled for female player characters
+    if (IsFemale($GLOBALS["PLAYER_NAME"])) {
+        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartFingering";
+        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartCunnilingus";
+    }
+    // Only enabled if already in a sex scene
+    if (IsSexActive()) {
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartFootjob";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartBoobjob";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartCunnilingus";
@@ -17,7 +25,6 @@ if (IsModEnabled("Sexlab") || IsModEnabled("Ostim")) {
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartDeepthroat";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartRimjob";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartFingering";
-        
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartMissionarySex";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartCowgirlSex";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartReverseCowgirl";
@@ -28,15 +35,9 @@ if (IsModEnabled("Sexlab") || IsModEnabled("Ostim")) {
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartThighjob";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartCuddleSex";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartKissingSex";
-
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartAggressive";
         $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStopSex";
-        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdPutOnClothes";
-        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdRemoveClothes";
-        /*}
-    else {
-        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartSexScene";
-        }*/
+    }
 }
 
 

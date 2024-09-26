@@ -41,6 +41,10 @@ Function IsEnabled($name, $key) {
   return $GLOBALS["db"]->fetchAll("select 1 from conf_opts where LOWER(id)=LOWER('_minai_{$name}//{$key}') and LOWER(value)=LOWER('TRUE')");
 }
 
+Function IsSexActive() {
+    return $GLOBALS["db"]->fetchAll("select 1 from conf_opts where LOWER(id)=LOWER('sexscene') and LOWER(value)=LOWER('on')");
+}
+
 Function IsPlayer($name) {
     return ($GLOBALS["PLAYER_NAME"] == $name);
 }
@@ -115,4 +119,13 @@ Function IsChildActor($name) {
 
 if (IsChildActor($GLOBALS['HERIKA_NAME'])) {
     $GLOBALS["disable_nsfw"] = true;
+}
+
+
+Function IsMale($name) {
+    return HasKeyword($name, "ActorSexMale");
+}
+
+Function IsFemale($name) {
+    return HasKeyword($name, "ActorSexFemale");
 }
