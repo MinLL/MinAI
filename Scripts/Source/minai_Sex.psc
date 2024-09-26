@@ -13,19 +13,25 @@ minai_AIFF aiff
 minai_MainQuestController main
 minai_DeviousStuff devious
 Actor PlayerRef
+minai_Config config
 
 float lastDirtyTalk
 
-
+Message minai_ConfirmSexMsg
 
 Function Maintenance(minai_MainQuestController _main)
   playerRef = Game.GetPlayer()
   main = _main
   aiff = (Self as Quest) as minai_AIFF
   devious = (Self as Quest) as minai_DeviousStuff
+  config = Game.GetFormFromFile(0x0912, "MinAI.esp") as minai_Config
+  if !config
+    Main.Fatal("Could not load configuration - script version mismatch with esp")
+  EndIf
   Main.Info("Initializing Sex Module.")
   bHasAIFF = (Game.GetModByName("AIAgent.esp") != 255)
-  
+  minai_ConfirmSexMsg = Game.GetFormFromFile(0x0914, "MinAI.esp") as Message
+
   RegisterForModEvent("HookStageStart", "OnStageStart")
   RegisterForModEvent("HookOrgasmStart", "PostSexScene")
   RegisterForModEvent("HookAnimationEnd", "EndSexScene")
@@ -98,6 +104,13 @@ EndFunction
 
 
 Function Start2pSex(actor akSpeaker, actor akTarget, actor Player, bool bPlayerInScene, string tags="")
+  if config.confirmSex
+    int result = minai_confirmSexMsg.Show()
+    if result == 1
+      Main.Info("User declined sex scene, aborting")
+      return
+    EndIf
+  EndIf
   if bHasOstim && minai_UseOStim.GetValue() == 1.0
     tags = ConvertTagsOstim(tags)
     Actor[] ostimActors = new Actor[2]

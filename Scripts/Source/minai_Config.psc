@@ -20,6 +20,7 @@ int allowDeviceUnlockOID
 int requestResponseCooldownOID
 int arousalForSexOID
 int arousalForHarassOID
+int confirmSexOID
 
 ; Legacy globals
 GlobalVariable useCBPC
@@ -54,14 +55,17 @@ bool Property allowDeviceLock = False Auto
 bool allowDeviceUnlockDefault = False
 bool Property allowDeviceUnlock = False Auto
 
-float requestResponseCooldownDefault = 5.0
-Float Property requestResponseCooldown = 5.0 Auto
+float requestResponseCooldownDefault = 10.0
+Float Property requestResponseCooldown = 10.0 Auto
 
 float arousalForSexDefault = 0.0
 Float Property arousalForSex = 0.0 Auto
 
 float arousalForHarassDefault = 0.0
 Float Property arousalForHarass = 0.0 Auto
+
+bool confirmSexDefault = False
+bool Property confirmSex = False Auto
 
 Event OnConfigInit()
   main.Info("Building mcm menu.")
@@ -138,6 +142,7 @@ Function RenderSexPage()
   AddHeaderOption("Arousal Settings ")
   arousalForSexOID = AddSliderOption("Arousal Threshold for Sex", arousalForSex, "{0}")
   arousalForHarassOID = AddSliderOption("Arousal Threshold for Flirting/Harassment", arousalForHarass, "{0}")
+  confirmSexOID = AddToggleOption("Ask before a sex scene is initiated", confirmSex)
 EndFunction
 
 
@@ -209,6 +214,9 @@ Event OnOptionSelect(int oid)
     allowDeviceUnlock = !allowDeviceUnlock
     SetToggleOptionValue(oid, allowDeviceUnlock)
     StoreConfig("allowDeviceUnlock", allowDeviceUnlock)
+  elseif oid == confirmSexOID
+    confirmSex = !confirmSex
+    SetToggleOptionValue(oid, confirmSex)
   EndIf
 EndEvent
 
@@ -255,6 +263,9 @@ Event OnOptionDefault(int oid)
   elseif oid ==  arousalForHarassOID
     arousalForHarass = arousalForHarassDefault
     SetSliderOptionValue(arousalForHarassOID, arousalForHarassDefault, "{0}")
+  elseif oid ==  confirmSexOID
+    confirmSex = confirmSexDefault
+    SetToggleOptionValue(oid, confirmSex)
   EndIf
 EndEvent
 
@@ -286,6 +297,8 @@ Event OnOptionHighlight(int oid)
     SetInfoText("Minimum Arousal level required for the Sex related actions to be exposed to the LLM")
   elseif oid == arousalForHarassOID
     SetInfoText("Minimum Arousal level required for actions like spanking, groping, kissing to be exposed to the LLM")
+  elseif oid == confirmSexOID
+    SetInfoText("Show a confirmation message before sex scenes start")
   EndIf
 EndEvent
 
