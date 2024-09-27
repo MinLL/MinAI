@@ -21,6 +21,7 @@ int requestResponseCooldownOID
 int arousalForSexOID
 int arousalForHarassOID
 int confirmSexOID
+int disableAIAnimationsOID
 
 int aOIDMap ; Jmap for storing action oid's
 
@@ -79,6 +80,9 @@ Float Property arousalForHarass = 0.0 Auto
 bool confirmSexDefault = False
 bool Property confirmSex = False Auto
 
+Bool disableAIAnimationsDefault = False
+Bool Property disableAIAnimations = False Auto
+
 bool Property bulkEnabled = True Auto
 
 Event OnConfigInit()
@@ -123,7 +127,7 @@ Function InitializeMCM()
 EndFunction
 
 int Function GetVersion()
-  return 8 ; mcm menu version
+  return 9 ; mcm menu version
 EndFunction
 
 Function SetupPages()
@@ -191,6 +195,8 @@ Function RenderGeneralPage()
   SetCursorFillMode(TOP_TO_BOTTOM)		
   AddHeaderOption("LLM Settings")
   requestResponseCooldownOID = AddSliderOption("LLM Response Request Cooldown", requestResponseCooldown, "{1}")
+  SetCursorPosition(1) ; Move cursor to top right position
+  disableAIAnimationsOID = AddToggleOption("Disable AI-FF Animations", disableAIAnimations)
 EndFunction
 
 Function RenderPhysicsPage()
@@ -237,7 +243,7 @@ Function RenderActionsPage(string mcmPageToRender)
   bulkIntervalOID = AddSliderOption("Bulk Set Interval", 0, "{1}")
   bulkExponentOID = AddSliderOption("Bulk Set Exponent", 2, "{1}")
   bulkMaxIntervalOID = AddSliderOption("Bulk Set Maximum Interval", 5, "{0}")
-  bulkDecayWindowOID = AddSliderOption("Decay Window", 60, "{1}")
+  bulkDecayWindowOID = AddSliderOption("Decay Window", 300, "{1}")
 
   int numActionsForPage = 0
   int i = 0
@@ -353,6 +359,9 @@ Event OnOptionSelect(int oid)
   elseif oid == confirmSexOID
     confirmSex = !confirmSex
     SetToggleOptionValue(oid, confirmSex)
+  elseif oid == disableAIAnimationsOID
+    disableAIAnimations = !disableAIAnimations
+    SetToggleOptionValue(oid, disableAIAnimations)
   EndIf
   string[] actions = JMap.allKeysPArray(aOIDMap)
   int i = 0
@@ -444,6 +453,9 @@ Event OnOptionDefault(int oid)
   elseif oid ==  confirmSexOID
     confirmSex = confirmSexDefault
     SetToggleOptionValue(oid, confirmSex)
+  elseif oid == disableAIAnimationsOID
+    disableAIAnimations = disableAIAnimationsDefault
+    SetToggleOptionValue(oid, disableAIAnimationsDefault)
   EndIf
   string[] actions = JMap.allKeysPArray(aOIDMap)
   int i = 0
@@ -493,6 +505,8 @@ Event OnOptionHighlight(int oid)
     SetInfoText("Minimum Arousal level required for actions like spanking, groping, kissing to be exposed to the LLM")
   elseif oid == confirmSexOID
     SetInfoText("Show a confirmation message before sex scenes start")
+  elseif oid == disableAIAnimationsOID
+    SetInfoText("Forces AI-FF animations to be disabled. There seems to be a CTD in the AIAgent DLL while resetting idle state sometimes, this avoids it.")
   EndIf
   string[] actions = JMap.allKeysPArray(aOIDMap)
   int i = 0
@@ -569,12 +583,12 @@ Event OnOptionSliderOpen(int oid)
     if oid == JMap.getInt(aOID, "interval")
       SetSliderDialogStartValue(JMap.getFlt(actionObj, "interval"))
       SetSliderDialogDefaultValue(JMap.getFlt(actionObj, "intervalDefault"))
-      SetSliderDialogRange(0, 30)
+      SetSliderDialogRange(0, 150)
       SetSliderDialogInterval(0.5)
     elseif oid == bulkIntervalOID
       SetSliderDialogStartValue(0)
       SetSliderDialogDefaultValue(0)
-      SetSliderDialogRange(0, 30)
+      SetSliderDialogRange(0, 150)
       SetSliderDialogInterval(0.5)
     elseif oid == JMap.getInt(aOID, "exponent") || oid == bulkExponentOID
       SetSliderDialogStartValue(JMap.getFlt(actionObj, "exponent"))
@@ -599,12 +613,12 @@ Event OnOptionSliderOpen(int oid)
     elseif oid == JMap.getInt(aOID, "decayWindow") || oid == bulkDecayWindowOID
       SetSliderDialogStartValue(JMap.getFlt(actionObj, "decayWindow"))
       SetSliderDialogDefaultValue(JMap.getFlt(actionObj, "decayWindowDefault"))
-      SetSliderDialogRange(0, 600)
+      SetSliderDialogRange(0, 1200)
       SetSliderDialogInterval(1)
     elseif oid == bulkDecayWindowOID
       SetSliderDialogStartValue(60)
       SetSliderDialogDefaultValue(60)
-      SetSliderDialogRange(0, 600)
+      SetSliderDialogRange(0, 1200)
       SetSliderDialogInterval(1)
     EndIf
     i += 1

@@ -5,6 +5,7 @@ minai_Sex sex
 minai_Survival survival
 minai_Arousal arousal
 minai_DeviousStuff devious
+minai_Config config
 
 bool bHasAIFF = False
 
@@ -26,6 +27,10 @@ Function Maintenance(minai_MainQuestController _main)
   ; TODO: Break this out and fix this.
   playerContextUpdateInterval = 5
   main = _main
+  config = Game.GetFormFromFile(0x0912, "MinAI.esp") as minai_Config
+  if !config
+    main.Fatal("Could not load configuration - script version mismatch with esp")
+  EndIf
   player = Game.GetPlayer()
   Main.Info("- Initializing for AIFF.")
 
@@ -144,6 +149,9 @@ EndFunction
 
 Function SetAnimationBusy(int busy, string name)
   if bHasAIFF
+    if busy == 0 && config.disableAIAnimations
+      Main.Warn("Not reenabling animations - AI animations are disabled")
+    EndIf
     AIAgentFunctions.setAnimationBusy(busy,name)
   EndIf
 EndFunction
@@ -237,6 +245,9 @@ actor[] Function GetNearbyAI()
   int i = 0
   while i < actors.length
     main.Info("Found nearby actor: " + actors[i].GetActorBase().GetName())
+    if config.disableAIAnimations
+      SetAnimationBusy(1, actors[i].GetActorBase().GetName())
+    EndIf
     i += 1
   endwhile
   return actors
@@ -322,17 +333,13 @@ Function ResetActionBackoff(string actionName, bool bypassCooldown)
   
   float interval = JMap.getFlt(actionObj, "interval")
   float exponent = JMap.getFlt(actionObj, "exponent")
+  float decayWindow = JMap.getFlt(actionObj, "decayWindow")
   float lastExecuted = JMap.getFlt(actionObj, "lastExecuted")
   int currentInterval = JMap.getInt(actionObj, "currentInterval")
   float nextExecution = lastExecuted + (interval * Math.pow(exponent, currentInterval))
-  float decayWindow = JMap.getFlt(actionObj, "decayWindow")
   float currentTime = Utility.GetCurrentRealTime()
-  if (currentInterval == 0)
-    Main.Debug("ActionRegistry: " + actionName + " is already off cooldown.")
-    return
-  EndIf
   bool isEnabled
-  bool offCooldown = (currentTime > nextExecution + decayWindow)
+  bool offCooldown = (currentTime > nextExecution)
   if JMap.GetInt(actionObj, "enabled") == 0
     isEnabled = False
   elseif currentInterval == 0
@@ -340,12 +347,19 @@ Function ResetActionBackoff(string actionName, bool bypassCooldown)
   else
     isEnabled = offCooldown
   EndIf
-  if offCooldown || bypassCooldown
+  if (currentInterval != 0 && currentTime > lastExecuted + decayWindow) || bypassCooldown
     JMap.SetFlt(actionObj, "lastExecuted", 0.0)
     JMap.SetInt(actionObj, "currentInterval", 0)
     JMap.SetObj(actionRegistry, actionName, actionObj)
+    Main.Info("ActionRegistry: " + actionName + " backoff has decayed back to base values.")
+  EndIf
+  if offCooldown || bypassCooldown    
     AIAgentFunctions.logMessage("_minai_ACTION//" + actionName + "@" + isEnabled, "setconf")
-    Main.Info("ActionRegistry: Backoff for " + actionName + " reset.")
+    if lastExecuted > 0.01
+      Main.Info("ActionRegistry: Backoff for " + actionName + " reset.")
+    EndIf
+  Else
+    Main.Debug("ActionRegistry: " + actionName + " still on cooldown (" + currentTime + " | " + nextExecution +")")
   EndIf
 EndFunction
 
@@ -362,18 +376,19 @@ Function ExecuteAction(string actionName)
   float interval = JMap.getFlt(actionObj, "interval")
   float exponent = JMap.getFlt(actionObj, "exponent")
   int maxInterval = JMap.getInt(actionObj, "maxInterval")
-  float decayWindow = JMap.getFlt(actionObj, "decayWindow")
   float lastExecuted = JMap.getFlt(actionObj, "lastExecuted")
   int currentInterval = JMap.getInt(actionObj, "currentInterval")
   float currentTime = Utility.GetCurrentRealTime()
-  
+  float nextExecution = 0.0
   if JMap.GetInt(actionObj, "enabled") == 0
     isEnabled = False
-  elseif currentInterval == 0
-    isEnabled = True
   else
     ; Backoff implemention
-    float nextExecution = lastExecuted + (interval * Math.pow(exponent, currentInterval))
+    if lastExecuted <= 0.01
+      ; Apply cooldown after first action rather than waiting for repeated actions
+      lastExecuted = currentTime
+    EndIf
+    nextExecution = lastExecuted + (interval * Math.pow(exponent, currentInterval))
     isEnabled = (currentTime > nextExecution)
     if currentInterval < maxInterval
       JMap.SetInt(actionObj, "currentInterval", currentInterval + 1)
@@ -381,7 +396,7 @@ Function ExecuteAction(string actionName)
     JMap.SetFlt(actionObj, "lastExecuted", currentTime)
     JMap.SetObj(actionRegistry, actionName, actionObj)
   EndIf
-  Main.Debug("ActionRegistry: Executed " + actionName +" ( " + isEnabled + " ), interval=" + interval + ", exponent= " + exponent +", maxInterval = " + maxInterval + ", decayWindow = " + decayWindow + ", currentInterval = " + currentInterval + ", currentTime = " + currentTime)
+  Main.Debug("ActionRegistry: Executed " + actionName +" ( " + isEnabled + " ), interval=" + interval + ", exponent= " + exponent +", maxInterval = " + maxInterval + ", currentInterval = " + currentInterval + ", currentTime = " + currentTime + ", nextExecution =  " + nextExecution)
   AIAgentFunctions.logMessage("_minai_ACTION//" + actionName + "@" + isEnabled, "setconf")
 EndFunction
 
