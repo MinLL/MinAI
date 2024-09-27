@@ -82,11 +82,11 @@ $GLOBALS["FUNCRET"]["ExtCmdMolest"]=$GLOBALS["GenericFuncRet"];
 
 require_once("deviousfollower.php");
 if (IsModEnabled("SLAPP") && !IsDeviousFollower($GLOBALS['HERIKA_NAME'])) {
-    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdHug";
-    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdKiss";
+    RegisterAction("ExtCmdHug");
+    RegisterAction("ExtCmdKiss");
 }
 if (IsModEnabled("SLHH") && !IsDeviousFollower($GLOBALS['HERIKA_NAME'])) {
-    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdMolest";
+    RegisterAction("ExtCmdMolest");
 }
 
 

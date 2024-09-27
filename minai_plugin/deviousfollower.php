@@ -3,7 +3,7 @@
 require_once("util.php");
 
 function IsDeviousFollower($name) {
-    $dfName = GetActorValue($playerName, "deviousFollowerName");
+    $dfName = GetActorValue($GLOBALS["PLAYER_NAME"], "deviousFollowerName");
     return (strtolower($name) == strtolower($dfName) && IsModEnabled("DeviousFollowers"));
 }
 
@@ -137,7 +137,7 @@ function GetDeviousFollowerContext($name) {
             ],
         ];
         $GLOBALS["FUNCRET"]["ExtCmdAcceptDeal"]=$GLOBALS["GenericFuncRet"];
-        $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdAcceptDeal";
+        RegisterAction("ExtCmdAcceptDeal");
     }
 
           

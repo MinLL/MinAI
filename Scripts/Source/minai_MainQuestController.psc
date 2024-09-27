@@ -60,6 +60,15 @@ Function Maintenance()
   if (!followers)
     Fatal("Could not load followers script - Mismatched script and esp versions")
   EndIf
+  
+  bHasMantella = (Game.GetModByName("Mantella.esp") != 255)
+  bHasAIFF = (Game.GetModByName("AIAgent.esp") != 255)
+  
+  ;; Initialize AIFF first so that the action registry is initialized
+  if bHasAIFF
+    minAIFF.Maintenance(Self)
+  EndIf
+  
   sex.Maintenance(Self)
   survival.Maintenance(Self)
   arousal.Maintenance(Self)
@@ -68,20 +77,17 @@ Function Maintenance()
   followers.Maintenance(Self)
   combat.Maintenance(Self)
   
-  bHasMantella = (Game.GetModByName("Mantella.esp") != 255)
-  bHasAIFF = (Game.GetModByName("AIAgent.esp") != 255)
-  
   if bHasMantella
     minMantella.Maintenance(Self)
   EndIf
   if bHasAIFF
-    minAIFF.Maintenance(Self)
     if (!minAIFF.IsInitialized())
       Debug.Notification("MinAI - First time setup complete. Save/reload to enable mod functionality")
       minAIFF.SetInitialized()
     Else
       nearbyAI = minAIFF.GetNearbyAI()
     EndIf
+    minAIFF.ResetAllActionBackoffs()
   EndIf
   lastRequestTime = 0.0
   Info("Initialization complete.")

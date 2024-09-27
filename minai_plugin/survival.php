@@ -143,20 +143,20 @@ $isInnKeeper = IsInFaction($GLOBALS['HERIKA_NAME'], "JobInnKeeper");
 $isServer = IsInFaction($GLOBALS['HERIKA_NAME'], "JobInnServer");
 
 if (IsModEnabled("Sunhelm") && ($isInnKeeper || $isServer)) {
-  $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdServeFood";
+    RegisterAction("ExtCmdServeFood");
 }
 if ($isInnKeeper) {
-  $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdRentRoom";
+    RegisterAction("ExtCmdRentRoom");
 }
 
 if (IsInFaction($GLOBALS['HERIKA_NAME'], "Carriage System Vendors")) {
-    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdCarriageRide";
+    RegisterAction("ExtCmdCarriageRide");
 }
 
 if (!IsFollower($GLOBALS["HERIKA_NAME"])) {
     // Allow anyone that isn't a follower to buy or sell. Don't restrict this to shop-keepers.
-    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdTrade";
+    RegisterAction("ExtCmdTrade");
 }
 // Allow anyone to offer training.
-$GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdTrainSkill";
+RegisterAction("ExtCmdTrainSkill");
 ?>

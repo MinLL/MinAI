@@ -17,6 +17,8 @@ bool isInitialized
 minai_MainQuestController main
 minai_Followers followers
 
+int Property actionRegistry Auto
+
 Function Maintenance(minai_MainQuestController _main)
   contextUpdateInterval = 30
   ; This is inefficient. We need to more selectively set specific parts of the context rather than repeatedly re-set everything.
@@ -47,6 +49,7 @@ Function Maintenance(minai_MainQuestController _main)
     SetContext(player)
     RegisterForSingleUpdate(playerContextUpdateInterval)
   EndIf
+  InitializeActionRegistry()
 EndFunction
 
 
@@ -125,6 +128,7 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     return
   EndIf
   SetContext(akActor)
+  ExecuteAction(command)
 EndEvent
 
 
@@ -219,6 +223,7 @@ Event OnUpdate()
     return;
   EndIf
   SetContext(player)
+  UpdateActions()
   RegisterForSingleUpdate(playerContextUpdateInterval)
 EndEvent
 
@@ -235,4 +240,167 @@ actor[] Function GetNearbyAI()
     i += 1
   endwhile
   return actors
+EndFunction
+
+
+Function RegisterAction(string actionName, string mcmName, string mcmDesc, string mcmPage, int enabled, float interval, float exponent, int maxInterval, float decayWindow, bool hasMod)
+  if JMap.getObj(actionRegistry, actionName) != 0
+    Main.Warn("ActionRegistry: " + actionName + " already registered. Skipping.")
+    return
+  EndIf
+  int actionObj = JMap.Object()
+  JValue.Retain(actionObj)
+  JMap.SetStr(actionObj, "name", actionName) ; ExtCmdFoo
+  JMap.SetStr(actionObj, "mcmName", mcmName) ; Foo
+  JMap.SetStr(actionObj, "mcmDesc", mcmDesc) ; Foo
+  JMap.SetStr(actionObj, "mcmPage", mcmPage) ; Foo
+  JMap.setInt(actionObj, "enabled", enabled)
+  JMap.setInt(actionObj, "enabledDefault", enabled)
+  JMap.setFlt(actionObj, "interval", interval)
+  JMap.setFlt(actionObj, "intervalDefault", interval)
+  JMap.setFlt(actionObj, "exponent", exponent)
+  JMap.setFlt(actionObj, "exponentDefault", exponent)
+  JMap.setInt(actionObj, "maxInterval", maxInterval)
+  JMap.setInt(actionObj, "maxIntervalDefault", maxInterval)
+  JMap.setFlt(actionObj, "decayWindow", decayWindow)
+  JMap.setFlt(actionObj, "decayWindowDefault", decayWindow)
+  JMap.setFlt(actionObj, "lastExecuted", 0.0)
+  JMap.setInt(actionObj, "currentInterval", 0)
+  if hasMod
+    JMap.setInt(actionObj, "hasMod", 1)
+  else
+    JMap.setInt(actionObj, "hasMod", 0)
+  EndIf
+  JMap.setObj(actionRegistry, actionName, actionObj)
+  Main.Info("ActionRegistry: Registered new action: " + actionName)
+EndFunction
+
+
+Function ResetActionRegistry()
+  if actionRegistry != 0
+    Main.Info("ActionRegistry: Resetting...")
+    string[] actions = JMap.allKeysPArray(actionRegistry)
+    int i = 0
+    while i < actions.Length
+      JMap.SetObj(actionRegistry, actions[i], JValue.Release(JMap.GetObj(actionRegistry, actions[i])))
+      i += 1
+    EndWhile
+    actionRegistry = JValue.Release(actionRegistry)
+  EndIf
+  InitializeActionRegistry()    
+EndFunction
+
+
+Function InitializeActionRegistry()
+  if actionRegistry == 0
+    actionRegistry = JMap.Object()
+    JValue.Retain(actionRegistry)
+    Main.Info("ActionRegistry: Initialized.")
+  else
+    Main.Info("ActionRegistry: Already initialized.")
+  EndIf
+EndFunction
+
+
+Function ResetAllActionBackoffs()
+  Main.Info("ActionRegistry: Resetting all action backoffs...")
+  string[] actions = JMap.allKeysPArray(actionRegistry)
+  int i = 0
+  while i < actions.Length
+    ResetActionBackoff(actions[i], true)
+    i += 1
+  EndWhile
+EndFunction
+
+
+Function ResetActionBackoff(string actionName, bool bypassCooldown)
+  int actionObj = JMap.GetObj(actionRegistry, actionName)
+  if actionObj == 0
+    Main.Warn("ActionRegistry: Could not find action " + actionName + " to reset backoff.")
+    return
+  EndIf
+  
+  float interval = JMap.getFlt(actionObj, "interval")
+  float exponent = JMap.getFlt(actionObj, "exponent")
+  float lastExecuted = JMap.getFlt(actionObj, "lastExecuted")
+  int currentInterval = JMap.getInt(actionObj, "currentInterval")
+  float nextExecution = lastExecuted + (interval * Math.pow(exponent, currentInterval))
+  float decayWindow = JMap.getFlt(actionObj, "decayWindow")
+  float currentTime = Utility.GetCurrentRealTime()
+  if (currentInterval == 0)
+    Main.Debug("ActionRegistry: " + actionName + " is already off cooldown.")
+    return
+  EndIf
+  bool isEnabled
+  bool offCooldown = (currentTime > nextExecution + decayWindow)
+  if JMap.GetInt(actionObj, "enabled") == 0
+    isEnabled = False
+  elseif currentInterval == 0
+    isEnabled = True
+  else
+    isEnabled = offCooldown
+  EndIf
+  if offCooldown || bypassCooldown
+    JMap.SetFlt(actionObj, "lastExecuted", 0.0)
+    JMap.SetInt(actionObj, "currentInterval", 0)
+    JMap.SetObj(actionRegistry, actionName, actionObj)
+    AIAgentFunctions.logMessage("_minai_ACTION//" + actionName + "@" + isEnabled, "setconf")
+    Main.Info("ActionRegistry: Backoff for " + actionName + " reset.")
+  EndIf
+EndFunction
+
+
+Function ExecuteAction(string actionName)
+  int actionObj = JMap.GetObj(actionRegistry, actionName)
+  if actionObj == 0
+    Main.Warn("ActionRegistry: Could not find action " + actionName + " to log execution.")
+    return
+  EndIf
+  
+  bool isEnabled = True
+  int enabled = JMap.getInt(actionObj, "enabled")
+  float interval = JMap.getFlt(actionObj, "interval")
+  float exponent = JMap.getFlt(actionObj, "exponent")
+  int maxInterval = JMap.getInt(actionObj, "maxInterval")
+  float decayWindow = JMap.getFlt(actionObj, "decayWindow")
+  float lastExecuted = JMap.getFlt(actionObj, "lastExecuted")
+  int currentInterval = JMap.getInt(actionObj, "currentInterval")
+  float currentTime = Utility.GetCurrentRealTime()
+  
+  if JMap.GetInt(actionObj, "enabled") == 0
+    isEnabled = False
+  elseif currentInterval == 0
+    isEnabled = True
+  else
+    ; Backoff implemention
+    float nextExecution = lastExecuted + (interval * Math.pow(exponent, currentInterval))
+    isEnabled = (currentTime > nextExecution)
+    if currentInterval < maxInterval
+      JMap.SetInt(actionObj, "currentInterval", currentInterval + 1)
+    EndIf
+    JMap.SetFlt(actionObj, "lastExecuted", currentTime)
+    JMap.SetObj(actionRegistry, actionName, actionObj)
+  EndIf
+  Main.Debug("ActionRegistry: Executed " + actionName +" ( " + isEnabled + " ), interval=" + interval + ", exponent= " + exponent +", maxInterval = " + maxInterval + ", decayWindow = " + decayWindow + ", currentInterval = " + currentInterval + ", currentTime = " + currentTime)
+  AIAgentFunctions.logMessage("_minai_ACTION//" + actionName + "@" + isEnabled, "setconf")
+EndFunction
+
+
+Function UpdateActions()
+  string[] actions = JMap.allKeysPArray(actionRegistry)
+  int i = 0
+  while i < actions.Length
+    ResetActionBackoff(actions[i], false)
+    i += 1
+  EndWhile
+EndFunction
+
+Function ResetAction(string actionName)
+  int actionObj = JMap.GetObj(actionRegistry, actionName)
+  JMap.setInt(actionObj, "enabled", JMap.GetInt(actionObj, "enabledDefault"))
+  JMap.setFlt(actionObj, "interval", JMap.getFlt(actionObj, "intervalDefault"))
+  JMap.setFlt(actionObj, "exponent", JMap.getFlt(actionObj, "exponentDefault"))
+  JMap.setInt(actionObj, "maxInterval", JMap.GetInt(actionObj, "maxIntervalDefault"))
+  JMap.setFlt(actionObj, "decayWindow", JMap.getFlt(actionObj, "decayWindowDefault"))
+  JMap.SetObj(actionRegistry, actionName, actionObj)
 EndFunction

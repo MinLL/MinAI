@@ -94,13 +94,13 @@ $GLOBALS["FUNCTIONS"][] = [
 
 // Add this function to enabled array
 if (IsModEnabled("DeviousFollowers")) {
-    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdSpankAss";
-    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdSpankTits";
+    RegisterAction("ExtCmdSpankAss");
+    RegisterAction("ExtCmdSpankTits");
 }
 
 if (IsModEnabled("Sexlab") || IsModEnabled("Ostim")) {
-    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdGrope";
-    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdPinchNipples";
+    RegisterAction("ExtCmdGrope");
+    RegisterAction("ExtCmdPinchNipples");
 }
 
 // From here, is stuff that will be needed once the papyrus plugin make a request of type funcret.

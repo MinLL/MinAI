@@ -128,6 +128,8 @@ function Maintenance(minai_MainQuestController _main)
   aiff.SetModAvailable("ArousedKeywords", bHasArousedKeywords)
   aiff.SetModAvailable("Babo", bHasBabo)
   aiff.SetModAvailable("TNG", bHasTNG)
+  aiff.RegisterAction("ExtCmdIncreaseArousal", "IncreaseArousal", "AI Arousal Increase", "Arousal", 1, 0, 2, 5, 60, (bHasAroused))
+  aiff.RegisterAction("ExtCmdDecreaseArousal", "DecreaseArousal", "AI Arousal Decrease", "Arousal", 1, 0, 2, 5, 60, (bHasAroused))
 EndFunction
 
 

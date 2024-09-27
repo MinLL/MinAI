@@ -34,6 +34,8 @@ function Maintenance(minai_MainQuestController _main)
       bHasNFF = False
     EndIf
   EndIf
+  aiff.RegisterAction("ExtCmdStartLooting", "StartLooting", "Start Looting the Area", "Followers", 1, 0, 2, 5, 60, True)
+  aiff.RegisterAction("ExtCmdStopLooting", "StopLooting", "Stop Looting the Area", "Followers", 1, 0, 2, 5, 60, True)
 EndFunction
 
 
