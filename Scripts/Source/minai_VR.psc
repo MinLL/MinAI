@@ -300,15 +300,28 @@ Event OnUpdate()
   Main.Debug("Most touched location (" + actorName + "): " + hitThreshold + " = " + hitValue)
   string lineToSay = ""
   bool wasPenetration = (JMap.GetInt(touchedLocations, GENITAL_COLLISION_KEY) == 1)
+  bool bHasDD = devious.hasDD() 
   if actorName == playerName
-    lineToSay = playerName + " touched their " + locationHit
+    if locationHit == VAGINAL_KEY && bHasDD && playerRef.WornHasKeyword(devious.libs.zad_DeviousBelt)
+      lineToSay = playerName + " tried to touch their " + locationHit + " but was prevented from doing so by the chastity belt"
+    elseif locationHit == BREASTS_KEY && bHasDD && playerRef.WornHasKeyword(devious.libs.zad_DeviousBra)
+      lineToSay = playerName + " tried to touch their " + locationHit + " but was prevented from doing so by the chastity bra"
+    else
+      lineToSay = playerName + " touched their " + locationHit
+    EndIf
   Else
     if wasPenetration && playerRef.GetActorBase().GetSex() == 0
       lineToSay = playerName + "'s " + PENIS_KEY + " touched " + actorName + "'s " + locationHit
     elseif wasPenetration && playerRef.GetActorBase().GetSex() >= 1
       lineToSay = playerName + "'s " + VAGINAL_KEY + " was touched by " + actorName + "'s " + locationHit
     else
-      lineToSay = playerName + " touched " + actorName + "'s " + locationHit
+      if locationHit == VAGINAL_KEY && bHasDD && akActor.WornHasKeyword(devious.libs.zad_DeviousBelt)
+        lineToSay = playerName + " tried to touch " + actorName + "'s " + locationHit + " but was prevented from doing so by the chastity belt"
+      elseif locationHit == BREASTS_KEY && bHasDD && akActor.WornHasKeyword(devious.libs.zad_DeviousBra)
+        lineToSay = playerName + " tried to touch " + actorName + "'s " + locationHit + " but was prevented from doing so by the chastity bra"
+      else
+        lineToSay = playerName + " touched " + actorName + "'s " + locationHit
+      EndIf
     endif
   EndIf
   float currentTime = Utility.GetCurrentRealTime()
