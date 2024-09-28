@@ -93,7 +93,7 @@ $GLOBALS["FUNCTIONS"][] = [
 
 
 // Add this function to enabled array
-if (IsModEnabled("DeviousFollowers")) {
+if (IsModEnabled("DeviousFollowers") && IsModEnabled("STA")) {
     RegisterAction("ExtCmdSpankAss");
     RegisterAction("ExtCmdSpankTits");
 }

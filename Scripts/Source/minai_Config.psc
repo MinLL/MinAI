@@ -243,7 +243,7 @@ Function RenderActionsPage(string mcmPageToRender)
   bulkIntervalOID = AddSliderOption("Bulk Set Interval", 0, "{1}")
   bulkExponentOID = AddSliderOption("Bulk Set Exponent", 2, "{1}")
   bulkMaxIntervalOID = AddSliderOption("Bulk Set Maximum Interval", 5, "{0}")
-  bulkDecayWindowOID = AddSliderOption("Decay Window", 300, "{1}")
+  bulkDecayWindowOID = AddSliderOption("Bulk Set Decay Window", 300, "{1}")
 
   int numActionsForPage = 0
   int i = 0
@@ -518,11 +518,11 @@ Event OnOptionHighlight(int oid)
     if oid == JMap.getInt(aOID, "enabled")
       SetInfoText("Enable or disable the action. This will prevent it from being exposed to the LLM")
     elseif oid == JMap.getInt(aOID, "interval")
-      SetInfoText("The cooldown (in seconds) inbetween uses of the action")
+      SetInfoText("The base cooldown (in seconds) inbetween uses of the action. Increases by the exponent every time this is triggered. Set to 0 to disable backoff entirely")
     elseif oid == JMap.getInt(aOID, "exponent")
       SetInfoText("The exponent applied to the interval's cooldown for uses of this action")
     elseif oid == JMap.getInt(aOID, "maxInterval")
-      SetInfoText("The cap on the maximum exponent that will be applied to the interval for uses of this action")
+      SetInfoText("The cap on the maximum value that the interval will rise to from repeated uses of the action. Useful if you want to have a cap on how long the cooldown will become")
     elseif oid == JMap.getInt(aOID, "decayWindow")
       SetInfoText("The duration of time which must pass without the action being used for the cooldown to return to the base value")
     EndIf
