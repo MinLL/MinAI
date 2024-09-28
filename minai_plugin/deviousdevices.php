@@ -147,7 +147,7 @@ foreach ($vibSettings as $strength) {
 					      ],
 			     ];
   if ($canVibrate) {
-      RegisterAction("$keyword");
+      $GLOBALS["ENABLED_FUNCTIONS"][]=$keyword;
   }
   $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["$keyword"]="{$GLOBALS["HERIKA_NAME"]} comments on remotely stimulating {$GLOBALS["PLAYER_NAME"]} with a $strength vibration. {$GLOBALS["TEMPLATE_DIALOG"]}";
 }
