@@ -4,7 +4,7 @@ $allKeywords = "";
 $allFactions = "";
 
 function CanVibrate($name) {
-  return IsEnabled($name, "CanVibrate");
+    return IsEnabled($name, "CanVibrate") && IsActionEnabled("MinaiGlobalVibrator");
 }
 
 // Return the specified actor value.

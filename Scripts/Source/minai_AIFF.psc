@@ -11,6 +11,7 @@ bool bHasAIFF = False
 
 int Property contextUpdateInterval Auto
 int Property playerContextUpdateInterval Auto
+string[] vibratorCommands
 
 Actor player
 VoiceType NullVoiceType
@@ -54,6 +55,17 @@ Function Maintenance(minai_MainQuestController _main)
     SetContext(player)
     RegisterForSingleUpdate(playerContextUpdateInterval)
   EndIf
+  vibratorCommands = new String[10]
+  vibratorCommands[0] = "ExtCmdTeaseWithVibratorVeryWeak"
+  vibratorCommands[1] = "ExtCmdTeaseWithVibratorWeak"
+  vibratorCommands[2] = "ExtCmdTeaseWithVibratorMedium"
+  vibratorCommands[3] = "ExtCmdTeaseWithVibratorStrong"
+  vibratorCommands[4] = "ExtCmdTeaseWithVibratorVeryStrong"
+  vibratorCommands[5] = "ExtCmdStimulateWithVibratorVeryWeak"
+  vibratorCommands[6] = "ExtCmdStimulateWithVibratorWeak"
+  vibratorCommands[7] = "ExtCmdStimulateWithVibratorMedium"
+  vibratorCommands[8] = "ExtCmdStimulateWithVibratorStrong"
+  vibratorCommands[9] = "ExtCmdStimulateWithVibratorVeryStrong"
   InitializeActionRegistry()
 EndFunction
 
@@ -89,6 +101,9 @@ Function SetContext(actor akTarget)
   StoreActorVoice(akTarget)
   StoreKeywords(akTarget)
   StoreFactions(akTarget)
+  if config.disableAIAnimations && akTarget != player
+    SetAnimationBusy(1, akTarget.GetActorBase().GetName())
+  EndIf
   Main.Debug("AIFF - SetContext(" + akTarget.GetDisplayName() + ") FINISH")
 EndFunction
 
@@ -101,6 +116,9 @@ EndFunction
 Function SetActorVariable(Actor akActor, string variable, string value)
   if (!IsInitialized())
     Main.Info("SetActorVariable() - Still Initializing.")
+    return
+  EndIf
+  if (!bHasAIFF)
     return
   EndIf
   string actorName = main.GetActorName(akActor) ; Damned khajit
@@ -118,6 +136,9 @@ Function RegisterEvent(string eventLine, string eventType)
     Main.Info("RegisterEvent() - Still Initializing.")
     return
   EndIf
+  if (!bHasAIFF)
+    return
+  EndIf
   AIAgentFunctions.logMessage(eventLine, eventType)
 EndFunction
 
@@ -133,6 +154,9 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     return
   EndIf
   SetContext(akActor)
+  if vibratorCommands.Find(command) >= 0
+    command = "MinaiGlobalVibrator"
+  EndIf
   ExecuteAction(command)
 EndEvent
 
@@ -143,6 +167,9 @@ Function ChillOut()
       Main.Info("ChillOut() - Still Initializing.")
       return
     EndIf
+  if (!bHasAIFF)
+    return
+  EndIf
     AIAgentFunctions.logMessage("Relax and enjoy","force_current_task")
   EndIf
 EndFunction
@@ -255,6 +282,9 @@ EndFunction
 
 
 Function RegisterAction(string actionName, string mcmName, string mcmDesc, string mcmPage, int enabled, float interval, float exponent, int maxInterval, float decayWindow, bool hasMod)
+  if !bHasAIFF
+    return
+  EndIf
   if JMap.getObj(actionRegistry, actionName) != 0
     Main.Warn("ActionRegistry: " + actionName + " already registered. Skipping.")
     return
@@ -325,6 +355,9 @@ EndFunction
 
 
 Function ResetActionBackoff(string actionName, bool bypassCooldown)
+  if (!bHasAIFF)
+    return
+  EndIf
   int actionObj = JMap.GetObj(actionRegistry, actionName)
   if actionObj == 0
     Main.Warn("ActionRegistry: Could not find action " + actionName + " to reset backoff.")
@@ -370,7 +403,9 @@ Function ExecuteAction(string actionName)
     Main.Warn("ActionRegistry: Could not find action " + actionName + " to log execution.")
     return
   EndIf
-  
+  if (!bHasAIFF)
+    return
+  EndIf
   bool isEnabled = True
   int enabled = JMap.getInt(actionObj, "enabled")
   float interval = JMap.getFlt(actionObj, "interval")
