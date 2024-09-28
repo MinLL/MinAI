@@ -31,6 +31,7 @@ GlobalVariable eyepenalty
 GlobalVariable eyereward
 GlobalVariable eyescore
 MagicEffect dwp_watched
+GlobalVariable dwp_global_minai
 
 actor playerRef
 
@@ -118,11 +119,16 @@ function Maintenance(minai_MainQuestController _main)
     eyepenalty = Game.GetFormFromFile(0x0AB14C, "DeviouslyAccessible.esp") as GlobalVariable
     eyereward = Game.GetFormFromFile(0x0AB142, "DeviouslyAccessible.esp") as GlobalVariable
     eyescore = Game.GetFormFromFile(0x0AB141, "DeviouslyAccessible.esp") as GlobalVariable
+    dwp_global_minai = Game.GetFormFromFile(0x1C38CC, "DeviouslyAccessible.esp") as GlobalVariable
     dwp_watched = Game.GetFormFromFile(0x0AB148, "DeviouslyAccessible.esp") as MagicEffect
     if (!eyefucktrack || !eyepenalty || !eyereward || !eyescore || !dwp_watched)
       Main.Error("Could not find DeviouslyAccessible globals")
       Debug.Notification("Incompatible version of DeviouslyAccessible. AI Integrations Disabled.")
       bHasDeviouslyAccessible = False
+    EndIf
+    if (!dwp_global_minai)
+      Main.Error("Old version of Deviously Accessible. Some integrations will be broken.")
+      Debug.Notification("Old version of Deviously Accessible. Some integrations will be broken.")
     EndIf
   EndIf  
   aiff.SetModAvailable("DeviousFollowers", bHasDeviousFollowers)
@@ -132,6 +138,26 @@ function Maintenance(minai_MainQuestController _main)
   aiff.SetModAvailable("SLApp", bHasSLApp)
   aiff.SetModAvailable("DeviouslyAccessible", bHasDeviouslyAccessible)
   config.StoreAllConfigs()
+
+  aiff.RegisterAction("ExtCmdGrope", "Grope", "Grope the Target", "General", 1, 30, 2, 5, 300, True)
+  aiff.RegisterAction("ExtCmdPinchNipples", "PinchNipples", "Pinch the Targets Nipples", "General", 1, 30, 2, 5, 300, True)
+  aiff.RegisterAction("ExtCmdSpankAss", "SpankAss", "Spank the Targets Ass", "General", 1, 10, 2, 5, 300, (bHasSTA && bHasDeviousFollowers))
+  aiff.RegisterAction("ExtCmdSpankTits", "SpankTits", "Spank the Targets Tits ", "General", 10, 1, 2, 5, 300, (bHasSTA && bHasDeviousFollowers))
+  aiff.RegisterAction("ExtCmdMolest", "Molest", "Sexually Assault the target", "General", 1, 120, 2, 5, 300, bHasSLHH)
+  aiff.RegisterAction("ExtCmdKiss", "Kiss", "Kiss the target", "General", 1, 120, 2, 5, 300, bHasSLapp)
+  aiff.RegisterAction("ExtCmdHug", "Hug", "Hug the target", "General", 1, 120, 2, 5, 300, bHasSLapp)
+  
+  aiff.RegisterAction("ExtCmdForceOrgasm", "ForceOrgasm", "Force the target  to cum", "Devious Stuff", 1, 30, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("MinaiGlobalVibrator", "Vibrator", "Global backoff for all vibrator usage", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdStopStimulation", "StopStimulation", "Stop Vibrations", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdshock", "Shock", "Shock the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdEquipCollar", "EquipCollar", "Lock a Collar on the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdUnequipCollar", "UnequipCollar", "Unlock a Collar from the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+
+  aiff.RegisterAction("ExtCmdAcceptDeal", "AcceptDeal", "Accept Deal Negotiation", "Devious Followers", 1, 1, 2, 5, 300, bHasDeviousFollowers)
+  aiff.RegisterAction("ExtCmdGiveDrugs", "GiveDrugs", "Give Drugs to the player", "Devious Followers", 1, 1, 2, 5, 300, bHasDeviousFollowers)
+  ; aiff.RegisterAction("ExtCmdRejectDeal", "RejectDeal", "Reject Deal Negotiation", "Devious Followers", 1, 1, 2, 5, 300, bHasDeviousFollowers)
+
 EndFunction
 
 Function ResetSpankRule()
@@ -792,6 +818,7 @@ Function SetContext(actor akTarget)
     aiff.SetActorVariable(playerRef, "deviouslyAccessibleEyeReward", eyereward.GetValueInt())
     aiff.SetActorVariable(playerRef, "deviouslyAccessibleEyeScore", eyescore.GetValueInt())
     aiff.SetActorVariable(playerRef, "deviouslyAccessibleBeingWatched", playerRef.HasMagicEffect(dwp_watched))
+    aiff.SetActorVariable(playerRef, "deviouslyAccessibleGlobal", dwp_global_minai.GetValueInt())
   EndIf
 EndFunction
 

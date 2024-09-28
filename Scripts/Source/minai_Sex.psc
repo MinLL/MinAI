@@ -4,6 +4,7 @@ SexLabFramework slf
 
 
 bool bHasOstim = False
+bool bHasSexlab = False
 GlobalVariable minai_UseOstim
 int clothingMap = 0
 int descriptionsMap
@@ -45,6 +46,10 @@ Function Maintenance(minai_MainQuestController _main)
   RegisterForModEvent("ostim_thread_end", "OStimManager")
     
   slf = Game.GetFormFromFile(0xD62, "SexLab.esm") as SexLabFramework
+  if slf != None
+    Main.Info("Found Sexlab")
+    bHasSexlab = True
+  EndIf
   if Game.GetModByName("OStim.esp") != 255
     Main.Info("Found OStim")
     bHasOstim = True
@@ -68,6 +73,35 @@ Function Maintenance(minai_MainQuestController _main)
   EndIf
   aiff.SetModAvailable("Ostim", bHasOstim)
   aiff.SetModAvailable("Sexlab", slf != None)
+  aiff.RegisterAction("ExtCmdRemoveClothes", "RemoveClothes", "Take off all clothing", "Sex1", 1, 5, 2, 5, 300, True)
+  aiff.RegisterAction("ExtCmdPutOnClothes", "PutOnClothes", "Put all clothing back on", "Sex1", 1, 5, 2, 5, 300, True)
+  aiff.RegisterAction("ExtCmdMasturbate", "Masturbate", "Begin Masturbating", "Sex1", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdOrgy", "Orgy", "Start Sex with all AI Actors", "Sex1", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdStopSex", "StopSex", "Stop having Sex", "Sex1", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  ; aiff.RegisterAction("ExtCmdStartSexScene", "StartSexScene", "ExtCmdStartSexScene", "Sex", 1, 5, 2, 5, 300)
+  aiff.RegisterAction("ExtCmdStartBlowjob", "StartBlowjob", "Sex Position", "Sex1", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdStartAnal", "StartAnal", "Sex Position", "Sex1", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdStartVaginal", "StartVaginal", "Sex Position", "Sex1", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdStartHandjob", "StartHandjob", "Sex Position", "Sex1", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdStartFootjob", "StartFootjob", "Sex Position", "Sex1", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdStartBoobjob", "StartBoobjob", "Sex Position", "Sex1", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdStartCunnilingus", "StartCunnilingus", "Sex Position", "Sex2", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdStartFacial", "StartFacial", "Sex Position", "Sex2", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdStartCumonchest", "StartCumonchest", "Sex Position", "Sex2", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdStartRubbingclitoris", "StartRubbingclitoris", "Sex Position", "Sex2", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdStartDeepthroat", "StartDeepthroat", "Sex Position", "Sex2", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdStartRimjob", "StartRimjob", "Sex Position", "Sex2", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdStartFingering", "StartFingering", "Sex Position", "Sex2", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdStartMissionarySex", "StartMissionarySex", "Sex Position", "Sex2", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdStartCowgirlSex", "StartCowgirlSex", "Sex Position", "Sex2", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdStartReverseCowgirl", "StartReverseCowgirl", "Sex Position", "Sex2", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdStartDoggystyle", "StartDoggystyle", "Sex Position", "Sex2", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdStartFacesitting", "StartFacesitting", "Sex Position", "Sex3", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdStart69Sex", "Start69Sex", "Sex Position", "Sex3", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdStartGrindingSex", "StartGrindingSex", "Sex Position", "Sex3", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdStartThighjob", "StartThighjob", "Sex Position", "Sex3", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdStartCuddleSex", "StartCuddleSex", "Sex Position", "Sex3", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdStartKissingSex", "StartKissingSex", "Sex Position", "Sex3", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
 EndFunction
 
 

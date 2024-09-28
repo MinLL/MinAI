@@ -41,7 +41,7 @@ $GLOBALS["FUNCTIONS"][] = [
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStopLooting"]=$GLOBALS["GenericFuncRet"];
 
-$GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStartLooting";
-$GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStopLooting";
+RegisterAction("ExtCmdStartLooting");
+RegisterAction("ExtCmdStopLooting");
 
 ?>

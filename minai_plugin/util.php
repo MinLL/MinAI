@@ -4,7 +4,7 @@ $allKeywords = "";
 $allFactions = "";
 
 function CanVibrate($name) {
-  return IsEnabled($name, "CanVibrate");
+    return IsEnabled($name, "CanVibrate") && IsActionEnabled("MinaiGlobalVibrator");
 }
 
 // Return the specified actor value.
@@ -128,4 +128,17 @@ Function IsMale($name) {
 
 Function IsFemale($name) {
     return HasKeyword($name, "ActorSexFemale");
+}
+
+
+Function IsActionEnabled($actionName) {
+  $actionName = strtolower($actionName);
+  return $GLOBALS["db"]->fetchAll("select 1 from conf_opts where LOWER(id)=LOWER('_minai_ACTION//{$actionName}') and LOWER(value)=LOWER('TRUE')");
+}
+
+
+Function RegisterAction($actionName) {
+    if (IsActionEnabled($actionName)) {
+        $GLOBALS["ENABLED_FUNCTIONS"][]=$actionName;
+    }
 }

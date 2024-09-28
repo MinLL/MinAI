@@ -76,6 +76,12 @@ function Maintenance(minai_MainQuestController _main)
   EndIf
   aiff.SetModAvailable("Sunhelm", bHasSunhelm)
   aiff.SetModAvailable("BetterFastTravel", bHasBFT)
+  aiff.RegisterAction("ExtCmdServeFood", "ServeFood", "Survival", "Receive food from an inn keeper/server", 1, 5, 2, 5, 60, bHasSunhelm)
+  aiff.RegisterAction("ExtCmdRentRoom", "RentRoom", "Rent a room from an inn keeper", "Survival", 1, 30, 2, 5, 60, True)
+  aiff.RegisterAction("ExtCmdTrade", "Trade", "Open the buy/sell menu", "Survival", 1, 5, 2, 5, 60, True)
+  aiff.RegisterAction("ExtCmdCarriageRide", "CarriageRide", "Request a carriage ride to a destination", "Survival", 1, 5, 2, 5, 60, True)
+  aiff.RegisterAction("ExtCmdTrainSkill", "TrainSkill", "Receive training in a skill", "Survival", 1, 5, 2, 5, 60, True)
+  
 EndFunction
 
 

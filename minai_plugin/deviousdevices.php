@@ -71,9 +71,9 @@ $GLOBALS["FUNCTIONS"][] = [
 
 
 if ($canVibrate) {
-  $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdShock";
-  $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdForceOrgasm";
-  $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdStopStimulation";
+    RegisterAction("ExtCmdShock");
+    RegisterAction("ExtCmdForceOrgasm");
+    RegisterAction("ExtCmdStopStimulation");
  }
 
 
@@ -118,7 +118,7 @@ foreach ($vibSettings as $strength) {
 					      ],
 			     ];
   if ($canVibrate) {
-    $GLOBALS["ENABLED_FUNCTIONS"][]="$keyword";
+      RegisterAction("$keyword");
   }
   $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["$keyword"]="{$GLOBALS["HERIKA_NAME"]} comments on remotely teasing {$GLOBALS["PLAYER_NAME"]} with a $strength vibration. {$GLOBALS["TEMPLATE_DIALOG"]}";
 }
@@ -147,7 +147,7 @@ foreach ($vibSettings as $strength) {
 					      ],
 			     ];
   if ($canVibrate) {
-    $GLOBALS["ENABLED_FUNCTIONS"][]="$keyword";
+      RegisterAction("$keyword");
   }
   $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["$keyword"]="{$GLOBALS["HERIKA_NAME"]} comments on remotely stimulating {$GLOBALS["PLAYER_NAME"]} with a $strength vibration. {$GLOBALS["TEMPLATE_DIALOG"]}";
 }
@@ -193,11 +193,11 @@ $GLOBALS["FUNCTIONS"][] = [
 ];
 
 if (IsConfigEnabled("allowDeviceLock")) {
-    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdEquipCollar";    
+    RegisterAction("ExtCmdEquipCollar");
 }
 
 if (IsConfigEnabled("allowDeviceUnlock")) {
-    $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdUnequipCollar";
+    RegisterAction("ExtCmdUnequipCollar");
 }
 
 ?>
