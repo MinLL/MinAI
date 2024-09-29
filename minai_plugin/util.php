@@ -154,5 +154,4 @@ if ($GLOBALS["force_aiff_name_to_ingame_name"]) {
 }
 
 
-
 ?>

@@ -100,7 +100,7 @@ $GLOBALS["FUNCTIONS"][] = [
 $GLOBALS["FUNCRET"]["ExtCmdMasturbate"]=$GLOBALS["GenericFuncRet"];
 
 $GLOBALS["F_NAMES"]["ExtCmdStartOrgy"]="StartOrgy";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartOrgy"]="Immediately start an orgy with all nearby participants";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartOrgy"]="Immediately engage in an orgy with multiple participants";
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdStartOrgy"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartOrgy"],

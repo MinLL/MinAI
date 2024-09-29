@@ -102,6 +102,7 @@ Function SetContext(actor akTarget)
   StoreKeywords(akTarget)
   StoreFactions(akTarget)
   AIAgentFunctions.logMessage("_minai_PLAYER//playerName@" + player.GetActorBase().GetName(), "setconf")
+  AIAgentFunctions.logMessage("_minai_PLAYER//nearbyActors@" + GetNearbyAiStr(), "setconf")
   if config.disableAIAnimations && akTarget != player
     SetAnimationBusy(1, akTarget.GetActorBase().GetName())
   EndIf
@@ -273,6 +274,20 @@ actor[] Function GetNearbyAI()
   return actors
 EndFunction
 
+
+String Function GetNearbyAIStr()
+  actor[] actors = AIAgentFunctions.findAllNearbyAgents()
+  string ret = ""
+  int i = 0
+  while i < actors.Length
+    ret += actors[i].GetActorBase().GetName()
+    if i != actors.Length - 1
+      ret += ","
+    EndIf
+    i += 1
+  EndWhile
+  return ret
+EndFunction
 
 Function RegisterAction(string actionName, string mcmName, string mcmDesc, string mcmPage, int enabled, float interval, float exponent, int maxInterval, float decayWindow, bool hasMod)
   if !bHasAIFF

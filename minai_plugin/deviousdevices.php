@@ -7,11 +7,11 @@ $canVibrate = CanVibrate($GLOBALS["PLAYER_NAME"]);
   
 $GLOBALS["F_NAMES"]["ExtCmdShock"]="Shock";
 $GLOBALS["F_NAMES"]["ExtCmdForceOrgasm"]="ForceOrgasm";
-$GLOBALS["F_NAMES"]["ExtCmdStopStimulation"]="StopStimulation";
+$GLOBALS["F_NAMES"]["ExtCmdTurnOffVibrator"]="TurnOffVibrator";
 
 $GLOBALS["F_TRANSLATIONS"]["ExtCmdShock"]="Shock the target in order to punish them or reduce their arousal";
 $GLOBALS["F_TRANSLATIONS"]["ExtCmdForceOrgasm"]="Make the target immediately have an orgasm";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdStopStimulation"]="Turn off the targets vibrator";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdTurnOffVibrator"]="Turn off the targets vibrator";
 
 
 
@@ -50,8 +50,8 @@ $GLOBALS["FUNCTIONS"][] = [
     ];
 
 $GLOBALS["FUNCTIONS"][] = [
-        "name" => $GLOBALS["F_NAMES"]["ExtCmdStopStimulation"],
-        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStopStimulation"],
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdTurnOffVibrator"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdTurnOffVibrator"],
         "parameters" => [
             "type" => "object",
             "properties" => [
@@ -73,19 +73,19 @@ $GLOBALS["FUNCTIONS"][] = [
 if ($canVibrate) {
     RegisterAction("ExtCmdShock");
     RegisterAction("ExtCmdForceOrgasm");
-    RegisterAction("ExtCmdStopStimulation");
+    RegisterAction("ExtCmdTurnOffVibrator");
  }
 
 
 $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdShock"]="{$GLOBALS["HERIKA_NAME"]} comments on remotely shocking {$GLOBALS["PLAYER_NAME"]}. {$GLOBALS["TEMPLATE_DIALOG"]}";
 $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdForceOrgasm"]="{$GLOBALS["HERIKA_NAME"]} comments on remotely forcing {$GLOBALS["PLAYER_NAME"]} to have an orgasm. {$GLOBALS["TEMPLATE_DIALOG"]}";
-$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdStopStimulation"]="{$GLOBALS["HERIKA_NAME"]} comments on turning off {$GLOBALS["PLAYER_NAME"]}'s vibrator. {$GLOBALS["TEMPLATE_DIALOG"]}";
+$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdTurnOffVibrator"]="{$GLOBALS["HERIKA_NAME"]} comments on turning off {$GLOBALS["PLAYER_NAME"]}'s vibrator. {$GLOBALS["TEMPLATE_DIALOG"]}";
 
 
 
 $GLOBALS["FUNCRET"]["ExtCmdShock"]=$GLOBALS["GenericFuncRet"];
 $GLOBALS["FUNCRET"]["ExtCmdForceOrgasm"]=$GLOBALS["GenericFuncRet"];
-$GLOBALS["FUNCRET"]["ExtCmdStopStimulation"]=$GLOBALS["GenericFuncRet"];
+$GLOBALS["FUNCRET"]["ExtCmdTurnOffVibrator"]=$GLOBALS["GenericFuncRet"];
 
 
 
