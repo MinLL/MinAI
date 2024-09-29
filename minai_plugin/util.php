@@ -142,3 +142,17 @@ Function RegisterAction($actionName) {
         $GLOBALS["ENABLED_FUNCTIONS"][]=$actionName;
     }
 }
+
+
+
+// Override player name
+if ($GLOBALS["force_aiff_name_to_ingame_name"]) {
+    $playerName = GetActorValue("PLAYER", "playerName");
+    if ($playerName) {
+        $GLOBALS["PLAYER_NAME"] = $playerName;
+    }
+}
+
+
+
+?>

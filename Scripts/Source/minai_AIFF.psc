@@ -101,6 +101,7 @@ Function SetContext(actor akTarget)
   StoreActorVoice(akTarget)
   StoreKeywords(akTarget)
   StoreFactions(akTarget)
+  AIAgentFunctions.logMessage("_minai_PLAYER//playerName@" + player.GetActorBase().GetName(), "setconf")
   if config.disableAIAnimations && akTarget != player
     SetAnimationBusy(1, akTarget.GetActorBase().GetName())
   EndIf
@@ -108,10 +109,6 @@ Function SetContext(actor akTarget)
 EndFunction
 
 
-
-bool Function HasIllegalCharacters(string theString)
-  return (StringUtil.Find(theString, "'") != -1)
-EndFunction
 
 Function SetActorVariable(Actor akActor, string variable, string value)
   if (!IsInitialized())
@@ -121,11 +118,7 @@ Function SetActorVariable(Actor akActor, string variable, string value)
   if (!bHasAIFF)
     return
   EndIf
-  string actorName = main.GetActorName(akActor) ; Damned khajit
-  if (HasIllegalCharacters(actorName) || HasIllegalCharacters(variable) || HasIllegalCharacters(value))
-    Main.Error("SetActorVariable(" + variable + "): Not persisting value for " + actorName + " due to illegal character: " + value)
-    return
-  EndIf
+  string actorName = main.GetActorName(akActor)
   Main.Debug("Set actor value for actor " + actorName + " "+ variable + " to " + value)
   AIAgentFunctions.logMessage("_minai_" + actorName + "//" + variable + "@" + value, "setconf")
 EndFunction
@@ -170,7 +163,7 @@ Function ChillOut()
   if (!bHasAIFF)
     return
   EndIf
-    AIAgentFunctions.logMessage("Relax and enjoy","force_current_task")
+    ; AIAgentFunctions.logMessage("Relax and enjoy","force_current_task")
   EndIf
 EndFunction
 
