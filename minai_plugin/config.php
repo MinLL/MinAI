@@ -13,4 +13,6 @@ $GLOBALS["stop_narrator_context_leak"] = false;
 $GLOBALS["always_enable_functions"] = true;
 // Set this to override the prompt head for all profiles
 $GLOBALS["PROMPT_HEAD_OVERRIDE"] = "";
+// Force the configured name in AI-FF to match the in-game name
+$GLOBALS["force_aiff_name_to_ingame_name"] = true;
 ?>
