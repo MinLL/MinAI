@@ -24,7 +24,7 @@ function GetDeviousFollowerContext($name) {
     $dfName = $GLOBALS["HERIKA_NAME"]; // This will have the right capitalization / etc
     $dfDebt = GetActorValue($playerName, "deviousFollowerDebt");
     $dfEnslaveDebt = GetActorValue($playerName, "deviousFollowerEnslaveDebt");
-    $dfContractRemaining = GetActorValue($playerName, "deviousFollowersContractRemaining");
+    $dfContractRemaining = GetActorValue($playerName, "deviousFollowerContractRemaining");
     $dfWill =  GetActorValue($playerName, "deviousFollowerWillpower");
     $dfRules = GetActorValue($playerName, "deviousFollowerRules");
     $dfDueForSpanks = GetActorValue($playerName, "deviousTimeForSpanks");
