@@ -115,6 +115,9 @@ Function GetClothingContext($name) {
   if (!empty($cuirass)) {
     $ret .= "{$name} is wearing {$cuirass}.\n";
   }
+  elseif (IsEnabled($name, "isNaked")) {
+    $ret .= "{$name} is naked and exposed.\n";
+  }
   if (HasKeyword($name, "SLA_HalfNakedBikini")) {
     $ret .= "{$name} is wearing a set of revealing bikini armor.\n";
   }
@@ -162,9 +165,6 @@ Function GetClothingContext($name) {
   }
   if (HasKeyword($name, "SLA_ArmorRubber")) {
     $ret .= "{$name}'s outfit is made out of tight form-fitting rubber (Referred to as Ebonite).\n";
-  }
-  if (IsEnabled($name, "isNaked")) {
-    $ret .= "{$name} is naked and exposed.\n";
   }
   if (HasKeyword($name, "EroticArmor")) {
       $ret .= "{$name} is wearing a sexy revealing outfit.\n";
