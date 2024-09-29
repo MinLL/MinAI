@@ -31,7 +31,7 @@ function GetDeviousFollowerContext($name) {
     $dfNewRuleDesc = GetActorValue($playerName, "deviousFollowerNewRuleDesc");
     // Main DF prompt
     $ret = "";
-    $personality = "{$dfName} is a pervert, though they initially hide this well. {$dfName}'s goal in becoming {$playerName}'s follower is to entrap them with debt that they owe {$dfName} from their fees, and eventually make {$playerName} their sex slave / pet. {$dfName} charges {$playerName} gold over time in exchange for their services, with an agreed daily payment schedule. {$dfName} has a good mix of being serious and flirty with {$playerName} and derives enjoyment from sexually teasing and embarrassing her. {$dfName} is likely to use perverted means in their interactions if deemed appropriate. {$dfName} wants to continue adventuring and is more likely to talk about adventure and events going on than the arrangement with {$playerName} (Though {$dfName} should sometimes incorporate perverted elements into this).\n";
+    $personality = "{$dfName} is a pervert, though they initially hide this well. {$dfName}'s goal in becoming {$playerName}'s follower is to entrap them with debt that they owe {$dfName} from their fees, and eventually make {$playerName} their sex slave / pet. {$dfName} charges {$playerName} gold over time in exchange for their services, with an agreed daily payment schedule. {$dfName} has a good mix of being serious and flirty with {$playerName} and derives enjoyment from sexually teasing, spanking, and embarrassing her. {$dfName} is likely to use perverted means in their interactions if deemed appropriate. {$dfName} wants to continue adventuring and is more likely to talk about adventure and events going on than the arrangement with {$playerName} (Though {$dfName} should sometimes incorporate perverted elements into this).\n";
     if (CanVibrate($playerName)) {
         $personality .= "{$dfName} can remotely make {$playerName}'s peircings or plugs vibrate when wanted in order to reward, or punish {$playerName} depending on how {$dfName} uses them. {$dfName} can also make (or allow) {$playerName} have an orgasm or climax at will using the vibrator. {$dfName} can also cause the piercings or vibrators to painfully shock {$playerName} if displeased, or if ${dfName} wants to reduce the arousal of {$playerName}\n";
     }
@@ -43,7 +43,7 @@ function GetDeviousFollowerContext($name) {
         $ret .= "{$playerName} currently owes a moderately large debt. {$playerName} owes over a thousand gold. {$dfName} will still be fairly playful (teasing and arousing {$playerName} a fair bit), though will be more strict. {$dfName} will be a lot less likely to let {$playerName} orgasm.\n";
     }
     elseif ($dfDebt > 0) {
-        $ret .= "{$playerName} currently has a small outstanding debt. {$playerName} owes hundreds of gold. {$dfName} will be a little less likely to let {$playerName} orgasm.\n";
+        $ret .= "{$playerName} currently has a small outstanding debt. {$playerName} does not owe much gold right now. {$dfName} will be a little less likely to let {$playerName} orgasm.\n";
     }
     else {
         $ret .= "{$playerName} does not currently owe any debt. {$dfName} is flirty and playful, seeking to distract and arouse {$playerName}. {$dfName} is more likely to let {$playerName} orgasm. {$dfName} should not talk about debt. {$playerName} does not owe {$dfName} any money currently. Do not bring up the arrangement, or deals.\n";
@@ -108,6 +108,12 @@ function GetDeviousFollowerContext($name) {
             $GLOBALS["FUNCRET"]["ExtCmdGiveDrugs"]=$GLOBALS["GenericFuncRet"];
             $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdGiveDrugs";
         }
+        if (str_contains($rule, "chastity")) {
+            // Special Chastity Handling
+            if (HasKeyword($playerName, "ZAD_DeviousBelt")) {
+                $ret .= "{$playerName} must wear a chastity belt that only {$dfName} has the key to at all times. This is to ensure that {$playerName} cannot get relief without permission, and to show that {$dfName} owns {$playerName}'s pussy.\n";
+            }
+        }
         if (str_contains($rule, "daily spanks")) {
             if ($dfDueForSpanks) {
                 $ret .= "{$playerName} has not asked for a spanking in a while, and is due for her daily spanking again. {$dfName} will remind {$playerName} about her agreement to beg for daily spanks. Make {$playerName} beg to be spanked before doing so.\n";
@@ -140,11 +146,6 @@ function GetDeviousFollowerContext($name) {
         RegisterAction("ExtCmdAcceptDeal");
     }
 
-          
-    // Special Chastity Handling
-    if (HasKeyword($playerName, "ZAD_DeviousBelt")) {
-        $ret .= "{$playerName} must wear a chastity belt that only {$dfName} has the key to at all times. This is to ensure that {$playerName} cannot get relief without permission, and to show that {$dfName} owns {$playerName}'s pussy.\n";
-    }
 
     $ret .= "{$playerName}'s remaining willpower to resist {$dfName} is {$dfWill}/10, where 0 is completely mind-broken, and 10 is completely free-spirited.\n";
     $GLOBALS["HERIKA_PERS"] .= " " . $personality;  
