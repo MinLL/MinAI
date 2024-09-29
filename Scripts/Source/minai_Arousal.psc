@@ -497,7 +497,6 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   EndIf
 EndEvent
 
-
 Function SetContext(actor akTarget)
   if !aiff
     return
@@ -529,8 +528,80 @@ Function SetContext(actor akTarget)
     actorRace = StringUtil.Substring(actorRace, 0, cotrIndex)
   EndIf
   aiff.SetActorVariable(akTarget, "race", actorRace)
+
+  string wornEquipments = GetWornEquipments(akTarget)
+  aiff.SetActorVariable(akTarget, "AllWornEquipment", wornEquipments)
 EndFunction
 
+string Function GetWornEquipments(Actor target)
+  ; Encoding format: base form id:esp:slotMasks:keywords:name
+  string wornEquipments = "v1:"
+  int index
+  int slotsChecked
+  slotsChecked += 0x00100000
+  slotsChecked += 0x00200000
+  slotsChecked += 0x80000000
+
+  int currentSlot = 0x01
+  while (currentSlot < 0x80000000)
+    if (Math.LogicalAnd(slotsChecked, currentSlot) != currentSlot) ;only check slots we haven't found anything equipped on already
+      Armor wornArmor = target.GetWornForm(currentSlot) as Armor
+      if (wornArmor)
+        int slotMask = wornArmor.GetSlotMask()
+        string wornArmorName = wornArmor.GetName()
+        ; ensure no pipe in the name
+        wornArmorName = Main.ReplaceString(wornArmorName, ":", "")
+        ; Need both ID and mod name to ensure uniqueness
+        string baseFormIdHex = PO3_SKSEFunctions.IntToString(Math.LogicalAnd(wornArmor.GetFormID(), 0x00FFFFFF), true)
+        string modName = PO3_SKSEFunctions.GetFormModName(wornArmor, false)
+        wornEquipments += baseFormIdHex + ":" + modName + ":" + PO3_SKSEFunctions.IntToString(slotMask, true) + ":" + GetKeywordsForEquipments(wornArmor) + ":" + wornArmorName  + ":"
+        slotsChecked += slotMask
+      else ;no armor was found on this slot
+        slotsChecked += currentSlot
+      endif
+    endif
+    currentSlot *= 2 ;double the number to move on to the next slot
+  endWhile
+  Main.Info("GetWornEquipments: " + wornEquipments)
+  return wornEquipments
+EndFunction
+
+string Function GetEquipmentKeywordWithComma(Armor equipment, string keywordStr, Keyword theKeyword)
+  if equipment.HasKeyword(theKeyword)
+    return keywordStr + ","
+  EndIf
+  return ""
+EndFunction
+
+string Function GetKeywordsForEquipments(Armor theArmor)
+  string ret = ""
+  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_HalfNakedBikini", SLA_HalfNakedBikini)
+  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_ArmorHalfNaked", SLA_ArmorHalfNaked)
+  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_Brabikini", SLA_Brabikini)
+  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_ThongT", SLA_ThongT)
+  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_ThongLowLeg", SLA_ThongLowLeg)
+  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_ThongCString", SLA_ThongCString)
+  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_ThongGstring", SLA_ThongGstring)
+  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_PantiesNormal", SLA_PantiesNormal)
+  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_KillerHeels", SLA_KillerHeels)
+  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_BootsHeels", SLA_BootsHeels)
+  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_PantsNormal", SLA_PantsNormal)
+  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_MicroHotPants", SLA_MicroHotPants)
+  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_ArmorHarness", SLA_ArmorHarness)
+  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_ArmorSpendex", SLA_ArmorSpendex)
+  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_ArmorTransparent", SLA_ArmorTransparent)
+  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_ArmorLewdLeotard", SLA_ArmorLewdLeotard)
+  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_PelvicCurtain", SLA_PelvicCurtain)
+  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_FullSkirt", SLA_FullSkirt)
+  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_MiniSkirt", SLA_MiniSkirt)
+  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_MicroSkirt", SLA_MicroSkirt)
+  ret += GetEquipmentKeywordWithComma(theArmor, "EroticArmor", EroticArmor)
+  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_PiercingVulva", SLA_PiercingVulva)
+  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_PiercingBelly", SLA_PiercingBelly)
+  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_PiercingNipple", SLA_PiercingNipple)
+  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_PiercingClit", SLA_PiercingClit)
+  return ret
+EndFunction
 
 string Function GetKeywordsForActor(actor akTarget)
   string ret = ""

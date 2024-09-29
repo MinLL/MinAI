@@ -31,7 +31,6 @@ Int Function GetVersion()
   return 14
 EndFunction
 
-
 Function Maintenance()
   playerRef = game.GetPlayer()
   config = Game.GetFormFromFile(0x0912, "MinAI.esp") as minai_Config
@@ -176,6 +175,21 @@ int function CountMatch(string sayLine, string lineToMatch)
   return count
 EndFunction
 
+string Function ReplaceString(string source, string stringToReplace, string replacement)
+  string ret = ""
+  string[] tokenized = StringUtil.Split(source, stringToReplace)
+  int len = tokenized.Length
+  int i = 0
+  while (i < len)
+    if i == 0
+      ret = tokenized[i]
+    else
+      ret = ret + replacement + tokenized[i]
+    EndIf
+    i += 1
+  endWhile
+  return ret
+EndFunction
 
 Function Log(String str, string lvl)
   Debug.Trace("[minai (" + lvl + ")]: " + str)
