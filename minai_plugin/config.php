@@ -15,4 +15,6 @@ $GLOBALS["always_enable_functions"] = true;
 $GLOBALS["PROMPT_HEAD_OVERRIDE"] = "";
 // Force the configured name in AI-FF to match the in-game name
 $GLOBALS["force_aiff_name_to_ingame_name"] = true;
+// List of commands to disable.
+$GLOBALS["commands_to_purge"] = array("TakeASeat");
 ?>
