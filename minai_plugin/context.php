@@ -271,6 +271,19 @@ Function GetDDContext($name) {
 if (!$GLOBALS["disable_nsfw"]) {
     $GLOBALS["COMMAND_PROMPT"].= BuildContext($GLOBALS["PLAYER_NAME"]);
     $GLOBALS["COMMAND_PROMPT"].= BuildContext($GLOBALS["HERIKA_NAME"]);
+    $nearbyActors = GetActorValue("PLAYER", "nearbyActors", true);
+    // This does work, I just need to figure out how to get a bit of the bio + relevant context to insert into the full context for this to work properly. TODO
+    /*if ($nearbyActors) {
+        $nearbyActors = explode(',', $nearbyActors);
+        
+        foreach ($nearbyActors as $actor) {
+            if ($actor != $GLOBALS["HERIKA_NAME"] && $actor != $GLOBALS["PLAYER_NAME"]) {
+                $profile = md5($GLOBALS["HERIKA_NAME"]);
+
+                $GLOBALS["COMMAND_PROMPT"] .= BuildContext($actor);
+            }
+        }
+        }*/
     $GLOBALS["COMMAND_PROMPT"].="
 
 ";

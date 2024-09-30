@@ -9,7 +9,7 @@ function CanVibrate($name) {
 
 // Return the specified actor value.
 // Caches the results of several queries that are repeatedly referenced.
-Function GetActorValue($name, $key) {
+Function GetActorValue($name, $key, $preserveCase=false) {
     $name = addslashes($name);
     $key = addslashes($key);
     global $allKeywords;
@@ -22,7 +22,12 @@ Function GetActorValue($name, $key) {
         return $allFactions;
     }
     // return strtolower("JobInnkeeper,Whiterun,,,,Bannered Mare Services,,Whiterun Bannered Mare Faction,,SLA TimeRate,sla_Arousal,sla_Exposure,slapp_HaveSeenBody,slapp_IsAnimatingWKidFaction,");
-    $ret = $GLOBALS["db"]->fetchAll("select * from conf_opts where LOWER(id)=LOWER('_minai_{$name}//{$key}')");
+    $query = "select * from conf_opts where LOWER(id)=LOWER('_minai_{$name}//{$key}')";
+    if ($preserveCase) {
+        $tmp = strtolower($name);
+        $query = "select * from conf_opts where LOWER(id)='_minai_{$tmp}//{$key}'";
+    }
+    $ret = $GLOBALS["db"]->fetchAll($query);
     if (!$ret) {
         return "";
     }

@@ -37,10 +37,11 @@ EndEvent
 require_once("config.php");
 require_once("util.php");
 
+
 if (ShouldClearFollowerFunctions()) {
     $GLOBALS["ENABLED_FUNCTIONS"] = array();
     // Enable baseline set of functions
-    $GLOBALS["ENABLED_FUNCTIONS"][] = 'Inspect';
+    // $GLOBALS["ENABLED_FUNCTIONS"][] = 'Inspect';
     $GLOBALS["ENABLED_FUNCTIONS"][] = 'LookAt';
     $GLOBALS["ENABLED_FUNCTIONS"][] = 'InspectSurroundings';
     $GLOBALS["ENABLED_FUNCTIONS"][] = 'TakeASeat';
@@ -84,5 +85,17 @@ if (!$GLOBALS["disable_nsfw"]) {
         $GLOBALS["FUNCTIONS_ARE_ENABLED"]=true;
     }
 }
+
+
+$commandToPurge=[];
+foreach ($GLOBALS["ENABLED_FUNCTIONS"] as $n=>$func) {
+    if (in_array($func, $GLOBALS["commands_to_purge"])) {
+        $commandsToPurge[] = $n;
+    }
+}
+foreach ($commandsToPurge as $n) {
+    unset($GLOBALS["ENABLED_FUNCTIONS"][$n]);
+}
+
 
 ?>
