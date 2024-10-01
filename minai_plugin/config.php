@@ -17,4 +17,6 @@ $GLOBALS["PROMPT_HEAD_OVERRIDE"] = "";
 $GLOBALS["force_aiff_name_to_ingame_name"] = true;
 // List of commands to disable.
 $GLOBALS["commands_to_purge"] = array("TakeASeat");
+// Set this to force the xtts server to be the same for all profiles
+$GLOBALS["xtts_server_override"] = "";
 ?>
