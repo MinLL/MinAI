@@ -314,6 +314,10 @@ if ($GLOBALS["stop_narrator_context_leak"] && $GLOBALS["HERIKA_NAME"] != "The Na
     }
 }
 
+if ($GLOBALS["xtts_server_override"]) {
+    $GLOBALS["TTS"]["XTTSFASTAPI"]["endpoint"] = $GLOBALS["xtts_server_override"];
+}
+
 require_once("deviousnarrator.php");
 if (ShouldUseDeviousNarrator()) {
     SetDeviousNarrator();
