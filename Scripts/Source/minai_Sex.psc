@@ -206,8 +206,8 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
     if ActiveOstimThreadID < 0
       ; akSpeaker is not in an OStim thread
       if ostimActors.Length == 1
-        OThread.Quickstart(akSpeaker)
-      else
+        OThread.QuickStart(OActorUtil.ToArray(akSpeaker))
+      elseif ostimActors.Length > 1
         ActiveOstimThreadID = OActor.GetSceneID(ostimActors[1])
         if ActiveOstimThreadID < 0
           ; Target 1 is not in an OStim thread
