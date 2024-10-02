@@ -265,6 +265,14 @@ Function GetDDContext($name) {
   if (HasKeyword($name, "zad_DeviousClamps")) {
     $ret .= "{$name} is wearing a set of painful nipple clamps.\n";
   }
+  if (CanVibrate($name)) {
+      if (IsInFaction($name, "Vibrator Effect Faction")) {
+          $ret .= "{$name}'s vibrator is currently on, and is actively stimulating her.\n";
+      }
+      else {
+          $ret .= "{$name}'s vibrator is currently off.\n";
+      }
+  }
   return $ret;
 }
 
@@ -302,6 +310,20 @@ foreach ($locaLastElement as $n) {
     unset($GLOBALS["contextDataFull"][$n]); 
 }
 
+
+// Handle speech from non-player actors
+if ($gameRequest[0]=="chatnf_npc" || $gameRequest[0]=="chat_npc") {
+    foreach ($GLOBALS["contextDataFull"] as $n=>$ctxLine) {
+        if (strpos($ctxLine["content"],"#NPCTALK")!==false) {
+            $matches = array();
+            preg_match(".+?#NPCTALK\(([a-zA-Z0-9]+), ([a-zA-Z0-9]+)\): (.+?)\(", $matches);
+            $replacement = "{$matches[0]}: {$matches[2]} (Talking to {$matches[1]})";
+            $GLOBALS["contextDataFull"][$n] = $replacement;
+        }
+    }
+}
+
+
 if ($GLOBALS["stop_narrator_context_leak"] && $GLOBALS["HERIKA_NAME"] != "The Narrator") {
     $narratorElements=[];
     foreach ($GLOBALS["contextDataFull"] as $n=>$ctxLine) {
@@ -317,6 +339,7 @@ if ($GLOBALS["stop_narrator_context_leak"] && $GLOBALS["HERIKA_NAME"] != "The Na
 if ($GLOBALS["xtts_server_override"]) {
     $GLOBALS["TTS"]["XTTSFASTAPI"]["endpoint"] = $GLOBALS["xtts_server_override"];
 }
+
 
 require_once("deviousnarrator.php");
 if (ShouldUseDeviousNarrator()) {
