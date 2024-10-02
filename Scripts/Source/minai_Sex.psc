@@ -339,30 +339,6 @@ EndFunction
 
 
 
-Function StartGroupSex(actor akSpeaker, actor akTarget, actor Player, bool bPlayerInScene, Actor[] actorsFromFormList, string tags="")
-  if bHasOstim && minai_UseOStim.GetValue() == 1.0
-    Main.Debug("OStim Orgy: Processing for akSpeaker: " + akSpeaker + "at akTarget: " + akTarget)
-    Main.Debug("OStim Orgy: actorsFromFormList: " + actorsFromFormList)
-    Actor[] ostimActors = new Actor[10]
-    if bPlayerInScene
-      ostimActors = OActorUtil.ToArray(Player, actorsFromFormList[0],actorsFromFormList[1],actorsFromFormList[2],actorsFromFormList[3],actorsFromFormList[4],actorsFromFormList[5],actorsFromFormList[6],actorsFromFormList[7],actorsFromFormList[8])
-    else
-      ostimActors = OActorUtil.ToArray(actorsFromFormList[0],actorsFromFormList[1],actorsFromFormList[2],actorsFromFormList[3],actorsFromFormList[4],actorsFromFormList[5],actorsFromFormList[6],actorsFromFormList[7],actorsFromFormList[8],actorsFromFormList[9])
-    EndIf
-    if OActor.VerifyActors(ostimActors)
-      Main.Debug("OStim Orgy: ostimActors pre-sort: " + ostimActors)
-      ostimActors = OActorUtil.Sort(ostimActors, OActorUtil.EmptyArray()) ; 2nd param is list of Dominant Actors
-      Main.Debug("OStim Orgy: ostimActors sorted: " + ostimActors)
-      int ActiveOstimThreadID
-      ActiveOstimThreadID = OThread.QuickStart(ostimActors, tags)
-    EndIf
-  elseif CanAnimate(akTarget, akSpeaker)
-    StartSexlabScene(bPlayerInScene, actorsFromFormList, tags)
-  EndIf
-EndFunction
-
-
-
 Function StopSex(actor akSpeaker)
   if OActor.IsInOStim(akSpeaker)
     int ActiveOstimThreadID = OActor.GetSceneID(akSpeaker)
@@ -464,7 +440,6 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
   ; Mutually Exclusive keywords
   if stringutil.Find(sayLine, "-masturbate-") != -1
     Start1pSex(akSpeaker)
-    
   elseif stringutil.Find(sayLine, "-startsex-") != -1 || stringUtil.Find(sayLine, "-sex-") != -1 || stringUtil.Find(sayLine, "-fuck-") != -1
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "vaginal")
   elseif stringutil.Find(sayLine, "-vaginalsex-") != -1
@@ -519,9 +494,8 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "hugging")
   elseif stringutil.Find(sayLine, "-frenchkissing-") != -1 || stringutil.Find(sayLine, "-frenchkiss-") != -1 || stringutil.Find(sayLine, "-french kissing-") != -1 || stringutil.Find(sayLine, "-french kiss-") != -1
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "kissing")
-    
   elseIf stringutil.Find(sayLine, "-groupsex-") != -1 || stringUtil.Find(sayLine, "-orgy-") != -1 || stringUtil.Find(sayLine, "-threesome-") != -1
-    StartGroupSex(akSpeaker, akTarget, Player, bPlayerInScene, actorsFromFormList)
+    StartSexOrSwitchToGroup(actorsFromFormList, akSpeaker)
   elseif stringutil.Find(sayLine, "-endsex-") != -1 || stringutil.Find(sayLine, "-end sex-") != -1 || stringutil.Find(sayLine, "-stopsex-") != -1 || stringutil.Find(sayLine, "-stop sex-") != -1 || stringutil.Find(sayLine, "-red-") != -1
     StopSex(akSpeaker)
   EndIf
@@ -578,7 +552,6 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "rimjob")
   elseif command == "ExtCmdStartFingering"
     StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "fingering")
-  
   elseif command == "ExtCmdStartMissionarySex"  
     StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "missionary")
   elseif command == "ExtCmdStartCowgirlSex"
