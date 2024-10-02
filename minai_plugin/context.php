@@ -178,14 +178,7 @@ Function GetClothingContext($name) {
   if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorRubber")) {
     $ret .= "{$name}'s outfit is made out of tight form-fitting rubber (Referred to as Ebonite).\n";
   }
-<<<<<<< HEAD
-  if (HasKeyword($name, "EroticArmor")) {
-=======
-  if (IsEnabled($name, "isNaked")) {
-    $ret .= "{$name} is naked and exposed.\n";
-  }
   if (HasKeywordAndNotSkip($name, $eqContext, "EroticArmor")) {
->>>>>>> efb3ddc ( * add all current wearing equipments to AI-FF)
       $ret .= "{$name} is wearing a sexy revealing outfit.\n";
   }
   if (HasKeywordAndNotSkip($name, $eqContext, "SLA_PiercingVulva")) {
