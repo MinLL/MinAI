@@ -489,7 +489,8 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "grindingpenis,buttjob")
   elseif stringutil.Find(sayLine, "-thighjob-") != -1
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "thighjob")
-   elseif stringutil.Find(sayLine, "-smooch-") != -1
+  ; experimental kiss animation for OStim
+  elseif stringutil.Find(sayLine, "-smooch-") != -1
     if bHasOstim && minai_UseOStim.GetValue() == 1.0
       OThread.Quickstart(OActorUtil.ToArray(akSpeaker, akTarget), "OARE_HoldingChinKiss")
     EndIf
