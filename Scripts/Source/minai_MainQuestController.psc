@@ -55,7 +55,7 @@ Function Maintenance()
   devious = (Self as Quest) as minai_DeviousStuff
   vr = Game.GetFormFromFile(0x090E, "MinAI.esp") as minai_VR
   followers = Game.GetFormFromFile(0x0913, "MinAI.esp") as minai_Followers
-  combat = Game.GetFormFromFile(0x090E, "MinAI.esp") as minai_CombatManager
+  combat = (Self as Quest) as minai_CombatManager
 
   if (!followers)
     Fatal("Could not load followers script - Mismatched script and esp versions")
@@ -132,6 +132,27 @@ Function RequestLLMResponse(string eventLine, string eventType, string name)
     RegisterEvent(eventLine, eventType)
    EndIf
 EndFunction
+
+
+
+Function RequestLLMResponseNPC(string speaker, string eventLine, string target)
+  if bHasAIFF
+    float currentTime = Utility.GetCurrentRealTime()
+    string lineToSend = "#NPCTALK(" + speaker + ", " + target + "): " + eventLine
+    if currentTime - lastRequestTime > config.requestResponseCooldown
+      lastRequestTime = currentTime
+      Info("Requesting response from LLM: " + eventLine)
+      AIAgentFunctions.requestMessageForActor(eventLine, "chatnf_npc", target)
+    Else
+      RegisterEvent(lineToSend, "chat_npc")
+    EndIf
+  elseif bHasMantella
+    RegisterEvent(eventLine, "chat_npc")
+   EndIf
+EndFunction
+
+
+
 
 string Function GetActorName(actor akActor)
   return akActor.GetActorBase().GetName()

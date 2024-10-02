@@ -245,9 +245,7 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
         Return
       EndIf
     EndIf
-    
   else
-  
     ; Sexlab
     Actor[] actorsInScene
     int i = 0
@@ -257,14 +255,11 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
     sslThreadController Controller
     Controller = slf.ThreadSlots.GetController(threadID)
     if (!Controller)
-    isNewScene = true
+      isNewScene = true
       actorsInScene = actors
     else
       actorsInScene = Controller.Positions
     EndIf
-  
-
-    Actor[] newActors = new actor[5]
     while i < actorsInScene.Length
       if actorsInScene[i] == akSpeaker && !isNewScene
         bSpeakerInScene = True
@@ -280,7 +275,6 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
       if !CanAnimate(actorsInScene[i], actorsInScene[i])
         bCanAnimate = False
       EndIf
-      newActors[i] = actorsInScene[i]
       i += 1
     EndWhile
 
@@ -289,41 +283,47 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
       return
     EndIf
     lastTag = tags
-    if !bSpeakerInScene ; Speaker not in scene, add them to it
-      Main.Info("Sex: Speaker was not in scene, adding them to it.")
-      newActors = SexLabUtil.MakeActorArray(akSpeaker, newActors[0], newActors[1], newActors[2], newActors[3])
-      newActors = slf.SortActors(newActors)
-      Controller.ChangeActors(newActors)
-      Utility.Wait(1)
-      if akSpeaker.GetActorBase().GetSex() == 0
-        numMales += 1
-      else
-        numFemales += 1
-      endIf
-    EndIf
-    ; If this isn't set, it means that a new actor is joining from the orgy command.
-    ; Prefer to reuse the existing tag for the added actor
-    if tags == ""
-      tags == lastTag
-    EndIf
-    sslBaseAnimation[] animations = FindSexlabAnimations(newActors, numMales, numFemales, tags)
-    Controller.SetAnimations(animations)
-    if actors.Length == 1
-      main.RegisterEvent(actors[0].GetActorBase().GetName() + " changed up their masturbation to " + tags + " instead.", "info_sexscene")
-    elseif actors.Length == 2
-      main.RegisterEvent(actors[0].GetActorBase().GetName() + " and " + actors[1].GetActorBase().GetName() + " changed up their sex to " + tags + " instead.", "info_sexscene")
-    elseif actors.Length > 2
-      string sexStr = ""
-      i = 0
-      while i < actors.Length
-        sexStr += actors[i]
-        if i != actors.Length - 1
-           sexStr += " and "
-        EndIf
-        i += 1
-      EndWhile
-      sexStr += " changed up their sex to " + tags + " instead."
-      Main.RegisterEvent(sexStr, "info_sexscene")
+    if isNewScene
+      StartSexScene(actors, bPlayerInScene, tags)
+    else
+      if !bSpeakerInScene ; Speaker not in scene, add them to it
+        Main.Info("Sex: Speaker was not in scene, adding them to it.")
+        actorsInScene = SexLabUtil.MakeActorArray(akSpeaker, actorsInScene[0], actorsInScene[1], actorsInScene[2], actorsInScene[3])
+        actorsInScene = slf.SortActors(actorsInScene)
+        Controller.ChangeActors(actorsInScene)
+	Controller.SetAnimations(animations)
+        Utility.Wait(1)
+        if akSpeaker.GetActorBase().GetSex() == 0
+          numMales += 1
+        else
+          numFemales += 1
+        endIf
+      EndIf
+      ; If this isn't set, it means that a new actor is joining from the orgy command.
+      ; Prefer to reuse the existing tag for the added actor
+      if tags == ""
+        tags == lastTag
+      EndIf
+      sslBaseAnimation[] animations = FindSexlabAnimations(actorsInScene, numMales, numFemales, tags)
+      Controller.SetForcedAnimations(animations)
+      Controller.SetAnimation()
+      if actors.Length == 1
+        main.RegisterEvent(actors[0].GetActorBase().GetName() + " changed up their masturbation to " + tags + " instead.", "info_sexscene")
+      elseif actors.Length == 2
+        main.RegisterEvent(actors[0].GetActorBase().GetName() + " and " + actors[1].GetActorBase().GetName() + " changed up their sex to " + tags + " instead.", "info_sexscene")
+      elseif actors.Length > 2
+        string sexStr = ""
+        i = 0
+        while i < actors.Length
+          sexStr += actors[i]
+          if i != actors.Length - 1
+             sexStr += " and "
+          EndIf
+          i += 1
+        EndWhile
+        sexStr += " changed up their sex to " + tags + " instead."
+        Main.RegisterEvent(sexStr, "info_sexscene")
+      EndIf
     EndIf
   EndIf
 EndFunction
@@ -713,8 +713,11 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
 
   elseif (eventName=="ostim_actor_orgasm")    
     Actor OrgasmedActor = Sender as Actor
+    string sceneName=OThread.GetScene(ostimTid);
+    bool isRunning=OThread.IsRunning(ostimTid);
+    Actor[] actors =  OThread.GetActors(ostimTid);
     main.RegisterEvent(OrgasmedActor.GetActorBase().GetName() + " had an Orgasm")
-    DirtyTalk(OrgasmedActor.GetActorBase().GetName(), "ohh... yes.", GetActorNameForSex(playerRef))
+    DirtyTalk(actors, "ohh... yes.")
     Main.Info("Ostim Actor orgasm")
 
   elseif (eventName=="ostim_thread_end")    
@@ -845,11 +848,6 @@ Event OnStageStart(int tid, bool HasPlayer)
     description2="";
   EndIf
 
-  ; Select an actor that's not the player, and have them talk.
-  actor otherActor = sortedActorList[0]
-  if otherActor == playerRef && sortedActorList.Length > 1
-    otherActor = sortedActorList[1]
-  EndIf
 
   string[] Tags = controller.Animation.GetRawTags()
   ; Send event, AI can be aware SEX is happening here
@@ -861,37 +859,64 @@ Event OnStageStart(int tid, bool HasPlayer)
 
   ; main.RegisterEvent(controller.Animation.FetchStage(controller.Stage)[0]+"@"+sceneTags,"info_sexscenelog")
 
-  aiff.setAnimationBusy(1, otherActor.GetActorBase().GetName())
-  if (!slf.isMouthOpen(otherActor) && otherActor != playerRef)
-    if (controller.Stage < (controller.Animation.StageCount()))
-      if bHasAIFF && AiAgentFunctions.isGameVR() 
-       ; VR users will have dirty talk through physics integration instead
-       ; Reenabled this temporarily while figuring out female player character collisions during sex.
-       ; Works much better for male atm, need to add different colliders
-        DirtyTalk(GetActorNameForSex(playerRef), "ohh... yes.", GetActorNameForSex(otherActor))
-      else
-        DirtyTalk(GetActorNameForSex(playerRef), "ohh... yes.", GetActorNameForSex(otherActor))
-      EndIf
+  i = 0
+  while i < sortedActorList.Length
+    if sortedActorList[i] != PlayerRef
+      aiff.setAnimationBusy(1, sortedActorList[i].GetActorBase().GetName())
     EndIf
-  else
-    main.RegisterEvent(GetActorNameForSex(otherActor)+ " is now using mouth with "+sortedActorList[1].GetActorBase().GetName(),"info_sexscene")
+    i += 1
+  EndWhile
+  
+  if (controller.Stage < (controller.Animation.StageCount()))
+    if bHasAIFF && AiAgentFunctions.isGameVR() 
+     ; VR users will have dirty talk through physics integration instead
+     ; Reenabled this temporarily while figuring out female player character collisions during sex.
+     ; Works much better for male atm, need to add different colliders
+      DirtyTalk(sortedActorList, "ohh... yes.")
+    else
+      DirtyTalk(sortedActorList, "ohh... yes.")
+    EndIf
   EndIf
 EndEvent
 
 
 
-Function DirtyTalk(string name, string lineToSay, string sayTo)
+Function DirtyTalk(actor[] actors, string lineToSay)
   if !bHasAIFF
     return
   EndIf
+  ; Select an actor that's not the player, and have them talk.
+  string speaker = ""
+  string sayTo = ""
+  if actors.Length == 1
+    speaker = GetActorNameForSex(actors[0])
+    sayTo = "everyone"
+  elseIf actors.Length == 2
+    actor otherActor
+    if actors[0] == playerRef
+      speaker = GetActorNameForSex(playerRef)
+      sayTo = GetActorNameForSex(actors[1])
+    elseif actors[1] == playerRef
+      speaker = GetActorNameForSex(playerRef)
+      sayTo = GetActorNameForSex(actors[0])
+    else
+      speaker = GetActorNameForSex(actors[0])
+      sayTo = GetActorNameForSex(actors[0])
+    EndIf
+  elseIf actors.Find(playerRef) >= 0
+    speaker = GetActorNameForSex(playerRef)
+    sayTo = "everyone"
+  else
+    speaker = GetActorNameForSex(actors[0])
+    sayTo = "everyone"
+  EndIf
+
   ; Throttle on how often we should dirty talk incase people are switching animations
   float currentTime = Utility.GetCurrentRealTime()
   if currentTime - lastDirtyTalk > 5
     lastDirtyTalk = currentTime
-    ; lineToSay = name + ": " + lineToSay ; Does not seem to be working correctly
-    
-    Main.Debug("DirtyTalk() => " + sayTo + ": " + lineToSay)
-    Main.RequestLLMResponse(lineToSay, "chatnf_sex_1", sayTo)
+    Main.Debug("DirtyTalk() => " + speaker + ": " + lineToSay + " => " + sayTo)
+    Main.RequestLLMResponseNPC(speaker, lineToSay, sayTo)
   else
     Main.Debug("DirtyTalk - THROTTLED")
   EndIf
@@ -919,17 +944,17 @@ Event PostSexScene(int tid, bool HasPlayer)
   
   Actor[] sortedActorList = slf.SortActors(actorList,true)
   ; Select an actor that's not the player, and have them talk.
+  
   actor otherActor = sortedActorList[0]
   if otherActor == playerRef && sortedActorList.Length > 1
     otherActor = sortedActorList[1]
   EndIf
   
   main.RegisterEvent(GetActorNameForSex(otherActor) + ": Oh yeah! I'm having an orgasm!")
-  if (!slf.isMouthOpen(playerRef))
-    DirtyTalk(GetActorNameForSex(playerRef), "I'm cumming!", GetActorNameForSex(otherActor))
-  EndIf
+  DirtyTalk(sortedActorList, "I'm cumming!")
   lastTag = ""
 EndEvent
+
 
 
 
@@ -952,7 +977,7 @@ Event EndSexScene(int tid, bool HasPlayer)
 
     main.RegisterEvent(sortedActorList[0].GetActorBase().GetName()+ " and "+sortedActorList[1].GetActorBase().GetName()+ " ended the intimate moment","info_sexscene")
     if bHasAIFF
-      DirtyTalk(GetActorNameForSex(playerRef), "What did you think of the sex?", GetActorNameForSex(otherActor))
+      DirtyTalk(sortedActorList, "What did you think of the sex?")
       AIFF.SetAnimationBusy(0, otherActor.GetActorBase().GetName())
     EndIf
     SetSexSceneState("off")
