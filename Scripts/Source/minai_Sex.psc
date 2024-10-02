@@ -205,42 +205,46 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
     int ActiveOstimThreadID = OActor.GetSceneID(akSpeaker)
     if ActiveOstimThreadID < 0
       ; akSpeaker is not in an OStim thread
-      ActiveOstimThreadID = OActor.GetSceneID(ostimActors[1])
-      if ActiveOstimThreadID < 0
-        ; Target 1 is not in an OStim thread
-        if OActor.VerifyActors(ostimActors)
-        StartSexScene(ostimActors, bPlayerInScene, tags)
+      if ostimActors.Length == 1
+        OThread.Quickstart(akSpeaker)
+      else
+        ActiveOstimThreadID = OActor.GetSceneID(ostimActors[1])
+        if ActiveOstimThreadID < 0
+          ; Target 1 is not in an OStim thread
+          if OActor.VerifyActors(ostimActors)
+          StartSexScene(ostimActors, bPlayerInScene, tags)
+          EndIf
+        else
+          ; Target 1 is already in an OStim thread
+          ostimActors = OThread.GetActors(ActiveOstimThreadID)
+          ; add akSpeaker to OStim actor array
+          ostimActors = OActorUtil.ToArray(akSpeaker, ostimActors[0],ostimActors[1],ostimActors[2],ostimActors[3])
+          OThread.Stop(ActiveOstimThreadID)
+          Utility.Wait(2)
+          StartSexScene(ostimActors, bPlayerInScene, tags)
         EndIf
       else
-        ; Target 1 is already in an OStim thread
+        ; akSpeaker is already in an OStim thread
         ostimActors = OThread.GetActors(ActiveOstimThreadID)
-        ; add akSpeaker to OStim actor array
-        ostimActors = OActorUtil.ToArray(akSpeaker, ostimActors[0],ostimActors[1],ostimActors[2],ostimActors[3])
-        OThread.Stop(ActiveOstimThreadID)
-        Utility.Wait(2)
-        StartSexScene(ostimActors, bPlayerInScene, tags)
-      EndIf
-    else
-      ; akSpeaker is already in an OStim thread
-      ostimActors = OThread.GetActors(ActiveOstimThreadID)
-      Main.Debug("Searching for random " + tags + " scene.")
-      string newScene = OLibrary.GetRandomSceneWithAnyActionCSV(ostimActors, tags)
-      Utility.Wait(0.5)
-      if newScene == ""
-        newScene = OLibrary.GetRandomSceneWithAnySceneTagCSV(ostimActors, tags)
-        Utility.Wait(1)
-      EndIf
-      Main.Debug("Ostim scene transition to: " + newScene + " for OStim Thread [" + ActiveOstimThreadID + "].")
-      if OThread.IsRunning(ActiveOstimThreadID)
-        OThread.NavigateTo(ActiveOstimThreadID, newScene)
-        if OThread.IsInAutoMode(ActiveOstimThreadID)
-          OThread.StopAutoMode(ActiveOstimThreadID)
-          Utility.Wait(5)
-          OThread.StartAutoMode(ActiveOstimThreadID)
+        Main.Debug("Searching for random " + tags + " scene.")
+        string newScene = OLibrary.GetRandomSceneWithAnyActionCSV(ostimActors, tags)
+        Utility.Wait(0.5)
+        if newScene == ""
+          newScene = OLibrary.GetRandomSceneWithAnySceneTagCSV(ostimActors, tags)
+          Utility.Wait(1)
         EndIf
+        Main.Debug("Ostim scene transition to: " + newScene + " for OStim Thread [" + ActiveOstimThreadID + "].")
+        if OThread.IsRunning(ActiveOstimThreadID)
+          OThread.NavigateTo(ActiveOstimThreadID, newScene)
+          if OThread.IsInAutoMode(ActiveOstimThreadID)
+            OThread.StopAutoMode(ActiveOstimThreadID)
+            Utility.Wait(5)
+            OThread.StartAutoMode(ActiveOstimThreadID)
+          EndIf
+        EndIf
+        main.RegisterEvent(akSpeaker.GetActorBase().GetName() + " attempted to change the OStim scene to " + tags + " instead: " + newScene, "info_sexscene")
+        Return
       EndIf
-      main.RegisterEvent(akSpeaker.GetActorBase().GetName() + " attempted to change the OStim scene to " + tags + " instead: " + newScene, "info_sexscene")
-      Return
     EndIf
     
   else
