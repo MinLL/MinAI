@@ -133,8 +133,6 @@ function GetAllEquipmentContext($actorName)
     EnrichEquipmentDataFromDb($parsedResult);
     return BuildEquipmentContext($parsedResult);
   } catch (Exception $e) {
-    error_log($e->getMessage());
-    error_log($e->getTraceAsString());
     return [
       'context' => "",
       'skipKeywords' => []
