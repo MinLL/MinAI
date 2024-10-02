@@ -197,53 +197,58 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
   bool bCanAnimate = True
   bool isNewScene = False
   if bHasOstim && minai_UseOStim.GetValue() == 1.0
+    Main.Debug("OStim detected - processing scene request")
     ; Ostim
-    Actor[] ostimActors = new actor[5]
-    ostimActors = actors
+    Actor[] ostimActors = actors
     tags = ConvertTagsOstim(tags)
     int ActiveOstimThreadID = OActor.GetSceneID(akSpeaker)
     if ActiveOstimThreadID < 0
+    Main.Debug("OStim detects akSpeaker is not in thread: " + ActiveOstimThreadID)
       ; akSpeaker is not in an OStim thread
       if ostimActors.Length == 1
         OThread.QuickStart(OActorUtil.ToArray(akSpeaker))
       elseif ostimActors.Length > 1
         ActiveOstimThreadID = OActor.GetSceneID(ostimActors[1])
         if ActiveOstimThreadID < 0
+          Main.Debug("OStim detects target 1 is not in thread: " + ActiveOstimThreadID)
           ; Target 1 is not in an OStim thread
           if OActor.VerifyActors(ostimActors)
           StartSexScene(ostimActors, bPlayerInScene, tags)
           EndIf
         else
           ; Target 1 is already in an OStim thread
+          Main.Debug("OStim detects target 1 is already in thread: " + ActiveOstimThreadID)
           ostimActors = OThread.GetActors(ActiveOstimThreadID)
           ; add akSpeaker to OStim actor array
-          ostimActors = OActorUtil.ToArray(akSpeaker, ostimActors[0],ostimActors[1],ostimActors[2],ostimActors[3])
+          actors = PapyrusUtil.PushActor(actors,akSpeaker)
+          ostimActors = OActorUtil.Sort(ostimActors, OActorUtil.EmptyArray())
+          Main.Debug("OStim added akSpeaker to array and sorted: " + ostimActors)
           OThread.Stop(ActiveOstimThreadID)
           Utility.Wait(2)
           StartSexScene(ostimActors, bPlayerInScene, tags)
         EndIf
-      else
-        ; akSpeaker is already in an OStim thread
-        ostimActors = OThread.GetActors(ActiveOstimThreadID)
-        Main.Debug("Searching for random " + tags + " scene.")
-        string newScene = OLibrary.GetRandomSceneWithAnyActionCSV(ostimActors, tags)
-        Utility.Wait(0.5)
-        if newScene == ""
-          newScene = OLibrary.GetRandomSceneWithAnySceneTagCSV(ostimActors, tags)
-          Utility.Wait(1)
-        EndIf
-        Main.Debug("Ostim scene transition to: " + newScene + " for OStim Thread [" + ActiveOstimThreadID + "].")
-        if OThread.IsRunning(ActiveOstimThreadID)
-          OThread.NavigateTo(ActiveOstimThreadID, newScene)
-          if OThread.IsInAutoMode(ActiveOstimThreadID)
-            OThread.StopAutoMode(ActiveOstimThreadID)
-            Utility.Wait(5)
-            OThread.StartAutoMode(ActiveOstimThreadID)
-          EndIf
-        EndIf
-        main.RegisterEvent(akSpeaker.GetActorBase().GetName() + " attempted to change the OStim scene to " + tags + " instead: " + newScene, "info_sexscene")
-        Return
       EndIf
+    else
+      ; akSpeaker is already in an OStim thread
+      ostimActors = OThread.GetActors(ActiveOstimThreadID)
+      Main.Debug("Searching for random " + tags + " scene.")
+      string newScene = OLibrary.GetRandomSceneWithAnyActionCSV(ostimActors, tags)
+      Utility.Wait(0.5)
+      if newScene == ""
+        newScene = OLibrary.GetRandomSceneWithAnySceneTagCSV(ostimActors, tags)
+        Utility.Wait(1)
+      EndIf
+      Main.Debug("Ostim scene transition to: " + newScene + " for OStim Thread [" + ActiveOstimThreadID + "].")
+      if OThread.IsRunning(ActiveOstimThreadID)
+        OThread.NavigateTo(ActiveOstimThreadID, newScene)
+        if OThread.IsInAutoMode(ActiveOstimThreadID)
+          OThread.StopAutoMode(ActiveOstimThreadID)
+          Utility.Wait(5)
+          OThread.StartAutoMode(ActiveOstimThreadID)
+        EndIf
+      EndIf
+      main.RegisterEvent(akSpeaker.GetActorBase().GetName() + " attempted to change the OStim scene to " + tags + " instead: " + newScene, "info_sexscene")
+      Return
     EndIf
   else
     ; Sexlab
@@ -489,6 +494,11 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "grindingpenis,buttjob")
   elseif stringutil.Find(sayLine, "-thighjob-") != -1
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "thighjob")
+  ; experimental kiss animation for OStim
+  elseif stringutil.Find(sayLine, "-smooch-") != -1
+    if bHasOstim && minai_UseOStim.GetValue() == 1.0
+      OThread.Quickstart(OActorUtil.ToArray(akSpeaker, akTarget), "OARE_HoldingChinKiss")
+    EndIf
   ; Kissing/Cuddling experimental alternates - leads to sex
   elseif stringutil.Find(sayLine, "-cuddling-") != -1
     StartSexOrSwitchTo(akSpeaker, akTarget, Player, bPlayerInScene, "hugging")
@@ -573,10 +583,10 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   elseif command == "ExtCmdStartKissingSex"
     StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "kissing")
   elseIf command == "ExtCmdStartOrgy"
-    actor[] actors = new actor[5]
-    actors = aiff.GetNearbyAI()
+    actor[] actors = aiff.GetNearbyAI()
+
     if bHasOstim && minai_UseOStim.GetValue() == 1.0
-      actors = OActorUtil.ToArray(playerRef, actors[0], actors[1], actors[2], actors[3])
+      actors = PapyrusUtil.PushActor(actors,playerRef)
       actors = OActorUtil.Sort(actors, OActorUtil.EmptyArray()) ; 2nd param is array of dominant actors
     else
       actors = SexLabUtil.MakeActorArray(playerRef, actors[0], actors[1], actors[2], actors[3])
