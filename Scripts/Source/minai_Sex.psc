@@ -197,6 +197,7 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
   bool bCanAnimate = True
   bool isNewScene = False
   if bHasOstim && minai_UseOStim.GetValue() == 1.0
+    Main.Debug("OStim detected - processing scene request")
     ; Ostim
     Actor[] ostimActors = new actor[5]
     ostimActors = actors
@@ -217,10 +218,12 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
           EndIf
         else
           ; Target 1 is already in an OStim thread
+          Main.Debug("OStim detects target 1 is already in thread: " + ActiveOstimThreadID)
           ostimActors = OThread.GetActors(ActiveOstimThreadID)
           ; add akSpeaker to OStim actor array
           ostimActors = OActorUtil.ToArray(akSpeaker, ostimActors[0],ostimActors[1],ostimActors[2],ostimActors[3])
           ostimActors = OActorUtil.Sort(ostimActors, OActorUtil.EmptyArray())
+          Main.Debug("OStim added akSpeaker to array and sorted: " + ostimActors)
           OThread.Stop(ActiveOstimThreadID)
           Utility.Wait(2)
           StartSexScene(ostimActors, bPlayerInScene, tags)
