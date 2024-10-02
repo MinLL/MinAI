@@ -583,10 +583,10 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   elseif command == "ExtCmdStartKissingSex"
     StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "kissing")
   elseIf command == "ExtCmdStartOrgy"
-    actor[] actors = new actor[5]
-    actors = aiff.GetNearbyAI()
+    actor[] actors = aiff.GetNearbyAI()
+
     if bHasOstim && minai_UseOStim.GetValue() == 1.0
-      actors = OActorUtil.ToArray(playerRef, actors[0], actors[1], actors[2], actors[3])
+      actors = PapyrusUtil.PushActor(actors,playerRef)
       actors = OActorUtil.Sort(actors, OActorUtil.EmptyArray()) ; 2nd param is array of dominant actors
     else
       actors = SexLabUtil.MakeActorArray(playerRef, actors[0], actors[1], actors[2], actors[3])
