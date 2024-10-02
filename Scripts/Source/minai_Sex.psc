@@ -584,12 +584,10 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "kissing")
   elseIf command == "ExtCmdStartOrgy"
     actor[] actors = aiff.GetNearbyAI()
-
+    actors = PapyrusUtil.PushActor(actors,playerRef)
     if bHasOstim && minai_UseOStim.GetValue() == 1.0
-      actors = PapyrusUtil.PushActor(actors,playerRef)
       actors = OActorUtil.Sort(actors, OActorUtil.EmptyArray()) ; 2nd param is array of dominant actors
     else
-      actors = SexLabUtil.MakeActorArray(playerRef, actors[0], actors[1], actors[2], actors[3])
       actors = slf.SortActors(actors)
     EndIf
     StartSexOrSwitchToGroup(actors, akSpeaker, "")
@@ -911,7 +909,7 @@ Function DirtyTalk(actor[] actors, string lineToSay)
       sayTo = GetActorNameForSex(actors[0])
     else
       speaker = GetActorNameForSex(actors[0])
-      sayTo = GetActorNameForSex(actors[0])
+      sayTo = GetActorNameForSex(actors[1])
     EndIf
   elseIf actors.Find(playerRef) >= 0
     speaker = GetActorNameForSex(playerRef)
