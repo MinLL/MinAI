@@ -199,7 +199,7 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
   if bHasOstim && minai_UseOStim.GetValue() == 1.0
     Main.Debug("OStim detected - processing scene request")
     ; Ostim
-    Actor[] ostimActors = OActorUtil.ToArray(actors[0],actors[1],actors[2],actors[3],actors[4])
+    Actor[] ostimActors = actors
     tags = ConvertTagsOstim(tags)
     int ActiveOstimThreadID = OActor.GetSceneID(akSpeaker)
     if ActiveOstimThreadID < 0
