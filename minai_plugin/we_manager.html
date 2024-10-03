@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Equipment Description Management</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid black; padding: 8px; text-align: left; }
+        input[type="text"] { width: 100%; }
+        .editing { background-color: #dbf1b2; }
+    </style>
+</head>
+<body>
+    <h1>Equipment Description Management</h1>
+
+    <!-- Filter Form -->
+    <form id="filterForm">
+        <table>
+            <tr>
+                <td><input type="text" id="filterBaseFormId" placeholder="Filter by BaseFormID"></td>
+                <td><input type="text" id="filterModName" placeholder="Filter by ModName"></td>
+                <td><input type="text" id="filterName" placeholder="Filter by Name"></td>
+                <td><input type="text" id="filterDescription" placeholder="Filter by Description"></td>
+                <td><button type="submit">Filter</button></td>
+            </tr>
+        </table>
+    </form>
+
+    <!-- Add New Row Form -->
+    <form id="addForm">
+        <table>
+            <tr>
+                <td><input type="text" id="newBaseFormId" placeholder="BaseFormID" required></td>
+                <td><input type="text" id="newModName" placeholder="ModName" required></td>
+                <td><input type="text" id="newName" placeholder="Name"></td>
+                <td><input type="text" id="newDescription" placeholder="Description"></td>
+                <td><button type="submit">Add</button></td>
+            </tr>
+        </table>
+    </form>
+
+    <!-- Data Table -->
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th><a href="#" class="sort" data-sort="baseFormId">BaseFormID</a></th>
+                <th><a href="#" class="sort" data-sort="modName">ModName</a></th>
+                <th><a href="#" class="sort" data-sort="name">Name</a></th>
+                <th><a href="#" class="sort" data-sort="description">Description</a></th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Rows will be inserted here by JavaScript -->
+        </tbody>
+    </table>
+
+    <script>
+        $(document).ready(function() {
+            // Load table data initially
+            loadTableData();
+
+            // Handle Filter Form Submission
+            $('#filterForm').submit(function(e) {
+                e.preventDefault();
+                loadTableData();  // Reload table data with filters
+            });
+
+            // Add new row
+            $('#addForm').submit(function(e) {
+                e.preventDefault();
+                const baseFormId = $('#newBaseFormId').val();
+                const modName = $('#newModName').val();
+                const name = $('#newName').val();
+                const description = $('#newDescription').val();
+
+                $.ajax({
+                    url: 'we_manager.php',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        action: 'add',
+                        baseFormId: baseFormId,
+                        modName: modName,
+                        name: name,
+                        description: description
+                    },
+                    success: function(response) {
+                        loadTableData();  // Reload table data
+                        $('#addForm')[0].reset();  // Reset the form fields
+                    }
+                });
+            });
+
+            // Inline edit and delete functionality
+            $(document).on('click', '.editBtn', function() {
+                const row = $(this).closest('tr');
+                row.find('.editable').attr('contenteditable', 'true').addClass('editing');
+                $(this).hide();
+                row.find('.saveBtn').show();
+            });
+
+            $(document).on('click', '.saveBtn', function() {
+                const row = $(this).closest('tr');
+                const baseFormId = row.find('.baseFormId').text();
+                const modName = row.find('.modName').text();
+                const description = row.find('.description').text();
+
+                $.ajax({
+                    url: 'we_manager.php',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        action: 'edit',
+                        baseFormId: baseFormId,
+                        modName: modName,
+                        description: description
+                    },
+                    success: function(response) {
+                        loadTableData();  // Reload table data
+                    }
+                });
+            });
+
+            $(document).on('click', '.deleteBtn', function() {
+                const row = $(this).closest('tr');
+                const baseFormId = row.find('.baseFormId').text();
+                const modName = row.find('.modName').text();
+
+                $.ajax({
+                    url: 'we_manager.php',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        action: 'delete',
+                        baseFormId: baseFormId,
+                        modName: modName
+                    },
+                    success: function(response) {
+                        loadTableData();  // Reload table data
+                    }
+                });
+            });
+
+            // Sorting functionality
+            $('.sort').click(function(e) {
+                e.preventDefault();
+                const sortField = $(this).data('sort');
+                loadTableData(sortField);
+            });
+
+            // Function to load table data via AJAX
+            function loadTableData(sortField = 'baseFormId') {
+                const baseFormId = $('#filterBaseFormId').val();
+                const modName = $('#filterModName').val();
+                const name = $('#filterName').val();
+                const description = $('#filterDescription').val();
+
+                $.ajax({
+                    url: 'we_manager.php',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: {
+                        action: 'load',
+                        sort: sortField,
+                        baseFormId: baseFormId,
+                        modName: modName,
+                        name: name,
+                        description: description
+                    },
+                    success: function(response) {
+                        // Clear the table body
+                        const tbody = $('#dataTable tbody');
+                        tbody.empty();
+
+                        // Append rows to the table
+                        $.each(response.data, function(index, row) {
+                            const tr = `<tr>
+                                <td class='baseFormId'>${row.baseFormId}</td>
+                                <td class='modName'>${row.modName}</td>
+                                <td class='name'>${row.name}</td>
+                                <td class='editable description'>${row.description}</td>
+                                <td>
+                                    <button class='editBtn'>Edit</button>
+                                    <button class='saveBtn' style='display:none;'>Save</button>
+                                    <button class='deleteBtn'>Delete</button>
+                                </td>
+                            </tr>`;
+                            tbody.append(tr);
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

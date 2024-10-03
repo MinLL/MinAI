@@ -19,4 +19,6 @@ $GLOBALS["force_aiff_name_to_ingame_name"] = true;
 $GLOBALS["commands_to_purge"] = array("TakeASeat");
 // Set this to force the xtts server to be the same for all profiles
 $GLOBALS["xtts_server_override"] = "";
+// disable worn equipment
+$GLOBALS["disable_worn_equipment"] = false;
 ?>
