@@ -324,7 +324,7 @@ foreach ($locaLastElement as $n) {
 
 
 // Handle speech from non-player actors
-if ($gameRequest[0]=="chatnf_npc" || $gameRequest[0]=="chat_npc") {
+if (isset($gameRequest) && ($gameRequest[0]=="chatnf_npc" || $gameRequest[0]=="chat_npc")) {
     foreach ($GLOBALS["contextDataFull"] as $n=>$ctxLine) {
         if (strpos($ctxLine["content"],"#NPCTALK")!==false) {
             $matches = array();
