@@ -2,6 +2,7 @@
 require_once("config.php");
 require_once("util.php");
 require_once("deviousfollower.php");
+require_once("wornequipment.php");
     
 Function BuildContext($name) {
   if ($name == "The Narrator") {
@@ -109,76 +110,87 @@ Function GetPenisSize($name) {
     return "";
 }
 
+Function HasKeywordAndNotSkip($name, $eqContext, $keyword) {
+  return HasKeyword($name, $keyword) && !IsSkipKeyword($keyword, $eqContext["skipKeywords"]);
+}
+
 Function GetClothingContext($name) {
   $cuirass = GetActorValue($name, "cuirass");
   $ret = "";
-  if (!empty($cuirass)) {
+  
+  $eqContext = GetAllEquipmentContext($name);
+
+  // if $eqContext["context"] not empty, then will set ret
+  if (!empty($eqContext["context"])) {
+    $ret .= "{$name} is wearing {$eqContext["context"]}";
+  } elseif (!empty($cuirass)) {
     $ret .= "{$name} is wearing {$cuirass}.\n";
   }
   elseif (IsEnabled($name, "isNaked")) {
     $ret .= "{$name} is naked and exposed.\n";
   }
-  if (HasKeyword($name, "SLA_HalfNakedBikini")) {
+
+  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_HalfNakedBikini")) {
     $ret .= "{$name} is wearing a set of revealing bikini armor.\n";
   }
-  if (HasKeyword($name, "SLA_ArmorHalfNaked")) {
+  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorHalfNaked")) {
     $ret .= "{$name} is wearing very revealing attire, leaving them half naked.\n";
   }
-  if (HasKeyword($name, "SLA_Brabikini")) {
+  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_Brabikini" )) {
     $ret .= "{$name} is wearing a bra underneath her other equipment.\n";
   }
-  if (HasKeyword($name, "SLA_Thong")) {
+  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_Thong")) {
     $ret .= "{$name} is wearing a thong underneath her other equipment.\n";
   }
-  if (HasKeyword($name, "SLA_PantiesNormal")) {
+  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_PantiesNormal")) {
     $ret .= "{$name} is wearing plain panties underneath her other equipment.\n";
   }
-  if (HasKeyword($name, "SLA_Heels")) {
+  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_Heels")) {
     $ret .= "{$name} is wearing a set of high-heels.\n";
   }
-  if (HasKeyword($name, "SLA_PantsNormal")) {
+  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_PantsNormal")) {
     $ret .= "{$name} is wearing a set of ordinary pants.\n";
   }
-  if (HasKeyword($name, "SLA_MicroHotPants")) {
+  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_MicroHotPants")) {
     $ret .= "{$name} is wearing a set of short hot-pants that accentuate her ass.\n";
   }
-  if (HasKeyword($name, "SLA_ArmorHarness")) {
+  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorHarness")) {
     $ret .= "{$name} is wearing a form-fitting body harness.\n";
   }
-  if (HasKeyword($name, "SLA_ArmorSpendex")) {
+  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorSpendex")) {
     $ret .= "{$name}'s outfit is made out of latex (Referred to as Ebonite).\n";
   }
-  if (HasKeyword($name, "SLA_ArmorTransparent")) {
+  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorTransparent")) {
     $ret .= "{$name}'s outfit is transparent, leaving nothing to the imagination.\n";
   }
-  if (HasKeyword($name, "SLA_ArmorLewdLeotard")) {
+  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorLewdLeotard")) {
     $ret .= "{$name} is wearing a sheer, revealing leotard leaving very little to the imagination.\n";
   }
-  if (HasKeyword($name, "SLA_PelvicCurtain")) {
+  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_PelvicCurtain")) {
     $ret .= "{$name}'s pussy is covered only by a sheer curtain of fabric.\n";
   }
-  if (HasKeyword($name, "SLA_FullSkirt")) {
+  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_FullSkirt")) {
     $ret .= "{$name} is wearing a full length skirt that goes down to her knees.\n";
   }
-  if (HasKeyword($name, "SLA_MiniSkirt")) {
+  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_MiniSkirt")) {
     $ret .= "{$name} is wearing a short mini-skirt that barely covers her ass. Her underwear or panties are sometimes visible underneath when she moves.\n";
   }
-  if (HasKeyword($name, "SLA_ArmorRubber")) {
+  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorRubber")) {
     $ret .= "{$name}'s outfit is made out of tight form-fitting rubber (Referred to as Ebonite).\n";
   }
-  if (HasKeyword($name, "EroticArmor")) {
+  if (HasKeywordAndNotSkip($name, $eqContext, "EroticArmor")) {
       $ret .= "{$name} is wearing a sexy revealing outfit.\n";
   }
-  if (HasKeyword($name, "SLA_PiercingVulva")) {
+  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_PiercingVulva")) {
       $ret .= "{$name} has labia piercings.\n";
   }
-  if (HasKeyword($name, "SLA_PiercingBelly")) {
+  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_PiercingBelly")) {
       $ret .= "{$name} has a navel piercing.\n";
   }
-  if (HasKeyword($name, "SLA_PiercingNipple")) {
+  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_PiercingNipple")) {
       $ret .= "{$name} has nipple piercings.\n";
   }
-  if (HasKeyword($name, "SLA_PiercingClit")) {
+  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_PiercingClit")) {
       $ret .= "{$name} has a clit piercing.\n";
   }
   return $ret;
@@ -307,7 +319,7 @@ foreach ($GLOBALS["contextDataFull"] as $n=>$ctxLine) {
 array_pop($locaLastElement);
 
 foreach ($locaLastElement as $n) {
-    unset($GLOBALS["contextDataFull"][$n]); 
+  unset($GLOBALS["contextDataFull"][$n]); 
 }
 
 
