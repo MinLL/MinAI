@@ -293,7 +293,7 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
     else
       if !bSpeakerInScene ; Speaker not in scene, add them to it
         Main.Info("Sex: Speaker was not in scene, adding them to it.")
-        actorsInScene = SexLabUtil.MakeActorArray(akSpeaker, actorsInScene[0], actorsInScene[1], actorsInScene[2], actorsInScene[3])
+	actorsInScene = PapyrusUtil.PushActor(actorsInScene,akSpeaker)
         actorsInScene = slf.SortActors(actorsInScene)
         Controller.ChangeActors(actorsInScene)
 	Controller.SetAnimations(animations)
