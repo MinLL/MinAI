@@ -18,6 +18,7 @@ VoiceType NullVoiceType
 bool isInitialized
 minai_MainQuestController main
 minai_Followers followers
+Keyword AIAssisted
 
 int Property actionRegistry Auto
 
@@ -34,7 +35,10 @@ Function Maintenance(minai_MainQuestController _main)
   EndIf
   player = Game.GetPlayer()
   Main.Info("- Initializing for AIFF.")
-
+  AIAssisted = Game.GetFormFromFile(0x217a8,"AIAgent.esp") as Keyword
+  if !AIAssisted
+    main.Fatal("You are running an old / outdated version of AI Follower Framework. Some functionality will be broken.")
+  EndIf
   sex = (Self as Quest)as minai_Sex
   survival = (Self as Quest)as minai_Survival
   arousal = (Self as Quest)as minai_Arousal
@@ -47,6 +51,7 @@ Function Maintenance(minai_MainQuestController _main)
   ; Hook into AIFF
   RegisterForModEvent("AIFF_CommandReceived", "CommandDispatcher")
   RegisterForModEvent("AIFF_TextReceived", "OnTextReceived")
+  RegisterForModEvent("AIFF_NPC", "OnAIActorChange")
   NullVoiceType = Game.GetFormFromFile(0x01D70E, "AIAgent.esp") as VoiceType
   if (!NullVoiceType)
     Main.Error("Could not load null voice type")
@@ -54,6 +59,9 @@ Function Maintenance(minai_MainQuestController _main)
   if isInitialized
     SetContext(player)
     RegisterForSingleUpdate(playerContextUpdateInterval)
+  EndIf
+  if (Game.GetModByName("MinAI_AIFF.esp") == 255)
+    Main.Fatal("You are running AIFF, but do not have MinAI_AIFF.esp enabled. Some functionality will be broken.")
   EndIf
   vibratorCommands = new String[10]
   vibratorCommands[0] = "ExtCmdTeaseWithVibratorVeryWeak"
@@ -269,6 +277,10 @@ actor[] Function GetNearbyAI()
     if config.disableAIAnimations
       SetAnimationBusy(1, actors[i].GetActorBase().GetName())
     EndIf
+    ; Make sure that agent has the right keyword
+    if !actors[i].HasKeyword(AIAssisted)
+      PO3_SKSEFunctions.AddKeywordToForm(actors[i],AIAssisted)
+    EndIf
     i += 1
   endwhile
   return actors
@@ -283,6 +295,10 @@ String Function GetNearbyAIStr()
     ret += actors[i].GetActorBase().GetName()
     if i != actors.Length - 1
       ret += ","
+    EndIf
+    ; Make sure that agent has the right keyword
+    if !actors[i].HasKeyword(AIAssisted)
+      PO3_SKSEFunctions.AddKeywordToForm(actors[i],AIAssisted)
     EndIf
     i += 1
   EndWhile
@@ -462,3 +478,8 @@ Function ResetAction(string actionName)
   JMap.setFlt(actionObj, "decayWindow", JMap.getFlt(actionObj, "decayWindowDefault"))
   JMap.SetObj(actionRegistry, actionName, actionObj)
 EndFunction
+
+Event OnAIActorChange(string npcName, string actionName)
+  Main.Info("OnAIActorChange(" + npcName + "): " + actionName)
+  ; I don't think we need to process context here since the new context effect condition will handle this based off the keyword.
+EndEvent
