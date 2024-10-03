@@ -533,9 +533,23 @@ Function SetContext(actor akTarget)
   aiff.SetActorVariable(akTarget, "AllWornEquipment", wornEquipments)
 EndFunction
 
+; Because escaping characters can be expensive, perform length encoding
+; instead of escaping the string
+string Function LengthEncodedString(string str)
+  if (!str || str == "") 
+    ; use empty string instead to save space
+    return ""
+  EndIf
+
+  int len = StringUtil.GetLength(str)
+  ; using integer instead of hex, most of the name should be less than 99 characters (so 2 digits)
+  ; the IntToString hex will return 4 characters 0xFF
+  return PO3_SKSEFunctions.IntToString(len, false) + "#" + str
+EndFunction
+
 string Function GetWornEquipments(Actor target)
   ; Encoding format: base form id:esp:slotMasks:keywords:name
-  string wornEquipments = "v1:"
+  string wornEquipments = ""
   int index
   int slotsChecked
   slotsChecked += 0x00100000
@@ -549,12 +563,11 @@ string Function GetWornEquipments(Actor target)
       if (wornArmor)
         int slotMask = wornArmor.GetSlotMask()
         string wornArmorName = wornArmor.GetName()
-        ; ensure no pipe in the name
-        wornArmorName = Main.ReplaceString(wornArmorName, ":", "")
         ; Need both ID and mod name to ensure uniqueness
         string baseFormIdHex = PO3_SKSEFunctions.IntToString(Math.LogicalAnd(wornArmor.GetFormID(), 0x00FFFFFF), true)
         string modName = PO3_SKSEFunctions.GetFormModName(wornArmor, false)
-        wornEquipments += baseFormIdHex + ":" + modName + ":" + PO3_SKSEFunctions.IntToString(slotMask, true) + ":" + GetKeywordsForEquipments(wornArmor) + ":" + wornArmorName  + ":"
+        ; only need to escape "name" as others can't contain any colon
+        wornEquipments += baseFormIdHex + ":" + modName + ":" + PO3_SKSEFunctions.IntToString(slotMask, true) + ":" + GetKeywordsForEquipments(wornArmor) + ":" + LengthEncodedString(wornArmorName)  + ":"
         slotsChecked += slotMask
       else ;no armor was found on this slot
         slotsChecked += currentSlot

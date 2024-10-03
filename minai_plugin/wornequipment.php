@@ -3,45 +3,91 @@
 require_once("config.php");
 require_once("util.php");
 
-function ParseEncodedEquipmentData($encodedString)
-{
-  // Check if the string starts with the version indicator "V1:"
-  if (strpos($encodedString, 'v1:') !== 0) {
-    return [];
-  }
+function ParseEncodedEquipmentData($encodedString) {
+  $results = [];
+  $currentIndex = 0;
+  $length = strlen($encodedString);
 
-  // Remove the "V1:" prefix - Just ignore this until we have more versions
-  $encodedString = substr($encodedString, 3);
+  while ($currentIndex < $length) {
+      // Parse baseFormId
+      $baseFormId = readUntilColon($encodedString, $currentIndex);
+      // Parse modName
+      $modName = ReadUntilColon($encodedString, $currentIndex);
+      // Parse slotMask as an integer
+      $slotMask = hexdec(ReadUntilColon($encodedString, $currentIndex));
 
-  // Split the string into segments by the pipe delimiter
-  $segments = explode(':', $encodedString);
+      // Parse keywords as an array of strings, separated by commas
+      $keywordsString = ReadUntilColon($encodedString, $currentIndex);
+      $keywords = explode(',', $keywordsString);
 
-  // Prepare the result array
-  $parsedData = [];
-  $segmentCount = count($segments);
+      // Parse name (format: <length>#<name>)
+      $name = ParseName($encodedString, $currentIndex);
 
-  // Process in chunks of 5 elements (baseFormId, modName, slotMask, keywords, name)
-  for ($i = 0; $i < $segmentCount; $i += 5) {
-    // Ensure we have enough elements left for a complete segment
-    if ($i + 4 < $segmentCount) {
-      $baseFormId = $segments[$i];
-      $modName = $segments[$i + 1];
-      $slotMask = (int)$segments[$i + 2]; // Convert to integer
-      $keywords = !empty($segments[$i + 3]) ? explode(',', $segments[$i + 3]) : [];
-      $name = $segments[$i + 4];
-
-      // Add the parsed segment to the result array
-      $parsedData[] = [
-        'baseFormId' => $baseFormId,
-        'modName' => $modName,
-        'slotMask' => $slotMask,
-        'keywords' => $keywords,
-        'name' => $name
+      // Store the parsed data for this segment
+      $results[] = [
+          'baseFormId' => $baseFormId,
+          'modName' => $modName,
+          'slotMask' => $slotMask,
+          'keywords' => $keywords,
+          'name' => $name
       ];
-    }
   }
 
-  return $parsedData;
+  return $results;
+}
+
+// Helper function to read until the next colon and return the string between
+function ReadUntilColon($string, &$currentIndex) {
+  $colonPos = strpos($string, ':', $currentIndex);
+
+  if ($colonPos === false) {
+      throw new Exception("Missing colon, last read index: $currentIndex");
+  }
+
+  $result = substr($string, $currentIndex, $colonPos - $currentIndex);
+
+  $currentIndex = $colonPos + 1;  // Move past the colon
+  return $result;
+}
+
+// Helper function to parse the name field
+function ParseName($string, &$currentIndex) {
+  // Find the position of the '#' which separates the length and the actual name
+  $hashPos = strpos($string, '#', $currentIndex);
+  
+  if ($hashPos === false) {
+      throw new Exception("Invalid name format: '#' not found");
+  }
+
+  // Extract the length of the name
+  $nameLengthStr = substr($string, $currentIndex, $hashPos - $currentIndex);
+  if (!is_numeric($nameLengthStr)) {
+      throw new Exception("Invalid name length: expected an integer, got '$nameLengthStr'");
+  }
+  $nameLength = (int)$nameLengthStr;
+
+  // Move the index to the start of the actual name
+  $currentIndex = $hashPos + 1;
+
+  // Ensure the length of the name is valid
+  if ($currentIndex + $nameLength > strlen($string)) {
+      throw new Exception("Name length exceeds available string data");
+  }
+
+  // Extract the name based on the character length
+  $name = substr($string, $currentIndex, $nameLength);
+
+  // Move the index past the name and expect the next colon after the name
+  $currentIndex += $nameLength;
+  if (
+    $currentIndex < strlen($string) &&
+    isset($string[$currentIndex]) && $string[$currentIndex] !== ':'
+  ) {
+      throw new Exception("Expected colon after name, found '" . $string[$currentIndex] . "'");
+  }
+
+  $currentIndex++;  // Move past the colon after the name
+  return $name;
 }
 
 function EnrichEquipmentDataFromDb(&$parsedData)
@@ -125,10 +171,13 @@ function GetAllEquipmentContext($actorName)
     ];
   }
 
-  CreateEquipmentDescriptionTableIfNotExist();
-
+  // if this fails, still be able to continue without this functionality
   try {
+    CreateEquipmentDescriptionTableIfNotExist();
     $encodedString = GetActorValue($actorName, "AllWornEquipment");
+    error_log("AllWornEquipment: " . $encodedString);
+    // we can potentially cache this by hashing the encodedString since equipment doesn't change often
+    // especially for npc, but this should be fine for now
     $parsedResult = ParseEncodedEquipmentData($encodedString);
     EnrichEquipmentDataFromDb($parsedResult);
     return BuildEquipmentContext($parsedResult);

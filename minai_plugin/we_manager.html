@@ -104,7 +104,6 @@
                 const row = $(this).closest('tr');
                 const baseFormId = row.find('.baseFormId').text();
                 const modName = row.find('.modName').text();
-                const name = row.find('.name').text();
                 const description = row.find('.description').text();
 
                 $.ajax({
@@ -115,7 +114,6 @@
                         action: 'edit',
                         baseFormId: baseFormId,
                         modName: modName,
-                        name: name,
                         description: description
                     },
                     success: function(response) {
@@ -180,7 +178,7 @@
                             const tr = `<tr>
                                 <td class='baseFormId'>${row.baseFormId}</td>
                                 <td class='modName'>${row.modName}</td>
-                                <td class='editable name'>${row.name}</td>
+                                <td class='name'>${row.name}</td>
                                 <td class='editable description'>${row.description}</td>
                                 <td>
                                     <button class='editBtn'>Edit</button>

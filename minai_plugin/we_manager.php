@@ -38,11 +38,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Edit existing row
         $baseFormId = $db->escape($_POST['baseFormId']);
         $modName = $db->escape($_POST['modName']);
-        $name = $db->escape($_POST['name']);
+        //$name = $db->escape($_POST['name']);
         $description = $db->escape($_POST['description']);
 
         // Update existing record
-        $updateQuery = "UPDATE equipment_description SET name = '{$name}', description = '{$description}' WHERE baseFormId = '{$baseFormId}' AND modName = '{$modName}'";
+        $updateQuery = "UPDATE equipment_description SET description = '{$description}' WHERE baseFormId = '{$baseFormId}' AND modName = '{$modName}'";
         error_log('update query: ' . $updateQuery);
         $db->execQuery($updateQuery);
 
