@@ -211,3 +211,9 @@ Function Debug(String str)
     Log(str, "DEBUG")
   EndIf
 EndFunction
+
+Function DebugVerbose(String str)
+  if LogLevel.GetValueInt() >= 5
+    Log(str, "VERBOSE")
+  EndIf
+EndFunction
