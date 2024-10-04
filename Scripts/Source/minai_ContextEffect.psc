@@ -7,10 +7,12 @@ minai_Arousal arousal
 minai_DeviousStuff devious
 minai_AIFF aiff
 minai_MainQuestController main
+Perk minai_AIManaged
 
 Function OnEffectStart(Actor akTarget, Actor akCaster)
   main = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_MainQuestController
   aiff = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_AIFF
+  minai_AIManaged = Game.GetFormFromFile(0x0915, "MinAI.esp") as Perk
   if (!akTarget || !main || !aiff || !aiff.IsInitialized())
     Debug.Trace("[minai] Skipping OnEffectStart, not ready")
     return
@@ -39,11 +41,16 @@ Event OnUpdate()
     aiff.SetContext(akTarget)
     RegisterForSingleUpdate(aiff.ContextUpdateInterval)
   Else
+    ; Cleanup perk if the actor is no longer ai managed
+    if akTarget.HasPerk(minai_AIManaged)
+      akTarget.RemovePerk(minai_AIManaged)
+      Main.Info("Cleaned up perk on actor " + akTarget.GetActorBase().GetName())
+    EndIf
     ; Store voice types even if they're not a managed actor so that they will immediately have voices when spoken to
-    aiff.StoreActorVoice(akTarget)
+    ; aiff.StoreActorVoice(akTarget)
     ; Store factions and keywords for the same reason
-    aiff.StoreFactions(akTarget)
-    aiff.StoreKeywords(akTarget)  
+    ; aiff.StoreFactions(akTarget)
+    ; aiff.StoreKeywords(akTarget)  
   EndIf
   Main.Debug("Context OnUpdate(" + targetName +") END")
 EndEvent

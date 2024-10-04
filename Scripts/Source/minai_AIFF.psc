@@ -19,6 +19,7 @@ bool isInitialized
 minai_MainQuestController main
 minai_Followers followers
 Keyword AIAssisted
+Perk minai_AIManaged
 
 int Property actionRegistry Auto
 
@@ -39,6 +40,7 @@ Function Maintenance(minai_MainQuestController _main)
   if !AIAssisted
     main.Fatal("You are running an old / outdated version of AI Follower Framework. Some functionality will be broken.")
   EndIf
+  minai_AIManaged = Game.GetFormFromFile(0x0915, "MinAI.esp") as Perk
   sex = (Self as Quest)as minai_Sex
   survival = (Self as Quest)as minai_Survival
   arousal = (Self as Quest)as minai_Arousal
@@ -60,8 +62,8 @@ Function Maintenance(minai_MainQuestController _main)
     SetContext(player)
     RegisterForSingleUpdate(playerContextUpdateInterval)
   EndIf
-  if (Game.GetModByName("MinAI_AIFF.esp") == 255)
-    Main.Fatal("You are running AIFF, but do not have MinAI_AIFF.esp enabled. Some functionality will be broken.")
+  if (Game.GetModByName("MinAI_AIFF.esp") != 255)
+    Main.Fatal("You are are running an old version of the beta with min_AIFF.esp. This file is no longer required. Delete this file.")
   EndIf
   vibratorCommands = new String[10]
   vibratorCommands[0] = "ExtCmdTeaseWithVibratorVeryWeak"
@@ -128,7 +130,7 @@ Function SetActorVariable(Actor akActor, string variable, string value)
     return
   EndIf
   string actorName = main.GetActorName(akActor)
-  Main.Debug("Set actor value for actor " + actorName + " "+ variable + " to " + value)
+  Main.DebugVerbose("Set actor value for actor " + actorName + " "+ variable + " to " + value)
   AIAgentFunctions.logMessage("_minai_" + actorName + "//" + variable + "@" + value, "setconf")
 EndFunction
 
@@ -278,8 +280,8 @@ actor[] Function GetNearbyAI()
       SetAnimationBusy(1, actors[i].GetActorBase().GetName())
     EndIf
     ; Make sure that agent has the right keyword
-    if !actors[i].HasKeyword(AIAssisted)
-      PO3_SKSEFunctions.AddKeywordToForm(actors[i],AIAssisted)
+    if !actors[i].HasPerk(minai_AIManaged)
+      actors[i].AddPerk(minai_AIManaged)
     EndIf
     i += 1
   endwhile
@@ -297,8 +299,8 @@ String Function GetNearbyAIStr()
       ret += ","
     EndIf
     ; Make sure that agent has the right keyword
-    if !actors[i].HasKeyword(AIAssisted)
-      PO3_SKSEFunctions.AddKeywordToForm(actors[i],AIAssisted)
+    if !actors[i].HasPerk(minai_AIManaged)
+      actors[i].AddPerk(minai_AIManaged)
     EndIf
     i += 1
   EndWhile
@@ -481,5 +483,16 @@ EndFunction
 
 Event OnAIActorChange(string npcName, string actionName)
   Main.Info("OnAIActorChange(" + npcName + "): " + actionName)
-  ; I don't think we need to process context here since the new context effect condition will handle this based off the keyword.
+  if actionName == "Add"
+    actor agent = AIAgentFunctions.getAgentByName(npcName)
+    if !agent
+      Main.Error("OnAIActorChange: Could not find NPC to add perk to")
+      return
+    EndIf
+    ; Make sure that agent has the right keyword
+    if !agent.HasPerk(minai_AIManaged)
+      agent.AddPerk(minai_AIManaged)
+    EndIf
+  EndIf
+  ; Can't process perk removal here, since the actor will already be gone from the aiff system at this point. The context script will clean that up instead. 
 EndEvent
