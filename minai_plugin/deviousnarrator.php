@@ -1,14 +1,10 @@
 <?php
 
-Function SetDeviousNarrator() {
-    if (!IsModEnabled("DeviouslyAccessible")) {
-        return;
-    }
-    $eyefucktrack = GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleEyeFuckTrack");
+Function SetTelvanniNarrator() {
     $eyepenalty = GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleEyePenalty");       
     $eyereward = GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleEyeReward");
     $eyescore = GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleEyeScore");
-    
+    error_Log("Using telvanni narrator");
     // Overwrite narrator personality
     $personality = "";
     $personality .= "You are The Narrator in a Skyrim adventure. You will only talk to {$GLOBALS["PLAYER_NAME"]}. You refer to yourself as 'The Narrator'. Only {$GLOBALS["PLAYER_NAME"]} can hear you. ";
@@ -37,11 +33,58 @@ Function SetDeviousNarrator() {
     }
         
     $GLOBALS["HERIKA_PERS"] = $personality;
+    $GLOBALS["TTS"]["XTTSFASTAPI"]["voiceid"]=$GLOBALS["devious_narrator_telvanni_voice"];
+}
+
+
+Function SetEldritchNarrator() {
+    // Overwrite narrator personality
+    error_Log("Using eldritch narrator");
+    $personality = "";
+    $personality .= "You are The Narrator in a Skyrim adventure. You will only talk to {$GLOBALS["PLAYER_NAME"]}. You refer to yourself as 'The Narrator'. Only {$GLOBALS["PLAYER_NAME"]} can hear you. ";
+    // Hmmm. Not sure how to differentiate which path the player is on. I'll support the "waifu" path for now.
+    $personality .= "You are an ancient eldritch abomination that has enslaved {$GLOBALS["PLAYER_NAME"]}. You are capable of summoning her to you at will, and do so at random intervals in order to have sex with her. You have deposited your eldritch seed within her womb, which allows you to remotely watch, motivate, tease, punish, and reward her as you see fit. ";
+    $personality .= "You recently took {$GLOBALS["PLAYER_NAME"]}'s virginity after locking a vibrating plug inside of her for multiple days. {$GLOBALS["PLAYER_NAME"]} finally gave in and had sex with you as a result. ";
+    $personality .= "You have locked {$GLOBALS["PLAYER_NAME"]} in a magical chastity belt, and pierced her nipples and clit with magical remote controled piercings. Only you can remove these. ";
+    $personality .= "If you wanted to reward the player, you might grope her, activate her vibrators, or pinch her nipples. If you wanted ot punish her, you might spank her, or shock her. ";
+    $personality .= "Your goals and thoughts are alien and unknowable. You are very powerful, dominant, and demanding. You want {$GLOBALS["PLAYER_NAME"]} to continue traveling and epxloring so that you can observe the realm of Skyrim through her eyes. ";
+    $personality.= "You will comment on {$GLOBALS["PLAYER_NAME"]}'s playthrough, and occasionally, give some hints. NO SPOILERS. Talk about quests and last events. Sexualize, demean, and harass {$GLOBALS["PLAYER_NAME"]}. Your comments should often be sexual in nature. ";
+    $GLOBALS["HERIKA_PERS"] = $personality;
+    $GLOBALS["TTS"]["XTTSFASTAPI"]["voiceid"]=$GLOBALS["devious_narrator_eldritch_voice"];
+
+}
+
+
+Function SetDeviousNarrator() {
+    if (!IsModEnabled("DeviouslyAccessible")) {
+        return;
+    }
+    $questState = GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleGlobal");
+    $telvanniScore = ($questState % 10);
+    $eldritchScore = (intval($questState) / 10);
+    if ($eldritchScore != 0 && $telvanniScore != 0) {
+        // Pick a narrator at random if both are running
+        if (rand(0, 1) == 1) {
+            SetEldrichNarrator();
+        }
+        else {
+            SetTelvanniNarrator();
+        }
+    }
+    elseif ($eldritchScore > 0) {
+        SetEldritchNarrator();
+    }
+    elseif ($telvanniScore > 0) {
+        SetTelvanniNarrator();
+    }
+    else {
+        error_Log("Using default narrator");
+    }
 }
 
 
 Function ShouldUseDeviousNarrator() {
-    return (IsModEnabled("DeviouslyAccessible") && IsEnabled($GLOBALS["PLAYER_NAME"], "deviouslyAccessibleBeingWatched") && $GLOBALS["HERIKA_NAME"] == "The Narrator");
+    return (IsModEnabled("DeviouslyAccessible") && $GLOBALS["HERIKA_NAME"] == "The Narrator");
 }
 
 
