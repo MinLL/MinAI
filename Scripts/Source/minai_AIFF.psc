@@ -19,7 +19,7 @@ bool isInitialized
 minai_MainQuestController main
 minai_Followers followers
 Keyword AIAssisted
-Perk minai_AIManaged
+Spell ContextSpell
 
 int Property actionRegistry Auto
 
@@ -40,7 +40,7 @@ Function Maintenance(minai_MainQuestController _main)
   if !AIAssisted
     main.Fatal("You are running an old / outdated version of AI Follower Framework. Some functionality will be broken.")
   EndIf
-  minai_AIManaged = Game.GetFormFromFile(0x0915, "MinAI.esp") as Perk
+  ContextSpell = Game.GetFormFromFile(0x090A, "MinAI.esp") as Spell
   sex = (Self as Quest)as minai_Sex
   survival = (Self as Quest)as minai_Survival
   arousal = (Self as Quest)as minai_Arousal
@@ -104,15 +104,17 @@ Function SetContext(actor akTarget)
     return
   EndIf  
   Main.Debug("AIFF - SetContext(" + akTarget.GetDisplayName() + ") START")
+  if akTarget == Player
+    AIAgentFunctions.logMessage("_minai_PLAYER//playerName@" + player.GetActorBase().GetName(), "setconf")
+    AIAgentFunctions.logMessage("_minai_PLAYER//nearbyActors@" + GetNearbyAiStr(), "setconf")
+  EndIf
+  StoreActorVoice(akTarget)
   devious.SetContext(akTarget)
   arousal.SetContext(akTarget)
   survival.SetContext(akTarget)
   followers.SetContext(akTarget)
-  StoreActorVoice(akTarget)
   StoreKeywords(akTarget)
   StoreFactions(akTarget)
-  AIAgentFunctions.logMessage("_minai_PLAYER//playerName@" + player.GetActorBase().GetName(), "setconf")
-  AIAgentFunctions.logMessage("_minai_PLAYER//nearbyActors@" + GetNearbyAiStr(), "setconf")
   if config.disableAIAnimations && akTarget != player
     SetAnimationBusy(1, akTarget.GetActorBase().GetName())
   EndIf
@@ -279,10 +281,7 @@ actor[] Function GetNearbyAI()
     if config.disableAIAnimations
       SetAnimationBusy(1, actors[i].GetActorBase().GetName())
     EndIf
-    ; Make sure that agent has the right keyword
-    if !actors[i].HasPerk(minai_AIManaged)
-      actors[i].AddPerk(minai_AIManaged)
-    EndIf
+    TrackContext(actors[i])
     i += 1
   endwhile
   return actors
@@ -298,13 +297,18 @@ String Function GetNearbyAIStr()
     if i != actors.Length - 1
       ret += ","
     EndIf
-    ; Make sure that agent has the right keyword
-    if !actors[i].HasPerk(minai_AIManaged)
-      actors[i].AddPerk(minai_AIManaged)
-    EndIf
+    TrackContext(actors[i])
     i += 1
   EndWhile
   return ret
+EndFunction
+
+Function TrackContext(actor akActor)
+  ; Make sure that agent has the right keyword
+  if !akActor.HasSpell(ContextSpell)
+    Main.Info("Adding Context Spell to " + akActor.GetActorBase().GetName())
+    akActor.AddSpell(ContextSpell)
+  EndIf
 EndFunction
 
 Function RegisterAction(string actionName, string mcmName, string mcmDesc, string mcmPage, int enabled, float interval, float exponent, int maxInterval, float decayWindow, bool hasMod)
@@ -486,13 +490,10 @@ Event OnAIActorChange(string npcName, string actionName)
   if actionName == "Add"
     actor agent = AIAgentFunctions.getAgentByName(npcName)
     if !agent
-      Main.Error("OnAIActorChange: Could not find NPC to add perk to")
+      Main.Error("OnAIActorChange: Could not find NPC to add context spell to")
       return
     EndIf
-    ; Make sure that agent has the right keyword
-    if !agent.HasPerk(minai_AIManaged)
-      agent.AddPerk(minai_AIManaged)
-    EndIf
+    TrackContext(agent)
   EndIf
-  ; Can't process perk removal here, since the actor will already be gone from the aiff system at this point. The context script will clean that up instead. 
+  ; Can't process spell removal here, since the actor will already be gone from the aiff system at this point. The context script will clean that up instead. 
 EndEvent

@@ -7,12 +7,12 @@ minai_Arousal arousal
 minai_DeviousStuff devious
 minai_AIFF aiff
 minai_MainQuestController main
-Perk minai_AIManaged
+Spell ContextSpell
 
 Function OnEffectStart(Actor akTarget, Actor akCaster)
   main = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_MainQuestController
   aiff = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_AIFF
-  minai_AIManaged = Game.GetFormFromFile(0x0915, "MinAI.esp") as Perk
+  ContextSpell = Game.GetFormFromFile(0x090A, "MinAI.esp") as Spell
   if (!akTarget || !main || !aiff || !aiff.IsInitialized())
     Debug.Trace("[minai] Skipping OnEffectStart, not ready")
     return
@@ -32,6 +32,7 @@ Event OnUpdate()
   Main.Debug("Context OnUpdate (" + targetName +")")
   if(!aiff || !akTarget.Is3DLoaded())
     Main.Debug("Context OnUpdate( " + targetName + ") Stopping OnUpdate for actor - actor is not loaded.")
+    akTarget.RemoveSpell(ContextSpell)
     UnregisterForUpdate()
     return
   endif
@@ -42,9 +43,9 @@ Event OnUpdate()
     RegisterForSingleUpdate(aiff.ContextUpdateInterval)
   Else
     ; Cleanup perk if the actor is no longer ai managed
-    if akTarget.HasPerk(minai_AIManaged)
-      akTarget.RemovePerk(minai_AIManaged)
-      Main.Info("Cleaned up perk on actor " + akTarget.GetActorBase().GetName())
+    if akTarget.HasSpell(ContextSpell)
+      akTarget.RemoveSpell(ContextSpell)
+      Main.Info("Cleaned up spell on actor " + akTarget.GetActorBase().GetName())
     EndIf
     ; Store voice types even if they're not a managed actor so that they will immediately have voices when spoken to
     ; aiff.StoreActorVoice(akTarget)
