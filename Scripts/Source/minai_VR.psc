@@ -163,7 +163,7 @@ Function TrackTouch(string nodeType, float collisionDuration, actor akActor)
   if hitThreshold
     return
   EndIf
-  string actorName = akActor.GetActorBase().GetName()
+  string actorName = Main.GetActorName(akActor)
   Float currentValue = JMap.GetFlt(touchedLocations, nodeType)
   Float newValue = currentValue + collisionDuration ; The longer the location is touched, the more it's weighted for the response
   Main.Debug("Tracking Touched Location (" + nodeType + ") for actor [" + actorName + "]: Before=" + currentValue + ", after=" + newValue)
@@ -204,12 +204,12 @@ Function OnCollision(string eventName, string nodeName, float collisionDuration,
   EndIf
   Actor akActor = actorForm as Actor
   if (akActor.IsChild())
-    Main.Warn(akActor.GetDisplayName() + " is a child actor. Not processing collision.")
+    Main.Warn(Main.GetActorName(akActor) + " is a child actor. Not processing collision.")
     collisionMutex = False
     return
   EndIf
-  string actorName = akActor.GetActorBase().GetName()
-  string playerName = playerRef.GetActorBase().GetName()
+  string actorName = Main.GetActorName(akActor)
+  string playerName = Main.GetActorName(playerRef)
   
   string debugStr = "OnCollision(" + eventName + ", " + nodeName + ", " + collisionDuration + ", " + actorName + ")"
   main.Debug(debugStr)
@@ -283,7 +283,7 @@ Event OnUpdate()
   EndIf
   string actorName = JMap.GetStr(touchedLocations, ACTOR_KEY)
   Actor akActor = JMap.GetForm(touchedLocations, ACTORREF_KEY) as Actor
-  string playerName = playerRef.GetActorBase().GetName()
+  string playerName = Main.GetActorName(playerRef)
   if actorName == ""
     Main.Debug("No actor touched for collision")
     ClearTouchedLocations()
@@ -347,7 +347,7 @@ Function ProcessArousal(actor akActor)
   if !akActor
     return
   EndIf
-  Main.Debug("CBPC: Updating arousal for actor " + akActor.GetActorBase().GetName())
+  Main.Debug("CBPC: Updating arousal for actor " + Main.GetActorName(akActor))
   if locationHit == VAGINAL_KEY
     arousal.UpdateArousal(akActor, 2)
   elseif locationHit == ANAL_KEY
@@ -362,7 +362,7 @@ Function ProcessArousal(actor akActor)
   if devious.HasDD()
     float currentTime = Utility.GetCurrentRealTime()
     if currentTime - lastMoanTime > 8
-      Main.RegisterEvent(akActor.GetActorBase().GetName() + " moaned due to being touched")
+      Main.RegisterEvent(Main.GetActorName(akActor) + " moaned due to being touched")
       lastMoanTime = currentTime
       devious.libs.Moan(akActor)
     EndIf

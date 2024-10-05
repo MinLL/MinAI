@@ -154,7 +154,11 @@ EndFunction
 
 
 string Function GetActorName(actor akActor)
-  return akActor.GetActorBase().GetName()
+  if akActor == playerRef
+    return akActor.GetActorBase().GetName()
+  else
+    return akActor.GetDisplayName()
+  EndIf
 EndFunction
 
 

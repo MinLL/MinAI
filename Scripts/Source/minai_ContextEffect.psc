@@ -17,7 +17,7 @@ Function OnEffectStart(Actor akTarget, Actor akCaster)
     Debug.Trace("[minai] Skipping OnEffectStart, not ready")
     return
   EndIf
-  string targetName = akTarget.GetActorBase().GetName()
+  string targetName = Main.GetActorName(akTarget)
   main.Debug("OnEffectStart(" + targetName +")")
   ; Do one update for actors the first time we enter a zone. Introduce a little jitter to distribute load.
   int updateTime = 2 + Utility.RandomInt(0, 5)
@@ -28,7 +28,7 @@ EndFunction
 
 Event OnUpdate()
   actor akTarget = GetTargetActor()
-  string targetName = akTarget.GetDisplayName()
+  string targetName = Main.GetActorName(akTarget)
   Main.Debug("Context OnUpdate (" + targetName +")")
   if(!aiff || !akTarget.Is3DLoaded())
     Main.Debug("Context OnUpdate( " + targetName + ") Stopping OnUpdate for actor - actor is not loaded.")
@@ -45,7 +45,7 @@ Event OnUpdate()
     ; Cleanup perk if the actor is no longer ai managed
     if akTarget.HasSpell(ContextSpell)
       akTarget.RemoveSpell(ContextSpell)
-      Main.Info("Cleaned up spell on actor " + akTarget.GetActorBase().GetName())
+      Main.Info("Cleaned up spell on actor " + Main.GetActorName(akTarget))
     EndIf
     ; Store voice types even if they're not a managed actor so that they will immediately have voices when spoken to
     ; aiff.StoreActorVoice(akTarget)

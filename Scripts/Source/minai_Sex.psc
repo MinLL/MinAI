@@ -168,12 +168,12 @@ Function StartSexScene(actor[] actors, bool bPlayerInScene, string tags="")
   
   if actors.Length == 1
     if devious.HasDD() && actors[0].WornHasKeyword(devious.libs.zad_DeviousBelt)
-      main.RegisterEvent(actors[0].GetActorBase().GetName() + " started unsuccessfully trying to masturbate through the chastity belt. (" + tags +") ", "info_sexscene")
+      main.RegisterEvent(Main.GetActorName(actors[0]) + " started unsuccessfully trying to masturbate through the chastity belt. (" + tags +") ", "info_sexscene")
     Else
-      main.RegisterEvent(actors[0].GetActorBase().GetName() + " started masturbating. (" + tags +") ", "info_sexscene")
+      main.RegisterEvent(Main.GetActorName(actors[0]) + " started masturbating. (" + tags +") ", "info_sexscene")
     EndIf
   elseif actors.Length == 2
-    main.RegisterEvent(actors[0].GetActorBase().GetName() + " and " + actors[1].GetActorBase().GetName() + " started having sex. (" + tags +") ", "info_sexscene")
+    main.RegisterEvent(Main.GetActorName(actors[0]) + " and " + Main.GetActorName(actors[1]) + " started having sex. (" + tags +") ", "info_sexscene")
   elseif actors.Length > 2
     string sexStr = ""
     int i = 0
@@ -247,7 +247,7 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
           OThread.StartAutoMode(ActiveOstimThreadID)
         EndIf
       EndIf
-      main.RegisterEvent(akSpeaker.GetActorBase().GetName() + " attempted to change the OStim scene to " + tags + " instead: " + newScene, "info_sexscene")
+      main.RegisterEvent(Main.GetActorName(akSpeaker) + " attempted to change the OStim scene to " + tags + " instead: " + newScene, "info_sexscene")
       Return
     EndIf
   else
@@ -313,9 +313,9 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
       Controller.SetForcedAnimations(animations)
       Controller.SetAnimation()
       if actors.Length == 1
-        main.RegisterEvent(actors[0].GetActorBase().GetName() + " changed up their masturbation to " + tags + " instead.", "info_sexscene")
+        main.RegisterEvent(Main.GetActorName(actors[0]) + " changed up their masturbation to " + tags + " instead.", "info_sexscene")
       elseif actors.Length == 2
-        main.RegisterEvent(actors[0].GetActorBase().GetName() + " and " + actors[1].GetActorBase().GetName() + " changed up their sex to " + tags + " instead.", "info_sexscene")
+        main.RegisterEvent(Main.GetActorName(actors[0]) + " and " + Main.GetActorName(actors[1]) + " changed up their sex to " + tags + " instead.", "info_sexscene")
       elseif actors.Length > 2
         string sexStr = ""
         i = 0
@@ -335,7 +335,7 @@ EndFunction
 
 
 Function StartSexOrSwitchTo(actor akSpeaker, actor akTarget, actor Player, bool bPlayerInScene, string tags)
-  Main.Info("StartSexOrSwitchTo( " + akSpeaker.GetActorBase().GetName() + ", " + akTarget.GetActorBase().GetName() + ", " + tags + " )")
+  Main.Info("StartSexOrSwitchTo( " + Main.GetActorName(akSpeaker) + ", " + Main.GetActorName(akTarget) + ", " + tags + " )")
   Actor[] actors = new Actor[2]
   actors[0] = akSpeaker
   actors[1] = akTarget
@@ -525,7 +525,7 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     akTarget = PlayerRef
   EndIf
   if (akTarget.IsChild())
-    Main.Warn(akTarget.GetDisplayName() + " is a child actor. Not processing actions.")
+    Main.Warn(Main.GetActorName(akTarget) + " is a child actor. Not processing actions.")
     return
   EndIf
   bool bPlayerInScene = (akTarget == PlayerRef || akSpeaker == PlayerRef)
@@ -534,7 +534,7 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   If command == "ExtCmdMasturbate"
     Start1pSex(akSpeaker)
   elseif command == "ExtCmdStartSexScene"
-    Main.RegisterEvent(akSpeaker.GetActorBase().GetName() + " and " + akTarget.GetActorBase().GetName() + " started having an intimate encounter together.")
+    Main.RegisterEvent(Main.GetActorName(akSpeaker) + " and " + Main.GetActorName(akTarget) + " started having an intimate encounter together.")
     SetSexSceneState("on")
   elseif command == "ExtCmdStartBlowjob"
     StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "blowjob")
@@ -678,7 +678,7 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
     bool playerInvolved=false
     while(i > 0)
         i -= 1
-        actorString=actorString+actors[i].GetActorBase().GetName()+",";
+        actorString=actorString+Main.GetActorName(actors[i])+",";
         if (actors[i] == playerRef) 
           playerInvolved=true;
         EndIf
@@ -703,7 +703,7 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
     bool playerInvolved=false
     while(i > 0)
       i -= 1
-      actorString=actorString+actors[i].GetActorBase().GetName()+",";
+      actorString=actorString+Main.GetActorName(actors[i])+",";
       if (actors[i] == playerRef)
         playerInvolved=true;
       EndIf
@@ -724,7 +724,7 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
     string sceneName=OThread.GetScene(ostimTid);
     bool isRunning=OThread.IsRunning(ostimTid);
     Actor[] actors =  OThread.GetActors(ostimTid);
-    main.RegisterEvent(OrgasmedActor.GetActorBase().GetName() + " had an Orgasm")
+    main.RegisterEvent(Main.GetActorName(OrgasmedActor) + " had an Orgasm")
     DirtyTalk(actors, "ohh... yes.")
     Main.Info("Ostim Actor orgasm")
 
@@ -737,7 +737,7 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
     bool playerInvolved=false
     while(i > 0)
       i -= 1
-      actorString=actorString+actors[i].GetActorBase().GetName()+",";
+      actorString=actorString+Main.GetActorName(actors[i])+",";
       if (actors[i] == playerRef) 
         playerInvolved=true;
       EndIf
@@ -798,11 +798,11 @@ EndEvent
 
 String Function GetActorNameForSex(actor akActor)
   ; Prefer base name, fall back to display name, and then other.
-  string ret = akActor.GetActorBase().GetName()
+  string ret = Main.GetActorName(akActor)
   if ret
     return ret
   EndIf
-  ret = akActor.GetDisplayName()
+  ret = Main.GetActorName(akActor)
   if ret
     return ret
   EndIf
@@ -870,7 +870,7 @@ Event OnStageStart(int tid, bool HasPlayer)
   i = 0
   while i < sortedActorList.Length
     if sortedActorList[i] != PlayerRef
-      aiff.setAnimationBusy(1, sortedActorList[i].GetActorBase().GetName())
+      aiff.setAnimationBusy(1, Main.GetActorName(sortedActorList[i]))
     EndIf
     i += 1
   EndWhile
@@ -944,7 +944,7 @@ Event PostSexScene(int tid, bool HasPlayer)
     int i = actorList.Length
   while(i > 0)
     i -= 1
-    pleasure=pleasure+actorList[i].GetActorBase().GetName()+" is reaching orgasm,"
+    pleasure=pleasure+Main.GetActorName(actorList[i])+" is reaching orgasm,"
   Endwhile
   string pleasureFull="Pleasure:"+pleasure
   ; Send event, AI can be aware SEX is happening here
@@ -983,10 +983,10 @@ Event EndSexScene(int tid, bool HasPlayer)
       otherActor = sortedActorList[1]
     EndIf
 
-    main.RegisterEvent(sortedActorList[0].GetActorBase().GetName()+ " and "+sortedActorList[1].GetActorBase().GetName()+ " ended the intimate moment","info_sexscene")
+    main.RegisterEvent(Main.GetActorName(sortedActorList[0])+ " and "+Main.GetActorName(sortedActorList[1])+ " ended the intimate moment","info_sexscene")
     if bHasAIFF
       DirtyTalk(sortedActorList, "What did you think of the sex?")
-      AIFF.SetAnimationBusy(0, otherActor.GetActorBase().GetName())
+      AIFF.SetAnimationBusy(0, Main.GetActorName(otherActor))
     EndIf
     SetSexSceneState("off")
 EndEvent

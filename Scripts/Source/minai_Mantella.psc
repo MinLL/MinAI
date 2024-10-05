@@ -200,7 +200,7 @@ Function ActionResponse(Form actorToSpeakTo,Form actorSpeaking, string sayLine)
     bPlayerInScene = True
   EndIf
   Actor[] actorsFromFormList = GetActorsFromFormList()
-  Main.Info("ActionResponse(" + akSpeaker.GetActorBase().GetName() + ", " + akTarget.GetActorBase().GetName() + ", playerInScene="+bPlayerInScene+"): " + sayLine) 
+  Main.Info("ActionResponse(" + Main.GetActorName(akSpeaker) + ", " + Main.GetActorName(akTarget) + ", playerInScene="+bPlayerInScene+"): " + sayLine) 
   arousal.ActionResponse(akTarget, akSpeaker, sayLine, actorsFromFormList)
   sex.ActionResponse(akTarget, akSpeaker, sayLine, actorsFromFormList, bPlayerInScene)
   survival.ActionResponse(akTarget, akSpeaker, sayLine, actorsFromFormList)

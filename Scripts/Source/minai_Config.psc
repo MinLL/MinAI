@@ -325,7 +325,7 @@ EndFunction
 
 Function StoreConfig(string var, string value)
   actor Player = Game.GetPlayer()
-  string playerName = player.GetActorBase().GetName()
+  string playerName = Main.GetActorName(player)
   if aiff.HasAIFF()
     aiff.SetActorVariable(Player, var, value)
   EndIf

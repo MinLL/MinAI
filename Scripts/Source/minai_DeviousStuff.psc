@@ -535,7 +535,7 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
 
   ; Generic actions
   If stringutil.Find(sayLine, "-grope-") != -1
-    Debug.Notification(akSpeaker.GetActorBase().GetName() + " gropes " + main.GetYouYour(akTarget) + " crotch abruptly!")
+    Debug.Notification(Main.GetActorName(akSpeaker) + " gropes " + main.GetYouYour(akTarget) + " crotch abruptly!")
     arousal.UpdateArousal(akTarget, 5)
     Game.ShakeController(0.5,0.5,1.0)
     if bHasDD
@@ -543,7 +543,7 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
     EndIf
   EndIf
   If stringutil.Find(sayLine, "-pinchnipples-") != -1
-    Debug.Notification(akSpeaker.GetActorBase().GetName() + " painfully pinches " + main.GetYouYour(akTarget) + " nipples!")
+    Debug.Notification(Main.GetActorName(akSpeaker) + " painfully pinches " + main.GetYouYour(akTarget) + " nipples!")
     arousal.UpdateArousal(akTarget, 3)
     Game.ShakeController(0.7,0.7,0.2)
     if bHasDD
@@ -621,7 +621,7 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     akTarget = PlayerRef
   EndIf
   if (akTarget.IsChild())
-    Main.Warn(akTarget.GetDisplayName() + " is a child actor. Not processing actions.")
+    Main.Warn(Main.GetActorName(akTarget) + " is a child actor. Not processing actions.")
     return
   EndIf
   string targetName = main.GetActorName(akTarget)

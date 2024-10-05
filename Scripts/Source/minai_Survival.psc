@@ -170,7 +170,7 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
     EndIf
     if stringutil.Find(sayLine, "-trade-") != -1
       akSpeaker.showbartermenu()
-      main.RegisterEvent(main.GetActorName(player) + " began to trade with " + akSpeaker.GetActorBase().GetName())
+      main.RegisterEvent(main.GetActorName(player) + " began to trade with " + Main.GetActorName(akSpeaker))
     EndIf
     if stringutil.Find(sayLine, "-gift-") != -1
       akSpeaker.ShowGiftMenu(true)
@@ -326,7 +326,7 @@ EndFunction
 
 
 Event Campfire_OnObjectPlaced(Form akPlacedObject, float afPositionX, float afPositionY, float afPositionZ, float afAngleX, float afAngleY, float afAngleZ, bool abIsTent)
-  string playerName = playerRef.GetActorBase().GetName()
+  string playerName = Main.GetActorName(playerRef)
   if abIsTent
     Main.RequestLLMResponse(playerName + " set up a tent.", "chatnf_survival_1", playerName)
   EndIf
@@ -334,14 +334,14 @@ EndEvent
 
 
 Event Campfire_OnObjectRemoved(Form akBaseObject, float afPositionX, float afPositionY, float afPositionZ, float afAngleX, float afAngleY, float afAngleZ, bool abIsTent)
-  string playerName = playerRef.GetActorBase().GetName()
+  string playerName = Main.GetActorName(playerRef)
   if abIsTent
     Main.RequestLLMResponse(playerName + " took down a tent.", "chatnf_survival_1", playerName)
   EndIf
 EndEvent
 
 Event Campfire_OnBedrollSitLay(Form akTent, bool abGettingUp)
-  string playerName = playerRef.GetActorBase().GetName()
+  string playerName = Main.GetActorName(playerRef)
   if !abGettingUp
     Main.RequestLLMResponse(playerName + " laid down on a bedroll.", "chatnf_survival_1", playerName)
   else
@@ -352,7 +352,7 @@ endEvent
 
 
 Event Campfire_OnTentEnter(Form akTent, bool abHasShelter)
-  string playerName = playerRef.GetActorBase().GetName()
+  string playerName = Main.GetActorName(playerRef)
   if abHasShelter
     Main.RequestLLMResponse(playerName + " entered their tent, which has adequate shelter.", "chatnf_survival_1", playerName)
   else
@@ -362,6 +362,6 @@ endEvent
 
 Event Campfire_OnTentLeave()
   ; This seems to fire at inappropriate times
-  ; string playerName = playerRef.GetActorBase().GetName()
+  ; string playerName = Main.GetActorName(playerRef)
   ; Main.RequestLLMResponse(playerName + " left their tent.", "chatnf_survival_1", playerName)
 endEvent

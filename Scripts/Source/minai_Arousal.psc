@@ -442,7 +442,7 @@ Function WritePlayerAppearance(Actor player)
     Main.Info("Set player description (Babo): " + appearanceStr)
     main.RegisterAction(appearanceStr)
   else
-    string appearanceStr = Player.GetActorBase().GetName() + " is a " + gender + " " + actorRace + "." 
+    string appearanceStr = Main.GetActorName(Player) + " is a " + gender + " " + actorRace + "." 
     Main.Info("Set player description: " + appearanceStr)
     main.RegisterAction(appearanceStr)
   EndIf
@@ -464,11 +464,11 @@ EndFunction
 Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[] actorsFromFormList)
     If stringutil.Find(sayLine, "-thats hot-") != -1
       UpdateArousal(akSpeaker, 6)
-      Debug.Notification(akSpeaker.GetActorBase().GetName() + " is getting more turned on.")
+      Debug.Notification(Main.GetActorName(akSpeaker) + " is getting more turned on.")
     EndIf
     If stringutil.Find(sayLine, "-eww-") != -1
       UpdateArousal(akSpeaker, -12)
-      Debug.Notification(akSpeaker.GetActorBase().GetName() + " is getting less turned on.")
+      Debug.Notification(Main.GetActorName(akSpeaker) + " is getting less turned on.")
     EndIf
 EndFunction
 
@@ -480,19 +480,19 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     akTarget = PlayerRef
   EndIf
   if (akTarget.IsChild())
-    Main.Warn(akTarget.GetDisplayName() + " is a child actor. Not processing actions.")
+    Main.Warn(Main.GetActorName(akTarget) + " is a child actor. Not processing actions.")
     return
   EndIf
   Main.Debug("Arousal - CommandDispatcher(" + speakerName +", " + command +", " + parameter + ")")
   string targetName = main.GetActorName(akTarget)
   if command == "ExtCmdIncreaseArousal"
     UpdateArousal(akSpeaker, 6)
-    Debug.Notification(akSpeaker.GetActorBase().GetName() + " is getting more turned on.")
+    Debug.Notification(Main.GetActorName(akSpeaker) + " is getting more turned on.")
     Main.RegisterEvent(""+speakerName+"'s arousal level increased.")
   EndIf
   if command == "ExtCmdDecreaseArousal"
     UpdateArousal(akSpeaker, -12)
-    Debug.Notification(akSpeaker.GetActorBase().GetName() + " is getting less turned on.")
+    Debug.Notification(Main.GetActorName(akSpeaker) + " is getting less turned on.")
     Main.RegisterEvent(""+speakerName+"'s arousal level decreased.")
   EndIf
 EndEvent

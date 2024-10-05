@@ -103,9 +103,9 @@ Function SetContext(actor akTarget)
     Main.Warn("SetContext(" + akTarget + ") - Still Initializing.")
     return
   EndIf  
-  Main.Debug("AIFF - SetContext(" + akTarget.GetDisplayName() + ") START")
+  Main.Debug("AIFF - SetContext(" + Main.GetActorName(akTarget) + ") START")
   if akTarget == Player
-    AIAgentFunctions.logMessage("_minai_PLAYER//playerName@" + player.GetActorBase().GetName(), "setconf")
+    AIAgentFunctions.logMessage("_minai_PLAYER//playerName@" + Main.GetActorName(player), "setconf")
     AIAgentFunctions.logMessage("_minai_PLAYER//nearbyActors@" + GetNearbyAiStr(), "setconf")
   EndIf
   StoreActorVoice(akTarget)
@@ -116,9 +116,9 @@ Function SetContext(actor akTarget)
   StoreKeywords(akTarget)
   StoreFactions(akTarget)
   if config.disableAIAnimations && akTarget != player
-    SetAnimationBusy(1, akTarget.GetActorBase().GetName())
+    SetAnimationBusy(1, Main.GetActorName(akTarget))
   EndIf
-  Main.Debug("AIFF - SetContext(" + akTarget.GetDisplayName() + ") FINISH")
+  Main.Debug("AIFF - SetContext(" + Main.GetActorName(akTarget) + ") FINISH")
 EndFunction
 
 
@@ -277,9 +277,9 @@ actor[] Function GetNearbyAI()
   actor[] actors = AIAgentFunctions.findAllNearbyAgents()
   int i = 0
   while i < actors.length
-    main.Info("Found nearby actor: " + actors[i].GetActorBase().GetName())
+    main.Info("Found nearby actor: " + Main.GetActorName(actors[i]))
     if config.disableAIAnimations
-      SetAnimationBusy(1, actors[i].GetActorBase().GetName())
+      SetAnimationBusy(1, Main.GetActorName(actors[i]))
     EndIf
     TrackContext(actors[i])
     i += 1
@@ -293,7 +293,7 @@ String Function GetNearbyAIStr()
   string ret = ""
   int i = 0
   while i < actors.Length
-    ret += actors[i].GetActorBase().GetName()
+    ret += Main.GetActorName(actors[i])
     if i != actors.Length - 1
       ret += ","
     EndIf
@@ -306,7 +306,7 @@ EndFunction
 Function TrackContext(actor akActor)
   ; Make sure that agent has the right keyword
   if !akActor.HasSpell(ContextSpell)
-    Main.Info("Adding Context Spell to " + akActor.GetActorBase().GetName())
+    Main.Info("Adding Context Spell to " + Main.GetActorName(akActor))
     akActor.AddSpell(ContextSpell)
   EndIf
 EndFunction
