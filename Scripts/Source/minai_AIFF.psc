@@ -87,6 +87,7 @@ Function StoreActorVoice(actor akTarget)
   EndIf
   VoiceType voice = akTarget.GetVoiceType()
   if !voice || voice == NullVoiceType ; AIFF dynamically replaces NPC's voices with "null voice type". Don't store this.
+    Main.Warn("Not storing voice type for " + Main.GetActorName(akTarget) + ": Voice type is invalid")
     Return
   EndIf
   ; Fix broken xtts support in AIFF for VR by exposing the voiceType to the plugin for injection
