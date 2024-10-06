@@ -21,4 +21,7 @@ $GLOBALS["commands_to_purge"] = array("TakeASeat");
 $GLOBALS["xtts_server_override"] = "";
 // disable worn equipment
 $GLOBALS["disable_worn_equipment"] = false;
+// Voice type overrides for devious narrator
+$GLOBALS["devious_narrator_eldritch_voice"] = "dragon";
+$GLOBALS["devious_narrator_telvanni_voice"] = "TelvanniNarrator";
 ?>
