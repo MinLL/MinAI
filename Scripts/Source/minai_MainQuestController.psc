@@ -89,6 +89,9 @@ Function Maintenance()
     minAIFF.ResetAllActionBackoffs()
   EndIf
   lastRequestTime = 0.0
+  RegisterForModEvent("MinAI_RegisterEvent", "OnRegisterEvent")
+  RegisterForModEvent("MinAI_RequestResponse", "OnRequestResponse")
+  RegisterForModEvent("MinAI_RequestResponseDialogue", "OnRequestResponseDialogue")
   Info("Initialization complete.")
 EndFunction
 
@@ -221,3 +224,49 @@ Function DebugVerbose(String str)
     Log(str, "VERBOSE")
   EndIf
 EndFunction
+
+
+; Inform the LLM that something has happened, without requesting the LLM to respond immediately.
+; int handle = ModEvent.Create("MinAI_RegisterEvent")
+;  if (handle)
+;    ModEvent.PushString(handle, eventLine)
+;    ModEvent.PushString(handle, eventType)
+;    ModEvent.Send(handle)
+;  endIf
+Event OnRegisterEvent(string eventLine, string eventType)
+  Info("OnRegisterEvent(" + eventType + "): " + eventLine)
+  RegisterEvent(eventLine, eventType)
+EndEvent
+
+
+; Inform the LLM that something has happened, and request a specific actor to respond.
+; Use "everyone" for targetName if you don't want a specific response.
+; int handle = ModEvent.Create("MinAI_RequestResponse")
+;  if (handle)
+;    ModEvent.PushString(handle, eventLine)
+;    ModEvent.PushString(handle, eventType)
+;    ModEvent.PushString(handle, targetName)
+;    ModEvent.Send(handle)
+;  endIf
+Event OnRequestResponse(string eventLine, string eventType, string targetName)
+  Info("OnRequestResponse(" + eventType + " => " + targetName + "): " + eventLine)
+  RequestLLMResponse(eventLine, eventType, targetName)
+EndEvent
+
+
+
+; Inform the LLM that an actor has spoken, and request a specific actor to respond.
+; Use "everyone" for targetName if you don't want a specific response.
+; int handle = ModEvent.Create("MinAI_RequestResponseDialogue")
+;  if (handle)
+;    ModEvent.PushString(handle, speakerName)
+;    ModEvent.PushString(handle, eventLine)
+;    ModEvent.PushString(handle, targetName)
+;    ModEvent.Send(handle)
+;  endIf
+Event OnRequestResponseDialogue(string speakerName, string eventLine, string targetName)
+  Info("OnRequestResponse(" + speakerName + " => " + targetName + "): " + eventLine)
+  RequestLLMResponseNPC(speakerName, eventLine, targetName)
+EndEvent
+
+
