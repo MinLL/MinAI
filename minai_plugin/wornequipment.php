@@ -52,12 +52,11 @@ function ReadUntilColon($string, &$currentIndex) {
 
 // Helper function to parse the name field
 function ParseName($string, &$currentIndex) {
-  // Find the position of the '#' which separates the length and the actual name
+  $colonPos = strpos($string, ':', $currentIndex);
   $hashPos = strpos($string, '#', $currentIndex);
   
-  if ($hashPos === false) {
-    // if no hash is found, it could be empty, and should follow by colon. But let be defensive
-    $colonPos = strpos($string, ':', $currentIndex);
+  // hash not found or hash is after a colon
+  if ($hashPos === false || (($hashPos > $colonPos) && $colonPos)) {
     if ($colonPos) {
       // skip to this position + 1
       $currentIndex = $colonPos + 1;
@@ -89,7 +88,7 @@ function ParseName($string, &$currentIndex) {
   // Move the index past the name and expect the next colon after the name
   $currentIndex += $nameLength;
   if (
-    $currentIndex < strlen($string) &&
+    $currentIndex + 1 < strlen($string) &&
     isset($string[$currentIndex]) && $string[$currentIndex] !== ':'
   ) {
       throw new Exception("Expected colon after name, found '" . $string[$currentIndex] . "'");
@@ -191,6 +190,8 @@ function GetAllEquipmentContext($actorName)
     EnrichEquipmentDataFromDb($parsedResult);
     return BuildEquipmentContext($parsedResult);
   } catch (Exception $e) {
+    error_log("Failed to get equipment context: " . $e->getMessage());
+    error_log($e->getTraceAsString());
     return [
       'context' => "",
       'skipKeywords' => []

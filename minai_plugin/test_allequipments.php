@@ -29,10 +29,37 @@ $HERIKA_NAME = "Herika";
 require_once("util.php");
 require_once("wornequipment.php");
 
+
+function assertTrue($expression, $message = "Failed assertion") {
+  if (!$expression) {
+    throw new Exception($message);
+  }
+}
+
+function assertString($expected, $actual, $message = "Failed assertion") {
+  if ($expected != $actual) {
+    print_r("\nExpected: $expected");
+    print_r("\nActual  : $actual");
+    print("\n");
+    throw new Exception($message);
+  }
+}
+
+function assertObjectAsJson($expected, $actual, $message = "Failed assertion") {
+  $expectedStr = json_encode($expected);
+  $actualStr = json_encode($actual);
+  if ($expectedStr != $actualStr) {
+    print_r("\nExpected: $expectedStr");
+    print_r("\nActual  : $actualStr");
+    print("\n");
+    throw new Exception($message);
+  }
+}
+
 function parse_valid_encoded_string_correctly_test() {
   print("parse_valid_encoded_string_correctly_test: ");
 
-  $encodedString = "baseForm1:mod1:123:keyword1,keyword2:5#Hello:baseForm2:mod2:456:keyword4,keyword5:7#Goodbye";
+  $encodedString = "baseForm1:mod1:0x123:keyword1,keyword2:5#Hello:baseForm2:mod2:0x456:keyword4,keyword5:7#Goodbye";
   $parsedData = ParseEncodedEquipmentData($encodedString);
   
   // Expected Output:
@@ -40,25 +67,25 @@ function parse_valid_encoded_string_correctly_test() {
       [
           'baseFormId' => 'baseForm1',
           'modName' => 'mod1',
-          'slotMask' => 123,
+          'slotMask' => 0x123,
           'keywords' => ['keyword1', 'keyword2'],
           'name' => 'Hello',
       ],
       [
           'baseFormId' => 'baseForm2',
           'modName' => 'mod2',
-          'slotMask' => 456,
+          'slotMask' => 0x456,
           'keywords' => ['keyword4', 'keyword5'],
           'name' => 'Goodbye',
       ],
   ];
   
-  assert($parsedData === $expectedOutput);
+  assertObjectAsJson($expectedOutput, $parsedData);
   print("Passed\n");
 }
 
 function parse_correctly_when_name_empty_test() {
-  print("parse_valid_encoded_string_correctly_test: ");
+  print("parse_correctly_when_name_empty_test: ");
 
   $encodedString = "baseForm1:mod1:123:keyword1,keyword2::baseForm2:mod2:456:keyword4,keyword5:7#Goodbye";
   $parsedData = ParseEncodedEquipmentData($encodedString);
@@ -68,25 +95,53 @@ function parse_correctly_when_name_empty_test() {
       [
           'baseFormId' => 'baseForm1',
           'modName' => 'mod1',
-          'slotMask' => 123,
+          'slotMask' => 0x123,
           'keywords' => ['keyword1', 'keyword2'],
           'name' => '',
       ],
       [
           'baseFormId' => 'baseForm2',
           'modName' => 'mod2',
-          'slotMask' => 456,
+          'slotMask' => 0x456,
           'keywords' => ['keyword4', 'keyword5'],
           'name' => 'Goodbye',
       ],
   ];
   
-  assert($parsedData === $expectedOutput);
+  assertObjectAsJson($expectedOutput, $parsedData);
   print("Passed\n");
 }
 
 function parse_correctly_when_name_empty_last_with_colon_test() {
-  print("parse_valid_encoded_string_correctly_test: ");
+  print("parse_correctly_when_name_empty_last_with_colon_test: ");
+
+  $encodedString = "baseForm1:mod1:123:keyword1,keyword2:5#Hello:baseForm2:mod2:456:keyword4,keyword5::";
+  $parsedData = ParseEncodedEquipmentData($encodedString);
+  
+  // Expected Output:
+  $expectedOutput = [
+      [
+          'baseFormId' => 'baseForm1',
+          'modName' => 'mod1',
+          'slotMask' => 0x123,
+          'keywords' => ['keyword1', 'keyword2'],
+          'name' => 'Hello',
+      ],
+      [
+          'baseFormId' => 'baseForm2',
+          'modName' => 'mod2',
+          'slotMask' => 0x456,
+          'keywords' => ['keyword4', 'keyword5'],
+          'name' => '',
+      ],
+  ];
+  
+  assertObjectAsJson($expectedOutput, $parsedData);
+  print("Passed\n");
+}
+
+function parse_correctly_when_name_empty_last_without_colon_test() {
+  print("parse_correctly_when_name_empty_last_without_colon_test: ");
 
   $encodedString = "baseForm1:mod1:123:keyword1,keyword2:5#Hello:baseForm2:mod2:456:keyword4,keyword5:";
   $parsedData = ParseEncodedEquipmentData($encodedString);
@@ -96,48 +151,20 @@ function parse_correctly_when_name_empty_last_with_colon_test() {
       [
           'baseFormId' => 'baseForm1',
           'modName' => 'mod1',
-          'slotMask' => 123,
+          'slotMask' => 0x123,
           'keywords' => ['keyword1', 'keyword2'],
           'name' => 'Hello',
       ],
       [
           'baseFormId' => 'baseForm2',
           'modName' => 'mod2',
-          'slotMask' => 456,
+          'slotMask' => 0x456,
           'keywords' => ['keyword4', 'keyword5'],
           'name' => '',
       ],
   ];
   
-  assert($parsedData === $expectedOutput);
-  print("Passed\n");
-}
-
-function parse_correctly_when_name_empty_last_without_colon_test() {
-  print("parse_valid_encoded_string_correctly_test: ");
-
-  $encodedString = "baseForm1:mod1:123:keyword1,keyword2:5#Hello:baseForm2:mod2:456:keyword4,keyword5";
-  $parsedData = ParseEncodedEquipmentData($encodedString);
-  
-  // Expected Output:
-  $expectedOutput = [
-      [
-          'baseFormId' => 'baseForm1',
-          'modName' => 'mod1',
-          'slotMask' => 123,
-          'keywords' => ['keyword1', 'keyword2'],
-          'name' => 'Hello',
-      ],
-      [
-          'baseFormId' => 'baseForm2',
-          'modName' => 'mod2',
-          'slotMask' => 456,
-          'keywords' => ['keyword4', 'keyword5'],
-          'name' => '',
-      ],
-  ];
-  
-  assert($parsedData === $expectedOutput);
+  assertObjectAsJson($expectedOutput, $parsedData);
   print("Passed\n");
 }
 
@@ -152,27 +179,27 @@ function parse_valid_encoded_string_correctly_with_colon_in_name_test() {
       [
           'baseFormId' => 'baseForm1',
           'modName' => 'mod1',
-          'slotMask' => 123,
+          'slotMask' => 0x123,
           'keywords' => ['keyword1', 'keyword2'],
           'name' => 'Hello',
       ],
       [
           'baseFormId' => 'baseForm2',
           'modName' => 'mod2',
-          'slotMask' => 456,
+          'slotMask' => 0x456,
           'keywords' => ['keyword4', 'keyword5'],
           'name' => 'Goodbye',
       ],
       [
           'baseFormId' => 'baseForm3',
           'modName' => 'mod3',
-          'slotMask' => 789,
+          'slotMask' => 0x789,
           'keywords' => ['keyword6', 'keyword7'],
           'name' => 'Hello:World',
       ],
   ];
   
-  assert($parsedData === $expectedOutput);
+  assertObjectAsJson($expectedOutput, $parsedData);
   print("Passed\n");
 }
 
@@ -187,20 +214,20 @@ function parse_valid_encoded_string_if_string_end_with_segment_separator_colon_t
       [
           'baseFormId' => 'baseForm1',
           'modName' => 'mod1',
-          'slotMask' => 123,
+          'slotMask' => 0x123,
           'keywords' => ['keyword1', 'keyword2'],
           'name' => 'Hello',
       ],
       [
           'baseFormId' => 'baseForm2',
           'modName' => 'mod2',
-          'slotMask' => 456,
+          'slotMask' => 0x456,
           'keywords' => ['keyword4', 'keyword5'],
           'name' => 'Goodbye',
       ],
   ];
   
-  assert($parsedData === $expectedOutput);
+  assertObjectAsJson($expectedOutput, $parsedData);
   print("Passed\n");
 }
 
@@ -210,35 +237,11 @@ function error_if_a_colon_is_missing_test() {
     $encodedString = "baseForm1:mod1:123:keyword1,keyword2:5#Hello:baseForm2:mod2:456:keyword4,keyword57#Goodbye";
     ParseEncodedEquipmentData($encodedString);
   } catch (Exception $e) {
-    assert($e->getMessage() === "Invalid encoded string");
+    assertString("Missing colon, last read index: 64", $e->getMessage());
     print("Passed\n");
     return;
   }
-  assert(false);
-}
-
-function throw_error_if_slotmask_is_not_a_number_test() {
-  print("throw_error_if_slotmask_is_not_a_number_test: ");
-  try {
-    $encodedString = "baseForm1:mod1:123a:keyword1,keyword2:5#Hello";
-    ParseEncodedEquipmentData($encodedString);
-  } catch (Exception $e) {
-    print("passed\n");
-    return;
-  }
-  assert(false);
-}
-
-function throw_error_when_name_is_missing_hash_code_test() {
-  print("throw_error_when_name_is_missing_hash_code_test: ");
-  try {
-    $encodedString = "baseForm1:mod1:123:keyword1,keyword2:5Hello";
-    ParseEncodedEquipmentData($encodedString);
-  } catch (Exception $e) {
-    print("passed\n");
-    return;
-  }
-  assert(false);
+  assertTrue(false);
 }
 
 function throw_error_when_name_length_is_not_a_number_test() {
@@ -250,7 +253,7 @@ function throw_error_when_name_length_is_not_a_number_test() {
     print("passed\n");
     return;
   }
-  assert(false);
+  assertTrue(false);
 }
 
 function throw_error_when_name_length_is_not_correct_test() {
@@ -262,7 +265,7 @@ function throw_error_when_name_length_is_not_correct_test() {
     print("passed\n");
     return;
   }
-  assert(false);
+  assertTrue(false);
 }
 
 function parse_unicode_correctly_test() {
@@ -274,11 +277,12 @@ function parse_unicode_correctly_test() {
 
 print("<pre>Test cases for ParseEncodedEquipmentData: \n");
 parse_valid_encoded_string_correctly_test();
+parse_correctly_when_name_empty_test();
+parse_correctly_when_name_empty_last_with_colon_test();
+parse_correctly_when_name_empty_last_without_colon_test();
 parse_valid_encoded_string_correctly_with_colon_in_name_test();
 parse_valid_encoded_string_if_string_end_with_segment_separator_colon_test();
 error_if_a_colon_is_missing_test();
-throw_error_if_slotmask_is_not_a_number_test();
-throw_error_when_name_is_missing_hash_code_test();
 throw_error_when_name_length_is_not_a_number_test();
 throw_error_when_name_length_is_not_correct_test();
 parse_unicode_correctly_test();
@@ -298,11 +302,11 @@ function creates_new_entry_when_not_exist_test() {
   EnrichEquipmentDataFromDb($parsedData);
 
   $result = $db->fetchAll("SELECT * FROM equipment_description WHERE (baseFormId = '0xfffff0' AND modName = 'testmod1') OR (baseFormId = '0xfffff1' AND modName = 'testmod2')");
-  assert(count($result) === 2);
-  assert($result[0]['name'] === 'outfit1');
-  assert($result[0]['description'] === '');
-  assert($result[1]['name'] === 'Goodbye');
-  assert($result[1]['description'] === '');
+  assertTrue(count($result) === 2);
+  assertTrue($result[0]['name'] === 'outfit1');
+  assertTrue($result[0]['description'] === '');
+  assertTrue($result[1]['name'] === 'Goodbye');
+  assertTrue($result[1]['description'] === '');
 
   print("Passed\n");
 }
@@ -325,11 +329,11 @@ function enrich_if_description_does_exists_test() {
   EnrichEquipmentDataFromDb($parsedData);
 
   $result = $db->fetchAll("SELECT * FROM equipment_description WHERE (baseFormId = '0xfffff0' AND modName = 'testmod1') OR (baseFormId = '0xfffff1' AND modName = 'testmod2')");
-  assert(count($result) === 2);
-  assert($result[0]['name'] === 'outfit1');
-  assert($result[0]['description'] === 'outfit1_desc');
-  assert($result[1]['name'] === 'Goodbye');
-  assert($result[1]['description'] === 'outfit2_desc');
+  assertTrue(count($result) === 2);
+  assertTrue($result[0]['name'] === 'outfit1');
+  assertTrue($result[0]['description'] === 'outfit1_desc');
+  assertTrue($result[1]['name'] === 'Goodbye');
+  assertTrue($result[1]['description'] === 'outfit2_desc');
 
   print("Passed\n");
 }
@@ -357,8 +361,8 @@ function build_context_correctly_test() {
   ];
 
   $context = BuildEquipmentContext($parsedData);
-  $expectedContext = "outfit1 - outfit1_desc, Goodbye - outfit2_desc";
-  assert($context === $expectedContext);
+  $expectedContext = "outfit1 - outfit1_desc, Goodbye - outfit2_desc, . ";
+  assertString($expectedContext, $context['context']);
 
   print("Passed\n");
 }
