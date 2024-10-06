@@ -98,7 +98,7 @@ foreach ($vibSettings as $strength) {
   $name = "TeaseWithVibrator" . str_replace(' ', '', $strength);
   
   $GLOBALS["F_NAMES"][$keyword]=$name;
-  $GLOBALS["F_TRANSLATIONS"][$keyword]="Remotely tease the target with a vibrator ($strength intensity) without letting them orgasm";
+  $GLOBALS["F_TRANSLATIONS"][$keyword]="Remotely stimulate the target with a vibrator ($strength intensity) without letting them climax";
 
   $GLOBALS["FUNCTIONS"][] = [
 			     "name" => $GLOBALS["F_NAMES"]["$keyword"],
@@ -128,7 +128,7 @@ foreach ($vibSettings as $strength) {
   $name = "StimulateWithVibrator" . str_replace(' ', '', $strength);
   
   $GLOBALS["F_NAMES"][$keyword]=$name;
-  $GLOBALS["F_TRANSLATIONS"][$keyword]="Remotely stimulate the target with a vibrator ($strength intensity) while potentially letting them orgasm";
+  $GLOBALS["F_TRANSLATIONS"][$keyword]="Remotely stimulate the target with a vibrator ($strength intensity)";
 
   $GLOBALS["FUNCTIONS"][] = [
 			     "name" => $GLOBALS["F_NAMES"]["$keyword"],

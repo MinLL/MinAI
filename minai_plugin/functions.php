@@ -87,7 +87,7 @@ if (!$GLOBALS["disable_nsfw"]) {
 }
 
 
-$commandToPurge=[];
+$commandsToPurge=[];
 foreach ($GLOBALS["ENABLED_FUNCTIONS"] as $n=>$func) {
     if (in_array($func, $GLOBALS["commands_to_purge"])) {
         $commandsToPurge[] = $n;
