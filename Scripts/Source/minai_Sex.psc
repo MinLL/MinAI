@@ -105,6 +105,8 @@ Function Maintenance(minai_MainQuestController _main)
   aiff.RegisterAction("ExtCmdStartThighjob", "StartThighjob", "Sex Position", "Sex3", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
   aiff.RegisterAction("ExtCmdStartCuddleSex", "StartCuddleSex", "Sex Position", "Sex3", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
   aiff.RegisterAction("ExtCmdStartKissingSex", "StartKissingSex", "Sex Position", "Sex3", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdSpeedUpSex", "SpeedUpSex", "Sex Intensity", "Sex3", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdSlowDownSex", "SlowDownSex", "Sex Intensity", "Sex3", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
 EndFunction
 
 
@@ -508,6 +510,10 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
     StartSexOrSwitchToGroup(actorsFromFormList, akSpeaker)
   elseif stringutil.Find(sayLine, "-endsex-") != -1 || stringutil.Find(sayLine, "-end sex-") != -1 || stringutil.Find(sayLine, "-stopsex-") != -1 || stringutil.Find(sayLine, "-stop sex-") != -1 || stringutil.Find(sayLine, "-red-") != -1
     StopSex(akSpeaker)
+  elseif stringutil.Find(sayLine, "-speedup-") != -1 || stringutil.Find(sayLine, "-speed up-") != -1 || stringutil.Find(sayLine, "-faster-") != -1 || stringutil.Find(sayLine, "-gofaster-") != -1 || stringutil.Find(sayLine, "-go faster-") != -1
+    SpeedUpSex(akSpeaker)
+  elseif stringutil.Find(sayLine, "-slowdown-") != -1 || stringutil.Find(sayLine, "-slow down-") != -1 || stringutil.Find(sayLine, "-slower-") != -1 || stringutil.Find(sayLine, "-goslower-") != -1 || stringutil.Find(sayLine, "-go slower-") != -1
+    SlowDownSex(akSpeaker)
   EndIf
 EndFunction
 
@@ -591,8 +597,6 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
       actors = slf.SortActors(actors)
     EndIf
     StartSexOrSwitchToGroup(actors, akSpeaker, "")
-  elseif command == "ExtCmdStopSex"
-    StopSex(akSpeaker)
   elseif (command=="ExtCmdRemoveClothes")
     Form[] equippedItems=PO3_SKSEFunctions.AddAllEquippedItemsToArray(akSpeaker);
     int equippedArmor = JArray.Object()
@@ -625,10 +629,36 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     Endwhile
     equippedItems = JValue.release(equippedItems)
     AIAgentFunctions.logMessageForActor("command@ExtCmdPutOnClothes@@"+speakerName+" puts on clothes and armor","funcret",speakerName)
+  elseif command == "ExtCmdSpeedUpSex"
+    SpeedUpSex(akSpeaker)
+  elseif command == "ExtCmdSlowDownSex"
+    SlowDownSex(akSpeaker)
+  elseif command == "ExtCmdStopSex"
+    StopSex(akSpeaker)
   EndIf
 EndEvent
 
+Function SpeedUpSex(actor akActor)
+  if bHasOstim && minai_UseOStim.GetValue() == 1.0
+    int ostimTid = OActor.GetSceneID(akActor)
+    if OThread.IsRunning(ostimTid)
+      int ostimSpeed = OThread.GetSpeed(ostimTid)
+      ostimSpeed += 10
+      OThread.SetSpeed(ostimTid, ostimSpeed)
+    EndIf
+  EndIf
+EndFunction
 
+Function SlowDownSex(actor akActor)
+  if bHasOstim && minai_UseOStim.GetValue() == 1.0
+    int ostimTid = OActor.GetSceneID(akActor)
+    if OThread.IsRunning(ostimTid)
+      int ostimSpeed = OThread.GetSpeed(ostimTid)
+      ostimSpeed -= 10
+      OThread.SetSpeed(ostimTid, ostimSpeed)
+    EndIf
+  EndIf
+EndFunction
 
 string Function ConvertTagsOstim(string tags)
   ; Convert sexlab tags to ostim tags

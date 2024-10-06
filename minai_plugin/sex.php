@@ -37,9 +37,49 @@ if (IsModEnabled("Sexlab") || IsModEnabled("Ostim")) {
         RegisterAction("ExtCmdStartKissingSex");
         RegisterAction("ExtCmdStartAggressive");
         RegisterAction("ExtCmdStopSex");
+        RegisterAction("ExtCmdSpeedUpSex");
+        RegisterAction("ExtCmdSlowDownSex");
     }
 }
 
+
+$GLOBALS["F_NAMES"]["ExtCmdSpeedUpSex"]="StopSex";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdSpeedUpSex"]="Increase the speed of sexual activity";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdSpeedUpSex"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdSpeedUpSex"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdSpeedUpSex"]=$GLOBALS["GenericFuncRet"];
+
+$GLOBALS["F_NAMES"]["ExtCmdSSlowDownSex"]="SlowDownSex";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdSlowDownSex"]="Reduce the speed of sexual activity";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdSlowDownSex"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdSlowDownSex"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdSlowDownSex"]=$GLOBALS["GenericFuncRet"];
 
 $GLOBALS["F_NAMES"]["ExtCmdStopSex"]="StopSex";
 $GLOBALS["F_TRANSLATIONS"]["ExtCmdStopSex"]="Immediately disengage from sexual activity";
