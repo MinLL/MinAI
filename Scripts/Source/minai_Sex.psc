@@ -295,14 +295,17 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
         Main.Info("Sex: Speaker was not in scene, adding them to it.")
 	actorsInScene = PapyrusUtil.PushActor(actorsInScene,akSpeaker)
         actorsInScene = slf.SortActors(actorsInScene)
-        Controller.ChangeActors(actorsInScene)
-	Controller.SetAnimations(animations)
-        Utility.Wait(1)
         if akSpeaker.GetActorBase().GetSex() == 0
           numMales += 1
         else
           numFemales += 1
         endIf
+      EndIf
+      if actorsInScene.Length != actors.Length || !bSpeakerInScene
+        Main.Info("Sex: Number of actors changed, forcing update")
+        Controller.ChangeActors(actorsInScene)
+	Controller.SetAnimations(animations)
+        Utility.Wait(1)
       EndIf
       ; If this isn't set, it means that a new actor is joining from the orgy command.
       ; Prefer to reuse the existing tag for the added actor
