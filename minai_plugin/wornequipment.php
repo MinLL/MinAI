@@ -56,7 +56,16 @@ function ParseName($string, &$currentIndex) {
   $hashPos = strpos($string, '#', $currentIndex);
   
   if ($hashPos === false) {
-      throw new Exception("Invalid name format: '#' not found");
+    // if no hash is found, it could be empty, and should follow by colon. But let be defensive
+    $colonPos = strpos($string, ':', $currentIndex);
+    if ($colonPos) {
+      // skip to this position + 1
+      $currentIndex = $colonPos + 1;
+    } else {
+      // no more colon ?? or otherwise, bad data, just going to step to the end
+      $currentIndex = strlen($string);
+    }
+    return "";
   }
 
   // Extract the length of the name
