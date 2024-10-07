@@ -309,19 +309,51 @@ if (!$GLOBALS["disable_nsfw"]) {
 ";
 }
 
-// Remove all references to sex scene, and only keep the last one.
 $locaLastElement=[];
+$narratorElements=[];
+$sexInfoElements=[];
+$physicsInfoElements=[];
 foreach ($GLOBALS["contextDataFull"] as $n=>$ctxLine) {
     if (strpos($ctxLine["content"],"#SEX_SCENARIO")!==false) {
         $locaLastElement[]=$n;
     }
+    if ($GLOBALS["stop_narrator_context_leak"] && $GLOBALS["HERIKA_NAME"] != "The Narrator") {
+        if (strpos($ctxLine["content"],"The Narrator:")!==false && strpos($ctxLine["content"],"(talking to")!==false) {
+            $narratorElements[]=$n;
+        }
+    }
+    if (strpos($ctxLine["content"],"#SEX_INFO")!==false) {
+        $sexInfoElements[]=$n;
+    }
+    if (strpos($ctxLine["content"],"#PHYSICS_INFO")!==false) {
+        $physicsInfoElements[]=$n;
+    }
 }
+// Remove all references to sex scene, and only keep the last one.
 array_pop($locaLastElement);
-
 foreach ($locaLastElement as $n) {
   unset($GLOBALS["contextDataFull"][$n]); 
 }
 
+// Cleanup narrator context for non-narrator actors
+foreach ($narratorElements as $n) {
+    unset($GLOBALS["contextDataFull"][$n]); 
+}
+
+// Remove all references to sex scene info, and only keep the last one.
+array_pop($sexInfoElements);
+foreach ($sexInfoElements as $n) {
+    unset($GLOBALS["contextDataFull"][$n]); 
+}
+
+// Remove all references to physics / collision info, and only keep the last three.
+array_pop($physicsInfoElements);
+array_pop($physicsInfoElements);
+array_pop($physicsInfoElements);
+foreach ($physicsInfoElements as $n) {
+    unset($GLOBALS["contextDataFull"][$n]); 
+}
+$GLOBALS["contextDataFull"] = array_values($GLOBALS["contextDataFull"]);
 
 // Handle speech from non-player actors
 if (isset($gameRequest) && ($gameRequest[0]=="chatnf_npc" || $gameRequest[0]=="chat_npc")) {
@@ -335,18 +367,6 @@ if (isset($gameRequest) && ($gameRequest[0]=="chatnf_npc" || $gameRequest[0]=="c
     }
 }
 
-
-if ($GLOBALS["stop_narrator_context_leak"] && $GLOBALS["HERIKA_NAME"] != "The Narrator") {
-    $narratorElements=[];
-    foreach ($GLOBALS["contextDataFull"] as $n=>$ctxLine) {
-        if (strpos($ctxLine["content"],"The Narrator:")!==false && strpos($ctxLine["content"],"(talking to")!==false) {
-            $narratorElements[]=$n;
-        }
-    }
-    foreach ($narratorElements as $n) {
-        unset($GLOBALS["contextDataFull"][$n]); 
-    }
-}
 
 if ($GLOBALS["xtts_server_override"]) {
     $GLOBALS["TTS"]["XTTSFASTAPI"]["endpoint"] = $GLOBALS["xtts_server_override"];

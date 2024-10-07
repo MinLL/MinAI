@@ -331,6 +331,7 @@ Event OnUpdate()
   Else
     cooldown = config.collisionSpeechCooldown
   EndIf
+  lineToSay = "#PHYSICS_INFO " + lineToSay
   if currentTime - lastCollisionSpeechTime < cooldown || !(PromptKeys.Find(locationHit) >= 0) || !bHasAIFF
     Main.RegisterEvent(lineToSay)
   Else
