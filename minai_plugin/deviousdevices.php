@@ -192,12 +192,125 @@ $GLOBALS["FUNCTIONS"][] = [
     ],
 ];
 
+$GLOBALS["F_NAMES"]["ExtCmdEquipBinder"]="EquipBinder";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdEquipBinder"]="Lock a Armbinder on the target";
+$GLOBALS["FUNCTIONS"][] = [
+    "name" => $GLOBALS["F_NAMES"]["ExtCmdEquipBinder"],
+    "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdEquipBinder"],
+    "parameters" => [
+        "type" => "object",
+        "properties" => [
+            "target" => [
+                "type" => "string",
+                "description" => "Target NPC, Actor, or being",
+                "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+            ]
+        ],
+        "required" => [],
+    ],
+];
+
+$GLOBALS["F_NAMES"]["ExtCmdUnequipBinder"]="UnequipBinder";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdUnequipBinder"]="Remove a Armbinder from the target";
+$GLOBALS["FUNCTIONS"][] = [
+    "name" => $GLOBALS["F_NAMES"]["ExtCmdUnequipBinder"],
+    "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdUnequipBinder"],
+    "parameters" => [
+        "type" => "object",
+        "properties" => [
+            "target" => [
+                "type" => "string",
+                "description" => "Target NPC, Actor, or being",
+                "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+            ]
+        ],
+        "required" => [],
+    ],
+];
+
+$GLOBALS["F_NAMES"]["ExtCmdEquipBelt"]="EquipBelt";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdEquipBelt"]="Lock a Chastity Belt on the target";
+$GLOBALS["FUNCTIONS"][] = [
+    "name" => $GLOBALS["F_NAMES"]["ExtCmdEquipBelt"],
+    "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdEquipCollar"],
+    "parameters" => [
+        "type" => "object",
+        "properties" => [
+            "target" => [
+                "type" => "string",
+                "description" => "Target NPC, Actor, or being",
+                "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+            ]
+        ],
+        "required" => [],
+    ],
+];
+
+$GLOBALS["F_NAMES"]["ExtCmdUnequipBelt"]="UnequipBelt";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdUnequipBelt"]="Remove a Chastity Belt from the target";
+$GLOBALS["FUNCTIONS"][] = [
+    "name" => $GLOBALS["F_NAMES"]["ExtCmdUnequipBelt"],
+    "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdUnequipCollar"],
+    "parameters" => [
+        "type" => "object",
+        "properties" => [
+            "target" => [
+                "type" => "string",
+                "description" => "Target NPC, Actor, or being",
+                "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+            ]
+        ],
+        "required" => [],
+    ],
+];
+
+
+$GLOBALS["F_NAMES"]["ExtCmdEquipGag"]="EquipGag";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdEquipGag"]="Lock a Gag on the target";
+$GLOBALS["FUNCTIONS"][] = [
+    "name" => $GLOBALS["F_NAMES"]["ExtCmdEquipGag"],
+    "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdEquipGag"],
+    "parameters" => [
+        "type" => "object",
+        "properties" => [
+            "target" => [
+                "type" => "string",
+                "description" => "Target NPC, Actor, or being",
+                "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+            ]
+        ],
+        "required" => [],
+    ],
+];
+$GLOBALS["F_NAMES"]["ExtCmdUnequipGag"]="UnequipGag";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdUnequipGag"]="Remove a gag from the target";
+$GLOBALS["FUNCTIONS"][] = [
+    "name" => $GLOBALS["F_NAMES"]["ExtCmdUnequipGag"],
+    "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdUnequipGag"],
+    "parameters" => [
+        "type" => "object",
+        "properties" => [
+            "target" => [
+                "type" => "string",
+                "description" => "Target NPC, Actor, or being",
+                "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+            ]
+        ],
+        "required" => [],
+    ],
+];
 if (IsConfigEnabled("allowDeviceLock")) {
     RegisterAction("ExtCmdEquipCollar");
+	RegisterAction("ExtCmdEquipGag");
+	RegisterAction("ExtCmdEquipBelt");
+	RegisterAction("ExtCmdEquipBinder");
 }
 
 if (IsConfigEnabled("allowDeviceUnlock")) {
     RegisterAction("ExtCmdUnequipCollar");
+	RegisterAction("ExtCmdUnequipGag");
+	RegisterAction("ExtCmdUnequipBelt");
+	RegisterAction("ExtCmdUnequipBinder");
 }
 
 ?>
