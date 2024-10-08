@@ -73,6 +73,7 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
 
 ### The New Gentlemen
 * LLM will be aware of exposed penis sizes.
+* Currently, auto assigned addons are finicky (to be addressed in a future TNG update). Manually assign a type and size to PC/NPC with TNG hotkey to ensure LLM awareness.
 
 ### Deviously Accessible
 * Has support for the Telvanni quest from Deviously Accessible - If doing the quest, the Narrator will be replaced with the telvanni mage's personality. He will be aware of how well you've been doing, and of the dreams you've been having recently.
