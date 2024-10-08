@@ -1,5 +1,5 @@
 # MinAI
-Bridge between LLMs and various Skyrim Mods
+Bridge between LLMs and various Skyrim Mods. Documentation for modders can be found [here](https://github.com/MinLL/MinAI/ModdersGuide.md).
  
  ## Description
 
