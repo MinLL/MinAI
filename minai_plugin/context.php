@@ -3,7 +3,8 @@ require_once("config.php");
 require_once("util.php");
 require_once("deviousfollower.php");
 require_once("wornequipment.php");
-    
+require_once("customintegrations.php");
+
 Function BuildContext($name) {
   if ($name == "The Narrator") {
     return "";
@@ -288,9 +289,12 @@ Function GetDDContext($name) {
   return $ret;
 }
 
+
+// Build context
 if (!$GLOBALS["disable_nsfw"]) {
     $GLOBALS["COMMAND_PROMPT"].= BuildContext($GLOBALS["PLAYER_NAME"]);
     $GLOBALS["COMMAND_PROMPT"].= BuildContext($GLOBALS["HERIKA_NAME"]);
+    $GLOBALS["COMMAND_PROMPT"].= GetThirdPartyContext();
     $nearbyActors = GetActorValue("PLAYER", "nearbyActors", true);
     // This does work, I just need to figure out how to get a bit of the bio + relevant context to insert into the full context for this to work properly. TODO
     /*if ($nearbyActors) {
@@ -309,6 +313,7 @@ if (!$GLOBALS["disable_nsfw"]) {
 ";
 }
 
+// Clean up context
 $locaLastElement=[];
 $narratorElements=[];
 $sexInfoElements=[];
@@ -356,20 +361,13 @@ foreach ($physicsInfoElements as $n) {
 $GLOBALS["contextDataFull"] = array_values($GLOBALS["contextDataFull"]);
 
 // Handle speech from non-player actors
-if (isset($gameRequest) && ($gameRequest[0]=="chatnf_npc" || $gameRequest[0]=="chat_npc")) {
-    foreach ($GLOBALS["contextDataFull"] as $n=>$ctxLine) {
-        if (strpos($ctxLine["content"],"#NPCTALK")!==false) {
-            $matches = array();
-            preg_match(".+?#NPCTALK\(([a-zA-Z0-9]+), ([a-zA-Z0-9]+)\): (.+?)\(", $matches);
-            $replacement = "{$matches[0]}: {$matches[2]} (Talking to {$matches[1]})";
-            $GLOBALS["contextDataFull"][$n] = $replacement;
-        }
+foreach ($GLOBALS["contextDataFull"] as $n=>$ctxLine) {
+    if (strpos($ctxLine["content"],"#NPCTALK")!==false) {
+        $matches = array();
+        preg_match(".+?#NPCTALK\(([a-zA-Z0-9]+), ([a-zA-Z0-9]+)\): (.+?)\(", $matches);
+        $replacement = "{$matches[0]}: {$matches[2]} (Talking to {$matches[1]})";
+        $GLOBALS["contextDataFull"][$n] = $replacement;
     }
-}
-
-
-if ($GLOBALS["xtts_server_override"]) {
-    $GLOBALS["TTS"]["XTTSFASTAPI"]["endpoint"] = $GLOBALS["xtts_server_override"];
 }
 
 

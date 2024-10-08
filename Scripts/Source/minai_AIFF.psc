@@ -77,6 +77,8 @@ Function Maintenance(minai_MainQuestController _main)
   vibratorCommands[8] = "ExtCmdStimulateWithVibratorStrong"
   vibratorCommands[9] = "ExtCmdStimulateWithVibratorVeryStrong"
   InitializeActionRegistry()
+  ; Test, remove this later
+  ; StoreContext("minai", "testKey", "This is dynamically persisted context!", 1200)
 EndFunction
 
 
@@ -498,3 +500,17 @@ Event OnAIActorChange(string npcName, string actionName)
   EndIf
   ; Can't process spell removal here, since the actor will already be gone from the aiff system at this point. The context script will clean that up instead. 
 EndEvent
+
+
+
+Function StoreContext(string modName, string eventKey, string eventValue, int ttl)
+  if (!IsInitialized())
+    Main.Info("StoreContext() - Still Initializing.")
+    return
+  EndIf
+  if (!bHasAIFF)
+    return
+  EndIf
+  Main.Debug("StoreContext(" + modName +", " + eventKey + ", " + ttl +"): " + eventValue)
+  AIAgentFunctions.logMessage(modName + "@" + eventKey + "@" + eventValue + "@" + ttl, "storecontext")
+EndFunction
