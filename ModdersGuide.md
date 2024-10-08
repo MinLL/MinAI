@@ -77,10 +77,14 @@ EndEvent
 ## MinAI_SetContext
 This mod event is used to set persistent context to be included in all future prompts. This is useful if there is some mod state that you want to always be exposed. For example, you could use this to implement LLM awareness of the player's current arousal level, hunger, and so forth.
 
+
+Subsequent calls to this mod event with the same mod name / key will update the value with whatever you specify. For example, if you had a key "hunger", you could set this to "Min is Very hungry", "Min is not hungry at all", etc, depending on your mod's own internal state.
+
 ### Parameters
 * modName is a string containing the name of the mod that owns this context. This should be the name of your mod.
 * eventKey is a string containing the name of the event. Use this to differentiate between different sets of context you want to expose. For example, you might have one named "arousal", and one named "thirst".
 * eventValue is a string containing the text you want included in the context. This should provide whatever description you want the LLM to be aware of. For example, "Min is very hungry.".
+* TTL is how long this (in seconds) this event should be shown in the context after it is registered. Set this to 0 to immediately disable your event. Set this to a large value to avoid it expiring if you want it to be persistent.
 
 ```
 ; Set persistent context to be included in every LLM request until TTL expires.
