@@ -23,7 +23,8 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
 
 ## AIFF Extensions
 * This mod contains a number of quality of life improvements for AIFF.
-### AIFF-Specific Configuration Options (found in File Explorer: \\wsl.localhost\DwemerAI4Skyrim3\var\www\html\HerikaServer\ext\minai_plugin\config.php)
+### AIFF-Specific Configuration Options:
+(found in File Explorer: \\wsl.localhost\DwemerAI4Skyrim3\var\www\html\HerikaServer\ext\minai_plugin\config.php)
 * force_voice_type = Force the voice type sent to xtts to be the NPC's base voice type. This is useful for compatibility with Mantella's xtts server.
 * disable_nsfw = Globally disable all NSFW functionality.
 * restrict_nonfollower_functions = By default, AIFF will have all of its actions available to all NPC's. This option disables functions that make sense only for followers, when interacting with non-follower NPC's.
@@ -110,7 +111,7 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
 * NPC's can grope the player if they want. This event needs to be expanded. It's pretty simple at the moment.
 * NPC's can pinch the player's nipples if they want. This event needs to be expanded. It's pretty simple at the moment.
 * Players can carry out a number of routine vanilla interactions through natural dialogue. Currently supported integrations are:
-* * Renting a room from innkeepers
+  * Renting a room from innkeepers
   * Arranging for carriage rides to any location
   * Receiving training in skills from NPC's
   
