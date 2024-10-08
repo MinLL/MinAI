@@ -225,12 +225,12 @@ EndEvent
 
 
 Event OnOrgasm(string eventName, string actorName, float numArg, Form sender)
-  Main.RegisterEvent(actorName + " had an orgasm.")
+  Main.RequestLLMResponseNPC(actorName, actorName + " just had an orgasm!", "everyone")
 EndEvent
 
 
 Event OnEdged(string eventName, string actorName, float numArg, Form sender)
-  Main.RegisterEvent(actorName + " was brought right to the edge of orgasm but stopped before she could orgasm.")
+  Main.RequestLLMResponseNPC(actorName, actorName + " was brought right to the edge of orgasm but the vibrations stopped before I could cum!", "everyone")
 EndEvent
 
 
