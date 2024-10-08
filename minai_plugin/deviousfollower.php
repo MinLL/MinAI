@@ -76,7 +76,7 @@ function GetDeviousFollowerContext($name) {
         else {
             $daysRemaining = "{$dfContractRemaining} days";
         }
-        $ret .= "{$playerName} has agreed to hire the follower as part of a contract, and must continue to pay them. There are currently {$daysRemaining} remaining on the contract.\n";
+        $ret .= "{$playerName} has agreed to hire {$dfName} as part of a contract, and must continue to pay them. There are currently {$daysRemaining} remaining on the contract.\n";
     }
     // Special rule handling
     $rules = preg_split("/\r\n|\n|\r/", $dfRules);

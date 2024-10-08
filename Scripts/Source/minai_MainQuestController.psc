@@ -89,9 +89,11 @@ Function Maintenance()
     minAIFF.ResetAllActionBackoffs()
   EndIf
   lastRequestTime = 0.0
+  ; Public interface functions
   RegisterForModEvent("MinAI_RegisterEvent", "OnRegisterEvent")
   RegisterForModEvent("MinAI_RequestResponse", "OnRequestResponse")
   RegisterForModEvent("MinAI_RequestResponseDialogue", "OnRequestResponseDialogue")
+  RegisterForModEvent("MinAI_SetContext", "OnSetContext")
   Info("Initialization complete.")
 EndFunction
 
@@ -267,6 +269,27 @@ EndEvent
 Event OnRequestResponseDialogue(string speakerName, string eventLine, string targetName)
   Info("OnRequestResponse(" + speakerName + " => " + targetName + "): " + eventLine)
   RequestLLMResponseNPC(speakerName, eventLine, targetName)
+EndEvent
+
+
+
+; Set persistent context to be included in every LLM request until TTL expires.
+; int handle = ModEvent.Create("MinAI_SetContext")
+;  if (handle)
+;    ModEvent.PushString(handle, modName)
+;    ModEvent.PushString(handle, eventKey)
+;    ModEvent.PushString(handle, eventValue)
+;    ModEvent.PushInt(handle, ttl)
+;    ModEvent.Send(handle)
+;  endIf
+Event OnSetContext(string modName, string eventKey, string eventValue, int ttl)
+  Info("OnSetContext(" + modName + " => " + eventKey + " (TTL: " + ttl + ")): " + eventValue)
+  if bHasAIFF
+    minAIFF.StoreContext(modName, eventKey, eventValue, ttl)
+  elseif bHasMantella
+    ; Not persistent, but better than nothing for mantella users
+    RegisterEvent(eventValue, "info_context")
+  endif
 EndEvent
 
 
