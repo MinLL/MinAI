@@ -17,6 +17,24 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
 * Both Mantella and AIFF are supported by this mod as soft-dependencies. Run one or the other, or both at the same time. At the time of beta14 they have roughly equivalent feature parity (AIFF excels at some things like Sex scenes). As time goes on, AIFF will be focused on for development. Mantella's feature-set is effectively frozen.
 * Update as of Beta32: The majority of this mod's more advanced features are built for AIFF at this point, due to limitations with the Mantella API. Mantella still has rudimentary support, though, and continues to be supported. 
 
+## Action Registry (AIFF)
+* All commands can be enabled or disabled in the MCM.
+* All commands can be configured with cooldowns, with exponential backoff parameters. Effectively, this means that you can set a cooldown on a command, and have the cooldown increase every time that command is used, until enough time passes for the cooldown to reset back to base values.
+
+## AIFF Extensions
+* This mod contains a number of quality of life improvements for AIFF.
+### Configuration Options:
+* force_voice_type = Force the voice type sent to xtts to be the NPC's base voice type. This is useful for compatibility with Mantella's xtts server.
+* disable_nsfw = Globally disable all NSFW functionality.
+* restrict_nonfollower_functions = By default, AIFF will have all of its actions available to all NPC's. This option disables functions that make sense only for followers, when interacting with non-follower NPC's.
+* stop_narrator_context_leak = Prevent companions from being aware of what the narrator has said recently.
+* always_enable_functions = Enable functions during rechat. Fun for kinky party play.
+* PROMPT_HEAD_OVERRIDE = Override the prompt head for all profiles in a single place.
+* force_aiff_name_to_ingame_name = Force the AIFF player name to match the player's in-game name for compatibility with mods that change the player's name.
+* commands_to_purge = Remove any AIFF commands that you don't like. Removes "TakeASeat" by default.
+* xtts_server_override = Set the XTTS server in one place. Useful if you have to update this often for use with runpods.
+* disable_worn_equipment = Disable the worn equipment system, and fall back to keyword based equipment awareness.
+
 
 ### Sexlab and OStim:
 * This mod will let the LLM know when Sex is happening, and what type of sex it is. The AI will be aware of other NPC's having sex, or the player having sex.
@@ -29,6 +47,10 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
 * (AIFF) Actors have vastly improved awareness of sex scene details in AIFF over Mantella.
 * (Sexlab, Optional) This mod ships with a json file for configuration of prompts that are injected at each stage of a given animation. This can be edited to improve AI awareness of what is happening during a given sex scene. See data/minai/sexlab_descriptions.json
 
+## Worn Equipment Customization
+* You can customize the LLM's awareness of any piece of equipment that you are wearing in order to control how it perceives / reacts to specific gear.
+* Currently you can do this by accessing http://10.0.0.144:8081/HerikaServer/ext/minai_plugin/we_manager.html (Replace the IP address with the IP of your AIFF server). A link will be provided to this from within the plugins page in the future.
+* If you want to use the old keyword based system instead, you can disable this system in config.php.
 
 ### CBPC
 * This mod will connect the physics from CBPC to the LLM. The LLM will be aware of both where (breasts, ass, etc) and when the player touches themselves, or other actors, and will react to and comment on it. This works particularly well during sex, as the location the LLM will be aware of the location that the penis collides with. This requires solid CBPC configurations. This was tested with these: https://www.nexusmods.com/skyrimspecialedition/mods/82745?tab=description
@@ -77,6 +99,10 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
 ### Sunhelm
 * Players can now request food (A full sunhelm meal) to be served to them by servers or innkeepers.
 * The AI will be aware of the player's general hunger, thirst, and fatigue levels.
+
+## Nether's Follower Framework (NFF)
+* Allows the player to order followers to start / stop looting the nearby area.
+* This will be expanded greatly in the future to provide further integrations.
 
 ### General
 * The player can convince NPC's to trade with them, dress, or undress.
