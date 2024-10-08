@@ -273,8 +273,7 @@ EndEvent
 
 
 
-; Inform the LLM that an actor has spoken, and request a specific actor to respond.
-; Use "everyone" for targetName if you don't want a specific response.
+; Set persistent context to be included in every LLM request until TTL expires.
 ; int handle = ModEvent.Create("MinAI_SetContext")
 ;  if (handle)
 ;    ModEvent.PushString(handle, modName)
