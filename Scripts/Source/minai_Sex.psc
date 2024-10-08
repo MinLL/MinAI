@@ -781,12 +781,11 @@ EndFunction
 Event OnAnimationStart(int tid, bool HasPlayer)
   LoadSexlabDescriptions()
   Actor[] actorList = slf.GetController(tid).Positions
-  Actor[] sortedActorList = slf.SortActors(actorList,true)
-  int i = sortedActorList.Length
+  int i = actorList.Length
   bool bPlayerInScene=false
   while(i > 0)
     i -= 1
-    if (sortedActorList[i]==playerRef) 
+    if (actorList[i]==playerRef) 
       bPlayerInScene=true;
     EndIf
   Endwhile
@@ -821,15 +820,15 @@ Event OnStageStart(int tid, bool HasPlayer)
     LoadSexlabDescriptions()
   EndIf
   
-  Actor[] actorList = slf.GetController(tid).Positions
-  Actor[] targetactorList = actorList
+  Actor[] sortedActorList = slf.GetController(tid).Positions
+  
 
-  if (actorList.length < 1)
+  if (sortedActorList.length < 1)
     return
   EndIf
   
   string pleasure=""
-  Actor[] sortedActorList = slf.SortActors(actorList,true)
+  
   
   int i = sortedActorList.Length
   while(i > 0)
