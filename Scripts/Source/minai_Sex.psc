@@ -713,7 +713,9 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
       string actorName = main.GetActorName(actors[i])
       int excitement = OActor.GetExcitement(actors[i]) as int
       int orgasmcount = OActor.GetTimesClimaxed(actors[i])
-      Main.RegisterEvent(actorName + " is " + excitement + "% of the way toward their next orgasm and has already climaxed " + orgasmcount + " times during this encounter.")
+      if excitement > 80
+        Main.RegisterEvent(actorName + " is close to orgasm number " + (orgasmcount+1) + ".")
+      EndIf
     Endwhile
     
     if (playerInvolved)
