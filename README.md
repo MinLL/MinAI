@@ -25,6 +25,7 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
 * This mod contains a number of quality of life improvements for AIFF.
 ### AIFF-Specific Configuration Options:
 (found in File Explorer: \\wsl.localhost\DwemerAI4Skyrim3\var\www\html\HerikaServer\ext\minai_plugin\config.php)
+(You can easily access this folder by running the tools/AI-FF Plugins Folder file in your DwemerAI4Skyrim3 directory)
 * force_voice_type = Force the voice type sent to xtts to be the NPC's base voice type. This is useful for compatibility with Mantella's xtts server.
 * disable_nsfw = Globally disable all NSFW functionality.
 * restrict_nonfollower_functions = By default, AIFF will have all of its actions available to all NPC's. This option disables functions that make sense only for followers, when interacting with non-follower NPC's.
@@ -133,7 +134,7 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
 * In the web UI for AIFF, validate that the plugin has loaded by clicking "Plugins" on the top right.
 * Customize the prompt to your liking. This version of MinAI is much less prescriptive and heavy-handed on what the prompt needs to be.
 * (Optional) In the Herika Server (wsl) Plugins Folder - minai_plugin/config.php, enable or disable "force_voice_type" for Mantella XTTS compatibility.
-* (Optional) Configure any other options in minai_prompt/config.php to your liking.
+* (Optional) Configure any other options in minai_plugin/config.php to your liking.
 
 ## Installation Steps (MANTELLA)
 * Download and install this mod's archive through your mod organizer of choice.
