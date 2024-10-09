@@ -1,5 +1,5 @@
 # MinAI Modder's Guide
-MinAI exposes an API to allow mods to easily integrate with AIFF / MinAI without having to write a server plugin, and simplifies the process of making your mod compatible with AI. Currently there are four mod events exposed to facilitate this, which you can send to MinAI.
+MinAI exposes an API to allow mods to easily integrate with AIFF / MinAI without having to write a server plugin, and simplifies the process of making your mod compatible with AI. Currently there are five mod events exposed to facilitate this, which you can send to MinAI.
 
 ## MinAI_RegisterEvent
 This mod event is used to let the LLM know that an event has happened in game. It will be included in the context, and the LLM will be aware of it / possibly incorporate it into future responses. This does not prompt the LLM to respond immediately.
