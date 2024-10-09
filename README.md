@@ -15,7 +15,7 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
 
 ### Mantella or AI Follower Framework
 * Both Mantella and AIFF are supported by this mod as soft-dependencies. Run one or the other, or both at the same time. At the time of beta14 they have roughly equivalent feature parity (AIFF excels at some things like Sex scenes). As time goes on, AIFF will be focused on for development. Mantella's feature-set is effectively frozen.
-* Update as of Beta32: The majority of this mod's more advanced features are built for AIFF at this point, due to limitations with the Mantella API. Mantella still has rudimentary support, though, and continues to be supported. 
+* Update as of Beta32: The majority of this mod's more advanced features are built for AIFF at this point, due to limitations with the Mantella API. Mantella is still supported with it's current feature set.
 
 ## Action Registry (AIFF)
 * All commands can be enabled or disabled in the MCM.
@@ -23,7 +23,9 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
 
 ## AIFF Extensions
 * This mod contains a number of quality of life improvements for AIFF.
-### Configuration Options:
+### AIFF-Specific Configuration Options:
+(found in File Explorer: \\wsl.localhost\DwemerAI4Skyrim3\var\www\html\HerikaServer\ext\minai_plugin\config.php)
+(You can easily access this folder by running the tools/AI-FF Plugins Folder file in your DwemerAI4Skyrim3 directory)
 * force_voice_type = Force the voice type sent to xtts to be the NPC's base voice type. This is useful for compatibility with Mantella's xtts server.
 * disable_nsfw = Globally disable all NSFW functionality.
 * restrict_nonfollower_functions = By default, AIFF will have all of its actions available to all NPC's. This option disables functions that make sense only for followers, when interacting with non-follower NPC's.
@@ -72,7 +74,8 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
 * The AI will sometimes sexually harass you if you're wearing skimpy armor. Spanking, groping, pinching nipples, etc.
 
 ### The New Gentlemen
-* NPC's will be aware of their penis size and the player's, if applicable.
+* LLM will be aware of exposed penis sizes.
+* Currently, auto assigned addons are finicky (to be addressed in a future TNG update). Manually assign a type and size to PC/NPC with TNG hotkey to ensure LLM awareness.
 
 ### Deviously Accessible
 * Has support for the Telvanni quest from Deviously Accessible - If doing the quest, the Narrator will be replaced with the telvanni mage's personality. He will be aware of how well you've been doing, and of the dreams you've been having recently.
@@ -109,7 +112,7 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
 * NPC's can grope the player if they want. This event needs to be expanded. It's pretty simple at the moment.
 * NPC's can pinch the player's nipples if they want. This event needs to be expanded. It's pretty simple at the moment.
 * Players can carry out a number of routine vanilla interactions through natural dialogue. Currently supported integrations are:
-* * Renting a room from innkeepers
+  * Renting a room from innkeepers
   * Arranging for carriage rides to any location
   * Receiving training in skills from NPC's
   
@@ -119,29 +122,23 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
 
 # Installation
 ## Hard Requirements
-* This mod requires a functional installation of  either AI Follower Framework or Mantella and all of its dependencies in order to function.
-* Papyrus Tweaks is a hard requirement. The soft dependency integration from this mod can and will break if you don't have it.
-* You must have an Openrouter.ai account, with enough credits to pay for the LLM usage.
-* This mod will work with any version of Skyrim that Mantella or AIFF does. AFAIK that's SE, AE, and VR. I developed this mod in VR.
+* This mod requires a functional installation of either AI Follower Framework, Mantella, or both (and their respective dependencies). DO THIS FIRST and seek assistance in those forums. When you are up and running well, return here and continue installation as follows:
+* Papyrus Tweaks is required. Install the version appropriate for your game (SE/AE/VR).
 
 ## Soft Requirements
 * See the features section. All supported mods are soft requirements. Highly suggest having at a minimum either OStim or Sexlab.
 
 ## Installation Steps (AI Follower Framework)
-* Obtain an openrouter.ai key, and fund the account with some credits.
-* Install AI Follower Framework. This is quite a bit more involved than the mantella installation, but the payoff is worth it. I will not provide support for setting up, installing, or configuring AIFF.
-* Download and install this mod's archive through your mod organizer of choice.
-* Copy the minai_plugin folder to your Herika Server plugins directory. You can easily access this folder by running the tools/AI-FF Plugins Folder file in your DwemerAI4Skyrim3 directory.
+* Download and install this mod through your mod organizer of choice.
+* Copy the minai_plugin folder to your Herika Server plugins directory (this is in your wsl VM, under This PC in File Explorer). You can easily access this folder by running the tools/AI-FF Plugins Folder file in your DwemerAI4Skyrim3 directory.
 * In the web UI for AIFF, validate that the plugin has loaded by clicking "Plugins" on the top right.
 * Customize the prompt to your liking. This version of MinAI is much less prescriptive and heavy-handed on what the prompt needs to be.
-* (Optional) In minai_prompt/config.php, enable or disable "force_voice_type" for Mantella XTTS compatibility.
-* (Optional) Configure any other options in minai_prompt/config.php to your liking.
+* (Optional) In the Herika Server (wsl) Plugins Folder - minai_plugin/config.php, enable or disable "force_voice_type" for Mantella XTTS compatibility.
+* (Optional) Configure any other options in minai_plugin/config.php to your liking.
 
 ## Installation Steps (MANTELLA)
-* Obtain an openrouter.ai key, and fund the account with some credits.
-* Download, install, and configure Mantella. Instructions for this can be found here. I will not provide support for setting up, installing, or configuring Mantella.
 * Download and install this mod's archive through your mod organizer of choice.
-* Use the Mantella Web Interface to configure the prompts for this mod. I ship two sets of prompts: A very kinky set for submissive female characters in the example configuration, and a more vanilla set in vanilla_prompts.txt. If you're not sure which to use, I'd suggest using the vanilla prompts. Replace the skyrim, multi-npc, and radiant prompts with the ones provided by this mod.
+* Use the Mantella Web Interface to configure the prompts for this mod (main, multi-npc, and radiant). I ship two sets of prompts: A very kinky set for submissive female characters in the example configuration, and a more vanilla set in vanilla_prompts.txt. If you're not sure which to use, I'd suggest using the vanilla prompts. Replace the skyrim, multi-npc, and radiant prompts with the ones provided by this mod.
 * In the Mantella Web Interface under Other, set the "Max Count Events" setting to a minimum of 15. I use 50 with the full set of integrations.
 * (Recommended, Optional) Enable Radiant Dialogue in Mantella's MCM setting. This has a lot of very good and fun interactions when combined with this mod.
 * (Optional) If you want a specific character to roleplay in a specific manner, or have a specific personality, edit the skyrim_characters.csv file that ships with Mantella to update that character's bio.
