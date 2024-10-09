@@ -323,12 +323,14 @@ Function RegisterAction(string actionName, string mcmName, string mcmDesc, strin
   if !bHasAIFF
     return
   EndIf
-  if JMap.getObj(actionRegistry, actionName) != 0
-    Main.Warn("ActionRegistry: " + actionName + " already registered. Skipping.")
-    return
+  int actionObj = JMap.getObj(actionRegistry, actionName)
+  bool updating = false
+  if actionObj != 0
+    updating = true
+  else
+    actionObj = JMap.Object()
+    JValue.Retain(actionObj)
   EndIf
-  int actionObj = JMap.Object()
-  JValue.Retain(actionObj)
   JMap.SetStr(actionObj, "name", actionName) ; ExtCmdFoo
   JMap.SetStr(actionObj, "mcmName", mcmName) ; Foo
   JMap.SetStr(actionObj, "mcmDesc", mcmDesc) ; Foo
@@ -351,7 +353,12 @@ Function RegisterAction(string actionName, string mcmName, string mcmDesc, strin
     JMap.setInt(actionObj, "hasMod", 0)
   EndIf
   JMap.setObj(actionRegistry, actionName, actionObj)
-  Main.Info("ActionRegistry: Registered new action: " + actionName)
+  config.ActionRegistryIsDirty = true
+  if updating
+    Main.Info("ActionRegistry: Updated existing action: " + actionName)
+  else
+    Main.Info("ActionRegistry: Registered new action: " + actionName)
+  EndIf
 EndFunction
 
 
@@ -533,7 +540,6 @@ Function StoreAction(string actionName, string actionPrompt, int enabled, int tt
   EndIf
   Main.Debug("StoreAction(" + actionName +", " + enabled + ", " + ttl +"): " + actionPrompt)
 	AIAgentFunctions.logMessage(actionName + "@" + actionPrompt + "@" + enabled + "@" + ttl + "@" + targetDescription + "@" + targetEnum, "registeraction")
-  config.InitializeMCM() ; Register new actions in the MCM
 EndFunction
 
 
