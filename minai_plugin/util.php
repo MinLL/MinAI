@@ -145,6 +145,10 @@ Function IsActionEnabled($actionName) {
 Function RegisterAction($actionName) {
     if (IsActionEnabled($actionName)) {
         $GLOBALS["ENABLED_FUNCTIONS"][]=$actionName;
+        // error_log("minai: Registering {$actionName}");
+    }
+    else {
+        // error_log("minai: Not Registering {$actionName}");
     }
 }
 

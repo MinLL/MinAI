@@ -86,6 +86,7 @@ if (!$GLOBALS["disable_nsfw"]) {
     }
 }
 
+RegisterThirdPartyActions();
 
 $commandsToPurge=[];
 foreach ($GLOBALS["ENABLED_FUNCTIONS"] as $n=>$func) {

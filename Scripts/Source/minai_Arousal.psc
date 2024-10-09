@@ -575,7 +575,7 @@ string Function GetWornEquipments(Actor target)
     endif
     currentSlot *= 2 ;double the number to move on to the next slot
   endWhile
-  Main.Info("GetWornEquipments: " + wornEquipments)
+  Main.Debug("GetWornEquipments: " + wornEquipments)
   return wornEquipments
 EndFunction
 

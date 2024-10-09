@@ -137,14 +137,15 @@ Function SetupPages()
   Pages[2] = "Devious Stuff"
   Pages[3] = "Sex Settings"
   Pages[4] = "Action Registry (General)"
-  Pages[5] = "Action Registry (Survival)"
-  Pages[6] = "Action Registry (Followers)"
+  Pages[5] = "Action Registry (External)"
+  Pages[6] = "Action Registry (Survival)"
   Pages[7] = "Action Registry (Arousal)"
   Pages[8] = "Action Registry (Sex (1))"
   Pages[9] = "Action Registry (Sex (2))"
   Pages[10] = "Action Registry (Sex (3))"
   Pages[11] = "Action Registry (Devious Stuff)"
   Pages[12] = "Action Registry (Devious Followers)"
+  Pages[13] = "Action Registry (Followers)"
 EndFunction
 
 Event OnVersionUpdate(int newVersion)
@@ -168,6 +169,8 @@ Event OnPageReset(string page)
     RenderSexPage()
   elseif page == "Action Registry (General)"
     RenderActionsPage("General")
+  elseif page == "Action Registry (External)"
+    RenderActionsPage("External")
   elseif page == "Action Registry (Survival)"
     RenderActionsPage("Survival")
   elseif page == "Action Registry (Followers)"
