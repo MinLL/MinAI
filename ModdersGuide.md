@@ -1,5 +1,5 @@
 # MinAI Modder's Guide
-MinAI exposes an API to allow mods to easily integrate with AIFF / MinAI without having to write a server plugin, and simplifies the process of making your mod compatible with AI. Currently there are four mod events exposed to facilitate this, which you can send to MinAI.
+MinAI exposes an API to allow mods to easily integrate with AIFF / MinAI without having to write a server plugin, and simplifies the process of making your mod compatible with AI. Currently there are five mod events exposed to facilitate this, which you can send to MinAI.
 
 ## MinAI_RegisterEvent
 This mod event is used to let the LLM know that an event has happened in game. It will be included in the context, and the LLM will be aware of it / possibly incorporate it into future responses. This does not prompt the LLM to respond immediately.
@@ -107,3 +107,70 @@ Event OnSetContext(string modName, string eventKey, string eventValue, int ttl)
 EndEvent
 ```
 
+## MinAI_RegisterAction
+This mod event is used to expose new actions that you want the LLM to be able to execute. In short, you can provide instructions to the LLM on how to use your action, and it will invoke it, ultimately triggering a callback within your papyrus code.
+
+```
+; Register an action
+; int handle = ModEvent.Create("MinAI_RegisterAction")
+;  if (handle)
+;    ModEvent.PushString(handle, actionName) ; Cannot contain spaces! Example, "SitDown".
+;    ModEvent.PushString(handle, actionPrompt)
+;    ModEvent.PushString(handle, mcmDescription)
+;    ModEvent.PushString(handle, targetDescription)
+;    ModEvent.PushString(handle, targetEnum)
+;    ModEvent.PushInt(handle, enabled)
+;    ModEvent.PushFloat(handle, cooldown)
+;    ModEvent.PushInt(handle, ttl)
+;    ModEvent.Send(handle)
+;  endIf
+Event OnRegisterAction(string actionName, string actionPrompt, string mcmDescription, string targetDescription, string targetEnum, int enabled, float cooldown, int ttl)
+  Info("OnRegisterAction(" + actionName + " => " + enabled + " (Cooldown: " + cooldown + ")): " + actionPrompt)
+  if bHasAIFF
+		minaiff.RegisterAction("ExtCmd"+actionName, actionName, mcmDescription, "External", enabled, cooldown, 2, 5, 300, true)
+    minaiff.StoreAction(actionName, actionPrompt, enabled, ttl, targetDescription, targetEnum)
+  elseif bHasMantella
+    ; Nothing to do for mantella.
+  endif
+EndEvent
+```
+
+### Example
+```
+Function RegisterTestAction(int enabled)
+  int handle = ModEvent.Create("MinAI_RegisterAction")
+  if (handle)
+    ModEvent.PushString(handle, "testaction") ; The name of the action. Must not contain spaces.
+    ModEvent.PushString(handle, "Use the test action") ; Instructions for the LLM on how to use your action.
+    ModEvent.PushString(handle, "Test Action Description") ; The description for your action in the MCM.
+    ModEvent.PushString(handle, "Target (Actor, NPC)") ; The type of target for your action. Leave empty if not applicable.
+    ModEvent.PushString(handle, "my,list,of,targets") ; The list of targets for your action. Leave empty if not applicable. 
+    ModEvent.PushInt(handle, enabled)
+    ModEvent.PushFloat(handle, 5) ; 5 second cooldown
+    ModEvent.PushInt(handle, 1200) ; 1200 second TTL
+    ModEvent.Send(handle)
+  endIf
+EndFunction
+
+Function Maintenance()
+  RegisterTestAction(1) ; Enable the action for the LLM.
+  ; After registering an action, you would register for a modevent to be informed when the command is executed (Like such)
+  RegisterForModEvent("AIFF_CommandReceived", "CommandDispatcher")
+EndFunction
+
+; speakerName is the NPC that triggered your action.
+; Command is the function name.
+; Parameter is the target that the LLM selected for the action.
+Event CommandDispatcher(String speakerName,String  command, String parameter)
+  Actor akActor = AIAgentFunctions.getAgentByName(speakerName)
+  if (command=="ExtCmdtestaction")
+    ; Do the thing here.
+
+    ; It is encouraged that you conditionally enable and disable actions circumstantially when it makes sense for them to be available for the LLM.
+    ; For example, you might only want to enable an "eat food" action if the NPC's hunger level were over a certain threshold.
+    ; This is an example for how you would disable the action when you did not want it to be exposed:
+    RegisterTestAction(0) 
+    ; 
+  EndIf
+EndEvent
+```
