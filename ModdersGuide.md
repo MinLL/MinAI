@@ -165,6 +165,12 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   Actor akActor = AIAgentFunctions.getAgentByName(speakerName)
   if (command=="ExtCmdtestaction")
     ; Do the thing here.
+
+    ; It is encouraged that you conditionally enable and disable actions circumstantially when it makes sense for them to be available for the LLM.
+    ; For example, you might only want to enable an "eat food" action if the NPC's hunger level were over a certain threshold.
+    ; This is an example for how you would disable the action when you did not want it to be exposed:
+    RegisterTestAction(0) 
+    ; 
   EndIf
 EndEvent
 ```
