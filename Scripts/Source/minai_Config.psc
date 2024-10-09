@@ -4,7 +4,8 @@ minai_MainQuestController main
 minai_AIFF aiff
 minai_Sex  sex
 minai_DeviousStuff devious
-
+bool Property ActionRegistryIsDirty = false Auto
+  
 ; OID definitions
 int logLevelOID
 int useCBPCOID
@@ -123,6 +124,7 @@ Function InitializeMCM()
     JMap.SetObj(aOIDMap, actions[i], aOID)
     i += 1
   EndWhile
+  ActionRegistryIsDirty = False
   SetupPages()
 EndFunction
 
@@ -149,7 +151,7 @@ Function SetupPages()
 EndFunction
 
 Event OnVersionUpdate(int newVersion)
-  if newVersion != CurrentVersion || aOIDMap == 0 || JMap.Count(aOIDMap) == 0
+  if newVersion != CurrentVersion || aOIDMap == 0 || JMap.Count(aOIDMap) == 0 || ActionRegistryIsDirty
     InitializeMCM()
   EndIf
 EndEvent

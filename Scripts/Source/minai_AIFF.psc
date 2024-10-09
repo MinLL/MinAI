@@ -351,6 +351,7 @@ Function RegisterAction(string actionName, string mcmName, string mcmDesc, strin
     JMap.setInt(actionObj, "hasMod", 0)
   EndIf
   JMap.setObj(actionRegistry, actionName, actionObj)
+  config.ActionRegistryIsDirty = true
   Main.Info("ActionRegistry: Registered new action: " + actionName)
 EndFunction
 
@@ -533,7 +534,6 @@ Function StoreAction(string actionName, string actionPrompt, int enabled, int tt
   EndIf
   Main.Debug("StoreAction(" + actionName +", " + enabled + ", " + ttl +"): " + actionPrompt)
 	AIAgentFunctions.logMessage(actionName + "@" + actionPrompt + "@" + enabled + "@" + ttl + "@" + targetDescription + "@" + targetEnum, "registeraction")
-  config.InitializeMCM() ; Register new actions in the MCM
 EndFunction
 
 
