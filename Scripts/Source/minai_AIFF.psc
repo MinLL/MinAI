@@ -21,8 +21,8 @@ minai_Followers followers
 Keyword AIAssisted
 Spell ContextSpell
 GlobalVariable minai_SapienceEnabled
-
 int Property actionRegistry Auto
+int sapientActors
 
 Function Maintenance(minai_MainQuestController _main)
   contextUpdateInterval = 30
@@ -534,4 +534,36 @@ Function StoreAction(string actionName, string actionPrompt, int enabled, int tt
   Main.Debug("StoreAction(" + actionName +", " + enabled + ", " + ttl +"): " + actionPrompt)
 	AIAgentFunctions.logMessage(actionName + "@" + actionPrompt + "@" + enabled + "@" + ttl + "@" + targetDescription + "@" + targetEnum, "registeraction")
   config.InitializeMCM() ; Register new actions in the MCM
+EndFunction
+
+
+Function TrackSapientActor(actor akTarget)
+  if (sapientActors == 0)
+    Main.Debug("Initializing sapient actors map")
+    sapientActors = JMap.Object()
+    JValue.Retain(sapientActors)
+  EndIf
+  JMap.SetForm(sapientActors, Main.GetActorName(akTarget), akTarget)
+EndFunction
+
+
+Function RemoveActorAI(actor akTarget)
+  string targetName = Main.GetActorName(akTarget)
+  Actor agent = AIAgentFunctions.getAgentByName(targetName)
+  if agent
+    Main.Info("SAPIENCE: Removing " + targetName + " from AI")
+    AIAgentFunctions.setDrivenByAIA(akTarget, false)
+    akTarget.RemoveSpell(ContextSpell)
+  EndIf
+EndFunction
+
+Function EnableActorAI(actor akTarget)
+  string targetName = Main.GetActorName(akTarget)
+  Actor agent = AIAgentFunctions.getAgentByName(targetName)
+  if !agent
+    Main.Info("SAPIENCE: Adding " + targetName + " to AI")
+    AIAgentFunctions.setDrivenByAIA(akTarget, false)
+    TrackContext(akTarget)
+    TrackSapientActor(akTarget)
+  EndIf
 EndFunction

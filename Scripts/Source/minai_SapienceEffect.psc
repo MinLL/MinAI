@@ -29,36 +29,7 @@ Function OnEffectStart(Actor akTarget, Actor akCaster)
   RegisterForSingleUpdate(updateTime)
 EndFunction
 
-Function RemoveAI(actor akTarget)
-  string targetName = Main.GetActorName(akTarget)
-  Actor agent = AIAgentFunctions.getAgentByName(targetName)
-  if agent
-    Main.Info("SAPIENCE: Removing " + targetName + " from AI")
-    AIAgentFunctions.setDrivenByAIA(akTarget, false)
-    akTarget.RemoveSpell(ContextSpell)
-  EndIf
-EndFunction
-
-Function EnableAI(actor akTarget)
-  string targetName = Main.GetActorName(akTarget)
-  Actor agent = AIAgentFunctions.getAgentByName(targetName)
-  if !agent
-    Main.Info("SAPIENCE: Adding " + targetName + " to AI")
-    AIAgentFunctions.setDrivenByAIA(akTarget, false)
-    aiff.TrackContext(akTarget)
-  EndIf
-EndFunction
-
-Function OnEffectStop(Actor akTarget, Actor akCaster)
-  if (!akTarget || !main || !aiff || !aiff.IsInitialized())
-    Debug.Trace("[minai] SAPIENCE: Skipping OnEffectStop, not ready")
-    return
-  EndIf
-  string targetName = Main.GetActorName(akTarget)
-  main.Debug("SAPIENCE: OnEffectStop(" + targetName +")")
-  RemoveAI(akTarget)
-EndFunction
-
+; OnEffectStop is not reliably called. Handle cleanup elsewhere.
 
 Event OnUpdate()
   actor akTarget = GetTargetActor()
@@ -66,10 +37,9 @@ Event OnUpdate()
   Main.Debug("SAPIENCE OnUpdate (" + targetName +")")
   if(!aiff || !akTarget.Is3DLoaded())
     Main.Debug("SAPIENCE OnUpdate( " + targetName + ") Stopping OnUpdate for actor - actor is not loaded.")
-    RemoveAI(akTarget)
+    aiff.RemoveActorAI(akTarget)
     UnregisterForUpdate()
     return
   endif
-  EnableAI(akTarget)
-  RegisterForSingleUpdate(60) ; Check every 60 seconds if the NPC is still loaded, and clean them up if they're not.
+  aiff.EnableActorAI(akTarget)
 EndEvent
