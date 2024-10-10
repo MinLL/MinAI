@@ -149,10 +149,16 @@ function Maintenance(minai_MainQuestController _main)
   
   aiff.RegisterAction("ExtCmdForceOrgasm", "ForceOrgasm", "Force the target  to cum", "Devious Stuff", 1, 30, 2, 5, 300, bHasDD)
   aiff.RegisterAction("MinaiGlobalVibrator", "Vibrator", "Global backoff for all vibrator usage", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
-  aiff.RegisterAction("ExtCmdTurnOffVibrator", "TurnOffVibrator", "Stop Vibrations", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdStopStimulation", "StopStimulation", "Stop Vibrations", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
   aiff.RegisterAction("ExtCmdshock", "Shock", "Shock the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
   aiff.RegisterAction("ExtCmdEquipCollar", "EquipCollar", "Lock a Collar on the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
   aiff.RegisterAction("ExtCmdUnequipCollar", "UnequipCollar", "Unlock a Collar from the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdEquipGag", "EquipGag", "Lock a gag on the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdUnequipGag", "UnequipGag", "Unlock a gag from the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdEquipBelt", "EquipBelt", "Lock a Chastity Belt on the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdUnequipBelt", "UnequipBelt", "Unlock a Chastity Belt from the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdEquipBinder", "EquipBinder", "Lock a Armbinder on the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdUnequipBinder", "UnequipBinder", "Unlock a Armbinder from the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
 
   aiff.RegisterAction("ExtCmdAcceptDeal", "AcceptDeal", "Accept Deal Negotiation", "Devious Followers", 1, 1, 2, 5, 300, bHasDeviousFollowers)
   aiff.RegisterAction("ExtCmdGiveDrugs", "GiveDrugs", "Give Drugs to the player", "Devious Followers", 1, 1, 2, 5, 300, bHasDeviousFollowers)
@@ -225,12 +231,12 @@ EndEvent
 
 
 Event OnOrgasm(string eventName, string actorName, float numArg, Form sender)
-  Main.RequestLLMResponseNPC(actorName, actorName + " just had an orgasm!", "everyone")
+  Main.RegisterEvent(actorName + " had an orgasm.")
 EndEvent
 
 
 Event OnEdged(string eventName, string actorName, float numArg, Form sender)
-  Main.RequestLLMResponseNPC(actorName, actorName + " was brought right to the edge of orgasm but the vibrations stopped before I could cum!", "everyone")
+  Main.RegisterEvent(actorName + " was brought right to the edge of orgasm but stopped before she could orgasm.")
 EndEvent
 
 
@@ -535,7 +541,7 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
 
   ; Generic actions
   If stringutil.Find(sayLine, "-grope-") != -1
-    Debug.Notification(Main.GetActorName(akSpeaker) + " gropes " + main.GetYouYour(akTarget) + " crotch abruptly!")
+    Debug.Notification(akSpeaker.GetActorBase().GetName() + " gropes " + main.GetYouYour(akTarget) + " crotch abruptly!")
     arousal.UpdateArousal(akTarget, 5)
     Game.ShakeController(0.5,0.5,1.0)
     if bHasDD
@@ -543,7 +549,7 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
     EndIf
   EndIf
   If stringutil.Find(sayLine, "-pinchnipples-") != -1
-    Debug.Notification(Main.GetActorName(akSpeaker) + " painfully pinches " + main.GetYouYour(akTarget) + " nipples!")
+    Debug.Notification(akSpeaker.GetActorBase().GetName() + " painfully pinches " + main.GetYouYour(akTarget) + " nipples!")
     arousal.UpdateArousal(akTarget, 3)
     Game.ShakeController(0.7,0.7,0.2)
     if bHasDD
@@ -621,7 +627,7 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     akTarget = PlayerRef
   EndIf
   if (akTarget.IsChild())
-    Main.Warn(Main.GetActorName(akTarget) + " is a child actor. Not processing actions.")
+    Main.Warn(akTarget.GetDisplayName() + " is a child actor. Not processing actions.")
     return
   EndIf
   string targetName = main.GetActorName(akTarget)
@@ -677,7 +683,7 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
       libs.StopVibrating(akTarget)
       libs.VibrateEffect(akTarget, 5, vibTime, False)
       Main.RegisterEvent(""+speakerName+" very strongly stimulates " + targetName + " with a remote vibrator.")
-    elseIf (command == "ExtCmdTurnOffVibrator")
+    elseIf (command == "ExtCmdStopStimulation")
       libs.StopVibrating(akTarget)
       Main.RegisterEvent(""+speakerName+" turns off " + targetName + "'s remote vibrator.")
     elseIf (command == "ExtCmdshock")
@@ -689,10 +695,28 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
       if (command == "ExtCmdEquipCollar")
         ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_collars)
         Main.RegisterEvent(""+speakerName+" locked a collar on " + targetName)
-      elseif (command == "ExtCmdUnequipCollar")
+	elseif (command == "ExtCmdUnequipCollar")
         libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousCollar)
         Main.RegisterEvent(""+speakerName+" removed a collar from " + targetName)
-      EndIf
+      elseif (command == "ExtCmdEquipGag")
+        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_gags_ball_ebonite)
+        Main.RegisterEvent(""+speakerName+" Puts a gag on " + targetName)
+		elseif (command == "ExtCmdEquipBinder")
+        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_armbinders_ebonite)
+        Main.RegisterEvent(""+speakerName+" Puts a Armbinder on " + targetName)
+		elseif (command == "ExtCmdEquipBelt")
+        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_chastitybelts_closed)
+        Main.RegisterEvent(""+speakerName+" Puts a Chastity Belt on " + targetName)
+		elseif (command == "ExtCmdUnequipBelt")
+        libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousBelt)
+	Main.RegisterEvent(""+speakerName+" removes a Belt from " + targetName)
+      elseif (command == "ExtCmdUnequipGag")
+        libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousGag)
+	Main.RegisterEvent(""+speakerName+" removes a Gag from " + targetName)
+	elseif (command == "ExtCmdUnequipBinder")
+        libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousArmbinder)
+	Main.RegisterEvent(""+speakerName+" removes a Armbinder from " + targetName)
+	EndIf
     EndIf
   EndIf
   ;  Generic actions
