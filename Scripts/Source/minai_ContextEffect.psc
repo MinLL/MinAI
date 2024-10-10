@@ -25,22 +25,28 @@ Function OnEffectStart(Actor akTarget, Actor akCaster)
   
 EndFunction
 
+Function DisableSelf(actor akTarget)
+  Main.Debug("Context OnUpdate( " + Main.GetActorName(akTarget) + ") Stopping OnUpdate for actor - actor is not loaded.")
+  akTarget.RemoveSpell(ContextSpell)
+EndFunction
 
 Event OnUpdate()
   actor akTarget = GetTargetActor()
   string targetName = Main.GetActorName(akTarget)
   Main.Debug("Context OnUpdate (" + targetName +")")
   if(!aiff || !akTarget.Is3DLoaded())
-    Main.Debug("Context OnUpdate( " + targetName + ") Stopping OnUpdate for actor - actor is not loaded.")
-    akTarget.RemoveSpell(ContextSpell)
-    UnregisterForUpdate()
+    DisableSelf(akTarget)
     return
   endif
   if AIAgentFunctions.getAgentByName(targetName)
     Main.Debug("Updating context for managed NPC: " + targetName)
     ; sex = (Self as Quest) as minai_Sex
     aiff.SetContext(akTarget)
-    RegisterForSingleUpdate(aiff.ContextUpdateInterval)
+    if(!aiff || !akTarget.Is3DLoaded())
+      DisableSelf(akTarget)
+    else
+      RegisterForSingleUpdate(aiff.ContextUpdateInterval)
+    endif
   Else
     ; Cleanup perk if the actor is no longer ai managed
     if akTarget.HasSpell(ContextSpell)
