@@ -673,21 +673,26 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
     string actorString
     int i = actors.Length
     bool playerInvolved=false
-    while(i > 0)
-      i -= 1
-      actorString = actorString+Main.GetActorName(actors[i])+","
-      if (actors[i] == playerRef) 
-        playerInvolved = true
+    if isRunning
+      while(i > 0)
+        i -= 1
+        actorString = actorString+Main.GetActorName(actors[i])+","
+        if (actors[i] == playerRef) 
+          playerInvolved = true
+        EndIf
+      Endwhile
+      if (playerInvolved)
+        AIFF.ChillOut()
       EndIf
-    Endwhile
-    if (playerInvolved)
-      AIFF.ChillOut()
+      Main.RegisterEvent(actorString + " begin scene: " + sceneName + ".")
+      SetSexSceneState("on")
+      if bHasAIFF
+        AIAgentFunctions.logMessage("ostim@"+sceneName+" "+isRunning+" "+actorString,"setconf")
+      EndIf
+      Main.Info("OStim scene start")
+    else
+      Main.Debug("OStim thread start failed")
     EndIf
-    SetSexSceneState("on")
-    if bHasAIFF
-      AIAgentFunctions.logMessage("ostim@"+sceneName+" "+isRunning+" "+actorString,"setconf")
-    EndIf
-    Main.Info("Started intimate scene")
   
   elseif (eventName == "ostim_thread_scenechanged")
     string sceneId = strArg 
@@ -698,25 +703,29 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
     string actorString
     int i = actors.Length
     bool playerInvolved=false
-    while(i > 0)
-      i -= 1
-      actorString = actorString+Main.GetActorName(actors[i])+","
-      if (actors[i] == playerRef)
-        playerInvolved = true
+    if isRunning
+      while(i > 0)
+        i -= 1
+        actorString = actorString+Main.GetActorName(actors[i])+","
+        if (actors[i] == playerRef)
+          playerInvolved = true
+        EndIf
+        string actorName = Main.GetActorName(actors[i])
+        int excitement = OActor.GetExcitement(actors[i]) as int
+        int orgasmcount = OActor.GetTimesClimaxed(actors[i])
+        if excitement >= 80
+          Main.RegisterEvent(actorName + " is close to orgasm number " + (orgasmcount+1) + ".")
+        EndIf
+      Endwhile
+      if (playerInvolved)
+        AIFF.ChillOut()
       EndIf
-      string actorName = Main.GetActorName(actors[i])
-      int excitement = OActor.GetExcitement(actors[i]) as int
-      int orgasmcount = OActor.GetTimesClimaxed(actors[i])
-      if excitement >= 80
-        Main.RegisterEvent(actorName + " is close to orgasm number " + (orgasmcount+1) + ".")
-      EndIf
-    Endwhile
-    if (playerInvolved)
-      AIFF.ChillOut()
+      Main.Info("Ostim Scene changed to: " + sceneName)
+      Main.Debug(""+sceneName+" id:"+sceneId+" isRunning:"+isRunning+" Actors: "+actorString)
+      Main.RegisterEvent(actorString + " changed the action to " + tags + ".")
+    else
+      Main.Debug("OStim scene change failed")
     EndIf
-    Main.Info("Ostim Scene changed to: " + sceneName)
-    Main.Debug(""+sceneName+" id:"+sceneId+" isRunning:"+isRunning+" Actors: "+actorString)
-    Main.RegisterEvent(actorString + " changed the action to " + tags + ".")
     
   elseif (eventName == "ostim_thread_speedchanged")
     string sceneId = strArg 
@@ -726,35 +735,37 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
     string actorString
     int i = actors.Length
     bool playerInvolved=false
-    while(i > 0)
-      i -= 1
-      actorString = actorString+Main.GetActorName(actors[i])+","
-      if (actors[i] == playerRef)
-        playerInvolved = true
+    if isRunning
+      while(i > 0)
+        i -= 1
+        actorString = actorString+Main.GetActorName(actors[i])+","
+        if (actors[i] == playerRef)
+          playerInvolved = true
+        EndIf
+        string actorName = Main.GetActorName(actors[i])
+        int excitement = OActor.GetExcitement(actors[i]) as int
+        int orgasmcount = OActor.GetTimesClimaxed(actors[i])
+        if excitement >= 80
+          Main.RegisterEvent(actorName + " is close to orgasm number " + (orgasmcount+1) + ".")
+        EndIf
+      Endwhile
+      if (playerInvolved)
+        AIFF.ChillOut()
       EndIf
-      string actorName = Main.GetActorName(actors[i])
-      int excitement = OActor.GetExcitement(actors[i]) as int
-      int orgasmcount = OActor.GetTimesClimaxed(actors[i])
-      if excitement >= 80
-        Main.RegisterEvent(actorName + " is close to orgasm number " + (orgasmcount+1) + ".")
+      int sceneSpeed = OThread.GetSpeed(ostimTid)
+      int defaultSpeed = OMetadata.GetDefaultSpeed(ostimTid)
+      if sceneSpeed > defaultSpeed
+        DirtyTalk(actors, "Fuck yes! Faster! Harder!")
+      elseif sceneSpeed < defaultSpeed
+        DirtyTalk(actors, "Mmm, yeah... slow it down, make it last.")
       EndIf
-    Endwhile
-    if (playerInvolved)
-      AIFF.ChillOut()
-    EndIf
-    int sceneSpeed = OThread.GetSpeed(ostimTid)
-    int defaultSpeed = OMetadata.GetDefaultSpeed(ostimTid)
-    if sceneSpeed >= defaultSpeed
-      DirtyTalk(actors, "Fuck yes! Faster! Harder!")
+      Main.Info("Ostim speed change")
     else
-      DirtyTalk(actors, "Mmm, yeah... slow it down, make it last.")
+      Main.Debug("OStim speed change failed")
     EndIf
-    Main.Info("Ostim speed change")
 
   elseif (eventName == "ostim_actor_orgasm")    
     Actor OrgasmedActor = Sender as Actor
-    string sceneName = OThread.GetScene(ostimTid)
-    bool isRunning = OThread.IsRunning(ostimTid)
     Actor[] actors = OThread.GetActors(ostimTid)
     Main.RegisterEvent(Main.GetActorName(OrgasmedActor) + " had an Orgasm")
     DirtyTalk(actors, "ohh... yes.")
@@ -762,7 +773,6 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
 
   elseif (eventName == "ostim_thread_end")    
     string sceneName = OThread.GetScene(ostimTid)
-    bool isRunning = OThread.IsRunning(ostimTid)
     Actor[] actors = OThread.GetActors(ostimTid)
     string actorString
     int i = actors.Length
@@ -777,6 +787,7 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
     if (playerInvolved)
       AIFF.ChillOut()
     EndIf
+    Main.RegisterEvent(actorString + " finished scene: " + sceneName + ".")
     SetSexSceneState("off")
     Main.Info("Ended intimate scene")
   EndIf
