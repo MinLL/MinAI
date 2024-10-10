@@ -152,10 +152,10 @@ Function StartSexScene(actor[] actors, bool bPlayerInScene, string tags="")
     tags = ConvertTagsOstim(tags)
     actors = OActorUtil.Sort(actors, OActorUtil.EmptyArray())
     string newScene = OLibrary.GetRandomSceneWithAnyActionCSV(actors, tags)
-    Utility.Wait(0.5)
+    Utility.Wait(0.2)
     if newScene == ""
       newScene = OLibrary.GetRandomSceneWithAnySceneTagCSV(actors, tags)
-      Utility.Wait(1)
+      Utility.Wait(0.5)
       if newScene == ""
         Main.Debug("No OStim scene found for: " + tags)
       EndIf
@@ -224,7 +224,7 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
           ostimActors = OActorUtil.Sort(ostimActors, OActorUtil.EmptyArray())
           Main.Debug("OStim added akSpeaker to array and sorted: " + ostimActors)
           OThread.Stop(ActiveOstimThreadID)
-          Utility.Wait(2)
+          Utility.Wait(0.5)
           StartSexScene(ostimActors, bPlayerInScene, tags)
         EndIf
       EndIf
@@ -233,17 +233,17 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
       ostimActors = OThread.GetActors(ActiveOstimThreadID)
       Main.Debug("Searching for random " + tags + " scene.")
       string newScene = OLibrary.GetRandomSceneWithAnyActionCSV(ostimActors, tags)
-      Utility.Wait(0.5)
+      Utility.Wait(0.2)
       if newScene == ""
         newScene = OLibrary.GetRandomSceneWithAnySceneTagCSV(ostimActors, tags)
-        Utility.Wait(1)
+        Utility.Wait(0.5)
       EndIf
       Main.Debug("Ostim scene transition to: " + newScene + " for OStim Thread [" + ActiveOstimThreadID + "].")
       if OThread.IsRunning(ActiveOstimThreadID)
         OThread.NavigateTo(ActiveOstimThreadID, newScene)
         if OThread.IsInAutoMode(ActiveOstimThreadID)
           OThread.StopAutoMode(ActiveOstimThreadID)
-          Utility.Wait(5)
+          Utility.Wait(4)
           OThread.StartAutoMode(ActiveOstimThreadID)
         EndIf
       EndIf
@@ -663,27 +663,21 @@ EndFunction
 
 
 
-Event OnOstimOrgasm(string eventName, string strArg, float numArg, Form sender)
-  actor akActor = sender as actor
-EndEvent
-
-
-
 Event OStimManager(string eventName, string strArg, float numArg, Form sender)
   int ostimTid = numArg as int
   Main.Info("oStim eventName: "+eventName+", strArg: "+strArg)
-  if (eventName=="ostim_thread_start")
-    string sceneName=OThread.GetScene(ostimTid)
-    bool isRunning=OThread.IsRunning(ostimTid)
+  if (eventName == "ostim_thread_start")
+    string sceneName  =OThread.GetScene(ostimTid)
+    bool isRunning = OThread.IsRunning(ostimTid)
     Actor[] actors =  OThread.GetActors(ostimTid)
-    string actorString;
+    string actorString
     int i = actors.Length
     bool playerInvolved=false
     while(i > 0)
       i -= 1
-      actorString=actorString+Main.GetActorName(actors[i])+","
+      actorString = actorString+Main.GetActorName(actors[i])+","
       if (actors[i] == playerRef) 
-        playerInvolved=true
+        playerInvolved = true
       EndIf
     Endwhile
     if (playerInvolved)
@@ -695,20 +689,20 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
     EndIf
     Main.Info("Started intimate scene")
   
-  elseif (eventName=="ostim_thread_scenechanged")
+  elseif (eventName == "ostim_thread_scenechanged")
     string sceneId = strArg 
-    string sceneName=OThread.GetScene(ostimTid)
-    bool isRunning=OThread.IsRunning(ostimTid)
+    string sceneName = OThread.GetScene(ostimTid)
+    bool isRunning = OThread.IsRunning(ostimTid)
     string tags = OMetadata.GetActionTypes(ostimTid)
-    Actor[] actors =  OThread.GetActors(ostimTid)
-    string actorString;
+    Actor[] actors = OThread.GetActors(ostimTid)
+    string actorString
     int i = actors.Length
     bool playerInvolved=false
     while(i > 0)
       i -= 1
-      actorString=actorString+Main.GetActorName(actors[i])+","
+      actorString = actorString+Main.GetActorName(actors[i])+","
       if (actors[i] == playerRef)
-        playerInvolved=true;
+        playerInvolved = true
       EndIf
       string actorName = Main.GetActorName(actors[i])
       int excitement = OActor.GetExcitement(actors[i]) as int
@@ -724,19 +718,19 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
     Main.Debug(""+sceneName+" id:"+sceneId+" isRunning:"+isRunning+" Actors: "+actorString)
     Main.RegisterEvent(actorString + " changed the action to " + tags + ".")
     
-  elseif (eventName=="ostim_thread_speedchanged")
+  elseif (eventName == "ostim_thread_speedchanged")
     string sceneId = strArg 
-    string sceneName=OThread.GetScene(ostimTid)
-    bool isRunning=OThread.IsRunning(ostimTid)
-    Actor[] actors =  OThread.GetActors(ostimTid)
-    string actorString;
+    string sceneName = OThread.GetScene(ostimTid)
+    bool isRunning = OThread.IsRunning(ostimTid)
+    Actor[] actors = OThread.GetActors(ostimTid)
+    string actorString
     int i = actors.Length
     bool playerInvolved=false
     while(i > 0)
       i -= 1
-      actorString=actorString+Main.GetActorName(actors[i])+","
+      actorString = actorString+Main.GetActorName(actors[i])+","
       if (actors[i] == playerRef)
-        playerInvolved=true;
+        playerInvolved = true
       EndIf
       string actorName = Main.GetActorName(actors[i])
       int excitement = OActor.GetExcitement(actors[i]) as int
@@ -759,25 +753,25 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
 
   elseif (eventName=="ostim_actor_orgasm")    
     Actor OrgasmedActor = Sender as Actor
-    string sceneName=OThread.GetScene(ostimTid)
-    bool isRunning=OThread.IsRunning(ostimTid)
+    string sceneName = OThread.GetScene(ostimTid)
+    bool isRunning = OThread.IsRunning(ostimTid)
     Actor[] actors =  OThread.GetActors(ostimTid)
     Main.RegisterEvent(Main.GetActorName(OrgasmedActor) + " had an Orgasm")
     DirtyTalk(actors, "ohh... yes.")
     Main.Info("Ostim actor orgasm: " + OrgasmedActor)
 
-  elseif (eventName=="ostim_thread_end")    
-    string sceneName=OThread.GetScene(ostimTid)
-    bool isRunning=OThread.IsRunning(ostimTid)
+  elseif (eventName == "ostim_thread_end")    
+    string sceneName = OThread.GetScene(ostimTid)
+    bool isRunning = OThread.IsRunning(ostimTid)
     Actor[] actors =  OThread.GetActors(ostimTid)
-    string actorString;
+    string actorString
     int i = actors.Length
-    bool playerInvolved=false
+    bool playerInvolved = false
     while(i > 0)
       i -= 1
-      actorString=actorString+Main.GetActorName(actors[i])+","
+      actorString = actorString+Main.GetActorName(actors[i])+","
       if (actors[i] == playerRef) 
-        playerInvolved=true
+        playerInvolved = true
       EndIf
     endwhile
     if (playerInvolved)
