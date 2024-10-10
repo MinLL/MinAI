@@ -53,6 +53,8 @@ Event OnUpdate()
     return
   endif
   actor[] nearbyActors = AIAgentFunctions.findAllNearbyAgents()
+  ; clean up follow, since it can be override or npc has entered a scene
+  aiff.CheckIfActorShouldStillFollow(akTarget)
   if nearbyActors.Find(akTarget)
     Main.Debug("Updating context for managed NPC: " + targetName)
     ; sex = (Self as Quest) as minai_Sex

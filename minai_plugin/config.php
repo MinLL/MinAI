@@ -36,4 +36,5 @@ $GLOBALS["radiance_rechat_p"] = 20;
 // triggered before the LLM and TTS have finished with the response. For radiant dialogue frequency configuration,
 // use the in-game MCM.
 $GLOBALS["input_delay_for_radiance"] = 15;
+
 ?>

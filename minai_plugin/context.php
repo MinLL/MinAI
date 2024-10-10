@@ -14,9 +14,11 @@ Function BuildContext($name) {
   $context .= GetClothingContext($name);
   $context .= GetDDContext($name);
   $context .= GetArousalContext($name);
+  $context .= GetFollowingContext($name);
   if (!isset($GLOBALS["HERIKA_TARGET"]))
       $context .= GetDeviousFollowerContext($name);
   $context .= GetSurvivalContext($name);
+
   return $context;
 }
 
@@ -128,6 +130,14 @@ Function GetPenisSize($name) {
         return "{$name} has {$sizeDescription}. ";
     }
     return "";
+}
+
+Function GetFollowingContext($name) {
+  if (IsFollowing($name)) {
+    return "{$name} is following, walking, or escorting ".$GLOBALS["PLAYER_NAME"];
+  } else {
+    return "";
+  }
 }
 
 Function HasKeywordAndNotSkip($name, $eqContext, $keyword) {

@@ -12,6 +12,18 @@ if ((IsModEnabled("Sexlab") || IsModEnabled("Ostim")) && ((IsEnabled("PLAYER", "
     RegisterAction("ExtCmdStartOrgy");
     RegisterAction("ExtCmdPutOnClothes");
     RegisterAction("ExtCmdRemoveClothes");
+
+    if (IsFollowing($GLOBALS['HERIKA_NAME'])) {
+        RegisterAction("ExtCmdEndComeWithMe");
+    } else {
+        if (!IsInScene($GLOBALS['HERIKA_NAME'])) {
+            error_log($GLOBALS['HERIKA_NAME']." is not in a scene");
+            RegisterAction("ExtCmdComeWithMe");
+        } else {
+            error_log($GLOBALS['HERIKA_NAME']." is in a scene");
+        }
+    }
+
     // Always enabled for female actors
     if (IsFemale(GetTargetActor())) {
         RegisterAction("ExtCmdStartFingering");
@@ -644,5 +656,43 @@ $GLOBALS["FUNCTIONS"][] = [
     ];
 $GLOBALS["FUNCRET"]["ExtCmdPutOnClothes"]=$GLOBALS["GenericFuncRet"];
 
+
+$GLOBALS["F_NAMES"]["ExtCmdComeWithMe"]="ComeWithMe";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdComeWithMe"]="Walking or escorting target to places, only do this if target asks or agrees";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdComeWithMe"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdComeWithMe"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target Actor",
+                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdComeWithMe"]=$GLOBALS["GenericFuncRet"];
+
+$GLOBALS["F_NAMES"]["ExtCmdEndComeWithMe"]="EndComeWithMe";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdEndComeWithMe"]="End ComeWithMe, walking or escorting target";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdEndComeWithMe"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdEndComeWithMe"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target Actor",
+                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdEndComeWithMe"]=$GLOBALS["GenericFuncRet"];
 ?>
 
