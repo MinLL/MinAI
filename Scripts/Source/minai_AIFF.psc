@@ -22,7 +22,7 @@ Keyword AIAssisted
 Spell ContextSpell
 GlobalVariable minai_SapienceEnabled
 int Property actionRegistry Auto
-int sapientActors
+int sapientActors = 0
 
 Function Maintenance(minai_MainQuestController _main)
   contextUpdateInterval = 30
@@ -267,8 +267,9 @@ Event OnUpdate()
     UnregisterForUpdate()
     return;
   EndIf
+  CleanupSapientActors()
   SetContext(player)
-  UpdateActions()
+  UpdateActions()  
   RegisterForSingleUpdate(playerContextUpdateInterval)
 EndEvent
 
@@ -552,15 +553,33 @@ Function TrackSapientActor(actor akTarget)
   JMap.SetForm(sapientActors, Main.GetActorName(akTarget), akTarget)
 EndFunction
 
+Function CleanupSapientActors()
+  Main.Debug("SAPIENCE: CleanupSapientActors()")
+  ; Cleanup actors that are not currently loaded
+  string[] actorNames = JMap.allKeysPArray(sapientActors)
+  actor[] nearbyActors = AIAgentFunctions.findAllNearbyAgents()
+  int i = 0
+  while i < actorNames.Length
+    actor akActor = JMap.GetForm(sapientActors, actorNames[i]) as Actor
+    if !akActor
+      Main.Warn("SAPIENCE: Could not validate that " + actorNames[i] + " is unloaded: Actor is none")
+      RemoveActorAI(actorNames[i])
+    EndIf
+    bool loaded = akActor.Is3DLoaded()
+    if !loaded || !nearbyActors.Find(akActor)
+      Main.Debug("SAPIENCE: Actor " + actorNames[i] + " is no longer active.")
+      RemoveActorAI(actorNames[i])
+    else
+      Main.Debug("SAPIENCE: Actor " + actorNames[i] + " is still active.")
+    EndIf
+    i += 1
+  EndWhile
+EndFunction
 
-Function RemoveActorAI(actor akTarget)
-  string targetName = Main.GetActorName(akTarget)
-  Actor agent = AIAgentFunctions.getAgentByName(targetName)
-  if agent
-    Main.Info("SAPIENCE: Removing " + targetName + " from AI")
-    AIAgentFunctions.setDrivenByAIA(akTarget, false)
-    akTarget.RemoveSpell(ContextSpell)
-  EndIf
+Function RemoveActorAI(string targetName)
+  Main.Info("SAPIENCE: Removing " + targetName + " from AI")
+  AIAgentFunctions.removeAgentByName(targetName)
+  JMap.RemoveKey(sapientActors, targetName)
 EndFunction
 
 Function EnableActorAI(actor akTarget)
