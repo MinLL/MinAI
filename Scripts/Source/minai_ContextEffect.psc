@@ -32,6 +32,10 @@ EndFunction
 
 Event OnUpdate()
   actor akTarget = GetTargetActor()
+  if !akTarget
+    Main.Warn("Context: Could not find target actor. Aborting.")
+    return
+  EndIf
   string targetName = Main.GetActorName(akTarget)
   Main.Debug("Context OnUpdate (" + targetName +")")
   if(!aiff || !akTarget.Is3DLoaded() || !akTarget.HasSpell(contextSpell))
