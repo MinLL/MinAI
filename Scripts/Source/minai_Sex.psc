@@ -667,9 +667,9 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
   int ostimTid = numArg as int
   Main.Info("oStim eventName: "+eventName+", strArg: "+strArg)
   if (eventName == "ostim_thread_start")
-    string sceneName  =OThread.GetScene(ostimTid)
+    string sceneName = OThread.GetScene(ostimTid)
     bool isRunning = OThread.IsRunning(ostimTid)
-    Actor[] actors =  OThread.GetActors(ostimTid)
+    Actor[] actors = OThread.GetActors(ostimTid)
     string actorString
     int i = actors.Length
     bool playerInvolved=false
@@ -751,11 +751,11 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
     EndIf
     Main.Info("Ostim speed change")
 
-  elseif (eventName=="ostim_actor_orgasm")    
+  elseif (eventName == "ostim_actor_orgasm")    
     Actor OrgasmedActor = Sender as Actor
     string sceneName = OThread.GetScene(ostimTid)
     bool isRunning = OThread.IsRunning(ostimTid)
-    Actor[] actors =  OThread.GetActors(ostimTid)
+    Actor[] actors = OThread.GetActors(ostimTid)
     Main.RegisterEvent(Main.GetActorName(OrgasmedActor) + " had an Orgasm")
     DirtyTalk(actors, "ohh... yes.")
     Main.Info("Ostim actor orgasm: " + OrgasmedActor)
@@ -763,7 +763,7 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
   elseif (eventName == "ostim_thread_end")    
     string sceneName = OThread.GetScene(ostimTid)
     bool isRunning = OThread.IsRunning(ostimTid)
-    Actor[] actors =  OThread.GetActors(ostimTid)
+    Actor[] actors = OThread.GetActors(ostimTid)
     string actorString
     int i = actors.Length
     bool playerInvolved = false
