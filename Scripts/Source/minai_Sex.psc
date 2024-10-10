@@ -671,22 +671,21 @@ EndEvent
 
 Event OStimManager(string eventName, string strArg, float numArg, Form sender)
   int ostimTid = numArg as int
-  Main.Info("oStim eventName: "+eventName+", strArg: "+strArg);
+  Main.Info("oStim eventName: "+eventName+", strArg: "+strArg)
   if (eventName=="ostim_thread_start")
-    string sceneName=OThread.GetScene(ostimTid);
-    bool isRunning=OThread.IsRunning(ostimTid);
-    Actor[] actors =  OThread.GetActors(ostimTid);
+    string sceneName=OThread.GetScene(ostimTid)
+    bool isRunning=OThread.IsRunning(ostimTid)
+    Actor[] actors =  OThread.GetActors(ostimTid)
     string actorString;
     int i = actors.Length
     bool playerInvolved=false
     while(i > 0)
-        i -= 1
-        actorString=actorString+Main.GetActorName(actors[i])+",";
-        if (actors[i] == playerRef) 
-          playerInvolved=true;
-        EndIf
+      i -= 1
+      actorString=actorString+Main.GetActorName(actors[i])+","
+      if (actors[i] == playerRef) 
+        playerInvolved=true
+      EndIf
     Endwhile
-    
     if (playerInvolved)
       AIFF.ChillOut()
     EndIf
@@ -698,56 +697,89 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
   
   elseif (eventName=="ostim_thread_scenechanged")
     string sceneId = strArg 
-    string sceneName=OThread.GetScene(ostimTid);
-    bool isRunning=OThread.IsRunning(ostimTid);
-    Actor[] actors =  OThread.GetActors(ostimTid);
+    string sceneName=OThread.GetScene(ostimTid)
+    bool isRunning=OThread.IsRunning(ostimTid)
+    string tags = OMetadata.GetActionTypes(ostimTid)
+    Actor[] actors =  OThread.GetActors(ostimTid)
     string actorString;
     int i = actors.Length
     bool playerInvolved=false
     while(i > 0)
       i -= 1
-      actorString=actorString+Main.GetActorName(actors[i])+",";
+      actorString=actorString+Main.GetActorName(actors[i])+","
       if (actors[i] == playerRef)
         playerInvolved=true;
       EndIf
-      string actorName = main.GetActorName(actors[i])
+      string actorName = Main.GetActorName(actors[i])
       int excitement = OActor.GetExcitement(actors[i]) as int
       int orgasmcount = OActor.GetTimesClimaxed(actors[i])
-      if excitement > 80
+      if excitement >= 80
         Main.RegisterEvent(actorName + " is close to orgasm number " + (orgasmcount+1) + ".")
       EndIf
     Endwhile
-    
     if (playerInvolved)
       AIFF.ChillOut()
     EndIf
-    main.RegisterEvent(""+sceneName+" id:"+sceneId+" isRunning:"+isRunning+" Actors:"+actorString,"info_sexscene")
-    Main.Info("Ostim Scene changed")
-
-  elseif (eventName=="ostim_actor_orgasm")    
-    Actor OrgasmedActor = Sender as Actor
-    string sceneName=OThread.GetScene(ostimTid);
-    bool isRunning=OThread.IsRunning(ostimTid);
-    Actor[] actors =  OThread.GetActors(ostimTid);
-    main.RegisterEvent(Main.GetActorName(OrgasmedActor) + " had an Orgasm")
-    DirtyTalk(actors, "ohh... yes.")
-    Main.Info("Ostim Actor orgasm")
-
-  elseif (eventName=="ostim_thread_end")    
-    string sceneName=OThread.GetScene(ostimTid);
-    bool isRunning=OThread.IsRunning(ostimTid);
-    Actor[] actors =  OThread.GetActors(ostimTid);
+    Main.Info("Ostim Scene changed to: " + sceneName)
+    Main.Debug(""+sceneName+" id:"+sceneId+" isRunning:"+isRunning+" Actors: "+actorString)
+    Main.RegisterEvent(actorString + " changed the action to " + tags + ".")
+    
+  elseif (eventName=="ostim_thread_speedchanged")
+    string sceneId = strArg 
+    string sceneName=OThread.GetScene(ostimTid)
+    bool isRunning=OThread.IsRunning(ostimTid)
+    Actor[] actors =  OThread.GetActors(ostimTid)
     string actorString;
     int i = actors.Length
     bool playerInvolved=false
     while(i > 0)
       i -= 1
-      actorString=actorString+Main.GetActorName(actors[i])+",";
-      if (actors[i] == playerRef) 
+      actorString=actorString+Main.GetActorName(actors[i])+","
+      if (actors[i] == playerRef)
         playerInvolved=true;
       EndIf
+      string actorName = Main.GetActorName(actors[i])
+      int excitement = OActor.GetExcitement(actors[i]) as int
+      int orgasmcount = OActor.GetTimesClimaxed(actors[i])
+      if excitement >= 80
+        Main.RegisterEvent(actorName + " is close to orgasm number " + (orgasmcount+1) + ".")
+      EndIf
+    Endwhile
+    if (playerInvolved)
+      AIFF.ChillOut()
+    EndIf
+    int sceneSpeed = OThread.GetSpeed(ostimTid)
+    int defaultSpeed = OMetadata.GetDefaultSpeed(ostimTid)
+    if sceneSpeed >= defaultSpeed
+      DirtyTalk(actors, "Fuck yes! Faster! Harder!")
+    else
+      DirtyTalk(actors, "Mmm, yeah... slow it down, make it last.")
+    EndIf
+    Main.Info("Ostim speed change")
+
+  elseif (eventName=="ostim_actor_orgasm")    
+    Actor OrgasmedActor = Sender as Actor
+    string sceneName=OThread.GetScene(ostimTid)
+    bool isRunning=OThread.IsRunning(ostimTid)
+    Actor[] actors =  OThread.GetActors(ostimTid)
+    Main.RegisterEvent(Main.GetActorName(OrgasmedActor) + " had an Orgasm")
+    DirtyTalk(actors, "ohh... yes.")
+    Main.Info("Ostim actor orgasm: " + OrgasmedActor)
+
+  elseif (eventName=="ostim_thread_end")    
+    string sceneName=OThread.GetScene(ostimTid)
+    bool isRunning=OThread.IsRunning(ostimTid)
+    Actor[] actors =  OThread.GetActors(ostimTid)
+    string actorString;
+    int i = actors.Length
+    bool playerInvolved=false
+    while(i > 0)
+      i -= 1
+      actorString=actorString+Main.GetActorName(actors[i])+","
+      if (actors[i] == playerRef) 
+        playerInvolved=true
+      EndIf
     endwhile
-    
     if (playerInvolved)
       AIFF.ChillOut()
     EndIf
@@ -761,7 +793,7 @@ EndEvent
 Function LoadSexlabDescriptions()
   if (descriptionsMap==0)
     Main.Info("Loading Sexlab Descriptions")
-    descriptionsMap=JValue.readFromFile( "Data/Data/minai/sexlab_descriptions.json");
+    descriptionsMap=JValue.readFromFile( "Data/Data/minai/sexlab_descriptions.json")
     JValue.retain(descriptionsMap)
     Main.Info("Descriptions set: "+JMap.count(descriptionsMap)+" using map: "+descriptionsMap+ " Data/Data/minai/sexlab_descriptions.json")
   EndIf
