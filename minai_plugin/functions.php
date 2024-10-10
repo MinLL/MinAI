@@ -36,7 +36,7 @@ EndEvent
 
 require_once("config.php");
 require_once("util.php");
-
+require_once("customintegrations.php");
 
 if (ShouldClearFollowerFunctions()) {
     $GLOBALS["ENABLED_FUNCTIONS"] = array();
@@ -86,6 +86,7 @@ if (!$GLOBALS["disable_nsfw"]) {
     }
 }
 
+RegisterThirdPartyActions();
 
 $commandsToPurge=[];
 foreach ($GLOBALS["ENABLED_FUNCTIONS"] as $n=>$func) {

@@ -20,8 +20,9 @@ minai_MainQuestController main
 minai_Followers followers
 Keyword AIAssisted
 Spell ContextSpell
-
+GlobalVariable minai_SapienceEnabled
 int Property actionRegistry Auto
+int sapientActors = 0
 
 Function Maintenance(minai_MainQuestController _main)
   contextUpdateInterval = 30
@@ -55,11 +56,11 @@ Function Maintenance(minai_MainQuestController _main)
   RegisterForModEvent("AIFF_TextReceived", "OnTextReceived")
   RegisterForModEvent("AIFF_NPC", "OnAIActorChange")
   NullVoiceType = Game.GetFormFromFile(0x01D70E, "AIAgent.esp") as VoiceType
+  minai_SapienceEnabled = Game.GetFormFromFile(0x091A, "MinAI.esp") as GlobalVariable
   if (!NullVoiceType)
     Main.Error("Could not load null voice type")
   EndIf
   if isInitialized
-    SetContext(player)
     RegisterForSingleUpdate(playerContextUpdateInterval)
   EndIf
   if (Game.GetModByName("MinAI_AIFF.esp") != 255)
@@ -266,8 +267,9 @@ Event OnUpdate()
     UnregisterForUpdate()
     return;
   EndIf
+  CleanupSapientActors()
   SetContext(player)
-  UpdateActions()
+  UpdateActions()  
   RegisterForSingleUpdate(playerContextUpdateInterval)
 EndEvent
 
@@ -284,7 +286,9 @@ actor[] Function GetNearbyAI()
     if config.disableAIAnimations
       SetAnimationBusy(1, Main.GetActorName(actors[i]))
     EndIf
-    TrackContext(actors[i])
+    if minai_SapienceEnabled.GetValueInt() != 1
+      TrackContext(actors[i])
+    EndIf
     i += 1
   endwhile
   return actors
@@ -300,7 +304,9 @@ String Function GetNearbyAIStr()
     if i != actors.Length - 1
       ret += ","
     EndIf
-    TrackContext(actors[i])
+    if minai_SapienceEnabled.GetValueInt() != 1
+      TrackContext(actors[i])
+    EndIf
     i += 1
   EndWhile
   return ret
@@ -318,12 +324,14 @@ Function RegisterAction(string actionName, string mcmName, string mcmDesc, strin
   if !bHasAIFF
     return
   EndIf
-  if JMap.getObj(actionRegistry, actionName) != 0
-    Main.Warn("ActionRegistry: " + actionName + " already registered. Skipping.")
-    return
+  int actionObj = JMap.getObj(actionRegistry, actionName)
+  bool updating = false
+  if actionObj != 0
+    updating = true
+  else
+    actionObj = JMap.Object()
+    JValue.Retain(actionObj)
   EndIf
-  int actionObj = JMap.Object()
-  JValue.Retain(actionObj)
   JMap.SetStr(actionObj, "name", actionName) ; ExtCmdFoo
   JMap.SetStr(actionObj, "mcmName", mcmName) ; Foo
   JMap.SetStr(actionObj, "mcmDesc", mcmDesc) ; Foo
@@ -346,7 +354,12 @@ Function RegisterAction(string actionName, string mcmName, string mcmDesc, strin
     JMap.setInt(actionObj, "hasMod", 0)
   EndIf
   JMap.setObj(actionRegistry, actionName, actionObj)
-  Main.Info("ActionRegistry: Registered new action: " + actionName)
+  config.ActionRegistryIsDirty = true
+  if updating
+    Main.Info("ActionRegistry: Updated existing action: " + actionName)
+  else
+    Main.Info("ActionRegistry: Registered new action: " + actionName)
+  EndIf
 EndFunction
 
 
@@ -496,7 +509,9 @@ Event OnAIActorChange(string npcName, string actionName)
       Main.Error("OnAIActorChange: Could not find NPC to add context spell to")
       return
     EndIf
-    TrackContext(agent)
+    if minai_SapienceEnabled.GetValueInt() != 1
+      TrackContext(agent)
+    EndIf
   EndIf
   ; Can't process spell removal here, since the actor will already be gone from the aiff system at this point. The context script will clean that up instead. 
 EndEvent
@@ -513,4 +528,67 @@ Function StoreContext(string modName, string eventKey, string eventValue, int tt
   EndIf
   Main.Debug("StoreContext(" + modName +", " + eventKey + ", " + ttl +"): " + eventValue)
   AIAgentFunctions.logMessage(modName + "@" + eventKey + "@" + eventValue + "@" + ttl, "storecontext")
+EndFunction
+
+
+Function StoreAction(string actionName, string actionPrompt, int enabled, int ttl, string targetDescription, string targetEnum)
+	if (!IsInitialized())
+    Main.Info("StoreAction() - Still Initializing.")
+    return
+  EndIf
+  if (!bHasAIFF)
+    return
+  EndIf
+  Main.Debug("StoreAction(" + actionName +", " + enabled + ", " + ttl +"): " + actionPrompt)
+	AIAgentFunctions.logMessage(actionName + "@" + actionPrompt + "@" + enabled + "@" + ttl + "@" + targetDescription + "@" + targetEnum, "registeraction")
+EndFunction
+
+
+Function TrackSapientActor(actor akTarget)
+  if (sapientActors == 0)
+    Main.Debug("Initializing sapient actors map")
+    sapientActors = JMap.Object()
+    JValue.Retain(sapientActors)
+  EndIf
+  JMap.SetForm(sapientActors, Main.GetActorName(akTarget), akTarget)
+EndFunction
+
+Function CleanupSapientActors()
+  Main.Debug("SAPIENCE: CleanupSapientActors()")
+  ; Cleanup actors that are not currently loaded
+  string[] actorNames = JMap.allKeysPArray(sapientActors)
+  actor[] nearbyActors = AIAgentFunctions.findAllNearbyAgents()
+  int i = 0
+  while i < actorNames.Length
+    actor akActor = JMap.GetForm(sapientActors, actorNames[i]) as Actor
+    if !akActor
+      Main.Warn("SAPIENCE: Could not validate that " + actorNames[i] + " is unloaded: Actor is none")
+      RemoveActorAI(actorNames[i])
+    EndIf
+    bool loaded = akActor.Is3DLoaded()
+    if !loaded || !nearbyActors.Find(akActor)
+      Main.Debug("SAPIENCE: Actor " + actorNames[i] + " is no longer active.")
+      RemoveActorAI(actorNames[i])
+    else
+      Main.Debug("SAPIENCE: Actor " + actorNames[i] + " is still active.")
+    EndIf
+    i += 1
+  EndWhile
+EndFunction
+
+Function RemoveActorAI(string targetName)
+  Main.Info("SAPIENCE: Removing " + targetName + " from AI")
+  AIAgentFunctions.removeAgentByName(targetName)
+  JMap.RemoveKey(sapientActors, targetName)
+EndFunction
+
+Function EnableActorAI(actor akTarget)
+  string targetName = Main.GetActorName(akTarget)
+  Actor agent = AIAgentFunctions.getAgentByName(targetName)
+  if !agent
+    Main.Info("SAPIENCE: Adding " + targetName + " to AI")
+    AIAgentFunctions.setDrivenByAIA(akTarget, false)
+    TrackContext(akTarget)
+    TrackSapientActor(akTarget)
+  EndIf
 EndFunction

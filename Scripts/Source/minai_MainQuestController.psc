@@ -43,6 +43,13 @@ Function Maintenance()
   EndIf
   Info("Maintenance() - minai v" +GetVersion() + " initializing.")
   ; Register for Mod Events
+  ; Public interface functions
+  RegisterForModEvent("MinAI_RegisterEvent", "OnRegisterEvent")
+  RegisterForModEvent("MinAI_RequestResponse", "OnRequestResponse")
+  RegisterForModEvent("MinAI_RequestResponseDialogue", "OnRequestResponseDialogue")
+  RegisterForModEvent("MinAI_SetContext", "OnSetContext")
+  RegisterForModEvent("MinAI_RegisterAction", "OnRegisterAction")
+  ; RegisterTestAction()
   Info("Checking for installed mods...")
 
   minai_WhichAI = Game.GetFormFromFile(0x0907, "MinAI.esp") as GlobalVariable
@@ -89,11 +96,6 @@ Function Maintenance()
     minAIFF.ResetAllActionBackoffs()
   EndIf
   lastRequestTime = 0.0
-  ; Public interface functions
-  RegisterForModEvent("MinAI_RegisterEvent", "OnRegisterEvent")
-  RegisterForModEvent("MinAI_RequestResponse", "OnRequestResponse")
-  RegisterForModEvent("MinAI_RequestResponseDialogue", "OnRequestResponseDialogue")
-  RegisterForModEvent("MinAI_SetContext", "OnSetContext")
   Info("Initialization complete.")
 EndFunction
 
@@ -293,3 +295,42 @@ Event OnSetContext(string modName, string eventKey, string eventValue, int ttl)
 EndEvent
 
 
+
+; Register an action
+; int handle = ModEvent.Create("MinAI_RegisterAction")
+;  if (handle)
+;    ModEvent.PushString(handle, actionName) ; Cannot contain spaces! Example, "SitDown".
+;    ModEvent.PushString(handle, actionPrompt)
+;    ModEvent.PushString(handle, mcmDescription)
+;    ModEvent.PushString(handle, targetDescription)
+;    ModEvent.PushString(handle, targetEnum)
+;    ModEvent.PushInt(handle, enabled)
+;    ModEvent.PushFloat(handle, cooldown)
+;    ModEvent.PushInt(handle, ttl)
+;    ModEvent.Send(handle)
+;  endIf
+Event OnRegisterAction(string actionName, string actionPrompt, string mcmDescription, string targetDescription, string targetEnum, int enabled, float cooldown, int ttl)
+  Info("OnRegisterAction(" + actionName + " => " + enabled + " (Cooldown: " + cooldown + ")): " + actionPrompt)
+  if bHasAIFF
+		minaiff.RegisterAction("ExtCmd"+actionName, actionName, mcmDescription, "External", enabled, cooldown, 2, 5, 300, true)
+    minaiff.StoreAction(actionName, actionPrompt, enabled, ttl, targetDescription, targetEnum)
+  elseif bHasMantella
+    ; Nothing to do for mantella.
+  endif
+EndEvent
+
+
+Function RegisterTestAction()
+  int handle = ModEvent.Create("MinAI_RegisterAction")
+  if (handle)
+    ModEvent.PushString(handle, "testaction")
+    ModEvent.PushString(handle, "Use the test action")
+    ModEvent.PushString(handle, "Test Action Description")
+    ModEvent.PushString(handle, "Target (Actor, NPC)")
+    ModEvent.PushString(handle, "my,list,of,targets")
+    ModEvent.PushInt(handle, 1)
+    ModEvent.PushFloat(handle, 5)
+    ModEvent.PushInt(handle, 1200)
+    ModEvent.Send(handle)
+  endIf
+EndFunction
