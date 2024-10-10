@@ -33,6 +33,10 @@ EndFunction
 
 Event OnUpdate()
   actor akTarget = GetTargetActor()
+  if !akTarget
+    Main.Warn("SAPIENCE: Could not find target actor. Aborting.")
+    return
+  EndIf
   string targetName = Main.GetActorName(akTarget)
   Main.Debug("SAPIENCE Processing (" + targetName +")")
   if(!aiff || !akTarget.Is3DLoaded())
@@ -41,5 +45,8 @@ Event OnUpdate()
     UnregisterForUpdate()
     return
   endif
+  ; Immediately store the targets voice to avoid the delay on context due to jitter to make sure they can respond immediately
+  aiff.StoreActorVoice(akTarget)
+  ; Enable AI
   aiff.EnableActorAI(akTarget)
 EndEvent

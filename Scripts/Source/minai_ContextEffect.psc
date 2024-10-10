@@ -34,30 +34,23 @@ Event OnUpdate()
   actor akTarget = GetTargetActor()
   string targetName = Main.GetActorName(akTarget)
   Main.Debug("Context OnUpdate (" + targetName +")")
-  if(!aiff || !akTarget.Is3DLoaded())
+  if(!aiff || !akTarget.Is3DLoaded() || !akTarget.HasSpell(contextSpell))
     DisableSelf(akTarget)
     return
   endif
-  if AIAgentFunctions.getAgentByName(targetName)
+  actor[] nearbyActors = AIAgentFunctions.findAllNearbyAgents()
+  if nearbyActors.Find(akTarget)
     Main.Debug("Updating context for managed NPC: " + targetName)
     ; sex = (Self as Quest) as minai_Sex
     aiff.SetContext(akTarget)
-    if(!aiff || !akTarget.Is3DLoaded())
+    nearbyActors = AIAgentFunctions.findAllNearbyAgents()
+    if(!nearbyActors.Find(akTarget))
       DisableSelf(akTarget)
     else
       RegisterForSingleUpdate(aiff.ContextUpdateInterval)
     endif
   Else
-    ; Cleanup perk if the actor is no longer ai managed
-    if akTarget.HasSpell(ContextSpell)
-      akTarget.RemoveSpell(ContextSpell)
-      Main.Info("Cleaned up spell on actor " + Main.GetActorName(akTarget))
-    EndIf
-    ; Store voice types even if they're not a managed actor so that they will immediately have voices when spoken to
-    ; aiff.StoreActorVoice(akTarget)
-    ; Store factions and keywords for the same reason
-    ; aiff.StoreFactions(akTarget)
-    ; aiff.StoreKeywords(akTarget)  
+    DisableSelf(akTarget)
   EndIf
   Main.Debug("Context OnUpdate(" + targetName +") END")
 EndEvent
