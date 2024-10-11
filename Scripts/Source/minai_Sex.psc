@@ -697,6 +697,7 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
   elseif (eventName == "ostim_thread_scenechanged")
     bool isRunning = OThread.IsRunning(ostimTid)
     string[] actionTypes = OMetadata.GetActionTypes(sceneId)
+    string[] sceneTags = OMetadata.GetSceneTags(sceneId)
     Actor[] actors = OThread.GetActors(ostimTid)
     string actorString
     int i = actors.Length
@@ -727,8 +728,15 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
           j -= 1
           tags = tags+actionTypes[j]+", "
         Endwhile
-        Main.RegisterEvent(actorString + "changed the action to " + tags + ".")
       EndIf
+      int k = sceneTags.Length
+      if k > 0
+        while (k > 0)
+          k -= 1
+          tags = tags+sceneTags[k]+", "
+        Endwhile        
+      EndIf
+      Main.RegisterEvent(actorString + "changed the action to " + tags + ".")
     else
       Main.Debug("OStim scene change failed")
     EndIf
