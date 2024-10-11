@@ -96,6 +96,26 @@ function ProcessIntegrations() {
         );
         $MUST_DIE=true;
     }
+    if (isset($GLOBALS["gameRequest"]) && strtolower($GLOBALS["gameRequest"][0]) == "ginputtext") {
+        ClearRadiantActors();
+    }
+    if (isset($GLOBALS["gameRequest"]) && strtolower($GLOBALS["gameRequest"][0]) == "bored") {
+        ClearRadiantActors();
+    }
+    if (isset($GLOBALS["gameRequest"]) && strtolower($GLOBALS["gameRequest"][0]) == "radiant") {
+        // $GLOBALS["HERIKA_NAME"] is npc1
+        $GLOBALS["HERIKA_TARGET"] = explode(":", $GLOBALS["gameRequest"][3])[3];
+        error_log("minai: Starting radiant dialogue between {$GLOBALS["HERIKA_NAME"]} and {$GLOBALS["HERIKA_TARGET"]}");
+        $GLOBALS["PROMPTS"]["radiant"]= [
+            "cue"=>[
+                "write dialogue for {$GLOBALS["HERIKA_NAME"]}.{$GLOBALS["TEMPLATE_DIALOG"]}  "
+            ], 
+            "player_request"=>[    
+                "The Narrator: {$GLOBALS["HERIKA_NAME"]} starts a dialogue with {$GLOBALS["HERIKA_TARGET"]} about a random topic",
+            ]
+        ];
+        StoreRadiantActors($GLOBALS["HERIKA_TARGET"], $GLOBALS["HERIKA_NAME"]);
+    }
     if ($MUST_DIE) {
         error_log("minai: Done procesing custom request");
         die('X-CUSTOM-CLOSE');

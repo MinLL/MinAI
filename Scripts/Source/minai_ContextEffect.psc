@@ -9,7 +9,7 @@ minai_AIFF aiff
 minai_MainQuestController main
 Spell ContextSpell
 
-Function OnEffectStart(Actor akTarget, Actor akCaster)
+Event OnEffectStart(Actor akTarget, Actor akCaster)
   main = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_MainQuestController
   aiff = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_AIFF
   ContextSpell = Game.GetFormFromFile(0x090A, "MinAI.esp") as Spell
@@ -22,11 +22,21 @@ Function OnEffectStart(Actor akTarget, Actor akCaster)
   ; Do one update for actors the first time we enter a zone. Introduce a little jitter to distribute load.
   int updateTime = 2 + Utility.RandomInt(0, 5)
   RegisterForSingleUpdate(updateTime)
-  
-EndFunction
+EndEvent
+
+
+Event OnEffectFinish(Actor akTarget, Actor akCaster)
+  UnregisterForUpdate()
+  DisableSelf(akTarget)
+EndEvent
+
 
 Function DisableSelf(actor akTarget)
-  Main.Debug("Context OnUpdate( " + Main.GetActorName(akTarget) + ") Stopping OnUpdate for actor - actor is not loaded.")
+  if !akTarget
+    Main.Warn("Context: Could not find target actor. Aborting.")
+    return
+  EndIf
+  Main.Debug("Context OnUpdate( " + Main.GetActorName(akTarget) + ") Stopping OnUpdate.")
   akTarget.RemoveSpell(ContextSpell)
 EndFunction
 

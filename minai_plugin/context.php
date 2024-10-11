@@ -9,7 +9,15 @@ Function BuildContext($name) {
   if ($name == "The Narrator") {
     return "";
   }
-  return "\n" . GetPhysicalDescription($name) . "\n" . GetClothingContext($name) . "\n" . GetDDContext($name) . "\n" . GetArousalContext($name) . "\n" . GetDeviousFollowerContext($name) . "\n" . GetSurvivalContext($name) . "\n";
+  $context = "";
+  $context .= GetPhysicalDescription($name);
+  $context .= GetClothingContext($name);
+  $context .= GetDDContext($name);
+  $context .= GetArousalContext($name);
+  if (!isset($GLOBALS["HERIKA_TARGET"]))
+      $context .= GetDeviousFollowerContext($name);
+  $context .= GetSurvivalContext($name);
+  return $context;
 }
 
 Function GetSurvivalContext($name) {
@@ -32,6 +40,8 @@ Function GetSurvivalContext($name) {
         $fatigue = (floatval($fatigue)/5) * 100;
         $ret .= "{$name}'s fatigue level is at {$fatigue}%. ";
     }
+    if ($ret != "")
+        $ret .= "\n";
     return $ret;
 }
 
@@ -39,8 +49,10 @@ Function GetArousalContext($name) {
   $ret = "";
   $arousal = GetActorValue($name, "arousal");
   if ($arousal != "") {
-      $ret .= "{$name}'s sexual arousal level is {$arousal}/100, where 0 is not aroused at all, and 100 is desperate for sex. ";
+      $ret .= "{$name}'s sexual arousal level is {$arousal}/100, where 0 is not aroused at all, and 100 is desperate for sex.";
   }
+  if ($ret != "")
+        $ret .= "\n";
   return $ret;
 }
 
@@ -70,6 +82,8 @@ Function GetPhysicalDescription($name) {
   if (IsEnabled($name, "isexposed")) {
     $ret  .= GetPenisSize($name);
   }
+  if ($ret != "")
+      $ret .= "\n";
   return $ret;
 }
 
@@ -194,6 +208,8 @@ Function GetClothingContext($name) {
   if (HasKeywordAndNotSkip($name, $eqContext, "SLA_PiercingClit")) {
       $ret .= "{$name} has a clit piercing.\n";
   }
+  if ($ret != "")
+      $ret .= "\n";
   return $ret;
 }
 
@@ -286,13 +302,15 @@ Function GetDDContext($name) {
           $ret .= "{$name}'s vibrator is currently off.\n";
       }
   }
+  if ($ret != "")
+      $ret .= "\n";
   return $ret;
 }
 
 
 // Build context
 if (!$GLOBALS["disable_nsfw"]) {
-    $GLOBALS["COMMAND_PROMPT"].= BuildContext($GLOBALS["PLAYER_NAME"]);
+    $GLOBALS["COMMAND_PROMPT"].= BuildContext(GetTargetActor());
     $GLOBALS["COMMAND_PROMPT"].= BuildContext($GLOBALS["HERIKA_NAME"]);
     $GLOBALS["COMMAND_PROMPT"].= GetThirdPartyContext();
     $nearbyActors = GetActorValue("PLAYER", "nearbyActors", true);
