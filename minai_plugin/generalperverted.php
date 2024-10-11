@@ -109,10 +109,11 @@ if (IsModEnabled("Sexlab") || IsModEnabled("Ostim")) {
 // Custom prompt. This will overwrite default cue. This is what we are requesting the LLM to do.
 // TEMPLATE_DIALOG is degined in global prompts.php.
 
-$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdSpankAss"]="{$GLOBALS["HERIKA_NAME"]} comments on spanking {$GLOBALS["PLAYER_NAME"]}'s ass. {$GLOBALS["TEMPLATE_DIALOG"]}";
-$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdSpankTits"]="{$GLOBALS["HERIKA_NAME"]} comments on spanking {$GLOBALS["PLAYER_NAME"]}'s tits. {$GLOBALS["TEMPLATE_DIALOG"]}";
-$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdGrope"]="{$GLOBALS["HERIKA_NAME"]} comments on groping {$GLOBALS["PLAYER_NAME"]}. {$GLOBALS["TEMPLATE_DIALOG"]}";
-$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdPinchNipples"]="{$GLOBALS["HERIKA_NAME"]} comments on pinching {$GLOBALS["PLAYER_NAME"]}'s nipples. {$GLOBALS["TEMPLATE_DIALOG"]}";
+$target = GetTargetActor();
+$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdSpankAss"]="{$GLOBALS["HERIKA_NAME"]} comments on spanking {$target}'s ass. {$GLOBALS["TEMPLATE_DIALOG"]}";
+$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdSpankTits"]="{$GLOBALS["HERIKA_NAME"]} comments on spanking {$target}'s tits. {$GLOBALS["TEMPLATE_DIALOG"]}";
+$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdGrope"]="{$GLOBALS["HERIKA_NAME"]} comments on groping {$target}. {$GLOBALS["TEMPLATE_DIALOG"]}";
+$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdPinchNipples"]="{$GLOBALS["HERIKA_NAME"]} comments on pinching {$target}'s nipples. {$GLOBALS["TEMPLATE_DIALOG"]}";
 
 
 // If function is a server function (we need to calculate the result value in web server using php code)

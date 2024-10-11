@@ -148,7 +148,9 @@ function GetDeviousFollowerContext($name) {
 
 
     $ret .= "{$playerName}'s remaining willpower to resist {$dfName} is {$dfWill}/10, where 0 is completely mind-broken, and 10 is completely free-spirited.\n";
-    $GLOBALS["HERIKA_PERS"] .= " " . $personality;  
+    $GLOBALS["HERIKA_PERS"] .= " " . $personality;
+    if ($ret != "")
+        $ret .= "\n";
     return $ret;
 }
 

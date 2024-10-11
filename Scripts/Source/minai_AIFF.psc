@@ -267,7 +267,6 @@ Event OnUpdate()
     UnregisterForUpdate()
     return;
   EndIf
-  CleanupSapientActors()
   SetContext(player)
   UpdateActions()  
   RegisterForSingleUpdate(playerContextUpdateInterval)

@@ -163,4 +163,55 @@ if ($GLOBALS["force_aiff_name_to_ingame_name"]) {
 }
 
 
+Function StoreRadiantActors($actor1, $actor2) {
+    $db = $GLOBALS['db'];
+    $id = "_minai_RADIANT//actor1";
+    $db->delete("conf_opts", "id='{$id}'");
+    $db->insert(
+        'conf_opts',
+        array(
+            'id' => $id,
+            'value' => $actor1
+        )
+    );
+    $id = "_minai_RADIANT//actor2";
+    $db->delete("conf_opts", "id='{$id}'");
+    $db->insert(
+        'conf_opts',
+        array(
+            'id' => $id,
+            'value' => $actor2
+        )
+    );
+}
+
+Function ClearRadiantActors() {
+    $db = $GLOBALS['db'];
+    $id = "_minai_RADIANT//actor1";
+    $db->delete("conf_opts", "id='{$id}'");
+    $id = "_minai_RADIANT//actor2";
+    $db->delete("conf_opts", "id='{$id}'");
+}
+
+Function GetTargetActor() {
+    $db = $GLOBALS['db'];
+    $query = "select * from conf_opts where id='_minai_RADIANT//actor1'";
+    $ret1 = $GLOBALS["db"]->fetchAll($query);
+    if (!$ret1)
+        return $GLOBALS["PLAYER_NAME"];
+    $query = "select * from conf_opts where id='_minai_RADIANT//actor2'";
+    $ret2 = $GLOBALS["db"]->fetchAll($query);
+    if (!$ret2)
+        return $GLOBALS["PLAYER_NAME"];
+    if ($GLOBALS['HERIKA_NAME'] == $ret1[0]['value'])
+        return $ret2[0]['value'];
+    if ($GLOBALS['HERIKA_NAME'] == $ret2[0]['value'])
+        return $ret1[0]['value'];
+    return $GLOBALS["PLAYER_NAME"];
+}
+
+Function IsRadiant() {
+    return (GetTargetActor() != $GLOBALS["PLAYER_NAME"]);
+}
+
 ?>
