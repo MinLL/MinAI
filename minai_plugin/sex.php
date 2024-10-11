@@ -65,7 +65,7 @@ $GLOBALS["FUNCTIONS"][] = [
     ];
 $GLOBALS["FUNCRET"]["ExtCmdSpeedUpSex"]=$GLOBALS["GenericFuncRet"];
 
-$GLOBALS["F_NAMES"]["ExtCmdSSlowDownSex"]="SlowDownSex";
+$GLOBALS["F_NAMES"]["ExtCmdSlowDownSex"]="SlowDownSex";
 $GLOBALS["F_TRANSLATIONS"]["ExtCmdSlowDownSex"]="Reduce the speed of sexual activity";
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdSlowDownSex"],
