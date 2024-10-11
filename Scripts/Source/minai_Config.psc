@@ -24,6 +24,7 @@ int arousalForSexOID
 int arousalForHarassOID
 int confirmSexOID
 int disableAIAnimationsOID
+int useSapienceOID
 
 int aOIDMap ; Jmap for storing action oid's
 
@@ -39,6 +40,7 @@ int radiantDialogueChanceOID
 ; Legacy globals
 GlobalVariable useCBPC
 GlobalVariable minai_UseOstim
+GlobalVariable minai_SapienceEnabled
 
 string currentActionsPage
 
@@ -106,6 +108,7 @@ Function InitializeMCM()
   main = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_MainQuestController
   devious = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_DeviousStuff
   sapience = Game.GetFormFromFile(0x091D, "MinAI.esp") as minai_SapienceController
+  minai_SapienceEnabled = Game.GetFormFromFile(0x091A, "MinAI.esp") as GlobalVariable
   Main.Info("Initializing MCM ( " + JMap.Count(aiff.actionRegistry) + " actions in registry).")
   useCBPC = Game.GetFormFromFile(0x0910, "MinAI.esp") as GlobalVariable
   if aOIDMap != 0
@@ -138,7 +141,7 @@ Function InitializeMCM()
 EndFunction
 
 int Function GetVersion()
-  return 12 ; mcm menu version
+  return 13 ; mcm menu version
 EndFunction
 
 Function SetupPages()
@@ -210,6 +213,7 @@ Function RenderGeneralPage()
   AddHeaderOption("LLM Settings")
   requestResponseCooldownOID = AddSliderOption("LLM Response Request Cooldown", requestResponseCooldown, "{1}")
   AddHeaderOption("Sapience Settings")
+  useSapienceOID = AddToggleOption("Enable Sapience", minai_SapienceEnabled.GetValueInt() == 1)
   radiantDialogueFrequencyOID = AddSliderOption("Radiant Dialogue Frequency", radiantDialogueFrequency, "{1}")
   radiantDialogueChanceOID = AddSliderOption("Radiant Dialogue Chance", radiantDialogueChance, "{1}")
   SetCursorPosition(1) ; Move cursor to top right position
@@ -359,6 +363,13 @@ Event OnOptionSelect(int oid)
   if oid == UseCBPCOID
     toggleGlobal(oid, useCBPC)
     Debug.Notification("CBPC setting changed. Save/Reload to take effect")
+  oid == useSapienceOID
+    toggleGlobal(oid, minai_SapienceEnabled)
+    if minai_SapienceEnabled.GetValueInt() == 1
+      sapience.StartRadiantDialogue()
+    else
+      sapience.StopRadiantDialogue()
+    EndIf
   elseif oid == cbpcDisableSelfTouchOID
     cbpcDisableSelfTouch = !cbpcDisableSelfTouch
     SetToggleOptionValue(oid, cbpcDisableSelfTouch)
@@ -429,6 +440,13 @@ Event OnOptionDefault(int oid)
   if oid == UseCBPCOID
     SetGlobalToggle(oid, UseCBPC, true)
     Debug.Notification("CBPC setting changed. Save/Reload to take effect")
+  oid == useSapienceOID
+    SetGlobalToggle(oid, minai_SapienceEnabled, false)
+    if minai_SapienceEnabled.GetValueInt() == 1
+      sapience.StartRadiantDialogue()
+    else
+      sapience.StopRadiantDialogue()
+    EndIf
   elseif oid == cbpcDisableSelfTouchOID
     cbpcDisableSelfTouch = cbpcDisableSelfTouchDefault
     SetToggleOptionValue(oid, cbpcDisableSelfTouchDefault)
@@ -502,6 +520,8 @@ EndEvent
 Event OnOptionHighlight(int oid)
   if oid == UseCBPCOID
     SetInfoText("Enables or disables CBPC globally. Requires save/reload to take effect")
+  elseif  oid == useSapienceOID
+    SetInfoText("The Sapience System enables and disables AI dynamically in a radius around the player using SPID, and allows NPC's to radiantly interact with eachother without direct player involvement.")
   elseif oid == cbpcDisableSelfTouchOID
     SetInfoText("Enables or disables collision detection on self")
   elseif oid == cbpcDisableSelfAssTouchOID
