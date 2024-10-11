@@ -224,8 +224,8 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
           Main.Debug("OStim detects target 1 is already in thread: " + ActiveOstimThreadID)
           ostimActors = OThread.GetActors(ActiveOstimThreadID)
           ; add akSpeaker to OStim actor array
-          actors = PapyrusUtil.PushActor(actors,akSpeaker)
-          ostimActors = OActorUtil.Sort(actors, OActorUtil.EmptyArray())
+          ostimActors = PapyrusUtil.PushActor(ostimActors,akSpeaker)
+          ostimActors = OActorUtil.Sort(ostimActors, OActorUtil.EmptyArray())
           Main.Debug("OStim added akSpeaker to array and sorted: " + ostimActors)
           OThread.Stop(ActiveOstimThreadID)
           Utility.Wait(2)
