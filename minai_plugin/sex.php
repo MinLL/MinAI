@@ -10,7 +10,7 @@ if (IsModEnabled("Sexlab") || IsModEnabled("Ostim")) {
     RegisterAction("ExtCmdPutOnClothes");
     RegisterAction("ExtCmdRemoveClothes");
     // Always enabled for female player characters
-    if (IsFemale($GLOBALS["PLAYER_NAME"])) {
+    if (IsFemale($GLOBALS["HERIKA_NAME"])) {
         RegisterAction("ExtCmdStartFingering");
         RegisterAction("ExtCmdStartCunnilingus");
     }
