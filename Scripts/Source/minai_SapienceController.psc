@@ -5,7 +5,8 @@ minai_AIFF aiff
 minai_Sex  sex
 minai_DeviousStuff devious
 minai_Config config
-
+AIAgentMCMConfigScript aiffConfig
+  
 actor playerRef
 bool bHasAIFF
 GlobalVariable minai_SapienceEnabled
@@ -18,6 +19,7 @@ function Maintenance(minai_MainQuestController _main)
     Main.Fatal("Could not load configuration - script version mismatch with esp")
   EndIf
   aiff = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_AIFF
+  aiffConfig = Game.GetFormFromFile(0x9EC2, "AIAgent.esp") as AIAgentMCMConfigScript
   sex = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_Sex
   devious = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_DeviousStuff
   Main.Info("Initializing Sapience Module.")
@@ -26,6 +28,8 @@ function Maintenance(minai_MainQuestController _main)
   RegisterForModEvent("AIFF_TextReceived", "OnTextReceived")
   bHasAIFF = (Game.GetModByName("AIAgent.esp") != 255)
   StartRadiantDialogue()
+  ; RegisterForKey(aiffConfig._myKey2)
+  ; RegisterForKey(aiffConfig._myKey)
 EndFunction
 
 
@@ -69,13 +73,24 @@ Event OnUpdate()
       endwhile
       string actor1name = Main.GetActorName(nearbyActors[actor1])
       string actor2name = Main.GetActorName(nearbyActors[actor2])
-      Main.Info("SAPIENCE: Triggering Radiant Dialogue ( " + actor1name + " => " + actor2name + ")")
-      AIAgentFunctions.requestMessageForActor(actor2name, "radiant", actor1name)
+      if (!Utility.IsInMenuMode())
+        Main.Info("SAPIENCE: Triggering Radiant Dialogue ( " + actor1name + " => " + actor2name + ")")
+        AIAgentFunctions.requestMessageForActor(actor2name, "radiant", actor1name)
+        else
+          Main.Info("SAPIENCE: Not triggering radiant dialogue, in menu");
+        EndIf
+      ; Set a longer delay after triggering a rechat to avoid overwhelming AIFF if the player has the cooldown set too low.
+      ; This will be overridden by OnTextReceived with the proper cooldown after the LLM responds.
+      StartNextUpdate(60.0)
     else
       Main.Debug("SAPIENCE: Not enough nearby actors for radiant dialogue")
+      ; Shorter cooldown if there weren't enough actors nearby last time we checked
+      StartNextUpdate(5.0)
     EndIf
+  Else
+      StartNextUpdate()
   EndIf
-  StartNextUpdate()
+  
 EndEvent
 
 Event OnTextReceived(String speakerName, String sayLine)
@@ -92,9 +107,13 @@ Function StartRadiantDialogue()
 EndFunction
 
 
-Function StartNextUpdate()
+Function StartNextUpdate(float nextTime = 0.0)
   if minai_SapienceEnabled.GetValueInt() == 1  && config.radiantDialogueChance > 0
-    RegisterForSingleUpdate(config.radiantDialogueFrequency)
+    if nextTime == 0.0
+      RegisterForSingleUpdate(config.radiantDialogueFrequency)
+    else
+      RegisterForSingleUpdate(nextTime)
+    endif
   EndIf
 EndFunction
 
@@ -105,3 +124,11 @@ Function StopRadiantDialogue()
   Main.Info("SAPIENCE: Stopping Radiant Dialogue")
   UnregisterForUpdate()
 EndFunction
+
+
+Event OnKeyDown(int KeyCode)
+  ; if KeyCode == aiffConfig._myKey || KeyCode == aiffConfig._myKey2
+  ;    Main.Debug("SAPIENCE: Detected AIFF dialogue key, resetting sapience cooldown")
+  ;    StartNextUpdate()
+  ;  EndIf
+EndEvent
