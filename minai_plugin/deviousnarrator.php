@@ -61,11 +61,11 @@ Function SetDeviousNarrator() {
     }
     $questState = intval(GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleGlobal"));
     $telvanniScore = ($questState % 10);
-    $eldritchScore = (intval($questState) / 10);
+    $eldritchScore = intval(intval($questState) / 10);
     if ($eldritchScore != 0 && $telvanniScore != 0) {
         // Pick a narrator at random if both are running
         if (rand(0, 1) == 1) {
-            SetEldrichNarrator();
+            SetEldritchNarrator();
         }
         else {
             SetTelvanniNarrator();
