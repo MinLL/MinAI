@@ -106,8 +106,8 @@ Function Maintenance(minai_MainQuestController _main)
   aiff.RegisterAction("ExtCmdStartCuddleSex", "StartCuddleSex", "Sex Position", "Sex1", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
   aiff.RegisterAction("ExtCmdStartKissingSex", "StartKissingSex", "Sex Position", "Sex1", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
   
-  aiff.RegisterAction("ExtCmdSpeedUpSex", "SpeedUpSex", "Sex Intensity", "Sex3", 1, 5, 2, 5, 300, (bHasOstim))
-  aiff.RegisterAction("ExtCmdSlowDownSex", "SlowDownSex", "Sex Intensity", "Sex3", 1, 5, 2, 5, 300, (bHasOstim))
+  aiff.RegisterAction("ExtCmdSpeedUpSex", "SpeedUpSex", "Sex Intensity", "Sex3", 1, 3, 1, 1, 300, (bHasOstim))
+  aiff.RegisterAction("ExtCmdSlowDownSex", "SlowDownSex", "Sex Intensity", "Sex3", 1, 3, 1, 1, 300, (bHasOstim))
 EndFunction
 
 
