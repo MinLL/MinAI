@@ -124,6 +124,8 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
 ## Hard Requirements
 * This mod requires a functional installation of either AI Follower Framework, Mantella, or both (and their respective dependencies). DO THIS FIRST and seek assistance in those forums. When you are up and running well, return here and continue installation as follows:
 * Papyrus Tweaks is required. Install the version appropriate for your game (SE/AE/VR).
+* Requires the latest version of JContainers.
+* Requires the latest version of Papyrus Extender.
 
 ## Soft Requirements
 * See the features section. All supported mods are soft requirements. Highly suggest having at a minimum either OStim or Sexlab.
