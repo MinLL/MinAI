@@ -2,6 +2,8 @@
 if (IsModEnabled("Sexlab") || IsModEnabled("Ostim")) {
     // Always enabled
     RegisterAction("ExtCmdMasturbate");
+    RegisterAction("ExtCmdStartCuddleSex");
+    RegisterAction("ExtCmdStartKissingSex");
     RegisterAction("ExtCmdStartVaginal");
     RegisterAction("ExtCmdStartAnal");
     RegisterAction("ExtCmdStartBlowjob");
@@ -33,8 +35,6 @@ if (IsModEnabled("Sexlab") || IsModEnabled("Ostim")) {
         RegisterAction("ExtCmdStart69Sex");
         RegisterAction("ExtCmdStartGrindingSex");
         RegisterAction("ExtCmdStartThighjob");
-        RegisterAction("ExtCmdStartCuddleSex");
-        RegisterAction("ExtCmdStartKissingSex");
         RegisterAction("ExtCmdStartAggressive");
         RegisterAction("ExtCmdEndSex");
         // Speed control for OStim scenes 
