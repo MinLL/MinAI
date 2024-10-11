@@ -1,4 +1,8 @@
 <?php
+// Player bio - Added to the prompt head for dialogue that is not npc -> npc
+$GLOBALS["PLAYER_BIO"] = "I'm #PLAYER_NAME#. ";
+// Set this to override the prompt head for all profiles
+$GLOBALS["PROMPT_HEAD_OVERRIDE"] = "";
 // Force the voice type to use the actor's base voice type (eg, "maleguard") instead of "whiterun_guard".
 // Useful for compatibility with mantella's xtts configuration if you don't want to mess with setting up latents
 $GLOBALS["force_voice_type"] = false;
@@ -11,8 +15,6 @@ $GLOBALS["stop_narrator_context_leak"] = false;
 // Enable functions during things like rechat.
 // Allows for better party dynamics. Disabled for the narrator to avoid CTD.
 $GLOBALS["always_enable_functions"] = true;
-// Set this to override the prompt head for all profiles
-$GLOBALS["PROMPT_HEAD_OVERRIDE"] = "";
 // Force the configured name in AI-FF to match the in-game name
 $GLOBALS["force_aiff_name_to_ingame_name"] = true;
 // List of commands to disable.
@@ -24,4 +26,14 @@ $GLOBALS["disable_worn_equipment"] = false;
 // Voice type overrides for devious narrator
 $GLOBALS["devious_narrator_eldritch_voice"] = "dragon";
 $GLOBALS["devious_narrator_telvanni_voice"] = "TelvanniNarrator";
+
+// Overrides for rechat settings during radiant dialogue.
+// NOTE: At least one rechat is always guaranteed after a radiant dialogue is started.
+$GLOBALS["radiance_rechat_h"] = 3;
+$GLOBALS["radiance_rechat_p"] = 20;
+// How many seconds after player input should radiant dialogue be blocked?
+// This is intended to prevent the situation where the player begins talking, and a radiant conversation is 
+// triggered before the LLM and TTS have finished with the response. For radiant dialogue frequency configuration,
+// use the in-game MCM.
+$GLOBALS["input_delay_for_radiance"] = 15;
 ?>

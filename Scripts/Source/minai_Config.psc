@@ -5,7 +5,8 @@ minai_AIFF aiff
 minai_Sex  sex
 minai_DeviousStuff devious
 bool Property ActionRegistryIsDirty = false Auto
-  
+minai_SapienceController sapience
+
 ; OID definitions
 int logLevelOID
 int useCBPCOID
@@ -23,6 +24,7 @@ int arousalForSexOID
 int arousalForHarassOID
 int confirmSexOID
 int disableAIAnimationsOID
+int useSapienceOID
 
 int aOIDMap ; Jmap for storing action oid's
 
@@ -32,11 +34,13 @@ int bulkIntervalOID
 int bulkExponentOID
 int bulkMaxIntervalOID
 int bulkDecayWindowOID
+int radiantDialogueFrequencyOID
+int radiantDialogueChanceOID
 
-  
 ; Legacy globals
 GlobalVariable useCBPC
 GlobalVariable minai_UseOstim
+GlobalVariable minai_SapienceEnabled
 
 string currentActionsPage
 
@@ -84,6 +88,12 @@ bool Property confirmSex = False Auto
 Bool disableAIAnimationsDefault = False
 Bool Property disableAIAnimations = False Auto
 
+Float radiantDialogueFrequencyDefault = 30.0
+Float Property radiantDialogueFrequency = 30.0 Auto
+
+Float radiantDialogueChanceDefault = 50.0
+Float Property radiantDialogueChance = 50.0 Auto
+
 bool Property bulkEnabled = True Auto
 
 Event OnConfigInit()
@@ -97,6 +107,8 @@ Function InitializeMCM()
   sex = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_Sex
   main = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_MainQuestController
   devious = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_DeviousStuff
+  sapience = Game.GetFormFromFile(0x091D, "MinAI.esp") as minai_SapienceController
+  minai_SapienceEnabled = Game.GetFormFromFile(0x091A, "MinAI.esp") as GlobalVariable
   Main.Info("Initializing MCM ( " + JMap.Count(aiff.actionRegistry) + " actions in registry).")
   useCBPC = Game.GetFormFromFile(0x0910, "MinAI.esp") as GlobalVariable
   if aOIDMap != 0
@@ -129,7 +141,7 @@ Function InitializeMCM()
 EndFunction
 
 int Function GetVersion()
-  return 11 ; mcm menu version
+  return 13 ; mcm menu version
 EndFunction
 
 Function SetupPages()
@@ -200,6 +212,10 @@ Function RenderGeneralPage()
   SetCursorFillMode(TOP_TO_BOTTOM)		
   AddHeaderOption("LLM Settings")
   requestResponseCooldownOID = AddSliderOption("LLM Response Request Cooldown", requestResponseCooldown, "{1}")
+  AddHeaderOption("Sapience Settings")
+  useSapienceOID = AddToggleOption("Enable Sapience", minai_SapienceEnabled.GetValueInt() == 1)
+  radiantDialogueFrequencyOID = AddSliderOption("Radiant Dialogue Frequency", radiantDialogueFrequency, "{1}")
+  radiantDialogueChanceOID = AddSliderOption("Radiant Dialogue Chance", radiantDialogueChance, "{1}")
   SetCursorPosition(1) ; Move cursor to top right position
   disableAIAnimationsOID = AddToggleOption("Disable AI-FF Animations", disableAIAnimations)
 EndFunction
@@ -347,6 +363,13 @@ Event OnOptionSelect(int oid)
   if oid == UseCBPCOID
     toggleGlobal(oid, useCBPC)
     Debug.Notification("CBPC setting changed. Save/Reload to take effect")
+  oid == useSapienceOID
+    toggleGlobal(oid, minai_SapienceEnabled)
+    if minai_SapienceEnabled.GetValueInt() == 1
+      sapience.StartRadiantDialogue()
+    else
+      sapience.StopRadiantDialogue()
+    EndIf
   elseif oid == cbpcDisableSelfTouchOID
     cbpcDisableSelfTouch = !cbpcDisableSelfTouch
     SetToggleOptionValue(oid, cbpcDisableSelfTouch)
@@ -417,6 +440,13 @@ Event OnOptionDefault(int oid)
   if oid == UseCBPCOID
     SetGlobalToggle(oid, UseCBPC, true)
     Debug.Notification("CBPC setting changed. Save/Reload to take effect")
+  oid == useSapienceOID
+    SetGlobalToggle(oid, minai_SapienceEnabled, false)
+    if minai_SapienceEnabled.GetValueInt() == 1
+      sapience.StartRadiantDialogue()
+    else
+      sapience.StopRadiantDialogue()
+    EndIf
   elseif oid == cbpcDisableSelfTouchOID
     cbpcDisableSelfTouch = cbpcDisableSelfTouchDefault
     SetToggleOptionValue(oid, cbpcDisableSelfTouchDefault)
@@ -461,6 +491,12 @@ Event OnOptionDefault(int oid)
   elseif oid == disableAIAnimationsOID
     disableAIAnimations = disableAIAnimationsDefault
     SetToggleOptionValue(oid, disableAIAnimationsDefault)
+  elseif oid ==  radiantDialogueFrequencyOID
+    radiantDialogueFrequency = radiantDialogueFrequencyDefault
+    SetSliderOptionValue(radiantDialogueFrequencyOID, radiantDialogueFrequencyDefault, "{1}")
+  elseif oid ==  radiantDialogueChanceOID
+    radiantDialogueChance = radiantDialogueChanceDefault
+    SetSliderOptionValue(radiantDialogueChanceOID, radiantDialogueChanceDefault, "{1}")
   EndIf
   string[] actions = JMap.allKeysPArray(aOIDMap)
   int i = 0
@@ -484,6 +520,8 @@ EndEvent
 Event OnOptionHighlight(int oid)
   if oid == UseCBPCOID
     SetInfoText("Enables or disables CBPC globally. Requires save/reload to take effect")
+  elseif  oid == useSapienceOID
+    SetInfoText("The Sapience System enables and disables AI dynamically in a radius around the player using SPID, and allows NPC's to radiantly interact with eachother without direct player involvement.")
   elseif oid == cbpcDisableSelfTouchOID
     SetInfoText("Enables or disables collision detection on self")
   elseif oid == cbpcDisableSelfAssTouchOID
@@ -496,6 +534,10 @@ Event OnOptionHighlight(int oid)
     SetInfoText("How often physics are calculated in seconds. Lower = more responsive, higher = less script load")
   elseif oid == collisionSpeechCooldownOID
     SetInfoText("How often the AI should be prompted to react to physics in seconds (outside of sex)")
+  elseif oid == radiantDialogueFrequencyOID
+    SetInfoText("How often the radiant dialogue chance is checked for nearby AI")
+  elseif oid == radiantDialogueChanceOID
+    SetInfoText("How likely the radiant dialogue system is to be invoked each time it is checked")
   elseif oid == collisionSexCooldownOID
     SetInfoText("How often the AI should be prompted to react to physics in seconds (during sex)")
   elseif oid == allowDeviceLockOID
@@ -555,6 +597,16 @@ Event OnOptionSliderOpen(int oid)
     SetSliderDialogStartValue(collisionSpeechCooldown)
     SetSliderDialogDefaultValue(collisionSpeechCooldownDefault)
     SetSliderDialogRange(1, 100)
+    SetSliderDialogInterval(0.5)
+  elseif oid == radiantDialogueFrequencyOID
+    SetSliderDialogStartValue(radiantDialogueFrequency)
+    SetSliderDialogDefaultValue(radiantDialogueFrequencyDefault)
+    SetSliderDialogRange(5, 300)
+    SetSliderDialogInterval(0.5)
+  elseif oid == radiantDialogueChanceOID
+    SetSliderDialogStartValue(radiantDialogueChance)
+    SetSliderDialogDefaultValue(radiantDialogueChanceDefault)
+    SetSliderDialogRange(0, 100)
     SetSliderDialogInterval(0.5)
   elseif oid == collisionSexCooldownOID
     SetSliderDialogStartValue(collisionSexCooldown)
@@ -644,6 +696,14 @@ Event OnOptionSliderAccept(int oid, float value)
     SetSliderOptionValue(oid, value, "{1}")
   elseif oid == collisionSpeechCooldownOID
     collisionSpeechCooldown = value
+    SetSliderOptionValue(oid, value, "{1}")
+  elseif oid == radiantDialogueFrequencyOID
+    sapience.StartRadiantDialogue()
+    radiantDialogueFrequency = value
+    SetSliderOptionValue(oid, value, "{1}")
+  elseif oid == radiantDialogueChanceOID
+    sapience.StartRadiantDialogue()
+    radiantDialogueChance = value
     SetSliderOptionValue(oid, value, "{1}")
   elseif oid == collisionSexCooldownOID
     collisionSexCooldown = value

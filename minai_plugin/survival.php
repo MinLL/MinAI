@@ -142,21 +142,23 @@ $GLOBALS["FUNCTIONS"][] = [
 $isInnKeeper = IsInFaction($GLOBALS['HERIKA_NAME'], "JobInnKeeper");
 $isServer = IsInFaction($GLOBALS['HERIKA_NAME'], "JobInnServer");
 
-if (IsModEnabled("Sunhelm") && ($isInnKeeper || $isServer)) {
-    RegisterAction("ExtCmdServeFood");
-}
-if ($isInnKeeper) {
-    RegisterAction("ExtCmdRentRoom");
-}
+if (!IsRadiant()) { // Don't enable these commands for NPC's
+    if (IsModEnabled("Sunhelm") && ($isInnKeeper || $isServer)) {
+        RegisterAction("ExtCmdServeFood");
+    }
+    if ($isInnKeeper) {
+        RegisterAction("ExtCmdRentRoom");
+    }
 
-if (IsInFaction($GLOBALS['HERIKA_NAME'], "Carriage System Vendors")) {
-    RegisterAction("ExtCmdCarriageRide");
-}
+    if (IsInFaction($GLOBALS['HERIKA_NAME'], "Carriage System Vendors")) {
+        RegisterAction("ExtCmdCarriageRide");
+    }
 
-if (!IsFollower($GLOBALS["HERIKA_NAME"])) {
-    // Allow anyone that isn't a follower to buy or sell. Don't restrict this to shop-keepers.
-    RegisterAction("ExtCmdTrade");
+    if (!IsFollower($GLOBALS["HERIKA_NAME"])) {
+        // Allow anyone that isn't a follower to buy or sell. Don't restrict this to shop-keepers.
+        RegisterAction("ExtCmdTrade");
+    }
+    // Allow anyone to offer training.
+    RegisterAction("ExtCmdTrainSkill");
 }
-// Allow anyone to offer training.
-RegisterAction("ExtCmdTrainSkill");
 ?>
