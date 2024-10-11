@@ -183,15 +183,6 @@ Function StoreRadiantActors($actor1, $actor2) {
             'value' => $actor2
         )
     );
-    $id = "_minai_RADIANT//initial";
-    $db->delete("conf_opts", "id='{$id}'");
-    $db->insert(
-        'conf_opts',
-        array(
-            'id' => $id,
-            'value' => 'TRUE'
-        )
-    );
 }
 
 Function ClearRadiantActors() {
@@ -200,7 +191,6 @@ Function ClearRadiantActors() {
     $db->delete("conf_opts", "id='{$id}'");
     $id = "_minai_RADIANT//actor2";
     $db->delete("conf_opts", "id='{$id}'");
-    $db->delete("conf_opts", "id='_minai_RADIANT//initial'");
 }
 
 Function GetTargetActor() {
@@ -218,19 +208,6 @@ Function GetTargetActor() {
     if ($GLOBALS['HERIKA_NAME'] == $ret2[0]['value'])
         return $ret1[0]['value'];
     return $GLOBALS["PLAYER_NAME"];
-}
-
-Function IsNewRadiantConversation() {
-    return $GLOBALS["db"]->fetchAll("select 1 from conf_opts where id='_minai_RADIANT//initial' and value='TRUE'");
-}
-
-Function GetLastInput() {
-    $db = $GLOBALS['db'];
-    $ret = $GLOBALS["db"]->fetchAll("select * from conf_opts where id='_minai_RADIANT//lastInput'");
-    if (!$ret) {
-        return 0;
-    }
-    return intval($ret[0]['value']);
 }
 
 Function IsRadiant() {

@@ -96,41 +96,25 @@ function ProcessIntegrations() {
         );
         $MUST_DIE=true;
     }
-    if (isset($GLOBALS["gameRequest"]) && strtolower($GLOBALS["gameRequest"][0]) == "radiant") {
-        if (time() > GetLastInput() + $GLOBALS["input_delay_for_radiance"]) {
-            // $GLOBALS["HERIKA_NAME"] is npc1
-            $GLOBALS["HERIKA_TARGET"] = explode(":", $GLOBALS["gameRequest"][3])[3];
-            error_log("minai: Starting radiant dialogue between {$GLOBALS["HERIKA_NAME"]} and {$GLOBALS["HERIKA_TARGET"]}");
-            $GLOBALS["PROMPTS"]["radiant"]= [
-                "cue"=>[
-                    "write dialogue for {$GLOBALS["HERIKA_NAME"]}.{$GLOBALS["TEMPLATE_DIALOG"]}  "
-                ], 
-                "player_request"=>[    
-                    "The Narrator: {$GLOBALS["HERIKA_NAME"]} starts a dialogue with {$GLOBALS["HERIKA_TARGET"]} about a random topic",
-                ]
-            ];
-            StoreRadiantActors($GLOBALS["HERIKA_TARGET"], $GLOBALS["HERIKA_NAME"]);
-        }
-        else {
-            // Avoid race condition where we send input, the server starts to process the request, and then
-            // a radiant request comes in 
-            error_log("minai: Not starting radiance: Input was too recent");
-        }
+    if (isset($GLOBALS["gameRequest"]) && strtolower($GLOBALS["gameRequest"][0]) == "ginputtext") {
+        ClearRadiantActors();
     }
-    if (in_array($GLOBALS["gameRequest"][0],["inputtext","inputtext_s","ginputtext","ginputtext_s","rechat","bored", "radiant"])) {
-        if ($GLOBALS["gameRequest"][0] != "radiant")
-            ClearRadiantActors();
-        error_log("minai: Setting lastInput time.");
-        $db = $GLOBALS['db'];
-        $id = "_minai_RADIANT//lastInput";
-        $db->delete("conf_opts", "id='{$id}'");
-        $db->insert(
-            'conf_opts',
-            array(
-                'id' => $id,
-                'value' => time()
-            )
-        );
+    if (isset($GLOBALS["gameRequest"]) && strtolower($GLOBALS["gameRequest"][0]) == "bored") {
+        ClearRadiantActors();
+    }
+    if (isset($GLOBALS["gameRequest"]) && strtolower($GLOBALS["gameRequest"][0]) == "radiant") {
+        // $GLOBALS["HERIKA_NAME"] is npc1
+        $GLOBALS["HERIKA_TARGET"] = explode(":", $GLOBALS["gameRequest"][3])[3];
+        error_log("minai: Starting radiant dialogue between {$GLOBALS["HERIKA_NAME"]} and {$GLOBALS["HERIKA_TARGET"]}");
+        $GLOBALS["PROMPTS"]["radiant"]= [
+            "cue"=>[
+                "write dialogue for {$GLOBALS["HERIKA_NAME"]}.{$GLOBALS["TEMPLATE_DIALOG"]}  "
+            ], 
+            "player_request"=>[    
+                "The Narrator: {$GLOBALS["HERIKA_NAME"]} starts a dialogue with {$GLOBALS["HERIKA_TARGET"]} about a random topic",
+            ]
+        ];
+        StoreRadiantActors($GLOBALS["HERIKA_TARGET"], $GLOBALS["HERIKA_NAME"]);
     }
     if ($MUST_DIE) {
         error_log("minai: Done procesing custom request");
