@@ -668,7 +668,6 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
   int ostimTid = numArg as int
   Main.Debug("oStim eventName: "+eventName+", strArg: "+strArg+", numArg: "+numArg as int+" sender: "+sender as actor )
   if (eventName == "ostim_thread_start")
-    string sceneName = OThread.GetScene(ostimTid)
     bool isRunning = OThread.IsRunning(ostimTid)
     Actor[] actors = OThread.GetActors(ostimTid)
     string actorString
@@ -685,10 +684,10 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
       if (playerInvolved)
         AIFF.ChillOut()
       EndIf
-      Main.RegisterEvent(actorString + " begin scene: " + sceneName + ".")
+      Main.RegisterEvent(actorString + " begin scene: " + sceneId + ".")
       SetSexSceneState("on")
       if bHasAIFF
-        AIAgentFunctions.logMessage("ostim@"+sceneName+" "+isRunning+" "+actorString,"setconf")
+        AIAgentFunctions.logMessage("ostim@"+sceneId+" "+isRunning+" "+actorString,"setconf")
       EndIf
       Main.Info("OStim scene start")
     else
