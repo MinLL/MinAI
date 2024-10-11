@@ -152,10 +152,10 @@ Function StartSexScene(actor[] actors, bool bPlayerInScene, string tags="")
     tags = ConvertTagsOstim(tags)
     actors = OActorUtil.Sort(actors, OActorUtil.EmptyArray())
     string newScene = OLibrary.GetRandomSceneWithAnyActionCSV(actors, tags)
-    Utility.Wait(0.2)
+    Utility.Wait(0.5)
     if newScene == ""
       newScene = OLibrary.GetRandomSceneWithAnySceneTagCSV(actors, tags)
-      Utility.Wait(0.5)
+      Utility.Wait(1)
       if newScene == ""
         Main.Debug("No OStim scene found for: " + tags)
       EndIf
@@ -224,7 +224,7 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
           ostimActors = OActorUtil.Sort(ostimActors, OActorUtil.EmptyArray())
           Main.Debug("OStim added akSpeaker to array and sorted: " + ostimActors)
           OThread.Stop(ActiveOstimThreadID)
-          Utility.Wait(0.5)
+          Utility.Wait(2)
           StartSexScene(ostimActors, bPlayerInScene, tags)
         EndIf
       EndIf
@@ -233,17 +233,17 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
       ostimActors = OThread.GetActors(ActiveOstimThreadID)
       Main.Debug("Searching for random " + tags + " scene.")
       string newScene = OLibrary.GetRandomSceneWithAnyActionCSV(ostimActors, tags)
-      Utility.Wait(0.2)
+      Utility.Wait(0.5)
       if newScene == ""
         newScene = OLibrary.GetRandomSceneWithAnySceneTagCSV(ostimActors, tags)
-        Utility.Wait(0.5)
+        Utility.Wait(1)
       EndIf
       Main.Debug("Ostim scene transition to: " + newScene + " for OStim Thread [" + ActiveOstimThreadID + "].")
       if OThread.IsRunning(ActiveOstimThreadID)
         OThread.NavigateTo(ActiveOstimThreadID, newScene)
         if OThread.IsInAutoMode(ActiveOstimThreadID)
           OThread.StopAutoMode(ActiveOstimThreadID)
-          Utility.Wait(4)
+          Utility.Wait(5)
           OThread.StartAutoMode(ActiveOstimThreadID)
         EndIf
       EndIf
