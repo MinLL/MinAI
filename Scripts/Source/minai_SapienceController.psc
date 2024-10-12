@@ -65,7 +65,7 @@ Event OnUpdate()
     actor[] nearbyActors = AIAgentFunctions.findAllNearbyAgents()
     ; Use bored chat instead for this
     ; PapyrusUtil.PushActor(nearbyActors, playerRef) ; Let the NPC decide to talk to the player
-    if nearbyActors.Length >= 2
+    if (nearbyActors.Length >= 2) && (!Utility.IsInMenuMode() && !PlayerRef.GetCurrentScene())
       int actor1 = PO3_SKSEFunctions.GenerateRandomInt(0, nearbyActors.Length - 1)
       int actor2 = actor1
       while actor2 == actor1
@@ -73,17 +73,13 @@ Event OnUpdate()
       endwhile
       string actor1name = Main.GetActorName(nearbyActors[actor1])
       string actor2name = Main.GetActorName(nearbyActors[actor2])
-      if (!Utility.IsInMenuMode())
-        Main.Info("SAPIENCE: Triggering Radiant Dialogue ( " + actor1name + " => " + actor2name + ")")
-        AIAgentFunctions.requestMessageForActor(actor2name, "radiant", actor1name)
-        else
-          Main.Info("SAPIENCE: Not triggering radiant dialogue, in menu");
-        EndIf
+      Main.Info("SAPIENCE: Triggering Radiant Dialogue ( " + actor1name + " => " + actor2name + ")")
+      AIAgentFunctions.requestMessageForActor(actor2name, "radiant", actor1name)
       ; Set a longer delay after triggering a rechat to avoid overwhelming AIFF if the player has the cooldown set too low.
       ; This will be overridden by OnTextReceived with the proper cooldown after the LLM responds.
       StartNextUpdate(60.0)
     else
-      Main.Debug("SAPIENCE: Not enough nearby actors for radiant dialogue")
+      Main.Debug("SAPIENCE: Not enough nearby actors for radiant dialogue or player in blocking condition")
       ; Shorter cooldown if there weren't enough actors nearby last time we checked
       StartNextUpdate(5.0)
     EndIf
