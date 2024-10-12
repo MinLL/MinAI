@@ -382,7 +382,7 @@ $GLOBALS["contextDataFull"] = array_values($GLOBALS["contextDataFull"]);
 foreach ($GLOBALS["contextDataFull"] as $n=>$ctxLine) {
     if (strpos($ctxLine["content"],"#NPCTALK")!==false) {
         $matches = array();
-        preg_match(".+?#NPCTALK\(([a-zA-Z0-9]+), ([a-zA-Z0-9]+)\): (.+?)\(", $ctxLine["content"], $matches);
+        preg_match("/.+?#NPCTALK\(([a-zA-Z0-9]+), ([a-zA-Z0-9]+)\): (.+?)\(/", $ctxLine["content"], $matches);
         $replacement = "{$matches[0]}: {$matches[2]} (Talking to {$matches[1]})";
         $GLOBALS["contextDataFull"][$n]["content"] = $replacement;
     }

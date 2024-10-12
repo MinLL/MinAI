@@ -118,7 +118,7 @@ function ProcessIntegrations() {
         }
     }
     if (in_array($GLOBALS["gameRequest"][0],["inputtext","inputtext_s","ginputtext","ginputtext_s","rechat","bored", "radiant"])) {
-        if ($GLOBALS["gameRequest"][0] != "radiant")
+        if (!in_array($GLOBALS["gameRequest"][0], ["radiant", "rechat"]))
             ClearRadiantActors();
         error_log("minai: Setting lastInput time.");
         $db = $GLOBALS['db'];
