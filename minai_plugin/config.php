@@ -26,4 +26,14 @@ $GLOBALS["disable_worn_equipment"] = false;
 // Voice type overrides for devious narrator
 $GLOBALS["devious_narrator_eldritch_voice"] = "dragon";
 $GLOBALS["devious_narrator_telvanni_voice"] = "TelvanniNarrator";
+
+// Overrides for rechat settings during radiant dialogue.
+// NOTE: At least one rechat is always guaranteed after a radiant dialogue is started.
+$GLOBALS["radiance_rechat_h"] = 3;
+$GLOBALS["radiance_rechat_p"] = 20;
+// How many seconds after player input should radiant dialogue be blocked?
+// This is intended to prevent the situation where the player begins talking, and a radiant conversation is 
+// triggered before the LLM and TTS have finished with the response. For radiant dialogue frequency configuration,
+// use the in-game MCM.
+$GLOBALS["input_delay_for_radiance"] = 15;
 ?>
