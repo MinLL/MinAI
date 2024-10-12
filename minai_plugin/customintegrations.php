@@ -96,6 +96,21 @@ function ProcessIntegrations() {
         );
         $MUST_DIE=true;
     }
+    if (isset($GLOBALS["gameRequest"]) && strtolower($GLOBALS["gameRequest"][0]) =="npc_talk") {
+        $vars=explode("@",$GLOBALS["gameRequest"][3]);
+        $speaker = explode(":", $vars[0])[3];
+        $target = $vars[1];
+        $message = $vars[2];
+        error_log("minai: Processing NPC request ({$speaker} => {$target}: {$message})");
+        $GLOBALS["PROMPTS"]["npc_talk"]= [
+            "cue"=>[
+                "write dialogue for {$GLOBALS["HERIKA_NAME"]}.{$GLOBALS["TEMPLATE_DIALOG"]}  "
+            ], 
+            "player_request"=>[
+                "{$speaker}: {$message} (Talking to {$target})"
+            ]
+        ];
+    }
     if (isset($GLOBALS["gameRequest"]) && strtolower($GLOBALS["gameRequest"][0]) == "radiant") {
         if (time() > GetLastInput() + $GLOBALS["input_delay_for_radiance"]) {
             // $GLOBALS["HERIKA_NAME"] is npc1
@@ -183,7 +198,7 @@ function RegisterThirdPartyActions() {
                             "enum" => $targetEnum
                         ]
                     ],
-                    "required" => [],
+                    "required" => ["target"],
                 ],
             ];
             $GLOBALS["FUNCRET"][$cmdName]=$GLOBALS["GenericFuncRet"];

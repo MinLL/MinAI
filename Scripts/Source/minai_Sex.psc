@@ -141,7 +141,7 @@ EndFunction
 
 
 Function StartSexScene(actor[] actors, bool bPlayerInScene, string tags="")
-  if config.confirmSex
+  if config.confirmSex && bPlayerInScene
     int result = minai_confirmSexMsg.Show()
     if result == 1
       Main.Info("User declined sex scene, aborting")
@@ -588,6 +588,15 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   elseIf command == "ExtCmdStartOrgy"
     actor[] actors = aiff.GetNearbyAI()
     actors = PapyrusUtil.PushActor(actors,playerRef)
+    if (actors.Length > 5)
+      actor[] newActors = new actor[5];
+      int i = 0;
+      while i  < 5
+        newActors[i] = actors[i]
+        i += 1
+      EndWhile
+      actors = newActors
+    EndIf
     if bHasOstim && minai_UseOStim.GetValue() == 1.0
       actors = OActorUtil.Sort(actors, OActorUtil.EmptyArray()) ; 2nd param is array of dominant actors
     else

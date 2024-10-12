@@ -34,8 +34,8 @@ event OnDefeatRecoverSequence(Form sender, Form theForm, int theInt, string theS
 EndEvent
 
 
-event OnDefeat(Form sender, Form theForm, int theInt, string theString)
-  main.Info("OnDefeat(" + sender + ", " + theInt + ", " + theString + ")")
+event OnDefeat(String str1, String str2, Float theFloat, form def)
+  main.Info("OnDefeat(" + str1 + ", " + str2 +"," + theFloat + ", " + def + ")")
 EndEvent
 
 event OnDefeatAnimationEnd(Form sender, Form theForm, int theInt, string theString)

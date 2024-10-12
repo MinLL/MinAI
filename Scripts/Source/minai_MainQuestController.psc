@@ -146,16 +146,14 @@ EndFunction
 Function RequestLLMResponseNPC(string speaker, string eventLine, string target)
   if bHasAIFF
     float currentTime = Utility.GetCurrentRealTime()
-    string lineToSend = "#NPCTALK(" + speaker + ", " + target + "): " + eventLine
+    string lineToSend = speaker + "@" + target + "@" + eventLine
     if currentTime - lastRequestTime > config.requestResponseCooldown
       lastRequestTime = currentTime
-      Info("Requesting response from LLM: " + eventLine)
-      AIAgentFunctions.requestMessageForActor(eventLine, "chatnf_npc", target)
-    Else
-      RegisterEvent(lineToSend, "chat_npc")
+      Info("Requesting response from LLM: " + lineToSend)
+      AIAgentFunctions.requestMessageForActor(lineToSend, "npc_talk", target)
     EndIf
   elseif bHasMantella
-    RegisterEvent(eventLine, "chat_npc")
+    RegisterEvent(eventLine, "npc_chat")
    EndIf
 EndFunction
 

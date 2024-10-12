@@ -1,4 +1,6 @@
 <?php
+$target = $GLOBALS["target"];
+
 if (IsModEnabled("Sexlab") || IsModEnabled("Ostim")) {
     // Always enabled
     RegisterAction("ExtCmdMasturbate");
@@ -52,10 +54,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStopSex"]=$GLOBALS["GenericFuncRet"];
@@ -71,10 +73,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartSexScene"]=$GLOBALS["GenericFuncRet"];
@@ -91,10 +93,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdMasturbate"]=$GLOBALS["GenericFuncRet"];
@@ -110,10 +112,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartOrgy"]=$GLOBALS["GenericFuncRet"];
@@ -129,10 +131,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartVaginal"]=$GLOBALS["GenericFuncRet"];
@@ -148,10 +150,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartAnal"]=$GLOBALS["GenericFuncRet"];
@@ -167,10 +169,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartBlowjob"]=$GLOBALS["GenericFuncRet"];
@@ -186,10 +188,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartHandjob"]=$GLOBALS["GenericFuncRet"];
@@ -205,10 +207,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartFootjob"]=$GLOBALS["GenericFuncRet"];
@@ -224,10 +226,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartBoobjob"]=$GLOBALS["GenericFuncRet"];
@@ -243,10 +245,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartCunnilingus"]=$GLOBALS["GenericFuncRet"];
@@ -262,10 +264,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartFacial"]=$GLOBALS["GenericFuncRet"];
@@ -281,10 +283,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartCumonchest"]=$GLOBALS["GenericFuncRet"];
@@ -300,10 +302,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartRubbingclitoris"]=$GLOBALS["GenericFuncRet"];
@@ -319,10 +321,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartDeepthroat"]=$GLOBALS["GenericFuncRet"];
@@ -338,10 +340,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartRimjob"]=$GLOBALS["GenericFuncRet"];
@@ -357,10 +359,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartFingering"]=$GLOBALS["GenericFuncRet"];
@@ -378,10 +380,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartMissionarySex"]=$GLOBALS["GenericFuncRet"];
@@ -397,10 +399,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartCowgirlSex"]=$GLOBALS["GenericFuncRet"];
@@ -416,10 +418,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartReverseCowgirl"]=$GLOBALS["GenericFuncRet"];
@@ -435,10 +437,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartDoggystyle"]=$GLOBALS["GenericFuncRet"];
@@ -454,10 +456,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartFacesitting"]=$GLOBALS["GenericFuncRet"];
@@ -473,10 +475,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStart69Sex"]=$GLOBALS["GenericFuncRet"];
@@ -492,10 +494,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartGrindingSex"]=$GLOBALS["GenericFuncRet"];
@@ -511,10 +513,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartThighjob"]=$GLOBALS["GenericFuncRet"];
@@ -530,10 +532,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartCuddleSex"]=$GLOBALS["GenericFuncRet"];
@@ -549,10 +551,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartKissingSex"]=$GLOBALS["GenericFuncRet"];
@@ -570,10 +572,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdRemoveClothes"]=$GLOBALS["GenericFuncRet"];
@@ -590,10 +592,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdPutOnClothes"]=$GLOBALS["GenericFuncRet"];

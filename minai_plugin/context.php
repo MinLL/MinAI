@@ -64,17 +64,22 @@ Function GetPhysicalDescription($name) {
   $buttScore = GetActorValue($name, "buttScore");
   $isexposed = GetActorValue($name, "isexposed");
   $ret = "";
+  $isWerewolf = false;
   if ($gender != "" && $race != "") {
     $ret .= "{$name} is a {$gender} {$race}. ";
+    if ($race == "werewolf") {
+        $isWerewolf = true;
+        $ret .= "{$name} is currently transformed into a terrifying werewolf! ";
+    }
   }
   if (!IsPlayer($name)) {
     return $ret;
   }
-  if (!empty($beautyScore) && $beautyScore != "0") {
+  if (!empty($beautyScore) && $beautyScore != "0" && !$isWerewolf) {
     $beautyScore = ceil(intval($beautyScore)/10);
     $ret .= "She is a {$beautyScore}/10 in terms of beauty ";
   }
-  if((!empty($breastsScore) && $breastsScore != "0") && (!empty($buttScore) && $buttScore != "0")) {
+  if((!empty($breastsScore) && $breastsScore != "0") && (!empty($buttScore) && $buttScore != "0") && !$isWerewolf) {
       $breastsScore = ceil(intval($breastsScore)/10);
       $buttScore = ceil(intval($buttScore)/10);
       $ret .= "with {$breastsScore}/10 tits and a {$buttScore}/10 ass. ";
@@ -376,17 +381,21 @@ array_pop($physicsInfoElements);
 foreach ($physicsInfoElements as $n) {
     unset($GLOBALS["contextDataFull"][$n]); 
 }
-$GLOBALS["contextDataFull"] = array_values($GLOBALS["contextDataFull"]);
 
-// Handle speech from non-player actors
+/*$nullValues = [];
 foreach ($GLOBALS["contextDataFull"] as $n=>$ctxLine) {
-    if (strpos($ctxLine["content"],"#NPCTALK")!==false) {
-        $matches = array();
-        preg_match("/.+?#NPCTALK\(([a-zA-Z0-9]+), ([a-zA-Z0-9]+)\): (.+?)\(/", $ctxLine["content"], $matches);
-        $replacement = "{$matches[0]}: {$matches[2]} (Talking to {$matches[1]})";
-        $GLOBALS["contextDataFull"][$n]["content"] = $replacement;
+    error_log("minai: Checking ({$n}) {$ctxLine["content"]}");
+    if (!$ctxLine["content"] || $ctxLine["content"] == null || $ctxLine["content"]  == "") {
+        $nullValues[] = $n;
+        error_log("minai: Found null value in context ({$n})");
     }
 }
+foreach ($nullValues as $n) {
+    error_log("minai: Unsetting null value $n");
+    unset($GLOBALS["contextDataFull"][$n]); 
+}*/
+
+$GLOBALS["contextDataFull"] = array_values($GLOBALS["contextDataFull"]);
 
 
 require_once("deviousnarrator.php");

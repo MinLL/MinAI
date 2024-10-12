@@ -2,7 +2,8 @@
 
 require_once("util.php");
 
-$canVibrate = CanVibrate($GLOBALS["PLAYER_NAME"]);
+$target = GetTargetActor();
+$canVibrate = CanVibrate($target);
 
   
 $GLOBALS["F_NAMES"]["ExtCmdShock"]="Shock";
@@ -24,10 +25,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 
@@ -42,10 +43,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 
@@ -58,10 +59,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 
@@ -77,9 +78,9 @@ if ($canVibrate) {
  }
 
 
-$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdShock"]="{$GLOBALS["HERIKA_NAME"]} comments on remotely shocking {$GLOBALS["PLAYER_NAME"]}. {$GLOBALS["TEMPLATE_DIALOG"]}";
-$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdForceOrgasm"]="{$GLOBALS["HERIKA_NAME"]} comments on remotely forcing {$GLOBALS["PLAYER_NAME"]} to have an orgasm. {$GLOBALS["TEMPLATE_DIALOG"]}";
-$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdTurnOffVibrator"]="{$GLOBALS["HERIKA_NAME"]} comments on turning off {$GLOBALS["PLAYER_NAME"]}'s vibrator. {$GLOBALS["TEMPLATE_DIALOG"]}";
+$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdShock"]="{$GLOBALS["HERIKA_NAME"]} comments on remotely shocking {$target}. {$GLOBALS["TEMPLATE_DIALOG"]}";
+$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdForceOrgasm"]="{$GLOBALS["HERIKA_NAME"]} comments on remotely forcing {$target} to have an orgasm. {$GLOBALS["TEMPLATE_DIALOG"]}";
+$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdTurnOffVibrator"]="{$GLOBALS["HERIKA_NAME"]} comments on turning off {$target}'s vibrator. {$GLOBALS["TEMPLATE_DIALOG"]}";
 
 
 
@@ -106,21 +107,19 @@ foreach ($vibSettings as $strength) {
 			     "parameters" => [
 					      "type" => "object",
 					      "properties" => [
-							       "intensity" => [
-									       "type" => "string",
-									       "description" => "Strength of the vibration",
-									       "enum" => ["Very Weak", "Weak", "Medium", "Strong", "Very Strong"]
-
-									       ]
-		
-							       ],
-					      "required" => [],
+                              "target" => [
+                                  "type" => "string",
+                                  "description" => "Target NPC, Actor, or being",
+                                  "enum" => $GLOBALS["nearby"]
+                              ]
+                          ],
+					      "required" => ["target"],
 					      ],
 			     ];
   if ($canVibrate) {
       $GLOBALS["ENABLED_FUNCTIONS"][]=$keyword;
   }
-  $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["$keyword"]="{$GLOBALS["HERIKA_NAME"]} comments on remotely teasing {$GLOBALS["PLAYER_NAME"]} with a $strength vibration. {$GLOBALS["TEMPLATE_DIALOG"]}";
+  $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["$keyword"]="{$GLOBALS["HERIKA_NAME"]} comments on remotely teasing {$target} with a $strength vibration. {$GLOBALS["TEMPLATE_DIALOG"]}";
 }
 
 foreach ($vibSettings as $strength) {
@@ -131,25 +130,24 @@ foreach ($vibSettings as $strength) {
   $GLOBALS["F_TRANSLATIONS"][$keyword]="Remotely stimulate the target with a vibrator ($strength intensity)";
 
   $GLOBALS["FUNCTIONS"][] = [
-			     "name" => $GLOBALS["F_NAMES"]["$keyword"],
-			     "description" => $GLOBALS["F_TRANSLATIONS"]["$keyword"],
-			     "parameters" => [
-					      "type" => "object",
-					      "properties" => [
-							       "intensity" => [
-									       "type" => "string",
-									       "description" => "Strength of the vibration",
-									       "enum" => ["Very Weak", "Weak", "Medium", "Strong", "Very Strong"]
-									       ]
-		
-							       ],
-					      "required" => [],
-					      ],
-			     ];
+      "name" => $GLOBALS["F_NAMES"]["$keyword"],
+      "description" => $GLOBALS["F_TRANSLATIONS"]["$keyword"],
+      "parameters" => [
+          "type" => "object",
+          "properties" => [
+              "target" => [
+                  "type" => "string",
+                  "description" => "Target NPC, Actor, or being",
+                  "enum" => $GLOBALS["nearby"]
+              ],
+              "required" => ["target"],
+          ],
+      ]
+  ];
   if ($canVibrate) {
       $GLOBALS["ENABLED_FUNCTIONS"][]=$keyword;
   }
-  $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["$keyword"]="{$GLOBALS["HERIKA_NAME"]} comments on remotely stimulating {$GLOBALS["PLAYER_NAME"]} with a $strength vibration. {$GLOBALS["TEMPLATE_DIALOG"]}";
+  $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["$keyword"]="{$GLOBALS["HERIKA_NAME"]} comments on remotely stimulating {$target} with a $strength vibration. {$GLOBALS["TEMPLATE_DIALOG"]}";
 }
 
 
@@ -167,10 +165,10 @@ $GLOBALS["FUNCTIONS"][] = [
             "target" => [
                 "type" => "string",
                 "description" => "Target NPC, Actor, or being",
-                "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                "enum" => $GLOBALS["nearby"]
             ]
         ],
-        "required" => [],
+        "required" => ["target"],
     ],
 ];
 
@@ -185,10 +183,10 @@ $GLOBALS["FUNCTIONS"][] = [
             "target" => [
                 "type" => "string",
                 "description" => "Target NPC, Actor, or being",
-                "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                "enum" => $GLOBALS["nearby"]
             ]
         ],
-        "required" => [],
+        "required" => ["target"],
     ],
 ];
 

@@ -11,10 +11,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => [$GLOBALS["target"]]
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdRentRoom"]=function($gameRequest) {
@@ -43,11 +43,11 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => [$GLOBALS["target"]]
 
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdServeFood"]=$GLOBALS["GenericFuncRet"];
@@ -63,11 +63,11 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => [$GLOBALS["target"]]
 
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 
@@ -116,7 +116,7 @@ $GLOBALS["FUNCTIONS"][] = [
                     "enum" => $destinations
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 
@@ -132,10 +132,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "The skill you are teaching to {$GLOBALS["PLAYER_NAME"]}",
-                    "enum" => $destinations
+                    "enum" => []
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 

@@ -99,10 +99,10 @@ function GetDeviousFollowerContext($name) {
                         "target" => [
                             "type" => "string",
                             "description" => "Target NPC, Actor, or being",
-                            "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                            "enum" => $GLOBALS["nearby"]
                         ]
                     ],
-                    "required" => [],
+                    "required" => ["target"],
                 ],
             ];
             $GLOBALS["FUNCRET"]["ExtCmdGiveDrugs"]=$GLOBALS["GenericFuncRet"];
@@ -136,10 +136,10 @@ function GetDeviousFollowerContext($name) {
                     "target" => [
                         "type" => "string",
                         "description" => "Target NPC, Actor, or being",
-                        "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                        "enum" => $GLOBALS["nearby"]
                     ]
                 ],
-                "required" => [],
+                "required" => ["target"],
             ],
         ];
         $GLOBALS["FUNCRET"]["ExtCmdAcceptDeal"]=$GLOBALS["GenericFuncRet"];

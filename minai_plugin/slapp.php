@@ -13,11 +13,11 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
 
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 
@@ -41,11 +41,11 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
 
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 
@@ -70,11 +70,11 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
 
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 

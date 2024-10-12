@@ -9,6 +9,7 @@ Function SetRadiance($rechat_h, $rechat_p) {
 }
 
 if (IsNewRadiantConversation()) {
+    error_log("minai: Initial radiant conversation, overriding rechat parameters");
     $GLOBALS["db"]->delete("conf_opts", "id='_minai_RADIANT//initial'");
     SetRadiance(2, 0); // Always rechat at least once
 }

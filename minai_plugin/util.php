@@ -192,9 +192,11 @@ Function StoreRadiantActors($actor1, $actor2) {
             'value' => 'TRUE'
         )
     );
+    error_log("minai: Storing Radiant Actors");
 }
 
 Function ClearRadiantActors() {
+    error_log("minai: Clearing Radiant Actors");
     $db = $GLOBALS['db'];
     $id = "_minai_RADIANT//actor1";
     $db->delete("conf_opts", "id='{$id}'");
@@ -237,4 +239,6 @@ Function IsRadiant() {
     return (GetTargetActor() != $GLOBALS["PLAYER_NAME"]);
 }
 
+$GLOBALS["target"] = GetTargetActor();
+$GLOBALS["nearby"] = explode(",", GetActorValue("PLAYER", "nearbyActors"));
 ?>

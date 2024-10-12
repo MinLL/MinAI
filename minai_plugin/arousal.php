@@ -21,13 +21,13 @@ $GLOBALS["FUNCTIONS"][] = [
         "parameters" => [
             "type" => "object",
             "properties" => [
-                "change" => [
+                "target" => [
                     "type" => "integer",
                     "description" => "How much to increase arousal (0-100 scale)",
-                    "enum" => range(1, 100)
+                    "enum" => range(1, 20)
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 
@@ -37,13 +37,13 @@ $GLOBALS["FUNCTIONS"][] = [
         "parameters" => [
             "type" => "object",
             "properties" => [
-                "change" => [
+                "target" => [
                     "type" => "integer",
                     "description" => "How much to decrease arousal (0-100 scale)",
-                    "enum" => range(1, 100)
+                    "enum" => range(1, 20)
                 ]
             ],
-            "required" => [],
+            "required" => ["target"],
         ],
     ];
 

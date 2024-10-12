@@ -621,12 +621,12 @@ Event OnOptionSliderOpen(int oid)
   elseif oid == arousalForSexOID
     SetSliderDialogStartValue(arousalForSex)
     SetSliderDialogDefaultValue(arousalForSexDefault)
-    SetSliderDialogRange(1, 100)
+    SetSliderDialogRange(0, 100)
     SetSliderDialogInterval(1.0)
   elseif oid == arousalForHarassOID
     SetSliderDialogStartValue(arousalForHarass)
     SetSliderDialogDefaultValue(arousalForHarassDefault)
-    SetSliderDialogRange(1, 100)
+    SetSliderDialogRange(0, 100)
     SetSliderDialogInterval(1.0)
   EndIf
   string[] actions = JMap.allKeysPArray(aOIDMap)
