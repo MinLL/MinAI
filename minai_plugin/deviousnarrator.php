@@ -84,7 +84,10 @@ Function SetDeviousNarrator() {
 
 
 Function ShouldUseDeviousNarrator() {
-    return (IsModEnabled("DeviouslyAccessible") && $GLOBALS["HERIKA_NAME"] == "The Narrator");
+    $questState = intval(GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleGlobal"));
+    $telvanniScore = ($questState % 10);
+    $eldritchScore = intval(intval($questState) / 10);
+    return (IsModEnabled("DeviouslyAccessible") && $GLOBALS["HERIKA_NAME"] == "The Narrator" && ($eldritchScore != 0 || $telvanniScore != 0));
 }
 
 

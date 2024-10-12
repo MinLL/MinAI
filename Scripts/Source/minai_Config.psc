@@ -363,9 +363,9 @@ Event OnOptionSelect(int oid)
   if oid == UseCBPCOID
     toggleGlobal(oid, useCBPC)
     Debug.Notification("CBPC setting changed. Save/Reload to take effect")
-  oid == useSapienceOID
+  elseif oid == useSapienceOID
     toggleGlobal(oid, minai_SapienceEnabled)
-    if minai_SapienceEnabled.GetValueInt() == 1
+    if minai_SapienceEnabled.GetValueInt() == 1.0
       sapience.StartRadiantDialogue()
     else
       sapience.StopRadiantDialogue()
