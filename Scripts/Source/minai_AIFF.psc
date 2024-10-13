@@ -577,7 +577,7 @@ EndFunction
 
 Function RemoveActorAI(string targetName)
   Main.Info("SAPIENCE: Removing " + targetName + " from AI")
-  AIAgentFunctions.removeAgentByName(targetName)
+  ;AIAgentFunctions.removeAgentByName(targetName)
   JMap.RemoveKey(sapientActors, targetName)
 EndFunction
 
