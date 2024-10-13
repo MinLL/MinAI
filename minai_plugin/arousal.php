@@ -27,7 +27,7 @@ $GLOBALS["FUNCTIONS"][] = [
                     "enum" => range(1, 20)
                 ]
             ],
-            "required" => ["target"],
+            "required" => [],
         ],
     ];
 
@@ -43,7 +43,7 @@ $GLOBALS["FUNCTIONS"][] = [
                     "enum" => range(1, 20)
                 ]
             ],
-            "required" => ["target"],
+            "required" => [],
         ],
     ];
 

@@ -13,7 +13,7 @@ if (IsModEnabled("Sexlab") || IsModEnabled("Ostim")) {
     RegisterAction("ExtCmdStartOrgy");
     RegisterAction("ExtCmdPutOnClothes");
     RegisterAction("ExtCmdRemoveClothes");
-    // Always enabled for female player characters
+    // Always enabled for female actors
     if (IsFemale(GetTargetActor())) {
         RegisterAction("ExtCmdStartFingering");
         RegisterAction("ExtCmdStartCunnilingus");
@@ -62,7 +62,7 @@ $GLOBALS["FUNCTIONS"][] = [
                     "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => ["target"],
+            "required" => [],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdSpeedUpSex"]=$GLOBALS["GenericFuncRet"];
@@ -139,7 +139,7 @@ $GLOBALS["FUNCTIONS"][] = [
                     "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => ["target"],
+            "required" => [],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdMasturbate"]=$GLOBALS["GenericFuncRet"];
@@ -158,7 +158,7 @@ $GLOBALS["FUNCTIONS"][] = [
                     "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => ["target"],
+            "required" => [],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStartOrgy"]=$GLOBALS["GenericFuncRet"];
@@ -618,7 +618,7 @@ $GLOBALS["FUNCTIONS"][] = [
                     "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => ["target"],
+            "required" => [],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdRemoveClothes"]=$GLOBALS["GenericFuncRet"];
@@ -638,7 +638,7 @@ $GLOBALS["FUNCTIONS"][] = [
                     "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => ["target"],
+            "required" => [],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdPutOnClothes"]=$GLOBALS["GenericFuncRet"];
