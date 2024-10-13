@@ -297,7 +297,7 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
     else
       if !bSpeakerInScene ; Speaker not in scene, add them to it
         Main.Info("Sex: Speaker was not in scene, adding them to it.")
-	actorsInScene = PapyrusUtil.PushActor(actorsInScene,akSpeaker)
+	      actorsInScene = PapyrusUtil.PushActor(actorsInScene,akSpeaker)
         actorsInScene = slf.SortActors(actorsInScene)
         if akSpeaker.GetActorBase().GetSex() == 0
           numMales += 1
@@ -305,10 +305,11 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
           numFemales += 1
         endIf
       EndIf
+      sslBaseAnimation[] animations = FindSexlabAnimations(actorsInScene, numMales, numFemales, tags)
       if actorsInScene.Length != actors.Length || !bSpeakerInScene
         Main.Info("Sex: Number of actors changed, forcing update")
         Controller.ChangeActors(actorsInScene)
-	Controller.SetAnimations(animations)
+	      Controller.SetAnimations(animations)
         Utility.Wait(1)
       EndIf
       ; If this isn't set, it means that a new actor is joining from the orgy command.
@@ -316,7 +317,6 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
       if tags == ""
         tags == lastTag
       EndIf
-      sslBaseAnimation[] animations = FindSexlabAnimations(actorsInScene, numMales, numFemales, tags)
       Controller.SetForcedAnimations(animations)
       Controller.SetAnimation()
       if actors.Length == 1

@@ -319,12 +319,16 @@ Function TrackContext(actor akActor)
   EndIf
 EndFunction
 
-Function RegisterAction(string actionName, string mcmName, string mcmDesc, string mcmPage, int enabled, float interval, float exponent, int maxInterval, float decayWindow, bool hasMod)
+Function RegisterAction(string actionName, string mcmName, string mcmDesc, string mcmPage, int enabled, float interval, float exponent, int maxInterval, float decayWindow, bool hasMod, bool forceUpdate=false)
   if !bHasAIFF
     return
   EndIf
   int actionObj = JMap.getObj(actionRegistry, actionName)
   bool updating = false
+  if actionObj != 0 && !forceUpdate
+    Main.Info("Not registering action " + actionName + ": Action already is registered.")
+    return
+  EndIf
   if actionObj != 0
     updating = true
   else
