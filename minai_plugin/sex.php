@@ -4,6 +4,8 @@ $target = $GLOBALS["target"];
 if (IsModEnabled("Sexlab") || IsModEnabled("Ostim")) {
     // Always enabled
     RegisterAction("ExtCmdMasturbate");
+    RegisterAction("ExtCmdStartCuddleSex");
+    RegisterAction("ExtCmdStartKissingSex");
     RegisterAction("ExtCmdStartVaginal");
     RegisterAction("ExtCmdStartAnal");
     RegisterAction("ExtCmdStartBlowjob");
@@ -35,19 +37,22 @@ if (IsModEnabled("Sexlab") || IsModEnabled("Ostim")) {
         RegisterAction("ExtCmdStart69Sex");
         RegisterAction("ExtCmdStartGrindingSex");
         RegisterAction("ExtCmdStartThighjob");
-        RegisterAction("ExtCmdStartCuddleSex");
-        RegisterAction("ExtCmdStartKissingSex");
         RegisterAction("ExtCmdStartAggressive");
-        RegisterAction("ExtCmdStopSex");
+        RegisterAction("ExtCmdEndSex");
+        // Speed control for OStim scenes 
+        if (IsModEnabled("Ostim")) {
+          RegisterAction("ExtCmdSpeedUpSex");
+          RegisterAction("ExtCmdSlowDownSex");
+        }
     }
 }
 
 
-$GLOBALS["F_NAMES"]["ExtCmdStopSex"]="StopSex";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdStopSex"]="Immediately disengage from sexual activity";
+$GLOBALS["F_NAMES"]["ExtCmdSpeedUpSex"]="SpeedUpSex";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdSpeedUpSex"]="Increase the speed of sexual activity";
 $GLOBALS["FUNCTIONS"][] = [
-        "name" => $GLOBALS["F_NAMES"]["ExtCmdStopSex"],
-        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStopSex"],
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdSpeedUpSex"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdSpeedUpSex"],
         "parameters" => [
             "type" => "object",
             "properties" => [
@@ -60,9 +65,47 @@ $GLOBALS["FUNCTIONS"][] = [
             "required" => ["target"],
         ],
     ];
-$GLOBALS["FUNCRET"]["ExtCmdStopSex"]=$GLOBALS["GenericFuncRet"];
+$GLOBALS["FUNCRET"]["ExtCmdSpeedUpSex"]=$GLOBALS["GenericFuncRet"];
 
-$GLOBALS["F_NAMES"]["ExtCmdStartSexScene"]="StartSexScene";
+$GLOBALS["F_NAMES"]["ExtCmdSlowDownSex"]="SlowDownSex";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdSlowDownSex"]="Reduce the speed of sexual activity";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdSlowDownSex"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdSlowDownSex"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdSlowDownSex"]=$GLOBALS["GenericFuncRet"];
+
+$GLOBALS["F_NAMES"]["ExtCmdEndSex"]="EndSex";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdEndSex"]="Immediately disengage from sexual activity";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdEndSex"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdEndSex"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdEndSex"]=$GLOBALS["GenericFuncRet"];
+
+/* $GLOBALS["F_NAMES"]["ExtCmdStartSexScene"]="StartSexScene";
 $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartSexScene"]="Immediately engage in sexual activity with the target";
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdStartSexScene"],
@@ -79,7 +122,7 @@ $GLOBALS["FUNCTIONS"][] = [
             "required" => ["target"],
         ],
     ];
-$GLOBALS["FUNCRET"]["ExtCmdStartSexScene"]=$GLOBALS["GenericFuncRet"];
+$GLOBALS["FUNCRET"]["ExtCmdStartSexScene"]=$GLOBALS["GenericFuncRet"]; */
 
 $GLOBALS["F_NAMES"]["ExtCmdMasturbate"]="Masturbate";
 $GLOBALS["F_TRANSLATIONS"]["ExtCmdMasturbate"]="Immediately begin masturbating";

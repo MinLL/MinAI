@@ -80,7 +80,7 @@ Function Maintenance(minai_MainQuestController _main)
   aiff.RegisterAction("ExtCmdPutOnClothes", "PutOnClothes", "Put all clothing back on", "Sex1", 1, 5, 2, 5, 300, True)
   aiff.RegisterAction("ExtCmdMasturbate", "Masturbate", "Begin Masturbating", "Sex1", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
   aiff.RegisterAction("ExtCmdStartOrgy", "Orgy", "Start Sex with all nearby AI Actors", "Sex1", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
-  aiff.RegisterAction("ExtCmdStopSex", "StopSex", "Stop having Sex", "Sex1", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdEndSex", "EndSex", "Finish the Current Sex Scene", "Sex1", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
   ; aiff.RegisterAction("ExtCmdStartSexScene", "StartSexScene", "ExtCmdStartSexScene", "Sex", 1, 5, 2, 5, 300)
   aiff.RegisterAction("ExtCmdStartBlowjob", "StartBlowjob", "Sex Position", "Sex1", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
   aiff.RegisterAction("ExtCmdStartAnal", "StartAnal", "Sex Position", "Sex1", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
@@ -88,13 +88,13 @@ Function Maintenance(minai_MainQuestController _main)
   aiff.RegisterAction("ExtCmdStartHandjob", "StartHandjob", "Sex Position", "Sex1", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
   aiff.RegisterAction("ExtCmdStartFootjob", "StartFootjob", "Sex Position", "Sex1", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
   aiff.RegisterAction("ExtCmdStartBoobjob", "StartBoobjob", "Sex Position", "Sex1", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
-  aiff.RegisterAction("ExtCmdStartCunnilingus", "StartCunnilingus", "Sex Position", "Sex2", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdStartCunnilingus", "StartCunnilingus", "Sex Position", "Sex1", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
   aiff.RegisterAction("ExtCmdStartFacial", "StartFacial", "Sex Position", "Sex2", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
   aiff.RegisterAction("ExtCmdStartCumonchest", "StartCumonchest", "Sex Position", "Sex2", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
   aiff.RegisterAction("ExtCmdStartRubbingclitoris", "StartRubbingclitoris", "Sex Position", "Sex2", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
   aiff.RegisterAction("ExtCmdStartDeepthroat", "StartDeepthroat", "Sex Position", "Sex2", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
   aiff.RegisterAction("ExtCmdStartRimjob", "StartRimjob", "Sex Position", "Sex2", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
-  aiff.RegisterAction("ExtCmdStartFingering", "StartFingering", "Sex Position", "Sex2", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdStartFingering", "StartFingering", "Sex Position", "Sex1", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
   aiff.RegisterAction("ExtCmdStartMissionarySex", "StartMissionarySex", "Sex Position", "Sex2", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
   aiff.RegisterAction("ExtCmdStartCowgirlSex", "StartCowgirlSex", "Sex Position", "Sex2", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
   aiff.RegisterAction("ExtCmdStartReverseCowgirl", "StartReverseCowgirl", "Sex Position", "Sex2", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
@@ -103,8 +103,11 @@ Function Maintenance(minai_MainQuestController _main)
   aiff.RegisterAction("ExtCmdStart69Sex", "Start69Sex", "Sex Position", "Sex3", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
   aiff.RegisterAction("ExtCmdStartGrindingSex", "StartGrindingSex", "Sex Position", "Sex3", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
   aiff.RegisterAction("ExtCmdStartThighjob", "StartThighjob", "Sex Position", "Sex3", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
-  aiff.RegisterAction("ExtCmdStartCuddleSex", "StartCuddleSex", "Sex Position", "Sex3", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
-  aiff.RegisterAction("ExtCmdStartKissingSex", "StartKissingSex", "Sex Position", "Sex3", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdStartCuddleSex", "StartCuddleSex", "Sex Position", "Sex1", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdStartKissingSex", "StartKissingSex", "Sex Position", "Sex1", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  
+  aiff.RegisterAction("ExtCmdSpeedUpSex", "SpeedUpSex", "Sex Intensity", "Sex3", 1, 3, 1, 1, 300, (bHasOstim))
+  aiff.RegisterAction("ExtCmdSlowDownSex", "SlowDownSex", "Sex Intensity", "Sex3", 1, 3, 1, 1, 300, (bHasOstim))
 EndFunction
 
 
@@ -190,6 +193,7 @@ Function StartSexScene(actor[] actors, bool bPlayerInScene, string tags="")
 EndFunction
 
 
+
 Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags="")
   Main.Info("Sex: Starting/switching for " + actors.Length + " actors (tags: " + tags + ")")
   bool bSpeakerInScene = False
@@ -220,7 +224,7 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
           Main.Debug("OStim detects target 1 is already in thread: " + ActiveOstimThreadID)
           ostimActors = OThread.GetActors(ActiveOstimThreadID)
           ; add akSpeaker to OStim actor array
-          actors = PapyrusUtil.PushActor(actors,akSpeaker)
+          ostimActors = PapyrusUtil.PushActor(ostimActors,akSpeaker)
           ostimActors = OActorUtil.Sort(ostimActors, OActorUtil.EmptyArray())
           Main.Debug("OStim added akSpeaker to array and sorted: " + ostimActors)
           OThread.Stop(ActiveOstimThreadID)
@@ -247,7 +251,7 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
           OThread.StartAutoMode(ActiveOstimThreadID)
         EndIf
       EndIf
-      main.RegisterEvent(Main.GetActorName(akSpeaker) + " attempted to change the OStim scene to " + tags + " instead: " + newScene, "info_sexscene")
+      main.RegisterEvent(Main.GetActorName(akSpeaker) + " changed the sex scene to " + tags + " instead: " + newScene, "info_sexscene")
       Return
     EndIf
   else
@@ -337,6 +341,7 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
 EndFunction
 
 
+
 Function StartSexOrSwitchTo(actor akSpeaker, actor akTarget, actor Player, bool bPlayerInScene, string tags)
   Main.Info("StartSexOrSwitchTo( " + Main.GetActorName(akSpeaker) + ", " + Main.GetActorName(akTarget) + ", " + tags + " )")
   Actor[] actors = new Actor[2]
@@ -347,7 +352,33 @@ EndFunction
 
 
 
-Function StopSex(actor akSpeaker)
+Function SpeedUpSex(actor akActor)
+  if bHasOstim && minai_UseOStim.GetValue() == 1.0
+    int ostimTid = OActor.GetSceneID(akActor)
+    if OThread.IsRunning(ostimTid)
+      int ostimSpeed = OThread.GetSpeed(ostimTid)
+      ostimSpeed += 1
+      OThread.SetSpeed(ostimTid, ostimSpeed)
+    EndIf
+  EndIf
+EndFunction
+
+
+
+Function SlowDownSex(actor akActor)
+  if bHasOstim && minai_UseOStim.GetValue() == 1.0
+    int ostimTid = OActor.GetSceneID(akActor)
+    if OThread.IsRunning(ostimTid)
+      int ostimSpeed = OThread.GetSpeed(ostimTid)
+      ostimSpeed -= 1
+      OThread.SetSpeed(ostimTid, ostimSpeed)
+    EndIf
+  EndIf
+EndFunction
+
+
+
+Function EndSex(actor akSpeaker)
   if OActor.IsInOStim(akSpeaker)
     int ActiveOstimThreadID = OActor.GetSceneID(akSpeaker)
     if OThread.IsRunning(ActiveOstimThreadID)
@@ -355,6 +386,9 @@ Function StopSex(actor akSpeaker)
     EndIf
   else
     ; add SL Stop
+    int threadID = slf.FindPlayerController()
+    EndSexScene(threadID, True)
+    ;;; WILL THIS WORK?
   EndIf
 EndFunction
 
@@ -510,7 +544,12 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
   elseIf stringutil.Find(sayLine, "-groupsex-") != -1 || stringUtil.Find(sayLine, "-orgy-") != -1 || stringUtil.Find(sayLine, "-threesome-") != -1
     StartSexOrSwitchToGroup(actorsFromFormList, akSpeaker)
   elseif stringutil.Find(sayLine, "-endsex-") != -1 || stringutil.Find(sayLine, "-end sex-") != -1 || stringutil.Find(sayLine, "-stopsex-") != -1 || stringutil.Find(sayLine, "-stop sex-") != -1 || stringutil.Find(sayLine, "-red-") != -1
-    StopSex(akSpeaker)
+    EndSex(akSpeaker)
+    
+  elseif stringutil.Find(sayLine, "-speedup-") != -1 || stringutil.Find(sayLine, "-speed up-") != -1 || stringutil.Find(sayLine, "-faster-") != -1 || stringutil.Find(sayLine, "-gofaster-") != -1 || stringutil.Find(sayLine, "-go faster-") != -1
+    SpeedUpSex(akSpeaker)
+  elseif stringutil.Find(sayLine, "-slowdown-") != -1 || stringutil.Find(sayLine, "-slow down-") != -1 || stringutil.Find(sayLine, "-slower-") != -1 || stringutil.Find(sayLine, "-goslower-") != -1 || stringutil.Find(sayLine, "-go slower-") != -1
+    SlowDownSex(akSpeaker)
   EndIf
 EndFunction
 
@@ -603,8 +642,13 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
       actors = slf.SortActors(actors)
     EndIf
     StartSexOrSwitchToGroup(actors, akSpeaker, "")
-  elseif command == "ExtCmdStopSex"
-    StopSex(akSpeaker)
+  elseif command == "ExtCmdEndSex"
+    EndSex(akSpeaker)
+  elseif command == "ExtCmdSpeedUpSex"
+    SpeedUpSex(akSpeaker)
+  elseif command == "ExtCmdSlowDownSex"
+    SlowDownSex(akSpeaker)
+
   elseif (command=="ExtCmdRemoveClothes")
     Form[] equippedItems=PO3_SKSEFunctions.AddAllEquippedItemsToArray(akSpeaker);
     int equippedArmor = JArray.Object()
@@ -672,96 +716,112 @@ EndFunction
 
 
 
-Event OnOstimOrgasm(string eventName, string strArg, float numArg, Form sender)
-  actor akActor = sender as actor
-EndEvent
-
-
-
 Event OStimManager(string eventName, string strArg, float numArg, Form sender)
   int ostimTid = numArg as int
-  Main.Info("oStim eventName: "+eventName+", strArg: "+strArg);
-  if (eventName=="ostim_thread_start")
-    string sceneName=OThread.GetScene(ostimTid);
-    bool isRunning=OThread.IsRunning(ostimTid);
-    Actor[] actors =  OThread.GetActors(ostimTid);
-    string actorString;
+  Main.Debug("oStim eventName: "+eventName+", strArg: "+strArg+", numArg: "+numArg as int+" sender: "+sender as actor )
+  if (eventName == "ostim_thread_start")
+    string sceneId = strArg
+    bool isRunning = OThread.IsRunning(ostimTid)
+    Actor[] actors = OThread.GetActors(ostimTid)
+    string actorString
     int i = actors.Length
     bool playerInvolved=false
-    while(i > 0)
+    if isRunning
+      while(i > 0)
         i -= 1
-        actorString=actorString+Main.GetActorName(actors[i])+",";
-        if (actors[i] == playerRef) 
-          playerInvolved=true;
-        EndIf
-    Endwhile
-    
-    if (playerInvolved)
-      AIFF.ChillOut()
+        actorString = actorString+Main.GetActorName(actors[i])+","
+      Endwhile
+      if actors.Find(playerRef) >= 0
+        playerInvolved = true
+        AIFF.ChillOut()
+      EndIf
+      Main.RegisterEvent(actorString + " begin sex scene: " + sceneId + ".")
+      SetSexSceneState("on")
+      if bHasAIFF
+        AIAgentFunctions.logMessage("ostim@"+sceneId+" "+isRunning+" "+actorString,"setconf")
+      EndIf
+      Main.Info("OStim scene start")
+    else
+      Main.Debug("OStim thread start failed")
     EndIf
-    SetSexSceneState("on")
-    if bHasAIFF
-      AIAgentFunctions.logMessage("ostim@"+sceneName+" "+isRunning+" "+actorString,"setconf")
-    EndIf
-    Main.Info("Started intimate scene")
   
-  elseif (eventName=="ostim_thread_scenechanged")
-    string sceneId = strArg 
-    string sceneName=OThread.GetScene(ostimTid);
-    bool isRunning=OThread.IsRunning(ostimTid);
-    Actor[] actors =  OThread.GetActors(ostimTid);
-    string actorString;
+  elseif (eventName == "ostim_thread_scenechanged")
+    string sceneId = strArg
+    bool isRunning = OThread.IsRunning(ostimTid)
+    string[] actionTypes = OMetadata.GetActionTypes(sceneId)
+    string[] sceneTags = OMetadata.GetSceneTags(sceneId)
+    Actor[] actors = OThread.GetActors(ostimTid)
+    string actorString
     int i = actors.Length
     bool playerInvolved=false
-    while(i > 0)
-      i -= 1
-      actorString=actorString+Main.GetActorName(actors[i])+",";
-      if (actors[i] == playerRef)
-        playerInvolved=true;
+    if isRunning
+      while(i > 0)
+        i -= 1
+        actorString = actorString+Main.GetActorName(actors[i])+", "
+        if (actors[i] == playerRef)
+          playerInvolved = true
+        EndIf
+        string actorName = Main.GetActorName(actors[i])
+        int excitement = OActor.GetExcitement(actors[i]) as int
+        int orgasmcount = OActor.GetTimesClimaxed(actors[i])
+        if excitement >= 80
+          Main.RegisterEvent(actorName + " is approaching orgasm number " + (orgasmcount+1) + ".")
+        EndIf
+      Endwhile
+      if (playerInvolved)
+        AIFF.ChillOut()
       EndIf
-      string actorName = main.GetActorName(actors[i])
-      int excitement = OActor.GetExcitement(actors[i]) as int
-      int orgasmcount = OActor.GetTimesClimaxed(actors[i])
-      if excitement > 80
-        Main.RegisterEvent(actorName + " is close to orgasm number " + (orgasmcount+1) + ".")
+      Main.Info("Ostim Scene changed to: " + sceneId)
+      Main.Debug("Name: "+sceneId+" isRunning:"+isRunning+" Actions: "+actionTypes.Length+" Actors: "+actorString)
+      string tags
+      int j = actionTypes.Length
+      if j > 0
+        while (j > 0)
+          j -= 1
+          tags = tags+actionTypes[j]+", "
+        Endwhile
       EndIf
-    Endwhile
-    
-    if (playerInvolved)
-      AIFF.ChillOut()
+      int k = sceneTags.Length
+      if k > 0
+        while (k > 0)
+          k -= 1
+          tags = tags+sceneTags[k]+", "
+        Endwhile        
+      EndIf
+      Main.RegisterEvent(actorString + "changed the action to " + tags + ".")
+    else
+      Main.Debug("OStim scene change failed")
     EndIf
-    main.RegisterEvent(""+sceneName+" id:"+sceneId+" isRunning:"+isRunning+" Actors:"+actorString,"info_sexscene")
-    Main.Info("Ostim Scene changed")
-
-  elseif (eventName=="ostim_actor_orgasm")    
-    Actor OrgasmedActor = Sender as Actor
-    string sceneName=OThread.GetScene(ostimTid);
-    bool isRunning=OThread.IsRunning(ostimTid);
-    Actor[] actors =  OThread.GetActors(ostimTid);
-    main.RegisterEvent(Main.GetActorName(OrgasmedActor) + " had an Orgasm")
-    DirtyTalk(actors, "ohh... yes.")
-    Main.Info("Ostim Actor orgasm")
-
-  elseif (eventName=="ostim_thread_end")    
-    string sceneName=OThread.GetScene(ostimTid);
-    bool isRunning=OThread.IsRunning(ostimTid);
-    Actor[] actors =  OThread.GetActors(ostimTid);
-    string actorString;
-    int i = actors.Length
-    bool playerInvolved=false
-    while(i > 0)
-      i -= 1
-      actorString=actorString+Main.GetActorName(actors[i])+",";
-      if (actors[i] == playerRef) 
-        playerInvolved=true;
-      EndIf
-    endwhile
     
-    if (playerInvolved)
-      AIFF.ChillOut()
+  elseif (eventName == "ostim_thread_speedchanged")
+    int newSpeed = strArg as int
+    bool isRunning = OThread.IsRunning(ostimTid)
+    Actor[] actors = OThread.GetActors(ostimTid)
+    if isRunning
+      int sceneSpeed = OThread.GetSpeed(ostimTid)
+      int defaultSpeed = OMetadata.GetDefaultSpeed(ostimTid)
+      if sceneSpeed > defaultSpeed
+        DirtyTalk(actors, "Fuck, yes! I like when you go faster like this.")
+      elseif sceneSpeed < defaultSpeed
+        DirtyTalk(actors, "Mmm, yeah... I like when you slow it down and tease me like this.")
+      EndIf
+      Main.Info("Ostim speed change")
+    else
+      Main.Debug("OStim speed change failed")
     EndIf
+
+  elseif (eventName == "ostim_actor_orgasm")   
+    string sceneId = strArg
+    Actor OrgasmedActor = sender as Actor
+    Actor[] actors = OThread.GetActors(ostimTid)
+    Main.RegisterEvent(Main.GetActorName(OrgasmedActor) + " had an orgasm.")
+    DirtyTalk(actors, "I love when you talk dirty with a sense of urgency about our sex scene between your moans and screams.")
+    Main.Info("Ostim actor orgasm: " + OrgasmedActor)
+
+  elseif (eventName == "ostim_thread_end")    
     SetSexSceneState("off")
-    Main.Info("Ended intimate scene")
+    Main.Info("OStim scene ended")
+    Main.RegisterEvent("Sex scene ended.")
   EndIf
 EndEvent
 
@@ -770,7 +830,7 @@ EndEvent
 Function LoadSexlabDescriptions()
   if (descriptionsMap==0)
     Main.Info("Loading Sexlab Descriptions")
-    descriptionsMap=JValue.readFromFile( "Data/Data/minai/sexlab_descriptions.json");
+    descriptionsMap=JValue.readFromFile( "Data/Data/minai/sexlab_descriptions.json")
     JValue.retain(descriptionsMap)
     Main.Info("Descriptions set: "+JMap.count(descriptionsMap)+" using map: "+descriptionsMap+ " Data/Data/minai/sexlab_descriptions.json")
   EndIf
@@ -980,7 +1040,6 @@ Event PostSexScene(int tid, bool HasPlayer)
   EndIf
   lastTag = ""
 EndEvent
-
 
 
 
