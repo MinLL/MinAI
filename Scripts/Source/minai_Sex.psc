@@ -109,14 +109,14 @@ EndFunction
 
 
 
-bool Function CanAnimate(actor akTarget, actor akSpeaker)
-  if (akTarget.IsOnMount() || akSpeaker.IsOnMount())
+bool Function CanAnimate(actor akTarget)
+  if (akTarget.IsOnMount())
     return False
   EndIf
-  if bHasOstim && (minai_UseOStim.GetValue() == 1.0 && !OActor.IsInOStim(akTarget) && !OActor.IsInOStim(akSpeaker))
+  if bHasOstim && (minai_UseOStim.GetValue() == 1.0 && !OActor.IsInOStim(akTarget))
     return True
   EndIf
-  if slf && (!slf.IsActorActive(akTarget) && !slf.IsActorActive(akSpeaker))
+  if slf && (!slf.IsActorActive(akTarget))
     return True
   EndIf
   return False
@@ -125,7 +125,7 @@ EndFunction
 
 
 Function Start1pSex(actor akSpeaker)
-  if CanAnimate(akSpeaker, akSpeaker)
+  if CanAnimate(akSpeaker)
     if bHasOstim && minai_UseOStim.GetValue() == 1.0
       OThread.QuickStart(OActorUtil.ToArray(akSpeaker))
     else
@@ -277,7 +277,7 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
       Else
         NumFemales += 1
       EndIf
-      if !CanAnimate(actorsInScene[i], actorsInScene[i])
+      if !CanAnimate(actorsInScene[i])
         bCanAnimate = False
       EndIf
       i += 1
@@ -970,9 +970,14 @@ Event PostSexScene(int tid, bool HasPlayer)
   if otherActor == playerRef && sortedActorList.Length > 1
     otherActor = sortedActorList[1]
   EndIf
-  
-  main.RegisterEvent(GetActorNameForSex(otherActor) + ": Oh yeah! I'm having an orgasm!")
-  DirtyTalk(sortedActorList, "I'm cumming!")
+    if (otherActor != playerRef)
+    main.RegisterEvent(GetActorNameForSex(otherActor) + ": Oh yeah! I'm having an orgasm!")
+  EndIf
+  if sortedActorList.Find(playerRef) >= 0 && playerRef.WornHasKeyword(devious.libs.zad_DeviousBelt)
+    DirtyTalk(sortedActorList, "I can't reach orgasm because of the chastity belt!")
+  else
+    DirtyTalk(sortedActorList, "I'm cumming!")
+  EndIf
   lastTag = ""
 EndEvent
 

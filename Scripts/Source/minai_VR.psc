@@ -326,7 +326,7 @@ Event OnUpdate()
   EndIf
   float currentTime = Utility.GetCurrentRealTime()
   float cooldown = 0.0
-  if !sex.CanAnimate(playerRef, playerRef) ; Enforce different cooldown during sex
+  if !sex.CanAnimate(playerRef) ; Enforce different cooldown during sex
     cooldown = config.collisionSexCooldown
   Else
     cooldown = config.collisionSpeechCooldown
