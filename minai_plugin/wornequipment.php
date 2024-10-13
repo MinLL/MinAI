@@ -108,9 +108,9 @@ function EnrichEquipmentDataFromDb(&$parsedData)
   }
 
   foreach ($parsedData as &$segment) {
-    $baseFormId = $segment['baseFormId'];
-    $modName = $segment['modName'];
-    $name = $segment['name'];
+      $baseFormId = $db -> escape($segment['baseFormId']);
+      $modName = $db->escape($segment['modName']);
+      $name = $db -> escape($segment['name']);
     $description = '';  // Placeholder description
 
     // Check if the row exists
