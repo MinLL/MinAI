@@ -3,6 +3,9 @@
 ## Things aren't working at all! I keep seeing a message about first time setup complete every time I load the game.
 This is caused by you not having all of the hard requirements installed (Particularly Papyrus Tweaks). Validate that you have them installed, and that you have up to date versions of them. If you did not have them, install them and then revert to a save prior to installing MinAI.
 
+## The Action Registry is empty!
+This is caused by you not having all of the hard requirements installed (Particularly Papyrus Tweaks). Validate that you have them installed, and that you have up to date versions of them. If you did not have them, install them and then revert to a save prior to installing MinAI.
+
 ## Actions aren't working!
 NSFW actions are only enabled if you have either Sexlab or ostim installed. If you don't have either, most of the actions and context will not be injected. In order to troubleshoot this you should:
 1) Validate that you have all of the requirements installed.
