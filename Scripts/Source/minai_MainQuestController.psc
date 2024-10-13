@@ -312,7 +312,7 @@ EndEvent
 Event OnRegisterAction(string actionName, string actionPrompt, string mcmDescription, string targetDescription, string targetEnum, int enabled, float cooldown, int ttl)
   Info("OnRegisterAction(" + actionName + " => " + enabled + " (Cooldown: " + cooldown + ")): " + actionPrompt)
   if bHasAIFF
-		minaiff.RegisterAction("ExtCmd"+actionName, actionName, mcmDescription, "External", enabled, cooldown, 2, 5, 300, true)
+		minaiff.RegisterAction("ExtCmd"+actionName, actionName, mcmDescription, "External", enabled, cooldown, 2, 5, 300, true, true)
     minaiff.StoreAction(actionName, actionPrompt, enabled, ttl, targetDescription, targetEnum)
   elseif bHasMantella
     ; Nothing to do for mantella.
