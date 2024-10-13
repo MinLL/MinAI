@@ -153,18 +153,22 @@ Function StartSexScene(actor[] actors, bool bPlayerInScene, string tags="")
   EndIf
   if bHasOstim && minai_UseOStim.GetValue() == 1.0
     tags = ConvertTagsOstim(tags)
-    actors = OActorUtil.Sort(actors, OActorUtil.EmptyArray())
-    string newScene = OLibrary.GetRandomSceneWithAnyActionCSV(actors, tags)
-    Utility.Wait(0.5)
-    if newScene == ""
-      newScene = OLibrary.GetRandomSceneWithAnySceneTagCSV(actors, tags)
-      Utility.Wait(1)
-      if newScene == ""
-        Main.Debug("No OStim scene found for: " + tags)
-      EndIf
+    if actors.Length > 5
+      actors = OActorUtil.ToArray(actors[0],actors[1],actors[2],actors[3],actors[4])
     EndIf
-    int ActiveOstimThreadID = OThread.Quickstart(actors, newScene)
-    Main.Debug("Found " + tags + " scene: " + newScene + " for OStim Thread [" + ActiveOstimThreadID + "].")
+      actors = OActorUtil.Sort(actors, OActorUtil.EmptyArray())
+      string newScene = OLibrary.GetRandomSceneWithAnyActionCSV(actors, tags)
+      Utility.Wait(0.5)
+      if newScene == ""
+        newScene = OLibrary.GetRandomSceneWithAnySceneTagCSV(actors, tags)
+        Utility.Wait(1)
+        if newScene == ""
+          Main.Debug("No OStim scene found for: " + tags)
+        EndIf
+      EndIf
+      int ActiveOstimThreadID = OThread.Quickstart(actors, newScene)
+      Main.Debug("Found " + tags + " scene: " + newScene + " for OStim Thread [" + ActiveOstimThreadID + "].")
+    
   else
     StartSexlabScene(bPlayerInScene, actors, tags)
   EndIf
@@ -223,13 +227,17 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
           ; Target 1 is already in an OStim thread
           Main.Debug("OStim detects target 1 is already in thread: " + ActiveOstimThreadID)
           ostimActors = OThread.GetActors(ActiveOstimThreadID)
-          ; add akSpeaker to OStim actor array
-          ostimActors = PapyrusUtil.PushActor(ostimActors,akSpeaker)
-          ostimActors = OActorUtil.Sort(ostimActors, OActorUtil.EmptyArray())
-          Main.Debug("OStim added akSpeaker to array and sorted: " + ostimActors)
-          OThread.Stop(ActiveOstimThreadID)
-          Utility.Wait(2)
-          StartSexScene(ostimActors, bPlayerInScene, tags)
+          if ostimActors.Length < 5
+            ; add akSpeaker to OStim actor array
+            ostimActors = PapyrusUtil.PushActor(ostimActors,akSpeaker)
+            ostimActors = OActorUtil.Sort(ostimActors, OActorUtil.EmptyArray())
+            Main.Debug("OStim added akSpeaker to array and sorted: " + ostimActors)
+            OThread.Stop(ActiveOstimThreadID)
+            Utility.Wait(2)
+            StartSexScene(ostimActors, bPlayerInScene, tags)
+          else
+            Main.Debug("OStim group scene already full.")
+          EndIf
         EndIf
       EndIf
     else
