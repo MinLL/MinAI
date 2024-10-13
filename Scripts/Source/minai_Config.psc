@@ -420,6 +420,7 @@ Event OnOptionSelect(int oid)
       else
         JMap.setInt(actionObj, "enabled", 0)
       endif
+      Main.Debug("Bulk setting action [" + actions[i] + "] to " + bulkEnabled)
       JMap.SetObj(aiff.actionRegistry, actions[i], actionObj)
       SetToggleOptionValue(oid, JMap.GetInt(actionObj, "enabled") == 1)
       changedAction = True
