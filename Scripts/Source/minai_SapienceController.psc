@@ -56,37 +56,63 @@ string Function GetFactionsForActor(actor akTarget)
   return "";
 EndFunction
 
+
+actor[] Function FindActors()
+  actor[] allNearbyActors = AIAgentFunctions.findAllNearbyAgents()
+  actor[] nearbyActors
+  int i = 0
+  while i < allNearbyActors.Length
+    if Sex.CanAnimate(allNearbyActors[i]) ; Filter out actors that are having sex
+      nearbyActors = PapyrusUtil.PushActor(nearbyActors,allNearbyActors[i])
+    EndIf
+    i += 1
+  EndWhile
+  ; Use bored chat instead for this
+  ; PapyrusUtil.PushActor(nearbyActors, playerRef) ; Let the NPC decide to talk to the player
+  actor[] ret
+  if (nearbyActors.Length >= 2)
+    ret = new actor[2]
+    int actor1 = PO3_SKSEFunctions.GenerateRandomInt(0, nearbyActors.Length - 1)
+    int actor2 = actor1
+    while actor2 == actor1
+      actor2 = PO3_SKSEFunctions.GenerateRandomInt(0, nearbyActors.Length - 1)
+    endwhile
+    ret[0] = nearbyActors[actor1]
+    ret[1] = nearbyActors[actor2]
+  EndIf
+  return ret
+EndFunction
+
+
 Event OnUpdate()
   if minai_SapienceEnabled.GetValueInt() != 1 || !bHasAIFF
     StopRadiantDialogue()
     return
   EndIf
-  if Utility.RandomFloat(0, 100) <= config.radiantDialogueChance    
-    actor[] nearbyActors = AIAgentFunctions.findAllNearbyAgents()
-    ; Use bored chat instead for this
-    ; PapyrusUtil.PushActor(nearbyActors, playerRef) ; Let the NPC decide to talk to the player
-    if (nearbyActors.Length >= 2) && (!Utility.IsInMenuMode() && !PlayerRef.GetCurrentScene())
-      int actor1 = PO3_SKSEFunctions.GenerateRandomInt(0, nearbyActors.Length - 1)
-      int actor2 = actor1
-      while actor2 == actor1
-        actor2 = PO3_SKSEFunctions.GenerateRandomInt(0, nearbyActors.Length - 1)
-      endwhile
-      string actor1name = Main.GetActorName(nearbyActors[actor1])
-      string actor2name = Main.GetActorName(nearbyActors[actor2])
+  ; Don't start radiant dialogue while the player is talking already, or in a menu
+  if (Utility.IsInMenuMode() || PlayerRef.GetCurrentScene())
+    Main.Debug("SAPIENCE: Player in menu or in a scene. Not checking radiant dialogue.")
+    ; Shorter cooldown if we were in a blocking condition
+    StartNextUpdate(5.0)
+    return
+  EndIf
+  actor[] nearbyActors = FindActors()
+  if (nearbyActors && nearbyActors.Length >= 2)
+    if Utility.RandomFloat(0, 100) <= config.radiantDialogueChance    
+      string actor1name = Main.GetActorName(nearbyActors[0])
+      string actor2name = Main.GetActorName(nearbyActors[1])
       Main.Info("SAPIENCE: Triggering Radiant Dialogue ( " + actor1name + " => " + actor2name + ")")
       AIAgentFunctions.requestMessageForActor(actor2name, "radiant", actor1name)
       ; Set a longer delay after triggering a rechat to avoid overwhelming AIFF if the player has the cooldown set too low.
       ; This will be overridden by OnTextReceived with the proper cooldown after the LLM responds.
       StartNextUpdate(60.0)
     else
-      Main.Debug("SAPIENCE: Not enough nearby actors for radiant dialogue or player in blocking condition")
-      ; Shorter cooldown if there weren't enough actors nearby last time we checked
-      StartNextUpdate(5.0)
-    EndIf
-  Else
       StartNextUpdate()
+    EndIf
+  Else ; Shorter cooldown if there weren't enough actors nearby last time we checked
+    Main.Debug("SAPIENCE: Not enough nearby actors for radiant dialogue or player in blocking condition")
+    StartNextUpdate(5.0)
   EndIf
-  
 EndEvent
 
 Event OnTextReceived(String speakerName, String sayLine)
