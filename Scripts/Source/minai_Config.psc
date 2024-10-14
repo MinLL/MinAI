@@ -223,11 +223,11 @@ Function RenderGeneralPage()
   requestResponseCooldownOID = AddSliderOption("LLM Response Request Cooldown", requestResponseCooldown, "{1}")
   AddHeaderOption("Sapience Settings")
   useSapienceOID = AddToggleOption("Enable Sapience", minai_SapienceEnabled.GetValueInt() == 1)
-  radiantDialogueFrequencyOID = AddSliderOption("Radiant Dialogue Frequency", radiantDialogueFrequency, "{1}")
-  radiantDialogueChanceOID = AddSliderOption("Radiant Dialogue Chance", radiantDialogueChance, "{1}")
+  radiantDialogueFrequencyOID = AddSliderOption("Radiant Dialogue (NPC -> NPC) Frequency", radiantDialogueFrequency, "{1}")
+  radiantDialogueChanceOID = AddSliderOption("Radiant Dialogue (NPC -> NPC) Chance", radiantDialogueChance, "{1}")
+  enableAISex = AddToggleOption("Enable NPC -> NPC Sex", enableAISex)
   SetCursorPosition(1) ; Move cursor to top right position
   disableAIAnimationsOID = AddToggleOption("Disable AI-FF Animations", disableAIAnimations)
-  enableAISex = AddToggleOption("Enable NPC -> NPC Sex", enableAISex)
 EndFunction
 
 Function RenderPhysicsPage()
