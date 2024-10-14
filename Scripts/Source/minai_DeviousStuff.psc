@@ -233,12 +233,12 @@ EndEvent
 
 
 Event OnOrgasm(string eventName, string actorName, float numArg, Form sender)
-  Main.RegisterEvent(actorName + " had an orgasm.")
+  Main.RequestLLMResponseNPC(actorName, actorName + " just had an orgasm!", "everyone")
 EndEvent
 
 
 Event OnEdged(string eventName, string actorName, float numArg, Form sender)
-  Main.RegisterEvent(actorName + " was brought right to the edge of orgasm but stopped before she could orgasm.")
+  Main.RequestLLMResponseNPC(actorName, actorName + " was brought right to the edge of orgasm but the vibrations stopped before I could cum!", "everyone")
 EndEvent
 
 
@@ -567,7 +567,7 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
   EndIf
 
     ; Mutually Exclusive keywords
-    if sex.CanAnimate(akTarget, akSpeaker)
+    if sex.CanAnimate(akTarget) && sex.CanAnimate(akSpeaker)
       if stringUtil.Find(sayLine, "-molest-") != -1 || stringUtil.Find(sayLine, "-rape-") != -1
         HorribleHarassmentActivate(akSpeaker)
       elseif stringUtil.Find(sayLine, "-harasskiss-") != -1 || stringUtil.Find(sayLine, "-kiss-") != -1 || stringUtil.Find(sayLine, "-kissing-") != -1
@@ -756,7 +756,7 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   EndIf
 
   ; Mutually Exclusive commands
-  if sex.CanAnimate(akTarget, akSpeaker)
+  if sex.CanAnimate(akTarget) && sex.CanAnimate(akSpeaker)
     if command == "ExtCmdMolest"
       HorribleHarassmentActivate(akSpeaker)
       Main.RegisterEvent(""+speakerName+" began to sexually assault " + targetName + "'.")
@@ -767,8 +767,6 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
       HarassHug(akSpeaker)
       Main.RegisterEvent(""+speakerName+" began to hug " + targetName + "'.")
     EndIf
-  Else
-    Main.Warn("Not processing commands for exclusive scene - Conflicting scene is running")
   EndIf
   if bHasDeviousFollowers
     string ruleDesc = DealManager.GetRuleInfo(targetRule);
