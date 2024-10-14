@@ -60,17 +60,20 @@ EndFunction
 actor[] Function FindActors()
   actor[] allNearbyActors = AIAgentFunctions.findAllNearbyAgents()
   actor[] nearbyActors
+  actor[] ret
   int i = 0
   while i < allNearbyActors.Length
     ; Filter out actors that are having sex or are in combat
-    if Sex.CanAnimate(allNearbyActors[i]) && allNearbyActors[i].GetCombatState() == 0
+    if  allNearbyActors[i].IsInDialogueWithPlayer() ; Player is in dialogue with at least one nearby actor. Don't start radiance.
+      return ret
+    EndIf
+    if Sex.CanAnimate(allNearbyActors[i]) && allNearbyActors[i].GetCombatState() == 0 && !allNearbyActors[i].GetCurrentScene()
       nearbyActors = PapyrusUtil.PushActor(nearbyActors,allNearbyActors[i])
     EndIf
     i += 1
   EndWhile
   ; Use bored chat instead for this
   ; PapyrusUtil.PushActor(nearbyActors, playerRef) ; Let the NPC decide to talk to the player
-  actor[] ret
   if (nearbyActors.Length >= 2)
     ret = new actor[2]
     int actor1 = PO3_SKSEFunctions.GenerateRandomInt(0, nearbyActors.Length - 1)
