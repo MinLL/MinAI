@@ -89,6 +89,15 @@ Function IsFollower($name) {
     return (IsInFaction($name, "Framework Follower Faction") || IsInFaction($name, "Follower Role Faction") || IsInFaction($name, "PotentialFollowerFaction") || IsInFaction($name, "Potential Follower"));
 }
 
+// Check if the specified actor is following (not follower)
+Function IsFollowing($name) {
+    return IsInFaction($name, "FollowFaction");
+}
+
+Function IsInScene($name) {
+    $value = strtolower(trim(GetActorValue($name, "scene")));
+    return $value != null && $value != "" && $value != "none";
+}
 
 Function ShouldClearFollowerFunctions() {
     return ($GLOBALS["restrict_nonfollower_functions"] && !IsFollower($GLOBALS["HERIKA_NAME"]));

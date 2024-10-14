@@ -24,6 +24,13 @@ GlobalVariable minai_SapienceEnabled
 int Property actionRegistry Auto
 int sapientActors = 0
 
+Package FollowPackage
+Faction FollowFaction
+
+Function InitFollow()
+  FollowPackage = Game.GetFormFromFile(0x01BC25, "AIAgent.esp") as Package 
+  FollowFaction = Game.GetFormFromFile(0x01BC24, "AIAgent.esp") as Faction
+EndFunction
 
 Function Maintenance(minai_MainQuestController _main)
   contextUpdateInterval = 30
@@ -82,9 +89,63 @@ Function Maintenance(minai_MainQuestController _main)
   InitializeActionRegistry()
   ; Test, remove this later
   ; StoreContext("minai", "testKey", "This is dynamically persisted context!", 1200)
+
+  InitFollow()
 EndFunction
 
+Function StartFollowTarget(actor akNpc, actor akTarget)
+  If (akNpc == None || akTarget == None)
+    Main.Error("[FollowTarget] Npc or target is none")
+    return
+  EndIf
+  If  (akNpc.GetCurrentScene() != None)
+    Main.Warn("[FollowTarget] Npc is in a scene, ignoring follow command")
+    return
+  EndIf
 
+  akNpc.SetFactionRank(FollowFaction, 1)
+  PO3_SKSEFunctions.SetLinkedRef(akNpc, akTarget)
+  ActorUtil.AddPackageOverride(akNpc, FollowPackage, 100, 0)
+  akNpc.EvaluatePackage()
+
+  ; refresh faction
+  StoreFactions(akNpc)
+
+  Main.Info("[FollowTarget] " + akNpc.GetDisplayName() + " is now following " + akTarget.GetDisplayName())
+EndFunction
+
+Function EndFollowTarget(actor akNpc)
+  If (akNpc == None)
+    Main.Error("[FollowTarget] Npc is none")
+    return
+  EndIf
+
+  ActorUtil.RemovePackageOverride(akNpc, FollowPackage)
+  akNpc.RemoveFromFaction(FollowFaction)
+
+  ; refresh faction
+  StoreFactions(akNpc)
+  Main.Info("[FollowTarget] " + akNpc.GetDisplayName() + " is no longer following anyone")
+EndFunction
+
+Function CheckIfActorShouldStillFollow(actor akNpc)
+  If (akNpc == None)
+    Main.Debug("[FollowTarget] Npc is none")
+    return
+  EndIf
+  If (akNpc == player)
+    Main.Debug("[FollowTarget] Npc is the player, ignoring follow command")
+    return
+  EndIf
+
+  If (akNpc.GetCurrentScene() != None)
+    Main.Debug("[FollowTarget] Npc is in a scene, End following target")
+    EndFollowTarget(akNpc)
+  ElseIf (akNpc.IsInFaction(FollowFaction) && akNpc.GetCurrentPackage() != FollowPackage)
+    Main.Debug("[FollowTarget] Npc is not following anyone, End following target")
+    EndFollowTarget(akNpc)
+  EndIf
+EndFunction
 
 Function StoreActorVoice(actor akTarget)
   if akTarget == None 
@@ -208,6 +269,11 @@ Function SetModAvailable(string mod, bool yesOrNo)
   EndIf
 EndFunction
 
+string Function GetFactionsForActor(actor akTarget)
+  string ret = ""
+  ret += GetFactionIfExists(akTarget, "FollowFaction", FollowFaction)
+  return ret
+EndFunction
 
 Function StoreFactions(actor akTarget)
   ; Not sure how to get the editor ID here (Eg, JobInnKeeper).
@@ -219,6 +285,7 @@ Function StoreFactions(actor akTarget)
   allFactions += survival.GetFactionsForActor(akTarget)
   allFactions += sex.GetFactionsForActor(akTarget)
   allFactions += followers.GetFactionsForActor(akTarget)
+  allFactions += GetFactionsForActor(akTarget)
   ; Causing illegal characters that break sql too often
   Faction[] factions = akTarget.GetFactions(-128, 127)
   int i = 0
@@ -248,7 +315,6 @@ String Function GetFactionIfExists(actor akTarget, string factionStr, Faction th
   EndIf
   return ""
 EndFunction
-
 
 Function StoreKeywords(actor akTarget)
   string keywords = devious.GetKeywordsForActor(akTarget)

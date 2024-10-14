@@ -108,6 +108,9 @@ Function Maintenance(minai_MainQuestController _main)
   
   aiff.RegisterAction("ExtCmdSpeedUpSex", "SpeedUpSex", "Sex Intensity", "Sex3", 1, 3, 1, 1, 300, (bHasOstim))
   aiff.RegisterAction("ExtCmdSlowDownSex", "SlowDownSex", "Sex Intensity", "Sex3", 1, 3, 1, 1, 300, (bHasOstim))
+
+  aiff.RegisterAction("ExtCmdComeWithMe", "ComeWithMe", "Start Following Player", "General", 1, 0, 2, 5, 300, true)
+  aiff.RegisterAction("ExtCmdEndComeWithMe", "EndComeWithMe", "End Following Player", "General", 1, 0, 2, 5, 300, true)
 EndFunction
 
 
@@ -437,6 +440,32 @@ Function StartSexlabScene(bool bPlayerInScene, actor[] actorsToSort, string tags
   slf.StartSex(actorsToSort, FindSexlabAnimations(actorsToSort, numMales, numFemales, tags))
 EndFunction
 
+Function StartFollow(actor akSpeaker, actor akTarget)
+  if (!bHasAIFF)
+    Main.Warn("StartFollow: AIFF not available")
+    return
+  EndIf
+
+  ; only follow if the target is the player
+  if (akTarget != PlayerRef)
+    if (akTarget)
+      Main.Error("StartFollowPlayer: Target is not the player: " + akTarget.GetName())
+    else
+      Main.Error("StartFollowPlayer: Target is None")
+    EndIf
+    return
+  EndIf
+  aiff.StartFollowTarget(akSpeaker, akTarget)
+EndFunction
+
+Function EndFollow(actor akSpeaker)
+  if (!bHasAIFF)
+    Main.Warn("EndFollow: AIFF not available")
+    return
+  EndIf
+
+  aiff.EndFollowTarget(akSpeaker)
+EndFunction
 
 
 sslBaseAnimation[] Function FindSexlabAnimations(actor[] actors, int numMales, int numFemales, string tags, bool forceaggressive = false)
@@ -681,10 +710,14 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     Endwhile
     equippedItems = JValue.release(equippedItems)
     AIAgentFunctions.logMessageForActor("command@ExtCmdPutOnClothes@@"+speakerName+" puts on clothes and armor","funcret",speakerName)
+  elseif (command=="ExtCmdComeWithMe")
+    Main.Debug("ExtCmdComeWithMe: is called")
+    StartFollow(akSpeaker, akTarget)
+  elseif (command=="ExtCmdEndComeWithMe")
+    Main.Debug("ExtCmdEndComeWithMe: is called")
+    EndFollow(akSpeaker)
   EndIf
 EndEvent
-
-
 
 string Function ConvertTagsOstim(string tags)
   ; Convert sexlab tags to ostim tags
@@ -1003,8 +1036,6 @@ Function DirtyTalk(actor[] actors, string lineToSay)
   EndIf
 EndFunction
 
-
-
 Event PostSexScene(int tid, bool HasPlayer)
   sslThreadController controller = slf.GetController(tid)
   Actor[] actorList = slf.HookActors(tid)
@@ -1014,10 +1045,11 @@ Event PostSexScene(int tid, bool HasPlayer)
   EndIf
   
   string pleasure=""
-    int i = actorList.Length
+  int i = actorList.Length
   while(i > 0)
     i -= 1
     pleasure=pleasure+Main.GetActorName(actorList[i])+" is reaching orgasm,"
+
   Endwhile
   string pleasureFull="Pleasure:"+pleasure
   ; Send event, AI can be aware SEX is happening here
@@ -1040,8 +1072,6 @@ Event PostSexScene(int tid, bool HasPlayer)
   EndIf
   lastTag = ""
 EndEvent
-
-
 
 Event EndSexScene(int tid, bool HasPlayer)
     JValue.release(descriptionsMap)
@@ -1068,14 +1098,10 @@ Event EndSexScene(int tid, bool HasPlayer)
     SetSexSceneState("off")
 EndEvent
 
-
-
 string Function GetSexStageDescription(string animationStageName) 
   Main.Info("Obtaining description for: <"+animationStageName+"> using map: "+descriptionsMap)
   return JMap.getStr(descriptionsMap,animationStageName)
 EndFunction
-
-
 
 Function InitializeSexDescriptions()
   if (JMap.count(descriptionsMap) != 0 || descriptionsMap != 0)

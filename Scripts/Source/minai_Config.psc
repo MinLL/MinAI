@@ -149,7 +149,7 @@ Function InitializeMCM()
 EndFunction
 
 int Function GetVersion()
-  return 13 ; mcm menu version
+  return 14 ; mcm menu version
 EndFunction
 
 Function SetupPages()
