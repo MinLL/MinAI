@@ -62,7 +62,8 @@ actor[] Function FindActors()
   actor[] nearbyActors
   int i = 0
   while i < allNearbyActors.Length
-    if Sex.CanAnimate(allNearbyActors[i]) ; Filter out actors that are having sex
+    ; Filter out actors that are having sex or are in combat
+    if Sex.CanAnimate(allNearbyActors[i]) && allNearbyActors[i].GetCombatState() == 0
       nearbyActors = PapyrusUtil.PushActor(nearbyActors,allNearbyActors[i])
     EndIf
     i += 1
