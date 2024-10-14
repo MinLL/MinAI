@@ -49,8 +49,9 @@ function Maintenance(minai_MainQuestController _main)
   aiff = (Self as Quest) as minai_AIFF
     
   RegisterForModEvent("DeviceActorOrgasm", "OnOrgasm")
-  RegisterForModEvent("DeviceActorEdged", "OnEdged")
-  RegisterForModEvent("DeviceVibrateEffectSta", "OnVibrateStart")
+  RegisterForModEvent("DeviceEdgedActor", "OnEdged")
+  RegisterForModEvent("DeviceVibrateEffectStart", "OnVibrateStart")
+  RegisterForModEvent("DeviceVibrateEffectStop", "OnVibrateStop")
 
   RegisterForModEvent("DDI_DeviceEquipped", "OnDeviceEquipped")
   RegisterForModEvent("DDI_DeviceRemoved", "OnDeviceRemoved")
@@ -233,12 +234,12 @@ EndEvent
 
 
 Event OnOrgasm(string eventName, string actorName, float numArg, Form sender)
-  Main.RequestLLMResponseNPC(actorName, actorName + " just had an orgasm!", "everyone")
+  Main.RequestLLMResponseNPC(actorName, "I just had an orgasm!", "everyone")
 EndEvent
 
 
 Event OnEdged(string eventName, string actorName, float numArg, Form sender)
-  Main.RequestLLMResponseNPC(actorName, actorName + " was brought right to the edge of orgasm but the vibrations stopped before I could cum!", "everyone")
+  Main.RequestLLMResponseNPC(actorName, "I was brought right to the edge of orgasm but the vibrations stopped before I could cum!", "everyone")
 EndEvent
 
 
@@ -258,7 +259,7 @@ endFunction
 
 Event OnVibrateStart(string eventName, string actorName, float vibStrength, Form sender)
   string strength = getVibStrength(vibStrength)
-  Main.RegisterEvent(actorName + " started being " + strength + " stimulated by a vibrator.")
+  Main.RegisterEvent("A low buzzing sound started to come from " + actorName + " as she started being " + strength + " stimulated by a vibrator.")
 EndEvent
 
 Event OnVibrateStop(string eventName, string actorName, float vibStrength, Form sender)
