@@ -24,6 +24,7 @@ GlobalVariable minai_SapienceEnabled
 int Property actionRegistry Auto
 int sapientActors = 0
 
+
 Function Maintenance(minai_MainQuestController _main)
   contextUpdateInterval = 30
   ; This is inefficient. We need to more selectively set specific parts of the context rather than repeatedly re-set everything.
@@ -66,6 +67,7 @@ Function Maintenance(minai_MainQuestController _main)
   if (Game.GetModByName("MinAI_AIFF.esp") != 255)
     Main.Fatal("You are are running an old version of the beta with min_AIFF.esp. This file is no longer required. Delete this file.")
   EndIf
+
   vibratorCommands = new String[10]
   vibratorCommands[0] = "ExtCmdTeaseWithVibratorVeryWeak"
   vibratorCommands[1] = "ExtCmdTeaseWithVibratorWeak"
@@ -578,6 +580,7 @@ Function CleanupSapientActors()
     i += 1
   EndWhile
 EndFunction
+
 
 Function RemoveActorAI(string targetName)
   Main.Info("SAPIENCE: Removing " + targetName + " from AI")
