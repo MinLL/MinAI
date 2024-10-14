@@ -13,7 +13,7 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["nearby"]
+                    "enum" => []
                 ]
             ],
             "required" => ["target"],
@@ -33,7 +33,7 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["nearby"]
+                    "enum" => []
                 ]
             ],
             "required" => ["target"],

@@ -11,10 +11,10 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => [$GLOBALS["target"]]
+                    "enum" => []
                 ]
             ],
-            "required" => ["target"],
+            "required" => [],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdRentRoom"]=function($gameRequest) {
@@ -43,17 +43,17 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => [$GLOBALS["target"]]
+                    "enum" => []
 
                 ]
             ],
-            "required" => ["target"],
+            "required" => [],
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdServeFood"]=$GLOBALS["GenericFuncRet"];
 
 $GLOBALS["F_NAMES"]["ExtCmdTrade"]="BeginTrading";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdTrade"]="Buy from or sell items to {$GLOBALS["PLAYER_NAME"]}";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdTrade"]="Trade with, or buy/sell items to {$GLOBALS["PLAYER_NAME"]}";
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdTrade"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdTrade"],
@@ -63,11 +63,11 @@ $GLOBALS["FUNCTIONS"][] = [
                 "target" => [
                     "type" => "string",
                     "description" => "Target NPC, Actor, or being",
-                    "enum" => [$GLOBALS["target"]]
+                    "enum" => []
 
                 ]
             ],
-            "required" => ["target"],
+            "required" => [],
         ],
     ];
 
@@ -135,7 +135,7 @@ $GLOBALS["FUNCTIONS"][] = [
                     "enum" => []
                 ]
             ],
-            "required" => ["target"],
+            "required" => [],
         ],
     ];
 

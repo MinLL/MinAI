@@ -4,8 +4,6 @@ $target = $GLOBALS["target"];
 if (IsModEnabled("Sexlab") || IsModEnabled("Ostim")) {
     // Always enabled
     RegisterAction("ExtCmdMasturbate");
-    RegisterAction("ExtCmdStartCuddleSex");
-    RegisterAction("ExtCmdStartKissingSex");
     RegisterAction("ExtCmdStartVaginal");
     RegisterAction("ExtCmdStartAnal");
     RegisterAction("ExtCmdStartBlowjob");
@@ -20,6 +18,8 @@ if (IsModEnabled("Sexlab") || IsModEnabled("Ostim")) {
     }
     // Only enabled if already in a sex scene
     if (IsSexActive()) {
+        RegisterAction("ExtCmdStartCuddleSex");
+        RegisterAction("ExtCmdStartKissingSex");
         RegisterAction("ExtCmdStartFootjob");
         RegisterAction("ExtCmdStartBoobjob");
         RegisterAction("ExtCmdStartCunnilingus");
