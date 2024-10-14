@@ -2,6 +2,8 @@
 // We need access to gameRequest here, but it's not global.
 // Impl copied from main.php
 
+require_once(__DIR__.DIRECTORY_SEPARATOR."updateThreadsDB.php");
+
 function CreateContextTableIfNotExists() {
   $db = $GLOBALS['db'];
   $db->execQuery(
@@ -98,6 +100,11 @@ function ProcessIntegrations() {
                 'targetEnum' => $db->escape($targetEnum)
             )
         );
+        $MUST_DIE=true;
+    }
+    if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "updateThreadsDB") {
+        file_put_contents("my_logs.txt", "\n\ncustom integrations: updateThreadsDB!!!\n\n", FILE_APPEND);
+        updateThreadsDB();
         $MUST_DIE=true;
     }
     if (isset($GLOBALS["gameRequest"]) && strtolower($GLOBALS["gameRequest"][0]) =="npc_talk") {
