@@ -36,6 +36,8 @@ int bulkMaxIntervalOID
 int bulkDecayWindowOID
 int radiantDialogueFrequencyOID
 int radiantDialogueChanceOID
+int autoUpdateDiaryOID
+int enableAISexOID
 
 ; Legacy globals
 GlobalVariable useCBPC
@@ -96,6 +98,12 @@ Float Property radiantDialogueChance = 50.0 Auto
 
 bool Property bulkEnabled = True Auto
 
+bool autoUpdateDiaryDefault = False
+bool Property autoUpdateDiary = False Auto
+
+bool enableAISexDefault = true
+bool Property enableAISex = False Auto
+  
 Event OnConfigInit()
   main.Info("Building mcm menu.")
   InitializeMCM()
@@ -211,6 +219,7 @@ EndEvent
 Function RenderGeneralPage()
   SetCursorFillMode(TOP_TO_BOTTOM)		
   AddHeaderOption("LLM Settings")
+  autoUpdateDiaryOID = AddToggleOption("Automatically Update Follower Diaries", autoUpdateDiary)
   requestResponseCooldownOID = AddSliderOption("LLM Response Request Cooldown", requestResponseCooldown, "{1}")
   AddHeaderOption("Sapience Settings")
   useSapienceOID = AddToggleOption("Enable Sapience", minai_SapienceEnabled.GetValueInt() == 1)
@@ -218,6 +227,7 @@ Function RenderGeneralPage()
   radiantDialogueChanceOID = AddSliderOption("Radiant Dialogue Chance", radiantDialogueChance, "{1}")
   SetCursorPosition(1) ; Move cursor to top right position
   disableAIAnimationsOID = AddToggleOption("Disable AI-FF Animations", disableAIAnimations)
+  enableAISex = AddToggleOption("Enable NPC -> NPC Sex", enableAISex)
 EndFunction
 
 Function RenderPhysicsPage()
@@ -363,6 +373,13 @@ Event OnOptionSelect(int oid)
   if oid == UseCBPCOID
     toggleGlobal(oid, useCBPC)
     Debug.Notification("CBPC setting changed. Save/Reload to take effect")
+  elseif oid == autoUpdateDiaryOID
+    autoUpdateDiary = !autoUpdateDiary
+    SetToggleOptionValue(oid, autoUpdateDiary)
+  elseif oid == enableAISexOID
+    enableAISex = !enableAISex
+    aiff.SetAISexEnabled(enableAISex)
+    SetToggleOptionValue(oid, enableAISex)
   elseif oid == useSapienceOID
     toggleGlobal(oid, minai_SapienceEnabled)
     if minai_SapienceEnabled.GetValueInt() == 1.0
@@ -441,7 +458,14 @@ Event OnOptionDefault(int oid)
   if oid == UseCBPCOID
     SetGlobalToggle(oid, UseCBPC, true)
     Debug.Notification("CBPC setting changed. Save/Reload to take effect")
-  oid == useSapienceOID
+  elseif oid == autoUpdateDiaryOID
+    autoUpdateDiary = autoUpdateDiaryDefault
+    SetToggleOptionValue(oid, autoUpdateDiary)
+  elseif oid == enableAISexOID
+    enableAISex = enableAISexDefault
+    aiff.SetAISexEnabled(enableAISex)
+    SetToggleOptionValue(oid, enableAISex)
+  elseif oid == useSapienceOID
     SetGlobalToggle(oid, minai_SapienceEnabled, false)
     if minai_SapienceEnabled.GetValueInt() == 1
       sapience.StartRadiantDialogue()
@@ -521,6 +545,10 @@ EndEvent
 Event OnOptionHighlight(int oid)
   if oid == UseCBPCOID
     SetInfoText("Enables or disables CBPC globally. Requires save/reload to take effect")
+  elseif oid == autoUpdateDiaryOID
+    SetInfoText("Automatically update the diary for all followers upon sleeping.")
+  elseif oid == enableAISexOID
+    SetInfoText("Allow NPC's to decide to have sex with eachother.")
   elseif  oid == useSapienceOID
     SetInfoText("The Sapience System enables and disables AI dynamically in a radius around the player using SPID, and allows NPC's to radiantly interact with eachother without direct player involvement.")
   elseif oid == cbpcDisableSelfTouchOID

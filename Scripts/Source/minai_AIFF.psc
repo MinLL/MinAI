@@ -128,6 +128,12 @@ Function SetContext(actor akTarget)
 EndFunction
 
 
+Function SetAISexEnabled(bool enabled)
+  if bHasAIFF
+    AIAgentFunctions.logMessage("_minai_PLAYER//enableAISex@" + enabled, "setconf")
+  EndIf
+EndFunction
+
 
 Function SetActorVariable(Actor akActor, string variable, string value)
   if (!IsInitialized())
@@ -596,5 +602,11 @@ Function EnableActorAI(actor akTarget)
     AIAgentFunctions.setDrivenByAIA(akTarget, false)
     TrackContext(akTarget)
     TrackSapientActor(akTarget)
+  EndIf
+EndFunction
+
+Function UpdateDiary(string targetName)
+  if bHasAIFF
+    AIAgentFunctions.requestMessageForActor("Please, update your diary","diary", targetName)
   EndIf
 EndFunction

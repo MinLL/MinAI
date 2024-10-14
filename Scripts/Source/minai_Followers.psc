@@ -78,6 +78,13 @@ string Function GetFactionsForActor(actor akTarget)
   return "";
 EndFunction
 
-bool Function IsFollower(actor akActor)
-  
+Function UpdateFollowerDiaries()
+  Main.Info("Updating all follower diaries")
+  int i = 0
+  while i < nff.mcmScript.activeNames.Length
+    string targetName = nff.mcmScript.activeNames[i]
+    Main.Debug("Updating diary for " + targetName)
+    aiff.UpdateDiary(targetName)
+    i += 1
+  EndWhile
 EndFunction

@@ -158,7 +158,9 @@ if (!IsRadiant()) { // Don't enable these commands for NPC's
         // Allow anyone that isn't a follower to buy or sell. Don't restrict this to shop-keepers.
         RegisterAction("ExtCmdTrade");
     }
-    // Allow anyone to offer training.
-    RegisterAction("ExtCmdTrainSkill");
+    // Only allow trainers to provide training
+    if (IsInFaction($GLOBALS['HERIKA_NAME'], "Skill Trainer")) {
+        RegisterAction("ExtCmdTrainSkill");
+    }
 }
 ?>

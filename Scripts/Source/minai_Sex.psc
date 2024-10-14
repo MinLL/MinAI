@@ -73,7 +73,7 @@ Function Maintenance(minai_MainQuestController _main)
     Main.Debug("Clothing map already initialized, id=" + clothingMap)
   EndIf
   lastTag = ""
-  
+  aiff.SetAISexEnabled(config.enableAISex)
   aiff.SetModAvailable("Ostim", bHasOstim)
   aiff.SetModAvailable("Sexlab", slf != None)
   aiff.RegisterAction("ExtCmdRemoveClothes", "RemoveClothes", "Take off all clothing", "Sex1", 1, 5, 2, 5, 300, True)
@@ -276,7 +276,7 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
       if actorsInScene[i] == PlayerRef
         bPlayerInScene = True
       EndIf
-      if actorsInScene[i].GetActorBase().GetSex() == 0
+      if slf.GetGender(actorsInScene[i]) == 0
         numMales += 1
       Else
         NumFemales += 1
@@ -299,7 +299,7 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
         Main.Info("Sex: Speaker was not in scene, adding them to it.")
 	      actorsInScene = PapyrusUtil.PushActor(actorsInScene,akSpeaker)
         actorsInScene = slf.SortActors(actorsInScene)
-        if akSpeaker.GetActorBase().GetSex() == 0
+        if slf.GetGender(akSpeaker) == 0
           numMales += 1
         else
           numFemales += 1
@@ -399,7 +399,7 @@ bool Function CompareActorSex(actor actor1, actor actor2)
   ; 0 = male
   ; 1 = female
   ; 2 = other
-  return actor1.GetActorBase().GetSex() < actor2.GetActorBase().GetSex()
+  return slf.GetGender(actor1) < slf.GetGender(actor2)
 EndFunction
 
 
@@ -425,7 +425,7 @@ Function StartSexlabScene(bool bPlayerInScene, actor[] actorsToSort, string tags
   int numMales = 0
   int numFemales = 0
   while i < actorsToSort.Length
-    if actorsToSort[i].GetActorBase().GetSex() == 0
+    if slf.GetGender(actorsToSort[i]) == 0
       numMales += 1
     else
       numFemales += 1
