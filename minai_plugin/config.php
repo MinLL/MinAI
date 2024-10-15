@@ -36,5 +36,26 @@ $GLOBALS["radiance_rechat_p"] = 20;
 // triggered before the LLM and TTS have finished with the response. For radiant dialogue frequency configuration,
 // use the in-game MCM.
 $GLOBALS["input_delay_for_radiance"] = 15;
-
+// Voice type fallbacks. These provide default voices based on the actor's gender and race if xtts did not have a valid voicetype for them.
+// "genderRace" => "voicename"
+$GLOBALS["voicetype_fallbacks"] = [
+    "maleargonian" => "argonianmale",
+    "femaleargonian" => "argonianfemale",
+    "malekhajiit" => "khajiitmale",
+    "femalekhajiit" => "khajiitfemale",
+    "maleredguard" => "maleeventonedaccented",
+    "femaleredguard" => "femaleeventonedaccented",
+    "malenord" => "malecondescending",
+    "femalenord" => "femalecondescending",
+    "malebreton" => "malecommoner",
+    "femalebreton" => "femalecommoner",
+    "maleimperial" => "maleeventoned",
+    "femaleimperial" => "femaleeventoned",
+    "maleorc" => "maleorc",
+    "femaleorc" => "femaleorc",
+    "malealtmer" => "maleelfhaughty",
+    "femalealtmer" => "femaleelfthaughty",
+    "maledunmer" => "maledarkelf",
+    "femaledunmer" => "femaledarkelf"
+];
 ?>
