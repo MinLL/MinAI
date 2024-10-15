@@ -25,6 +25,9 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
 * This mod contains a number of quality of life improvements for AIFF.
 ### Sapience
 * This mod exposes an option allowing you to dynamically enable / disable AI for all actors near the player. This generally means that you can just walk up to any NPC in the world, and start interacting with them seamlessly. This also implements radiant dialogue (Similar to the mantella feature), except more powerful / less buggy.
+### Extra Features
+* Implements commands for NPC's to follow you / stop following you.
+* Implements an equipment registry for customizing item descriptions.
 ### AIFF-Specific Configuration Options:
 (found in File Explorer: \\wsl.localhost\DwemerAI4Skyrim3\var\www\html\HerikaServer\ext\minai_plugin\config.php)
 (You can easily access this folder by running the tools/AI-FF Plugins Folder file in your DwemerAI4Skyrim3 directory)
