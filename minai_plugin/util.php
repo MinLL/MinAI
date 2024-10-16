@@ -1,7 +1,28 @@
 <?php
 require_once("config.php");
-$allKeywords = "";
-$allFactions = "";
+define("MINAI_CACHE_KEY", "minai_cache");
+
+$GLOBALS[MINAI_CACHE_KEY] = [];
+
+function CreateCacheKey($name, $key) {
+    return strtolower($name) . "//" . strtolower($key);
+}
+
+// Get the value of request scope cache
+function GetRequestScopeCache($name, $key) {
+    $combinedKey = CreateCacheKey($name, $key);
+    if (isset($GLOBALS[MINAI_CACHE_KEY][$combinedKey])) {
+        return $GLOBALS[MINAI_CACHE_KEY][$combinedKey];
+    }
+    else {
+        return null;
+    }
+}
+
+function SetRequestScopeCache($name, $key, $value) {
+    $combinedKey = CreateCacheKey($name, $key);
+    $GLOBALS[MINAI_CACHE_KEY][$combinedKey] = $value;
+}
 
 function CanVibrate($name) {
     return IsEnabled($name, "CanVibrate") && IsActionEnabled("MinaiGlobalVibrator");
@@ -9,18 +30,18 @@ function CanVibrate($name) {
 
 // Return the specified actor value.
 // Caches the results of several queries that are repeatedly referenced.
-Function GetActorValue($name, $key, $preserveCase=false) {
+Function GetActorValue($name, $key, $preserveCase=false, $skipCache=false) {
     $name = addslashes($name);
     $key = addslashes($key);
-    global $allKeywords;
-    global $allFactions;
+    $cacheKey = $key."//{$preserveCase}";
 
-    if ($allKeywords != "") {
-        return $allKeywords;
+    if (!$skipCache) {
+        $valueFromCache = GetRequestScopeCache($name, $cacheKey);
+        if ($valueFromCache !== null) {
+            return $valueFromCache;
+        }
     }
-    if ($allFactions != "") {
-        return $allFactions;
-    }
+
     // return strtolower("JobInnkeeper,Whiterun,,,,Bannered Mare Services,,Whiterun Bannered Mare Faction,,SLA TimeRate,sla_Arousal,sla_Exposure,slapp_HaveSeenBody,slapp_IsAnimatingWKidFaction,");
     $query = "select * from conf_opts where LOWER(id)=LOWER('_minai_{$name}//{$key}')";
     if ($preserveCase) {
@@ -32,12 +53,9 @@ Function GetActorValue($name, $key, $preserveCase=false) {
         return "";
     }
     $ret = strtolower($ret[0]['value']);
-    if ($name == "AllKeywords") {
-        $allKeywords = $ret;
-    }
-    if ($name == "AllFactions") {
-        $allFactions = $ret;
-    }
+
+    SetRequestScopeCache($name, $cacheKey, $ret);
+    
     return $ret;
 }
 
