@@ -291,14 +291,30 @@ $GLOBALS["target"] = GetTargetActor();
 $GLOBALS["nearby"] = explode(",", GetActorValue("PLAYER", "nearbyActors"));
 
 function getScene($actor) {
-    $scene = $GLOBALS["db"]->fetchAll("SELECT thread_id, curr_scene_id, actors, framework from minai_threads WHERE actors ~* '(,|^)$actor(,|$)'")[0];
+    $scene = $GLOBALS["db"]->fetchAll("SELECT thread_id, curr_scene_id, female_actors, male_actors, framework from minai_threads WHERE male_actors ~* '(,|^)$actor(,|$)' OR female_actors ~* '(,|^)$actor(,|$)'")[0];
     $sceneDesc = getSceneDesc($scene);
+
+    if($scene["female_actors"] && $scene["male_actors"]) {
+        // push females at the beginning for sexlab
+        if($scene["framework"] == "sexlab") {
+            $scene["actors"] = $scene["female_actors"].",".$scene["male_actors"];
+        }
+        // push males at the beginning for ostim
+        else {
+            $scene["actors"] = $scene["male_actors"].",".$scene["female_actors"];
+        }
+    } elseif($scene["female_actors"]) {
+        $scene["actors"] = $scene["female_actors"];
+    } else {
+        $scene["actors"] = $scene["male_actors"];
+    }
+
     $actors = explode(",", $scene["actors"]);
-
     $sceneDesc = replaceActorsNamesInSceneDesc($actors, $sceneDesc);
-
     $scene["description"] = $sceneDesc;
 
+    // file_put_contents("my_logs.txt", "\n".json_encode($scene)."\n", FILE_APPEND);
+            
     return $scene;
 }
 
