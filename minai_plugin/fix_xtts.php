@@ -11,7 +11,9 @@ function parseVoiceType($voiceTypeRaw) {
         return ltrim($GLOBALS["TTS"]["XTTSFASTAPI"]["voiceid"], "#");
     }
     if ($voiceTypeRaw == "") {
-        return "malecommoner"; // Don't know what their gender is here. Hmmm.
+        // Don't know their voice type, don't override.
+        // tts fallback will prevent non-existant voices.
+        return null;
     }
     // [VoiceType <MaleGuard (000AA8D3)>
     $voiceType = substr($voiceTypeRaw, 12, -1);
@@ -20,6 +22,8 @@ function parseVoiceType($voiceTypeRaw) {
 }
 
 if ($GLOBALS["HERIKA_NAME"] != "The Narrator") { // Users can configure the narrator on their own
-    $GLOBALS["TTS"]["FORCED_VOICE_DEV"] = parseVoiceType(GetActorValue($GLOBALS["HERIKA_NAME"], "voiceType"));
+    $voiceType = parseVoiceType(GetActorValue($GLOBALS["HERIKA_NAME"], "voiceType"));
+    if ($voiceType)
+        $GLOBALS["TTS"]["FORCED_VOICE_DEV"] = $voiceType;
 }
 ?>
