@@ -4,7 +4,7 @@ require_once("util.php");
 require_once("deviousfollower.php");
 require_once("wornequipment.php");
 require_once("customintegrations.php");
-
+require_once("weather.php");
 Function BuildContext($name) {
   if ($name == "The Narrator") {
     return "";
@@ -328,6 +328,7 @@ if (!$GLOBALS["disable_nsfw"]) {
     $GLOBALS["COMMAND_PROMPT"].= BuildContext(GetTargetActor());
     $GLOBALS["COMMAND_PROMPT"].= BuildContext($GLOBALS["HERIKA_NAME"]);
     $GLOBALS["COMMAND_PROMPT"].= GetThirdPartyContext();
+    $GLOBALS["COMMAND_PROMPT"].= GetWeatherContext();
     $nearbyActors = GetActorValue("PLAYER", "nearbyActors", true);
     // This does work, I just need to figure out how to get a bit of the bio + relevant context to insert into the full context for this to work properly. TODO
     /*if ($nearbyActors) {

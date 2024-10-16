@@ -294,6 +294,13 @@ int Function GetDestination(string destination)
 EndFunction
 
 
+float Function GetCurrentHourOfDay() 
+	float Time = Utility.GetCurrentGameTime()
+	Time -= Math.Floor(Time) ; Remove "previous in-game days passed" bit
+	Time *= 24 ; Convert from fraction of a day to number of hours
+	Return Time
+
+EndFunction
 
 Function SetContext(actor akTarget)
   if !aiff
@@ -304,9 +311,11 @@ Function SetContext(actor akTarget)
     aiff.SetActorVariable(playerRef, "thirst", sunhelmMain.Thirst.CurrentThirstStage)
     aiff.SetActorVariable(playerRef, "fatigue", sunhelmMain.Fatigue.CurrentFatigueStage)
   EndIf
-  actor[] actors = new actor[2]
-  actors[0] = akTarget
-  actors[1] = playerRef
+  if akTarget == playerRef
+    aiff.SetActorVariable(playerRef, "weather", Weather.GetCurrentWeather())
+    aiff.SetActorVariable(playerRef, "skyMode", Weather.GetSkyMode())
+    aiff.SetActorVariable(playerRef, "currentGameHour", GetCurrentHourOfDay())
+  EndIf
 EndFunction
 
 
