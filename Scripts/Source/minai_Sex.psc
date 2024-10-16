@@ -38,6 +38,7 @@ Function Maintenance(minai_MainQuestController _main)
   RegisterForModEvent("HookOrgasmStart", "PostSexScene")
   RegisterForModEvent("HookAnimationEnd", "EndSexScene")
   RegisterForModEvent("HookAnimationStart", "OnAnimationStart")
+  RegisterForModEvent("SexLabOrgasmSeparate", "SLSOOrgasm")
   
   ; RegisterForModEvent("ostim_event", "OnOstimEvent")
   RegisterForModEvent("ostim_thread_start", "OStimManager")
@@ -1043,7 +1044,45 @@ Function DirtyTalk(actor[] actors, string lineToSay)
   EndIf
 EndFunction
 
+Event SLSOOrgasm(Form actorRef, Int tid)
+  ; Make sure that the actor is an Actor, this should always that case but just in case
+  Actor actorInAction = actorRef as Actor
+  If (actorInAction == None)
+    Main.Debug("[SLSOOrgasm] No actor in action")
+    return
+  EndIf
+
+  Main.Debug("[SLSOOrgasm] name = " + actorInAction.GetName() + " tid: " + tid)
+  sslThreadController controller = slf.GetController(tid)
+  Actor[] actorList = slf.HookActors(tid)
+
+  if (actorList.length < 1)
+    return
+  EndIf
+  
+  string actorInActionName = GetActorNameForSex(actorInAction)
+  ; Send event, AI can be aware SEX is happening here
+  main.RegisterEvent(actorInActionName + " is reaching orgasm", "info_sexscene")
+
+  string sayTo="everyone"
+
+  If (actorList.Length == 2)
+    if (actorList[0] == actorInAction)
+      sayTo = GetActorNameForSex(actorList[1])
+    else
+      sayTo = GetActorNameForSex(actorList[0])
+    EndIf
+  EndIf 
+
+  Main.RequestLLMResponseNPC(actorInActionName, "I'm cumming!", sayTo)
+
+  ;not sure if this need to be set since the scene is not ended
+  ;lastTag = ""
+EndEvent
+
 Event PostSexScene(int tid, bool HasPlayer)
+  Main.Debug("[PostSexScene] tid = " + tid)
+
   sslThreadController controller = slf.GetController(tid)
   Actor[] actorList = slf.HookActors(tid)
   Actor[] targetactorList = actorList
@@ -1056,7 +1095,6 @@ Event PostSexScene(int tid, bool HasPlayer)
   while(i > 0)
     i -= 1
     pleasure=pleasure+Main.GetActorName(actorList[i])+" is reaching orgasm,"
-
   Endwhile
   string pleasureFull="Pleasure:"+pleasure
   ; Send event, AI can be aware SEX is happening here
