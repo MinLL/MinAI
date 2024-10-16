@@ -122,7 +122,7 @@ function GetWeatherContext() {
         // [Weather < (0010A231)>]
         if (!$weather)
             return $ret;
-        $weather = $weathers[substr($weather, 12, 8)];
+        $weather = $weathers[substr($weather, strpos($weather, "(")+1, 8)];
         if (!$weather) {
             error_log("minai: Unknown Weather type");
             return $ret;
