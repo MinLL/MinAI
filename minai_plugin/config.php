@@ -3,6 +3,8 @@
 $GLOBALS["PLAYER_BIO"] = "I'm #PLAYER_NAME#. ";
 // Set this to override the prompt head for all profiles
 $GLOBALS["PROMPT_HEAD_OVERRIDE"] = "";
+// Use a specific profile for the narrator instead of the default one.
+$GLOBALS["use_narrator_profile"] = false;
 // Force the voice type to use the actor's base voice type (eg, "maleguard") instead of "whiterun_guard".
 // Useful for compatibility with mantella's xtts configuration if you don't want to mess with setting up latents
 $GLOBALS["force_voice_type"] = false;
