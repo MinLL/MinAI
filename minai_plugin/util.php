@@ -1,27 +1,45 @@
 <?php
 require_once("config.php");
-define("MINAI_CACHE_KEY", "minai_cache");
+define("MINAI_ACTOR_VALUE_CACHE", "minai_actor_value_cache");
 
-$GLOBALS[MINAI_CACHE_KEY] = [];
+$GLOBALS[MINAI_ACTOR_VALUE_CACHE] = [];
 
-function CreateCacheKey($name, $key) {
-    return strtolower($name) . "//" . strtolower($key);
-}
-
-// Get the value of request scope cache
-function GetRequestScopeCache($name, $key) {
-    $combinedKey = CreateCacheKey($name, $key);
-    if (isset($GLOBALS[MINAI_CACHE_KEY][$combinedKey])) {
-        return $GLOBALS[MINAI_CACHE_KEY][$combinedKey];
+// Get Value from the cache. $name/$key should be lowercase
+Function GetActorValueCache($name, $key) {
+    if (isset($GLOBALS[MINAI_ACTOR_VALUE_CACHE][$name])
+        && isset($GLOBALS[MINAI_ACTOR_VALUE_CACHE][$name][$key])
+    ) {
+        return $GLOBALS[MINAI_ACTOR_VALUE_CACHE][$name][$key];
     }
     else {
+        // no value in the cache
         return null;
     }
 }
 
-function SetRequestScopeCache($name, $key, $value) {
-    $combinedKey = CreateCacheKey($name, $key);
-    $GLOBALS[MINAI_CACHE_KEY][$combinedKey] = $value;
+// Check if actor value has been cached. $name/$key should be lowercase
+Function HasActorValueCache($name, $key=null) {
+    if ($key === null) {
+        return isset($GLOBALS[MINAI_ACTOR_VALUE_CACHE][$name]);
+    }
+    return isset($GLOBALS[MINAI_ACTOR_VALUE_CACHE][$name]) && isset($GLOBALS[MINAI_ACTOR_VALUE_CACHE][$name][$key]);
+}
+
+Function BuildActorValueCache($name) {
+    $name = strtolower($name);
+    $GLOBALS[MINAI_ACTOR_VALUE_CACHE][$name] = [];
+
+    $idPrefix = "_minai_{$name}//";
+
+    $query = "select * from conf_opts where LOWER(id) like LOWER('{$idPrefix}%')";
+    $ret = $GLOBALS["db"]->fetchAll($query);
+
+    foreach ($ret as $row) {
+        //do this instead of split // because $name could have // in it
+        $key = substr(strtolower($row['id']), strlen($idPrefix));
+        $value = $row['value'];
+        $GLOBALS[MINAI_ACTOR_VALUE_CACHE][$name][$key] = $value;
+    }
 }
 
 function CanVibrate($name) {
@@ -33,13 +51,17 @@ function CanVibrate($name) {
 Function GetActorValue($name, $key, $preserveCase=false, $skipCache=false) {
     $name = addslashes($name);
     $key = addslashes($key);
-    $cacheKey = $key."//{$preserveCase}";
 
-    if (!$skipCache) {
-        $valueFromCache = GetRequestScopeCache($name, $cacheKey);
-        if ($valueFromCache !== null) {
-            return $valueFromCache;
+    If (!$preserveCase && !$skipCache) {
+        $name = strtolower($name);
+        $key = strtolower($key);
+
+        If (!HasActorValueCache($name)) {
+            BuildActorValueCache($name);
         }
+
+        $ret = GetActorValueCache($name, $key);
+        return $ret === null ? "" : $ret;
     }
 
     // return strtolower("JobInnkeeper,Whiterun,,,,Bannered Mare Services,,Whiterun Bannered Mare Faction,,SLA TimeRate,sla_Arousal,sla_Exposure,slapp_HaveSeenBody,slapp_IsAnimatingWKidFaction,");
@@ -53,8 +75,6 @@ Function GetActorValue($name, $key, $preserveCase=false, $skipCache=false) {
         return "";
     }
     $ret = strtolower($ret[0]['value']);
-
-    SetRequestScopeCache($name, $cacheKey, $ret);
     
     return $ret;
 }

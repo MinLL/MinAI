@@ -6,6 +6,12 @@ function assertTrue($expression, $message = "Failed assertion") {
   }
 }
 
+function assertFalse($expression, $message = "Failed assertion") {
+  if ($expression) {
+    throw new Exception($message);
+  }
+}
+
 function assertString($expected, $actual, $message = "Failed assertion") {
   if ($expected != $actual) {
     print_r("\nExpected: $expected");
