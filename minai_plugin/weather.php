@@ -117,7 +117,7 @@ function GetWeatherContext() {
     $ret = "";
     $skyMode = intval(GetActorValue($GLOBALS["PLAYER_NAME"], "skyMode"));
     if ($skyMode == 3) { // Outdoors, full skybox
-        $weather = GetActorValue($GLOBALS["PLAYER_NAME"], "weather");
+        $weather = strtolower(GetActorValue($GLOBALS["PLAYER_NAME"], "weather"));;
         // [VoiceType <MaleGuard (000AA8D3)>
         // [Weather < (0010A231)>]
         if (!$weather)
