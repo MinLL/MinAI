@@ -21,6 +21,10 @@ $GLOBALS["always_enable_functions"] = true;
 $GLOBALS["force_aiff_name_to_ingame_name"] = true;
 // List of commands to disable.
 $GLOBALS["commands_to_purge"] = array("TakeASeat");
+// List of events from the game to ignore.
+// Example: $GLOBALS["events_to_ignore"] = array("rpg_lvlup");
+// This would cause the LLM to not coment on the player leveling up.
+$GLOBALS["events_to_ignore"] = array();
 // Set this to force the xtts server to be the same for all profiles
 $GLOBALS["xtts_server_override"] = "";
 // disable worn equipment
