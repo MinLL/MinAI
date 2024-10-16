@@ -1,7 +1,46 @@
 <?php
 require_once("config.php");
-$allKeywords = "";
-$allFactions = "";
+define("MINAI_ACTOR_VALUE_CACHE", "minai_actor_value_cache");
+
+$GLOBALS[MINAI_ACTOR_VALUE_CACHE] = [];
+
+// Get Value from the cache. $name/$key should be lowercase
+Function GetActorValueCache($name, $key) {
+    if (isset($GLOBALS[MINAI_ACTOR_VALUE_CACHE][$name])
+        && isset($GLOBALS[MINAI_ACTOR_VALUE_CACHE][$name][$key])
+    ) {
+        return $GLOBALS[MINAI_ACTOR_VALUE_CACHE][$name][$key];
+    }
+    else {
+        // no value in the cache
+        return null;
+    }
+}
+
+// Check if actor value has been cached. $name/$key should be lowercase
+Function HasActorValueCache($name, $key=null) {
+    if ($key === null) {
+        return isset($GLOBALS[MINAI_ACTOR_VALUE_CACHE][$name]);
+    }
+    return isset($GLOBALS[MINAI_ACTOR_VALUE_CACHE][$name]) && isset($GLOBALS[MINAI_ACTOR_VALUE_CACHE][$name][$key]);
+}
+
+Function BuildActorValueCache($name) {
+    $name = strtolower($name);
+    $GLOBALS[MINAI_ACTOR_VALUE_CACHE][$name] = [];
+
+    $idPrefix = "_minai_{$name}//";
+
+    $query = "select * from conf_opts where LOWER(id) like LOWER('{$idPrefix}%')";
+    $ret = $GLOBALS["db"]->fetchAll($query);
+
+    foreach ($ret as $row) {
+        //do this instead of split // because $name could have // in it
+        $key = substr(strtolower($row['id']), strlen($idPrefix));
+        $value = $row['value'];
+        $GLOBALS[MINAI_ACTOR_VALUE_CACHE][$name][$key] = $value;
+    }
+}
 
 function CanVibrate($name) {
     return IsEnabled($name, "CanVibrate") && IsActionEnabled("MinaiGlobalVibrator");
@@ -9,18 +48,22 @@ function CanVibrate($name) {
 
 // Return the specified actor value.
 // Caches the results of several queries that are repeatedly referenced.
-Function GetActorValue($name, $key, $preserveCase=false) {
+Function GetActorValue($name, $key, $preserveCase=false, $skipCache=false) {
     $name = addslashes($name);
     $key = addslashes($key);
-    global $allKeywords;
-    global $allFactions;
 
-    if ($allKeywords != "") {
-        return $allKeywords;
+    If (!$preserveCase && !$skipCache) {
+        $name = strtolower($name);
+        $key = strtolower($key);
+
+        If (!HasActorValueCache($name)) {
+            BuildActorValueCache($name);
+        }
+
+        $ret = GetActorValueCache($name, $key);
+        return $ret === null ? "" : $ret;
     }
-    if ($allFactions != "") {
-        return $allFactions;
-    }
+
     // return strtolower("JobInnkeeper,Whiterun,,,,Bannered Mare Services,,Whiterun Bannered Mare Faction,,SLA TimeRate,sla_Arousal,sla_Exposure,slapp_HaveSeenBody,slapp_IsAnimatingWKidFaction,");
     $query = "select * from conf_opts where LOWER(id)=LOWER('_minai_{$name}//{$key}')";
     if ($preserveCase) {
@@ -32,12 +75,7 @@ Function GetActorValue($name, $key, $preserveCase=false) {
         return "";
     }
     $ret = strtolower($ret[0]['value']);
-    if ($name == "AllKeywords") {
-        $allKeywords = $ret;
-    }
-    if ($name == "AllFactions") {
-        $allFactions = $ret;
-    }
+    
     return $ret;
 }
 
