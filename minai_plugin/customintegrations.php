@@ -50,6 +50,10 @@ function ProcessIntegrations() {
     CreateContextTableIfNotExists();
     CreateActionsTableIfNotExists();
     $MUST_DIE=false;
+    if (isset($GLOBALS["gameRequest"]) && isset($GLOBALS["events_to_ignore"]) && in_array($GLOBALS["gameRequest"][0], $GLOBALS["events_to_ignore"])) {
+        error_log("minai: Event {$GLOBALS["gameRequest"][0]} in ignore list, blocking.");
+        $MUST_DIE=true;
+    }
     if (isset($GLOBALS["gameRequest"]) && strtolower($GLOBALS["gameRequest"][0]) == "storecontext") {
         $db = $GLOBALS['db'];
         $vars=explode("@",$GLOBALS["gameRequest"][3]);
