@@ -85,7 +85,8 @@ Function IsEnabled($name, $key) {
 }
 
 Function IsSexActive() {
-    return $GLOBALS["db"]->fetchAll("select 1 from conf_opts where LOWER(id)=LOWER('sexscene') and LOWER(value)=LOWER('on')");
+    // if there is active scene thread involving current speaker
+    getScene($GLOBALS["HERIKA_NAME"]);
 }
 
 Function IsPlayer($name) {
@@ -288,4 +289,56 @@ Function IsRadiant() {
 
 $GLOBALS["target"] = GetTargetActor();
 $GLOBALS["nearby"] = explode(",", GetActorValue("PLAYER", "nearbyActors"));
+
+function getScene($actor) {
+    $scene = $GLOBALS["db"]->fetchAll("SELECT thread_id, curr_scene_id, actors, framework from minai_threads WHERE actors ~* '(,|^)$actor(,|$)'")[0];
+    $sceneDesc = getSceneDesc($scene);
+    $actors = explode(",", $scene["actors"]);
+
+    $sceneDesc = replaceActorsNamesInSceneDesc($actors, $sceneDesc);
+
+    $scene["description"] = $sceneDesc;
+
+    return $scene;
+}
+
+function addXPersonality($codename, $jsonXPersonality, $isInSex) {
+    if(!$jsonXPersonality) {
+        return;
+    }
+
+    $speakStyle = implode(", ", $jsonXPersonality["speakStyleDuringSex"]);
+
+    $GLOBALS["HERIKA_PERS"] .= "
+    - Orientation: {$jsonXPersonality["orientation"]}
+    - Romantic relationship type: {$jsonXPersonality["relationshipStyle"]}";
+
+    if($isInSex) {
+        $GLOBALS["HERIKA_PERS"] .= "
+During intimate encounters {$GLOBALS["HERIKA_PERS"]} inherits these attributes:
+    - Speak style during encounter: $speakStyle";
+    }
+}
+
+function getSceneDesc($scene) {
+    $query = "SELECT * FROM scenes_descriptions WHERE ";
+    
+    if($scene["framework"] == "ostim") {
+        $query .= "ostim_id ";
+    } else {
+        $query .= "sexlab_id ";
+    }
+
+    $query .= "= '{$scene["curr_scene_id"]}'";
+
+    return $GLOBALS["db"]->fetchAll($query)[0]["description"];
+}
+
+function replaceActorsNamesInSceneDesc($actors, $sceneDesc) {
+    foreach ($actors as $index => $actor) {
+        $sceneDesc = str_replace("{actor$index}", $actor, $sceneDesc);
+    }
+
+    return $sceneDesc;
+}
 ?>
