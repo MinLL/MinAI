@@ -816,7 +816,6 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
     if isRunning
       sexTalkSpeedChange(GetWeightedRandomActorToSpeak(actors), increase)
       Main.Info("Ostim speed change")
-      UpdateThreadTable("speedchange", "ostim", ostimTid)
       setPrevSpeed(ostimTid, newSpeed)
     else
       Main.Debug("OStim speed change failed")
@@ -1093,8 +1092,7 @@ EndFunction
 function UpdateThreadTable(string type, string framework = "ostim", int ThreadID = -1)
   actor[] actors
   string sceneId
-  int speed = -1
-
+  
   ; !!!Min to review sexlab implementation
   if(framework == "sexlab")
     sslThreadController controller = slf.GetController(ThreadID)
@@ -1108,18 +1106,32 @@ function UpdateThreadTable(string type, string framework = "ostim", int ThreadID
   else
     actors = OThread.GetActors(ThreadID)
     sceneId = OThread.GetScene(ThreadID)
-    speed = OThread.GetSpeed(ThreadID)
   endif
 
-  string actorsString = JoinActorArray(actors)
+  actor[] maleActors = PapyrusUtil.ActorArray(0)
+  actor[] femaleActors = PapyrusUtil.ActorArray(0)
+  int i = 0
+  int count = actors.Length
+  while i < count
+    actor currActor = actors[i]
+    int currSex = currActor.GetActorBase().GetSex()
+    
+    MiscUtil.PrintConsole("currActor: " + currActor.GetDisplayName() + ". sex: "+currSex)
+    if(currSex == 0)
+      maleActors = PapyrusUtil.PushActor(maleActors, currActor)
+    elseif(currSex == 1)
+      femaleActors = PapyrusUtil.PushActor(femaleActors, currActor)
+    endif
+
+    i += 1
+  endwhile
+
+  string maleActorsString = JoinActorArray(maleActors)
+  string femaleActorsString = JoinActorArray(femaleActors)
 
   string fallback = buildSceneFallbackDescription(ThreadID, framework, type)
 
-  string jsonToSend = "{ \"type\": \""+type+"\", \"framework\": \""+framework+"\", \"threadId\": "+ThreadID+", \"actors\": \""+actorsString+"\", \"scene\": \""+sceneId+"\""
-
-  if(speed != -1)
-    jsonToSend += ", \"speed\": "+speed
-  endif
+  string jsonToSend = "{ \"type\": \""+type+"\", \"framework\": \""+framework+"\", \"threadId\": "+ThreadID+", \"maleActors\": \""+maleActorsString+"\", \"femaleActors\": \""+femaleActorsString+"\", \"scene\": \""+sceneId+"\""
 
   if(fallback != "")
     jsonToSend += ", \"fallback\": \""+fallback+"\""
