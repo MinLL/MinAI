@@ -19,7 +19,7 @@ Function SetNarratorProfile() {
         createProfile("The Narrator");
     }
     if ($GLOBALS["HERIKA_NAME"] == "The Narrator" && $GLOBALS["use_narrator_profile"]) {
-        error_log("minai: Overwriting profile with narrator profile.");
+        // error_log("minai: Overwriting profile with narrator profile.");
         require_once(GetNarratorConfigPath());
     }
 }
