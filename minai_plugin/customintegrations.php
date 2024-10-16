@@ -103,7 +103,6 @@ function ProcessIntegrations() {
         $MUST_DIE=true;
     }
     if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "updateThreadsDB") {
-        file_put_contents("my_logs.txt", "\n\ncustom integrations: updateThreadsDB!!!\n\n", FILE_APPEND);
         updateThreadsDB();
         $MUST_DIE=true;
     }
@@ -159,6 +158,41 @@ function ProcessIntegrations() {
                 'value' => time()
             )
         );
+    }
+    if (isset($GLOBALS["gameRequest"]) && str_starts_with(strtolower($GLOBALS["gameRequest"][0]), "sextalk")) {
+        $type = $GLOBALS["gameRequest"][0];
+        $scene = getScene($GLOBALS["HERIKA_NAME"]);
+        $sceneDesc = $scene["description"];
+
+        if(!isset($sceneDesc)) {
+            if($scene["fallback"]) {
+                $sceneDesc = $scene["fallback"];
+            } else {
+                $sceneDesc = "{$scene["actors"]} are having sex.";
+            }
+            
+        }
+
+        $prompt = "";
+
+        switch($type) {
+            case "sextalk_scenechange": {
+                $prompt = "The Narrator: ";
+
+                if(!$scene["prev_scene_id"]) {
+                    $prompt .= "{$scene["actors"]} started sex scene.";
+                } else {
+                    $prompt .= "{$scene["actors"]} changed position.";
+                }
+
+                $prompt .= " $sceneDesc";
+                break;
+            }
+        }
+
+        $GLOBALS["gameRequest"][3] = $prompt;
+        
+        
     }
     if ($MUST_DIE) {
         error_log("minai: Done procesing custom request");

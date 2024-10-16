@@ -337,7 +337,7 @@ Event OnUpdate()
   Else
     ; Prompt AIFF to comment on it.
     ; main.RequestLLMResponse(lineToSay, "chatnf_vr_1", actorName)
-    sex.sexTalkCollision(akActor, lineToSay)
+    ; sex.sexTalkCollision(akActor, lineToSay)
     lastCollisionSpeechTime = currentTime
   EndIf
   ProcessArousal(akActor)
