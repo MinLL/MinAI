@@ -38,7 +38,8 @@ function updateThreadsDB() {
         case "scenechange": {
             $thread = $db->fetchAll("SELECT * from minai_threads WHERE thread_id = $threadId")[0];
             $currSceneId = $thread["curr_scene_id"];
-            if($currSceneId && strtolower($type) !== "startthread") {
+            $prevSceneId = $thread["prev_scene_id"];
+            if($currSceneId && strtolower($type) !== "startthread" && $currSceneId !== $prevSceneId) {
                 $db->update('minai_threads', "prev_scene_id = '$currSceneId', curr_scene_id = '$sceneId', fallback = '$fallback'", "thread_id = $threadId");
             } else {
                 $db->insert('minai_threads', [

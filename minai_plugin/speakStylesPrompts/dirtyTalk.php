@@ -5,14 +5,14 @@ function setDirtyTalkPrompts($currentName)
     $GLOBALS["PROMPTS"]["sextalk_climaxchastity"] = [
         "cue" => [
             "$currentName curses the chastity belt, saying something filthy about how it's ruining their pleasure. {$GLOBALS["TEMPLATE_DIALOG"]}",
-            "$currentName says something naughty about how they're going to make up for it when the belt comes off. {$GLOBALS["TEMPLATE_DIALOG"]}",
+            "$currentName says something naughty about how they're going to make up for it when the chastity belt comes off. {$GLOBALS["TEMPLATE_DIALOG"]}",
         ],
     ];
 
     $GLOBALS["PROMPTS"]["sextalk_climax"] = [
         "cue" => [
             "$currentName exclaims something filthy about their orgasm, using explicit language. {$GLOBALS["TEMPLATE_DIALOG"]}",
-            "$currentName says something naughty as they come. {$GLOBALS["TEMPLATE_DIALOG"]}"
+            "$currentName says something naughty as they climax. {$GLOBALS["TEMPLATE_DIALOG"]}"
         ],
     ];
 
