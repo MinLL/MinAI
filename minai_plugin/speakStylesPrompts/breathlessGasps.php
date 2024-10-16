@@ -1,18 +1,18 @@
 <?php
 
-function setBreathlessGaspsPrompts($currentName)
+function setBreathlessGaspsPrompts($currentName, $targetToTalk)
 {
     $GLOBALS["PROMPTS"]["sextalk_climaxchastity"] = [
         "cue" => [
             "$currentName makes frustrated gasps and moans about the chastity belt, saying something brief but intense about how it's killing them. {$GLOBALS["TEMPLATE_DIALOG"]}",
-            "$currentName says something short but sensual about the anticipation of finally being able to come. {$GLOBALS["TEMPLATE_DIALOG"]}",
+            "$currentName says something short but sensual about the anticipation of finally being able to climax. {$GLOBALS["TEMPLATE_DIALOG"]}",
         ],
     ];
 
     $GLOBALS["PROMPTS"]["sextalk_climax"] = [
         "cue" => [
             "$currentName lets out a loud, breathless gasp as they reach orgasm, unable to speak in full sentences. {$GLOBALS["TEMPLATE_DIALOG"]}",
-            "$currentName moans repeatedly as they come. {$GLOBALS["TEMPLATE_DIALOG"]}",
+            "$currentName moans repeatedly as they climax. {$GLOBALS["TEMPLATE_DIALOG"]}",
         ],
     ];
 

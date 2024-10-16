@@ -2,49 +2,49 @@
 
 function setTeasingTalkPrompts($currentName)
 {
-    $GLOBALS["PROMPTS"]["chatnf_sexclimaxchastity"] = [
+    $GLOBALS["PROMPTS"]["sextalk_climaxchastity"] = [
         "cue" => [
-            "$currentName playfully taunts their partner about the chastity belt, saying something cheeky about how it's not their fault they can't come. {$GLOBALS["TEMPLATE_DIALOG"]}",
-            "$currentName says something saucy about how they'll tease them even more when the belt is finally off. {$GLOBALS["TEMPLATE_DIALOG"]}",
+            "$currentName playfully taunts their partner about the chastity belt, saying something cheeky about how it's not their fault they can't climax. {$GLOBALS["TEMPLATE_DIALOG"]}",
+            "$currentName says something saucy about how they'll tease them even more when the chastity belt is finally off. {$GLOBALS["TEMPLATE_DIALOG"]}",
         ],
     ];
 
-    $GLOBALS["PROMPTS"]["chatnf_sexclimax"] = [
+    $GLOBALS["PROMPTS"]["sextalk_climax"] = [
         "cue" => [
             "$currentName exclaims something playful about their orgasm, using flirtatious language. {$GLOBALS["TEMPLATE_DIALOG"]}",
-            "$currentName says something teasing as they come. {$GLOBALS["TEMPLATE_DIALOG"]}"
+            "$currentName says something teasing as they climax. {$GLOBALS["TEMPLATE_DIALOG"]}"
         ],
     ];
 
-    $GLOBALS["PROMPTS"]["chatnf_sexscenechange"] = [
+    $GLOBALS["PROMPTS"]["sextalk_scenechange"] = [
         "cue" => [
             "$currentName teases their partner about the current position, using playful language. {$GLOBALS["TEMPLATE_DIALOG"]}",
             "$currentName says something flirtatious about the current position. {$GLOBALS["TEMPLATE_DIALOG"]}",
         ],
     ];
 
-    $GLOBALS["PROMPTS"]["chatnf_sexspeedincrease"] = [
+    $GLOBALS["PROMPTS"]["sextalk_speedincrease"] = [
         "cue" => [
             "$currentName taunts their partner about keeping up with the faster pace, using playful language. {$GLOBALS["TEMPLATE_DIALOG"]}",
             "$currentName says something cheeky about what they want to do next. {$GLOBALS["TEMPLATE_DIALOG"]}",
         ],
     ];
 
-    $GLOBALS["PROMPTS"]["chatnf_sexspeeddecrease"] = [
+    $GLOBALS["PROMPTS"]["sextalk_speeddecrease"] = [
         "cue" => [
             "$currentName teases their partner about slowing down, using playful language. {$GLOBALS["TEMPLATE_DIALOG"]}",
             "$currentName says something saucy about why they want to take it slow. {$GLOBALS["TEMPLATE_DIALOG"]}"
         ],
     ];
 
-    $GLOBALS["PROMPTS"]["chatnf_sexend"] = [
+    $GLOBALS["PROMPTS"]["sextalk_end"] = [
         "cue" => [
             "$currentName teases their partner about their performance, using playful language. {$GLOBALS["TEMPLATE_DIALOG"]}",
             "$currentName says something cheeky about what they expect next time. {$GLOBALS["TEMPLATE_DIALOG"]}",
         ],
     ];
 
-    $GLOBALS["PROMPTS"]["chatnf_sexambient"] = [
+    $GLOBALS["PROMPTS"]["sextalk_ambient"] = [
         "cue" => [
             "$currentName comments on their partner's body, using playful language to keep the mood light. {$GLOBALS["TEMPLATE_DIALOG"]}",
             "$currentName says something cheeky about their partner's attempts to seduce them. {$GLOBALS["TEMPLATE_DIALOG"]}",

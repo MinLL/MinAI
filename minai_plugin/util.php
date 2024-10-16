@@ -1,8 +1,10 @@
 <?php
 require_once("config.php");
 define("MINAI_ACTOR_VALUE_CACHE", "minai_actor_value_cache");
+require_once("importDataToDB.php");
 
 $GLOBALS[MINAI_ACTOR_VALUE_CACHE] = [];
+$targetOverride = null;
 
 // Get Value from the cache. $name/$key should be lowercase
 Function GetActorValueCache($name, $key) {
@@ -254,6 +256,10 @@ Function ClearRadiantActors() {
 }
 
 Function GetTargetActor() {
+    global $targetOverride;
+    if($targetOverride) {
+        return $targetOverride;
+    }
     $db = $GLOBALS['db'];
     $query = "select * from conf_opts where id='_minai_RADIANT//actor1'";
     $ret1 = $GLOBALS["db"]->fetchAll($query);
@@ -291,7 +297,12 @@ $GLOBALS["target"] = GetTargetActor();
 $GLOBALS["nearby"] = explode(",", GetActorValue("PLAYER", "nearbyActors"));
 
 function getScene($actor) {
-    $scene = $GLOBALS["db"]->fetchAll("SELECT thread_id, curr_scene_id, female_actors, male_actors, framework from minai_threads WHERE male_actors ~* '(,|^)$actor(,|$)' OR female_actors ~* '(,|^)$actor(,|$)'")[0];
+    $scene = $GLOBALS["db"]->fetchAll("SELECT * from minai_threads WHERE male_actors ~* '(,|^)$actor(,|$)' OR female_actors ~* '(,|^)$actor(,|$)'")[0];
+
+    if(!$scene) {
+        return null;
+    }
+
     $sceneDesc = getSceneDesc($scene);
 
     if($scene["female_actors"] && $scene["male_actors"]) {
@@ -312,18 +323,14 @@ function getScene($actor) {
     $actors = explode(",", $scene["actors"]);
     $sceneDesc = replaceActorsNamesInSceneDesc($actors, $sceneDesc);
     $scene["description"] = $sceneDesc;
-
-    // file_put_contents("my_logs.txt", "\n".json_encode($scene)."\n", FILE_APPEND);
             
     return $scene;
 }
 
-function addXPersonality($codename, $jsonXPersonality, $isInSex) {
+function addXPersonality($jsonXPersonality, $isInSex) {
     if(!$jsonXPersonality) {
         return;
     }
-
-    $speakStyle = implode(", ", $jsonXPersonality["speakStyleDuringSex"]);
 
     $GLOBALS["HERIKA_PERS"] .= "
     - Orientation: {$jsonXPersonality["orientation"]}
@@ -331,13 +338,18 @@ function addXPersonality($codename, $jsonXPersonality, $isInSex) {
 
     if($isInSex) {
         $GLOBALS["HERIKA_PERS"] .= "
-During intimate encounters {$GLOBALS["HERIKA_PERS"]} inherits these attributes:
-    - Speak style during encounter: $speakStyle";
+During sex {$GLOBALS["HERIKA_PERS"]}:
+- speaks in this style {$jsonXPersonality["speakStyleDuringSex"]};
+- prefers these positions: ".implode(", ", $jsonXPersonality["preferredSexPositions"]).";
+- likes to participate in such sex activities: ".implode(", ", $jsonXPersonality["sexualBehavior"]).";
+- has secret sex fantasies:
+  ".implode("\n  ",$jsonXPersonality["sexFantasies"]);
     }
 }
 
 function getSceneDesc($scene) {
-    $query = "SELECT * FROM scenes_descriptions WHERE ";
+    importScenesDescriptions();
+    $query = "SELECT * FROM minai_scenes_descriptions WHERE ";
     
     if($scene["framework"] == "ostim") {
         $query .= "ostim_id ";
@@ -356,5 +368,46 @@ function replaceActorsNamesInSceneDesc($actors, $sceneDesc) {
     }
 
     return $sceneDesc;
+}
+
+function getXPersonality($currentName) {
+    importXPersonalities();
+    $codename=strtr(strtolower(trim($currentName)),[" "=>"_","'"=>"+"]);
+    $jsonXPersonality =  $GLOBALS["db"]->fetchAll("SELECT * from minai_x_personalities WHERE id = '$codename'")[0]["x_personality"];
+
+    if(isset($jsonXPersonality)) {
+        $jsonXPersonality = json_decode($jsonXPersonality,true);
+    }
+
+    return $jsonXPersonality;
+}
+
+// in case when we want to change target from radiant options and directly tell npc whom they need to talk to
+function overrideTargetToTalk($name) {
+    global $targetOverride;
+    $targetOverride = $name;
+}
+
+function getTargetDuringSex($scene) {
+    global $targetOverride;
+    if($targetOverride) {
+        return $targetOverride;
+    }
+    $actors = explode(",", $scene["actors"]);
+
+    $actorsToSpeak = array_filter($actors, function($str){
+        return $str !== $GLOBALS["HERIKA_NAME"];
+    });
+    $actorsToSpeak = array_values($actorsToSpeak);
+    $targetToSpeak = $actorsToSpeak[array_rand($actorsToSpeak)];
+
+    // if more then 1 actor to speak in scene make it 50% chance speaker will address all participants
+    if(count($actorsToSpeak) > 1 && mt_rand(0, 1) === 1) {
+        $targetToSpeak = implode(", ", $actorsToSpeak);
+    }
+
+    overrideTargetToTalk($targetToSpeak);
+
+    return $targetToSpeak;
 }
 ?>

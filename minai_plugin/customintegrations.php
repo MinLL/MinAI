@@ -178,21 +178,18 @@ function ProcessIntegrations() {
         switch($type) {
             case "sextalk_scenechange": {
                 $prompt = "The Narrator: ";
-
+                
                 if(!$scene["prev_scene_id"]) {
                     $prompt .= "{$scene["actors"]} started sex scene.";
                 } else {
                     $prompt .= "{$scene["actors"]} changed position.";
                 }
-
                 $prompt .= " $sceneDesc";
                 break;
             }
         }
 
         $GLOBALS["gameRequest"][3] = $prompt;
-        
-        
     }
     if ($MUST_DIE) {
         error_log("minai: Done procesing custom request");
