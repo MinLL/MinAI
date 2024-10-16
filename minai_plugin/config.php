@@ -57,7 +57,11 @@ $GLOBALS["voicetype_fallbacks"] = [
     "femaleorc" => "femaleorc",
     "malealtmer" => "maleelfhaughty",
     "femalealtmer" => "femaleelfthaughty",
+    "malehighelf" => "maleelfhaughty",
+    "femalehighelf" => "femaleelfthaughty",
     "maledunmer" => "maledarkelf",
-    "femaledunmer" => "femaledarkelf"
+    "femaledunmer" => "femaledarkelf",
+    "maledarkelf" => "maledarkelf",
+    "femaledarkelf" => "femaledarkelf"
 ];
 ?>
