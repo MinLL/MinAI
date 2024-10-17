@@ -110,8 +110,9 @@ Function Maintenance(minai_MainQuestController _main)
   aiff.RegisterAction("ExtCmdSpeedUpSex", "SpeedUpSex", "Sex Intensity", "Sex3", 1, 3, 1, 1, 300, (bHasOstim))
   aiff.RegisterAction("ExtCmdSlowDownSex", "SlowDownSex", "Sex Intensity", "Sex3", 1, 3, 1, 1, 300, (bHasOstim))
 
-  aiff.RegisterAction("ExtCmdComeWithMe", "ComeWithMe", "Start Following Player", "General", 1, 0, 2, 5, 300, true)
-  aiff.RegisterAction("ExtCmdEndComeWithMe", "EndComeWithMe", "End Following Player", "General", 1, 0, 2, 5, 300, true)
+  ; Temporarily disabled until bugs can be addressed
+  aiff.RegisterAction("ExtCmdComeWithMe", "ComeWithMe", "Start Following Player", "General", 1, 0, 2, 5, 300, false, true)
+  aiff.RegisterAction("ExtCmdEndComeWithMe", "EndComeWithMe", "End Following Player", "General", 1, 0, 2, 5, 300, false, true)
 EndFunction
 
 
