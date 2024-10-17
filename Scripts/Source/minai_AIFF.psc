@@ -32,6 +32,15 @@ Function InitFollow()
   FollowFaction = Game.GetFormFromFile(0x01BC24, "AIAgent.esp") as Faction
 EndFunction
 
+Function CleanupFollow()
+  actor[] actors = GetNearbyAI()
+  int i = 0
+  while i < actors.Length
+    EndFollowTarget(actors[i])
+    i += 1
+  EndWhile
+EndFunction
+
 Function Maintenance(minai_MainQuestController _main)
   contextUpdateInterval = 30
   ; This is inefficient. We need to more selectively set specific parts of the context rather than repeatedly re-set everything.
@@ -91,6 +100,7 @@ Function Maintenance(minai_MainQuestController _main)
   ; StoreContext("minai", "testKey", "This is dynamically persisted context!", 1200)
 
   InitFollow()
+  CleanupFollow()
 EndFunction
 
 Function StartFollowTarget(actor akNpc, actor akTarget)

@@ -13,14 +13,16 @@ if ((IsModEnabled("Sexlab") || IsModEnabled("Ostim")) && ((IsEnabled("PLAYER", "
     RegisterAction("ExtCmdPutOnClothes");
     RegisterAction("ExtCmdRemoveClothes");
 
-    if (IsFollowing($GLOBALS['HERIKA_NAME'])) {
-        RegisterAction("ExtCmdEndComeWithMe");
-    } else {
-        if (!IsInScene($GLOBALS['HERIKA_NAME'])) {
-            error_log($GLOBALS['HERIKA_NAME']." is not in a scene");
-            RegisterAction("ExtCmdComeWithMe");
+    if (!IsFollower($GLOBALS['HERIKA_NAME'])) {
+        if (IsFollowing($GLOBALS['HERIKA_NAME'])) {
+            RegisterAction("ExtCmdEndComeWithMe");
         } else {
-            error_log($GLOBALS['HERIKA_NAME']." is in a scene");
+            if (!IsInScene($GLOBALS['HERIKA_NAME'])) {
+                error_log($GLOBALS['HERIKA_NAME']." is not in a scene");
+                RegisterAction("ExtCmdComeWithMe");
+            } else {
+                error_log($GLOBALS['HERIKA_NAME']." is in a scene");
+            }
         }
     }
 
