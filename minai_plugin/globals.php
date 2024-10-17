@@ -10,7 +10,7 @@ $GLOBALS["TTS_FALLBACK_FNCT"] = function($responseTextUnmooded, $mood, $response
     $gender = GetActorValue($GLOBALS["HERIKA_NAME"], "gender");
     $fallback = $GLOBALS["voicetype_fallbacks"][$gender.$race];
     if (!$fallback) {
-        $error_log("Warning: Could not find fallback for {$gender}{$race}");
+        error_log("Warning: Could not find fallback for {$gender}{$race}");
         return;
     }
     error_log("minai: Voice type fallback to {$fallback} for {$GLOBALS["HERIKA_NAME"]}");
