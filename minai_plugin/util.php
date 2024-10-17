@@ -61,7 +61,7 @@ Function GetActorValue($name, $key, $preserveCase=false, $skipCache=false) {
         }
 
         $ret = GetActorValueCache($name, $key);
-        return $ret === null ? "" : $ret;
+        return $ret === null ? "" : strtolower($ret);
     }
 
     // return strtolower("JobInnkeeper,Whiterun,,,,Bannered Mare Services,,Whiterun Bannered Mare Faction,,SLA TimeRate,sla_Arousal,sla_Exposure,slapp_HaveSeenBody,slapp_IsAnimatingWKidFaction,");
@@ -89,7 +89,7 @@ Function IsSexActive() {
 }
 
 Function IsPlayer($name) {
-    return ($GLOBALS["PLAYER_NAME"] == $name);
+    return (strtolower($GLOBALS["PLAYER_NAME"]) == strtolower($name));
 }
 
 $GLOBALS["GenericFuncRet"] =function($gameRequest) {
@@ -111,12 +111,12 @@ Function IsModEnabled($mod) {
 
 Function IsInFaction($name, $faction) {
     $faction = strtolower($faction);
-    return str_contains(GetActorValue($name, "AllFactions"), $faction);
+    return str_contains(strtolower(GetActorValue($name, "AllFactions")), $faction);
 }
 
 Function HasKeyword($name, $keyword) {
     $keyword = strtolower($keyword);
-    return str_contains(GetActorValue($name, "AllKeywords"), $keyword);
+    return str_contains(strtolower(GetActorValue($name, "AllKeywords")), $keyword);
 }
 
 Function IsConfigEnabled($configKey) {
