@@ -6,8 +6,8 @@ $GLOBALS["TTS_FALLBACK_FNCT"] = function($responseTextUnmooded, $mood, $response
         $GLOBALS["db"] = new sql();
     require_once("config.php");
     require_once("util.php");
-    $race = GetActorValue($GLOBALS["HERIKA_NAME"], "race");
-    $gender = GetActorValue($GLOBALS["HERIKA_NAME"], "gender");
+    $race = strtolower(GetActorValue($GLOBALS["HERIKA_NAME"], "race"));
+    $gender = strtolower(GetActorValue($GLOBALS["HERIKA_NAME"], "gender"));
     $fallback = $GLOBALS["voicetype_fallbacks"][$gender.$race];
     if (!$fallback) {
         error_log("Warning: Could not find fallback for {$gender}{$race}");
@@ -15,5 +15,8 @@ $GLOBALS["TTS_FALLBACK_FNCT"] = function($responseTextUnmooded, $mood, $response
     }
     error_log("minai: Voice type fallback to {$fallback} for {$GLOBALS["HERIKA_NAME"]}");
     $GLOBALS["TTS"]["FORCED_VOICE_DEV"] = $fallback;
-    return tts($responseTextUnmooded, $mood, $responseText);
+    if(function_exists("tts")) {
+        return tts($responseTextUnmooded, $mood, $responseText);
+    }
+    return null;
 };
