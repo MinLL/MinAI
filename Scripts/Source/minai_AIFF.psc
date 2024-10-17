@@ -154,6 +154,9 @@ Function CheckIfActorShouldStillFollow(actor akNpc)
   ElseIf (akNpc.IsInFaction(FollowFaction) && akNpc.GetCurrentPackage() != FollowPackage)
     Main.Debug("[FollowTarget] Npc is not following anyone, End following target")
     EndFollowTarget(akNpc)
+  ElseIf (akNpc.GetCurrentPackage() == FollowPackage && !akNpc.IsInFaction(FollowFaction))
+    Main.Debug("[FollowTarget] Still following target, but not in faction, End following target")
+    EndFollowTarget(akNpc)
   EndIf
 EndFunction
 
