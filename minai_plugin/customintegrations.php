@@ -102,7 +102,8 @@ function ProcessIntegrations() {
     }
     if (isset($GLOBALS["gameRequest"]) && strtolower($GLOBALS["gameRequest"][0]) =="npc_talk") {
         $vars=explode("@",$GLOBALS["gameRequest"][3]);
-        $speaker = explode(":", $vars[0])[3];
+        $tmp = explode(":", $vars[0]);
+        $speaker = $tmp[sizeof($tmp)-1];
         $target = $vars[1];
         $message = $vars[2];
         error_log("minai: Processing NPC request ({$speaker} => {$target}: {$message})");
