@@ -364,6 +364,9 @@ EndFunction
 actor[] Function GetNearbyAI()
   actor[] actors = AIAgentFunctions.findAllNearbyAgents()
   int i = 0
+  if config.disableAIAnimations
+    AIAgentFunctions.setConf("_animations",0,0,"")
+  EndIf
   while i < actors.length
     main.Info("Found nearby actor: " + Main.GetActorName(actors[i]))
     if config.disableAIAnimations
@@ -382,6 +385,9 @@ String Function GetNearbyAIStr()
   actor[] actors = AIAgentFunctions.findAllNearbyAgents()
   string ret = ""
   int i = 0
+  if config.disableAIAnimations
+    AIAgentFunctions.setConf("_animations",0,0,"")
+  EndIf
   while i < actors.Length
     ret += Main.GetActorName(actors[i])
     if i != actors.Length - 1
