@@ -135,6 +135,7 @@ function ProcessIntegrations() {
             // Avoid race condition where we send input, the server starts to process the request, and then
             // a radiant request comes in 
             error_log("minai: Not starting radiance: Input was too recent");
+            $MUST_DIE=true;
         }
     }
     if (in_array($GLOBALS["gameRequest"][0],["inputtext","inputtext_s","ginputtext","ginputtext_s","rechat","bored", "radiant"])) {
