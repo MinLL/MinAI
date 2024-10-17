@@ -1116,7 +1116,6 @@ function UpdateThreadTable(string type, string framework = "ostim", int ThreadID
     actor currActor = actors[i]
     int currSex = currActor.GetActorBase().GetSex()
     
-    MiscUtil.PrintConsole("currActor: " + currActor.GetDisplayName() + ". sex: "+currSex)
     if(currSex == 0)
       maleActors = PapyrusUtil.PushActor(maleActors, currActor)
     elseif(currSex == 1)
@@ -1138,8 +1137,6 @@ function UpdateThreadTable(string type, string framework = "ostim", int ThreadID
   endif
 
   jsonToSend += "}"
-
-  MiscUtil.PrintConsole("command@ExtCmdUpdateThreadsTable@"+ jsonToSend +"@")
 
   AIAgentFunctions.logMessage("command@ExtCmdUpdateThreadsTable@"+ jsonToSend +"@", "updateThreadsDB")
 endfunction
@@ -1227,9 +1224,6 @@ actor Function GetWeightedRandomActorToSpeak(actor[] actors)
     endif
   endwhile
 
-  MiscUtil.PrintConsole("female actors length " + femaleActors.length)
-  MiscUtil.PrintConsole("male actors length " + maleActors.length)
-
   ; if no female npc, just pick random male. Can be none though if it's player only scene
   if(femaleActors.length == 0)
     return getRandomActor(maleActors)
@@ -1290,7 +1284,6 @@ string function buildSceneFallbackDescription(int ThreadID, string framework, st
     actorString = JoinActorArray(actors, ", ")
     actionString = JoinStringArray(actionTypes, ", ")
     sceneTagsString = JoinStringArray(sceneTags, ", ")
-    MiscUtil.PrintConsole(actorString + "--" + actionString + "--" + sceneTagsString)
   else
     sslThreadController controller = slf.GetController(ThreadID)
     string[] sceneTags= controller.Animation.GetRawTags()
