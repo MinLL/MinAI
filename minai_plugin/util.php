@@ -350,14 +350,20 @@ During sex {$GLOBALS["HERIKA_PERS"]}:
 function getSceneDesc($scene) {
     importScenesDescriptions();
     $query = "SELECT * FROM minai_scenes_descriptions WHERE ";
+    $currSceneId = $scene["curr_scene_id"];
     
     if($scene["framework"] == "ostim") {
         $query .= "ostim_id ";
     } else {
         $query .= "sexlab_id ";
+        // since in scene descriptions there is one description per scene for all actors
+        // sexlab id in minai_scenes_descriptions has this format SomeName_S1
+        // and original sexlab ids are usually with _A0 on the end: SOmeName_S1_A1
+        // need to remove _A0 part from ids to be able to find rows in minai_scenes_descriptions
+        $currSceneId = preg_replace('/_A\d+$/', '', $currSceneId);
     }
 
-    $query .= "= '{$scene["curr_scene_id"]}'";
+    $query .= "= '$currSceneId'";
 
     return $GLOBALS["db"]->fetchAll($query)[0]["description"];
 }
