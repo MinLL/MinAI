@@ -16,3 +16,5 @@ NSFW actions are only enabled if you have either Sexlab or ostim installed. If y
 6) Look at your ai log, and look at the output from the LLM. There will be an "action" field in the response from the LLM. This is where the commands that the LLM executes will be specified. If the commands are not here, it means that the LLM is not sending them. If the commands are here and aren't working, you will need to examine your Papyrus log.
 7) Enable Papyrus logging, and look in your log for errors related to MinAI. Anything coming from MinAI with the log level of "ERROR" or "FATAL" is probably why things are not working for you.
 
+## Sex actions specifically aren't working!
+In addition to the above sections, MinAI offers a feature to only expose sex / general perverted actions to the AI conditionally based on the NPC's arousal level (Disabled by default). Ensure that if you have set minimum arousal thresholds in the MCM, that the NPC is suitably aroused to use these actions.
