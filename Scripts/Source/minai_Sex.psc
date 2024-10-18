@@ -796,7 +796,7 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
       ; we don't want to catch transition scenes they usually couple of seconds which isn't enough to have conversation
       if(!OMetadata.isTransition(sceneId))
         UpdateThreadTable("scenechange", "ostim", ostimTid)
-        sexTalkSceneChage(GetWeightedRandomActorToSpeak(actors), playerInvolved)
+        sexTalkSceneChage(GetWeightedRandomActorToSpeak(actors), playerInvolved, "ostim")
       endif
     else
       Main.Debug("OStim scene change failed")
@@ -815,7 +815,7 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
     Actor[] actors = OThread.GetActors(ostimTid)
     bool increase = newSpeed > prevSpeed
     if isRunning
-      sexTalkSpeedChange(GetWeightedRandomActorToSpeak(actors), playerInvolved, increase)
+      sexTalkSpeedChange(GetWeightedRandomActorToSpeak(actors), playerInvolved, "ostim", increase)
       Main.Info("Ostim speed change")
       setPrevSpeed(ostimTid, newSpeed)
     else
@@ -823,7 +823,7 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
     EndIf
   elseif (eventName == "ostim_actor_orgasm")   
     Actor OrgasmedActor = sender as Actor
-    sexTalkClimax(OrgasmedActor, playerInvolved)
+    sexTalkClimax(OrgasmedActor, playerInvolved, "ostim")
     Main.Info("Ostim actor orgasm: " + OrgasmedActor)
 
   elseif (eventName == "ostim_thread_end")  
@@ -831,7 +831,7 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
     removePrevSpeed(ostimTid)
     actor actorToSayOnEnd = JMap.getForm(actorToSayOnEndMap, ostimTid) as Actor
     MiscUtil.PrintConsole("Thread #"+ostimTid+", isRunning: "+OThread.isRunning(ostimTid)+", and speaking actor: "+actorToSayOnEnd.GetDisplayName())
-    sexTalkOnEnd(actorToSayOnEnd, playerInvolved)
+    sexTalkOnEnd(actorToSayOnEnd, playerInvolved, "ostim")
     JMap.removeKey(actorToSayOnEndMap, ostimTid)
     UpdateThreadTable("end", "ostim", ostimTid)
   EndIf
@@ -903,9 +903,9 @@ Event OnStageStart(int tid, bool HasPlayer)
      ; VR users will have dirty talk through physics integration instead
      ; Reenabled this temporarily while figuring out female player character collisions during sex.
      ; Works much better for male atm, need to add different colliders
-     sexTalkSceneChage(GetWeightedRandomActorToSpeak(sortedActorList), HasPlayer)
+     sexTalkSceneChage(GetWeightedRandomActorToSpeak(sortedActorList), HasPlayer, "sexlab")
     else
-      sexTalkSceneChage(GetWeightedRandomActorToSpeak(sortedActorList), HasPlayer)
+      sexTalkSceneChage(GetWeightedRandomActorToSpeak(sortedActorList), HasPlayer, "sexlab")
     EndIf
   EndIf
 EndEvent
@@ -928,7 +928,7 @@ Event SLSOOrgasm(Form actorRef, Int tid)
 
   bool hasPlayer = isPlayerInvolved(tid, "sexlab")
   
-  sexTalkClimax(actorInAction, hasPlayer)
+  sexTalkClimax(actorInAction, hasPlayer, "sexlab")
 EndEvent
 
 Event PostSexScene(int tid, bool HasPlayer)
@@ -957,7 +957,7 @@ Event PostSexScene(int tid, bool HasPlayer)
   if actorWithBelt
     sexTalkClimax(actorWithBelt, HasPlayer, true)
   else
-    sexTalkClimax(GetWeightedRandomActorToSpeak(sortedActorList), HasPlayer)
+    sexTalkClimax(GetWeightedRandomActorToSpeak(sortedActorList), HasPlayer, "sexlab")
   EndIf
   lastTag = ""
 EndEvent
@@ -975,7 +975,7 @@ Event EndSexScene(int tid, bool HasPlayer)
     if bHasAIFF
       ; TODO make weighted random selection of actor to speak
       actor speaker = GetWeightedRandomActorToSpeak(sortedActorList)
-      sexTalkOnEnd(speaker, HasPlayer)
+      sexTalkOnEnd(speaker, HasPlayer, "sexlab")
       AIFF.SetAnimationBusy(0, Main.GetActorName(speaker))
     EndIf
     UpdateThreadTable("end", "sexlab", tid)
@@ -1139,45 +1139,47 @@ function UpdateThreadTable(string type, string framework = "ostim", int ThreadID
   AIAgentFunctions.logMessage("command@ExtCmdUpdateThreadsTable@"+ jsonToSend +"@", "updateThreadsDB")
 endfunction
 
-function sexTalkClimax(actor speaker, bool hasPlayer, bool chastity = false)
+function sexTalkClimax(actor speaker, bool hasPlayer, string framework, bool chastity = false)
   if(chastity)
-    SexTalk(speaker, "sextalk_climaxchastity", hasPlayer, config.forceOrgasmComment)
+    SexTalk(speaker, "sextalk_climaxchastity", hasPlayer, framework, config.forceOrgasmComment)
   else
-    SexTalk(speaker, "sextalk_climax", hasPlayer, config.forceOrgasmComment)
+    SexTalk(speaker, "sextalk_climax", hasPlayer, framework, config.forceOrgasmComment)
   endif
 endfunction
 
-function sexTalkSceneChage(actor speaker, bool hasPlayer)
-  SexTalk(speaker, "sextalk_scenechange", hasPlayer)
+function sexTalkSceneChage(actor speaker, bool hasPlayer, string framework)
+  SexTalk(speaker, "sextalk_scenechange", hasPlayer, framework)
 endfunction
 
-function sexTalkSpeedChange(actor speaker, bool hasPlayer, bool increase)
+function sexTalkSpeedChange(actor speaker, bool hasPlayer, string framework, bool increase)
   if(increase)
-    SexTalk(speaker, "sextalk_speedincrease", hasPlayer)
+    SexTalk(speaker, "sextalk_speedincrease", hasPlayer, framework)
   else
-    SexTalk(speaker, "sextalk_speeddecrease", hasPlayer)
+    SexTalk(speaker, "sextalk_speeddecrease", hasPlayer, framework)
   endif
   
 endfunction
 
-function sexTalkOnEnd(actor speaker, bool hasPlayer)
-  SexTalk(speaker, "sextalk_end", hasPlayer, config.forcePostSceneComment)
+function sexTalkOnEnd(actor speaker, bool hasPlayer, string framework)
+  SexTalk(speaker, "sextalk_end", hasPlayer, framework, config.forcePostSceneComment)
 endfunction
 
-function sexTalkCollision(actor speaker, bool hasPlayer, string promptToSay)
-  SexTalk(speaker, "chatnf_vr_1", hasPlayer)
+function sexTalkCollision(actor speaker, bool hasPlayer, string framework, string promptToSay)
+  SexTalk(speaker, "chatnf_vr_1", hasPlayer, framework)
 endfunction
 
 ; speaker is who actually will say llm lines, can be none if scene is player only
 ; chatType different AIFF custom chat topics see php files
-Function SexTalk(actor speaker, string chatType, bool hasPlayer, bool ignoreSexTalkCooldown = false)
+Function SexTalk(actor speaker, string chatType, bool hasPlayer, string framework, bool ignoreSexTalkCooldown = false)
   if !bHasAIFF || !speaker
     MiscUtil.PrintConsole("NO SPEAKER, " + chatType)
     return
   EndIf
 
-  ; don't request if prioritizePlayerThread is true and there is no player involved
-  if(!hasPlayer && config.prioritizePlayerThread)
+  bool anyThreadWithPlayer = getPlayerThread(framework) != -1
+
+  ; don't request if there any thread with player involved and current thread doesn't have player and config enabled player prioritazation
+  if(anyThreadWithPlayer && !hasPlayer && config.prioritizePlayerThread)
     return
   endif
 
@@ -1316,10 +1318,20 @@ string function buildSceneFallbackDescription(int ThreadID, string framework, st
   endif
 endfunction
 
-bool function isPlayerInvolved(int ThreadID, string framework)
+int function getPlayerThread(string framework)
   if(framework == "ostim")
-    return ThreadID == 0
+    if(OThread.isRunning(0))
+      return 0
+    else
+      return -1
+    endif
   else
-    return slf.FindPlayerController() == ThreadID
+    return slf.FindPlayerController()
   endif
+endfunction
+
+bool function isPlayerInvolved(int ThreadID, string framework)
+  int playerThread = getPlayerThread(framework)
+
+  return ThreadID == playerThread
 endfunction
