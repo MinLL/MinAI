@@ -10,15 +10,15 @@ Function SetRadiance($rechat_h, $rechat_p) {
 
 Function GetNarratorConfigPath() {
     $path = dirname((__FILE__)) . DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR;
-    $newConfFile=md5("The Narrator");
+    $newConfFile=md5("Narrator Override");
     return $path . "conf".DIRECTORY_SEPARATOR."conf_$newConfFile.php";
 }
 Function SetNarratorProfile() {
-    if (!file_exists(GetNarratorConfigPath())) {
-        error_log("minai: Initializing Narrator Profile");
-        createProfile("The Narrator");
-    }
     if ($GLOBALS["HERIKA_NAME"] == "The Narrator" && $GLOBALS["use_narrator_profile"]) {
+        if (!file_exists(GetNarratorConfigPath())) {
+            error_log("minai: Initializing Narrator Profile");
+            createProfile("Narrator Override");
+        }
         // error_log("minai: Overwriting profile with narrator profile.");
         require_once(GetNarratorConfigPath());
     }
