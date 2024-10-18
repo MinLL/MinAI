@@ -42,6 +42,7 @@ function updateThreadsDB() {
             if($currSceneId && strtolower($type) !== "startthread" && $currSceneId !== $prevSceneId) {
                 $db->update('minai_threads', "prev_scene_id = '$currSceneId', curr_scene_id = '$sceneId', fallback = '$fallback'", "thread_id = $threadId");
             } else {
+                $db->delete('minai_threads', "thread_id='{$threadId}'");
                 $db->insert('minai_threads', [
                     "thread_id" => $threadId,
                     "curr_scene_id" => $sceneId,

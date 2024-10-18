@@ -56,6 +56,13 @@ function ProcessIntegrations() {
         error_log("minai: Event {$GLOBALS["gameRequest"][0]} in ignore list, blocking.");
         $MUST_DIE=true;
     }
+    if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "init") {
+        // This is sent once by the SKSE plugin when the game is loaded. Do our initialization here.
+        error_log("minai: Initializing");
+        CreateThreadsTableIfNotExists();
+        CreateActionsTableIfNotExists();
+        CreateContextTableIfNotExists();
+    }
     if (isset($GLOBALS["gameRequest"]) && strtolower($GLOBALS["gameRequest"][0]) == "storecontext") {
         $db = $GLOBALS['db'];
         $vars=explode("@",$GLOBALS["gameRequest"][3]);

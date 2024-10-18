@@ -364,8 +364,10 @@ function getSceneDesc($scene) {
     }
 
     $query .= "= '$currSceneId'";
-
-    return $GLOBALS["db"]->fetchAll($query)[0]["description"];
+    $queryRet = $GLOBALS["db"]->fetchAll($query);
+    if ($queryRet)
+        return queryRet[0]["description"];
+    return "";
 }
 
 function replaceActorsNamesInSceneDesc($actors, $sceneDesc) {
@@ -379,8 +381,10 @@ function replaceActorsNamesInSceneDesc($actors, $sceneDesc) {
 function getXPersonality($currentName) {
     importXPersonalities();
     $codename=strtr(strtolower(trim($currentName)),[" "=>"_","'"=>"+"]);
-    $jsonXPersonality =  $GLOBALS["db"]->fetchAll("SELECT * from minai_x_personalities WHERE id = '$codename'")[0]["x_personality"];
-
+    $queryRet = $GLOBALS["db"]->fetchAll("SELECT * from minai_x_personalities WHERE id = '$codename'");
+    $jsonXPersonality = null;
+    if ($queryRet)
+        $jsonXPersonality =  $queryRet[0]["x_personality"];
     if(isset($jsonXPersonality)) {
         $jsonXPersonality = json_decode($jsonXPersonality,true);
     }

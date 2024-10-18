@@ -7,7 +7,9 @@ function importDataToDB($tableName, $folderName, $createQuery)
     $db = $GLOBALS['db'];
     $db->execQuery($createQuery);
 
-    
+    if (!is_file($importedVersionsFile)) {
+        file_put_contents($importedVersionsFile, "");
+    }
     $importedVersions = file($importedVersionsFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
     $iterator = new RecursiveIteratorIterator(
