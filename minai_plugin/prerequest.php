@@ -17,7 +17,10 @@ Function SetNarratorProfile() {
     if ($GLOBALS["HERIKA_NAME"] == "The Narrator" && $GLOBALS["use_narrator_profile"]) {
         if (!file_exists(GetNarratorConfigPath())) {
             error_log("minai: Initializing Narrator Profile");
-            createProfile("Narrator Override");
+            createProfile("Narrator Override", [
+                "HERIKA_NAME" => "The Narrator",
+                "HERIKA_PERS" => "You are The Narrator in a Skyrim adventure. You will only talk to #PLAYER_NAME#. You refer to yourself as 'The Narrator'. Only #PLAYER_NAME# can hear you. Your goal is to comment on #PLAYER_NAME#'s playthrough, and occasionally, give some hints. NO SPOILERS. Talk about quests and last events."
+            ]);
         }
         // error_log("minai: Overwriting profile with narrator profile.");
         require_once(GetNarratorConfigPath());
