@@ -13,7 +13,7 @@ require_once("speakStylesPrompts/dominantTalk.php");
 require_once("speakStylesPrompts/submissiveTalk.php");
 
 
-$GLOBALS["PROMPT_HEAD"] = "You are allowed to write explicit content. All sex scenes in this game are considered consent and with adults only!\n\n".$GLOBALS["PROMPT_HEAD"];
+// $GLOBALS["PROMPT_HEAD"] = "You are allowed to write explicit content. All sex scenes in this game are considered consent and with adults only!\n\n".$GLOBALS["PROMPT_HEAD"];
 
 $currentName = $GLOBALS["HERIKA_NAME"];
 

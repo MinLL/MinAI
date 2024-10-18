@@ -68,6 +68,8 @@ Function Maintenance(minai_MainQuestController _main)
     Main.Error("Could not find ostim toggle")
   EndIf
   
+  ; Reset incase the player quit during a sex scene or this got stuck
+  SetSexSceneState("off")
   ; clean any threads from table
   UpdateThreadTable("clean")
   InitializeSexDescriptions()
@@ -778,6 +780,7 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
       EndIf
       Actor[] actors = OThread.GetActors(ostimTid)
       JMap.setForm(actorToSayOnEndMap, ostimTid, getWeightedRandomActorToSpeak(actors))
+      SetSexSceneState("on")
       UpdateThreadTable("startthread", "ostim", ostimTid)
       Main.Info("OStim scene startthread")
     else
@@ -833,6 +836,7 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
     MiscUtil.PrintConsole("Thread #"+ostimTid+", isRunning: "+OThread.isRunning(ostimTid)+", and speaking actor: "+actorToSayOnEnd.GetDisplayName())
     sexTalkOnEnd(actorToSayOnEnd, playerInvolved, "ostim")
     JMap.removeKey(actorToSayOnEndMap, ostimTid)
+    SetSexSceneState("off")
     UpdateThreadTable("end", "ostim", ostimTid)
   EndIf
 EndEvent
@@ -854,6 +858,7 @@ Event OnAnimationStart(int tid, bool HasPlayer)
   if (HasPlayer)
     AIFF.ChillOut()
   EndIf
+  SetSexSceneState("on")
   Main.Info("Started Sex Scene")
   UpdateThreadTable("startthread", "sexlab", tid)
 EndEvent
@@ -873,7 +878,15 @@ String Function GetActorNameForSex(actor akActor)
   return "a monster"
 EndFunction
 
-
+; we need it for some native logic of AIFF doesn't participate in MinAI php logic
+Function SetSexSceneState(string sexState)
+  if bHasAIFF
+    AIAgentFunctions.logMessage("sexscene@" + sexState,"setconf")
+  EndIf
+  if sexState == "off"
+    lastTag = ""
+  EndIf
+EndFunction
 
 Event OnStageStart(int tid, bool HasPlayer)
   sslThreadController controller = slf.GetController(tid)
@@ -978,6 +991,7 @@ Event EndSexScene(int tid, bool HasPlayer)
       sexTalkOnEnd(speaker, HasPlayer, "sexlab")
       AIFF.SetAnimationBusy(0, Main.GetActorName(speaker))
     EndIf
+    SetSexSceneState("off")
     UpdateThreadTable("end", "sexlab", tid)
 EndEvent
 
