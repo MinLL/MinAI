@@ -163,8 +163,7 @@ function ProcessIntegrations() {
         $type = $GLOBALS["gameRequest"][0];
         $scene = getScene($GLOBALS["HERIKA_NAME"]);
         $sceneDesc = $scene["description"];
-
-        if(!isset($sceneDesc)) {
+        if(!$sceneDesc) {
             if($scene["fallback"]) {
                 $sceneDesc = $scene["fallback"];
             } else {
