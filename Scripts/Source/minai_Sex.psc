@@ -21,10 +21,6 @@ float lastSexTalk
 Message minai_ConfirmSexMsg
 string lastTag
 
-; what are chances that random speaker will be female sex. 0 - female actors won't talk; 100 - only female actors will talk
-; todo make it mcm slider
-int commentFemaleWeight = 100
-
 int threadsPrevSpeedsMap
 ; {threadId: Actor} to track actors who will say something on after ostim scene. Need this because there is no guarantee the on ostim end event there will be running thread with actors
 int actorToSayOnEndMap
@@ -625,8 +621,6 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   string targetName = main.GetActorName(akTarget)
   If command == "ExtCmdMasturbate"
     Start1pSex(akSpeaker)
-  elseif command == "ExtCmdStartSexScene"
-    ; not sure why it was here but it didn't start actual scene, only set in conf_opts to true
   elseif command == "ExtCmdStartBlowjob"
     StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "blowjob")
   elseif command == "ExtCmdStartAnal"
