@@ -31,7 +31,7 @@ $GLOBALS["FUNCTIONS"][] = [
                     "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => ["target"],
+            "required" => [],
         ],
     ];
 
@@ -49,7 +49,7 @@ $GLOBALS["FUNCTIONS"][] = [
                     "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => ["target"],
+            "required" => [],
         ],
     ];
 
@@ -65,7 +65,7 @@ $GLOBALS["FUNCTIONS"][] = [
                     "enum" => $GLOBALS["nearby"]
                 ]
             ],
-            "required" => ["target"],
+            "required" => [],
         ],
     ];
 
@@ -116,7 +116,7 @@ foreach ($vibSettings as $strength) {
                                   "enum" => $GLOBALS["nearby"]
                               ]
                           ],
-					      "required" => ["target"],
+					      "required" => [],
 					      ],
 			     ];
   if ($canVibrate) {
@@ -143,7 +143,7 @@ foreach ($vibSettings as $strength) {
                   "description" => "Target NPC, Actor, or being",
                   "enum" => $GLOBALS["nearby"]
               ],
-              "required" => ["target"],
+              "required" => [],
           ],
       ]
   ];
@@ -171,7 +171,7 @@ $GLOBALS["FUNCTIONS"][] = [
                 "enum" => $GLOBALS["nearby"]
             ]
         ],
-        "required" => ["target"],
+        "required" => [],
     ],
 ];
 
@@ -189,7 +189,7 @@ $GLOBALS["FUNCTIONS"][] = [
                 "enum" => $GLOBALS["nearby"]
             ]
         ],
-        "required" => ["target"],
+        "required" => [],
     ],
 ];
 
@@ -208,7 +208,7 @@ $GLOBALS["FUNCTIONS"][] = [
                 "enum" => $GLOBALS["nearby"]
             ]
         ],
-        "required" => ["target"],
+        "required" => [],
     ],
 ];
 $GLOBALS["F_NAMES"]["ExtCmdUnequipGag"]="UnequipGag";
@@ -225,7 +225,7 @@ $GLOBALS["FUNCTIONS"][] = [
                 "enum" => $GLOBALS["nearby"]
             ]
         ],
-        "required" => ["target"],
+        "required" => [],
     ],
 ];
 $GLOBALS["F_NAMES"]["ExtCmdEquipVibrator"]="EquipVibrator";
@@ -242,7 +242,7 @@ $GLOBALS["FUNCTIONS"][] = [
                 "enum" => $GLOBALS["nearby"]
             ]
         ],
-        "required" => ["target"],
+        "required" => [],
     ],
 ];
 $GLOBALS["F_NAMES"]["ExtCmdUnequipVibrator"]="UnequipVibrator";
@@ -259,7 +259,7 @@ $GLOBALS["FUNCTIONS"][] = [
                 "enum" => $GLOBALS["nearby"]
             ]
         ],
-        "required" => ["target"],
+        "required" => [],
     ],
 ];
 $GLOBALS["F_NAMES"]["ExtCmdEquipBelt"]="EquipBelt";
@@ -276,7 +276,7 @@ $GLOBALS["FUNCTIONS"][] = [
                 "enum" => $GLOBALS["nearby"]
             ]
         ],
-        "required" => ["target"],
+        "required" => [],
     ],
 ];
 $GLOBALS["F_NAMES"]["ExtCmdUnequipBelt"]="UnequipBelt";
@@ -293,7 +293,7 @@ $GLOBALS["FUNCTIONS"][] = [
                 "enum" => $GLOBALS["nearby"]
             ]
         ],
-        "required" => ["target"],
+        "required" => [],
     ],
 ];
 $GLOBALS["F_NAMES"]["ExtCmdEquipBinder"]="EquipBinder";
@@ -310,7 +310,7 @@ $GLOBALS["FUNCTIONS"][] = [
                 "enum" => $GLOBALS["nearby"]
             ]
         ],
-        "required" => ["target"],
+        "required" => [],
     ],
 ];
 $GLOBALS["F_NAMES"]["ExtCmdUnequipBinder"]="UnequipBinder";
@@ -327,7 +327,7 @@ $GLOBALS["FUNCTIONS"][] = [
                 "enum" => $GLOBALS["nearby"]
             ]
         ],
-        "required" => ["target"],
+        "required" => [],
     ],
 ];
 if (IsConfigEnabled("allowDeviceLock")) {
