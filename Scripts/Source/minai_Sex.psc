@@ -1305,6 +1305,6 @@ string function buildSceneFallbackDescription(int ThreadID, string framework, st
   if(eventType == "startthread")
     return actorString + " begin sex scene: " + buildSceneString(sceneId, sceneTagsString, actionString)
   elseif(eventType == "scenechange")
-    return actorString + "changed the scene to " + buildSceneString(sceneId, sceneTagsString, actionString)
+    return actorString + " changed the scene to " + buildSceneString(sceneId, sceneTagsString, actionString)
   endif
 endfunction
