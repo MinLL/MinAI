@@ -2,6 +2,8 @@
 // We need access to gameRequest here, but it's not global.
 // Impl copied from main.php
 
+require_once(__DIR__.DIRECTORY_SEPARATOR."updateThreadsDB.php");
+
 function CreateContextTableIfNotExists() {
   $db = $GLOBALS['db'];
   $db->execQuery(
@@ -100,6 +102,10 @@ function ProcessIntegrations() {
         );
         $MUST_DIE=true;
     }
+    if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "updateThreadsDB") {
+        updateThreadsDB();
+        $MUST_DIE=true;
+    }
     if (isset($GLOBALS["gameRequest"]) && strtolower($GLOBALS["gameRequest"][0]) =="npc_talk") {
         $vars=explode("@",$GLOBALS["gameRequest"][3]);
         $tmp = explode(":", $vars[0]);
@@ -152,6 +158,37 @@ function ProcessIntegrations() {
                 'value' => time()
             )
         );
+    }
+    if (isset($GLOBALS["gameRequest"]) && str_starts_with(strtolower($GLOBALS["gameRequest"][0]), "sextalk")) {
+        $type = $GLOBALS["gameRequest"][0];
+        $scene = getScene($GLOBALS["HERIKA_NAME"]);
+        $sceneDesc = $scene["description"];
+        if(!$sceneDesc) {
+            if($scene["fallback"]) {
+                $sceneDesc = $scene["fallback"];
+            } else {
+                $sceneDesc = "{$scene["actors"]} are having sex.";
+            }
+            
+        }
+
+        $prompt = "";
+
+        switch($type) {
+            case "sextalk_scenechange": {
+                $prompt = "The Narrator: ";
+                
+                if(!$scene["prev_scene_id"]) {
+                    $prompt .= "{$scene["actors"]} started sex scene.";
+                } else {
+                    $prompt .= "{$scene["actors"]} changed position.";
+                }
+                $prompt .= " $sceneDesc";
+                break;
+            }
+        }
+
+        $GLOBALS["gameRequest"][3] = $prompt;
     }
     if ($MUST_DIE) {
         error_log("minai: Done procesing custom request");
