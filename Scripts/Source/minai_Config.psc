@@ -38,6 +38,11 @@ int radiantDialogueFrequencyOID
 int radiantDialogueChanceOID
 int autoUpdateDiaryOID
 int enableAISexOID
+int genderWeightCommentsOID
+int commentsRateOID
+int forceOrgasmCommentOID
+int forcePostSceneCommentOID
+int prioritizePlayerThreadOID
 
 ; Legacy globals
 GlobalVariable useCBPC
@@ -103,6 +108,22 @@ bool Property autoUpdateDiary = False Auto
 
 bool enableAISexDefault = true
 bool Property enableAISex = False Auto
+
+float genderWeightCommentsDefault = 50.0
+float Property genderWeightComments = 50.0 Auto
+
+float commentsRateDefault = 15.0
+float Property commentsRate = 15.0 Auto
+
+bool forceOrgasmCommentDefault = true
+bool Property forceOrgasmComment = true Auto
+
+bool forcePostSceneCommentDefault = true
+bool Property forcePostSceneComment = true Auto
+
+bool prioritizePlayerThreadDefault = true
+bool Property prioritizePlayerThread = true Auto
+
   
 Event OnConfigInit()
   main.Info("Building mcm menu.")
@@ -245,11 +266,20 @@ EndFunction
 
 
 Function RenderSexPage()
+  ; left column
   SetCursorFillMode(TOP_TO_BOTTOM)
   AddHeaderOption("Arousal Settings ")
   arousalForSexOID = AddSliderOption("Arousal Threshold for Sex", arousalForSex, "{0}")
   arousalForHarassOID = AddSliderOption("Arousal Threshold for Flirting/Harassment", arousalForHarass, "{0}")
   confirmSexOID = AddToggleOption("Ask before a sex scene is initiated", confirmSex)
+  ; right column
+  SetCursorPosition(1)
+  AddHeaderOption("Comments during sex")
+  genderWeightCommentsOID = AddSliderOption("Gender weight", genderWeightComments, "{0}")
+  commentsRateOID = AddSliderOption("Comments rate", commentsRate)
+  prioritizePlayerThreadOID = AddToggleOption("Prioritize comments in player's scene", prioritizePlayerThread)
+  forceOrgasmCommentOID = AddToggleOption("Force orgasm comment", forceOrgasmComment)
+  forcePostSceneCommentOID = AddToggleOption("Force post scene comment", forcePostSceneComment)
 EndFunction
 
 
@@ -406,6 +436,15 @@ Event OnOptionSelect(int oid)
   elseif oid == disableAIAnimationsOID
     disableAIAnimations = !disableAIAnimations
     SetToggleOptionValue(oid, disableAIAnimations)
+  elseif oid == forceOrgasmCommentOID
+    forceOrgasmComment = !forceOrgasmComment
+    SetToggleOptionValue(oid, forceOrgasmComment)
+  elseif oid == forcePostSceneCommentOID
+    forcePostSceneComment = !forcePostSceneComment
+    SetToggleOptionValue(oid, forcePostSceneComment)
+  elseif oid == prioritizePlayerThreadOID
+    prioritizePlayerThread = !prioritizePlayerThread
+    SetToggleOptionValue(oid, prioritizePlayerThread)
   EndIf
   string[] actions = JMap.allKeysPArray(aOIDMap)
   int i = 0
@@ -521,6 +560,21 @@ Event OnOptionDefault(int oid)
   elseif oid ==  radiantDialogueChanceOID
     radiantDialogueChance = radiantDialogueChanceDefault
     SetSliderOptionValue(radiantDialogueChanceOID, radiantDialogueChanceDefault, "{1}")
+  elseif oid == genderWeightCommentsOID
+    genderWeightComments = genderWeightCommentsDefault
+    SetSliderOptionValue(oid, genderWeightCommentsDefault, "{0}")
+  elseif oid == commentsRateOID
+    commentsRate = commentsRateDefault
+    SetSliderOptionValue(oid, commentsRateDefault, "{0}")
+  elseif oid == forceOrgasmCommentOID
+    forceOrgasmComment = forceOrgasmCommentDefault
+    SetToggleOptionValue(oid, forceOrgasmCommentDefault)
+  elseif oid == forcePostSceneCommentOID
+    forcePostSceneComment = forcePostSceneCommentDefault
+    SetToggleOptionValue(oid, forcePostSceneCommentDefault)
+  elseif oid == prioritizePlayerThreadOID
+    prioritizePlayerThread = prioritizePlayerThreadDefault
+    SetToggleOptionValue(oid, prioritizePlayerThreadDefault)
   EndIf
   string[] actions = JMap.allKeysPArray(aOIDMap)
   int i = 0
@@ -582,6 +636,16 @@ Event OnOptionHighlight(int oid)
     SetInfoText("Show a confirmation message before sex scenes start")
   elseif oid == disableAIAnimationsOID
     SetInfoText("Forces AI-FF animations to be disabled. There seems to be a CTD in the AIAgent DLL while resetting idle state sometimes, this avoids it.")
+  elseif oid == genderWeightCommentsOID
+    SetInfoText("Chances how often either gender npcs will talk. 0 - males only will talk. 100 - females only wil talk")
+  elseif oid == commentsRateOID
+    SetInfoText("Comments during sex scene cooldown in seconds. Example: If average AI response - 10 seconds, set this option to >10. Don't set too low it can consume a lot of resources and characters will talk non-stop...")
+  elseif oid == forceOrgasmCommentOID
+    SetInfoText("Ignore comments during sex cooldown, and request message on orgasm event immediately.")
+  elseif oid == forcePostSceneCommentOID
+    SetInfoText("Ignore comments during sex cooldown, and request message after sex scene ends.")
+  elseif oid == prioritizePlayerThreadOID
+    SetInfoText("If there are scenes with player involve, all comments will be within this scenes.")
   EndIf
   string[] actions = JMap.allKeysPArray(aOIDMap)
   int i = 0
@@ -655,6 +719,16 @@ Event OnOptionSliderOpen(int oid)
     SetSliderDialogStartValue(arousalForHarass)
     SetSliderDialogDefaultValue(arousalForHarassDefault)
     SetSliderDialogRange(0, 100)
+    SetSliderDialogInterval(1.0)
+  elseif oid == genderWeightCommentsOID
+    SetSliderDialogStartValue(genderWeightComments)
+    SetSliderDialogDefaultValue(genderWeightCommentsDefault)
+    SetSliderDialogRange(0, 100)
+    SetSliderDialogInterval(1.0)
+  elseif oid == commentsRateOID
+    SetSliderDialogStartValue(commentsRate)
+    SetSliderDialogDefaultValue(commentsRateDefault)
+    SetSliderDialogRange(0, 120)
     SetSliderDialogInterval(1.0)
   EndIf
   string[] actions = JMap.allKeysPArray(aOIDMap)
@@ -747,6 +821,14 @@ Event OnOptionSliderAccept(int oid, float value)
     arousalForHarass = value
     SetSliderOptionValue(oid, value, "{0}")
     StoreConfig("arousalForHarass", arousalForHarass)
+  elseif oid == genderWeightCommentsOID
+    genderWeightComments = value
+    SetSliderOptionValue(oid, value, "{0}")
+    StoreConfig("genderWeightComments", genderWeightComments)
+  elseif oid == commentsRateOID
+    commentsRate = value
+    SetSliderOptionValue(oid, value, "{0}")
+    StoreConfig("commentsRate", commentsRate)
   EndIf
     string[] actions = JMap.allKeysPArray(aOIDMap)
   int i = 0

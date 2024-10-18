@@ -16,7 +16,7 @@ minai_DeviousStuff devious
 Actor PlayerRef
 minai_Config config
 
-float lastDirtyTalk
+float lastSexTalk
 
 Message minai_ConfirmSexMsg
 string lastTag
@@ -26,6 +26,8 @@ string lastTag
 int commentFemaleWeight = 100
 
 int threadsPrevSpeedsMap
+; {threadId: Actor} to track actors who will say something on after ostim scene. Need this because there is no guarantee the on ostim end event there will be running thread with actors
+int actorToSayOnEndMap
 
 Function Maintenance(minai_MainQuestController _main)
   playerRef = Game.GetPlayer()
@@ -53,6 +55,7 @@ Function Maintenance(minai_MainQuestController _main)
   RegisterForModEvent("ostim_thread_end", "OStimManager")
 
   threadsPrevSpeedsMap = JValue.releaseAndRetain(threadsPrevSpeedsMap, JMap.object())
+  actorToSayOnEndMap = JValue.releaseAndRetain(actorToSayOnEndMap, JMap.object())
     
   slf = Game.GetFormFromFile(0xD62, "SexLab.esm") as SexLabFramework
   if slf != None
@@ -72,7 +75,7 @@ Function Maintenance(minai_MainQuestController _main)
   ; clean any threads from table
   UpdateThreadTable("clean")
   InitializeSexDescriptions()
-  lastDirtyTalk = 0.0
+  lastSexTalk = 0.0
   if (clothingMap == 0)
     Main.Debug("Initializing clothing map")
     clothingMap = JMap.object()
@@ -120,9 +123,11 @@ Function Maintenance(minai_MainQuestController _main)
   ; Temporarily disabled until bugs can be addressed
   aiff.RegisterAction("ExtCmdComeWithMe", "ComeWithMe", "Start Following Player", "General", 1, 0, 2, 5, 300, false, true)
   aiff.RegisterAction("ExtCmdEndComeWithMe", "EndComeWithMe", "End Following Player", "General", 1, 0, 2, 5, 300, false, true)
+  ; RegisterForUpdate()
 EndFunction
 
-
+; Event onUpdate()
+; EndEvent
 
 bool Function CanAnimate(actor akTarget)
   if (akTarget.IsOnMount())
@@ -767,7 +772,7 @@ EndFunction
 Event OStimManager(string eventName, string strArg, float numArg, Form sender)
   int ostimTid = numArg as int
   ; ostim thread with index 0 is reserved for player scenes
-  bool playerInvolved = ostimTid == 0
+  bool playerInvolved = isPlayerInvolved(ostimTid, "ostim")
   bool isRunning = OThread.IsRunning(ostimTid)
   string sceneId = strArg
   Main.Debug("oStim eventName: "+eventName+", strArg: "+strArg+", numArg: "+numArg as int+" sender: "+sender as actor )
@@ -777,6 +782,8 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
       if playerInvolved
         AIFF.ChillOut()
       EndIf
+      Actor[] actors = OThread.GetActors(ostimTid)
+      JMap.setForm(actorToSayOnEndMap, ostimTid, getWeightedRandomActorToSpeak(actors))
       UpdateThreadTable("startthread", "ostim", ostimTid)
       Main.Info("OStim scene startthread")
     else
@@ -795,7 +802,7 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
       ; we don't want to catch transition scenes they usually couple of seconds which isn't enough to have conversation
       if(!OMetadata.isTransition(sceneId))
         UpdateThreadTable("scenechange", "ostim", ostimTid)
-        sexTalkSceneChage(GetWeightedRandomActorToSpeak(actors))
+        sexTalkSceneChage(GetWeightedRandomActorToSpeak(actors), playerInvolved)
       endif
     else
       Main.Debug("OStim scene change failed")
@@ -814,7 +821,7 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
     Actor[] actors = OThread.GetActors(ostimTid)
     bool increase = newSpeed > prevSpeed
     if isRunning
-      sexTalkSpeedChange(GetWeightedRandomActorToSpeak(actors), increase)
+      sexTalkSpeedChange(GetWeightedRandomActorToSpeak(actors), playerInvolved, increase)
       Main.Info("Ostim speed change")
       setPrevSpeed(ostimTid, newSpeed)
     else
@@ -822,13 +829,17 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
     EndIf
   elseif (eventName == "ostim_actor_orgasm")   
     Actor OrgasmedActor = sender as Actor
-    sexTalkClimax(OrgasmedActor)
+    sexTalkClimax(OrgasmedActor, playerInvolved)
     Main.Info("Ostim actor orgasm: " + OrgasmedActor)
 
   elseif (eventName == "ostim_thread_end")  
     Main.Info("OStim scene ended")
-    UpdateThreadTable("end", "ostim", ostimTid)
     removePrevSpeed(ostimTid)
+    actor actorToSayOnEnd = JMap.getForm(actorToSayOnEndMap, ostimTid) as Actor
+    MiscUtil.PrintConsole("Thread #"+ostimTid+", isRunning: "+OThread.isRunning(ostimTid)+", and speaking actor: "+actorToSayOnEnd.GetDisplayName())
+    sexTalkOnEnd(actorToSayOnEnd, playerInvolved)
+    JMap.removeKey(actorToSayOnEndMap, ostimTid)
+    UpdateThreadTable("end", "ostim", ostimTid)
   EndIf
 EndEvent
 
@@ -846,16 +857,7 @@ EndFunction
 
 Event OnAnimationStart(int tid, bool HasPlayer)
   LoadSexlabDescriptions()
-  Actor[] actorList = slf.GetController(tid).Positions
-  int i = actorList.Length
-  bool bPlayerInScene=false
-  while(i > 0)
-    i -= 1
-    if (actorList[i]==playerRef) 
-      bPlayerInScene=true;
-    EndIf
-  Endwhile
-  if (bPlayerInScene)
+  if (HasPlayer)
     AIFF.ChillOut()
   EndIf
   Main.Info("Started Sex Scene")
@@ -907,9 +909,9 @@ Event OnStageStart(int tid, bool HasPlayer)
      ; VR users will have dirty talk through physics integration instead
      ; Reenabled this temporarily while figuring out female player character collisions during sex.
      ; Works much better for male atm, need to add different colliders
-     sexTalkSceneChage(GetWeightedRandomActorToSpeak(sortedActorList))
+     sexTalkSceneChage(GetWeightedRandomActorToSpeak(sortedActorList), HasPlayer)
     else
-      sexTalkSceneChage(GetWeightedRandomActorToSpeak(sortedActorList))
+      sexTalkSceneChage(GetWeightedRandomActorToSpeak(sortedActorList), HasPlayer)
     EndIf
   EndIf
 EndEvent
@@ -929,8 +931,10 @@ Event SLSOOrgasm(Form actorRef, Int tid)
   if (actorList.length < 1)
     return
   EndIf
+
+  bool hasPlayer = isPlayerInvolved(tid, "sexlab")
   
-  sexTalkClimax(actorInAction)
+  sexTalkClimax(actorInAction, hasPlayer)
 EndEvent
 
 Event PostSexScene(int tid, bool HasPlayer)
@@ -957,9 +961,9 @@ Event PostSexScene(int tid, bool HasPlayer)
   endwhile
   
   if actorWithBelt
-    sexTalkClimax(actorWithBelt, true)
+    sexTalkClimax(actorWithBelt, HasPlayer, true)
   else
-    sexTalkClimax(GetWeightedRandomActorToSpeak(sortedActorList))
+    sexTalkClimax(GetWeightedRandomActorToSpeak(sortedActorList), HasPlayer)
   EndIf
   lastTag = ""
 EndEvent
@@ -977,7 +981,7 @@ Event EndSexScene(int tid, bool HasPlayer)
     if bHasAIFF
       ; TODO make weighted random selection of actor to speak
       actor speaker = GetWeightedRandomActorToSpeak(sortedActorList)
-      sexTalkOnEnd(speaker)
+      sexTalkOnEnd(speaker, HasPlayer)
       AIFF.SetAnimationBusy(0, Main.GetActorName(speaker))
     EndIf
     UpdateThreadTable("end", "sexlab", tid)
@@ -1141,50 +1145,58 @@ function UpdateThreadTable(string type, string framework = "ostim", int ThreadID
   AIAgentFunctions.logMessage("command@ExtCmdUpdateThreadsTable@"+ jsonToSend +"@", "updateThreadsDB")
 endfunction
 
-function sexTalkClimax(actor speaker, bool chastity = false)
+function sexTalkClimax(actor speaker, bool hasPlayer, bool chastity = false)
   if(chastity)
-    SexTalk(speaker, "sextalk_climaxchastity")
+    SexTalk(speaker, "sextalk_climaxchastity", hasPlayer, config.forceOrgasmComment)
   else
-    SexTalk(speaker, "sextalk_climax")
+    SexTalk(speaker, "sextalk_climax", hasPlayer, config.forceOrgasmComment)
   endif
 endfunction
 
-function sexTalkSceneChage(actor speaker)
-  SexTalk(speaker, "sextalk_scenechange")
+function sexTalkSceneChage(actor speaker, bool hasPlayer)
+  SexTalk(speaker, "sextalk_scenechange", hasPlayer)
 endfunction
 
-function sexTalkSpeedChange(actor speaker, bool increase)
+function sexTalkSpeedChange(actor speaker, bool hasPlayer, bool increase)
   if(increase)
-    SexTalk(speaker, "sextalk_speedincrease")
+    SexTalk(speaker, "sextalk_speedincrease", hasPlayer)
   else
-    SexTalk(speaker, "sextalk_speeddecrease")
+    SexTalk(speaker, "sextalk_speeddecrease", hasPlayer)
   endif
   
 endfunction
 
-function sexTalkOnEnd(actor speaker)
-  SexTalk(speaker, "sextalk_end")
+function sexTalkOnEnd(actor speaker, bool hasPlayer)
+  SexTalk(speaker, "sextalk_end", hasPlayer, config.forcePostSceneComment)
 endfunction
 
-function sexTalkCollision(actor speaker, string promptToSay)
-  SexTalk(speaker, "chatnf_vr_1")
+function sexTalkCollision(actor speaker, bool hasPlayer, string promptToSay)
+  SexTalk(speaker, "chatnf_vr_1", hasPlayer)
 endfunction
 
 ; speaker is who actually will say llm lines, can be none if scene is player only
 ; chatType different AIFF custom chat topics see php files
-Function SexTalk(actor speaker, string chatType)
+Function SexTalk(actor speaker, string chatType, bool hasPlayer, bool ignoreSexTalkCooldown = false)
   if !bHasAIFF || !speaker
+    MiscUtil.PrintConsole("NO SPEAKER, " + chatType)
     return
   EndIf
 
-  ; Throttle on how often we should dirty talk incase people are switching animations
+  ; don't request if prioritizePlayerThread is true and there is no player involved
+  if(!hasPlayer && config.prioritizePlayerThread)
+    return
+  endif
+
+  ; Throttle on how often we should sex talk incase people are switching animations
   float currentTime = Utility.GetCurrentRealTime()
-  if currentTime - lastDirtyTalk > 5
-    lastDirtyTalk = currentTime
+  if currentTime - lastSexTalk > config.commentsRate || ignoreSexTalkCooldown
+    lastSexTalk = currentTime
     string speakerName = Main.GetActorName(speaker)
     Main.Debug("SexTalk() => " + speakerName + ": " + chatType)
+    MiscUtil.PrintConsole("SexTalk() => " + speakerName + ": " + chatType)
     Main.RequestLLMResponseNPC("", "", speakerName, chatType)
   else
+    MiscUtil.PrintConsole("SexTalk - THROTTLED")
     Main.Debug("SexTalk - THROTTLED")
   EndIf
 EndFunction
@@ -1235,7 +1247,8 @@ actor Function GetWeightedRandomActorToSpeak(actor[] actors)
   endif
 
   ; pick weighted type of npc who will talk
-  bool isFemale = Utility.RandomInt(1, 100) <= commentFemaleWeight
+  bool isFemale = Utility.RandomInt(1, 100) <= config.genderWeightComments
+  MiscUtil.PrintConsole("genderWeightComments: " + config.genderWeightComments)
 
   if(isFemale)
     return getRandomActor(femaleActors)
@@ -1306,5 +1319,13 @@ string function buildSceneFallbackDescription(int ThreadID, string framework, st
     return actorString + " begin sex scene: " + buildSceneString(sceneId, sceneTagsString, actionString)
   elseif(eventType == "scenechange")
     return actorString + " changed the scene to " + buildSceneString(sceneId, sceneTagsString, actionString)
+  endif
+endfunction
+
+bool function isPlayerInvolved(int ThreadID, string framework)
+  if(framework == "ostim")
+    return ThreadID == 0
+  else
+    return slf.FindPlayerController() == ThreadID
   endif
 endfunction

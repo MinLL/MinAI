@@ -186,6 +186,21 @@ function ProcessIntegrations() {
                 $prompt .= " $sceneDesc";
                 break;
             }
+            case "sextalk_speedincrease":
+                $prompt = "The Narrator: {$scene["actors"]} sex pace just became faster.";
+                break;
+            case "sextalk_speeddecrease":
+                $prompt = "The Narrator: {$scene["actors"]} sex pace just became slower.";
+                break;
+            case "sextalk_climax":
+                $prompt = "The Narrator: {$GLOBALS["HERIKA_NAME"]} reaches orgasm.";
+                break;
+            case "sextalk_climaxchastity":
+                $prompt = "The Narrator: {$GLOBALS["HERIKA_NAME"]} is frustrated they can't reach orgasm becasue of chastity belt.";
+                break;
+            case "sextalk_end":
+                $prompt = "The Narrator: Participants finished their sex.";
+                break;
         }
 
         $GLOBALS["gameRequest"][3] = $prompt;
