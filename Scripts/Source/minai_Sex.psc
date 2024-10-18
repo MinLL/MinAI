@@ -1294,7 +1294,7 @@ string function buildSceneFallbackDescription(int ThreadID, string framework, st
     int count = actors.length
     while(count > 0)
       count -= 1
-      string stageDescription = GetSexStageDescription(controller.Animation.FetchStage(controller.Stage)[0])
+      string stageDescription = GetSexStageDescription(controller.Animation.FetchStage(controller.Stage)[count])
 
       if(stageDescription != "")
         actionString += GetActorNameForSex(actors[count])+" is "+ stageDescription
