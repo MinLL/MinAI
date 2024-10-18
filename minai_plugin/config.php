@@ -52,6 +52,9 @@ $GLOBALS["radiance_rechat_p"] = 20;
 // Set this to force the xtts server to be the same for all profiles
 $GLOBALS["xtts_server_override"] = "";
 
+// Cleanup emotes like *smirking* from the LLM's response. Disabled by default as some LLM's use *'s for quotes.
+$GLOBALS["strip_emotes_from_output"] = false;
+
 // How many seconds after player input should radiant dialogue be blocked?
 // This is intended to prevent the situation where the player begins talking, and a radiant conversation is 
 // triggered before the LLM and TTS have finished with rthe response. For radiant dialogue frequency configuration,
