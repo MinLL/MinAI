@@ -1112,7 +1112,7 @@ function UpdateThreadTable(string type, string framework = "ostim", int ThreadID
   int count = actors.Length
   while i < count
     actor currActor = actors[i]
-    int currSex = currActor.GetActorBase().GetSex()
+    int currSex = GetGender(currActor)
     
     if(currSex == 0)
       maleActors = PapyrusUtil.PushActor(maleActors, currActor)
@@ -1212,7 +1212,7 @@ actor Function GetWeightedRandomActorToSpeak(actor[] actors)
   while count > 0
     count -= 1
     actor currActor = actors[count]
-    int currSex = currActor.GetActorBase().GetSex()
+    int currSex = GetGender(currActor)
     bool isMuted = false
 
     ; if ostim actor is muted
@@ -1334,4 +1334,15 @@ bool function isPlayerInvolved(int ThreadID, string framework)
   int playerThread = getPlayerThread(framework)
 
   return ThreadID == playerThread
+endfunction
+
+int function GetGender(actor targetActor)
+  int sex = targetActor.GetActorBase().GetSex()
+  
+  ; sex 1+ is considered female
+  if(sex >= 1)
+    return 1
+  endif
+
+  return sex
 endfunction
