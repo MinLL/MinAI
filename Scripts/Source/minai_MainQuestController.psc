@@ -143,14 +143,14 @@ EndFunction
 
 
 
-Function RequestLLMResponseNPC(string speaker, string eventLine, string target)
+Function RequestLLMResponseNPC(string speaker, string eventLine, string target, string type = "npc_talk")
   if bHasAIFF
     float currentTime = Utility.GetCurrentRealTime()
     string lineToSend = speaker + "@" + target + "@" + eventLine
     if currentTime - lastRequestTime > config.requestResponseCooldown
       lastRequestTime = currentTime
       Info("Requesting response from LLM: " + lineToSend)
-      AIAgentFunctions.requestMessageForActor(lineToSend, "npc_talk", target)
+      AIAgentFunctions.requestMessageForActor(lineToSend, type, target)
     EndIf
   elseif bHasMantella
     RegisterEvent(eventLine, "npc_chat")
@@ -188,6 +188,7 @@ EndFunction
 
 Function Log(String str, string lvl)
   Debug.Trace("[minai (" + lvl + ")]: " + str)
+  ; MiscUtil.PrintConsole("[minai (" + lvl + ")]: " + str)
 EndFunction
 
 Function Fatal(String str)

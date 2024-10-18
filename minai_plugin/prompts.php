@@ -1,6 +1,7 @@
 <?php
 require_once("config.php");
 require_once("util.php");
+require_once("sexPrompts.php");
 require_once("customintegrations.php");
 
 // Custom command / third party integrations support

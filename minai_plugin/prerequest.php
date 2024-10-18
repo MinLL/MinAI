@@ -9,7 +9,9 @@ Function SetRadiance($rechat_h, $rechat_p) {
 }
 
 Function GetNarratorConfigPath() {
-    $path = dirname((__FILE__)) . DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR;
+    // If use symlink, php code is actually in repo folder but included in wsl php server
+    // with just dirname((__FILE__)) it was getting directory of repo not php server 
+    $path = getcwd().DIRECTORY_SEPARATOR;
     $newConfFile=md5("Narrator Override");
     return $path . "conf".DIRECTORY_SEPARATOR."conf_$newConfFile.php";
 }
