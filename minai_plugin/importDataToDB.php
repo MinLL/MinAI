@@ -11,6 +11,7 @@ function importDataToDB($tableName, $folderName, $createQuery)
         file_put_contents($importedVersionsFile, "");
     }
     $importedVersions = file($importedVersionsFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    $importedVersions = is_array($importedVersions) ? $importedVersions : [];
 
     $iterator = new RecursiveIteratorIterator(
         new RecursiveDirectoryIterator($folder, RecursiveDirectoryIterator::SKIP_DOTS)
@@ -23,7 +24,7 @@ function importDataToDB($tableName, $folderName, $createQuery)
             $fileName = $fileInfo->getFileName();
             $extension = $fileInfo->getExtension();
             $filePath = $fileInfo->getRealPath();
-            if ($extension !== "csv" || (is_array($importedVersions) && in_array($fileName, $importedVersions))) {
+            if ($extension !== "csv" || in_array($fileName, $importedVersions)) {
                 continue;
             }
 
