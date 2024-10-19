@@ -23,7 +23,9 @@ function parseVoiceType($voiceTypeRaw) {
 
 if ($GLOBALS["HERIKA_NAME"] != "The Narrator") { // Users can configure the narrator on their own
     $voiceType = parseVoiceType(GetActorValue($GLOBALS["HERIKA_NAME"], "voiceType"));
-    if ($voiceType)
+    if ($voiceType) {
         $GLOBALS["TTS"]["FORCED_VOICE_DEV"] = $voiceType;
+        $GLOBALS["TTS"]["MELOTTS"]["voiceid"] = $voiceType;
+    }
 }
 ?>

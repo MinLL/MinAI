@@ -15,6 +15,7 @@ $GLOBALS["TTS_FALLBACK_FNCT"] = function($responseTextUnmooded, $mood, $response
     }
     error_log("minai: Voice type fallback to {$fallback} for {$GLOBALS["HERIKA_NAME"]}");
     $GLOBALS["TTS"]["FORCED_VOICE_DEV"] = $fallback;
+    $GLOBALS["TTS"]["MELOTTS"]["voiceid"] = $fallback;
     if(function_exists("tts")) {
         return tts($responseTextUnmooded, $mood, $responseText);
     }
