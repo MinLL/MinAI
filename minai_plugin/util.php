@@ -297,12 +297,12 @@ $GLOBALS["target"] = GetTargetActor();
 $GLOBALS["nearby"] = explode(",", GetActorValue("PLAYER", "nearbyActors"));
 
 function getScene($actor) {
-    $scene = $GLOBALS["db"]->fetchAll("SELECT * from minai_threads WHERE male_actors ~* '(,|^)$actor(,|$)' OR female_actors ~* '(,|^)$actor(,|$)'")[0];
+    $scene = $GLOBALS["db"]->fetchAll("SELECT * from minai_threads WHERE male_actors ~* '(,|^)$actor(,|$)' OR female_actors ~* '(,|^)$actor(,|$)'");
 
     if(!$scene) {
         return null;
     }
-
+    $scene = $scene[0];
     $sceneDesc = getSceneDesc($scene);
 
     if($scene["female_actors"] && $scene["male_actors"]) {
@@ -348,7 +348,6 @@ During sex {$GLOBALS["HERIKA_PERS"]}:
 }
 
 function getSceneDesc($scene) {
-    importScenesDescriptions();
     $query = "SELECT * FROM minai_scenes_descriptions WHERE ";
     $currSceneId = $scene["curr_scene_id"];
     
@@ -379,7 +378,6 @@ function replaceActorsNamesInSceneDesc($actors, $sceneDesc) {
 }
 
 function getXPersonality($currentName) {
-    importXPersonalities();
     $codename=strtr(strtolower(trim($currentName)),[" "=>"_","'"=>"+"]);
     $queryRet = $GLOBALS["db"]->fetchAll("SELECT * from minai_x_personalities WHERE id = '$codename'");
     $jsonXPersonality = null;

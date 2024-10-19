@@ -62,6 +62,9 @@ function ProcessIntegrations() {
         CreateThreadsTableIfNotExists();
         CreateActionsTableIfNotExists();
         CreateContextTableIfNotExists();
+        importXPersonalities();
+        importScenesDescriptions();
+
     }
     if (isset($GLOBALS["gameRequest"]) && strtolower($GLOBALS["gameRequest"][0]) == "storecontext") {
         $db = $GLOBALS['db'];

@@ -23,7 +23,7 @@ function importDataToDB($tableName, $folderName, $createQuery)
             $fileName = $fileInfo->getFileName();
             $extension = $fileInfo->getExtension();
             $filePath = $fileInfo->getRealPath();
-            if ($extension !== "csv" || in_array($fileName, $importedVersions)) {
+            if ($extension !== "csv" || (is_array($importedVersions) && in_array($fileName, $importedVersions))) {
                 continue;
             }
 
