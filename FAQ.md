@@ -18,3 +18,47 @@ NSFW actions are only enabled if you have either Sexlab or ostim installed. If y
 
 ## Sex actions specifically aren't working!
 In addition to the above sections, MinAI offers a feature to only expose sex / general perverted actions to the AI conditionally based on the NPC's arousal level (Disabled by default). Ensure that if you have set minimum arousal thresholds in the MCM, that the NPC is suitably aroused to use these actions.
+
+## How do I set use Mantella's XTTS with AIFF?
+AIFF is not compatible with the xtts from Mantella out of the box. The reason for this, is that AIFF requests the character name from xtts as the name of the voice type, where-as Mantella's XTTS expects the request to be for the base voice type. For example, for a guard in whiterun, AIFF would request a voice of type "whiterun_guard" from xtts, where-as mantella would expect "maleguard" instead.
+
+MinAI offers a feature allowing you to use the latents from Mantella with AIFF seamlessly. It does this by reading the base voicetype of the NPC's you encounter in the game, and saving them. When AIFF requests a voice from xtts with this mode enabled, it instead sends the base voice type of the actor instead, allowing the Mantella XTTS to work with AIFF.
+```
+// Force the voice type to use the actor's base voice type (eg, "maleguard") instead of "whiterun_guard".
+// Useful for compatibility with mantella's xtts configuration if you don't want to mess with setting up latents
+$GLOBALS["force_voice_type"] = true;
+```
+
+You can enable this by editing the config.php that comes with this mod, and setting "force_voice_type" to true. This requires a functioning mantella xtts setup to utilize. Note, that this substitution only works in-game, and will not work in the "TTS Troubleshooting" page. If you want to validate that things are working via the troubleshooting tool, you should update the voiceid of the npc you are testing with to the base voice type appropriate ("maleguard", "malecommoner", etc).
+
+MinAI also supports a feature to allow you to configure an automatic retry to the XTTS should a voice type be missing. This is intended to solve situations where mod added actors have base voice types that you do not have the latents for. In config.php, you can configure this like such:
+```
+// "genderRace" "voicetype"
+$GLOBALS["voicetype_fallbacks"] = [
+    "maleargonian" => "argonianmale",
+    "femaleargonian" => "argonianfemale",
+    "malekhajiit" => "khajiitmale",
+    "femalekhajiit" => "khajiitfemale",
+    "maleredguard" => "maleeventonedaccented",
+    "femaleredguard" => "femaleeventonedaccented",
+    "malenord" => "malecondescending",
+    "femalenord" => "femalecondescending",
+    "malebreton" => "malecommoner",
+    "femalebreton" => "femalecommoner",
+    "maleimperial" => "maleeventoned",
+    "femaleimperial" => "femaleeventoned",
+    "maleorc" => "maleorc",
+    "femaleorc" => "femaleorc",
+    "malealtmer" => "maleelfhaughty",
+    "femalealtmer" => "femaleelfthaughty",
+    "malehighelf" => "maleelfhaughty",
+    "femalehighelf" => "femaleelfthaughty",
+    "maledunmer" => "maledarkelf",
+    "femaledunmer" => "femaledarkelf",
+    "maledarkelf" => "maledarkelf",
+    "femaledarkelf" => "femaledarkelf",
+    "maleOld People Race" => "maleoldkindly",
+    "femaleOld People Race" => "femaleoldkindly"
+];
+```
+For example, the above configuration would have all male bretons that are missing a voice instead default to the "malecommoner" voice, thereby ensuring that all mod added bretons (No matter their voice type) have at least a default voice to use. Ensure that you have latents for each of the above voice types, and configure them appropriately if you do not.
