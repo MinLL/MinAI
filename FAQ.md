@@ -4,7 +4,7 @@
 1) Stop using llama 70b. Seriously, this model sucks. 90% of user complaints around LLM behavior are from this model.
 
 ## What are your favorite models?
-My preferred setup is to use [https://openrouter.ai/cohere/command-r-plus-08-2024](Command R+ 08-2024) for sapient NPC's, and [https://openrouter.ai/nousresearch/hermes-3-llama-3.1-405b](Hermes 405b) for followers.
+My preferred setup is to use [Command R+ 08-2024](https://openrouter.ai/cohere/command-r-plus-08-2024) for sapient NPC's, and [Hermes 405b](https://openrouter.ai/nousresearch/hermes-3-llama-3.1-405b) for followers.
 
 Command R+ is a reasonable general purpose LLM that is reasonably intelligent with action usage, while being fast and responsive and uncensored.
 
