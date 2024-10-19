@@ -1,16 +1,17 @@
 # Frequently Asked Questions
 
 ## My model is dumb / keeps spamming actions inappropriately!
-1) Stop using llama 70b. Seriously, this model sucks. 90% of user complaints around LLM behavior are from this model.
+This is caused by the LLM you are using. If you are using Llama 70b, be aware that 90% of user complaints around LLM behavior are from this model. It tends to be rather shallow in it's RP, and very aggressively use actions at inappropriate times.
+
 
 ## What are your favorite models?
 My preferred setup is to use [Command R+ 08-2024](https://openrouter.ai/cohere/command-r-plus-08-2024) for sapient NPC's, and [Hermes 405b](https://openrouter.ai/nousresearch/hermes-3-llama-3.1-405b) for followers.
 
-Command R+ is a reasonable general purpose LLM that is reasonably intelligent with action usage, while being fast and responsive and uncensored.
+Command R+ is a pretty solid general purpose LLM that is reasonably intelligent with action usage, while being fast and responsive and uncensored.
 
-Hermes 405b is the most intelligent uncensored model available at the moment, but is slower than Command R+.
+Hermes 405b is the most intelligent uncensored model available at the moment, but is slower and more expensive than Command R+.
 
-Honorable mention to [Wizard 8x22b](https://openrouter.ai/microsoft/wizardlm-2-8x22b). This is a fast, uncensored model that is strong at action usage, but is very chatty / verbose in its responses. May be a good choice if you like this sort of RP / dialogue.
+Honorable mention to [Wizard 8x22b](https://openrouter.ai/microsoft/wizardlm-2-8x22b). This is a fast, cheap uncensored model that is strong at action usage, but is very chatty / verbose in its responses. May be a good choice if you like this sort of RP / dialogue.
 
 
 ## Things aren't working at all! I keep seeing a message about first time setup complete every time I load the game.
