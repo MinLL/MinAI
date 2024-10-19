@@ -10,7 +10,7 @@ Command R+ is a reasonable general purpose LLM that is reasonably intelligent wi
 
 Hermes 405b is the most intelligent uncensored model available at the moment, but is slower than Command R+.
 
-Honorable mention to [https://openrouter.ai/microsoft/wizardlm-2-8x22b](Wizard 8x22b). This is a fast, uncensored model that is strong at action usage, but is very chatty / verbose in its responses. May be a good choice if you like this sort of RP / dialogue.
+Honorable mention to [Wizard 8x22b](https://openrouter.ai/microsoft/wizardlm-2-8x22b). This is a fast, uncensored model that is strong at action usage, but is very chatty / verbose in its responses. May be a good choice if you like this sort of RP / dialogue.
 
 
 ## Things aren't working at all! I keep seeing a message about first time setup complete every time I load the game.
