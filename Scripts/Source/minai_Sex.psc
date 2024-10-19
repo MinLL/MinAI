@@ -1106,16 +1106,15 @@ function UpdateThreadTable(string type, string framework = "ostim", int ThreadID
   string sceneId
   
   ; !!!Min to review sexlab implementation
-  if(framework == "sexlab")
+  if(framework == "sexlab") && bHasSexlab
     sslThreadController controller = slf.GetController(ThreadID)
   
     if (controller.Stage==1) 
       LoadSexlabDescriptions()
     EndIf
-    
     actors = slf.GetController(ThreadID).Positions
     sceneId = controller.Animation.FetchStage(controller.Stage)[0]
-  else
+  elseif bHasOstim
     actors = OThread.GetActors(ThreadID)
     sceneId = OThread.GetScene(ThreadID)
   endif
@@ -1299,7 +1298,7 @@ string function buildSceneFallbackDescription(int ThreadID, string framework, st
   string actorString = ""
   string actionString = ""
   string sceneTagsString = ""
-  if(framework == "ostim")
+  if(framework == "ostim") && bHasOstim
     sceneId = OThread.GetScene(ThreadID)
     string[] actionTypes = OMetadata.GetActionTypes(sceneId)
     string[] sceneTags = OMetadata.GetSceneTags(sceneId)
@@ -1307,7 +1306,7 @@ string function buildSceneFallbackDescription(int ThreadID, string framework, st
     actorString = JoinActorArray(actors, ", ")
     actionString = JoinStringArray(actionTypes, ", ")
     sceneTagsString = JoinStringArray(sceneTags, ", ")
-  else
+  elseif bHasSexlab
     sslThreadController controller = slf.GetController(ThreadID)
     string[] sceneTags= controller.Animation.GetRawTags()
     sceneId = controller.Animation.Name
