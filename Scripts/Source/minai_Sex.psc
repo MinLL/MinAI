@@ -1308,6 +1308,9 @@ string function buildSceneFallbackDescription(int ThreadID, string framework, st
     sceneTagsString = JoinStringArray(sceneTags, ", ")
   elseif bHasSexlab
     sslThreadController controller = slf.GetController(ThreadID)
+    if (!controller)
+      return ""
+    EndIf
     string[] sceneTags= controller.Animation.GetRawTags()
     sceneId = controller.Animation.Name
     Actor[] actors = slf.GetController(ThreadID).Positions
