@@ -1,5 +1,18 @@
 # Frequently Asked Questions
 
+## My model is dumb / keeps spamming actions inappropriately!
+1) Stop using llama 70b. Seriously, this model sucks. 90% of user complaints around LLM behavior are from this model.
+
+## What are your favorite models?
+My preferred setup is to use [https://openrouter.ai/cohere/command-r-plus-08-2024](Command R+ 08-2024) for sapient NPC's, and [https://openrouter.ai/nousresearch/hermes-3-llama-3.1-405b](Hermes 405b) for followers.
+
+Command R+ is a reasonable general purpose LLM that is reasonably intelligent with action usage, while being fast and responsive and uncensored.
+
+Hermes 405b is the most intelligent uncensored model available at the moment, but is slower than Command R+.
+
+Honorable mention to [https://openrouter.ai/microsoft/wizardlm-2-8x22b](Wizard 8x22b). This is a fast, uncensored model that is strong at action usage, but is very chatty / verbose in its responses. May be a good choice if you like this sort of RP / dialogue.
+
+
 ## Things aren't working at all! I keep seeing a message about first time setup complete every time I load the game.
 This is caused by you not having all of the hard requirements installed (Particularly Papyrus Tweaks). Validate that you have them installed, and that you have up to date versions of them. If you did not have them, install them and then revert to a save prior to installing MinAI.
 
