@@ -62,3 +62,9 @@ $GLOBALS["voicetype_fallbacks"] = [
 ];
 ```
 For example, the above configuration would have all male bretons that are missing a voice instead default to the "malecommoner" voice, thereby ensuring that all mod added bretons (No matter their voice type) have at least a default voice to use. Ensure that you have latents for each of the above voice types, and configure them appropriately if you do not.
+
+Here is an example of a correctly configured xtts in the UI:
+
+![image](https://github.com/user-attachments/assets/db7a8a66-ddba-4a97-bdd0-6962a336d6db)
+
+In this case, I am forcing this actor to use the "cruniqueodahviing" voice type. Note, that there is no trailing slash on the URL.
