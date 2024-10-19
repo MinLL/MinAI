@@ -1,7 +1,8 @@
 # Frequently Asked Questions
 
 ## My model is dumb / keeps spamming actions inappropriately!
-1) Stop using llama 70b. Seriously, this model sucks. 90% of user complaints around LLM behavior are from this model.
+This is caused by the LLM you are using. If you are using Llama 70b, be aware that 90% of user complaints around LLM behavior are from this model. It tends to be rather shallow in it's RP, and very aggressively use actions at inappropriate times.
+
 
 ## What are your favorite models?
 My preferred setup is to use [Command R+ 08-2024](https://openrouter.ai/cohere/command-r-plus-08-2024) for sapient NPC's, and [Hermes 405b](https://openrouter.ai/nousresearch/hermes-3-llama-3.1-405b) for followers.
