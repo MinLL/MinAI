@@ -12,6 +12,7 @@ Spell ContextSpell
 GlobalVariable minai_SapienceEnabled
 Faction followerFaction
 Faction nffFollowerFaction
+  actor playerRef
 	
 Event OnEffectStart(Actor akTarget, Actor akCaster)
   main = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_MainQuestController
@@ -25,6 +26,7 @@ Event OnEffectStart(Actor akTarget, Actor akCaster)
     Debug.Trace("[minai] SAPIENCE: Skipping OnEffectStart, not ready")
     return
   EndIf
+  playerRef = Game.GetPlayer()
   string targetName = Main.GetActorName(akTarget)
   main.Debug("SAPIENCE: OnEffectStart(" + targetName +")")
   ; Do one update for actors the first time we enter a zone. Introduce a little jitter to distribute load.
@@ -47,8 +49,26 @@ Event OnEffectFinish(Actor akTarget, Actor akCaster)
     Debug.Trace("[minai] SAPIENCE: Skipping OnEffectFinish, not ready")
     return
   EndIf
-  aiff.RemoveActorAI(targetName)
+  ; It's okay if the actor doesn't end up getting cleaned up here, they'll get cleaned up on location change.
+  ; This prevents the actor from flapping in and out of ai control when the magic effect falls off for some reason
+  if (ShouldRemoveActor(akTarget))
+    aiff.RemoveActorAI(targetName)
+  else
+    Main.Debug("Not removing actor " + targetName)
+  EndIf
 EndEvent
+
+bool Function ShouldRemoveActor(actor akTarget)
+  if (!playerRef || !akTarget)
+    return true
+  EndIf
+  bool distanceCheck = (akTarget.GetDistance(playerRef) <= 1024)
+  bool isAlive = (akTarget.GetKiller() == None)
+  bool isNotHostile = !(akTarget.IsHostileToActor(playerRef))
+  bool isSapienceEnabled = (minai_SapienceEnabled.GetValueInt() == 1)
+  Main.Debug("ShouldRemoveActor(" + Main.GetActorName(akTarget) + "): distanceCheck= " + distanceCheck +", isAlive=" + isAlive +", isNotHostile=" + isNotHostile + ", sapienceEnabled=" + isSapienceEnabled)
+  return (!distanceCheck || !isAlive || !isNotHostile || !isSapienceEnabled)
+EndFunction
 
 
 Event OnUpdate()
