@@ -240,14 +240,14 @@ EndEvent
 Event CommandDispatcher(String speakerName,String  command, String parameter)
   Main.Info("AIFF - CommandDispatcher(" + speakerName +", " + command +", " + parameter + ")")
   Actor akActor = AIAgentFunctions.getAgentByName(speakerName)
-  if !akActor
-    return
-  EndIf
-  SetContext(akActor)
   if vibratorCommands.Find(command) >= 0
     command = "MinaiGlobalVibrator"
   EndIf
   ExecuteAction(command)
+  if !akActor
+    return
+  EndIf
+  SetContext(akActor)
 EndEvent
 
 
