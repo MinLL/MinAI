@@ -11,12 +11,17 @@ actor playerRef
 bool bHasAIFF
 GlobalVariable minai_SapienceEnabled
 
+  
 function Maintenance(minai_MainQuestController _main)
   playerRef = Game.GetPlayer()
   main = _main
   config = Game.GetFormFromFile(0x0912, "MinAI.esp") as minai_Config
   if !config
     Main.Fatal("Could not load configuration - script version mismatch with esp")
+  EndIf
+  bHasAIFF = (Game.GetModByName("AIAgent.esp") != 255)
+  if !bHasAIFF
+    return
   EndIf
   aiff = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_AIFF
   aiffConfig = Game.GetFormFromFile(0x9EC2, "AIAgent.esp") as AIAgentMCMConfigScript
@@ -26,10 +31,16 @@ function Maintenance(minai_MainQuestController _main)
   minai_SapienceEnabled = Game.GetFormFromFile(0x091A, "MinAI.esp") as GlobalVariable
   RegisterForModEvent("AIFF_CommandReceived", "CommandDispatcher") ; Hook into AIFF - This is a separate quest, so we have to do this separately
   RegisterForModEvent("AIFF_TextReceived", "OnTextReceived")
-  bHasAIFF = (Game.GetModByName("AIAgent.esp") != 255)
   StartRadiantDialogue()
+  EnableCombatDialogue()
   ; RegisterForKey(aiffConfig._myKey2)
   ; RegisterForKey(aiffConfig._myKey)
+EndFunction
+
+
+Function EnableCombatDialogue()
+  ; Enable combat dialogue
+  AIAgentFunctions.setConf("_combat_dialogue",1,0,"")
 EndFunction
 
 
@@ -67,13 +78,19 @@ actor[] Function FindActors()
     if  allNearbyActors[i].IsInDialogueWithPlayer() ; Player is in dialogue with at least one nearby actor. Don't start radiance.
       return ret
     EndIf
-    if Sex.CanAnimate(allNearbyActors[i]) && allNearbyActors[i].GetCombatState() == 0 && !allNearbyActors[i].GetCurrentScene()
+    if Sex.CanAnimate(allNearbyActors[i]) && !allNearbyActors[i].GetCurrentScene()
+      Main.Debug("SAPIENCE: Found nearby actor for dialogue: " + Main.GetActorName(allNearbyActors[i]))
       nearbyActors = PapyrusUtil.PushActor(nearbyActors,allNearbyActors[i])
     EndIf
     i += 1
   EndWhile
-  ; Use bored chat instead for this
-  ; PapyrusUtil.PushActor(nearbyActors, playerRef) ; Let the NPC decide to talk to the player
+
+  if main.PlayerInCombat
+    ; Let the NPC decide to talk to the player if they're searching for / in combat
+    Main.Debug("SAPIENCE: Combat is active, adding player to radiant target list")
+    nearbyActors = PapyrusUtil.PushActor(nearbyActors, playerRef)
+  EndIf
+  
   if (nearbyActors.Length >= 2)
     ret = new actor[2]
     int actor1 = PO3_SKSEFunctions.GenerateRandomInt(0, nearbyActors.Length - 1)
@@ -87,6 +104,18 @@ actor[] Function FindActors()
   return ret
 EndFunction
 
+
+bool Function IsSearching(actor actor1, actor actor2)
+  return actor1.GetCombatState() == 2 || actor2.GetCombatState() == 2
+EndFunction
+
+bool Function IsInCombat(actor actor1, actor actor2)
+  return actor1.GetCombatState() == 1 || actor2.GetCombatState() == 1
+EndFunction
+
+bool Function IsFighting(actor actor1, actor actor2)
+  return actor1.IsHostileToActor(actor2) || actor2.IsHostileToActor(actor1)
+EndFunction
 
 Event OnUpdate()
   if minai_SapienceEnabled.GetValueInt() != 1 || !bHasAIFF
@@ -105,8 +134,23 @@ Event OnUpdate()
     if Utility.RandomFloat(0, 100) <= config.radiantDialogueChance    
       string actor1name = Main.GetActorName(nearbyActors[0])
       string actor2name = Main.GetActorName(nearbyActors[1])
-      Main.Info("SAPIENCE: Triggering Radiant Dialogue ( " + actor1name + " => " + actor2name + ")")
-      AIAgentFunctions.requestMessageForActor(actor2name, "radiant", actor1name)
+      bool actorsAreFighting = IsFighting(nearbyActors[0], nearbyActors[1])
+      if IsSearching(nearbyActors[0], nearbyActors[1]) && !actorsAreFighting
+        Main.Info("SAPIENCE: Triggering Search Dialogue ( " + actor1name + " => " + actor2name + ")")
+        AIAgentFunctions.requestMessageForActor(actor2name, "radiantsearchingfriend", actor1name)
+      elseif IsSearching(nearbyActors[0], nearbyActors[1]) && actorsAreFighting
+        Main.Info("SAPIENCE: Triggering Search Dialogue ( " + actor1name + " => " + actor2name + ")")
+        AIAgentFunctions.requestMessageForActor(actor2name, "radiantsearchinghostile", actor1name)
+      elseIf IsInCombat(nearbyActors[0], nearbyActors[1]) && !actorsAreFighting
+        Main.Info("SAPIENCE: Triggering Combat Dialogue ( " + actor1name + " => " + actor2name + ")")
+        AIAgentFunctions.requestMessageForActor(actor2name, "radiantcombatfriend", actor1name)
+      elseIf IsInCombat(nearbyActors[0], nearbyActors[1]) && actorsAreFighting
+        Main.Info("SAPIENCE: Triggering Combat Dialogue ( " + actor1name + " => " + actor2name + ")")
+        AIAgentFunctions.requestMessageForActor(actor2name, "radiantcombathostile", actor1name)
+      else
+        Main.Info("SAPIENCE: Triggering Radiant Dialogue ( " + actor1name + " => " + actor2name + ")")
+        AIAgentFunctions.requestMessageForActor(actor2name, "radiant", actor1name)
+      EndIf
       ; Set a longer delay after triggering a rechat to avoid overwhelming AIFF if the player has the cooldown set too low.
       ; This will be overridden by OnTextReceived with the proper cooldown after the LLM responds.
       StartNextUpdate(60.0)

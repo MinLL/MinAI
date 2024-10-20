@@ -132,17 +132,55 @@ function ProcessIntegrations() {
             ]
         ];
     }
-    if (isset($GLOBALS["gameRequest"]) && strtolower($GLOBALS["gameRequest"][0]) == "radiant") {
+    if (isset($GLOBALS["gameRequest"]) && in_array(strtolower($GLOBALS["gameRequest"][0]), ["radiant", "radiantsearchinghostile", "radiantsearchingfriend", "radiantcombathostile", "radiantcombatfriend"])) {
         if (time() > GetLastInput() + $GLOBALS["input_delay_for_radiance"]) {
             // $GLOBALS["HERIKA_NAME"] is npc1
             $GLOBALS["HERIKA_TARGET"] = explode(":", $GLOBALS["gameRequest"][3])[3];
-            error_log("minai: Starting radiant dialogue between {$GLOBALS["HERIKA_NAME"]} and {$GLOBALS["HERIKA_TARGET"]}");
+            if ($GLOBALS["HERIKA_TARGET"] == $GLOBALS["HERIKA_NAME"])
+                $GLOBALS["HERIKA_TARGET"] = $GLOBALS["PLAYER_NAME"];
+            error_log("minai: Starting {$GLOBALS["gameRequest"][0]} dialogue between {$GLOBALS["HERIKA_NAME"]} and {$GLOBALS["HERIKA_TARGET"]}");
             $GLOBALS["PROMPTS"]["radiant"]= [
                 "cue"=>[
                     "write dialogue for {$GLOBALS["HERIKA_NAME"]}.{$GLOBALS["TEMPLATE_DIALOG"]}  "
                 ], 
                 "player_request"=>[    
                     "The Narrator: {$GLOBALS["HERIKA_NAME"]} starts a dialogue with {$GLOBALS["HERIKA_TARGET"]} about a random topic",
+                ]
+            ];
+            $GLOBALS["PROMPTS"]["radiantsearchinghostile"]= [
+                "cue"=>[
+                    "write dialogue for {$GLOBALS["HERIKA_NAME"]} who is responding in a hostile, and concerned manner.{$GLOBALS["TEMPLATE_DIALOG"]}  "
+                ], 
+                "player_request"=>[    
+                    "The Narrator: {$GLOBALS["HERIKA_NAME"]} is currently searching the area for hostiles, and asks who is there?",
+                    "The Narrator: {$GLOBALS["HERIKA_NAME"]} is currently searching the area for hostiles, and starts threatening what he's going to do when he finds them",
+                ]
+            ];
+            $GLOBALS["PROMPTS"]["radiantsearchingfriend"]= [
+                "cue"=>[
+                    "write dialogue for {$GLOBALS["HERIKA_NAME"]} who is responding in a concerned manner.{$GLOBALS["TEMPLATE_DIALOG"]}  "
+                ], 
+                "player_request"=>[    
+                    "The Narrator: {$GLOBALS["HERIKA_NAME"]} is currently searching the area for hostiles, and starts a dialogue with their ally {$GLOBALS["target"]} about this topic",
+                ]
+            ];
+            $GLOBALS["PROMPTS"]["radiantcombathostile"]= [
+                "cue"=>[
+                    "write dialogue for {$GLOBALS["HERIKA_NAME"]} who is responding in a hostile and combative manner.{$GLOBALS["TEMPLATE_DIALOG"]}  "
+                ], 
+                "player_request"=>[    
+                    "The Narrator: {$GLOBALS["HERIKA_NAME"]} is engaged in deadly combat with {$GLOBALS["target"]} and taunts them",
+                    "The Narrator: {$GLOBALS["HERIKA_NAME"]} is engaged in deadly combat with {$GLOBALS["target"]} and trash-talks them",
+                    "The Narrator: {$GLOBALS["HERIKA_NAME"]} is engaged in deadly combat with {$GLOBALS["target"]} and boasts about what they will do after {$GLOBALS["HERIKA_NAME"]} has defeated them ",
+                ]
+            ];
+            $GLOBALS["PROMPTS"]["radiantcombatfriend"]= [
+                "cue"=>[
+                    "write dialogue for {$GLOBALS["HERIKA_NAME"]} who is responding in a tense, serious manner.{$GLOBALS["TEMPLATE_DIALOG"]}  "
+                ], 
+                "player_request"=>[    
+                    "The Narrator: {$GLOBALS["HERIKA_NAME"]} is teamed up with {$GLOBALS["target"]} in deadly combat against someone and talks about the battle",
+                    "The Narrator: {$GLOBALS["HERIKA_NAME"]} is teamed up with {$GLOBALS["target"]} in deadly combat against someone and asks for help",
                 ]
             ];
             StoreRadiantActors($GLOBALS["HERIKA_TARGET"], $GLOBALS["HERIKA_NAME"]);

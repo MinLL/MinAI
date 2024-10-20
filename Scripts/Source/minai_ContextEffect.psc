@@ -18,7 +18,7 @@ Event OnEffectStart(Actor akTarget, Actor akCaster)
     return
   EndIf
   string targetName = Main.GetActorName(akTarget)
-  main.Debug("OnEffectStart(" + targetName +")")
+  main.Debug("Context OnEffectStart(" + targetName +")")
   ; Do one update for actors the first time we enter a zone. Introduce a little jitter to distribute load.
   int updateTime = 2 + Utility.RandomInt(0, 5)
   RegisterForSingleUpdate(updateTime)
@@ -26,6 +26,7 @@ EndEvent
 
 
 Event OnEffectFinish(Actor akTarget, Actor akCaster)
+  Main.Debug("Context OnEffectFinish( " + Main.GetActorName(akTarget) + ")")
   UnregisterForUpdate()
   DisableSelf(akTarget)
 EndEvent
@@ -49,23 +50,24 @@ Event OnUpdate()
   string targetName = Main.GetActorName(akTarget)
   Main.Debug("Context OnUpdate (" + targetName +")")
   if(!aiff || !akTarget.Is3DLoaded() || !akTarget.HasSpell(contextSpell))
+    Main.Debug("Context Safeguard hit - aborting")
     DisableSelf(akTarget)
     return
   endif
-  actor[] nearbyActors = AIAgentFunctions.findAllNearbyAgents()
   ; clean up follow, since it can be override or npc has entered a scene
   aiff.CheckIfActorShouldStillFollow(akTarget)
-  if nearbyActors.Find(akTarget)
+  if AIAgentFunctions.getAgentByName(targetName)
     Main.Debug("Updating context for managed NPC: " + targetName)
     ; sex = (Self as Quest) as minai_Sex
     aiff.SetContext(akTarget)
-    nearbyActors = AIAgentFunctions.findAllNearbyAgents()
-    if(!nearbyActors.Find(akTarget))
+    if !AIAgentFunctions.getAgentByName(targetName)
+      Main.Debug("Actor " + targetName + " went away: Removing context tracking")
       DisableSelf(akTarget)
     else
       RegisterForSingleUpdate(aiff.ContextUpdateInterval)
     endif
   Else
+    Main.Debug("Actor " + targetName + " went away: Removing context tracking")
     DisableSelf(akTarget)
   EndIf
   Main.Debug("Context OnUpdate(" + targetName +") END")

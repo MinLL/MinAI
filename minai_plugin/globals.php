@@ -6,11 +6,11 @@ $GLOBALS["TTS_FALLBACK_FNCT"] = function($responseTextUnmooded, $mood, $response
         $GLOBALS["db"] = new sql();
     require_once("config.php");
     require_once("util.php");
-    $race = strtolower(GetActorValue($GLOBALS["HERIKA_NAME"], "race"));
+    $race = str_replace(" ", "", strtolower(GetActorValue($GLOBALS["HERIKA_NAME"], "race")));
     $gender = strtolower(GetActorValue($GLOBALS["HERIKA_NAME"], "gender"));
     $fallback = $GLOBALS["voicetype_fallbacks"][$gender.$race];
     if (!$fallback) {
-        error_log("Warning: Could not find fallback for {$gender}{$race}");
+        error_log("minai: Warning: Could not find fallback for {$gender}{$race}");
         return;
     }
     error_log("minai: Voice type fallback to {$fallback} for {$GLOBALS["HERIKA_NAME"]}");

@@ -24,6 +24,8 @@ bool bHasMantella = False;
 bool bHasAIFF = False;
 float lastRequestTime
 actor[] nearbyAI
+bool Property PlayerInCombat Auto
+  
 Event OnInit()
   Maintenance()
 EndEvent
