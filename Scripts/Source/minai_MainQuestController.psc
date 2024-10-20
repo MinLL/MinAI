@@ -51,6 +51,7 @@ Function Maintenance()
   RegisterForModEvent("MinAI_RequestResponse", "OnRequestResponse")
   RegisterForModEvent("MinAI_RequestResponseDialogue", "OnRequestResponseDialogue")
   RegisterForModEvent("MinAI_SetContext", "OnSetContext")
+  RegisterForModEvent("MinAI_SetContextNPC", "OnSetContextNPC")      
   RegisterForModEvent("MinAI_RegisterAction", "OnRegisterAction")
   ; RegisterTestAction()
   Info("Checking for installed mods...")
@@ -290,13 +291,32 @@ EndEvent
 Event OnSetContext(string modName, string eventKey, string eventValue, int ttl)
   Info("OnSetContext(" + modName + " => " + eventKey + " (TTL: " + ttl + ")): " + eventValue)
   if bHasAIFF
-    minAIFF.StoreContext(modName, eventKey, eventValue, ttl)
+    minAIFF.StoreContext(modName, eventKey, eventValue, "everyone", ttl)
   elseif bHasMantella
     ; Not persistent, but better than nothing for mantella users
     RegisterEvent(eventValue, "info_context")
   endif
 EndEvent
 
+; Set persistent context to be included in every LLM request for a specific NPC until TTL expires.
+; int handle = ModEvent.Create("MinAI_SetContextNPC")
+;  if (handle)
+;    ModEvent.PushString(handle, modName)
+;    ModEvent.PushString(handle, eventKey)
+;    ModEvent.PushString(handle, eventValue)
+;    ModEvent.PushString(handle, npcName)
+;    ModEvent.PushInt(handle, ttl)
+;    ModEvent.Send(handle)
+;  endIf
+Event OnSetContextNPC(string modName, string eventKey, string eventValue, string npcName, int ttl)
+  Info("OnSetContextNPC(" + modName + " => " + eventKey + " (TTL: " + ttl + ") ["+npcName+"]): " + eventValue)
+  if bHasAIFF
+    minAIFF.StoreContext(modName, eventKey, eventValue, npcName, ttl)
+  elseif bHasMantella
+    ; Not persistent, but better than nothing for mantella users
+    RegisterEvent(eventValue, "info_context")
+  endif
+EndEvent
 
 
 ; Register an action

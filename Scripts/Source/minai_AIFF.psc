@@ -155,6 +155,9 @@ Function CheckIfActorShouldStillFollow(actor akNpc)
   ElseIf (akNpc.IsInFaction(FollowFaction) && akNpc.GetCurrentPackage() != FollowPackage)
     Main.Debug("[FollowTarget] Npc is not following anyone, End following target")
     EndFollowTarget(akNpc)
+  ElseIf (akNpc.GetCurrentPackage() == FollowPackage && !akNpc.IsInFaction(FollowFaction))
+    Main.Debug("[FollowTarget] Still following target, but not in faction, End following target")
+    EndFollowTarget(akNpc)  
   EndIf
 EndFunction
 
@@ -612,7 +615,7 @@ EndEvent
 
 
 
-Function StoreContext(string modName, string eventKey, string eventValue, int ttl)
+Function StoreContext(string modName, string eventKey, string eventValue, string npcName, int ttl)
   if (!IsInitialized())
     Main.Info("StoreContext() - Still Initializing.")
     return
@@ -621,7 +624,7 @@ Function StoreContext(string modName, string eventKey, string eventValue, int tt
     return
   EndIf
   Main.Debug("StoreContext(" + modName +", " + eventKey + ", " + ttl +"): " + eventValue)
-  AIAgentFunctions.logMessage(modName + "@" + eventKey + "@" + eventValue + "@" + ttl, "storecontext")
+  AIAgentFunctions.logMessage(modName + "@" + eventKey + "@" + eventValue + "@" + npcName + "@" + ttl, "storecontext")
 EndFunction
 
 
