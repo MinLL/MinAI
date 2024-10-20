@@ -1349,6 +1349,8 @@ endfunction
 function onSceneChange(int ThreadID, string framework)
   UpdateThreadTable("scenechange", sexlabType, ThreadID)
   bool playerInvolved = isPlayerInvolved(ThreadID, framework)
+  ; in case if any framework need to block sex talk during scene change
+  bool skipSexTalk = false
   if(playerInvolved)
     AIFF.ChillOut()
   endif
@@ -1357,21 +1359,14 @@ function onSceneChange(int ThreadID, string framework)
   if(framework == ostimType)
     actors = OThread.GetActors(ThreadID)
   elseif(framework == sexlabType)
-    actors = slf.GetController(ThreadID).Positions
-  endif
-  ; do we really need this check for sexlab?
-  ; if (sortedActorList.length < 1)
-  ;   return
-  ; EndIf
+    sslThreadController controller = slf.GetController(ThreadID)
+    actors = controller.Positions
 
-  ; we don't to call VR here, right? We still log VR events in context, sexTalk is triggered by events
-  ; if (controller.Stage < (controller.Animation.StageCount()))
-  ;   if bHasAIFF && AiAgentFunctions.isGameVR() 
-  ;    ; VR users will have dirty talk through physics integration instead
-  ;    ; Reenabled this temporarily while figuring out female player character collisions during sex.
-  ;    ; Works much better for male atm, need to add different colliders
-  ;    sexTalkSceneChage(GetWeightedRandomActorToSpeak(sortedActorList), HasPlayer, sexlabType)
-  ; endif
+    ; we don't want to fire scene change sex talk on last sexlab stage since it will be orgasm stage for actors, where orgasm sex talk will be fired
+    if (controller.Stage == controller.Animation.StageCount())
+      skipSexTalk
+    endif
+  endif
 
   int i = 0
   while i < actors.Length
@@ -1381,5 +1376,7 @@ function onSceneChange(int ThreadID, string framework)
     i += 1
   EndWhile
 
-  sexTalkSceneChage(GetWeightedRandomActorToSpeak(actors), playerInvolved, framework)
+  if(skipSexTalk)
+    sexTalkSceneChage(GetWeightedRandomActorToSpeak(actors), playerInvolved, framework)
+  endif
 endfunction
