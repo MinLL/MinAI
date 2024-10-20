@@ -365,7 +365,7 @@ function getSceneDesc($scene) {
     $query .= "= '$currSceneId'";
     $queryRet = $GLOBALS["db"]->fetchAll($query);
     if ($queryRet)
-        return queryRet[0]["description"];
+        return $queryRet[0]["description"];
     return "";
 }
 
