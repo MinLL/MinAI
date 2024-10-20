@@ -6,7 +6,7 @@ require_once("deviousnarrator.php");
 $target = GetTargetActor();
 // If the eldritch narrator is active, only they have control over the devices.
 $eldritch = IsEldritchNarratorActive();
-$canVibrate = (CanVibrate($target) && (!$eldritch || ($eldritch && $GLOBALS["HERIKA_NAME"] == "The Narrator")));
+$canVibrate = (CanVibrate($target) && ((!$eldritch && !isset($GLOBALS["devious_narrator"])) || ($eldritch && $GLOBALS["HERIKA_NAME"] == "The Narrator")));
 
   
 $GLOBALS["F_NAMES"]["ExtCmdShock"]="Shock";

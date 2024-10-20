@@ -1,6 +1,7 @@
 <?php
 
 Function SetTelvanniNarrator() {
+    $GLOBALS["devious_narrator"]="telvanni";
     $eyepenalty = GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleEyePenalty");       
     $eyereward = GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleEyeReward");
     $eyescore = GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleEyeScore");
@@ -39,6 +40,7 @@ Function SetTelvanniNarrator() {
 
 
 Function SetEldritchNarrator() {
+    $GLOBALS["devious_narrator"]="eldritch";
     // Overwrite narrator personality
     error_Log("Using eldritch narrator");
     $personality = "";
@@ -93,9 +95,8 @@ Function ShouldUseDeviousNarrator() {
 }
 
 Function IsEldritchNarratorActive() {
-    $questState = intval(GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleGlobal"));
-    $eldritchScore = intval(intval($questState) / 10);
-    return (IsModEnabled("DeviouslyAccessible") && ($eldritchScore != 0));
+    error_log("minai: Narrator={$GLOBALS["devious_narrator"]}");
+    return (IsModEnabled("DeviouslyAccessible") && isset($GLOBALS["devious_narrator"]) && $GLOBALS["devious_narrator"] == "eldritch");
 }
 
 Function EnableDeviousNarratorActions() {

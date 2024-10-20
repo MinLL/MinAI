@@ -64,4 +64,9 @@ elseif (IsRadiant()) {
 
 SetNarratorProfile();
 
+require_once("deviousnarrator.php");
+if (ShouldUseDeviousNarrator()) {
+    SetDeviousNarrator();
+}
+
 ?>

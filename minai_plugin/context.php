@@ -409,10 +409,5 @@ foreach ($nullValues as $n) {
 $GLOBALS["contextDataFull"] = array_values($GLOBALS["contextDataFull"]);
 
 
-require_once("deviousnarrator.php");
-if (ShouldUseDeviousNarrator()) {
-    SetDeviousNarrator();
-}
-
 require "command_prompt_custom.php";
 ?>
