@@ -64,10 +64,10 @@ bool Function ShouldRemoveActor(actor akTarget)
   EndIf
   bool distanceCheck = (akTarget.GetDistance(playerRef) <= 1024)
   bool isAlive = (akTarget.GetKiller() == None)
-  bool isNotHostile = !(akTarget.IsHostileToActor(playerRef))
+  ; bool isNotHostile = !(akTarget.IsHostileToActor(playerRef))
   bool isSapienceEnabled = (minai_SapienceEnabled.GetValueInt() == 1)
-  Main.Debug("ShouldRemoveActor(" + Main.GetActorName(akTarget) + "): distanceCheck= " + distanceCheck +", isAlive=" + isAlive +", isNotHostile=" + isNotHostile + ", sapienceEnabled=" + isSapienceEnabled)
-  return (!distanceCheck || !isAlive || !isNotHostile || !isSapienceEnabled)
+  Main.Debug("ShouldRemoveActor(" + Main.GetActorName(akTarget) + "): distanceCheck=" + distanceCheck +", isAlive=" + isAlive +  ", sapienceEnabled=" + isSapienceEnabled)
+  return (!distanceCheck || !isAlive || !isSapienceEnabled) ; || !isNotHostile
 EndFunction
 
 
