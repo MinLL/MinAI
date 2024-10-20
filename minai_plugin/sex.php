@@ -13,13 +13,13 @@ if ((IsModEnabled("Sexlab") || IsModEnabled("Ostim")) && ((IsEnabled("PLAYER", "
     RegisterAction("ExtCmdPutOnClothes");
     RegisterAction("ExtCmdRemoveClothes");
 
-    if (!IsFollower($GLOBALS['HERIKA_NAME'])) {
+    if (!IsFollower($GLOBALS['HERIKA_NAME']) && $GLOBALS["target"] == $GLOBALS["PLAYER_NAME"]) {
         if (IsFollowing($GLOBALS['HERIKA_NAME'])) {
-            RegisterAction("ExtCmdEndComeWithMe");
+            RegisterAction("ExtCmdEndFollow");
         } else {
             if (!IsInScene($GLOBALS['HERIKA_NAME'])) {
                 error_log($GLOBALS['HERIKA_NAME']." is not in a scene");
-                RegisterAction("ExtCmdComeWithMe");
+                RegisterAction("ExtCmdFollow");
             } else {
                 error_log($GLOBALS['HERIKA_NAME']." is in a scene");
             }
@@ -659,42 +659,42 @@ $GLOBALS["FUNCTIONS"][] = [
 $GLOBALS["FUNCRET"]["ExtCmdPutOnClothes"]=$GLOBALS["GenericFuncRet"];
 
 
-$GLOBALS["F_NAMES"]["ExtCmdComeWithMe"]="ComeWithMe";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdComeWithMe"]="Walking or escorting target to places, only do this if target asks or agrees";
+$GLOBALS["F_NAMES"]["ExtCmdFollow"]="Follow";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdFollow"]="Begin following the target to another location";
 $GLOBALS["FUNCTIONS"][] = [
-        "name" => $GLOBALS["F_NAMES"]["ExtCmdComeWithMe"],
-        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdComeWithMe"],
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdFollow"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdFollow"],
         "parameters" => [
             "type" => "object",
             "properties" => [
                 "target" => [
                     "type" => "string",
                     "description" => "Target Actor",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
             "required" => [],
         ],
     ];
-$GLOBALS["FUNCRET"]["ExtCmdComeWithMe"]=$GLOBALS["GenericFuncRet"];
+$GLOBALS["FUNCRET"]["ExtCmdFollow"]=$GLOBALS["GenericFuncRet"];
 
-$GLOBALS["F_NAMES"]["ExtCmdEndComeWithMe"]="EndComeWithMe";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdEndComeWithMe"]="End ComeWithMe, walking or escorting target";
+$GLOBALS["F_NAMES"]["ExtCmdStopFollowing"]="StopFollowing";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStopFollowing"]="Stop following the target";
 $GLOBALS["FUNCTIONS"][] = [
-        "name" => $GLOBALS["F_NAMES"]["ExtCmdEndComeWithMe"],
-        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdEndComeWithMe"],
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdStopFollowing"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStopFollowing"],
         "parameters" => [
             "type" => "object",
             "properties" => [
                 "target" => [
                     "type" => "string",
                     "description" => "Target Actor",
-                    "enum" => $GLOBALS["FUNCTION_PARM_INSPECT"]
+                    "enum" => $GLOBALS["nearby"]
                 ]
             ],
             "required" => [],
         ],
     ];
-$GLOBALS["FUNCRET"]["ExtCmdEndComeWithMe"]=$GLOBALS["GenericFuncRet"];
+$GLOBALS["FUNCRET"]["ExtCmdStopFollowing"]=$GLOBALS["GenericFuncRet"];
 ?>
 
