@@ -78,6 +78,7 @@ Function Maintenance(minai_MainQuestController _main)
     Main.Error("Could not load null voice type")
   EndIf
   if isInitialized
+    AIAgentFunctions.logMessage("initializing","minai_init")
     RegisterForSingleUpdate(playerContextUpdateInterval)
   EndIf
   if (Game.GetModByName("MinAI_AIFF.esp") != 255)

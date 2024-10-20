@@ -5,11 +5,13 @@ minai_AIFF aiff
 minai_Sex  sex
 minai_DeviousStuff devious
 minai_Config config
-
+DefeatConfig Defeat
+  
 actor playerRef
 bool bHasAIFF
 bool bHasNFF
-
+bool bHasDefeat
+  
 nwsFollowerControllerScript nff
 
 function Maintenance(minai_MainQuestController _main)
@@ -24,9 +26,14 @@ function Maintenance(minai_MainQuestController _main)
   devious = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_DeviousStuff
   Main.Info("Initializing Combat Management Module.")
   bHasAIFF = (Game.GetModByName("AIAgent.esp") != 255)
+  bHasDefeat = (Game.GetModByName("SexlabDefeat.esp") != 255)
+  if bHasDefeat
+    Defeat = DefeatUtil.GetDefeat()
+  EndIf
   RegisterForModEvent("DefeatPostAssault", "OnDefeat")
   RegisterForModEvent("da_StartRecoverSequence", "OnDefeatRecoverSequence")
   RegisterForModEvent("AnimationEnd_Defeat", "OnDefeatAnimationEnd")
+  aiff.SetModAvailable("SexlabDefeat", bHasDefeat)
 EndFunction
 
 event OnDefeatRecoverSequence(Form sender, Form theForm, int theInt, string theString)
@@ -65,3 +72,19 @@ string Function GetFactionsForActor(actor akTarget)
   return "";
 EndFunction
 
+
+Function OnCombatStart()
+  Main.Info("Combat: OnCombatStart()")
+EndFunction
+
+Function OnCombatEnd()
+  Main.Info("Combat: OnCombatEnd()")
+  if !bHasDefeat || !bHasAIFF
+    return
+  EndIf
+  if (Defeat.IsDefeatActive(playerRef))
+    AIAgentFunctions.requestMessage("The party was defeated in combat", "minai_combatenddefeat")
+  else
+    AIAgentFunctions.requestMessage("The party was victorious in combat", "minai_combatendvictory")
+  EndIf
+EndFunction

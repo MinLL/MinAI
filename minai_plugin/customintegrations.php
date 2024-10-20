@@ -49,14 +49,16 @@ function SetGameRequest() {
 function ProcessIntegrations() {
     // Handle allowing third party mods to register things with the context system
     SetGameRequest();
-    CreateContextTableIfNotExists();
-    CreateActionsTableIfNotExists();
     $MUST_DIE=false;
+    if (isset($GLOBALS["use_defeat"]) && $GLOBALS["use_defeat"] && IsModEnabled("SexlabDefeat")) {
+        $GLOBALS["events_to_ignore"][] = "combatend";
+        $GLOBALS["events_to_ignore"][] = "combatendmighty";
+    }
     if (isset($GLOBALS["gameRequest"]) && isset($GLOBALS["events_to_ignore"]) && in_array($GLOBALS["gameRequest"][0], $GLOBALS["events_to_ignore"])) {
         error_log("minai: Event {$GLOBALS["gameRequest"][0]} in ignore list, blocking.");
         $MUST_DIE=true;
     }
-    if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "init") {
+    if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "minai_init") {
         // This is sent once by the SKSE plugin when the game is loaded. Do our initialization here.
         error_log("minai: Initializing");
         CreateThreadsTableIfNotExists();
@@ -64,6 +66,7 @@ function ProcessIntegrations() {
         CreateContextTableIfNotExists();
         importXPersonalities();
         importScenesDescriptions();
+        $MUST_DIE=true;
 
     }
     if (isset($GLOBALS["gameRequest"]) && strtolower($GLOBALS["gameRequest"][0]) == "storecontext") {
@@ -139,50 +142,6 @@ function ProcessIntegrations() {
             if ($GLOBALS["HERIKA_TARGET"] == $GLOBALS["HERIKA_NAME"])
                 $GLOBALS["HERIKA_TARGET"] = $GLOBALS["PLAYER_NAME"];
             error_log("minai: Starting {$GLOBALS["gameRequest"][0]} dialogue between {$GLOBALS["HERIKA_NAME"]} and {$GLOBALS["HERIKA_TARGET"]}");
-            $GLOBALS["PROMPTS"]["radiant"]= [
-                "cue"=>[
-                    "write dialogue for {$GLOBALS["HERIKA_NAME"]}.{$GLOBALS["TEMPLATE_DIALOG"]}  "
-                ], 
-                "player_request"=>[    
-                    "The Narrator: {$GLOBALS["HERIKA_NAME"]} starts a dialogue with {$GLOBALS["HERIKA_TARGET"]} about a random topic",
-                ]
-            ];
-            $GLOBALS["PROMPTS"]["radiantsearchinghostile"]= [
-                "cue"=>[
-                    "write dialogue for {$GLOBALS["HERIKA_NAME"]} who is responding in a hostile, and concerned manner.{$GLOBALS["TEMPLATE_DIALOG"]}  "
-                ], 
-                "player_request"=>[    
-                    "The Narrator: {$GLOBALS["HERIKA_NAME"]} is currently searching the area for hostiles, and asks who is there?",
-                    "The Narrator: {$GLOBALS["HERIKA_NAME"]} is currently searching the area for hostiles, and starts threatening what he's going to do when he finds them",
-                ]
-            ];
-            $GLOBALS["PROMPTS"]["radiantsearchingfriend"]= [
-                "cue"=>[
-                    "write dialogue for {$GLOBALS["HERIKA_NAME"]} who is responding in a concerned manner.{$GLOBALS["TEMPLATE_DIALOG"]}  "
-                ], 
-                "player_request"=>[    
-                    "The Narrator: {$GLOBALS["HERIKA_NAME"]} is currently searching the area for hostiles, and starts a dialogue with their ally {$GLOBALS["target"]} about this topic",
-                ]
-            ];
-            $GLOBALS["PROMPTS"]["radiantcombathostile"]= [
-                "cue"=>[
-                    "write dialogue for {$GLOBALS["HERIKA_NAME"]} who is responding in a hostile and combative manner.{$GLOBALS["TEMPLATE_DIALOG"]}  "
-                ], 
-                "player_request"=>[    
-                    "The Narrator: {$GLOBALS["HERIKA_NAME"]} is engaged in deadly combat with {$GLOBALS["target"]} and taunts them",
-                    "The Narrator: {$GLOBALS["HERIKA_NAME"]} is engaged in deadly combat with {$GLOBALS["target"]} and trash-talks them",
-                    "The Narrator: {$GLOBALS["HERIKA_NAME"]} is engaged in deadly combat with {$GLOBALS["target"]} and boasts about what they will do after {$GLOBALS["HERIKA_NAME"]} has defeated them ",
-                ]
-            ];
-            $GLOBALS["PROMPTS"]["radiantcombatfriend"]= [
-                "cue"=>[
-                    "write dialogue for {$GLOBALS["HERIKA_NAME"]} who is responding in a tense, serious manner.{$GLOBALS["TEMPLATE_DIALOG"]}  "
-                ], 
-                "player_request"=>[    
-                    "The Narrator: {$GLOBALS["HERIKA_NAME"]} is teamed up with {$GLOBALS["target"]} in deadly combat against someone and talks about the battle",
-                    "The Narrator: {$GLOBALS["HERIKA_NAME"]} is teamed up with {$GLOBALS["target"]} in deadly combat against someone and asks for help",
-                ]
-            ];
             StoreRadiantActors($GLOBALS["HERIKA_TARGET"], $GLOBALS["HERIKA_NAME"]);
         }
         else {
