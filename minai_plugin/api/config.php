@@ -1,6 +1,9 @@
 <?php
 
 header('Content-Type: application/json');
+if (!file_exists("..".DIRECTORY_SEPARATOR."config.php")) {
+    copy("..".DIRECTORY_SEPARATOR."config.base.php", "..".DIRECTORY_SEPARATOR."config.php");
+}
 
 // Define the directory where the config file is located
 $configFile = '../config.php';
@@ -73,10 +76,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $newConfig .= "\$GLOBALS['voicetype_fallbacks'] = " . buildAssociativeArrayString($input['voicetype_fallbacks']) . ";\n";
 
     // Save the new config to the config.php file
-    file_put_contents($configFile, $newConfig);
+    $success = (file_put_contents($configFile, $newConfig) !== false);
 
     // Send response
-    echo json_encode(['status' => 'success']);
+    echo json_encode(['status' => $success?'success':'error']);
 }
 
 // Function to build a string for indexed arrays using Array("value1", "value2") format
