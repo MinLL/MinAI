@@ -16,6 +16,10 @@ function CreateContextTableIfNotExists() {
       PRIMARY KEY (modName, eventKey)
     )"
   );
+  $db->execQuery(
+    "ALTER TABLE custom_context
+     ADD COLUMN IF NOT EXISTS npcName TEXT NOT NULL
+  ");
 }
 
 
@@ -49,6 +53,7 @@ function SetGameRequest() {
 function ProcessIntegrations() {
     // Handle allowing third party mods to register things with the context system
     SetGameRequest();
+    CreateContextTableIfNotExists();
     $MUST_DIE=false;
     if (isset($GLOBALS["use_defeat"]) && $GLOBALS["use_defeat"] && IsModEnabled("SexlabDefeat")) {
         $GLOBALS["events_to_ignore"][] = "combatend";
@@ -75,7 +80,8 @@ function ProcessIntegrations() {
         $modName = $vars[0];
         $eventKey = $vars[1];
         $eventValue = $vars[2];
-        $ttl = intval($vars[3]);
+        $npcName = $vars[3];
+        $ttl = intval($vars[4]);
         error_log("minai: Storing custom context: {$modName}, {$eventKey}, {$eventValue}, {$ttl}");
         $db->delete("custom_context", "modName='".$db->escape($modName)."' AND eventKey='".$db->escape($eventKey)."'");
         $db->insert(
@@ -85,6 +91,7 @@ function ProcessIntegrations() {
                 'eventKey' => $db->escape($eventKey),
                 'eventValue' => $db->escape($eventValue),
                 'expiresAt' => time() + $ttl,
+                'npcName' => $db->escape($npcName),
                 'ttl' => $ttl // already converted to int, no need to escape
             )
         );
@@ -210,7 +217,8 @@ function GetThirdpartyContext() {
     );
     foreach ($rows as $row) {
         error_log("minai: Inserting third-party context: {$row["eventvalue"]}");
-        $ret .= $row["eventvalue"] . "\n";
+        if (strtolower($GLOBALS["HERIKA_NAME"]) == strtolower($row['npcname']) || strtolower($row['npcname']) == "everyone")
+            $ret .= $row["eventvalue"] . "\n";
     }
     return $ret;
 }

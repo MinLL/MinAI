@@ -129,7 +129,23 @@ Function RegisterEvent(String eventLine, string eventType = "")
 EndFunction
 
 
-Function RequestLLMResponse(string eventLine, string eventType, string name)
+Function RequestLLMResponse(string eventLine, string eventType)
+  if bHasAIFF
+    float currentTime = Utility.GetCurrentRealTime()
+    if currentTime - lastRequestTime > config.requestResponseCooldown
+      lastRequestTime = currentTime
+      Info("Requesting response from LLM: " + eventLine)
+      AIAgentFunctions.RequestMessage(eventLine, eventType)
+    Else
+      RegisterEvent(eventLine, eventType)
+    EndIf
+  elseif bHasMantella
+    RegisterEvent(eventLine, eventType)
+   EndIf
+EndFunction
+
+
+Function RequestLLMResponseFromActor(string eventLine, string eventType, string name)
   if bHasAIFF
     float currentTime = Utility.GetCurrentRealTime()
     if currentTime - lastRequestTime > config.requestResponseCooldown
@@ -143,7 +159,6 @@ Function RequestLLMResponse(string eventLine, string eventType, string name)
     RegisterEvent(eventLine, eventType)
    EndIf
 EndFunction
-
 
 
 Function RequestLLMResponseNPC(string speaker, string eventLine, string target, string type = "npc_talk")
@@ -258,7 +273,7 @@ EndEvent
 ;  endIf
 Event OnRequestResponse(string eventLine, string eventType, string targetName)
   Info("OnRequestResponse(" + eventType + " => " + targetName + "): " + eventLine)
-  RequestLLMResponse(eventLine, eventType, targetName)
+  RequestLLMResponseFromActor(eventLine, eventType, targetName)
 EndEvent
 
 

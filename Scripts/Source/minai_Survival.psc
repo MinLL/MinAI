@@ -337,7 +337,7 @@ EndFunction
 Event Campfire_OnObjectPlaced(Form akPlacedObject, float afPositionX, float afPositionY, float afPositionZ, float afAngleX, float afAngleY, float afAngleZ, bool abIsTent)
   string playerName = Main.GetActorName(playerRef)
   if abIsTent
-    Main.RequestLLMResponse(playerName + " set up a tent.", "chatnf_survival_1", playerName)
+    Main.RequestLLMResponse(playerName + " set up a tent.", "chatnf_survival_1")
   EndIf
 EndEvent
 
@@ -345,17 +345,17 @@ EndEvent
 Event Campfire_OnObjectRemoved(Form akBaseObject, float afPositionX, float afPositionY, float afPositionZ, float afAngleX, float afAngleY, float afAngleZ, bool abIsTent)
   string playerName = Main.GetActorName(playerRef)
   if abIsTent
-    Main.RequestLLMResponse(playerName + " took down a tent.", "chatnf_survival_1", playerName)
+    Main.RequestLLMResponse(playerName + " took down a tent.", "chatnf_survival_1")
   EndIf
 EndEvent
 
 Event Campfire_OnBedrollSitLay(Form akTent, bool abGettingUp)
   string playerName = Main.GetActorName(playerRef)
   if !abGettingUp
-    Main.RequestLLMResponse(playerName + " laid down on a bedroll.", "chatnf_survival_1", playerName)
+    Main.RequestLLMResponse(playerName + " laid down on a bedroll.", "chatnf_survival_1")
   else
     ; This might be too spammy if it's chat, since they'll also get the "goodmorning" message at the same time
-    Main.RequestLLMResponse(playerName + " got up from a bedroll.", "chatnf_survival_1", playerName)
+    Main.RequestLLMResponse(playerName + " got up from a bedroll.", "chatnf_survival_1")
   endif
 endEvent
 
@@ -363,9 +363,9 @@ endEvent
 Event Campfire_OnTentEnter(Form akTent, bool abHasShelter)
   string playerName = Main.GetActorName(playerRef)
   if abHasShelter
-    Main.RequestLLMResponse(playerName + " entered their tent, which has adequate shelter.", "chatnf_survival_1", playerName)
+    Main.RequestLLMResponse(playerName + " entered their tent, which has adequate shelter.", "chatnf_survival_1")
   else
-    Main.RequestLLMResponse(playerName + " entered their tent, which is unsheltered from the elements.", "chatnf_survival_1", playerName)
+    Main.RequestLLMResponse(playerName + " entered their tent, which is unsheltered from the elements.", "chatnf_survival_1")
   endif
 endEvent
 

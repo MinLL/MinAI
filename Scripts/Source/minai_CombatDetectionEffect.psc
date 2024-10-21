@@ -21,8 +21,8 @@ Event OnEffectStart(Actor akTarget, Actor akCaster)
     aiff.SetActorVariable(akTarget, "hostileToPlayer", akTarget.IsHostileToActor(playerRef))
   else
     main.PlayerInCombat = true
-    combat.OnCombatStart()
   EndIf
+  combat.OnCombatStart(akTarget)
   aiff.SetActorVariable(akTarget, "inCombat", true)
 EndEvent
 
@@ -35,7 +35,7 @@ Event OnEffectFinish(Actor akTarget, Actor akCaster)
     aiff.SetActorVariable(akTarget, "hostileToPlayer", false)
   else
     main.PlayerInCombat = false
-    combat.OnCombatEnd()
   EndIf
+  combat.OnCombatEnd(akTarget)
 EndEvent
 
