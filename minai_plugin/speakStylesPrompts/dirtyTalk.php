@@ -47,11 +47,11 @@ function setDirtyTalkPrompts($currentName)
     $GLOBALS["PROMPTS"]["sextalk_ambient"] = [
         "cue" => [
             "$currentName comments on their partner's body, using explicit language to describe their attraction. {$GLOBALS["TEMPLATE_DIALOG"]}",
-            "$currentName says something filthy about their partner's scent. {$GLOBALS["TEMPLATE_DIALOG"]}",
-            "$currentName describes the way their partner's skin feels against theirs. {$GLOBALS["TEMPLATE_DIALOG"]}",
+            " $currentName expresses their delight with every move, promising sexy surprises. {$GLOBALS['TEMPLATE_DIALOG']} Don't hold back!",
+            "$currentName teases, detailing naughty rewards for good behavior in a playful tone: {$GLOBALS['TEMPLATE_DIALOG']}",
             "$currentName talks about how much they love their partner's moans. {$GLOBALS["TEMPLATE_DIALOG"]}",
-            "$currentName says something dirty about their partner's hair. {$GLOBALS["TEMPLATE_DIALOG"]}",
-            "$currentName comments on the way their partner's eyes look during sex. {$GLOBALS["TEMPLATE_DIALOG"]}",
+            "$currentName says something filthy about the way they want to explore their partner's body. {$GLOBALS["TEMPLATE_DIALOG"]}",
+            "$currentName moans their desire for more, asking for deeper pleasure with a filthy whisper: {$GLOBALS['TEMPLATE_DIALOG']}"
         ],
     ];
 }
