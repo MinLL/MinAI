@@ -7,6 +7,9 @@ int jThreadsByFrameworkMap
 int playerThread = -1
 
 Function OnSexStart(int ThreadID, string framework, minai_Config configLocal, SexLabFramework slfLocal = None)
+    if(!config.enableAmbientComments)
+        return
+    endif
     MiscUtil.PrintConsole("Ambient:OnSexStart")
     config = configLocal
     RegisterForSingleUpdate(config.commentsRate)
@@ -27,6 +30,9 @@ Function OnSexStart(int ThreadID, string framework, minai_Config configLocal, Se
 EndFunction
 
 Function OnSexEnd(int ThreadID, string framework)
+    if(!config.enableAmbientComments)
+        return
+    endif
     MiscUtil.PrintConsole("Ambient:OnSexEnd")
     minai_Sex sex = (self as Quest) as minai_Sex
     removeThread(ThreadID, framework)
@@ -38,6 +44,9 @@ Function OnSexEnd(int ThreadID, string framework)
 EndFunction
 
 Event OnUpdate()
+    if(!config.enableAmbientComments)
+        return
+    endif
     MiscUtil.PrintConsole("Ambient:OnUpdate")
     minai_Sex sex = (self as Quest) as minai_Sex
     
