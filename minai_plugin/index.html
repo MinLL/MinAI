@@ -54,6 +54,12 @@
             margin-bottom: 20px;
         }
 
+        .development-info {
+            color: #2196F3;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
         .links {
             display: flex;
             flex-direction: column;
@@ -143,7 +149,7 @@
             <a href="config.html">Configuration</a>
             <a href="we_manager.html">Equipment Manager</a>
             <a href="https://github.com/MinLL/MinAI/tree/main">Github</a>
-	    <a href="/HerikaServer/">Back to Main AI-FF Page</a>
+            <a href="/HerikaServer/">Back to Main AI-FF Page</a>
         </div>
     </div>
 
@@ -171,7 +177,7 @@
         // Function to fetch the latest version from GitHub (bypassing the cache)
         async function fetchGitHubVersion(branch) {
             const githubRepo = 'MinLL/MinAI'; // Your GitHub repository
-            const versionFilePath = 'version.txt'; // Path to the version file in your GitHub repository
+            const versionFilePath = 'minai_plugin/version.txt'; // Path to the version file in your GitHub repository
             const timestamp = new Date().getTime(); // Use the current timestamp to bypass cache
             const url = `https://raw.githubusercontent.com/${githubRepo}/refs/heads/${branch}/${versionFilePath}?cache_buster=${timestamp}`;
             try {
@@ -221,16 +227,23 @@
             const versionInfoDiv = document.getElementById('version-info');
             const updateButtonsDiv = document.getElementById('update-buttons');
 
-            if (localVersion && stableVersion) {
+            if (localVersion && stableVersion && mainVersion) {
                 let message = `Local version: ${localVersion} | Latest stable: ${stableVersion} | Latest development: ${mainVersion}`;
 
                 if (localVersion === stableVersion && localVersion === mainVersion) {
                     versionInfoDiv.textContent = `You are using the latest version (${localVersion})`;
                 } else {
-                    versionInfoDiv.innerHTML = `
-                        <p class="update-warning">New versions are available!</p>
-                        <p>${message}</p>
-                    `;
+                    versionInfoDiv.innerHTML = `<p>${message}</p>`;
+                    
+                    // Check if the local version differs from the stable version and show an update warning
+                    if (localVersion !== stableVersion) {
+                        versionInfoDiv.innerHTML += `<p class="update-warning">A new stable version is available!</p>`;
+                    }
+                    // Check if the local version differs from the main (development) version, less emphasis
+                    if (localVersion !== mainVersion && localVersion === stableVersion) {
+                        versionInfoDiv.innerHTML += `<p class="development-info">A new development version is available.</p>`;
+                    }
+
                     updateButtonsDiv.style.display = 'block';
                 }
             } else {
