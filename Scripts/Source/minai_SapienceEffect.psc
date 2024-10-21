@@ -64,9 +64,8 @@ bool Function ShouldRemoveActor(actor akTarget)
   bool isAlive = (akTarget.GetKiller() == None)
   ; bool isNotHostile = !(akTarget.IsHostileToActor(playerRef))
   bool isSapienceEnabled = (minai_SapienceEnabled.GetValueInt() == 1)
-  bool losCheck = akTarget.HasLOS(playerRef)
   Main.Debug("ShouldRemoveActor(" + Main.GetActorName(akTarget) + "): distanceCheck=" + distanceCheck +", isAlive=" + isAlive +  ", sapienceEnabled=" + isSapienceEnabled)
-  return (!distanceCheck || !isAlive || !isSapienceEnabled || !losCheck) ; || !isNotHostile
+  return (!distanceCheck || !isAlive || !isSapienceEnabled) ; || !isNotHostile
 EndFunction
 
 
