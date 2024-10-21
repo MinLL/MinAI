@@ -35,7 +35,7 @@ if(isset($scene)){
     
     $speakStyle = null;
     if ($jsonXPersonality)
-        $jsonXPersonality["speakStyleDuringSex"];
+        $speakStyle = $jsonXPersonality["speakStyleDuringSex"];
 
     if(!$speakStyle) {
         $speakStyle = $speakStyles[array_rand($speakStyles)];

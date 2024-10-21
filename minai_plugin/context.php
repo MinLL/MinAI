@@ -347,6 +347,37 @@ if (!$GLOBALS["disable_nsfw"]) {
 ";
 }
 
+// If npc is in sex scene add current scene description to context
+function getSexSceneContext() {
+  $scene = getScene($GLOBALS["HERIKA_NAME"]);
+  if ($scene && is_array($GLOBALS["contextDataFull"]) && $GLOBALS["HERIKA_NAME"] !== "The Narrator") {
+    $prompt = "The Narrator: ";
+    $sceneDesc = $scene["description"];
+    if (!$sceneDesc) {
+      if ($scene["fallback"]) {
+        $sceneDesc = $scene["fallback"];
+      } else {
+        $sceneDesc = "{$scene["actors"]} are having sex.";
+      }
+
+    }
+
+    if (!$scene["prev_scene_id"]) {
+      $prompt .= "{$scene["actors"]} started sex scene.";
+    } else {
+      $prompt .= "{$scene["actors"]} changed position.";
+    }
+    $prompt .= " $sceneDesc #SEX_SCENARIO";
+    $contextItem = [
+      "role"=>"user",
+      "content"=>$prompt
+    ];
+    array_push($GLOBALS["contextDataFull"], $contextItem);
+  }
+}
+
+getSexSceneContext();
+
 // Clean up context
 $locaLastElement=[];
 $narratorElements=[];

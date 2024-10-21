@@ -817,7 +817,9 @@ Event OStimManager(string eventName, string strArg, float numArg, Form sender)
     EndIf
   elseif (eventName == "ostim_actor_orgasm")   
     Actor OrgasmedActor = sender as Actor
-    sexTalkClimax(OrgasmedActor, playerInvolved, ostimType)
+    if(OrgasmedActor != PlayerRef)
+      sexTalkClimax(OrgasmedActor, playerInvolved, ostimType)
+    endif
     Main.Info("Ostim actor orgasm: " + OrgasmedActor)
 
   elseif (eventName == "ostim_thread_end")  
@@ -1047,8 +1049,7 @@ function UpdateThreadTable(string type, string framework = "ostim", int ThreadID
   actor[] actors
   string sceneId
   
-  ; !!!Min to review sexlab implementation
-  if(framework == sexlabType) && bHasSexlab
+  if(framework == sexlabType)
     sslThreadController controller = slf.GetController(ThreadID)
   
     if (controller.Stage==1) 
@@ -1056,7 +1057,7 @@ function UpdateThreadTable(string type, string framework = "ostim", int ThreadID
     EndIf
     actors = slf.GetController(ThreadID).Positions
     sceneId = controller.Animation.FetchStage(controller.Stage)[0]
-  elseif bHasOstim
+  elseif (framework == ostimType)
     actors = OThread.GetActors(ThreadID)
     sceneId = OThread.GetScene(ThreadID)
   endif
@@ -1131,7 +1132,6 @@ endfunction
 ; chatType different AIFF custom chat topics see php files
 Function SexTalk(actor speaker, string chatType, bool hasPlayer, string framework, bool ignoreSexTalkCooldown = false)
   if !bHasAIFF || !speaker
-    MiscUtil.PrintConsole("NO SPEAKER, " + chatType)
     return
   EndIf
 
@@ -1148,10 +1148,8 @@ Function SexTalk(actor speaker, string chatType, bool hasPlayer, string framewor
     lastSexTalk = currentTime
     string speakerName = Main.GetActorName(speaker)
     Main.Debug("SexTalk() => " + speakerName + ": " + chatType)
-    MiscUtil.PrintConsole("SexTalk() => " + speakerName + ": " + chatType)
     Main.RequestLLMResponseNPC("", "", speakerName, chatType)
   else
-    MiscUtil.PrintConsole("SexTalk - THROTTLED")
     Main.Debug("SexTalk - THROTTLED")
   EndIf
 EndFunction
@@ -1203,7 +1201,6 @@ actor Function GetWeightedRandomActorToSpeak(actor[] actors)
 
   ; pick weighted type of npc who will talk
   bool isFemale = Utility.RandomInt(1, 100) <= config.genderWeightComments
-  MiscUtil.PrintConsole("genderWeightComments: " + config.genderWeightComments)
 
   if(isFemale)
     return getRandomActor(femaleActors)
@@ -1244,7 +1241,7 @@ string function buildSceneFallbackDescription(int ThreadID, string framework, st
   string actorString = ""
   string actionString = ""
   string sceneTagsString = ""
-  if(framework == ostimType) && bHasOstim
+  if(framework == ostimType)
     sceneId = OThread.GetScene(ThreadID)
     string[] actionTypes = OMetadata.GetActionTypes(sceneId)
     string[] sceneTags = OMetadata.GetSceneTags(sceneId)
@@ -1252,7 +1249,8 @@ string function buildSceneFallbackDescription(int ThreadID, string framework, st
     actorString = JoinActorArray(actors, ", ")
     actionString = JoinStringArray(actionTypes, ", ")
     sceneTagsString = JoinStringArray(sceneTags, ", ")
-  elseif bHasSexlab
+    
+  elseif(framework == sexlabType)
     sslThreadController controller = slf.GetController(ThreadID)
     if (!controller)
       return ""
@@ -1348,7 +1346,7 @@ function onSexEnd(int ThreadID, string framework)
 endfunction
 
 function onSceneChange(int ThreadID, string framework)
-  UpdateThreadTable("scenechange", sexlabType, ThreadID)
+  UpdateThreadTable("scenechange", framework, ThreadID)
   bool playerInvolved = isPlayerInvolved(ThreadID, framework)
   ; in case if any framework need to block sex talk during scene change
   bool skipSexTalk = false
@@ -1376,8 +1374,7 @@ function onSceneChange(int ThreadID, string framework)
     EndIf
     i += 1
   EndWhile
-
-  if(skipSexTalk)
+  if(!skipSexTalk)
     sexTalkSceneChage(GetWeightedRandomActorToSpeak(actors), playerInvolved, framework)
   endif
 endfunction
