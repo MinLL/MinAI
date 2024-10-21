@@ -18,9 +18,9 @@ MinAI implements many NSFW integrations for users that have either OStim or Sexl
 * If you want to use the old keyword based system instead, you can disable this system in config.php.
 
 ### CBPC
-* This mod will connect the physics from CBPC to the LLM. The LLM will be aware of both where (breasts, ass, etc) and when the player touches themselves, or other actors, and will react to and comment on it. This works particularly well during sex, as the location the LLM will be aware of the location that the penis collides with. This requires solid CBPC configurations. This was tested with these: https://www.nexusmods.com/skyrimspecialedition/mods/82745?tab=description
+* Exposes physics collisions from CBPC as context. NPC's will be made aware of where the player touches them or other actors (or themselves) and will react to and comment on it. This is also active during OStim/SL sex scenes. Requires solid CBPC configs. (Tested with these: https://www.nexusmods.com/skyrimspecialedition/mods/82745)
 * This can be further expanded by enabling additional colliders in your CBPC configuration. You could for example, enable detection when the head collides with the vagina, etc.
-* In VR, this works particularly well, since you you can freely control your hands.
+* Works particularly well in VR since you can freely move your hands. HIGGS/PLANCK recommended.
 * This has integration with Devious Devices - The LLM will be aware if you try to touch yourself / others through a chastity belt, or other devices as an example.
 
 ### Devious Devices
@@ -40,7 +40,7 @@ MinAI implements many NSFW integrations for users that have either OStim or Sexl
 * NPC's will know when certain DW events occur (virginity loss, squirting, milk leak, cum leak)
 
 ### The New Gentlemen
-* LLM will be aware of exposed penis sizes.
+* NPC's will be aware of exposed penis sizes.
 * Currently, auto assigned addons are finicky (to be addressed in a future TNG update). Manually assign a type and size to PC/NPC with TNG hotkey to ensure LLM awareness.
 
 ### Deviously Accessible
@@ -74,5 +74,5 @@ MinAI implements many NSFW integrations for users that have either OStim or Sexl
 * NPC's can pinch the player's nipples if they want. This event needs to be expanded. It's pretty simple at the moment.
 
 ### (In Development) Diary of Mine (DoM, PAH, HSH, AYGAS)
-* Slave context, character info, and events exposed to AIFF/Sapient NPCs
+* Slave context, character info, and events exposed to AIFF/Sapient NPC's
 * Slave actions - TBD
