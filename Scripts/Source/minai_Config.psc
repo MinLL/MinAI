@@ -43,6 +43,7 @@ int commentsRateOID
 int forceOrgasmCommentOID
 int forcePostSceneCommentOID
 int prioritizePlayerThreadOID
+int enableAmbientCommentsOID
 
 ; Legacy globals
 GlobalVariable useCBPC
@@ -123,6 +124,9 @@ bool Property forcePostSceneComment = true Auto
 
 bool prioritizePlayerThreadDefault = true
 bool Property prioritizePlayerThread = true Auto
+
+bool enableAmbientCommentsDefault = true
+bool Property enableAmbientComments = true Auto
 
   
 Event OnConfigInit()
@@ -280,6 +284,7 @@ Function RenderSexPage()
   prioritizePlayerThreadOID = AddToggleOption("Prioritize comments in player's scene", prioritizePlayerThread)
   forceOrgasmCommentOID = AddToggleOption("Force orgasm comment", forceOrgasmComment)
   forcePostSceneCommentOID = AddToggleOption("Force post scene comment", forcePostSceneComment)
+  enableAmbientCommentsOID = AddToggleOption("Enable ambient comments between events", enableAmbientComments)
 EndFunction
 
 
@@ -445,6 +450,9 @@ Event OnOptionSelect(int oid)
   elseif oid == prioritizePlayerThreadOID
     prioritizePlayerThread = !prioritizePlayerThread
     SetToggleOptionValue(oid, prioritizePlayerThread)
+  elseif oid == enableAmbientCommentsOID
+    enableAmbientComments = !enableAmbientComments
+    SetToggleOptionValue(oid, enableAmbientComments)
   EndIf
   string[] actions = JMap.allKeysPArray(aOIDMap)
   int i = 0
@@ -575,6 +583,9 @@ Event OnOptionDefault(int oid)
   elseif oid == prioritizePlayerThreadOID
     prioritizePlayerThread = prioritizePlayerThreadDefault
     SetToggleOptionValue(oid, prioritizePlayerThreadDefault)
+  elseif oid == enableAmbientCommentsOID
+    enableAmbientComments = enableAmbientCommentsDefault
+    SetToggleOptionValue(oid, enableAmbientCommentsDefault)
   EndIf
   string[] actions = JMap.allKeysPArray(aOIDMap)
   int i = 0
@@ -646,6 +657,8 @@ Event OnOptionHighlight(int oid)
     SetInfoText("Ignore comments during sex cooldown, and request message after sex scene ends.")
   elseif oid == prioritizePlayerThreadOID
     SetInfoText("If there are scenes with player involve, all comments will be within this scenes.")
+  elseif oid == enableAmbientCommentsOID
+    SetInfoText("Enable ambient comments between events. Follows comments during sex scene cooldown. Polling mechanism checking each time if there is no cooldown on comments and fires ambient talking.")
   EndIf
   string[] actions = JMap.allKeysPArray(aOIDMap)
   int i = 0

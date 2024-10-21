@@ -15,6 +15,7 @@ minai_MainQuestController main
 minai_DeviousStuff devious
 Actor PlayerRef
 minai_Config config
+minai_AmbientSexTalk ambientSexTalk
 
 float lastSexTalk
 
@@ -25,14 +26,15 @@ int threadsPrevSpeedsMap
 ; {threadId: Actor} to track actors who will say something on after ostim scene. Need this because there is no guarantee the on ostim end event there will be running thread with actors
 int actorToSayOnEndMap
 
-string ostimType = "ostim"
-string sexlabType = "sexlab"
+string property ostimType = "ostim" auto
+string property sexlabType = "sexlab" auto
 
 Function Maintenance(minai_MainQuestController _main)
   playerRef = Game.GetPlayer()
   main = _main
   aiff = (Self as Quest) as minai_AIFF
   devious = (Self as Quest) as minai_DeviousStuff
+  ambientSexTalk = (Self as Quest) as minai_AmbientSexTalk
   config = Game.GetFormFromFile(0x0912, "MinAI.esp") as minai_Config
   if !config
     Main.Fatal("Could not load configuration - script version mismatch with esp")
@@ -1317,6 +1319,7 @@ function onSexStart(int ThreadID, string framework)
   ; enable sex-mode for php
   SetSexSceneState("on")
   UpdateThreadTable("startthread", framework, ThreadID)
+  ambientSexTalk.OnSexStart(ThreadID, framework, config, slf)
 
   ; get actors to store random actor who will talk at the end. Doing it at start ensure that on sex end events we won't end up where in threads there are no actors anymore
   Actor[] actors
@@ -1333,6 +1336,7 @@ function onSexEnd(int ThreadID, string framework)
   ; disable sex-mode for php. AIFF implementation is a little incorrect, since there are still
   SetSexSceneState("off")
   UpdateThreadTable("end", framework, ThreadID)
+  ambientSexTalk.OnSexEnd(ThreadID, framework)
 
   ; get actor to say something after sex
   bool playerInvolved = isPlayerInvolved(ThreadID, framework)

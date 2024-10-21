@@ -48,10 +48,10 @@ function setBreathlessGaspsPrompts($currentName)
         "cue" => [
             "$currentName makes gasps and moans as they comment on their partner's body. {$GLOBALS["TEMPLATE_DIALOG"]}",
             "$currentName says something brief but intense about their partner's touch. {$GLOBALS["TEMPLATE_DIALOG"]}",
-            "$currentName describes the way their partner's skin feels against theirs, gasping for air. {$GLOBALS["TEMPLATE_DIALOG"]}",
+            "$currentName describes the way their partner's movements feel, gasping for air. {$GLOBALS["TEMPLATE_DIALOG"]}",
             "$currentName talks about how much they love their partner's kisses, making short gasps. {$GLOBALS["TEMPLATE_DIALOG"]}",
             "$currentName says something short but sensual about their partner's fingers. {$GLOBALS["TEMPLATE_DIALOG"]}",
-            "$currentName comments on the way their partner's breath feels on their skin, moaning softly. {$GLOBALS["TEMPLATE_DIALOG"]}"
+            "$currentName comments on the way their partner's intimacy is overwhelming, moaning softly. {$GLOBALS["TEMPLATE_DIALOG"]}",
         ],
     ];
 }
