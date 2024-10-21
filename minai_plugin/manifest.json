@@ -1,5 +1,6 @@
 
 {
-  "name":"minai",
-  "description":"MinAI is loaded."
+    "name":"minai",
+    "description":"MinAI is loaded.",
+    "config_url":"<a href=\"/HerikaServer/ext/minai_plugin/index.html\">Configure MinAI</a>"
  }

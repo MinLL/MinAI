@@ -1,0 +1,14 @@
+
+*.php~
+
+sceneDescriptionsDBImport/imported.txt
+
+sceneDescriptionsDBImport/imported.txt~
+
+xPersonalitiesDBImport/imported.txt
+
+xPersonalitiesDBImport/imported.txt~
+
+manifest.json~
+
+*.html~

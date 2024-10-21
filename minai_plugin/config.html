@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .config-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .option-group {
+            margin-bottom: 20px;
+        }
+
+        .option-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .text-input input,
+        .slider input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .checkbox-group input {
+            margin-right: 10px;
+        }
+
+        .submit-button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .submit-button:hover {
+            background-color: #45a049;
+        }
+
+        .dynamic-list-container {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        .dynamic-list-entry {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .dynamic-list-entry input {
+            width: 90%;
+            padding: 10px;
+            margin-right: 10px;
+        }
+
+        .dynamic-list-entry button {
+            padding: 10px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .dynamic-list-entry button:hover {
+            background-color: #e53935;
+        }
+
+        .add-list-item {
+            padding: 10px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .add-list-item:hover {
+            background-color: #1976D2;
+        }
+
+        .voicetype-container {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        .voicetype-entry {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .voicetype-entry input {
+            width: 45%;
+            padding: 10px;
+            margin-right: 10px;
+        }
+
+        .voicetype-entry button {
+            padding: 10px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .voicetype-entry button:hover {
+            background-color: #e53935;
+        }
+
+        .add-voicetype {
+            padding: 10px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .add-voicetype:hover {
+            background-color: #1976D2;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="config-container">
+        <h1>Configuration Page</h1>
+
+        <p id="loading-message">Loading configuration...</p>
+
+        <div id="config-form" style="display: none;">
+            <!-- PLAYER_BIO -->
+            <div class="option-group text-input">
+                <label class="option-label" for="player-bio">PLAYER_BIO</label>
+                <input type="text" id="player-bio">
+            </div>
+
+            <!-- PROMPT_HEAD_OVERRIDE -->
+            <div class="option-group text-input">
+                <label class="option-label" for="prompt-head-override">PROMPT_HEAD_OVERRIDE</label>
+                <input type="text" id="prompt-head-override">
+            </div>
+
+            <!-- use_narrator_profile -->
+            <div class="option-group checkbox-group">
+                <label class="option-label" for="use-narrator-profile">Use Narrator Profile</label>
+                <input type="checkbox" id="use-narrator-profile">
+            </div>
+
+            <!-- stop_narrator_context_leak -->
+            <div class="option-group checkbox-group">
+                <label class="option-label" for="stop-narrator-context-leak">Stop Narrator Context Leak</label>
+                <input type="checkbox" id="stop-narrator-context-leak">
+            </div>
+
+            <!-- devious_narrator_eldritch_voice -->
+            <div class="option-group text-input">
+                <label class="option-label" for="eldritch-voice">Devious Narrator Eldritch Voice</label>
+                <input type="text" id="eldritch-voice">
+            </div>
+
+            <!-- devious_narrator_telvanni_voice -->
+            <div class="option-group text-input">
+                <label class="option-label" for="telvanni-voice">Devious Narrator Telvanni Voice</label>
+                <input type="text" id="telvanni-voice">
+            </div>
+
+            <!-- force_voice_type -->
+            <div class="option-group checkbox-group">
+                <label class="option-label" for="force-voice-type">Force Voice Type</label>
+                <input type="checkbox" id="force-voice-type">
+            </div>
+
+            <!-- disable_nsfw -->
+            <div class="option-group checkbox-group">
+                <label class="option-label" for="disable-nsfw">Disable NSFW</label>
+                <input type="checkbox" id="disable-nsfw">
+            </div>
+
+            <!-- restrict_nonfollower_functions -->
+            <div class="option-group checkbox-group">
+                <label class="option-label" for="restrict-nonfollower-functions">Restrict Non-Follower Functions</label>
+                <input type="checkbox" id="restrict-nonfollower-functions">
+            </div>
+
+            <!-- always_enable_functions -->
+            <div class="option-group checkbox-group">
+                <label class="option-label" for="always-enable-functions">Always Enable Functions</label>
+                <input type="checkbox" id="always-enable-functions">
+            </div>
+
+            <!-- force_aiff_name_to_ingame_name -->
+            <div class="option-group checkbox-group">
+                <label class="option-label" for="force-aiff-name">Force AIFF Name to Match In-Game Name</label>
+                <input type="checkbox" id="force-aiff-name">
+            </div>
+
+            <!-- commands_to_purge -->
+            <div class="option-group">
+                <label class="option-label" for="commands-to-purge">Commands to Purge</label>
+                <div id="commands-to-purge-container" class="dynamic-list-container">
+                    <div class="dynamic-list-entry">
+                        <input type="text" value="">
+                        <button onclick="removeListItem(this)">Remove</button>
+                    </div>
+                </div>
+                <button class="add-list-item" onclick="addListItem('commands-to-purge-container')">Add Command to Purge</button>
+            </div>
+
+            <!-- events_to_ignore -->
+            <div class="option-group">
+                <label class="option-label" for="events-to-ignore">Events to Ignore</label>
+                <div id="events-to-ignore-container" class="dynamic-list-container">
+                    <div class="dynamic-list-entry">
+                        <input type="text" value="">
+                        <button onclick="removeListItem(this)">Remove</button>
+                    </div>
+                </div>
+                <button class="add-list-item" onclick="addListItem('events-to-ignore-container')">Add Event to Ignore</button>
+            </div>
+
+            <!-- use_defeat -->
+            <div class="option-group checkbox-group">
+                <label class="option-label" for="use-defeat">Use Defeat Awareness</label>
+                <input type="checkbox" id="use-defeat">
+            </div>
+
+            <!-- disable_worn_equipment -->
+            <div class="option-group checkbox-group">
+                <label class="option-label" for="disable-worn-equipment">Disable Worn Equipment</label>
+                <input type="checkbox" id="disable-worn-equipment">
+            </div>
+
+            <!-- radiance_rechat_h -->
+            <div class="option-group slider">
+                <label class="option-label" for="radiance-rechat-h">Radiance Rechat H</label>
+                <input type="range" id="radiance-rechat-h" min="0" max="20" value="8">
+            </div>
+
+            <!-- radiance_rechat_p -->
+            <div class="option-group slider">
+                <label class="option-label" for="radiance-rechat-p">Radiance Rechat P</label>
+                <input type="range" id="radiance-rechat-p" min="0" max="50" value="20">
+            </div>
+
+            <!-- xtts_server_override -->
+            <div class="option-group text-input">
+                <label class="option-label" for="xtts-server-override">XTTS Server Override</label>
+                <input type="text" id="xtts-server-override">
+            </div>
+
+            <!-- strip_emotes_from_output -->
+            <div class="option-group checkbox-group">
+                <label class="option-label" for="strip-emotes">Strip Emotes from Output</label>
+                <input type="checkbox" id="strip-emotes">
+            </div>
+
+            <!-- input_delay_for_radiance -->
+            <div class="option-group slider">
+                <label class="option-label" for="input-delay">Input Delay for Radiance (Seconds)</label>
+                <input type="range" id="input-delay" min="0" max="30" value="15">
+            </div>
+
+            <!-- VoiceType Fallbacks -->
+            <div class="option-group">
+                <label class="option-label" for="voicetype-fallbacks">VoiceType Fallbacks</label>
+                <div id="voicetype-container" class="voicetype-container">
+                    <div class="voicetype-entry">
+                        <input type="text" placeholder="VoiceType">
+                        <input type="text" placeholder="Fallback">
+                        <button onclick="removeVoiceTypeEntry(this)">Remove</button>
+                    </div>
+                </div>
+                <button class="add-voicetype" onclick="addVoiceTypeEntry()">Add VoiceType Fallback</button>
+            </div>
+
+            <!-- Submit Button -->
+            <button class="submit-button" onclick="submitConfiguration()">Submit Configuration</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchConfigData();
+        });
+
+        async function fetchConfigData() {
+            try {
+                const response = await fetch('api/config.php');
+                const configData = await response.json();
+
+                document.getElementById('player-bio').value = configData.PLAYER_BIO;
+                document.getElementById('prompt-head-override').value = configData.PROMPT_HEAD_OVERRIDE;
+                document.getElementById('use-narrator-profile').checked = configData.use_narrator_profile;
+                document.getElementById('stop-narrator-context-leak').checked = configData.stop_narrator_context_leak;
+                document.getElementById('eldritch-voice').value = configData.devious_narrator_eldritch_voice;
+                document.getElementById('telvanni-voice').value = configData.devious_narrator_telvanni_voice;
+                document.getElementById('force-voice-type').checked = configData.force_voice_type;
+                document.getElementById('disable-nsfw').checked = configData.disable_nsfw;
+                document.getElementById('restrict-nonfollower-functions').checked = configData.restrict_nonfollower_functions;
+                document.getElementById('always-enable-functions').checked = configData.always_enable_functions;
+                document.getElementById('force-aiff-name').checked = configData.force_aiff_name_to_ingame_name;
+                populateDynamicList('commands-to-purge-container', configData.commands_to_purge);
+                populateDynamicList('events-to-ignore-container', configData.events_to_ignore);
+                document.getElementById('use-defeat').checked = configData.use_defeat;
+                document.getElementById('disable-worn-equipment').checked = configData.disable_worn_equipment;
+                document.getElementById('radiance-rechat-h').value = configData.radiance_rechat_h;
+                document.getElementById('radiance-rechat-p').value = configData.radiance_rechat_p;
+                document.getElementById('xtts-server-override').value = configData.xtts_server_override;
+                document.getElementById('strip-emotes').checked = configData.strip_emotes_from_output;
+                document.getElementById('input-delay').value = configData.input_delay_for_radiance;
+                populateVoiceTypeFallbacks(configData.voicetype_fallbacks);
+
+                document.getElementById('loading-message').style.display = 'none';
+                document.getElementById('config-form').style.display = 'block';
+            } catch (error) {
+                console.error('Failed to fetch config data:', error);
+            }
+        }
+
+        async function submitConfiguration() {
+            const config = {
+                PLAYER_BIO: document.getElementById('player-bio').value,
+                PROMPT_HEAD_OVERRIDE: document.getElementById('prompt-head-override').value,
+                use_narrator_profile: document.getElementById('use-narrator-profile').checked,
+                stop_narrator_context_leak: document.getElementById('stop-narrator-context-leak').checked,
+                devious_narrator_eldritch_voice: document.getElementById('eldritch-voice').value,
+                devious_narrator_telvanni_voice: document.getElementById('telvanni-voice').value,
+                force_voice_type: document.getElementById('force-voice-type').checked,
+                disable_nsfw: document.getElementById('disable-nsfw').checked,
+                restrict_nonfollower_functions: document.getElementById('restrict-nonfollower-functions').checked,
+                always_enable_functions: document.getElementById('always-enable-functions').checked,
+                force_aiff_name_to_ingame_name: document.getElementById('force-aiff-name').checked,
+                commands_to_purge: getDynamicList('commands-to-purge-container'),
+                events_to_ignore: getDynamicList('events-to-ignore-container'),
+                use_defeat: document.getElementById('use-defeat').checked,
+                disable_worn_equipment: document.getElementById('disable-worn-equipment').checked,
+                radiance_rechat_h: document.getElementById('radiance-rechat-h').value,
+                radiance_rechat_p: document.getElementById('radiance-rechat-p').value,
+                xtts_server_override: document.getElementById('xtts-server-override').value,
+                strip_emotes_from_output: document.getElementById('strip-emotes').checked,
+                input_delay_for_radiance: document.getElementById('input-delay').value,
+                voicetype_fallbacks: getVoiceTypeFallbacks(),
+            };
+
+            try {
+                const response = await fetch('api/config.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(config),
+                });
+
+                if (response.ok) {
+                    alert('Configuration saved successfully!');
+                } else {
+                    alert('Failed to save configuration.');
+                }
+            } catch (error) {
+                console.error('Failed to submit configuration:', error);
+            }
+        }
+
+        function populateDynamicList(containerId, list) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            list.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'dynamic-list-entry';
+                div.innerHTML = `
+                    <input type="text" value="${item}">
+                    <button onclick="removeListItem(this)">Remove</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function getDynamicList(containerId) {
+            const inputs = document.querySelectorAll(`#${containerId} .dynamic-list-entry input`);
+            return Array.from(inputs).map(input => input.value).filter(value => value);
+        }
+
+        function populateVoiceTypeFallbacks(fallbacks) {
+            const container = document.getElementById('voicetype-container');
+            container.innerHTML = '';
+            for (const [voiceType, fallback] of Object.entries(fallbacks)) {
+                const div = document.createElement('div');
+                div.className = 'voicetype-entry';
+                div.innerHTML = `
+                    <input type="text" value="${voiceType}" placeholder="VoiceType">
+                    <input type="text" value="${fallback}" placeholder="Fallback">
+                    <button onclick="removeVoiceTypeEntry(this)">Remove</button>
+                `;
+                container.appendChild(div);
+            }
+        }
+
+        function getVoiceTypeFallbacks() {
+            const fallbackEntries = document.querySelectorAll('.voicetype-entry');
+            const fallbacks = {};
+            fallbackEntries.forEach(entry => {
+                const voiceType = entry.children[0].value;
+                const fallback = entry.children[1].value;
+                if (voiceType && fallback) {
+                    fallbacks[voiceType] = fallback;
+                }
+            });
+            return fallbacks;
+        }
+
+        function addListItem(containerId) {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = 'dynamic-list-entry';
+            div.innerHTML = `
+                <input type="text" value="">
+                <button onclick="removeListItem(this)">Remove</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function removeListItem(button) {
+            const entry = button.parentElement;
+            entry.remove();
+        }
+
+        function addVoiceTypeEntry() {
+            const container = document.getElementById('voicetype-container');
+            const div = document.createElement('div');
+            div.className = 'voicetype-entry';
+            div.innerHTML = `
+                <input type="text" placeholder="VoiceType">
+                <input type="text" placeholder="Fallback">
+                <button onclick="removeVoiceTypeEntry(this)">Remove</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function removeVoiceTypeEntry(button) {
+            const entry = button.parentElement;
+            entry.remove();
+        }
+    </script>
+
+</body>
+</html>

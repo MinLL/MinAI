@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landing Page</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            height: 100%;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            background: linear-gradient(to bottom, #ffffff, #e0e0e0);
+        }
+
+        .splash-image {
+            width: 100%;
+            max-width: 200px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        p {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        .version-info {
+            margin-bottom: 20px;
+            color: #666;
+            font-size: 16px;
+        }
+
+        .update-warning {
+            color: #FF5733;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .links {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .links a, .update-button {
+            display: block;
+            text-decoration: none;
+            font-size: 20px;
+            color: #ffffff;
+            background-color: #4CAF50;
+            padding: 15px 30px;
+            margin: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .links a:hover, .update-button:hover {
+            background-color: #45a049;
+        }
+
+        .update-buttons {
+            margin-bottom: 20px;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        footer {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            color: #777;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 36px;
+            }
+
+            .links a {
+                font-size: 18px;
+                padding: 12px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Welcome to the MinAI Configuration Page</h1>
+        <p>Manage your game settings, configuration, and more from here.</p>
+
+        <!-- Splash Image -->
+        <img src="splash.png" alt="Splash Image" class="splash-image">
+
+        <!-- Version Info -->
+        <div id="version-info" class="version-info">
+            Checking for updates...
+        </div>
+
+        <!-- Error Message (hidden by default) -->
+        <div id="error-message" class="error-message" style="display:none;"></div>
+
+        <!-- Update Buttons for Stable and Main Branch -->
+        <div id="update-buttons" class="update-buttons" style="display:none;">
+            <table>
+                <tr>
+                    <td>
+                        <button class="update-button" onclick="updateToLatestVersion('stable')">Update to Latest Stable</button>
+                    </td>
+                    <td>
+                        <button class="update-button" onclick="updateToLatestVersion('main')">Update to Latest Development</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Navigation Links -->
+        <div class="links">
+            <a href="config.html">Configuration</a>
+            <a href="we_manager.html">Equipment Manager</a>
+            <a href="https://github.com/MinLL/MinAI/tree/main">Github</a>
+	    <a href="/HerikaServer/">Back to Main AI-FF Page</a>
+        </div>
+    </div>
+
+    <footer>
+        MinAI
+    </footer>
+
+    <script>
+        // Function to fetch the local version from version.txt (bypassing the cache)
+        async function fetchLocalVersion() {
+            try {
+                const timestamp = new Date().getTime(); // Use the current timestamp to bypass cache
+                const response = await fetch(`version.txt?cache_buster=${timestamp}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch local version');
+                }
+                const version = await response.text();
+                return version.trim();
+            } catch (error) {
+                console.error('Error fetching local version:', error);
+                return null;
+            }
+        }
+
+        // Function to fetch the latest version from GitHub (bypassing the cache)
+        async function fetchGitHubVersion(branch) {
+            const githubRepo = 'MinLL/MinAI'; // Your GitHub repository
+            const versionFilePath = 'version.txt'; // Path to the version file in your GitHub repository
+            const timestamp = new Date().getTime(); // Use the current timestamp to bypass cache
+            const url = `https://raw.githubusercontent.com/${githubRepo}/refs/heads/${branch}/${versionFilePath}?cache_buster=${timestamp}`;
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch GitHub version');
+                }
+                const version = await response.text();
+                return version.trim();
+            } catch (error) {
+                console.error('Error fetching GitHub version:', error);
+                return null;
+            }
+        }
+
+        // Function to call the PHP API to update to the selected branch
+        async function updateToLatestVersion(branch) {
+            try {
+                const response = await fetch(`api/update.php?branch=${branch}`, { method: 'POST' });
+                const result = await response.json();
+                const errorMessageDiv = document.getElementById('error-message');
+
+                if (response.ok && result.status === 'success') {
+                    alert(`Updated to the latest version on the ${branch} branch! Please refresh the page.`);
+                } else {
+                    const errorDetails = result.message || 'Unknown error';
+                    errorMessageDiv.textContent = `Error updating to the latest ${branch} branch: ${errorDetails}`;
+                    if (result.output) {
+                        errorMessageDiv.textContent += `\nDetails: ${result.output.join('\n')}`;
+                    }
+                    errorMessageDiv.style.display = 'block';
+                }
+            } catch (error) {
+                const errorMessageDiv = document.getElementById('error-message');
+                errorMessageDiv.textContent = `Error updating to the latest version: ${error.message}`;
+                errorMessageDiv.style.display = 'block';
+                console.error('Error updating to the latest version:', error);
+            }
+        }
+
+        // Function to compare the local version with both GitHub branches
+        async function checkForUpdates() {
+            const localVersion = await fetchLocalVersion();
+            const stableVersion = await fetchGitHubVersion('stable');
+            const mainVersion = await fetchGitHubVersion('main');
+
+            const versionInfoDiv = document.getElementById('version-info');
+            const updateButtonsDiv = document.getElementById('update-buttons');
+
+            if (localVersion && stableVersion) {
+                let message = `Local version: ${localVersion} | Latest stable: ${stableVersion} | Latest development: ${mainVersion}`;
+
+                if (localVersion === stableVersion && localVersion === mainVersion) {
+                    versionInfoDiv.textContent = `You are using the latest version (${localVersion})`;
+                } else {
+                    versionInfoDiv.innerHTML = `
+                        <p class="update-warning">New versions are available!</p>
+                        <p>${message}</p>
+                    `;
+                    // updateButtonsDiv.style.display = 'block';
+                }
+            } else {
+                versionInfoDiv.textContent = 'Unable to check for updates at this time.';
+            }
+        }
+
+        // Run the update check when the page loads
+        document.addEventListener('DOMContentLoaded', checkForUpdates);
+    </script>
+
+</body>
+</html>
