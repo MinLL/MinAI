@@ -169,28 +169,10 @@ function ProcessIntegrations() {
     if (isset($GLOBALS["gameRequest"]) && str_starts_with(strtolower($GLOBALS["gameRequest"][0]), "sextalk")) {
         $type = $GLOBALS["gameRequest"][0];
         $scene = getScene($GLOBALS["HERIKA_NAME"]);
-        $sceneDesc = $scene["description"];
-        if(!$sceneDesc) {
-            if($scene["fallback"]) {
-                $sceneDesc = $scene["fallback"];
-            } else {
-                $sceneDesc = "{$scene["actors"]} are having sex.";
-            }
-            
-        }
-
         $prompt = "";
 
         switch($type) {
             case "sextalk_scenechange": {
-                $prompt = "The Narrator: ";
-                
-                if(!$scene["prev_scene_id"]) {
-                    $prompt .= "{$scene["actors"]} started sex scene.";
-                } else {
-                    $prompt .= "{$scene["actors"]} changed position.";
-                }
-                $prompt .= " $sceneDesc";
                 break;
             }
             case "sextalk_speedincrease":

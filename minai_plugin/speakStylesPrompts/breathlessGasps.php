@@ -1,6 +1,6 @@
 <?php
 
-function setBreathlessGaspsPrompts($currentName, $targetToTalk)
+function setBreathlessGaspsPrompts($currentName)
 {
     $GLOBALS["PROMPTS"]["sextalk_climaxchastity"] = [
         "cue" => [
