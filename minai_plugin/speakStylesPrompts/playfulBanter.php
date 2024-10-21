@@ -48,9 +48,9 @@ function setPlayfulBanterPrompts($currentName) {
             "$currentName comments on their partner's body, using a playful and lighthearted tone to keep the mood light. {$GLOBALS["TEMPLATE_DIALOG"]}",
             "$currentName says something funny about their partner's attempts to seduce them. {$GLOBALS["TEMPLATE_DIALOG"]}",
             "$currentName describes the way their partner's teasing makes them laugh. {$GLOBALS["TEMPLATE_DIALOG"]}",
-            "$currentName talks about how much they love their partner's playful jokes. {$GLOBALS["TEMPLATE_DIALOG"]}",
+            "$currentName enjoys the passionate pace set by their partner, resulting in flirtatious and fun remarks. {$GLOBALS["TEMPLATE_DIALOG"]}",
             "$currentName says something cheeky about their partner's flirting. {$GLOBALS["TEMPLATE_DIALOG"]}",
-            "$currentName comments on the way their partner's silly face make them smile during sex. {$GLOBALS["TEMPLATE_DIALOG"]}"
+            "The attention to their erogenous zones delights $currentName, who can't resist making witty comments. {$GLOBALS["TEMPLATE_DIALOG"]}"
         ],
     ];
 }

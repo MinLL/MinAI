@@ -48,10 +48,10 @@ function setSultrySeductionPrompts($currentName)
         "cue" => [
             "$currentName comments on their partner's body, using a smooth and seductive tone to describe their attraction. {$GLOBALS["TEMPLATE_DIALOG"]}",
             "$currentName says something enticing about their partner's eyes. {$GLOBALS["TEMPLATE_DIALOG"]}",
-            "$currentName describes the way their partner's skin looks in the light. {$GLOBALS["TEMPLATE_DIALOG"]}",
+            "Breathlessly, $currentName expresses gratitude for the pleasure with a whispered, suggestive phrase.",
             "$currentName talks about how much they love their partner's gentle caress. {$GLOBALS["TEMPLATE_DIALOG"]}",
-            "$currentName says something alluring about their partner's smile. {$GLOBALS["TEMPLATE_DIALOG"]}",
-            "$currentName comments on the way their partner's voice sounds during sex. {$GLOBALS["TEMPLATE_DIALOG"]}"
+            "In a moment of passion, $currentName murmurs a seductive sentence, expressing how $currentName is losing control. {$GLOBALS["TEMPLATE_DIALOG"]}",
+            "With a soft laugh, $currentName uses a playful phrase to encourage partner to explore further, hinting at the pleasures to come."
         ],
     ];
 }

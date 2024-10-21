@@ -49,7 +49,7 @@ function setEroticStorytellingPrompts($currentName)
             "$currentName says something erotic about their partner's body, describing their attraction to it. {$GLOBALS["TEMPLATE_DIALOG"]}",
             "$currentName says something seductive about a fantasy scenario involving their partner. {$GLOBALS["TEMPLATE_DIALOG"]}",
             "$currentName describes a sensual scene involving their partner's touch. {$GLOBALS["TEMPLATE_DIALOG"]}",
-            "$currentName talks about how much they love a particular fantasy involving their partner. {$GLOBALS["TEMPLATE_DIALOG"]}",
+            "$currentName catching off guard their partner, reveals their deepest, most intimate desire, a scenario that leaves them all trembling with anticipation. {$GLOBALS['TEMPLATE_DIALOG']}",
             "$currentName says something erotic about a roleplay scenario involving their partner's body. {$GLOBALS["TEMPLATE_DIALOG"]}",
             "$currentName comments on the way their partner's body fits into their favorite fantasy. {$GLOBALS["TEMPLATE_DIALOG"]}"
         ],

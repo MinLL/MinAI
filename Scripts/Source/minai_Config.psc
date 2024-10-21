@@ -34,6 +34,7 @@ int commentsRateOID
 int forceOrgasmCommentOID
 int forcePostSceneCommentOID
 int prioritizePlayerThreadOID
+int enableAmbientCommentsOID
 
 int aOIDMap ; Jmap for storing action oid's
 int aCategoryMap ; Jmap for storing action categories
@@ -127,6 +128,9 @@ bool Property forcePostSceneComment = true Auto
 
 bool prioritizePlayerThreadDefault = true
 bool Property prioritizePlayerThread = true Auto
+
+bool enableAmbientCommentsDefault = true
+bool Property enableAmbientComments = true Auto
 
   
 Event OnConfigInit()
@@ -238,6 +242,7 @@ Function RenderSexPage()
   prioritizePlayerThreadOID = AddToggleOption("Prioritize comments in player's scene", prioritizePlayerThread)
   forceOrgasmCommentOID = AddToggleOption("Force orgasm comment", forceOrgasmComment)
   forcePostSceneCommentOID = AddToggleOption("Force post scene comment", forcePostSceneComment)
+  enableAmbientCommentsOID = AddToggleOption("Enable ambient comments between events", enableAmbientComments)
 EndFunction
 
 
@@ -489,6 +494,9 @@ Event OnOptionSelect(int oid)
   elseif oid == testActionsOID
     main.TestModEvents()
     Debug.MessageBox("Testing mod events...")
+  elseif oid == enableAmbientCommentsOID
+    enableAmbientComments = !enableAmbientComments
+    SetToggleOptionValue(oid, enableAmbientComments)
   EndIf
   int i = 0
   string[] categories = JMap.allKeysPArray(aCategoryMap)
@@ -599,6 +607,9 @@ Event OnOptionDefault(int oid)
   elseif oid == prioritizePlayerThreadOID
     prioritizePlayerThread = prioritizePlayerThreadDefault
     SetToggleOptionValue(oid, prioritizePlayerThreadDefault)
+  elseif oid == enableAmbientCommentsOID
+    enableAmbientComments = enableAmbientCommentsDefault
+    SetToggleOptionValue(oid, enableAmbientCommentsDefault)
   EndIf
 EndEvent
 
@@ -667,6 +678,8 @@ Event OnOptionHighlight(int oid)
     SetInfoText("The duration of time which must pass without the action being used for the cooldown to return to the base value")
   elseif oid == testActionsOID
     SetInfoText("For debugging purposes. Send test mod events to the backend")
+  elseif oid == enableAmbientCommentsOID
+    SetInfoText("Enable ambient comments between events. Follows comments during sex scene cooldown. Polling mechanism checking each time if there is no cooldown on comments and fires ambient talking.")
   EndIf
   int i = 0
   string[] actions = JMap.allKeysPArray(aiff.actionRegistry)
