@@ -297,7 +297,14 @@
                 <input type="checkbox" id="disable-worn-equipment">
             </div>
 
-            <!-- radiance_rechat_h -->
+            <!-- strip_emotes_from_output -->
+            <div class="option-group checkbox-group">
+                <label class="option-label" for="strip-emotes">Strip emotes from output</label>
+                <p>Remove anything between two astericks from the response. Useful if your LLM likes to respond with things like *smirking*, *laughing*, etc.</p>
+                <input type="checkbox" id="strip-emotes">
+            </div>
+
+	    <!-- radiance_rechat_h -->
             <div class="option-group slider">
                 <label class="option-label" for="radiance-rechat-h">Radiance Rechat H</label>
                 <p>Overrides for rechat settings during radiant dialogue.</p>
@@ -366,6 +373,7 @@
                 document.getElementById('radiance-rechat-p').value = configData.radiance_rechat_p;
                 document.getElementById('xtts-server-override').value = configData.xtts_server_override;
                 document.getElementById('input-delay').value = configData.input_delay_for_radiance;
+		document.getElementById('strip-emotes').checked = configData.strip_emotes_from_output;
                 populateVoiceTypeFallbacks(configData.voicetype_fallbacks);
 
                 document.getElementById('loading-message').style.display = 'none';
