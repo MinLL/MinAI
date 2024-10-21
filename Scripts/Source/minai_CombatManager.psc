@@ -5,6 +5,7 @@ minai_AIFF aiff
 minai_Sex  sex
 minai_DeviousStuff devious
 minai_Config config
+minai_Followers followers
 DefeatConfig Defeat
   
 actor playerRef
@@ -24,6 +25,7 @@ function Maintenance(minai_MainQuestController _main)
   aiff = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_AIFF
   sex = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_Sex
   devious = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_DeviousStuff
+  followers = Game.GetFormFromFile(0x0913, "MinAI.esp") as minai_Followers
   Main.Info("Initializing Combat Management Module.")
   bHasAIFF = (Game.GetModByName("AIAgent.esp") != 255)
   bHasDefeat = (Game.GetModByName("SexlabDefeat.esp") != 255)
@@ -73,18 +75,21 @@ string Function GetFactionsForActor(actor akTarget)
 EndFunction
 
 
-Function OnCombatStart()
+Function OnCombatStart(actor akTarget)
   Main.Info("Combat: OnCombatStart()")
 EndFunction
 
-Function OnCombatEnd()
+Function OnCombatEnd(actor akTarget)
   Main.Info("Combat: OnCombatEnd()")
   if !bHasDefeat || !bHasAIFF
     return
   EndIf
-  if (Defeat.IsDefeatActive(playerRef))
+  bool defeated = Defeat.IsDefeatActive(akTarget)
+  if (defeated && akTarget == playerRef)
     AIAgentFunctions.requestMessage("The party was defeated in combat", "minai_combatenddefeat")
-  else
+   elseif (!defeated && akTarget == playerRef)
     AIAgentFunctions.requestMessage("The party was victorious in combat", "minai_combatendvictory")
+  elseif (defeated && followers.IsFollower(akTarget))
+    AIAgentFunctions.requestMessage(Main.GetActorName(akTarget) + " was defeated in combat", "minai_combatenddefeat")
   EndIf
 EndFunction

@@ -6,22 +6,20 @@ minai_Survival survival
 minai_Arousal arousal
 minai_DeviousStuff devious
 minai_AIFF aiff
+minai_Followers followers 
 minai_MainQuestController main
 Spell SapienceSpell
 Spell ContextSpell
 GlobalVariable minai_SapienceEnabled
-Faction followerFaction
-Faction nffFollowerFaction
-  actor playerRef
+actor playerRef
 	
 Event OnEffectStart(Actor akTarget, Actor akCaster)
   main = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_MainQuestController
   aiff = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_AIFF
+  followers = Game.GetFormFromFile(0x0913, "MinAI.esp") as minai_Followers
   SapienceSpell = Game.GetFormFromFile(0x0917, "MinAI.esp") as Spell
   ContextSpell = Game.GetFormFromFile(0x090A, "MinAI.esp") as Spell
   minai_SapienceEnabled = Game.GetFormFromFile(0x091A, "MinAI.esp") as GlobalVariable
-  followerFaction = Game.GetFormFromFile(0x05C84E, "Skyrim.esm") as Faction
-  nffFollowerFaction = Game.GetFormFromFile(0x094CC, "nwsFollowerFramework.esp") as Faction
   if (!akTarget || !main || !aiff || !aiff.IsInitialized())
     Debug.Trace("[minai] SAPIENCE: Skipping OnEffectStart, not ready")
     return
@@ -39,7 +37,7 @@ Event OnEffectFinish(Actor akTarget, Actor akCaster)
     Main.Warn("SAPIENCE: Could not find target actor. Aborting.")
     return
   EndIf
-  if IsFollower(akTarget)
+  if followers.IsFollower(akTarget)
     Main.Debug("SAPIENCE: Aborting. " + targetName + " is a follower.")
     return
   EndIf
@@ -79,7 +77,7 @@ Event OnUpdate()
   EndIf
   string targetName = Main.GetActorName(akTarget)
   Main.Debug("SAPIENCE Processing (" + targetName +")")
-  if IsFollower(akTarget)
+  if followers.IsFollower(akTarget)
     Main.Debug("SAPIENCE: Aborting. " + targetName + " is a follower.")
     return
   EndIf
@@ -95,7 +93,3 @@ Event OnUpdate()
     aiff.EnableActorAI(akTarget)
   EndIf
 EndEvent
-
-bool Function IsFollower(actor akTarget)
-  return (nffFollowerFaction && akTarget.IsInFaction(nffFollowerFaction)) || akTarget.IsInFaction(followerFaction)
-EndFunction

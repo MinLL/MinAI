@@ -9,7 +9,9 @@ minai_Config config
 actor playerRef
 bool bHasAIFF
 bool bHasNFF
-
+  
+Faction followerFaction
+Faction nffFollowerFaction
 nwsFollowerControllerScript nff
 
 function Maintenance(minai_MainQuestController _main)
@@ -26,9 +28,11 @@ function Maintenance(minai_MainQuestController _main)
   RegisterForModEvent("AIFF_CommandReceived", "CommandDispatcher") ; Hook into AIFF - This is a separate quest, so we have to do this separately
   bHasAIFF = (Game.GetModByName("AIAgent.esp") != 255)
   bHasNFF = (Game.GetModByName("nwsFollowerFramework.esp") != 255)
+  followerFaction = Game.GetFormFromFile(0x05C84E, "Skyrim.esm") as Faction
   if bHasNFF
     Main.Info("Found NFF")
     nff = Game.GetFormFromFile(0x00434F, "nwsFollowerFramework.esp") as nwsFollowerControllerScript
+    nffFollowerFaction = Game.GetFormFromFile(0x094CC, "nwsFollowerFramework.esp") as Faction
     if !nff
       Main.Error("Could not load main NFF quest. Disabling NFF support")
       bHasNFF = False
@@ -87,4 +91,10 @@ Function UpdateFollowerDiaries()
     aiff.UpdateDiary(targetName)
     i += 1
   EndWhile
+EndFunction
+
+
+
+bool Function IsFollower(actor akTarget)
+  return (nffFollowerFaction && akTarget.IsInFaction(nffFollowerFaction)) || akTarget.IsInFaction(followerFaction)
 EndFunction
