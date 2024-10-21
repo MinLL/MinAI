@@ -36,6 +36,9 @@ MinAI implements many NSFW integrations for users that have either OStim or Sexl
 * NPC's will be aware of, and react to all sexlab aroused keywords. I was getting some pretty amusing / interesting comments and reactions while wearing a set of Iron or Steel Bikini Armor from TAWOBA.
 * The AI will sometimes sexually harass you if you're wearing skimpy armor. Spanking, groping, pinching nipples, etc.
 
+### Dripping When Aroused NG
+* NPC's will know when certain DW events occur (virginity loss, squirting, milk leak, cum leak)
+
 ### The New Gentlemen
 * LLM will be aware of exposed penis sizes.
 * Currently, auto assigned addons are finicky (to be addressed in a future TNG update). Manually assign a type and size to PC/NPC with TNG hotkey to ensure LLM awareness.
@@ -70,3 +73,6 @@ MinAI implements many NSFW integrations for users that have either OStim or Sexl
 * NPC's can grope the player if they want. This event needs to be expanded. It's pretty simple at the moment.
 * NPC's can pinch the player's nipples if they want. This event needs to be expanded. It's pretty simple at the moment.
 
+### (In Development) Diary of Mine (DoM, PAH, HSH, AYGAS)
+* Slave context, character info, and events exposed to AIFF/Sapient NPCs
+* Slave actions - TBD
