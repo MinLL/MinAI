@@ -1,6 +1,9 @@
 <?php
 
 header('Content-Type: application/json');
+$path = "..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR;
+require_once($path . "conf".DIRECTORY_SEPARATOR."conf.php");
+require_once($path. "lib" .DIRECTORY_SEPARATOR."{$GLOBALS["DBDRIVER"]}.class.php");
 
 // Get the branch from the request
 $branch = isset($_GET['branch']) ? $_GET['branch'] : 'main';
@@ -84,6 +87,11 @@ if ($returnVar !== 0) {
 
 // Clean up the temp directory
 shell_exec("rm -rf $tempDir");
+
+// Clean up DB and perform migrations
+$db = new sql();
+$db->execQuery("DROP TABLE IF EXISTS custom_context");
+$db->execQuery("DROP TABLE IF EXISTS custom_actions");
 
 // If successful, return a success message
 echo json_encode([
