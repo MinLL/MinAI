@@ -385,7 +385,7 @@ Function SetTestContextNPC()
     ModEvent.PushString(handle, "testmod")
     ModEvent.PushString(handle, "testkeynpc")
     ModEvent.PushString(handle, "testvaluenpc")
-    ModEvent.PushString(handle, "Uthgerd")
+    ModEvent.PushString(handle, "Uthgerd the Unbroken")
     ModEvent.PushInt(handle, 1200)
     ModEvent.Send(handle)
   endIf
