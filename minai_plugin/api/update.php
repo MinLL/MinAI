@@ -93,6 +93,11 @@ $db = new sql();
 $db->execQuery("DROP TABLE IF EXISTS custom_context");
 $db->execQuery("DROP TABLE IF EXISTS custom_actions");
 
+// Run migrate script
+$migrateScript = "..".DIRECTORY_SEPARATOR."migrate.php";
+if (file_exists($migrateScript))
+    include($migrateScript);
+
 // If successful, return a success message
 echo json_encode([
     'status' => 'success',
