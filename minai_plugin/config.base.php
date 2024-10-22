@@ -1,8 +1,8 @@
 <?php
-$GLOBALS['PLAYER_BIO'] = "I'm #PLAYER_NAME#. I'm a somewhat wild looking half-elf with black hair and blue eyes. ";
+$GLOBALS['PLAYER_BIO'] = "I'm #PLAYER_NAME#. ";
 $GLOBALS['PROMPT_HEAD_OVERRIDE'] = "Let's roleplay in the Universe of Skyrim.  ";
 $GLOBALS['use_narrator_profile'] = false;
-$GLOBALS['stop_narrator_context_leak'] = false;
+$GLOBALS['stop_narrator_context_leak'] = true;
 $GLOBALS['devious_narrator_eldritch_voice'] = "dragon";
 $GLOBALS['devious_narrator_telvanni_voice'] = "TelvanniNarrator";
 $GLOBALS['force_voice_type'] = false;
