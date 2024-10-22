@@ -54,7 +54,7 @@ Function Maintenance()
   RegisterForModEvent("MinAI_SetContext", "OnSetContext")
   RegisterForModEvent("MinAI_SetContextNPC", "OnSetContextNPC")      
   RegisterForModEvent("MinAI_RegisterAction", "OnRegisterAction")
-  ; RegisterTestAction()
+  
   Info("Checking for installed mods...")
 
   minai_WhichAI = Game.GetFormFromFile(0x0907, "MinAI.esp") as GlobalVariable
@@ -359,6 +359,37 @@ Event OnRegisterAction(string actionName, string actionPrompt, string mcmDescrip
   endif
 EndEvent
 
+Function SendTestEvent()
+  int handle = ModEvent.Create("MinAI_RegisterEvent")
+  if (handle)
+    ModEvent.PushString(handle, "testevent")
+    ModEvent.PushString(handle, "info_testevent")
+    ModEvent.Send(handle)
+  endIf
+EndFunction
+
+Function SetTestContext()
+  int handle = ModEvent.Create("MinAI_SetContext")
+  if (handle)
+    ModEvent.PushString(handle, "testmod")
+    ModEvent.PushString(handle, "testkey")
+    ModEvent.PushString(handle, "testvalue")
+    ModEvent.PushInt(handle, 1200)
+    ModEvent.Send(handle)
+  endIf
+EndFunction
+
+Function SetTestContextNPC()
+  int handle = ModEvent.Create("MinAI_SetContextNPC")
+  if (handle)
+    ModEvent.PushString(handle, "testmod")
+    ModEvent.PushString(handle, "testkeynpc")
+    ModEvent.PushString(handle, "testvaluenpc")
+    ModEvent.PushString(handle, "Uthgerd")
+    ModEvent.PushInt(handle, 1200)
+    ModEvent.Send(handle)
+  endIf
+EndFunction 
 
 Function RegisterTestAction()
   int handle = ModEvent.Create("MinAI_RegisterAction")
@@ -373,4 +404,11 @@ Function RegisterTestAction()
     ModEvent.PushInt(handle, 1200)
     ModEvent.Send(handle)
   endIf
+EndFunction
+
+Function TestModEvents()
+  SendTestEvent()
+  SetTestContext()
+  SetTestContextNPC()
+  RegisterTestAction()
 EndFunction
