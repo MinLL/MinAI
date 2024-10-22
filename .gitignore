@@ -12,3 +12,5 @@ skyrimse.ppj
 SkyrimSE.code-workspace
 minai_plugin/sceneDescriptionsDBImport/imported.txt
 minai_plugin/xPersonalitiesDBImport/imported.txt
+
+.vs/
