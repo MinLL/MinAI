@@ -1,5 +1,4 @@
 <?php
-require_once("config.php");
 define("MINAI_ACTOR_VALUE_CACHE", "minai_actor_value_cache");
 require_once("importDataToDB.php");
 

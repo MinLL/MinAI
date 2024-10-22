@@ -92,6 +92,12 @@
             font-size: 16px;
             margin-bottom: 20px;
         }
+	
+	.nsfw-mode {
+            color: purple;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
 
         footer {
             position: absolute;
@@ -122,6 +128,9 @@
         <!-- Splash Image -->
         <img src="splash.png" alt="Splash Image" class="splash-image">
 
+	<!-- Error Message (hidden by default) -->
+        <div id="nsfw-mode" class="nsfw-mode" style="display:none;">NSFW mode is currently enabled</div>
+	
         <!-- Version Info -->
         <div id="version-info" class="version-info">
             Checking for updates...
@@ -148,8 +157,18 @@
         <div class="links">
             <a href="config.html">Configuration</a>
             <a href="we_manager.html">Equipment Manager</a>
-            <a href="https://github.com/MinLL/MinAI/tree/main">Github</a>
-            <a href="/HerikaServer/">Back to Main AI-FF Page</a>
+	    <br />
+	    <div class="nsfw-options" id="nsfw-options" style="display:none;">
+	      <a href="personalities.html">Edit NPC Sex Personalities</a>
+	      <a href="scene_descriptions.html">Edit Sex Scene Descriptions</a>
+	    </div>
+	    <table>
+	      <tr><td>
+		  <a href="https://github.com/MinLL/MinAI/tree/main">Github</a>
+		  </td><td>
+		  <a href="/HerikaServer/">Back to Main AI-FF Page</a>
+	      </td></tr>
+	    </table>
         </div>
     </div>
 
@@ -252,7 +271,51 @@
         }
 
         // Run the update check when the page loads
-        document.addEventListener('DOMContentLoaded', checkForUpdates);
+      document.addEventListener('DOMContentLoaded', checkForUpdates);
+       // Global variable to store the fetched payload
+        var fetchedPayload = {};
+
+        // Function to fetch the index_payload on page load
+        async function fetchPayload() {
+            try {
+                const response = await fetch('api/main.php?endpoint=index_payload', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                // Parse the JSON response
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Store the data in the global variable
+                    fetchedPayload = result.data;
+                    console.log('Payload received:', fetchedPayload);
+                    return fetchedPayload;  // Return the payload data
+                } else {
+                    console.error('Error fetching payload:', result.message);
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+            }
+        }
+
+        // Fetch the payload when the page loads
+        window.onload = async function() {
+            // Wait for the payload to be fetched
+            var data = await fetchPayload();
+            console.log(data);
+
+            // Check if nsfw exists in the payload and take action
+            if (data && data.nsfw === "nsfw") {
+                console.log("NSFW mode enabled");
+                var nsfwDiv = document.getElementById('nsfw-mode');
+                nsfwDiv.style.display = 'block';  // Show the NSFW mode div
+		var nsfwOptionsDiv = document.getElementById('nsfw-options');
+                nsfwOptionsDiv.style.display = 'block';  // Show the NSFW options div
+            }
+        };
     </script>
 
 </body>

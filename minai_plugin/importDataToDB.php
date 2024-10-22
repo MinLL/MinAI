@@ -22,15 +22,17 @@ function importDataToDB($tableName, $folderName, $createQuery)
         // Check if the current item is a file (not a directory)
         if ($fileInfo->isFile()) {
             $fileName = $fileInfo->getFileName();
+            error_log("Processing $fileName");
             $extension = $fileInfo->getExtension();
             $filePath = $fileInfo->getRealPath();
             if ($extension !== "csv" || in_array($fileName, $importedVersions)) {
+                error_log("Not processing");
                 continue;
             }
+error_log("Opening $filePath");                
 
             if (($handle = fopen($filePath, "r")) !== FALSE) {
                 $headers = fgetcsv($handle, 1000, ",");
-                
                 while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
                     $insertData = [];
 
@@ -41,7 +43,6 @@ function importDataToDB($tableName, $folderName, $createQuery)
                         }
                         $insertData[$header] = $value;
                     }
-
                     $db->insert($tableName, $insertData);
                 }
 

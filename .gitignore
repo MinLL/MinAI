@@ -14,3 +14,5 @@ minai_plugin/sceneDescriptionsDBImport/imported.txt
 minai_plugin/xPersonalitiesDBImport/imported.txt
 
 .vs/
+
+*.php#
