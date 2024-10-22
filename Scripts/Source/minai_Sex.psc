@@ -236,14 +236,16 @@ Function ProcessActorsAndStartScenes(Actor[] actors)
   ; Continue processing while we have more than 5 actors
   While actors.Length > 5
     Main.Debug(actors.Length + " actors total found for orgy scenes.")
-    ; Randomly choose group size (3 or 4 actors)
-    int groupSize = Utility.RandomInt(3, 4)    
+    ; Randomly choose group size (3 to 5 actors)
+    int groupSize = Utility.RandomInt(3, 5)    
     ; Create a new array for the selected actors
     Actor[] lessActors
     if groupSize == 3
       lessActors = new Actor[3]
-    else
+    elseif groupSize == 4
       lessActors = new Actor[4]
+    else
+      lessActors = new Actor[5]
     EndIf
     int groupIndex = groupSize - 1
     lessActors = PapyrusUtil.SliceActorArray(actors, 0, groupIndex)
@@ -252,7 +254,7 @@ Function ProcessActorsAndStartScenes(Actor[] actors)
     ; Start the sex scene with the selected group
     StartSexOrSwitchToGroup(lessActors, lessActors[0], "")
     ; Remove the selected actors from the main array
-    actors = PapyrusUtil.SliceActorArray(actors, groupIndex)
+    actors = PapyrusUtil.SliceActorArray(actors, groupSize)
     Main.Debug(actors.Length + " actors remain to be processed for orgy scenes.")
     Utility.Wait(3.0)
   EndWhile
