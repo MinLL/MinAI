@@ -13,7 +13,7 @@ function CreateContextTableIfNotExists() {
       eventValue TEXT NOT NULL,
       ttl INT,
       expiresAt INT,
-      npcName TEXT NOT NULL
+      npcName TEXT NOT NULL,
       PRIMARY KEY (modName, eventKey)
     )"
   );
