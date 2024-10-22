@@ -172,17 +172,22 @@ Function StartSexScene(actor[] actors, bool bPlayerInScene, string tags="")
   if bHasOstim && minai_UseOStim.GetValue() == 1.0
     tags = ConvertTagsOstim(tags)
     actors = OActorUtil.Sort(actors, OActorUtil.EmptyArray())
-    string newScene = OLibrary.GetRandomSceneWithAnyActionCSV(actors, tags)
-    Utility.Wait(0.5)
-    if newScene == ""
-      newScene = OLibrary.GetRandomSceneWithAnySceneTagCSV(actors, tags)
-      Utility.Wait(1)
+    string newScene = ""
+    if tags != ""
+      newScene = OLibrary.GetRandomSceneWithAnyActionCSV(actors, tags)
+      Utility.Wait(0.5)
       if newScene == ""
-        Main.Debug("No OStim scene found for: " + tags)
+        newScene = OLibrary.GetRandomSceneWithAnySceneTagCSV(actors, tags)
+        Utility.Wait(1)
+        if newScene == ""
+          Main.Debug("No OStim scene found for: " + tags)
+        else
+          Main.Debug("Found " + tags + " scene: " + newScene + " for OStim Thread [" + ActiveOstimThreadID + "].")
+        EndIf
       EndIf
     EndIf
     int ActiveOstimThreadID = OThread.Quickstart(actors, newScene)
-    Main.Debug("Found " + tags + " scene: " + newScene + " for OStim Thread [" + ActiveOstimThreadID + "].")
+    Main.Debug("OStim Thread [" + ActiveOstimThreadID + "] Initialized")
   else
     StartSexlabScene(bPlayerInScene, actors, tags)
   EndIf
@@ -207,6 +212,54 @@ Function StartSexScene(actor[] actors, bool bPlayerInScene, string tags="")
     EndWhile
     ; sexStr += " started having sex. (" + tags +") "
     Main.RegisterEvent(sexStr, "info_sexscene")
+  EndIf
+EndFunction
+
+
+
+Actor[] Function SortSexActors(Actor[] actors, Actor[] dominantActors)
+  if dominantActors == ""
+    dominantActors = OActorUtil.EmptyArray()
+  EndIf
+  if bHasOstim && minai_UseOStim.GetValue() == 1.0
+    actors = OActorUtil.Sort(actors, dominantActors)
+  else
+    actors = slf.SortActors(actors)
+  EndIf
+  return actors
+EndFunction
+
+
+
+Function ProcessActorsAndStartScenes(Actor[] actors)
+  Actor[] emptyDominantActors = new Actor[1]
+  ; Continue processing while we have more than 5 actors
+  While actors.Length > 5
+    Main.Debug(actors.Length + " actors total found for orgy scenes.")
+    ; Randomly choose group size (3 or 4 actors)
+    int groupSize = Utility.RandomInt(3, 4)    
+    ; Create a new array for the selected actors
+    Actor[] lessActors
+    if groupSize == 3
+      lessActors = new Actor[3]
+    else
+      lessActors = new Actor[4]
+    EndIf
+    int groupIndex = groupSize - 1
+    lessActors = PapyrusUtil.SliceActorArray(actors, 0, groupIndex)
+    ; Sort the selected actors
+    lessActors = SortSexActors(lessActors, emptyDominantActors)
+    ; Start the sex scene with the selected group
+    StartSexOrSwitchToGroup(lessActors, lessActors[0], "")
+    ; Remove the selected actors from the main array
+    actors = PapyrusUtil.SliceActorArray(actors, groupIndex)
+    Main.Debug(actors.Length + " actors remain to be processed for orgy scenes.")
+    Utility.Wait(3.0)
+  EndWhile
+  ; Process the final group (5 or fewer actors)
+  If actors.Length > 0
+    actors = SortSexActors(actors, emptyDominantActors)
+    StartSexOrSwitchToGroup(actors, actors[0], "")
   EndIf
 EndFunction
 
@@ -675,21 +728,7 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   elseIf command == "ExtCmdStartOrgy"
     actor[] actors = aiff.GetNearbyAI()
     actors = PapyrusUtil.PushActor(actors,playerRef)
-    if (actors.Length > 5)
-      actor[] newActors = new actor[5];
-      int i = 0;
-      while i  < 5
-        newActors[i] = actors[i]
-        i += 1
-      EndWhile
-      actors = newActors
-    EndIf
-    if bHasOstim && minai_UseOStim.GetValue() == 1.0
-      actors = OActorUtil.Sort(actors, OActorUtil.EmptyArray()) ; 2nd param is array of dominant actors
-    else
-      actors = slf.SortActors(actors)
-    EndIf
-    StartSexOrSwitchToGroup(actors, akSpeaker, "")
+    ProcessActorsAndStartScenes(actors)
   elseif command == "ExtCmdEndSex"
     EndSex(akSpeaker)
   elseif command == "ExtCmdSpeedUpSex"
