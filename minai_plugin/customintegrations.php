@@ -13,13 +13,10 @@ function CreateContextTableIfNotExists() {
       eventValue TEXT NOT NULL,
       ttl INT,
       expiresAt INT,
+      npcName TEXT NOT NULL,
       PRIMARY KEY (modName, eventKey)
     )"
   );
-  $db->execQuery(
-    "ALTER TABLE custom_context
-     ADD COLUMN IF NOT EXISTS npcName TEXT NOT NULL
-  ");
 }
 
 

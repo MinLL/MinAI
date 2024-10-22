@@ -25,15 +25,6 @@ int arousalForHarassOID
 int confirmSexOID
 int disableAIAnimationsOID
 int useSapienceOID
-
-int aOIDMap ; Jmap for storing action oid's
-
-int resetActionsOID
-int bulkEnabledOID
-int bulkIntervalOID
-int bulkExponentOID
-int bulkMaxIntervalOID
-int bulkDecayWindowOID
 int radiantDialogueFrequencyOID
 int radiantDialogueChanceOID
 int autoUpdateDiaryOID
@@ -44,13 +35,25 @@ int forceOrgasmCommentOID
 int forcePostSceneCommentOID
 int prioritizePlayerThreadOID
 
+int aOIDMap ; Jmap for storing action oid's
+int aCategoryMap ; Jmap for storing action categories
+
+int actionEnabledOID
+int actionIntervalOID
+int actionExponentOID
+int actionMaxIntervalOID
+int actionDecayWindowOID
+
+
+
+
 ; Legacy globals
 GlobalVariable useCBPC
 GlobalVariable minai_UseOstim
 GlobalVariable minai_SapienceEnabled
 
-string currentActionsPage
-
+string currentAction
+string currentCategory
 
 ; New configs
 Bool cbpcDisableSelfAssTouchDefault = True
@@ -140,61 +143,32 @@ Function InitializeMCM()
   minai_SapienceEnabled = Game.GetFormFromFile(0x091A, "MinAI.esp") as GlobalVariable
   Main.Info("Initializing MCM ( " + JMap.Count(aiff.actionRegistry) + " actions in registry).")
   useCBPC = Game.GetFormFromFile(0x0910, "MinAI.esp") as GlobalVariable
-  if aOIDMap != 0
-    string[] actions = JMap.allKeysPArray(aOIDMap)
-    int i = 0
-    while i < actions.Length
-      JMap.SetObj(aOIDMap, actions[i], JValue.Release(JMap.GetObj(aOIDMap, actions[i])))
-      i += 1
-    EndWhile
-    aOIDMap = JValue.Release(aOIDMap)
-  EndIf
-  aOIDMap = JMap.Object()
-  JValue.Retain(aOIDMap)
-  string[] actions = JMap.allKeysPArray(aiff.actionRegistry)
-  int i = 0
-  while i < actions.Length
-    int aOID = JMap.Object()
-    JValue.Retain(aOID)
-    JMap.SetInt(aOID, "enabled", 0)
-    JMap.SetInt(aOID, "interval", 0)
-    JMap.SetInt(aOID, "exponent", 0)
-    JMap.SetInt(aOID, "maxInterval", 0)
-    JMap.SetInt(aOID, "decayWindow", 0)
-    Main.Info("Initializing aOID map for " + actions[i] + " : " + aOID)
-    JMap.SetObj(aOIDMap, actions[i], aOID)
-    i += 1
-  EndWhile
   ActionRegistryIsDirty = False
   SetupPages()
 EndFunction
 
 int Function GetVersion()
-  return 14 ; mcm menu version
+  return 15 ; mcm menu version
 EndFunction
 
 Function SetupPages()
-  Pages = new string[13]
-  Pages[0] = "General"
-  Pages[1] = "Physics (CBPC)"
-  Pages[2] = "Devious Stuff"
-  Pages[3] = "Sex Settings"
-  Pages[4] = "Action Registry (General)"
-  Pages[5] = "Action Registry (External)"
-  Pages[6] = "Action Registry (Survival)"
-  Pages[7] = "Action Registry (Arousal)"
-  Pages[8] = "Action Registry (Sex (1))"
-  Pages[9] = "Action Registry (Sex (2))"
-  Pages[10] = "Action Registry (Sex (3))"
-  Pages[11] = "Action Registry (Devious Stuff)"
-  Pages[12] = "Action Registry (Devious Followers)"
-  Pages[13] = "Action Registry (Followers)"
+  if sex.IsNSFW()
+    Pages = new string[5]
+    Pages[0] = "General"
+    Pages[1] = "Physics (CBPC)"
+    Pages[2] = "Devious Stuff"
+    Pages[3] = "Sex Settings"
+    Pages[4] = "Action Registry"
+  Else
+    Pages = new string[3]
+    Pages[0] = "General"
+    Pages[1] = "Physics (CBPC)"
+    Pages[2] = "Action Registry"
+  EndIf
 EndFunction
 
 Event OnVersionUpdate(int newVersion)
-  if newVersion != CurrentVersion || aOIDMap == 0 || JMap.Count(aOIDMap) == 0 || ActionRegistryIsDirty
-    InitializeMCM()
-  EndIf
+  InitializeMCM()
 EndEvent
 
 Event OnPageReset(string page)
@@ -210,29 +184,9 @@ Event OnPageReset(string page)
     RenderDeviousPage()
   elseif page == "Sex Settings"
     RenderSexPage()
-  elseif page == "Action Registry (General)"
-    RenderActionsPage("General")
-  elseif page == "Action Registry (External)"
-    RenderActionsPage("External")
-  elseif page == "Action Registry (Survival)"
-    RenderActionsPage("Survival")
-  elseif page == "Action Registry (Followers)"
-    RenderActionsPage("Followers")
-  elseif page == "Action Registry (Sex (1))"
-    RenderActionsPage("Sex1")
-  elseif page == "Action Registry (Sex (2))"
-    RenderActionsPage("Sex2")
-  elseif page == "Action Registry (Sex (3))"
-    RenderActionsPage("Sex3")
-  elseif page == "Action Registry (Sex (4))"
-    RenderActionsPage("Sex4")
-  elseif page == "Action Registry (Arousal)"
-    RenderActionsPage("Arousal")
-  elseif page == "Action Registry (Devious Stuff)"
-    RenderActionsPage("Devious Stuff")
-  elseif page == "Action Registry (Devious Followers)"
-    RenderActionsPage("Devious Followers")
-  Else
+  elseif page == "Action Registry"
+    RenderActionsPage();
+  else
     RenderPlaceholderPage()
   EndIf
 EndEvent
@@ -246,7 +200,6 @@ Function RenderGeneralPage()
   useSapienceOID = AddToggleOption("Enable Sapience", minai_SapienceEnabled.GetValueInt() == 1)
   radiantDialogueFrequencyOID = AddSliderOption("Radiant Dialogue (NPC -> NPC) Frequency", radiantDialogueFrequency, "{1}")
   radiantDialogueChanceOID = AddSliderOption("Radiant Dialogue (NPC -> NPC) Chance", radiantDialogueChance, "{1}")
-  enableAISexOID = AddToggleOption("Enable NPC -> NPC Sex", enableAISex)
   SetCursorPosition(1) ; Move cursor to top right position
   disableAIAnimationsOID = AddToggleOption("Disable AI-FF Animations", disableAIAnimations)
 EndFunction
@@ -272,6 +225,8 @@ Function RenderSexPage()
   arousalForSexOID = AddSliderOption("Arousal Threshold for Sex", arousalForSex, "{0}")
   arousalForHarassOID = AddSliderOption("Arousal Threshold for Flirting/Harassment", arousalForHarass, "{0}")
   confirmSexOID = AddToggleOption("Ask before a sex scene is initiated", confirmSex)
+  AddHeaderOption("NPC Sex Settings")
+  enableAISexOID = AddToggleOption("Enable NPC -> NPC Sex", enableAISex)
   ; right column
   SetCursorPosition(1)
   AddHeaderOption("Comments during sex")
@@ -295,67 +250,90 @@ Function RenderDeviousPage()
 EndFunction
 
 
-Function RenderActionsPage(string mcmPageToRender)
-  currentActionsPage=mcmPageToRender
-  SetCursorFillMode(TOP_TO_BOTTOM)
-  AddHeaderOption("Bulk Manipulation Options")
-  bulkEnabledOID = AddToggleOption("Bulk Set Enable/Disable", bulkEnabled)
-  bulkIntervalOID = AddSliderOption("Bulk Set Interval", 0, "{1}")
-  bulkExponentOID = AddSliderOption("Bulk Set Exponent", 2, "{1}")
-  bulkMaxIntervalOID = AddSliderOption("Bulk Set Maximum Interval", 5, "{0}")
-  bulkDecayWindowOID = AddSliderOption("Bulk Set Decay Window", 300, "{1}")
+Function RenderAction(int actionObj)
+  SetCursorPosition(1)
+  string name = JMap.getStr(actionObj, "name")
+  string mcmName = JMap.getStr(actionObj, "mcmName")
+  string mcmDesc = JMap.getStr(actionObj, "mcmDesc")
+  AddHeaderOption(mcmName + ": " + mcmDesc)
+  int enabled = JMap.getInt(actionObj, "enabled")
+  float interval = JMap.getFlt(actionObj, "interval")
+  float exponent = JMap.getFlt(actionObj, "exponent")
+  float maxInterval = JMap.getFlt(actionObj, "maxInterval")
+  float decayWindow = JMap.getFlt(actionObj, "decayWindow")
+  Main.Debug("Rendering action " + name + " with mcmName " + mcmName)
+  actionEnabledOID  = AddToggleOption("Enable/Disable", enabled == 1)
+  actionIntervalOID = AddSliderOption("Interval", interval, "{1}")
+  actionExponentOID = AddSliderOption("Exponent", exponent, "{1}")
+  actionMaxIntervalOID = AddSliderOption("Maximum Interval", maxInterval, "{0}")
+  actionDecayWindowOID = AddSliderOption("Decay Window", decayWindow, "{0}")
 
-  int numActionsForPage = 0
+EndFunction
+
+Function RenderActionCategory(string category)
+  AddHeaderOption(">>> " + category + " Actions")
+  if category != currentCategory
+    int categoryOID = AddTextOption("Expand " + category + " Actions", "")
+    JMap.setInt(aCategoryMap, category, categoryOID)
+    return
+  EndIf
+  Main.Debug("Rendering category " + category)
   int i = 0
-  string[] actions = JMap.allKeysPArray(aOIDMap)
+  string[] actions = JMap.allKeysPArray(aiff.actionRegistry)
   while i < actions.Length
     int actionObj = JMap.getObj(aiff.actionRegistry, actions[i])
     string mcmPage = JMap.getStr(actionObj, "mcmPage")
-    if mcmPage == mcmPageToRender
-      numActionsForPage += 1
-    EndIf
-    i += 1
-  EndWhile
-  i = 0
-  int numActionsForPageSoFar = 0
-  while i < actions.Length
-    if (numActionsForPageSoFar  == ( numActionsForPage / 2))
-      SetCursorPosition(1) ; Move cursor to top right position
-    EndIf
-    int actionObj = JMap.getObj(aiff.actionRegistry, actions[i])
-    string mcmPage = JMap.getStr(actionObj, "mcmPage")
-    if mcmPage == mcmPageToRender
-      numActionsForPageSoFar += 1
-      string actionName = JMap.getStr(actionObj, "name")
+    if mcmPage == category
       string mcmName = JMap.getStr(actionObj, "mcmName")
-      string mcmDesc = JMap.getStr(actionObj, "mcmDesc")
-      
-      int enabled = JMap.getInt(actionObj, "enabled")
-      float interval = JMap.getFlt(actionObj, "interval")
-      float exponent = JMap.getFlt(actionObj, "exponent")
-      int maxInterval = JMap.getInt(actionObj, "maxInterval")
-      float decayWindow = JMap.getFlt(actionObj, "decayWindow")
-      bool hasMod = JMap.GetInt(actionObj, "hasMod") == 1
-      int aOID = JMap.GetObj(aOIDMap, actions[i])
-      if aOID == 0
-        Main.Error("Could not find aOID for " + actions[i] + " total: " + JMap.Count(aOIDMap))
-      EndIf
-      AddHeaderOption(mcmName + ": " + mcmDesc)
-      if !hasMod
-        AddTextOption("Disabled - Missing Mod Dependency", "DISABLED")
-      Else
-        int enabledOID = AddToggleOption("Enable/Disable", enabled == 1)
-        JMap.SetInt(aOID, "enabled", enabledOID)
-        Main.Info(actions[i] + ": aoid enabled  = " + JMap.GetInt(aOID, "enabled") + " oid = " + enabledOID + " total: " + JMap.Count(aOIDMap))
-        JMap.SetInt(aOID, "interval", AddSliderOption("Interval", interval, "{1}"))
-        JMap.SetInt(aOID, "exponent", AddSliderOption("Exponent", exponent, "{1}"))
-        JMap.SetInt(aOID, "maxInterval", AddSliderOption("Maximum Interval", maxInterval, "{0}"))
-        JMap.SetInt(aOID, "decayWindow", AddSliderOption("Decay Window", decayWindow, "{1}"))
-        JMap.SetObj(aOIDMap, actions[i], aOID)
-      EndIf
+      string name = JMap.getStr(actionObj, "name")
+      int oid = AddTextOption(mcmName, "Edit Action")
+      Main.Debug("Adding action " + name + " to aOIDMap with oid " + oid + " and name " + mcmName + " and page " + mcmPage)
+      JMap.setInt(aOIDMap, name, oid)
     EndIf
     i += 1
   EndWhile
+EndFunction
+
+Function RenderActionsPage()
+  if aOIDMap != 0
+    aOIDMap = JValue.Release(aOIDMap)
+  EndIf
+  aOIDMap = JMap.Object()
+  JValue.Retain(aOIDMap)
+  if aCategoryMap != 0
+    aCategoryMap = JValue.Release(aCategoryMap)
+  EndIf
+  aCategoryMap = JMap.Object()
+  JValue.Retain(aCategoryMap)
+
+  SetCursorFillMode(TOP_TO_BOTTOM)
+  SetCursorPosition(0)
+  string[] actionCategories
+  if sex.IsNSFW()
+    actionCategories = new String[8];
+    actionCategories[0] = "General";
+    actionCategories[1] = "Survival";
+    actionCategories[2] = "External";
+    actionCategories[3] = "Followers";
+    actionCategories[4] = "Arousal";
+    actionCategories[5] = "Sex";
+    actionCategories[6] = "Devious Stuff"; 
+    actionCategories[7] = "Devious Followers";
+  else
+    actionCategories = new String[4];
+    actionCategories[0] = "General";
+    actionCategories[1] = "Survival";
+    actionCategories[2] = "External";
+    actionCategories[3] = "Followers";
+  EndIf
+  int i = 0
+  while i < actionCategories.Length
+    RenderActionCategory(actionCategories[i])
+    i += 1
+  EndWhile
+  if currentAction != ""
+    RenderAction(JMap.getObj(aiff.actionRegistry, currentAction))
+  EndIf
 EndFunction
 
 
@@ -398,7 +376,64 @@ Function StoreAllConfigs()
   StoreConfig("arousalForHarass", arousalForHarass)
 EndFunction
 
+Function SetActionEnabled(string actionName, bool value)
+  int actionObj = JMap.getObj(aiff.actionRegistry, actionName)
+  int tmp = 0
+  if value
+    tmp = 1
+  EndIf
+  JMap.setInt(actionObj, "enabled", tmp)
+  JMap.SetObj(aiff.actionRegistry, actionName, actionObj)
+  aiff.ResetAllActionBackoffs()
+EndFunction
+
+Function ToggleActionEnabled(string actionName)
+  int actionObj = JMap.getObj(aiff.actionRegistry, actionName)
+  int tmp = JMap.getInt(actionObj, "enabled")
+  if tmp == 1
+    tmp = 0
+  else
+    tmp = 1
+  EndIf
+  JMap.setInt(actionObj, "enabled", tmp)
+  JMap.SetObj(aiff.actionRegistry, actionName, actionObj)
+  aiff.ResetAllActionBackoffs()
+EndFunction
+
+Function SetActionInterval(string actionName, float value)
+  Main.Debug("Setting action interval for " + actionName + " to " + value)
+  int actionObj = JMap.getObj(aiff.actionRegistry, actionName)
+  JMap.setFlt(actionObj, "interval", value)
+  JMap.SetObj(aiff.actionRegistry, actionName, actionObj)
+  aiff.ResetAllActionBackoffs()
+EndFunction
+
+Function SetActionExponent(string actionName, float value)
+  Main.Debug("Setting action exponent for " + actionName + " to " + value)
+  int actionObj = JMap.getObj(aiff.actionRegistry, actionName)
+  JMap.setFlt(actionObj, "exponent", value)
+  JMap.SetObj(aiff.actionRegistry, actionName, actionObj)
+  aiff.ResetAllActionBackoffs()
+EndFunction
+
+Function SetActionMaxInterval(string actionName, float value)
+  Main.Debug("Setting action max interval for " + actionName + " to " + value)
+  int actionObj = JMap.getObj(aiff.actionRegistry, actionName)
+  JMap.setFlt(actionObj, "maxInterval", value)
+  JMap.SetObj(aiff.actionRegistry, actionName, actionObj)
+  aiff.ResetAllActionBackoffs()
+EndFunction
+
+Function SetActionDecayWindow(string actionName, float value)
+  Main.Debug("Setting action decay window for " + actionName + " to " + value)
+  int actionObj = JMap.getObj(aiff.actionRegistry, actionName)
+  JMap.setFlt(actionObj, "decayWindow", value)
+  JMap.SetObj(aiff.actionRegistry, actionName, actionObj)
+  aiff.ResetAllActionBackoffs()
+EndFunction
+
 Event OnOptionSelect(int oid)
+  Main.Debug("OnOptionSelect(" + oid + ")")
   if oid == UseCBPCOID
     toggleGlobal(oid, useCBPC)
     Debug.Notification("CBPC setting changed. Save/Reload to take effect")
@@ -445,49 +480,32 @@ Event OnOptionSelect(int oid)
   elseif oid == prioritizePlayerThreadOID
     prioritizePlayerThread = !prioritizePlayerThread
     SetToggleOptionValue(oid, prioritizePlayerThread)
+  elseif oid == actionEnabledOID
+    ToggleActionEnabled(currentAction)
+    SetToggleOptionValue(oid, JMap.getInt(JMap.getObj(aiff.actionRegistry, currentAction), "enabled") == 1)
   EndIf
-  string[] actions = JMap.allKeysPArray(aOIDMap)
   int i = 0
-  bool changedAction = False
-  if oid == bulkEnabledOID
-    bulkEnabled = !bulkEnabled
-    SetToggleOptionValue(oid, bulkEnabled)
-  EndIf
-  while i < actions.Length
-    int aOID = JMap.GetObj(aOIDMap, actions[i])
-    int actionObj = JMap.getObj(aiff.actionRegistry, actions[i])
-    string mcmPage = JMap.getStr(actionObj, "mcmPage")
-    if aOID == 0
-      Main.Error("Could not find aOID for " + actions[i] + " total: " + JMap.Count(aOIDMap))
-    EndIf
-    if oid == JMap.GetInt(aOID, "enabled")
-      if JMap.getInt(actionObj, "enabled") == 1
-        JMap.setInt(actionObj, "enabled", 0)
-      else
-        JMap.setInt(actionObj, "enabled", 1)
-      EndIf
-      JMap.SetObj(aiff.actionRegistry, actions[i], actionObj)
-      SetToggleOptionValue(oid, JMap.GetInt(actionObj, "enabled") == 1)
-    endIf
-    if oid == bulkEnabledOID && mcmPage == currentActionsPage
-      if bulkEnabled
-        JMap.setInt(actionObj, "enabled", 1)
-      else
-        JMap.setInt(actionObj, "enabled", 0)
-      endif
-      Main.Debug("Bulk setting action [" + actions[i] + "] to " + bulkEnabled)
-      JMap.SetObj(aiff.actionRegistry, actions[i], actionObj)
-      SetToggleOptionValue(oid, JMap.GetInt(actionObj, "enabled") == 1)
-      changedAction = True
+  string[] categories = JMap.allKeysPArray(aCategoryMap)
+  while i < categories.Length
+    int categoryOID = JMap.getInt(aCategoryMap, categories[i])
+    if oid == categoryOID
+      currentCategory = categories[i]
+      ForcePageReset()
+      return
     EndIf
     i += 1
   EndWhile
-  if oid == bulkEnabledOID
-    ForcePageReset()
-  EndIf
-  if changedAction
-    aiff.ResetAllActionBackoffs()
-  EndIf
+  i = 0
+  string[] actions = JMap.allKeysPArray(aOIDMap)
+  while i < actions.Length
+    int aOID = JMap.getInt(aOIDMap, actions[i])
+    if (oid == aoid)
+      currentAction = actions[i]
+      ForcePageReset()
+      return
+    EndIf
+    i += 1
+  EndWhile
 EndEvent
 
 
@@ -576,26 +594,11 @@ Event OnOptionDefault(int oid)
     prioritizePlayerThread = prioritizePlayerThreadDefault
     SetToggleOptionValue(oid, prioritizePlayerThreadDefault)
   EndIf
-  string[] actions = JMap.allKeysPArray(aOIDMap)
-  int i = 0
-  while i < actions.Length
-    int aOID = JMap.GetObj(aOIDMap, actions[i])
-    if aOID == 0
-      Main.Error("Could not find aOID for " + actions[i] + " total: " + JMap.Count(aOIDMap))
-    EndIf
-    if (oid == JMap.getInt(aOID, "enabled") || oid == JMap.getInt(aOID, "interval") || oid == JMap.getInt(aOID, "exponent") || oid == JMap.getInt(aOID, "maxInterval") || oid == JMap.getInt(aOID, "decayWindow"))
-      aiff.ResetAction(actions[i])
-      changedAction = True
-    EndIf
-    i += 1
-  EndWhile
-  if changedAction
-    aiff.ResetAllActionBackoffs()
-  EndIf
 EndEvent
 
 
 Event OnOptionHighlight(int oid)
+  Main.Debug("OnOptionHighlight(" + oid + ")")
   if oid == UseCBPCOID
     SetInfoText("Enables or disables CBPC globally. Requires save/reload to take effect")
   elseif oid == autoUpdateDiaryOID
@@ -646,24 +649,26 @@ Event OnOptionHighlight(int oid)
     SetInfoText("Ignore comments during sex cooldown, and request message after sex scene ends.")
   elseif oid == prioritizePlayerThreadOID
     SetInfoText("If there are scenes with player involve, all comments will be within this scenes.")
+  elseif oid == actionEnabledOID
+    SetInfoText("Enable or disable the action. This will prevent it from being exposed to the LLM")
+  elseif oid == actionIntervalOID
+    SetInfoText("The base cooldown (in seconds) inbetween uses of the action. Increases by the exponent every time this is triggered. Set to 0 to disable backoff entirely")
+  elseif oid == actionExponentOID
+    SetInfoText("The exponent applied to the interval's cooldown for uses of this action")
+  elseif oid == actionMaxIntervalOID
+    SetInfoText("The cap on the maximum value that the interval will rise to from repeated uses of the action. Useful if you want to have a cap on how long the cooldown will become")
+  elseif oid == actionDecayWindowOID
+    SetInfoText("The duration of time which must pass without the action being used for the cooldown to return to the base value")
   EndIf
-  string[] actions = JMap.allKeysPArray(aOIDMap)
   int i = 0
+  string[] actions = JMap.allKeysPArray(aiff.actionRegistry)
   while i < actions.Length
-    int aOID = JMap.GetObj(aOIDMap, actions[i])
-    if aOID == 0
-      Main.Error("Could not find aOID for " + actions[i] + " total: " + JMap.Count(aOIDMap))
-    EndIf
-    if oid == JMap.getInt(aOID, "enabled")
-      SetInfoText("Enable or disable the action. This will prevent it from being exposed to the LLM")
-    elseif oid == JMap.getInt(aOID, "interval")
-      SetInfoText("The base cooldown (in seconds) inbetween uses of the action. Increases by the exponent every time this is triggered. Set to 0 to disable backoff entirely")
-    elseif oid == JMap.getInt(aOID, "exponent")
-      SetInfoText("The exponent applied to the interval's cooldown for uses of this action")
-    elseif oid == JMap.getInt(aOID, "maxInterval")
-      SetInfoText("The cap on the maximum value that the interval will rise to from repeated uses of the action. Useful if you want to have a cap on how long the cooldown will become")
-    elseif oid == JMap.getInt(aOID, "decayWindow")
-      SetInfoText("The duration of time which must pass without the action being used for the cooldown to return to the base value")
+    if oid == JMap.getInt(aOIDMap, actions[i])
+      int actionObj = JMap.getObj(aiff.actionRegistry, actions[i])
+      string mcmDesc = JMap.getStr(actionObj, "mcmDesc")
+      Main.Debug("Highlighting action " + actions[i] + " with description " + mcmDesc)
+      SetInfoText(mcmDesc)
+      return
     EndIf
     i += 1
   EndWhile
@@ -730,58 +735,39 @@ Event OnOptionSliderOpen(int oid)
     SetSliderDialogDefaultValue(commentsRateDefault)
     SetSliderDialogRange(0, 120)
     SetSliderDialogInterval(1.0)
+  elseIf oid == actionIntervalOID
+    int actionObj = JMap.getObj(aiff.actionRegistry, currentAction)
+    float value = JMap.getFlt(actionObj, "interval")
+    float defaultValue = JMap.getFlt(actionObj, "intervalDefault")
+    SetSliderDialogStartValue(value)
+    SetSliderDialogDefaultValue(defaultValue)
+    SetSliderDialogRange(0, 100)
+    SetSliderDialogInterval(0.5)
+  elseif oid == actionExponentOID
+    int actionObj = JMap.getObj(aiff.actionRegistry, currentAction)
+    float value = JMap.getFlt(actionObj, "exponent")
+    float defaultValue = JMap.getFlt(actionObj, "exponentDefault")
+    SetSliderDialogStartValue(value)
+    SetSliderDialogDefaultValue(defaultValue)
+    SetSliderDialogRange(0, 100)
+    SetSliderDialogInterval(0.5)
+  elseif oid == actionMaxIntervalOID
+    int actionObj = JMap.getObj(aiff.actionRegistry, currentAction)
+    float value = JMap.getFlt(actionObj, "maxInterval")
+    float defaultValue = JMap.getFlt(actionObj, "maxIntervalDefault")
+    SetSliderDialogStartValue(value)
+    SetSliderDialogDefaultValue(defaultValue)
+    SetSliderDialogRange(0, 100)
+    SetSliderDialogInterval(1)
+  elseif oid == actionDecayWindowOID
+    int actionObj = JMap.getObj(aiff.actionRegistry, currentAction)
+    float value = JMap.getFlt(actionObj, "decayWindow")
+    float defaultValue = JMap.getFlt(actionObj, "decayWindowDefault")
+    SetSliderDialogStartValue(value)
+    SetSliderDialogDefaultValue(defaultValue)
+    SetSliderDialogRange(0, 1200)
+    SetSliderDialogInterval(5)
   EndIf
-  string[] actions = JMap.allKeysPArray(aOIDMap)
-  int i = 0
-  while i < actions.Length
-    int aOID = JMap.GetObj(aOIDMap, actions[i])
-    if aOID == 0
-      Main.Error("Could not find aOID for " + actions[i] + " total: " + JMap.Count(aOIDMap))
-    EndIf
-    int actionObj = JMap.GetObj(aiff.actionRegistry, actions[i])
-    if oid == JMap.getInt(aOID, "interval")
-      SetSliderDialogStartValue(JMap.getFlt(actionObj, "interval"))
-      SetSliderDialogDefaultValue(JMap.getFlt(actionObj, "intervalDefault"))
-      SetSliderDialogRange(0, 150)
-      SetSliderDialogInterval(0.5)
-    elseif oid == bulkIntervalOID
-      SetSliderDialogStartValue(0)
-      SetSliderDialogDefaultValue(0)
-      SetSliderDialogRange(0, 150)
-      SetSliderDialogInterval(0.5)
-    elseif oid == JMap.getInt(aOID, "exponent") || oid == bulkExponentOID
-      SetSliderDialogStartValue(JMap.getFlt(actionObj, "exponent"))
-      SetSliderDialogDefaultValue(JMap.getFlt(actionObj, "exponentDefault"))
-      SetSliderDialogRange(1, 10)
-      SetSliderDialogInterval(0.5)
-    elseif oid == bulkExponentOID
-      SetSliderDialogStartValue(2)
-      SetSliderDialogDefaultValue(2)
-      SetSliderDialogRange(1, 10)
-      SetSliderDialogInterval(0.5)
-    elseif oid == JMap.getInt(aOID, "maxInterval") || oid == bulkMaxIntervalOID
-      SetSliderDialogStartValue(JMap.getInt(actionObj, "maxInterval"))
-      SetSliderDialogDefaultValue(JMap.getInt(actionObj, "maxIntervalDefault"))
-      SetSliderDialogRange(1, 10)
-      SetSliderDialogInterval(1)
-    elseif oid == bulkMaxIntervalOID
-      SetSliderDialogStartValue(5)
-      SetSliderDialogDefaultValue(5)
-      SetSliderDialogRange(1, 10)
-      SetSliderDialogInterval(1)
-    elseif oid == JMap.getInt(aOID, "decayWindow") || oid == bulkDecayWindowOID
-      SetSliderDialogStartValue(JMap.getFlt(actionObj, "decayWindow"))
-      SetSliderDialogDefaultValue(JMap.getFlt(actionObj, "decayWindowDefault"))
-      SetSliderDialogRange(0, 1200)
-      SetSliderDialogInterval(1)
-    elseif oid == bulkDecayWindowOID
-      SetSliderDialogStartValue(60)
-      SetSliderDialogDefaultValue(60)
-      SetSliderDialogRange(0, 1200)
-      SetSliderDialogInterval(1)
-    EndIf
-    i += 1
-  EndWhile
 EndEvent
 
 
@@ -829,44 +815,17 @@ Event OnOptionSliderAccept(int oid, float value)
     commentsRate = value
     SetSliderOptionValue(oid, value, "{0}")
     StoreConfig("commentsRate", commentsRate)
-  EndIf
-    string[] actions = JMap.allKeysPArray(aOIDMap)
-  int i = 0
-  bool changedAction = False
-  while i < actions.Length
-    int aOID = JMap.GetObj(aOIDMap, actions[i])
-    int actionObj = JMap.GetObj(aiff.actionRegistry, actions[i])
-    string mcmPage = JMap.getStr(actionObj, "mcmPage")
-    if aOID == 0
-      Main.Error("Could not find aOID for " + actions[i] + " total: " + JMap.Count(aOIDMap))
-    EndIf
-    if oid == JMap.getInt(aOID, "interval") ||  (oid == bulkIntervalOID && mcmPage == currentActionsPage)
-      SetSliderOptionValue(oid, value, "{1}")
-      JMap.SetInt(actionObj, "interval", value as Int)
-      JMap.SetObj(aiff.actionRegistry, actions[i], actionObj)
-      changedAction = True
-    elseif oid == JMap.getInt(aOID, "exponent") ||  (oid == bulkExponentOID && mcmPage == currentActionsPage)
-      SetSliderOptionValue(oid, value, "{1}")
-      JMap.SetFlt(actionObj, "exponent", value)
-      JMap.SetObj(aiff.actionRegistry, actions[i], actionObj)
-      changedAction = True
-    elseif oid == JMap.getInt(aOID, "maxInterval") ||  (oid == bulkMaxIntervalOID && mcmPage == currentActionsPage)
-      SetSliderOptionValue(oid, value, "{0}")
-      JMap.SetFlt(actionObj, "maxInterval", value)
-      JMap.SetObj(aiff.actionRegistry, actions[i], actionObj)
-      changedAction = True
-    elseif oid == JMap.getInt(aOID, "decayWindow") ||  (oid == bulkDecayWindowOID && mcmPage == currentActionsPage)
-      SetSliderOptionValue(oid, value, "{1}")
-      JMap.setFlt(actionObj, "decayWindow", value)
-      JMap.SetObj(aiff.actionRegistry, actions[i], actionObj)
-      changedAction = True
-    EndIf
-    i += 1
-  EndWhile
-  if oid == bulkIntervalOID || oid == bulkExponentOID || oid == bulkMaxIntervalOID || oid == bulkDecayWindowOID
-    ForcePageReset()
-  EndIf
-  if changedAction
-    aiff.ResetAllActionBackoffs()
+  elseIf oid == actionIntervalOID
+    SetActionInterval(currentAction, value)
+    SetSliderOptionValue(oid, value, "{1}")
+  elseif oid == actionExponentOID
+    SetActionExponent(currentAction, value)
+    SetSliderOptionValue(oid, value, "{1}")
+  elseif oid == actionMaxIntervalOID
+    SetActionMaxInterval(currentAction, value)
+    SetSliderOptionValue(oid, value, "{0}")
+  elseif oid == actionDecayWindowOID
+    SetActionDecayWindow(currentAction, value)
+    SetSliderOptionValue(oid, value, "{0}")
   EndIf
 EndEvent

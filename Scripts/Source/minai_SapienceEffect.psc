@@ -88,6 +88,9 @@ Event OnUpdate()
   endif
   ; Immediately store the targets voice to avoid the delay on context due to jitter to make sure they can respond immediately
   aiff.StoreActorVoice(akTarget)
+  ; Update combat state immediately
+  aiff.SetActorVariable(akTarget, "hostileToPlayer", akTarget.IsHostileToActor(playerRef))
+  aiff.SetActorVariable(akTarget, "inCombat", akTarget.GetCombatState() >= 1)
   ; Enable AI
   if StringUtil.GetLength(Main.GetActorName(akTarget)) > 1 ; Filter out mannequins and invisible NPC's some mods add
     aiff.EnableActorAI(akTarget)

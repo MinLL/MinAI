@@ -24,14 +24,15 @@ bool bHasMantella = False;
 bool bHasAIFF = False;
 float lastRequestTime
 actor[] nearbyAI
-bool Property PlayerInCombat Auto
-  
+bool Property PlayerInCombat auto
+int Property currentVersion Auto
+
 Event OnInit()
   Maintenance()
 EndEvent
 
 Int Function GetVersion()
-  return 14
+  return 39
 EndFunction
 
 Function Maintenance()
@@ -101,6 +102,7 @@ Function Maintenance()
     minAIFF.ResetAllActionBackoffs()
   EndIf
   lastRequestTime = 0.0
+  currentVersion = GetVersion()
   Info("Initialization complete.")
 EndFunction
 
