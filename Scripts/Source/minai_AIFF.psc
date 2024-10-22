@@ -42,6 +42,10 @@ Function CleanupFollow()
 EndFunction
 
 Function Maintenance(minai_MainQuestController _main)
+  if (main.GetVersion() != main.CurrentVersion)
+    Main.Info("AIFF - Maintenance: Version update detected. Resetting action registry.")
+    ResetActionRegistry()
+  EndIf
   contextUpdateInterval = 30
   ; This is inefficient. We need to more selectively set specific parts of the context rather than repeatedly re-set everything.
   ; Things like arousal need to update this often probably, most things don't.
