@@ -761,13 +761,13 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   if sex.CanAnimate(akTarget) && sex.CanAnimate(akSpeaker)
     if command == "ExtCmdMolest"
       HorribleHarassmentActivate(akSpeaker)
-      Main.RegisterEvent(""+speakerName+" began to sexually assault " + targetName + "'.")
+      Main.RegisterEvent(""+speakerName+" began to sexually assault " + Main.GetActorName(playerRef) + "'.")
     elseif command == "ExtCmdKiss"
       HarassKiss(akSpeaker)
-      Main.RegisterEvent(""+speakerName+" began to kiss " + targetName + "'.")
+      Main.RegisterEvent(""+speakerName+" began to kiss " + Main.GetActorName(playerRef) + "'.")
     elseif command == "ExtCmdHug"
       HarassHug(akSpeaker)
-      Main.RegisterEvent(""+speakerName+" began to hug " + targetName + "'.")
+      Main.RegisterEvent(""+speakerName+" began to hug " + Main.GetActorName(playerRef) + "'.")
     EndIf
   EndIf
   if bHasDeviousFollowers
