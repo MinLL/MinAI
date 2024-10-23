@@ -15,6 +15,7 @@ Function GetNarratorConfigPath() {
     $newConfFile=md5("Narrator");
     return $path . "conf".DIRECTORY_SEPARATOR."conf_$newConfFile.php";
 }
+
 Function SetNarratorProfile() {
     if ($GLOBALS["HERIKA_NAME"] == "The Narrator" && $GLOBALS["use_narrator_profile"]) {
         if (!file_exists(GetNarratorConfigPath())) {
@@ -68,5 +69,47 @@ require_once("deviousnarrator.php");
 if (ShouldUseDeviousNarrator()) {
     SetDeviousNarrator();
 }
+
+
+Function GetConfigPath($npcName) {
+    // If use symlink, php code is actually in repo folder but included in wsl php server
+    // with just dirname((__FILE__)) it was getting directory of repo not php server 
+    $path = getcwd().DIRECTORY_SEPARATOR;
+    $newConfFile=md5($npcName);
+    return $path . "conf".DIRECTORY_SEPARATOR."conf_$newConfFile.php";
+}
+
+if (isset($GLOBALS["realnames_support"]) && $GLOBALS["realnames_support"]) {
+    $matches = [];
+    if (preg_match('/^(.+?) \[(.+)\]$/', $GLOBALS["HERIKA_NAME"], $matches)) {
+        $fullPath = GetConfigPath($matches[0]);
+        $badPers = "Roleplay as {$matches[0]}";
+        if (!file_exists($fullPath) || $GLOBALS["HERIKA_PERS"] == $badPers) {
+            $npcName = $matches[2];
+            $codename=addslashes(strtr(strtolower(trim($npcName)),[" "=>"_","'"=>"+"]));
+            error_log("minai: Detected generic NPC, seeding profile. Original: {$matches[0]}, new: {$matches[2]}, codename: $codename");
+            $npcTemlate=$GLOBALS["db"]->fetchAll("SELECT npc_pers FROM npc_templates where npc_name='$codename'");
+            $personality = 'Roleplay as '.addslashes(trim($matches[1])) . ", who is a " . addslashes(trim($matches[2]));;
+            if (is_array($npcTemlate[0]))
+                $personality = addslashes(trim($npcTemlate[0]["npc_pers"]));
+            else {
+                $npcTemlate=$GLOBALS["db"]->fetchAll("SELECT npc_pers FROM npc_templates_custom where npc_name='$codename'");
+                if (is_array($npcTemlate[0]))
+                    $personality = addslashes(trim($npcTemlate[0]["npc_pers"]));
+            }
+            // Swap out the generic name for the new name
+            $personality = str_replace("Roleplay as {$matches[2]}", "Roleplay as {$matches[0]}", $personality);
+            error_log("minai: Initializing generic NPC {$matches[0]} with personality: $personality");
+            createProfile($matches[0],
+                          ["HERIKA_PERS" => $personality],
+                          true
+            );
+            global $HERIKA_PERS;
+            include($fullPath);
+                
+        }
+    }
+}
+
 
 ?>

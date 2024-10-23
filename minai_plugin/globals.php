@@ -1,4 +1,5 @@
 <?php
+require_once("config.php");
 
 $GLOBALS["TTS_FALLBACK_FNCT"] = function($responseTextUnmooded, $mood, $responseText) {
 
@@ -21,3 +22,4 @@ $GLOBALS["TTS_FALLBACK_FNCT"] = function($responseTextUnmooded, $mood, $response
     }
     return null;
 };
+

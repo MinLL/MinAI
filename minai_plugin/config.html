@@ -304,6 +304,20 @@
                 <input type="checkbox" id="strip-emotes">
             </div>
 
+	    <!-- realnames_support -->
+            <div class="option-group checkbox-group">
+                <label class="option-label" for="realnames-support">Add Support for Realnames Extended</label>
+                <p>Automatically seed NPC profiles that are renamed via Realnames Extended. For example, if a guard were renamed to Fred [Whiterun Guard], his personality would be initially seeded with the "Whiterun Guard" template.</p>
+                <input type="checkbox" id="realnames-support">
+            </div>
+
+	    <!-- use_defeat -->
+            <div class="option-group checkbox-group">
+                <label class="option-label" for="use-defeat">Add Support for Defeat mods</label>
+                <p>If using a supported defeat mod, the LLM will differentiate between victory and defeat in combat.</p>
+                <input type="checkbox" id="use-defeat">
+            </div>
+
 	    <!-- radiance_rechat_h -->
             <div class="option-group slider">
                 <label class="option-label" for="radiance-rechat-h">Radiance Rechat H</label>
@@ -374,6 +388,8 @@
                 document.getElementById('xtts-server-override').value = configData.xtts_server_override;
                 document.getElementById('input-delay').value = configData.input_delay_for_radiance;
 		document.getElementById('strip-emotes').checked = configData.strip_emotes_from_output;
+		document.getElementById('use-defeat').checked = configData.use_defeat;
+		document.getElementById('realnames-support').checked = configData.realnames_support;
                 populateVoiceTypeFallbacks(configData.voicetype_fallbacks);
 
                 document.getElementById('loading-message').style.display = 'none';
@@ -403,6 +419,8 @@
                 radiance_rechat_p: document.getElementById('radiance-rechat-p').value,
                 xtts_server_override: document.getElementById('xtts-server-override').value,
                 strip_emotes_from_output: document.getElementById('strip-emotes').checked,
+		use_defeat: document.getElementById('use-defeat').checked,
+		realnames_support: document.getElementById('realnames-support').checked,
                 input_delay_for_radiance: document.getElementById('input-delay').value,
                 voicetype_fallbacks: getVoiceTypeFallbacks(),
             };
