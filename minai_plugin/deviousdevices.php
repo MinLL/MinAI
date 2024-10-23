@@ -4,11 +4,18 @@ require_once("util.php");
 require_once("deviousnarrator.php");
 
 $target = GetTargetActor();
+
+$canVibrate = CanVibrate($target);
 // If the eldritch narrator is active, only they have control over the devices.
 $eldritch = IsEldritchNarratorActive();
-$canVibrate = (CanVibrate($target) && ((!$eldritch && !isset($GLOBALS["devious_narrator"])) || ($eldritch && $GLOBALS["HERIKA_NAME"] == "The Narrator")));
+if ($eldritch && $canVibrate) {
+    if ($GLOBALS["HERIKA_NAME"] == "The Narrator" && isset($GLOBALS["devious_narrator"]) && $GLOBALS["devious_narrator"] == "eldritch")
+        $canVibrate = true;
+    else
+        $canVibrate = false;
+}
 
-  
+
 $GLOBALS["F_NAMES"]["ExtCmdShock"]="Shock";
 $GLOBALS["F_NAMES"]["ExtCmdForceOrgasm"]="ForceOrgasm";
 $GLOBALS["F_NAMES"]["ExtCmdTurnOffVibrator"]="TurnOffVibrator";
