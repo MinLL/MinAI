@@ -30,7 +30,7 @@ if (file_exists($versionFile)) {
     if ($versionInFile === "beta39.5") {
         Beta395Migration();
     } else {
-        echo "Version mismatch. Current version is: $versionInFile";
+        // No migration necessary
     }
 } else {
     echo "Version file not found.";
