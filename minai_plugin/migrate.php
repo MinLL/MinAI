@@ -16,7 +16,7 @@ function Beta395Migration() {
     $GLOBALS["db"]->execQuery("DROP TABLE IF EXISTS custom_actions");
     CreateContextTableIfNotExists();
     CreateActionsTableIfNotExists();
-    echo("Migration complete");
+    error_log("Migration complete");
 }
 
 
