@@ -14,6 +14,7 @@ function Maintenance(minai_Sex _sex, SexLabFramework _slf)
     sex = _sex
     main = (_sex as Quest) as minai_MainQuestController
     slf = _slf
+    jThreadsByFrameworkMap = JValue.releaseAndRetain(jThreadsByFrameworkMap, JMap.object())
 endfunction
 
 Function OnSexStart(int ThreadID, string framework)
@@ -22,10 +23,6 @@ Function OnSexStart(int ThreadID, string framework)
     endif
     Main.Info("Ambient:OnSexStart")
     RegisterForSingleUpdate(config.commentsRate)
-
-    if(jThreadsByFrameworkMap == 0)
-        jThreadsByFrameworkMap = JValue.retain(JMap.object())
-    endif
 
     addThread(ThreadID, framework)
     
