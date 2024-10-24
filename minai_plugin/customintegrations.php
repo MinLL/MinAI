@@ -30,6 +30,7 @@ function CreateActionsTableIfNotExists() {
       targetEnum TEXT NOT NULL,
       enabled INT,
       ttl INT,
+      npcName TEXT NOT NULL,
       expiresAt INT,
       PRIMARY KEY (actionName, actionPrompt)
     )"
@@ -103,6 +104,7 @@ function ProcessIntegrations() {
         $ttl = intval($vars[3]);
         $targetDescription = $vars[4];
         $targetEnum = $vars[5];
+        $npcName = $vars[6];
         error_log("minai: Registering custom action: {$actionName}, {$actionPrompt}, {$enabled}, {$ttl}");
         $db->delete("custom_actions", "actionName='".$db->escape($actionName)."'");
         $db->insert(
@@ -114,7 +116,8 @@ function ProcessIntegrations() {
                 'expiresAt' => time() + $ttl,
                 'ttl' => $ttl, // already converted to int, no need to escape
                 'targetDescription' => $db->escape($targetDescription),
-                'targetEnum' => $db->escape($targetEnum)
+                'targetEnum' => $db->escape($targetEnum),
+                'npcName' => $db->escape($npcName)
             )
         );
         $MUST_DIE=true;
@@ -229,7 +232,7 @@ function RegisterThirdPartyActions() {
       "SELECT * FROM custom_actions WHERE expiresAt > {$currentTime}"
     );
     foreach ($rows as $row) {
-        if ($row["enabled"] == 1) {
+        if ($row["enabled"] == 1 && (strtolower($row["npcname"]) == strtolower($GLOBALS["HERIKA_NAME"]) || $row["npcname"] == "everyone")) {
             $actionName = $row["actionname"];
             $cmdName = "ExtCmd{$actionName}";
             $actionPrompt = $row["actionprompt"];
