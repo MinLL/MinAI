@@ -362,8 +362,8 @@ EndEvent
 
 
 
-; Register an action
-; int handle = ModEvent.Create("MinAI_RegisterAction")
+; Register an action to only be available to a specific NPC
+; int handle = ModEvent.Create("MinAI_RegisterActionNPC")
 ;  if (handle)
 ;    ModEvent.PushString(handle, actionName) ; Cannot contain spaces! Example, "SitDown".
 ;    ModEvent.PushString(handle, actionPrompt)
