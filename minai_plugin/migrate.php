@@ -1,8 +1,9 @@
 <?php
 
-$path = getcwd().DIRECTORY_SEPARATOR;
-require_once($path . "conf".DIRECTORY_SEPARATOR."conf.php");
-require_once($path. "lib" .DIRECTORY_SEPARATOR."{$GLOBALS["DBDRIVER"]}.class.php");
+$path = str_replace("/api","", getcwd());
+$path = str_replace("/ext/minai_plugin","", $path);
+require_once($path . "/conf".DIRECTORY_SEPARATOR."conf.php");
+require_once($path. "/lib" .DIRECTORY_SEPARATOR."{$GLOBALS["DBDRIVER"]}.class.php");
 require_once("customintegrations.php");
 
 
