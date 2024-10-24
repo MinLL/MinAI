@@ -1,20 +1,27 @@
-Scriptname minai_AmbientSexTalk extends Quest  
+Scriptname minai_AmbientSexTalk extends Quest 
 
 minai_Config config
+minai_Sex sex
+minai_MainQuestController main
+
 SexLabFramework slf = None
 ; store registered threads by ostim/sexlab framework:  {ostim: [0,1,2,3], sexlab: [0,1,2,3]}
 int jThreadsByFrameworkMap
 int playerThread = -1
 
-Function OnSexStart(int ThreadID, string framework, minai_Config configLocal, SexLabFramework slfLocal = None)
+function Maintenance(minai_Sex _sex, SexLabFramework _slf)
+    config = Game.GetFormFromFile(0x0912, "MinAI.esp") as minai_Config
+    sex = _sex
+    main = (_sex as Quest) as minai_MainQuestController
+    slf = _slf
+endfunction
+
+Function OnSexStart(int ThreadID, string framework)
     if(!config.enableAmbientComments)
         return
     endif
-    MiscUtil.PrintConsole("Ambient:OnSexStart")
-    config = configLocal
+    Main.Info("Ambient:OnSexStart")
     RegisterForSingleUpdate(config.commentsRate)
-    minai_Sex sex = (self as Quest) as minai_Sex
-    slf = slfLocal
 
     if(jThreadsByFrameworkMap == 0)
         jThreadsByFrameworkMap = JValue.retain(JMap.object())
@@ -33,8 +40,7 @@ Function OnSexEnd(int ThreadID, string framework)
     if(!config.enableAmbientComments)
         return
     endif
-    MiscUtil.PrintConsole("Ambient:OnSexEnd")
-    minai_Sex sex = (self as Quest) as minai_Sex
+    Main.Info("Ambient:OnSexEnd")
     removeThread(ThreadID, framework)
     if(framework == sex.sexlabType && ThreadID == slf.FindPlayerController())
         playerThread = -1
@@ -47,8 +53,7 @@ Event OnUpdate()
     if(!config.enableAmbientComments)
         return
     endif
-    MiscUtil.PrintConsole("Ambient:OnUpdate")
-    minai_Sex sex = (self as Quest) as minai_Sex
+    Main.Info("Ambient:OnUpdate")
     
     int jOstimThreadsArray = getFrameworkThreads(sex.ostimType)
     int jSexlabThreadsArray = getFrameworkThreads(sex.sexlabType)
@@ -84,7 +89,7 @@ Event OnUpdate()
         endif
         
         actor actorToSpeak = sex.getRandomActor(actors)
-        MiscUtil.PrintConsole("Request ambient sextalk for: "+actorToSpeak.GetDisplayName())
+        Main.Info("Request ambient sextalk for: "+actorToSpeak.GetDisplayName())
         sex.sexTalkAmbient(actorToSpeak, playerThread != -1, framework)
         
         ; register for next OnUpdate cycle only if game has current active threads

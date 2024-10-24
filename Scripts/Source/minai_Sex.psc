@@ -34,7 +34,7 @@ Function Maintenance(minai_MainQuestController _main)
   main = _main
   aiff = (Self as Quest) as minai_AIFF
   devious = (Self as Quest) as minai_DeviousStuff
-  ambientSexTalk = (Self as Quest) as minai_AmbientSexTalk
+  ambientSexTalk = Game.GetFormFromFile(0x0E88, "MinAI.esp") as minai_AmbientSexTalk
   config = Game.GetFormFromFile(0x0912, "MinAI.esp") as minai_Config
   if !config
     Main.Fatal("Could not load configuration - script version mismatch with esp")
@@ -59,6 +59,8 @@ Function Maintenance(minai_MainQuestController _main)
   actorToSayOnEndMap = JValue.releaseAndRetain(actorToSayOnEndMap, JMap.object())
     
   slf = Game.GetFormFromFile(0xD62, "SexLab.esm") as SexLabFramework
+
+  ambientSexTalk.Maintenance(self, slf)
   if slf != None
     Main.Info("Found Sexlab")
     bHasSexlab = True
@@ -1319,7 +1321,7 @@ function onSexStart(int ThreadID, string framework)
   ; enable sex-mode for php
   SetSexSceneState("on")
   UpdateThreadTable("startthread", framework, ThreadID)
-  ambientSexTalk.OnSexStart(ThreadID, framework, config, slf)
+  ambientSexTalk.OnSexStart(ThreadID, framework)
 
   ; get actors to store random actor who will talk at the end. Doing it at start ensure that on sex end events we won't end up where in threads there are no actors anymore
   Actor[] actors
