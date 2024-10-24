@@ -632,7 +632,7 @@ Function StoreContext(string modName, string eventKey, string eventValue, string
 EndFunction
 
 
-Function StoreAction(string actionName, string actionPrompt, int enabled, int ttl, string targetDescription, string targetEnum)
+Function StoreAction(string actionName, string actionPrompt, int enabled, int ttl, string targetDescription, string targetEnum, string npcName)
 	if (!IsInitialized())
     Main.Info("StoreAction() - Still Initializing.")
     return
@@ -641,7 +641,7 @@ Function StoreAction(string actionName, string actionPrompt, int enabled, int tt
     return
   EndIf
   Main.Debug("StoreAction(" + actionName +", " + enabled + ", " + ttl +"): " + actionPrompt)
-	AIAgentFunctions.logMessage(actionName + "@" + actionPrompt + "@" + enabled + "@" + ttl + "@" + targetDescription + "@" + targetEnum, "registeraction")
+	AIAgentFunctions.logMessage(actionName + "@" + actionPrompt + "@" + enabled + "@" + ttl + "@" + targetDescription + "@" + targetEnum + "@" + npcName, "registeraction")
 EndFunction
 
 

@@ -200,49 +200,49 @@
             <!-- PLAYER_BIO -->
             <div class="option-group text-input">
                 <label class="option-label" for="player-bio">PLAYER_BIO</label>
-                <p>Player bio added to the prompt head for dialogue that is not NPC -> NPC.</p>
+                <p>Player description that is added to the prompt head for dialogue that is not NPC -> NPC.</p>
                 <input type="text" id="player-bio">
             </div>
 
             <!-- PROMPT_HEAD_OVERRIDE -->
             <div class="option-group text-input">
                 <label class="option-label" for="prompt-head-override">PROMPT_HEAD_OVERRIDE</label>
-                <p>Set this to override the prompt head for all profiles.</p>
+                <p>Set this to override the prompt head for all profiles. Do not include any player specific information in this prompt. Use the bio for that instead. You can override this for specific NPC's by beginning their prompt head with a #./p>
                 <input type="text" id="prompt-head-override">
             </div>
 
             <!-- use_narrator_profile -->
             <div class="option-group checkbox-group">
                 <label class="option-label" for="use-narrator-profile">Use Narrator Profile</label>
-                <p>Use a specific profile for the narrator instead of the default one.</p>
+                <p>Use an alternative profile for the narrator instead of the default one. The profile name is "Narrator", and will be created the first time you load the game.</p>
                 <input type="checkbox" id="use-narrator-profile">
             </div>
 
             <!-- stop_narrator_context_leak -->
             <div class="option-group checkbox-group">
                 <label class="option-label" for="stop-narrator-context-leak">Stop Narrator Context Leak</label>
-                <p>Purge narrator dialogue from context shared with party members to avoid them commenting on narrator comments.</p>
+                <p>Purge narrator dialogue from the context that is shared with nearby NPC's in order to avoid them commenting on narrator dialogue.</p>
                 <input type="checkbox" id="stop-narrator-context-leak">
             </div>
 
             <!-- devious_narrator_eldritch_voice -->
             <div class="option-group text-input">
                 <label class="option-label" for="eldritch-voice">Devious Narrator Eldritch Voice</label>
-                <p>Override the devious narrator's Eldritch voice type.</p>
+                <p>If the Eldritch Devious Narrator is active, override it's voice type with the specified id.</p>
                 <input type="text" id="eldritch-voice">
             </div>
 
             <!-- devious_narrator_telvanni_voice -->
             <div class="option-group text-input">
                 <label class="option-label" for="telvanni-voice">Devious Narrator Telvanni Voice</label>
-                <p>Override the devious narrator's Telvanni voice type.</p>
+                <p>If the Telvanni Devious Narrator is active, override it's voice type with the specified id.</p>
                 <input type="text" id="telvanni-voice">
             </div>
 
             <!-- force_voice_type -->
             <div class="option-group checkbox-group">
                 <label class="option-label" for="force-voice-type">Force Voice Type</label>
-                <p>Force the voice type to use the actor's base voice type (e.g., "maleguard") instead of a specific one (e.g., "whiterun_guard"). Useful for compatibility with Mantella's XTTS configuration.</p>
+                <p>Force the voice type to use the actor's base voice type (e.g., "maleguard") instead of a specific one (e.g., "whiterun_guard"). Useful for compatibility with Mantella's XTTS configuration. You can still manually set the voice type for a specific actor by prefixing their voiceid with a #. For example, if you wanted Lydia to have a whiterun guard voice, you could set her voicetype to #maleguard.</p>
                 <input type="checkbox" id="force-voice-type">
             </div>
 
@@ -293,7 +293,7 @@
             <!-- disable_worn_equipment -->
             <div class="option-group checkbox-group">
                 <label class="option-label" for="disable-worn-equipment">Disable Worn Equipment</label>
-                <p>Disable worn equipment.</p>
+                <p>Disable the worn equipment system, which customizes the description of items that actors are wearing.</p>
                 <input type="checkbox" id="disable-worn-equipment">
             </div>
 
@@ -302,6 +302,20 @@
                 <label class="option-label" for="strip-emotes">Strip emotes from output</label>
                 <p>Remove anything between two astericks from the response. Useful if your LLM likes to respond with things like *smirking*, *laughing*, etc.</p>
                 <input type="checkbox" id="strip-emotes">
+            </div>
+
+	    <!-- realnames_support -->
+            <div class="option-group checkbox-group">
+                <label class="option-label" for="realnames-support">Add Support for Realnames Extended</label>
+                <p>Automatically seed NPC profiles that are renamed via Realnames Extended. For example, if a guard were renamed to Fred [Whiterun Guard], his personality would be initially seeded with the "Whiterun Guard" template.</p>
+                <input type="checkbox" id="realnames-support">
+            </div>
+
+	    <!-- use_defeat -->
+            <div class="option-group checkbox-group">
+                <label class="option-label" for="use-defeat">Add Support for Defeat mods</label>
+                <p>If using a supported defeat mod, the LLM will differentiate between victory and defeat in combat.</p>
+                <input type="checkbox" id="use-defeat">
             </div>
 
 	    <!-- radiance_rechat_h -->
@@ -374,6 +388,8 @@
                 document.getElementById('xtts-server-override').value = configData.xtts_server_override;
                 document.getElementById('input-delay').value = configData.input_delay_for_radiance;
 		document.getElementById('strip-emotes').checked = configData.strip_emotes_from_output;
+		document.getElementById('use-defeat').checked = configData.use_defeat;
+		document.getElementById('realnames-support').checked = configData.realnames_support;
                 populateVoiceTypeFallbacks(configData.voicetype_fallbacks);
 
                 document.getElementById('loading-message').style.display = 'none';
@@ -403,6 +419,8 @@
                 radiance_rechat_p: document.getElementById('radiance-rechat-p').value,
                 xtts_server_override: document.getElementById('xtts-server-override').value,
                 strip_emotes_from_output: document.getElementById('strip-emotes').checked,
+		use_defeat: document.getElementById('use-defeat').checked,
+		realnames_support: document.getElementById('realnames-support').checked,
                 input_delay_for_radiance: document.getElementById('input-delay').value,
                 voicetype_fallbacks: getVoiceTypeFallbacks(),
             };

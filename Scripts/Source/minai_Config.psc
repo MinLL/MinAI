@@ -44,6 +44,7 @@ int actionExponentOID
 int actionMaxIntervalOID
 int actionDecayWindowOID
 
+int testActionsOID
 
 
 
@@ -202,6 +203,8 @@ Function RenderGeneralPage()
   radiantDialogueChanceOID = AddSliderOption("Radiant Dialogue (NPC -> NPC) Chance", radiantDialogueChance, "{1}")
   SetCursorPosition(1) ; Move cursor to top right position
   disableAIAnimationsOID = AddToggleOption("Disable AI-FF Animations", disableAIAnimations)
+  AddHeaderOption("Debug")
+  testActionsOID = AddTextOption("Debug", "Test Mod Events")
 EndFunction
 
 Function RenderPhysicsPage()
@@ -483,6 +486,9 @@ Event OnOptionSelect(int oid)
   elseif oid == actionEnabledOID
     ToggleActionEnabled(currentAction)
     SetToggleOptionValue(oid, JMap.getInt(JMap.getObj(aiff.actionRegistry, currentAction), "enabled") == 1)
+  elseif oid == testActionsOID
+    main.TestModEvents()
+    Debug.MessageBox("Testing mod events...")
   EndIf
   int i = 0
   string[] categories = JMap.allKeysPArray(aCategoryMap)
@@ -659,6 +665,8 @@ Event OnOptionHighlight(int oid)
     SetInfoText("The cap on the maximum value that the interval will rise to from repeated uses of the action. Useful if you want to have a cap on how long the cooldown will become")
   elseif oid == actionDecayWindowOID
     SetInfoText("The duration of time which must pass without the action being used for the cooldown to return to the base value")
+  elseif oid == testActionsOID
+    SetInfoText("For debugging purposes. Send test mod events to the backend")
   EndIf
   int i = 0
   string[] actions = JMap.allKeysPArray(aiff.actionRegistry)

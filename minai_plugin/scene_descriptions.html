@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Scene Descriptions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f7f6;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        input, textarea, button {
+            padding: 10px;
+            margin: 5px;
+            font-size: 14px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            width: 100%;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            cursor: pointer;
+        }
+        .form-container {
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        .pagination {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .pagination button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+        }
+        .pagination button:hover {
+            background-color: #0056b3;
+        }
+	.navigation {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #007bff;
+            padding: 10px;
+            color: white;
+            border-radius: 5px;
+        }
+        .navigation a, .navigation button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .navigation a:hover, .navigation button:hover {
+            background-color: #0056b3;
+        }
+        .pagination-info {
+            font-size: 14px;
+        }
+        .search-container {
+            margin-bottom: 20px;
+        }
+        .search-container input {
+            width: 300px;
+            padding: 10px;
+        }
+        .new-entry-form {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>Manage Scene Descriptions</h1>
+
+    <!-- Navigation Bar -->
+    <div class="navigation">
+      <a href="index.html">Back to Home</a>
+      <button onclick="confirmResetScenes()">Reset Scenes</button>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search scene descriptions..." oninput="searchTable()">
+    </div>
+
+    <!-- Table for displaying scene descriptions -->
+    <table id="dataTable"></table>
+
+    <!-- Pagination Controls -->
+    <div class="pagination">
+        <button onclick="prevPage()">Previous</button>
+        <div class="pagination-info">
+            Page <span id="currentPage">1</span> of <span id="totalPages">1</span>
+        </div>
+        <button onclick="nextPage()">Next</button>
+    </div>
+
+    <!-- Form for creating new entries -->
+    <div class="new-entry-form">
+        <h2>Create New Scene Description</h2>
+        <form id="newEntryForm">
+            <label for="newOstimId">OStim ID</label>
+            <input type="text" id="newOstimId" name="ostim_id" required>
+            <label for="newSexlabId">SexLab ID</label>
+            <input type="text" id="newSexlabId" name="sexlab_id">
+            <label for="newDescription">Description</label>
+            <textarea id="newDescription" name="description" rows="4" required></textarea>
+            <button type="button" onclick="createNewEntry()">Create Entry</button>
+        </form>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        const rowsPerPage = 10;
+        let data = [];
+        let filteredData = [];
+        let editedRow = {};
+
+        window.onload = function() {
+            loadTable();
+        };
+
+        // Function to load table data from the backend
+        function loadTable() {
+            fetch('api/scenes.php?table=minai_scenes_descriptions')
+                .then(response => response.json())
+                .then(result => {
+                    data = result;
+                    filteredData = data;
+                    updatePagination();
+                    renderTable();
+                });
+        }
+
+        // Function to render the table based on the current page
+        function renderTable() {
+            const tableElem = document.getElementById('dataTable');
+            tableElem.innerHTML = '';
+
+            if (filteredData.length > 0) {
+                const headers = ['OStim ID', 'SexLab ID', 'Description', 'Actions'];
+                const headerRow = document.createElement('tr');
+                headers.forEach(header => {
+                    const th = document.createElement('th');
+                    th.innerText = header;
+                    th.onclick = () => sortTable(header.toLowerCase().replace(" ", "_"));
+                    headerRow.appendChild(th);
+                });
+                tableElem.appendChild(headerRow);
+
+                const startIndex = (currentPage - 1) * rowsPerPage;
+                const endIndex = startIndex + rowsPerPage;
+                const pageData = filteredData.slice(startIndex, endIndex);
+
+                pageData.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td contenteditable="true" onblur="editRow(this, 'ostim_id', '${row.ostim_id}')">${row.ostim_id}</td>
+                        <td contenteditable="true" onblur="editRow(this, 'sexlab_id', '${row.ostim_id}')">${row.sexlab_id || ''}</td>
+                        <td contenteditable="true" onblur="editRow(this, 'description', '${row.ostim_id}')">${row.description}</td>
+                    `;
+
+                    const actionTd = document.createElement('td');
+                    const saveBtn = document.createElement('button');
+                    saveBtn.innerText = 'Save';
+                    saveBtn.onclick = () => saveRow(row.ostim_id);
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.innerText = 'Delete';
+                    deleteBtn.onclick = () => deleteRow(row.ostim_id);
+                    actionTd.appendChild(saveBtn);
+                    actionTd.appendChild(deleteBtn);
+                    tr.appendChild(actionTd);
+
+                    tableElem.appendChild(tr);
+                });
+            }
+        }
+
+        // Function to edit an in-line row
+        function editRow(td, field, id) {
+            const value = td.innerText.trim();
+            if (!editedRow[id]) {
+                editedRow[id] = {};
+            }
+            editedRow[id][field] = value;
+        }
+
+        // Function to save the edited row to the backend
+        function saveRow(id) {
+            const updatedData = {
+                sexlab_id: editedRow[id]?.sexlab_id || '',
+                description: editedRow[id]?.description || ''
+            };
+
+            fetch('api/scenes.php', {
+                method: 'PUT',
+                body: new URLSearchParams({
+                    table: 'minai_scenes_descriptions',
+                    id: id,
+                    data: JSON.stringify(updatedData)
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                alert(result.status === 'success' ? 'Data saved!' : 'Failed to save data');
+                loadTable();
+            });
+        }
+
+        // Function to delete a row from the backend
+        function deleteRow(id) {
+            fetch('api/scenes.php', {
+                method: 'DELETE',
+                body: new URLSearchParams({
+                    table: 'minai_scenes_descriptions',
+                    id: id
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                alert(result.status === 'success' ? 'Data deleted!' : 'Failed to delete data');
+                loadTable();
+            });
+        }
+
+        // Function to search for scene descriptions in the table
+        function searchTable() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            filteredData = data.filter(row => {
+                return (
+                    row.ostim_id.toLowerCase().includes(searchText) ||
+                    (row.sexlab_id || '').toLowerCase().includes(searchText) ||
+                    row.description.toLowerCase().includes(searchText)
+                );
+            });
+            currentPage = 1; // Reset to first page when searching
+            updatePagination();
+            renderTable();
+        }
+
+        // Function to sort the table by column
+        function sortTable(column) {
+            filteredData.sort((a, b) => {
+                const valA = a[column] || '';
+                const valB = b[column] || '';
+
+                if (valA < valB) return -1;
+                if (valA > valB) return 1;
+                return 0;
+            });
+            renderTable();
+        }
+
+        // Pagination Functions
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+            document.getElementById('totalPages').innerText = totalPages;
+            document.getElementById('currentPage').innerText = currentPage;
+        }
+
+        function nextPage() {
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderTable();
+                updatePagination();
+            }
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTable();
+                updatePagination();
+            }
+        }
+
+        // Function to create a new scene description entry
+        function createNewEntry() {
+            const formData = new FormData(document.getElementById('newEntryForm'));
+            const newEntryData = {
+                ostim_id: formData.get('ostim_id'),
+                sexlab_id: formData.get('sexlab_id'),
+                description: formData.get('description'),
+            };
+
+            fetch('api/scenes.php', {
+                method: 'POST',
+                body: new URLSearchParams({
+                    table: 'minai_scenes_descriptions',
+                    data: JSON.stringify(newEntryData)
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                loadTable();
+            });
+        }
+
+        // Confirmation popup for resetting scenes
+        function confirmResetScenes() {
+            if (confirm("Are you sure you want to reset all scenes? This action cannot be undone.")) {
+                resetScenes();
+            }
+        }
+
+        // Function to reset all scenes
+        function resetScenes() {
+            fetch('api/main.php?endpoint=reset_scenes', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(result => {
+                alert('Scenes reset successfully!');
+                loadTable();
+            });
+        }
+    </script>
+</body>
+</html>

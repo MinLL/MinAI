@@ -54,7 +54,8 @@ Function Maintenance()
   RegisterForModEvent("MinAI_SetContext", "OnSetContext")
   RegisterForModEvent("MinAI_SetContextNPC", "OnSetContextNPC")      
   RegisterForModEvent("MinAI_RegisterAction", "OnRegisterAction")
-  ; RegisterTestAction()
+  RegisterForModEvent("MinAI_RegisterActionNPC", "OnRegisterActionNPC")
+  
   Info("Checking for installed mods...")
 
   minai_WhichAI = Game.GetFormFromFile(0x0907, "MinAI.esp") as GlobalVariable
@@ -353,12 +354,70 @@ Event OnRegisterAction(string actionName, string actionPrompt, string mcmDescrip
   Info("OnRegisterAction(" + actionName + " => " + enabled + " (Cooldown: " + cooldown + ")): " + actionPrompt)
   if bHasAIFF
 		minaiff.RegisterAction("ExtCmd"+actionName, actionName, mcmDescription, "External", enabled, cooldown, 2, 5, 300, true, true)
-    minaiff.StoreAction(actionName, actionPrompt, enabled, ttl, targetDescription, targetEnum)
+    minaiff.StoreAction(actionName, actionPrompt, enabled, ttl, targetDescription, targetEnum, "everyone")
   elseif bHasMantella
     ; Nothing to do for mantella.
   endif
 EndEvent
 
+
+
+; Register an action to only be available to a specific NPC
+; int handle = ModEvent.Create("MinAI_RegisterActionNPC")
+;  if (handle)
+;    ModEvent.PushString(handle, actionName) ; Cannot contain spaces! Example, "SitDown".
+;    ModEvent.PushString(handle, actionPrompt)
+;    ModEvent.PushString(handle, mcmDescription)
+;    ModEvent.PushString(handle, npcName)
+;    ModEvent.PushString(handle, targetDescription)
+;    ModEvent.PushString(handle, targetEnum)
+;    ModEvent.PushInt(handle, enabled)
+;    ModEvent.PushFloat(handle, cooldown)
+;    ModEvent.PushInt(handle, ttl)
+;    ModEvent.Send(handle)
+;  endIf
+Event OnRegisterActionNPC(string actionName, string actionPrompt, string mcmDescription, string npcName, string targetDescription, string targetEnum, int enabled, float cooldown, int ttl)
+  Info("OnRegisterActionNPC(" + actionName + " => " + enabled + " (Cooldown: " + cooldown + ")): " + actionPrompt)
+  if bHasAIFF
+		minaiff.RegisterAction("ExtCmd"+actionName, actionName, mcmDescription, "External", enabled, cooldown, 2, 5, 300, true, true)
+    minaiff.StoreAction(actionName, actionPrompt, enabled, ttl, targetDescription, targetEnum, npcName)
+  elseif bHasMantella
+    ; Nothing to do for mantella.
+  endif
+EndEvent
+
+
+Function SendTestEvent()
+  int handle = ModEvent.Create("MinAI_RegisterEvent")
+  if (handle)
+    ModEvent.PushString(handle, "testevent")
+    ModEvent.PushString(handle, "info_testevent")
+    ModEvent.Send(handle)
+  endIf
+EndFunction
+
+Function SetTestContext()
+  int handle = ModEvent.Create("MinAI_SetContext")
+  if (handle)
+    ModEvent.PushString(handle, "testmod")
+    ModEvent.PushString(handle, "testkey")
+    ModEvent.PushString(handle, "testvalue")
+    ModEvent.PushInt(handle, 1200)
+    ModEvent.Send(handle)
+  endIf
+EndFunction
+
+Function SetTestContextNPC()
+  int handle = ModEvent.Create("MinAI_SetContextNPC")
+  if (handle)
+    ModEvent.PushString(handle, "testmod")
+    ModEvent.PushString(handle, "testkeynpc")
+    ModEvent.PushString(handle, "testvaluenpc")
+    ModEvent.PushString(handle, "Uthgerd the Unbroken")
+    ModEvent.PushInt(handle, 1200)
+    ModEvent.Send(handle)
+  endIf
+EndFunction 
 
 Function RegisterTestAction()
   int handle = ModEvent.Create("MinAI_RegisterAction")
@@ -373,4 +432,28 @@ Function RegisterTestAction()
     ModEvent.PushInt(handle, 1200)
     ModEvent.Send(handle)
   endIf
+EndFunction
+
+Function RegisterTestActionNPC()
+  int handle = ModEvent.Create("MinAI_RegisterActionNPC")
+  if (handle)
+    ModEvent.PushString(handle, "testactionnpc")
+    ModEvent.PushString(handle, "Use the test action npc")
+    ModEvent.PushString(handle, "Test Action Description")
+    ModEvent.PushString(handle, "Uthgerd the Unbroken")
+    ModEvent.PushString(handle, "Target (Actor, NPC)")
+    ModEvent.PushString(handle, "my,list,of,targets")
+    ModEvent.PushInt(handle, 1)
+    ModEvent.PushFloat(handle, 5)
+    ModEvent.PushInt(handle, 1200)
+    ModEvent.Send(handle)
+  endIf
+EndFunction
+
+Function TestModEvents()
+  SendTestEvent()
+  SetTestContext()
+  SetTestContextNPC()
+  RegisterTestAction()
+  RegisterTestActionNPC()
 EndFunction

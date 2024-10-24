@@ -170,14 +170,21 @@ Function StartSexScene(actor[] actors, bool bPlayerInScene, string tags="")
     EndIf
   EndIf
   if bHasOstim && minai_UseOStim.GetValue() == 1.0
+    Main.Debug("StartSexScene processing for OStim: " + tags)
     tags = ConvertTagsOstim(tags)
+    Main.Debug("OStim actors pre-sort: " + actors)
     actors = OActorUtil.Sort(actors, OActorUtil.EmptyArray())
+    Main.Debug("OStim actors post-sort: " + actors)
     string newScene = ""
     if tags != ""
+      Main.Debug("Searching for OStim scene with Actions: " + tags)
       newScene = OLibrary.GetRandomSceneWithAnyActionCSV(actors, tags)
+      Main.Debug("Ostim post Action search: " + newScene)
       Utility.Wait(0.5)
       if newScene == ""
+        Main.Debug("Searching for OStim scene with Tags: " + tags)
         newScene = OLibrary.GetRandomSceneWithAnySceneTagCSV(actors, tags)
+        Main.Debug("Ostim post Tag search: " + newScene)
         Utility.Wait(1)
         if newScene == ""
           Main.Debug("No OStim scene found for: " + tags)
@@ -185,6 +192,8 @@ Function StartSexScene(actor[] actors, bool bPlayerInScene, string tags="")
           Main.Debug("Found " + tags + " scene: " + newScene + " for OStim Thread [" + ActiveOstimThreadID + "].")
         EndIf
       EndIf
+    else
+      Main.Debug("No OStim tags provided")
     EndIf
     int ActiveOstimThreadID = OThread.Quickstart(actors, newScene)
     Main.Debug("OStim Thread [" + ActiveOstimThreadID + "] Initialized")
@@ -296,9 +305,9 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
         if ActiveOstimThreadID < 0
           Main.Debug("OStim detects target 1 is not in thread: " + ActiveOstimThreadID)
           ; Target 1 is not in an OStim thread
-          if OActor.VerifyActors(ostimActors)
+          ;if OActor.VerifyActors(ostimActors)
           StartSexScene(ostimActors, bPlayerInScene, tags)
-          EndIf
+          ;EndIf
         else
           ; Target 1 is already in an OStim thread
           Main.Debug("OStim detects target 1 is already in thread: " + ActiveOstimThreadID)

@@ -88,10 +88,6 @@ if ($returnVar !== 0) {
 // Clean up the temp directory
 shell_exec("rm -rf $tempDir");
 
-// Clean up DB and perform migrations
-$db = new sql();
-$db->execQuery("DROP TABLE IF EXISTS custom_context");
-$db->execQuery("DROP TABLE IF EXISTS custom_actions");
 
 // Run migrate script
 $migrateScript = "..".DIRECTORY_SEPARATOR."migrate.php";

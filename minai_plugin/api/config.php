@@ -33,6 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         "radiance_rechat_p" => $GLOBALS["radiance_rechat_p"],
         "xtts_server_override" => $GLOBALS["xtts_server_override"],
         "strip_emotes_from_output" => $GLOBALS["strip_emotes_from_output"],
+        "realnames_support" => $GLOBALS["realnames_support"],
         "input_delay_for_radiance" => $GLOBALS["input_delay_for_radiance"],
         "voicetype_fallbacks" => $GLOBALS["voicetype_fallbacks"],
     );
@@ -70,6 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $newConfig .= "\$GLOBALS['radiance_rechat_p'] = " . intval($input['radiance_rechat_p']) . ";\n";
     $newConfig .= "\$GLOBALS['xtts_server_override'] = \"" . ($input['xtts_server_override']) . "\";\n";
     $newConfig .= "\$GLOBALS['strip_emotes_from_output'] = " . ($input['strip_emotes_from_output'] ? 'true' : 'false') . ";\n";
+    $newConfig .= "\$GLOBALS['realnames_support'] = " . ($input['realnames_support'] ? 'true' : 'false') . ";\n";
     $newConfig .= "\$GLOBALS['input_delay_for_radiance'] = " . intval($input['input_delay_for_radiance']) . ";\n";
 
     // Write the voicetype_fallbacks array using the Array() format
