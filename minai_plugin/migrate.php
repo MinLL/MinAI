@@ -1,7 +1,7 @@
 <?php
 
-$path = str_replace("/api","", getcwd());
-$path = str_replace("/ext/minai_plugin","", $path);
+$pluginPath = str_replace("/api","", getcwd());
+$path = str_replace("/ext/minai_plugin","", $pluginPath);
 require_once($path . "/conf".DIRECTORY_SEPARATOR."conf.php");
 require_once($path. "/lib" .DIRECTORY_SEPARATOR."{$GLOBALS["DBDRIVER"]}.class.php");
 require_once("customintegrations.php");
@@ -20,7 +20,7 @@ function Beta395Migration() {
 }
 
 
-$versionFile = 'version.txt';
+$versionFile = "$pluginPath/version.txt";
 
 // Check if the version file exists
 if (file_exists($versionFile)) {
