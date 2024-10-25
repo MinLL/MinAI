@@ -1,8 +1,8 @@
 <?php
-$GLOBALS['PLAYER_BIO'] = "I'm #PLAYER_NAME#. I'm a somewhat wild looking half-elf with black hair and blue eyes. ";
+$GLOBALS['PLAYER_BIO'] = "I'm #PLAYER_NAME#. ";
 $GLOBALS['PROMPT_HEAD_OVERRIDE'] = "Let's roleplay in the Universe of Skyrim.  ";
 $GLOBALS['use_narrator_profile'] = false;
-$GLOBALS['stop_narrator_context_leak'] = false;
+$GLOBALS['stop_narrator_context_leak'] = true;
 $GLOBALS['devious_narrator_eldritch_voice'] = "dragon";
 $GLOBALS['devious_narrator_telvanni_voice'] = "TelvanniNarrator";
 $GLOBALS['force_voice_type'] = false;
@@ -13,6 +13,7 @@ $GLOBALS['force_aiff_name_to_ingame_name'] = true;
 $GLOBALS['commands_to_purge'] = Array("TakeASeat", "Folow");
 $GLOBALS['events_to_ignore'] = Array("rpg_lvlup");
 $GLOBALS['use_defeat'] = false;
+$GLOBALS["realnames_support"] = false;
 $GLOBALS['disable_worn_equipment'] = false;
 $GLOBALS['radiance_rechat_h'] = 8;
 $GLOBALS['radiance_rechat_p'] = 20;

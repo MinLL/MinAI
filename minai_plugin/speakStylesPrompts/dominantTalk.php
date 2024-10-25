@@ -46,8 +46,8 @@ function setDominantTalkPrompts($currentName)
 
     $GLOBALS["PROMPTS"]["sextalk_ambient"] = [
         "cue" => [
-            "$currentName comments on their partner's body, using commanding language to exert control. {$GLOBALS["TEMPLATE_DIALOG"]}",
-            "$currentName says something authoritative about their partner's posture. {$GLOBALS["TEMPLATE_DIALOG"]}",
+            "$currentName teases their partner with a playful command. {$GLOBALS['TEMPLATE_DIALOG']}",
+            "$currentName demands their partner look at them in a certain way. {$GLOBALS['TEMPLATE_DIALOG']}",
             "$currentName describes the way their partner should move during sex. {$GLOBALS["TEMPLATE_DIALOG"]}",
             "$currentName talks about how much they love their partner's obedience. {$GLOBALS["TEMPLATE_DIALOG"]}",
             "$currentName says something dominating about their partner's submission. {$GLOBALS["TEMPLATE_DIALOG"]}",

@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Personalities</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f7f6;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        input, textarea, button, select {
+            padding: 10px;
+            margin: 5px;
+            font-size: 14px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            width: 100%;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .form-container {
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        .pagination {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .pagination button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+        }
+        .pagination button:hover {
+            background-color: #0056b3;
+        }
+        .pagination-info {
+            font-size: 14px;
+        }
+        .search-container {
+            margin-bottom: 20px;
+        }
+        .search-container input {
+            width: 300px;
+            padding: 10px;
+        }
+        .new-entry-form {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .navigation {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #007bff;
+            padding: 10px;
+            color: white;
+            border-radius: 5px;
+        }
+        .navigation a, .navigation button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .navigation a:hover, .navigation button:hover {
+            background-color: #0056b3;
+        }
+
+        .tooltip {
+            position: absolute;
+            background-color: #333;
+            color: #fff;
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 12px;
+            visibility: hidden;
+            max-width: 300px;
+            z-index: 1000;
+          }
+    </style>
+</head>
+<body>
+    <h1>Manage Personalities</h1>
+
+    <!-- Navigation Bar -->
+    <div class="navigation">
+      <a href="index.html">Back to Home</a>
+      <button onclick="confirmResetPersonalities()">Reset Personalities</button>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search personalities..." oninput="searchTable()">
+    </div>
+
+    <!-- Table for displaying personalities -->
+    <table id="dataTable"></table>
+
+    <!-- Pagination Controls -->
+    <div class="pagination">
+        <button onclick="prevPage()">Previous</button>
+        <div class="pagination-info">
+            Page <span id="currentPage">1</span> of <span id="totalPages">1</span>
+        </div>
+        <button onclick="nextPage()">Next</button>
+    </div>
+
+    <!-- Form for creating new entries -->
+    <div class="new-entry-form">
+        <h2>Create New Personality</h2>
+        <form id="newEntryForm">
+            <label for="newId">ID</label>
+            <input type="text" id="newId" name="id" required>
+            <label for="newOrientation">Orientation</label>
+            <input type="text" id="newOrientation" name="orientation" required>
+            <label for="speakStyleDuringSex">Speak style during sex</label>
+            <select type="text" id="speakStyleDuringSex" name="speakStyle" required></select>
+            <label for="newSexFantasies">Sex Fantasies (comma separated)</label>
+            <input type="text" id="newSexFantasies" name="sexFantasies">
+            <label for="newSexualBehavior">Sexual Behavior (comma separated)</label>
+            <input type="text" id="newSexualBehavior" name="sexualBehavior">
+            <label for="newRelationshipStyle">Relationship Style</label>
+            <input type="text" id="newRelationshipStyle" name="relationshipStyle">
+            <label for="newSexPersonalityTraits">Sex Personality Traits (comma separated)</label>
+            <input type="text" id="newSexPersonalityTraits" name="sexPersonalityTraits">
+            <label for="newPreferredSexPositions">Preferred Sex Positions (comma separated)</label>
+            <input type="text" id="newPreferredSexPositions" name="preferredSexPositions">
+            <button type="button" onclick="createNewEntry()">Create Entry</button>
+        </form>
+    </div>
+
+    <div id="tooltip" class="tooltip"></div>
+
+    <script>
+        let currentPage = 1;
+        const rowsPerPage = 10;
+        let data = [];
+        let filteredData = [];
+        let editedRow = {};  // Store in-line edited data
+        let originalRowData = {};  // Store original data for fallback
+
+        window.onload = function() {
+            loadTable();
+        };
+
+        // Function to load table data from the backend
+        function loadTable() {
+            fetch('api/personalities.php?table=minai_x_personalities')
+                .then(response => response.json())
+                .then(result => {
+                    data = result;
+                    filteredData = data.sort((a, b) => a.id.localeCompare(b.id));
+                    updatePagination();
+                    renderTable();
+                });
+        }
+
+        const speakStyleDuringSexOptions = ["dirty talk", "sweet talk", "sensual whispering", "dominant talk", "submissive talk", "teasing talk", "erotic storytelling", "breathless gasps", "sultry seduction", "playful banter"];
+
+        const speakStyleSelect = document.getElementById('speakStyleDuringSex')
+
+        speakStyleDuringSexOptions.forEach(opt => {
+            // Create a new option element
+            const option = document.createElement('option');
+                            
+            // Set the value and text of the option
+            option.value = opt;
+            option.text = opt;
+
+            // Append the option to the select element
+            speakStyleSelect.appendChild(option);
+        })
+
+        // Function to render the table based on the current page
+        function renderTable() {
+            const tableElem = document.getElementById('dataTable');
+            tableElem.innerHTML = '';
+
+            if (filteredData.length > 0) {
+                const headers = ['ID', 'Orientation', 'Relation Style', 'Positions', 'Speak style', 'Behavior', 'Fantasies',  'Traits', 'Actions'];
+                const headerRow = document.createElement('tr');
+                headers.forEach(header => {
+                    const th = document.createElement('th');
+                    th.innerText = header;
+                    th.onclick = () => sortTable(header.toLowerCase());
+                    headerRow.appendChild(th);
+                });
+                tableElem.appendChild(headerRow);
+
+                const startIndex = (currentPage - 1) * rowsPerPage;
+                const endIndex = startIndex + rowsPerPage;
+                const pageData = filteredData.slice(startIndex, endIndex);
+
+                pageData.forEach(row => {
+                    const personality = JSON.parse(row.x_personality);
+                    const tr = document.createElement('tr');
+
+                    // Store original data for the row to use as fallback
+                    originalRowData[row.id] = {
+                        orientation: personality.orientation,
+                        sexFantasies: personality.sexFantasies.join(", "),
+                        sexualBehavior: personality.sexualBehavior.join(", "),
+                        relationshipStyle: personality.relationshipStyle,
+                        sexPersonalityTraits: personality.sexPersonalityTraits.join(", "),
+                        preferredSexPositions: personality.preferredSexPositions.join(", ")
+                    };
+
+                    tr.innerHTML = `
+                        <td contenteditable="true" onblur="editRow(this, 'id', '${row.id}')">${row.id}</td>
+                        <td contenteditable="true" onblur="editRow(this, 'orientation', '${row.id}')">${personality.orientation}</td>
+                        <td contenteditable="true" onblur="editRow(this, 'relationshipStyle', '${row.id}')">${personality.relationshipStyle}</td>
+                        <td contenteditable="true" onblur="editRow(this, 'preferredSexPositions', '${row.id}')">${personality.preferredSexPositions.join(", ")}</td>
+                        <td><select style="width: 120px;" onchange="editRow(this, 'speakStyleDuringSex', '${row.id}')">${speakStyleDuringSexOptions.map(option => `<option value="${option}" ${personality.speakStyleDuringSex === option ? 'selected' : ''}>${option}</option>`)}</select></td>
+                        <td contenteditable="true" onblur="editRow(this, 'sexualBehavior', '${row.id}')">${personality.sexualBehavior.join(", ")}</td>
+                        <td contenteditable="true" onblur="editRow(this, 'sexFantasies', '${row.id}')">${personality.sexFantasies.join(", ")}</td>
+                        <td contenteditable="true" onblur="editRow(this, 'sexPersonalityTraits', '${row.id}')">${personality.sexPersonalityTraits.join(", ")}</td>
+                    `;
+
+                    const actionTd = document.createElement('td');
+                    const saveBtn = document.createElement('button');
+                    saveBtn.innerText = 'Save';
+                    saveBtn.onclick = () => saveRow(row.id);
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.innerText = 'Delete';
+                    deleteBtn.onclick = () => deleteRow(row.id);
+                    actionTd.appendChild(saveBtn);
+                    actionTd.appendChild(deleteBtn);
+                    tr.appendChild(actionTd);
+
+                    tableElem.appendChild(tr);
+                });
+            }
+        }
+
+        // Function to edit an in-line row
+        function editRow(el, field, id) {
+            let value = ''
+            if(field === 'speakStyleDuringSex') {
+                value = el.value
+            } else {
+                value = el.innerText.trim();
+            }
+            
+            if (!editedRow[id]) {
+                editedRow[id] = {};
+            }
+            editedRow[id][field] = value;
+        }
+
+        // Function to save the edited row to the backend
+        function saveRow(id) {
+            // Get the updated data or fallback to the original data if not edited
+            const updatedData = {
+                id: editedRow[id]?.id || id,
+                orientation: editedRow[id]?.orientation || originalRowData[id].orientation,
+                sexFantasies: (editedRow[id]?.sexFantasies || originalRowData[id].sexFantasies).split(',').map(f => f.trim()),
+                sexualBehavior: (editedRow[id]?.sexualBehavior || originalRowData[id].sexualBehavior).split(',').map(b => b.trim()),
+                relationshipStyle: editedRow[id]?.relationshipStyle || originalRowData[id].relationshipStyle,
+                sexPersonalityTraits: (editedRow[id]?.sexPersonalityTraits || originalRowData[id].sexPersonalityTraits).split(',').map(t => t.trim()),
+                preferredSexPositions: (editedRow[id]?.preferredSexPositions || originalRowData[id].preferredSexPositions).split(',').map(p => p.trim()),
+                speakStyleDuringSex: editedRow[id]?.speakStyleDuringSex || originalRowData[id].speakStyleDuringSex,
+            };
+
+            fetch('api/personalities.php', {
+                method: 'PUT',
+                body: new URLSearchParams({
+                    table: 'minai_x_personalities',
+                    id: id,
+                    data: JSON.stringify(updatedData)
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                alert(result.status === 'success' ? 'Data saved!' : 'Failed to save data');
+                loadTable();
+            });
+        }
+
+        // Function to delete a row from the backend
+        function deleteRow(id) {
+            fetch('api/personalities.php', {
+                method: 'DELETE',
+                body: new URLSearchParams({
+                    table: 'minai_x_personalities',
+                    id: id
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                alert(result.status === 'success' ? 'Data deleted!' : 'Failed to delete data');
+                loadTable();
+            });
+        }
+
+        // Function to search for personalities in the table
+        function searchTable() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            filteredData = data.filter(row => {
+                const personality = JSON.parse(row.x_personality);
+                return (
+                    row.id.toLowerCase().includes(searchText) ||
+                    personality.orientation.toLowerCase().includes(searchText) ||
+                    personality.sexFantasies.join(", ").toLowerCase().includes(searchText) ||
+                    personality.sexualBehavior.join(", ").toLowerCase().includes(searchText) ||
+                    personality.relationshipStyle.toLowerCase().includes(searchText) ||
+                    personality.sexPersonalityTraits.join(", ").toLowerCase().includes(searchText) ||
+                    personality.preferredSexPositions.join(", ").toLowerCase().includes(searchText)
+                );
+            });
+            currentPage = 1; // Reset to first page when searching
+            updatePagination();
+            renderTable();
+        }
+
+        // Function to sort the table by column
+        function sortTable(column) {
+            filteredData.sort((a, b) => {
+                const personalityA = JSON.parse(a.x_personality);
+                const personalityB = JSON.parse(b.x_personality);
+
+                const valA = column === 'id' ? a.id : personalityA[column];
+                const valB = column === 'id' ? b.id : personalityB[column];
+
+                if (valA < valB) return -1;
+                if (valA > valB) return 1;
+                return 0;
+            });
+            renderTable();
+        }
+
+        // Pagination Functions
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+            document.getElementById('totalPages').innerText = totalPages;
+            document.getElementById('currentPage').innerText = currentPage;
+        }
+
+        function nextPage() {
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderTable();
+                updatePagination();
+            }
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTable();
+                updatePagination();
+            }
+        }
+
+        // Function to create a new personality entry
+        function createNewEntry() {
+            const formData = new FormData(document.getElementById('newEntryForm'));
+            const newEntryData = {
+                id: formData.get('id'),
+                orientation: formData.get('orientation'),
+                sexFantasies: formData.get('sexFantasies').split(',').map(f => f.trim()),
+                sexualBehavior: formData.get('sexualBehavior').split(',').map(b => b.trim()),
+                relationshipStyle: formData.get('relationshipStyle'),
+                sexPersonalityTraits: formData.get('sexPersonalityTraits').split(',').map(t => t.trim()),
+                preferredSexPositions: formData.get('preferredSexPositions').split(',').map(p => p.trim()),
+                speakStyleDuringSex: formData.get('speakStyleDuringSex')
+            };
+
+            fetch('api/personalities.php', {
+                method: 'POST',
+                body: new URLSearchParams({
+                    table: 'minai_x_personalities',
+                    data: JSON.stringify(newEntryData)
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                alert(result.status === 'success' ? 'New entry created!' : 'Failed to create entry');
+                loadTable();
+            });
+        }
+
+        // Confirmation popup for resetting personalities
+        function confirmResetPersonalities() {
+            if (confirm("Are you sure you want to reset all personalities? This action cannot be undone.")) {
+                resetPersonalities();
+            }
+        }
+
+        // Function to reset all personalities
+        function resetPersonalities() {
+            fetch('api/main.php?endpoint=reset_personalities', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(result => {
+                alert('Personalities reset successfully!');
+                loadTable();
+            });
+        }
+
+        const tooltip = document.getElementById('tooltip');
+        const tooltipTarget = document.getElementById('dataTable');
+
+        const cellTooltips = [
+            `NPC's name as in game(papyrus getDisplayName). Replace spaces with _ and single quote ' with +`,
+            'The character\'s sexual orientation, which describes their emotional, romantic, or sexual attraction to others.',
+            `The character's preferred style of romantic relationship, which can impact their behavior and expectations in intimate relationships. 
+monogamous - exclusive commitment to one partner; 
+polyamorous - non-exclusive commitment to multiple partners; 
+open relationship - commitment to one partner with freedom to explore outside relationships; 
+swinging - non-monogamous relationships with mutual consent.`,
+            `A comma separated list of the character's favorite or preferred sex positions, which can provide insight into their physical and emotional comfort levels. Use well known positions keywords.`,
+            `Communication style during sex`,
+            `The character's specific behaviors or activities they engage in during sex, which can indicate their desires and boundaries. For example: public sex, nipple play, cum play, facials, voyeurism, etc...`,
+            `A list of the character's daring, risky erotic and sexual fantasies.`,
+            `The character's personality traits that influence their behavior and interactions during sex, which can impact their relationships and emotional well-being.`,
+        ]
+
+        // Function to show the tooltip
+        function showTooltip(event) {
+            const target = event.target
+            if(target.tagName.toLowerCase() !== 'td') {
+                return
+            }
+
+            let title = cellTooltips[target.cellIndex]
+
+            
+            tooltip.style.visibility = 'visible';
+            tooltip.textContent = title;
+            tooltip.style.left = (event.pageX - tooltip.clientWidth / 2) + 'px';
+            tooltip.style.top = (event.pageY + 10) + 'px';
+            
+        }
+        // Function to hide the tooltip
+        function hideTooltip() {
+            tooltip.style.visibility = 'hidden';
+        }
+
+        tooltipTarget.addEventListener('mouseover', showTooltip);
+        tooltipTarget.addEventListener('mousemove', showTooltip); // Update position
+        tooltipTarget.addEventListener('mouseout', hideTooltip);
+    </script>
+</body>
+</html>

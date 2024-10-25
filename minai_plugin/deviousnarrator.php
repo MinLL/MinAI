@@ -2,10 +2,10 @@
 
 Function SetTelvanniNarrator() {
     $GLOBALS["devious_narrator"]="telvanni";
+    // error_log("minai: Setting Telvanni Narrator");
     $eyepenalty = GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleEyePenalty");       
     $eyereward = GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleEyeReward");
     $eyescore = GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleEyeScore");
-    error_Log("Using telvanni narrator");
     // Overwrite narrator personality
     $personality = "";
     $personality .= "You are The Narrator in a Skyrim adventure. You will only talk to {$GLOBALS["PLAYER_NAME"]}. You refer to yourself as 'The Narrator'. Only {$GLOBALS["PLAYER_NAME"]} can hear you. ";
@@ -41,8 +41,8 @@ Function SetTelvanniNarrator() {
 
 Function SetEldritchNarrator() {
     $GLOBALS["devious_narrator"]="eldritch";
+    // error_log("minai: Setting Eldritch Narrator");
     // Overwrite narrator personality
-    error_Log("Using eldritch narrator");
     $personality = "";
     $personality .= "You are The Narrator in a Skyrim adventure. You will only talk to {$GLOBALS["PLAYER_NAME"]}. You refer to yourself as 'The Narrator'. Only {$GLOBALS["PLAYER_NAME"]} can hear you. ";
     // Hmmm. Not sure how to differentiate which path the player is on. I'll support the "waifu" path for now.
@@ -95,8 +95,9 @@ Function ShouldUseDeviousNarrator() {
 }
 
 Function IsEldritchNarratorActive() {
-    error_log("minai: Narrator={$GLOBALS["devious_narrator"]}");
-    return (IsModEnabled("DeviouslyAccessible") && isset($GLOBALS["devious_narrator"]) && $GLOBALS["devious_narrator"] == "eldritch");
+    $questState = intval(GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleGlobal"));
+    $eldritchScore = intval(intval($questState) / 10);
+    return (IsModEnabled("DeviouslyAccessible") && $eldritchScore != 0);
 }
 
 Function EnableDeviousNarratorActions() {
