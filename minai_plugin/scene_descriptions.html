@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,10 +12,14 @@
             background-color: #f4f7f6;
             padding: 20px;
         }
+
         h1 {
             color: #333;
         }
-        input, textarea, button {
+
+        input,
+        textarea,
+        button {
             padding: 10px;
             margin: 5px;
             font-size: 14px;
@@ -22,6 +27,7 @@
             border: 1px solid #ddd;
             width: 100%;
         }
+
         button {
             background-color: #28a745;
             color: white;
@@ -29,37 +35,48 @@
             cursor: pointer;
             margin-right: 5px;
         }
+
         button:hover {
             background-color: #218838;
         }
+
         table {
             width: 100%;
             margin-top: 20px;
             border-collapse: collapse;
         }
-        table, th, td {
+
+        table,
+        th,
+        td {
             border: 1px solid #ddd;
         }
-        th, td {
+
+        th,
+        td {
             padding: 8px;
             text-align: left;
         }
+
         th {
             background-color: #f2f2f2;
             cursor: pointer;
         }
+
         .form-container {
             background-color: white;
             padding: 20px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
             margin-top: 20px;
         }
+
         .pagination {
             margin-top: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
+
         .pagination button {
             background-color: #007bff;
             color: white;
@@ -67,10 +84,12 @@
             border: none;
             cursor: pointer;
         }
+
         .pagination button:hover {
             background-color: #0056b3;
         }
-	.navigation {
+
+        .navigation {
             margin-top: 20px;
             display: flex;
             justify-content: space-between;
@@ -80,7 +99,9 @@
             color: white;
             border-radius: 5px;
         }
-        .navigation a, .navigation button {
+
+        .navigation a,
+        .navigation button {
             background-color: #007bff;
             color: white;
             padding: 10px;
@@ -89,34 +110,93 @@
             text-decoration: none;
             font-weight: bold;
         }
-        .navigation a:hover, .navigation button:hover {
+
+        .navigation a:hover,
+        .navigation button:hover {
             background-color: #0056b3;
         }
+
         .pagination-info {
             font-size: 14px;
         }
+
         .search-container {
             margin-bottom: 20px;
         }
+
         .search-container input {
             width: 300px;
             padding: 10px;
         }
+
         .new-entry-form {
             margin-top: 20px;
             padding: 20px;
             background-color: #fff;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         }
+
+        .tooltip {
+            position: absolute;
+            background-color: #333;
+            color: #fff;
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 12px;
+            visibility: hidden;
+            max-width: 300px;
+            z-index: 1000;
+        }
+
+        /* Basic styles for the tabs */
+        .tab {
+            display: inline-block;
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+            border-bottom: none;
+            margin-right: 5px;
+            font-weight: bold;
+        }
+
+        /* Active tab styling */
+        .tab.active {
+            background-color: #fff;
+            border-bottom: 2px solid #000;
+        }
+
+        /* Content for each tab */
+        .tab-content {
+            padding: 20px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+        }
+
+        .tab-content-item {
+            display: none;
+        }
+
+        /* Show active tab content */
+        .tab-content-item.active {
+            display: block;
+        }
+
+        #generateError {
+            display: none;
+            color: #dc3545;
+            margin: 20px 0;
+        }
     </style>
 </head>
+
 <body>
     <h1>Manage Scene Descriptions</h1>
-
+    <h3><a href="https://github.com/MinLL/MinAI/blob/main/nsfw_Scenes.md">Scene descriptions guide</a></h4>
     <!-- Navigation Bar -->
     <div class="navigation">
-      <a href="index.html">Back to Home</a>
-      <button onclick="confirmResetScenes()">Reset Scenes</button>
+        <a href="index.html">Back to Home</a>
+        <button onclick="confirmResetScenes()">Reset Scenes</button>
     </div>
 
     <!-- Search Bar -->
@@ -136,19 +216,58 @@
         <button onclick="nextPage()">Next</button>
     </div>
 
-    <!-- Form for creating new entries -->
-    <div class="new-entry-form">
-        <h2>Create New Scene Description</h2>
-        <form id="newEntryForm">
-            <label for="newOstimId">OStim ID</label>
-            <input type="text" id="newOstimId" name="ostim_id" required>
-            <label for="newSexlabId">SexLab ID</label>
-            <input type="text" id="newSexlabId" name="sexlab_id">
-            <label for="newDescription">Description</label>
-            <textarea id="newDescription" name="description" rows="4" required></textarea>
-            <button type="button" onclick="createNewEntry()">Create Entry</button>
-        </form>
+    <div class="tabs">
+        <div class="tab active" onclick="openTab(event, 'create')">Create manually</div>
+        <div class="tab" onclick="openTab(event, 'generate')">Generate with LLM</div>
     </div>
+
+    <div class="tab-content">
+        <div class="new-entry-form">
+            <div id="create" class="tab-content-item active">
+                <!-- Form for creating new entries -->
+                <h2>Create New Scene Description</h2>
+            </div>
+
+            <div id="generate" class="tab-content-item" style="margin-bottom: 20px;">
+                <h2>Generate Scene Description with LLM</h2>
+                <p>It will use LLM endpoint from your AIFF diary configuration. You still need manually to privde
+                    ostim_id/sexlab_id</p>
+                    <details style="margin: 10px 0;">
+                        <summary>Example of not-pretty description you can feed to LLM</summary>
+                        <pre>
+{actor0}, {actor1} participate in scene. Scene is at bed. Scene can be described by this tags: anubs
+{actor0}(male) - is with feet on ground, their position can be described by these tags: standing.
+{actor1}(female) - their position can be described by these tags: lyingside.
+List of actions in the scene(all actions happen at the same time):
+  - vaginalsex. Action can be described by these tags: sexual. {actor0}(the one with the penis). {actor1}(the one with the vulva).
+                    </pre>
+                    </details>
+                    <details style="margin: 10px 0;">
+                        <summary>Possible LLM output(not guaranteed, since there is no way LLM will return 2 identical responses):</summary>
+                        <pre>{actor0} stands beside the bed, his feet firmly on the ground, while {actor1} lies on her side, her legs slightly parted. 
+He thrusts his hard cock into her wet pussy, their bodies moving in sync as they engage in passionate vaginal sex.</pre>
+                    </details>
+                <textarea name="prompt" id="descriptionPrompt"></textarea>
+                <div id="generateError"></div>
+                <button type="button" onclick="generateDescription()">Generate</button>
+            </div>
+            <form id="newEntryForm">
+                <label for="newOstimId">OStim ID</label>
+                <input type="text" id="newOstimId" name="ostim_id" required>
+                <label for="newSexlabId">SexLab ID</label>
+                <input type="text" id="newSexlabId" name="sexlab_id">
+                <label for="newDescription">Description</label>
+                <textarea id="newDescription" name="description" rows="4" required></textarea>
+                <button type="button" onclick="createNewEntry()">Create Entry</button>
+            </form>
+        </div>
+    </div>
+
+
+
+
+
+    <div id="tooltip" class="tooltip"></div>
 
     <script>
         let currentPage = 1;
@@ -157,7 +276,7 @@
         let filteredData = [];
         let editedRow = {};
 
-        window.onload = function() {
+        window.onload = function () {
             loadTable();
         };
 
@@ -241,11 +360,11 @@
                     data: JSON.stringify(updatedData)
                 })
             })
-            .then(response => response.json())
-            .then(result => {
-                alert(result.status === 'success' ? 'Data saved!' : 'Failed to save data');
-                loadTable();
-            });
+                .then(response => response.json())
+                .then(result => {
+                    alert(result.status === 'success' ? 'Data saved!' : 'Failed to save data');
+                    loadTable();
+                });
         }
 
         // Function to delete a row from the backend
@@ -257,11 +376,11 @@
                     id: id
                 })
             })
-            .then(response => response.json())
-            .then(result => {
-                alert(result.status === 'success' ? 'Data deleted!' : 'Failed to delete data');
-                loadTable();
-            });
+                .then(response => response.json())
+                .then(result => {
+                    alert(result.status === 'success' ? 'Data deleted!' : 'Failed to delete data');
+                    loadTable();
+                });
         }
 
         // Function to search for scene descriptions in the table
@@ -332,10 +451,10 @@
                     data: JSON.stringify(newEntryData)
                 })
             })
-            .then(response => response.json())
-            .then(result => {
-                loadTable();
-            });
+                .then(response => response.json())
+                .then(result => {
+                    loadTable();
+                });
         }
 
         // Confirmation popup for resetting scenes
@@ -350,12 +469,87 @@
             fetch('api/main.php?endpoint=reset_scenes', {
                 method: 'POST'
             })
+                .then(response => response.json())
+                .then(result => {
+                    alert('Scenes reset successfully!');
+                    loadTable();
+                });
+        }
+
+        const cellTooltips = [
+            "Ostim scene id. Usually it's file name without .json. For example for scene file `AnubsASt-1.json` it will be `AnubsASt-1`",
+            "Sexlab actor stage id without '_A1'-like part. Usually can be found in slal file in actors.stages array. For example for actor 1 for stage 1: Anubs_legupfuck_A1_S1 - should be Anubs_legupfuck_S1. Each description is for one stage for ALL actors!",
+            "Scene description. Use keywords like {actor0}, {actor1}. Use pronounces so it's easier for LLM to understand gender capabilities of actors(penis, vulva, etc...). Read more about actors order on MinAI repo documentation."
+        ]
+
+        const tooltip = document.getElementById('tooltip');
+        const tooltipTarget = document.getElementById('dataTable');
+
+
+        console.log('AAA', tooltipTarget)
+        // Function to show the tooltip
+        function showTooltip(event) {
+            const target = event.target
+            console.log('BBB', target)
+            if (target.tagName.toLowerCase() !== 'td') {
+                return
+            }
+
+            let title = cellTooltips[target.cellIndex]
+
+
+            tooltip.style.visibility = 'visible';
+            tooltip.textContent = title;
+            tooltip.style.left = (event.pageX - tooltip.clientWidth / 2) + 'px';
+            tooltip.style.top = (event.pageY + 10) + 'px';
+
+        }
+        // Function to hide the tooltip
+        function hideTooltip() {
+            tooltip.style.visibility = 'hidden';
+        }
+
+        tooltipTarget.addEventListener('mouseover', showTooltip);
+        tooltipTarget.addEventListener('mousemove', showTooltip); // Update position
+        tooltipTarget.addEventListener('mouseout', hideTooltip);
+
+        function openTab(event, tabId) {
+            // Hide all tab content
+            const contents = document.querySelectorAll('.tab-content-item');
+            contents.forEach(content => content.classList.remove('active'));
+
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Show the selected tab content
+            document.getElementById(tabId).classList.add('active');
+            // Set the clicked tab to active
+            event.currentTarget.classList.add('active');
+        }
+
+        function generateDescription() {
+            const descriptionPrompt = document.getElementById('descriptionPrompt').value
+            const res = fetch('api/generateDescription.php', {
+                method: 'POST',
+                body: new URLSearchParams({
+                    descriptionPrompt
+                })
+            })
             .then(response => response.json())
             .then(result => {
-                alert('Scenes reset successfully!');
-                loadTable();
+                const errEl = document.getElementById('generateError')
+                if(result.status === 'error') {
+                    errEl.style.display = 'block';
+                    errEl.innerHTML = result.message;
+                } else {
+                    errEl.style.display = 'none';
+                    const newDescriptionTextarea = document.getElementById('newDescription')
+                    newDescriptionTextarea.value = result.data;
+                }
             });
         }
     </script>
 </body>
+
 </html>
