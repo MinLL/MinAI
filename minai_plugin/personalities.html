@@ -14,7 +14,7 @@
         h1 {
             color: #333;
         }
-        input, textarea, button {
+        input, textarea, button, select {
             padding: 10px;
             margin: 5px;
             font-size: 14px;
@@ -47,6 +47,7 @@
         th {
             background-color: #f2f2f2;
             cursor: pointer;
+            white-space: nowrap;
         }
         .form-container {
             background-color: white;
@@ -108,6 +109,18 @@
         .navigation a:hover, .navigation button:hover {
             background-color: #0056b3;
         }
+
+        .tooltip {
+            position: absolute;
+            background-color: #333;
+            color: #fff;
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 12px;
+            visibility: hidden;
+            max-width: 300px;
+            z-index: 1000;
+          }
     </style>
 </head>
 <body>
@@ -144,6 +157,8 @@
             <input type="text" id="newId" name="id" required>
             <label for="newOrientation">Orientation</label>
             <input type="text" id="newOrientation" name="orientation" required>
+            <label for="speakStyleDuringSex">Speak style during sex</label>
+            <select type="text" id="speakStyleDuringSex" name="speakStyle" required></select>
             <label for="newSexFantasies">Sex Fantasies (comma separated)</label>
             <input type="text" id="newSexFantasies" name="sexFantasies">
             <label for="newSexualBehavior">Sexual Behavior (comma separated)</label>
@@ -157,6 +172,8 @@
             <button type="button" onclick="createNewEntry()">Create Entry</button>
         </form>
     </div>
+
+    <div id="tooltip" class="tooltip"></div>
 
     <script>
         let currentPage = 1;
@@ -176,11 +193,27 @@
                 .then(response => response.json())
                 .then(result => {
                     data = result;
-                    filteredData = data;
+                    filteredData = data.sort((a, b) => a.id.localeCompare(b.id));
                     updatePagination();
                     renderTable();
                 });
         }
+
+        const speakStyleDuringSexOptions = ["dirty talk", "sweet talk", "sensual whispering", "dominant talk", "submissive talk", "teasing talk", "erotic storytelling", "breathless gasps", "sultry seduction", "playful banter"];
+
+        const speakStyleSelect = document.getElementById('speakStyleDuringSex')
+
+        speakStyleDuringSexOptions.forEach(opt => {
+            // Create a new option element
+            const option = document.createElement('option');
+                            
+            // Set the value and text of the option
+            option.value = opt;
+            option.text = opt;
+
+            // Append the option to the select element
+            speakStyleSelect.appendChild(option);
+        })
 
         // Function to render the table based on the current page
         function renderTable() {
@@ -188,7 +221,7 @@
             tableElem.innerHTML = '';
 
             if (filteredData.length > 0) {
-                const headers = ['ID', 'Orientation', 'Fantasies', 'Behavior', 'Style', 'Traits', 'Positions', 'Actions'];
+                const headers = ['ID', 'Orientation', 'Relation Style', 'Positions', 'Speak style', 'Behavior', 'Fantasies',  'Traits', 'Actions'];
                 const headerRow = document.createElement('tr');
                 headers.forEach(header => {
                     const th = document.createElement('th');
@@ -219,11 +252,12 @@
                     tr.innerHTML = `
                         <td contenteditable="true" onblur="editRow(this, 'id', '${row.id}')">${row.id}</td>
                         <td contenteditable="true" onblur="editRow(this, 'orientation', '${row.id}')">${personality.orientation}</td>
-                        <td contenteditable="true" onblur="editRow(this, 'sexFantasies', '${row.id}')">${personality.sexFantasies.join(", ")}</td>
-                        <td contenteditable="true" onblur="editRow(this, 'sexualBehavior', '${row.id}')">${personality.sexualBehavior.join(", ")}</td>
                         <td contenteditable="true" onblur="editRow(this, 'relationshipStyle', '${row.id}')">${personality.relationshipStyle}</td>
-                        <td contenteditable="true" onblur="editRow(this, 'sexPersonalityTraits', '${row.id}')">${personality.sexPersonalityTraits.join(", ")}</td>
                         <td contenteditable="true" onblur="editRow(this, 'preferredSexPositions', '${row.id}')">${personality.preferredSexPositions.join(", ")}</td>
+                        <td><select style="width: 120px;" onchange="editRow(this, 'speakStyleDuringSex', '${row.id}')">${speakStyleDuringSexOptions.map(option => `<option value="${option}" ${personality.speakStyleDuringSex === option ? 'selected' : ''}>${option}</option>`)}</select></td>
+                        <td contenteditable="true" onblur="editRow(this, 'sexualBehavior', '${row.id}')">${personality.sexualBehavior.join(", ")}</td>
+                        <td contenteditable="true" onblur="editRow(this, 'sexFantasies', '${row.id}')">${personality.sexFantasies.join(", ")}</td>
+                        <td contenteditable="true" onblur="editRow(this, 'sexPersonalityTraits', '${row.id}')">${personality.sexPersonalityTraits.join(", ")}</td>
                     `;
 
                     const actionTd = document.createElement('td');
@@ -243,8 +277,14 @@
         }
 
         // Function to edit an in-line row
-        function editRow(td, field, id) {
-            const value = td.innerText.trim();
+        function editRow(el, field, id) {
+            let value = ''
+            if(field === 'speakStyleDuringSex') {
+                value = el.value
+            } else {
+                value = el.innerText.trim();
+            }
+            
             if (!editedRow[id]) {
                 editedRow[id] = {};
             }
@@ -262,6 +302,7 @@
                 relationshipStyle: editedRow[id]?.relationshipStyle || originalRowData[id].relationshipStyle,
                 sexPersonalityTraits: (editedRow[id]?.sexPersonalityTraits || originalRowData[id].sexPersonalityTraits).split(',').map(t => t.trim()),
                 preferredSexPositions: (editedRow[id]?.preferredSexPositions || originalRowData[id].preferredSexPositions).split(',').map(p => p.trim()),
+                speakStyleDuringSex: editedRow[id]?.speakStyleDuringSex || originalRowData[id].speakStyleDuringSex,
             };
 
             fetch('api/personalities.php', {
@@ -366,6 +407,7 @@
                 relationshipStyle: formData.get('relationshipStyle'),
                 sexPersonalityTraits: formData.get('sexPersonalityTraits').split(',').map(t => t.trim()),
                 preferredSexPositions: formData.get('preferredSexPositions').split(',').map(p => p.trim()),
+                speakStyleDuringSex: formData.get('speakStyleDuringSex')
             };
 
             fetch('api/personalities.php', {
@@ -400,6 +442,49 @@
                 loadTable();
             });
         }
+
+        const tooltip = document.getElementById('tooltip');
+        const tooltipTarget = document.getElementById('dataTable');
+
+        const cellTooltips = [
+            `NPC's name as in game(papyrus getDisplayName). Replace spaces with _ and single quote ' with +`,
+            'The character\'s sexual orientation, which describes their emotional, romantic, or sexual attraction to others.',
+            `The character's preferred style of romantic relationship, which can impact their behavior and expectations in intimate relationships. 
+monogamous - exclusive commitment to one partner; 
+polyamorous - non-exclusive commitment to multiple partners; 
+open relationship - commitment to one partner with freedom to explore outside relationships; 
+swinging - non-monogamous relationships with mutual consent.`,
+            `A comma separated list of the character's favorite or preferred sex positions, which can provide insight into their physical and emotional comfort levels. Use well known positions keywords.`,
+            `Communication style during sex`,
+            `The character's specific behaviors or activities they engage in during sex, which can indicate their desires and boundaries. For example: public sex, nipple play, cum play, facials, voyeurism, etc...`,
+            `A list of the character's daring, risky erotic and sexual fantasies.`,
+            `The character's personality traits that influence their behavior and interactions during sex, which can impact their relationships and emotional well-being.`,
+        ]
+
+        // Function to show the tooltip
+        function showTooltip(event) {
+            const target = event.target
+            if(target.tagName.toLowerCase() !== 'td') {
+                return
+            }
+
+            let title = cellTooltips[target.cellIndex]
+
+            
+            tooltip.style.visibility = 'visible';
+            tooltip.textContent = title;
+            tooltip.style.left = (event.pageX - tooltip.clientWidth / 2) + 'px';
+            tooltip.style.top = (event.pageY + 10) + 'px';
+            
+        }
+        // Function to hide the tooltip
+        function hideTooltip() {
+            tooltip.style.visibility = 'hidden';
+        }
+
+        tooltipTarget.addEventListener('mouseover', showTooltip);
+        tooltipTarget.addEventListener('mousemove', showTooltip); // Update position
+        tooltipTarget.addEventListener('mouseout', hideTooltip);
     </script>
 </body>
 </html>
