@@ -76,9 +76,13 @@ function importDataToDB($tableName, $folderName, $createQuery, $checkDuplicatesC
                     
                     foreach ($checkDuplicatesColumns as $column) {
                         $value = $db->escape($insertData[$column]);
-                        $whereClause[] = "$column = '{$value}'";
+                        if($value) {
+                            $whereClause[] = "$column = '{$value}'";
+                        } else {
+                            $whereClause[] = "$column IS NULL";
+                        }
                     }
-                    $whereQuery = implode(' OR ', $whereClause);
+                    $whereQuery = implode(' AND ', $whereClause);
                     $checkQuery = "SELECT COUNT(*) FROM $tableName WHERE $whereQuery";
                     // $params = array_intersect_key($insertData, array_flip($checkDuplicatesColumns));
                     $result = $db->query($checkQuery);
