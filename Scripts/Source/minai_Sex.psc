@@ -189,7 +189,7 @@ Function StartSexScene(actor[] actors, bool bPlayerInScene, string tags="")
         if newScene == ""
           Main.Debug("No OStim scene found for: " + tags)
         else
-          Main.Debug("Found " + tags + " scene: " + newScene + " for OStim Thread [" + ActiveOstimThreadID + "].")
+          Main.Debug("Found " + tags + " scene: " + newScene); + " for OStim Thread [" + ActiveOstimThreadID + "].")
         EndIf
       EndIf
     else
