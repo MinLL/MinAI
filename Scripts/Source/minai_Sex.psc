@@ -748,7 +748,11 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     actors[0] = akSpeaker
     actors[1] = akTarget
     actors[2] = PlayerRef
-    StartSexOrSwitchToGroup(actors, akSpeaker)
+    if actors[1] != actors[2]
+      StartSexOrSwitchToGroup(actors, akSpeaker)
+    else
+      Main.Debug("Threesome attempt - Must target another NPC")
+    EndIf
   elseIf command == "ExtCmdStartOrgy"
     actor[] actors = aiff.GetNearbyAI()
     actors = PapyrusUtil.PushActor(actors,playerRef)
