@@ -76,7 +76,11 @@ function importDataToDB($tableName, $folderName, $createQuery, $checkDuplicatesC
                     
                     foreach ($checkDuplicatesColumns as $column) {
                         $value = $db->escape($insertData[$column]);
-                        $whereClause[] = "$column = '{$value}'";
+                        if($value) {
+                            $whereClause[] = "$column = '{$value}'";
+                        } else {
+                            $whereClause[] = "$column IS NULL";
+                        }
                     }
                     $whereQuery = implode(' AND ', $whereClause);
                     $checkQuery = "SELECT COUNT(*) FROM $tableName WHERE $whereQuery";
@@ -118,7 +122,7 @@ function importScenesDescriptions() {
         ostim_id character varying(256),
         sexlab_id character varying(256),
         description text
-      )");
+      )", ["ostim_id", "sexlab_id"]);
 }
 
 function importXPersonalities() {

@@ -153,10 +153,7 @@ Function CheckIfActorShouldStillFollow(actor akNpc)
     return
   EndIf
 
-  If (akNpc.GetCurrentScene() != None)
-    Main.Debug("[FollowTarget] Npc is in a scene, End following target")
-    EndFollowTarget(akNpc)
-  ElseIf (akNpc.IsInFaction(FollowFaction) && akNpc.GetCurrentPackage() != FollowPackage)
+  If (akNpc.IsInFaction(FollowFaction) && akNpc.GetCurrentPackage() != FollowPackage)
     Main.Debug("[FollowTarget] Npc is not following anyone, End following target")
     EndFollowTarget(akNpc)
   ElseIf (akNpc.GetCurrentPackage() == FollowPackage && !akNpc.IsInFaction(FollowFaction))

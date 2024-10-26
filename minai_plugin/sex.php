@@ -659,7 +659,7 @@ $GLOBALS["FUNCTIONS"][] = [
 $GLOBALS["FUNCRET"]["ExtCmdPutOnClothes"]=$GLOBALS["GenericFuncRet"];
 
 
-$GLOBALS["F_NAMES"]["ExtCmdFollow"]="Follow";
+$GLOBALS["F_NAMES"]["ExtCmdFollow"]="FollowTarget";
 $GLOBALS["F_TRANSLATIONS"]["ExtCmdFollow"]="Begin following the target to another location";
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdFollow"],

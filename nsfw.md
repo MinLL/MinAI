@@ -12,6 +12,9 @@ MinAI implements many NSFW integrations for users that have either OStim or Sexl
 * (AIFF) Actors have vastly improved awareness of sex scene details in AIFF over Mantella.
 * (Sexlab, Optional) This mod ships with a json file for configuration of prompts that are injected at each stage of a given animation. This can be edited to improve AI awareness of what is happening during a given sex scene. See data/minai/sexlab_descriptions.json
 
+## [Scene Descriptions](./nsfw_Scenes.md) (here you can find tips how to generate your scenes descriptions)
+MinAI includes 3467 ostim/sexlab scene descriptions (as of 10/24/2024) for better context of what exactly happening right now.
+
 ## Worn Equipment Customization
 * You can customize the LLM's awareness of any piece of equipment that you are wearing in order to control how it perceives / reacts to specific gear.
 * Currently you can do this by accessing http://10.0.0.144:8081/HerikaServer/ext/minai_plugin/we_manager.html (Replace the IP address with the IP of your AIFF server). A link will be provided to this from within the plugins page in the future.

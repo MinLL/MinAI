@@ -48,10 +48,10 @@ function setSensualWhisperingPrompts($currentName)
         "cue" => [
             "$currentName whispers something sensual about their partner's body, using a soft tone. {$GLOBALS["TEMPLATE_DIALOG"]}",
             "$currentName says something erotic about their partner's lips. {$GLOBALS["TEMPLATE_DIALOG"]}",
-            "$currentName describes the way their partner's skin tastes. {$GLOBALS["TEMPLATE_DIALOG"]}",
+            "$currentName, in a fit of passionate whispers, lists all the reasons their partner is so desirable. {$GLOBALS['TEMPLATE_DIALOG']}",
             "$currentName talks about how much they love their partner's gentle touch. {$GLOBALS["TEMPLATE_DIALOG"]}",
             "$currentName says something seductive about their partner's fingers. {$GLOBALS["TEMPLATE_DIALOG"]}",
-            "$currentName comments on the way their partner's breath feels on their skin. {$GLOBALS["TEMPLATE_DIALOG"]}"
+            "$currentName tries to describe the overwhelming sensations, their words laced with lust. {$GLOBALS['TEMPLATE_DIALOG']}"
         ],
     ];
 }

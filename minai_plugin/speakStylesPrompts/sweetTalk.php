@@ -47,10 +47,10 @@ function setSweeTalkPrompts($currentName)
     $GLOBALS["PROMPTS"]["sextalk_ambient"] = [
         "cue" => [
             "$currentName comments on their partner's body, using affectionate language to describe their attraction. {$GLOBALS["TEMPLATE_DIALOG"]}",
-            "$currentName says something sweet about their partner's smile. {$GLOBALS["TEMPLATE_DIALOG"]}",
+            "$currentName says something sweet about how much they're enjoying the intimacy. {$GLOBALS["TEMPLATE_DIALOG"]}",
             "$currentName describes the way their partner's touch makes them feel. {$GLOBALS["TEMPLATE_DIALOG"]}",
-            "$currentName talks about how much they love their partner's laugh. {$GLOBALS["TEMPLATE_DIALOG"]}",
-            "$currentName says something loving about their partner's voice. {$GLOBALS["TEMPLATE_DIALOG"]}",
+            "$currentName talks about how turned on they are by their partner's movements. {$GLOBALS["TEMPLATE_DIALOG"]}",
+            "$currentName whispers something sensual about how good it feels to be inside/with their partner. {$GLOBALS["TEMPLATE_DIALOG"]}",
             "$currentName comments on the way their partner's eyes sparkle during sex. {$GLOBALS["TEMPLATE_DIALOG"]}"
         ],
     ];
