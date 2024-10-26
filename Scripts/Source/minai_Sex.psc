@@ -232,10 +232,10 @@ EndFunction
 
 
 Actor[] Function SortSexActors(Actor[] actors, Actor[] dominantActors)
-  if dominantActors == ""
-    dominantActors = OActorUtil.EmptyArray()
-  EndIf
   if bHasOstim && minai_UseOStim.GetValue() == 1.0
+    if dominantActors == ""
+      dominantActors = OActorUtil.EmptyArray()
+    EndIf
     actors = OActorUtil.Sort(actors, dominantActors)
   else
     actors = slf.SortActors(actors)
