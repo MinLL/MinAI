@@ -150,6 +150,7 @@ function ProcessIntegrations() {
                 $GLOBALS["HERIKA_TARGET"] = $GLOBALS["PLAYER_NAME"];
             error_log("minai: Starting {$GLOBALS["gameRequest"][0]} dialogue between {$GLOBALS["HERIKA_NAME"]} and {$GLOBALS["HERIKA_TARGET"]}");
             StoreRadiantActors($GLOBALS["HERIKA_TARGET"], $GLOBALS["HERIKA_NAME"]);
+            $GLOBALS["target"] = $GLOBALS["HERIKA_TARGET"];
         }
         else {
             // Avoid race condition where we send input, the server starts to process the request, and then
