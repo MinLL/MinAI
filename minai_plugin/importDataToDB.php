@@ -116,21 +116,96 @@ function importDataToDB($tableName, $folderName, $createQuery, $checkDuplicatesC
 
 }
 
+// create function to update value of updated_at column
+function createDbFunctionForUpdateTimestamp() {
+    $db = $GLOBALS['db'];
+    $db->execQuery("DO \$func\$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 
+        FROM pg_proc 
+        WHERE proname = 'update_timestamp'
+    ) THEN
+        EXECUTE '
+        CREATE OR REPLACE FUNCTION update_timestamp()
+        RETURNS TRIGGER AS $$
+        BEGIN
+            NEW.updated_at = NOW();
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql';
+    END IF;
+END \$func\$;");
+}
+
+function createUpdateTrigger($tableName) {
+    $db = $GLOBALS['db'];
+    $db->execQuery("DO \$trig\$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 
+        FROM pg_trigger 
+        WHERE tgname = 'update_timestamp_trigger' 
+          AND tgrelid = '$tableName'::regclass
+    ) THEN
+        EXECUTE '
+        CREATE TRIGGER update_timestamp_trigger
+        BEFORE UPDATE ON $tableName
+        FOR EACH ROW
+        EXECUTE FUNCTION update_timestamp()';
+    END IF;
+END \$trig\$;");
+}
+
+function addTimestampColumns($tableName) {
+    $db = $GLOBALS['db'];
+    $db->execQuery("DO $$
+BEGIN
+    -- Check if `created_at` column exists; if not, add it
+    IF NOT EXISTS (
+        SELECT 1 
+        FROM information_schema.columns 
+        WHERE table_name = '$tableName' 
+          AND column_name = 'created_at'
+    ) THEN
+        ALTER TABLE $tableName 
+        ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+    END IF;
+
+    -- Check if `updated_at` column exists; if not, add it
+    IF NOT EXISTS (
+        SELECT 1 
+        FROM information_schema.columns 
+        WHERE table_name = '$tableName' 
+          AND column_name = 'updated_at'
+    ) THEN
+        ALTER TABLE $tableName 
+        ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+    END IF;
+END $$;");
+}
+
 function importScenesDescriptions() {
+    createDbFunctionForUpdateTimestamp();
     $tableName = "minai_scenes_descriptions";
     importDataToDB($tableName, "sceneDescriptionsDBImport", "CREATE TABLE IF NOT EXISTS $tableName (
         ostim_id character varying(256),
         sexlab_id character varying(256),
         description text
       )", ["ostim_id", "sexlab_id"]);
+      addTimestampColumns($tableName);
+      createUpdateTrigger($tableName);
 }
 
 function importXPersonalities() {
+    createDbFunctionForUpdateTimestamp();
     $tableName = "minai_x_personalities";
     importDataToDB($tableName, "xPersonalitiesDBImport", "CREATE TABLE IF NOT EXISTS $tableName (
         id character varying(256) PRIMARY KEY,
         x_personality JSONB
       )", ["id"]);
+      addTimestampColumns($tableName);
+      createUpdateTrigger($tableName);
 }
 
 ?>
