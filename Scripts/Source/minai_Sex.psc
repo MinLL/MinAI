@@ -1103,7 +1103,7 @@ function UpdateThreadTable(string type, string framework = "ostim", int ThreadID
   actor[] actors
   string sceneId
   
-  if(framework == sexlabType)
+  if(framework == sexlabType) && bHasSexlab
     sslThreadController controller = slf.GetController(ThreadID)
   
     if (controller.Stage==1) 
@@ -1111,7 +1111,7 @@ function UpdateThreadTable(string type, string framework = "ostim", int ThreadID
     EndIf
     actors = slf.GetController(ThreadID).Positions
     sceneId = controller.Animation.FetchStage(controller.Stage)[0]
-  elseif (framework == ostimType)
+  elseif (framework == ostimType) && bHasOstim
     actors = OThread.GetActors(ThreadID)
     sceneId = OThread.GetScene(ThreadID)
   endif
