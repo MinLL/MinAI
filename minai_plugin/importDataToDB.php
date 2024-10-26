@@ -157,43 +157,16 @@ BEGIN
 END \$trig\$;");
 }
 
-function addTimestampColumns($tableName) {
-    $db = $GLOBALS['db'];
-    $db->execQuery("DO $$
-BEGIN
-    -- Check if `created_at` column exists; if not, add it
-    IF NOT EXISTS (
-        SELECT 1 
-        FROM information_schema.columns 
-        WHERE table_name = '$tableName' 
-          AND column_name = 'created_at'
-    ) THEN
-        ALTER TABLE $tableName 
-        ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
-    END IF;
-
-    -- Check if `updated_at` column exists; if not, add it
-    IF NOT EXISTS (
-        SELECT 1 
-        FROM information_schema.columns 
-        WHERE table_name = '$tableName' 
-          AND column_name = 'updated_at'
-    ) THEN
-        ALTER TABLE $tableName 
-        ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
-    END IF;
-END $$;");
-}
-
 function importScenesDescriptions() {
     createDbFunctionForUpdateTimestamp();
     $tableName = "minai_scenes_descriptions";
     importDataToDB($tableName, "sceneDescriptionsDBImport", "CREATE TABLE IF NOT EXISTS $tableName (
         ostim_id character varying(256),
         sexlab_id character varying(256),
+        created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+        updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
         description text
       )", ["ostim_id", "sexlab_id"]);
-      addTimestampColumns($tableName);
       createUpdateTrigger($tableName);
 }
 
@@ -202,9 +175,10 @@ function importXPersonalities() {
     $tableName = "minai_x_personalities";
     importDataToDB($tableName, "xPersonalitiesDBImport", "CREATE TABLE IF NOT EXISTS $tableName (
         id character varying(256) PRIMARY KEY,
-        x_personality JSONB
+        x_personality JSONB,
+        created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+        updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
       )", ["id"]);
-      addTimestampColumns($tableName);
       createUpdateTrigger($tableName);
 }
 
