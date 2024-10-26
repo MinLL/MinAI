@@ -1,0 +1,15 @@
+Scriptname minai_NPCRelations extends Quest  
+
+AssociationType property ParentChild auto
+AssociationType property GrandParentGrandChild auto
+AssociationType property GreatGrandParentGreatGrandChild auto
+AssociationType property InLawParentChild auto
+AssociationType property InLawGrandParentGrandChild auto
+AssociationType property Siblings auto
+AssociationType property Cousins auto
+AssociationType property InLawBrotherSister auto
+AssociationType property AuntUncle auto
+AssociationType property GrandAuntUncle auto
+AssociationType property InLawAuntUncle auto
+AssociationType property Courting auto
+AssociationType property Spouse auto
