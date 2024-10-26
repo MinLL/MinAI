@@ -9,6 +9,7 @@ if ((IsModEnabled("Sexlab") || IsModEnabled("Ostim")) && ((IsEnabled("PLAYER", "
     RegisterAction("ExtCmdStartAnal");
     RegisterAction("ExtCmdStartBlowjob");
     RegisterAction("ExtCmdStartHandjob");
+    RegisterAction("ExtCmdStartThreesome");
     RegisterAction("ExtCmdStartOrgy");
     RegisterAction("ExtCmdPutOnClothes");
     RegisterAction("ExtCmdRemoveClothes");
@@ -158,6 +159,25 @@ $GLOBALS["FUNCTIONS"][] = [
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdMasturbate"]=$GLOBALS["GenericFuncRet"];
+
+$GLOBALS["F_NAMES"]["ExtCmdStartThreesome"]="StartThreesome";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartThreesome"]="Immediately start threesome sex with target";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdStartThreesome"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartThreesome"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS["nearby"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdStartThreesome"]=$GLOBALS["GenericFuncRet"];
 
 $GLOBALS["F_NAMES"]["ExtCmdStartOrgy"]="StartOrgy";
 $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartOrgy"]="Immediately engage in an orgy with multiple participants";

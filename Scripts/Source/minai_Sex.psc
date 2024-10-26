@@ -95,7 +95,8 @@ Function Maintenance(minai_MainQuestController _main)
   aiff.RegisterAction("ExtCmdRemoveClothes", "RemoveClothes", "Take off all clothing", "Sex", 1, 5, 2, 5, 300, True)
   aiff.RegisterAction("ExtCmdPutOnClothes", "PutOnClothes", "Put all clothing back on", "Sex", 1, 5, 2, 5, 300, True)
   aiff.RegisterAction("ExtCmdMasturbate", "Masturbate", "Begin Masturbating", "Sex", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
-  aiff.RegisterAction("ExtCmdStartOrgy", "Orgy", "Start Sex with all nearby AI Actors", "Sex", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdStartThreesome", "Threesome", "Start threesome sex with target", "Sex", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
+  aiff.RegisterAction("ExtCmdStartOrgy", "Orgy", "Start sex with all nearby AI Actors", "Sex", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
   aiff.RegisterAction("ExtCmdEndSex", "EndSex", "Finish the Current Sex Scene", "Sex", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
   ; aiff.RegisterAction("ExtCmdStartSexScene", "StartSexScene", "ExtCmdStartSexScene", "Sex", 1, 5, 2, 5, 300)
   aiff.RegisterAction("ExtCmdStartBlowjob", "StartBlowjob", "Sex Position", "Sex", 1, 5, 2, 5, 300, (bHasSexlab || bHasOstim))
@@ -193,7 +194,7 @@ Function StartSexScene(actor[] actors, bool bPlayerInScene, string tags="")
         if newScene == ""
           Main.Debug("No OStim scene found for: " + tags)
         else
-          Main.Debug("Found " + tags + " scene: " + newScene); + " for OStim Thread [" + ActiveOstimThreadID + "].")
+          Main.Debug("Found " + tags + " scene: " + newScene)
         EndIf
       EndIf
     else
@@ -250,7 +251,10 @@ Function ProcessActorsAndStartScenes(Actor[] actors)
   While actors.Length > 5
     Main.Debug(actors.Length + " actors total found for orgy scenes.")
     ; Randomly choose group size (3 to 5 actors)
-    int groupSize = Utility.RandomInt(3, 5)    
+    int groupSize = Utility.RandomInt(3, 5)
+    if actors.Length <= 8
+      groupSize = actors.Length - 3 ; make sure the last group has at least three actors
+    EndIf
     ; Create a new array for the selected actors
     Actor[] lessActors
     if groupSize == 3
@@ -681,7 +685,6 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   Main.Debug("Sex - CommandDispatcher(" + speakerName +", " + command +", " + parameter + ")")
   actor akSpeaker = AIAgentFunctions.getAgentByName(speakerName)
   actor akTarget = AIAgentFunctions.getAgentByName(parameter)
-  actor[] actorsFromFormList = AIAgentFunctions.findAllNearbyAgents()
   if !akTarget
     akTarget = PlayerRef
   EndIf
@@ -740,6 +743,12 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "hugging")
   elseif command == "ExtCmdStartKissingSex"
     StartSexOrSwitchTo(akSpeaker, akTarget, PlayerRef, bPlayerInScene, "kissing")
+  elseif command == "ExtCmdStartThreesome"
+    actor[] actors = new Actor[3]
+    actors[0] = akSpeaker
+    actors[1] = akTarget
+    actors[2] = PlayerRef
+    StartSexOrSwitchToGroup(actors, akSpeaker)
   elseIf command == "ExtCmdStartOrgy"
     actor[] actors = aiff.GetNearbyAI()
     actors = PapyrusUtil.PushActor(actors,playerRef)
