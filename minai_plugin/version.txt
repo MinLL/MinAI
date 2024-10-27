@@ -1,1 +1,1 @@
-beta39.5
+beta39-release
