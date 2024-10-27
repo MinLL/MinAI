@@ -152,6 +152,10 @@ Function GetClothingContext($name) {
   
   $eqContext = GetAllEquipmentContext($name);
 
+  $tmp = GetRevealedStatus($name);
+  $wearingBottom = $tmp["wearingBottom"];
+  $wearingTop = $tmp["wearingTop"];
+  
   // if $eqContext["context"] not empty, then will set ret
   if (!empty($eqContext["context"])) {
     $ret .= "{$name} is wearing {$eqContext["context"]}";
@@ -213,17 +217,27 @@ Function GetClothingContext($name) {
   if (HasKeywordAndNotSkip($name, $eqContext, "EroticArmor")) {
       $ret .= "{$name} is wearing a sexy revealing outfit.\n";
   }
-  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_PiercingVulva")) {
+  if (!$wearingBottom && HasKeywordAndNotSkip($name, $eqContext, "SLA_PiercingVulva")) {
       $ret .= "{$name} has labia piercings.\n";
   }
   if (HasKeywordAndNotSkip($name, $eqContext, "SLA_PiercingBelly")) {
       $ret .= "{$name} has a navel piercing.\n";
   }
-  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_PiercingNipple")) {
-      $ret .= "{$name} has nipple piercings.\n";
+  if (!$wearingTop) {
+      if (HasKeyword($name, "zad_DeviousPiercingsNipple")) {
+          $ret .= "{$name} is wearing remotely controlled nipple piercings capable of powerful vibration.\n";
+      }
+      elseif  (HasKeywordAndNotSkip($name, $eqContext, "SLA_PiercingNipple")) {
+          $ret .= "{$name} has nipple piercings.\n";
+      }
   }
-  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_PiercingClit")) {
-      $ret .= "{$name} has a clit piercing.\n";
+  if (!$wearingBottom) {
+      if (HasKeyword($name, "zad_DeviousPiercingsVaginal")) {
+          $ret .= "{$name} is wearing a remotely controlled clitoral ring capable of powerful vibration.\n";
+      }
+      elseif (HasKeywordAndNotSkip($name, $eqContext, "SLA_PiercingClit")) {
+          $ret .= "{$name} has a clit piercing.\n";
+      }
   }
   if ($ret != "")
       $ret .= "\n";
@@ -233,23 +247,21 @@ Function GetClothingContext($name) {
 
 Function GetDDContext($name) {
   $ret = "";
-  if (HasKeyword($name, "zad_DeviousPlugVaginal")) {
+  $tmp = GetRevealedStatus($name);
+  $wearingBottom = $tmp["wearingBottom"];
+  $wearingTop = $tmp["wearingTop"];
+  // Piercings are handled in GetClothingContext instead
+  if (HasKeyword($name, "zad_DeviousPlugVaginal") && !$wearingBottom) {
     $ret .= "{$name} has a remotely controlled plug in her pussy capable of powerful vibrations.\n";
   }
-  if (HasKeyword($name, "zad_DeviousPlugAnal")) {
+  if (HasKeyword($name, "zad_DeviousPlugAnal") && !$wearingBottom) {
     $ret .= "{$name} has a remotely controlled plug in her ass capable of powerful vibrations.\n";
   }
-  if (HasKeyword($name, "zad_DeviousBelt")) {
+  if (HasKeyword($name, "zad_DeviousBelt") && !$wearingBottom) {
     $ret .= "{$name}'s pussy is locked away by a chastity belt, preventing her from touching it or having sex.\n";
   }
   if (HasKeyword($name, "zad_DeviousCollar")) {
     $ret .= "{$name} is wearing a collar marking her as someone's property.\n";
-  }
-  if (HasKeyword($name, "zad_DeviousPiercingsNipple")) {
-    $ret .= "{$name} is wearing remotely controlled nipple piercings capable of powerful vibration.\n";
-  }
-  if (HasKeyword($name, "zad_DeviousPiercingsVaginal")) {
-    $ret .= "{$name} is wearing a remotely controlled clitoral ring capable of powerful vibration.\n";
   }
   if (HasKeyword($name, "zad_DeviousArmCuffs")) {
     $ret .= "{$name} is wearing an arm cuff on each arm.\n";
@@ -257,7 +269,7 @@ Function GetDDContext($name) {
   if (HasKeyword($name, "zad_DeviousLegCuffs")) {
     $ret .= "{$name} is wearing a leg cuff on each leg.\n";
   }
-  if (HasKeyword($name, "zad_DeviousBra")) {
+  if (HasKeyword($name, "zad_DeviousBra") && !$wearingTop) {
     $ret .= "{$name}'s breasts are locked away in a chastity bra.\n";
   }
   if (HasKeyword($name, "zad_DeviousArmbinder")) {
@@ -308,10 +320,10 @@ Function GetDDContext($name) {
   if (HasKeyword($name, "zad_DeviousAnkleShackles")) {
     $ret .= "{$name} is wearing a set of ankle shackles, restricting her ability to move quickly.\n";
   }
-  if (HasKeyword($name, "zad_DeviousClamps")) {
+  if (HasKeyword($name, "zad_DeviousClamps") && !$wearingTop) {
     $ret .= "{$name} is wearing a set of painful nipple clamps.\n";
   }
-  if (CanVibrate($name)) {
+  if (CanVibrate($name) && (!$wearingTop || !$wearingBottom)) {
       if (IsInFaction($name, "Vibrator Effect Faction")) {
           $ret .= "{$name}'s vibrator is currently on, and is actively stimulating her.\n";
       }
