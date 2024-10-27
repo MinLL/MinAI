@@ -164,7 +164,7 @@ function importScenesDescriptions() {
         ostim_id character varying(256),
         sexlab_id character varying(256),
         created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-        updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+        updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
         description text
       )", ["ostim_id", "sexlab_id"]);
       createUpdateTrigger($tableName);
