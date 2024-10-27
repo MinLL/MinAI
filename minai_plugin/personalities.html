@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,10 +12,15 @@
             background-color: #f4f7f6;
             padding: 20px;
         }
+
         h1 {
             color: #333;
         }
-        input, textarea, button, select {
+
+        input,
+        textarea,
+        button,
+        select {
             padding: 10px;
             margin: 5px;
             font-size: 14px;
@@ -22,6 +28,7 @@
             border: 1px solid #ddd;
             width: 100%;
         }
+
         button {
             background-color: #28a745;
             color: white;
@@ -29,38 +36,49 @@
             cursor: pointer;
             margin-right: 5px;
         }
+
         button:hover {
             background-color: #218838;
         }
+
         table {
             width: 100%;
             margin-top: 20px;
             border-collapse: collapse;
         }
-        table, th, td {
+
+        table,
+        th,
+        td {
             border: 1px solid #ddd;
         }
-        th, td {
+
+        th,
+        td {
             padding: 8px;
             text-align: left;
         }
+
         th {
             background-color: #f2f2f2;
             cursor: pointer;
             white-space: nowrap;
         }
+
         .form-container {
             background-color: white;
             padding: 20px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
             margin-top: 20px;
         }
+
         .pagination {
             margin-top: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
+
         .pagination button {
             background-color: #007bff;
             color: white;
@@ -68,25 +86,31 @@
             border: none;
             cursor: pointer;
         }
+
         .pagination button:hover {
             background-color: #0056b3;
         }
+
         .pagination-info {
             font-size: 14px;
         }
+
         .search-container {
             margin-bottom: 20px;
         }
+
         .search-container input {
             width: 300px;
             padding: 10px;
         }
+
         .new-entry-form {
             margin-top: 20px;
             padding: 20px;
             background-color: #fff;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         }
+
         .navigation {
             margin-top: 20px;
             display: flex;
@@ -97,7 +121,9 @@
             color: white;
             border-radius: 5px;
         }
-        .navigation a, .navigation button {
+
+        .navigation a,
+        .navigation button {
             background-color: #007bff;
             color: white;
             padding: 10px;
@@ -106,7 +132,9 @@
             text-decoration: none;
             font-weight: bold;
         }
-        .navigation a:hover, .navigation button:hover {
+
+        .navigation a:hover,
+        .navigation button:hover {
             background-color: #0056b3;
         }
 
@@ -120,16 +148,57 @@
             visibility: hidden;
             max-width: 300px;
             z-index: 1000;
-          }
+        }
+
+        /* Basic styles for the tabs */
+        .tab {
+            display: inline-block;
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+            border-bottom: none;
+            margin-right: 5px;
+            font-weight: bold;
+        }
+
+        /* Active tab styling */
+        .tab.active {
+            background-color: #fff;
+            border-bottom: 2px solid #000;
+        }
+
+        /* Content for each tab */
+        .tab-content {
+            padding: 20px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+        }
+
+        .tab-content-item {
+            display: none;
+        }
+
+        /* Show active tab content */
+        .tab-content-item.active {
+            display: block;
+        }
+
+        #generateError, #speakStyleDuringSexError {
+            display: none;
+            color: #dc3545;
+            margin: 20px 0;
+        }
     </style>
 </head>
+
 <body>
     <h1>Manage Personalities</h1>
 
     <!-- Navigation Bar -->
     <div class="navigation">
-      <a href="index.html">Back to Home</a>
-      <button onclick="confirmResetPersonalities()">Reset Personalities</button>
+        <a href="index.html">Back to Home</a>
+        <button onclick="confirmResetPersonalities()">Reset Personalities</button>
     </div>
 
     <!-- Search Bar -->
@@ -149,28 +218,76 @@
         <button onclick="nextPage()">Next</button>
     </div>
 
-    <!-- Form for creating new entries -->
-    <div class="new-entry-form">
-        <h2>Create New Personality</h2>
-        <form id="newEntryForm">
-            <label for="newId">ID</label>
-            <input type="text" id="newId" name="id" required>
-            <label for="newOrientation">Orientation</label>
-            <input type="text" id="newOrientation" name="orientation" required>
-            <label for="speakStyleDuringSex">Speak style during sex</label>
-            <select type="text" id="speakStyleDuringSex" name="speakStyle" required></select>
-            <label for="newSexFantasies">Sex Fantasies (comma separated)</label>
-            <input type="text" id="newSexFantasies" name="sexFantasies">
-            <label for="newSexualBehavior">Sexual Behavior (comma separated)</label>
-            <input type="text" id="newSexualBehavior" name="sexualBehavior">
-            <label for="newRelationshipStyle">Relationship Style</label>
-            <input type="text" id="newRelationshipStyle" name="relationshipStyle">
-            <label for="newSexPersonalityTraits">Sex Personality Traits (comma separated)</label>
-            <input type="text" id="newSexPersonalityTraits" name="sexPersonalityTraits">
-            <label for="newPreferredSexPositions">Preferred Sex Positions (comma separated)</label>
-            <input type="text" id="newPreferredSexPositions" name="preferredSexPositions">
-            <button type="button" onclick="createNewEntry()">Create Entry</button>
-        </form>
+
+    <div class="tabs">
+        <div class="tab active" onclick="openTab(event, 'create')">Create manually</div>
+        <div class="tab" onclick="openTab(event, 'generate')">Generate with LLM</div>
+    </div>
+
+    <div class="tab-content">
+        <div class="new-entry-form">
+            <div id="create" class="tab-content-item active">
+                <!-- Form for creating new entries -->
+                <h2>Create New Personality</h2>
+            </div>
+
+            <div id="generate" class="tab-content-item" style="margin-bottom: 20px;">
+                <h2>Generate Sex Personality with LLM</h2>
+                <p>It will use LLM endpoint from your AIFF openrouterjson configuration. You still need manually to provide id(npc name with spaces replaced with _ an single quote ' with +)</p>
+                <details style="margin: 10px 0;">
+                    <summary>Additional tips to generate sex personality</summary>
+                    <p>What to add to personality:</p>
+                    <ul>
+                        <li>Anything you think can provide additional context for LLM</li>
+                        <li>Their biography: gender, age, background, occupation, origin</li>
+                        <li>Their character, behavior, biography, difficulties or achievements they epxerienced</li>
+                        <li>Any relationships with other characters represented in a game or just mentioned in dialogues</li>
+                        <li>Dialogue examples how NPC is usually talking</li>
+                        <li>Instead or in addition you can provide description of their speak style, for example: tone - friendly and professional; mannerisms: speaks passionately about her work, occasionally expresses her political views</li>
+                    </ul>
+                </details>
+                
+                <textarea name="prompt" rows="5" id="descriptionPersonality">
+Zora Fair-Child, a compassionate and spirited Nord woman, is a character filled with resilience and depth. Despite a tragic past marked by physical and emotional scars, Zora displays an optimistic, humorous outlook that contrasts with the harshness of her experiences. Zora’s story is one of perseverance and inner strength, having survived a fire that left her face scarred when she was young. This incident left her with a lasting insecurity about her appearance but did little to tarnish her kind-hearted nature and determination.
+Zora can be found early in the game in Brittleshin Pass, where she will often try to engage the player with her witty, self-deprecating humor. Initially shy and cautious, she is revealed to be a loyal friend and fierce protector when given the chance. Unlike many other NPCs, Zora’s relationship with the Dragonborn can evolve over time, leading her to become a valuable ally and potential follower with unique dialogue reflecting her journey and outlook.
+Notable Traits and Personality:
+  - Humor and Self-Awareness: Zora often uses humor to mask her insecurities, making her interactions refreshing and sometimes touching.
+  - Bravery: Despite her self-perceived flaws, she steps up to challenges without hesitation.
+  - Curiosity and Insight: Zora shows a surprising amount of wisdom about the world and reflects on her hardships with a depth uncommon in many.
+Relationships:
+  - Morndas is a mysterious Bosmer woman also added by the 3DNPC mod, and she shares a brief but impactful relationship with Zora. Despite their differences, Morndas and Zora connect over their hardships and individual battles with self-doubt. The two women support each other, with Morndas encouraging Zora to face her insecurities with strength, while Zora admires Morndas’ resilience. Their exchanges showcase a bond built on shared understanding and mutual respect.
+  - Gorr, another companion added by the mod, is a lighthearted and somewhat roguish Nord warrior. He and Zora share a humorous dynamic, as Gorr often teases her but never crosses the line into cruelty. They develop a brother-sister type of bond, with Gorr appreciating Zora’s bravery and humor. Their friendly banter adds levity to their interactions, showing how they balance and uplift each other, particularly during challenging times.
+  - The sarcastic Altmer mage Rumarin and Zora make for an amusing duo due to their contrasting personalities. Rumarin often jokes about Zora’s optimism and naivete, though there is a clear underlying affection. Zora, in turn, finds Rumarin’s cynicism and humor refreshing, and the two develop a teasing friendship. They may appear mismatched at first, but over time, they display a shared warmth and loyalty that highlights their contrasting but complementary perspectives.
+  - Zora holds admiration for Erik’s bravery and the resilience he shows as an aspiring adventurer, given her own journey of facing fears and embracing challenges. Erik and Zora occasionally reflect on their goals and reasons for adventuring, with Zora gently encouraging Erik to be mindful of his choices and embrace both his strengths and weaknesses. Their friendship is marked by a mutual respect for each other’s dreams and vulnerabilities.
+                </textarea>
+                <details>
+                    <summary>Raw response from LLM text</summary>
+                    <div id="rawResponse"></div>
+                </details>
+                <div id="generateError"></div>
+                <button type="button" onclick="generatePersonality()">Generate</button>
+            </div>
+            <form id="newEntryForm">
+                <label for="newId">ID</label>
+                <input type="text" id="newId" name="id" required>
+                <label for="newOrientation">Orientation</label>
+                <input type="text" id="newOrientation" name="orientation" required>
+                <label for="speakStyleDuringSex" required>Speak style during sex</label>
+                <select type="text" id="speakStyleDuringSex" name="speakStyle" required></select>
+                <div id="speakStyleDuringSexError"></div>
+                <label for="newSexFantasies">Sex Fantasies (comma separated)</label>
+                <input type="text" id="newSexFantasies" name="sexFantasies">
+                <label for="newSexualBehavior">Sexual Behavior (comma separated)</label>
+                <input type="text" id="newSexualBehavior" name="sexualBehavior">
+                <label for="newRelationshipStyle">Relationship Style</label>
+                <input type="text" id="newRelationshipStyle" name="relationshipStyle">
+                <label for="newSexPersonalityTraits">Sex Personality Traits (comma separated)</label>
+                <input type="text" id="newSexPersonalityTraits" name="sexPersonalityTraits">
+                <label for="newPreferredSexPositions">Preferred Sex Positions (comma separated)</label>
+                <input type="text" id="newPreferredSexPositions" name="preferredSexPositions">
+                <button type="button" onclick="createNewEntry()">Create Entry</button>
+            </form>
+        </div>
     </div>
 
     <div id="tooltip" class="tooltip"></div>
@@ -183,7 +300,7 @@
         let editedRow = {};  // Store in-line edited data
         let originalRowData = {};  // Store original data for fallback
 
-        window.onload = function() {
+        window.onload = function () {
             loadTable();
         };
 
@@ -206,7 +323,7 @@
         speakStyleDuringSexOptions.forEach(opt => {
             // Create a new option element
             const option = document.createElement('option');
-                            
+
             // Set the value and text of the option
             option.value = opt;
             option.text = opt;
@@ -221,7 +338,7 @@
             tableElem.innerHTML = '';
 
             if (filteredData.length > 0) {
-                const headers = ['ID', 'Orientation', 'Relation Style', 'Positions', 'Speak style', 'Behavior', 'Fantasies',  'Traits', 'Actions'];
+                const headers = ['ID', 'Orientation', 'Relation Style', 'Positions', 'Speak style', 'Behavior', 'Fantasies', 'Traits', 'Actions'];
                 const headerRow = document.createElement('tr');
                 headers.forEach(header => {
                     const th = document.createElement('th');
@@ -279,12 +396,12 @@
         // Function to edit an in-line row
         function editRow(el, field, id) {
             let value = ''
-            if(field === 'speakStyleDuringSex') {
+            if (field === 'speakStyleDuringSex') {
                 value = el.value
             } else {
                 value = el.innerText.trim();
             }
-            
+
             if (!editedRow[id]) {
                 editedRow[id] = {};
             }
@@ -313,11 +430,11 @@
                     data: JSON.stringify(updatedData)
                 })
             })
-            .then(response => response.json())
-            .then(result => {
-                alert(result.status === 'success' ? 'Data saved!' : 'Failed to save data');
-                loadTable();
-            });
+                .then(response => response.json())
+                .then(result => {
+                    alert(result.status === 'success' ? 'Data saved!' : 'Failed to save data');
+                    loadTable();
+                });
         }
 
         // Function to delete a row from the backend
@@ -329,11 +446,11 @@
                     id: id
                 })
             })
-            .then(response => response.json())
-            .then(result => {
-                alert(result.status === 'success' ? 'Data deleted!' : 'Failed to delete data');
-                loadTable();
-            });
+                .then(response => response.json())
+                .then(result => {
+                    alert(result.status === 'success' ? 'Data deleted!' : 'Failed to delete data');
+                    loadTable();
+                });
         }
 
         // Function to search for personalities in the table
@@ -417,11 +534,11 @@
                     data: JSON.stringify(newEntryData)
                 })
             })
-            .then(response => response.json())
-            .then(result => {
-                alert(result.status === 'success' ? 'New entry created!' : 'Failed to create entry');
-                loadTable();
-            });
+                .then(response => response.json())
+                .then(result => {
+                    alert(result.status === 'success' ? 'New entry created!' : 'Failed to create entry');
+                    loadTable();
+                });
         }
 
         // Confirmation popup for resetting personalities
@@ -436,11 +553,11 @@
             fetch('api/main.php?endpoint=reset_personalities', {
                 method: 'POST'
             })
-            .then(response => response.json())
-            .then(result => {
-                alert('Personalities reset successfully!');
-                loadTable();
-            });
+                .then(response => response.json())
+                .then(result => {
+                    alert('Personalities reset successfully!');
+                    loadTable();
+                });
         }
 
         const tooltip = document.getElementById('tooltip');
@@ -464,18 +581,18 @@ swinging - non-monogamous relationships with mutual consent.`,
         // Function to show the tooltip
         function showTooltip(event) {
             const target = event.target
-            if(target.tagName.toLowerCase() !== 'td') {
+            if (target.tagName.toLowerCase() !== 'td') {
                 return
             }
 
             let title = cellTooltips[target.cellIndex]
 
-            
+
             tooltip.style.visibility = 'visible';
             tooltip.textContent = title;
             tooltip.style.left = (event.pageX - tooltip.clientWidth / 2) + 'px';
             tooltip.style.top = (event.pageY + 10) + 'px';
-            
+
         }
         // Function to hide the tooltip
         function hideTooltip() {
@@ -485,6 +602,71 @@ swinging - non-monogamous relationships with mutual consent.`,
         tooltipTarget.addEventListener('mouseover', showTooltip);
         tooltipTarget.addEventListener('mousemove', showTooltip); // Update position
         tooltipTarget.addEventListener('mouseout', hideTooltip);
+
+        function openTab(event, tabId) {
+            // Hide all tab content
+            const contents = document.querySelectorAll('.tab-content-item');
+            contents.forEach(content => content.classList.remove('active'));
+
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Show the selected tab content
+            document.getElementById(tabId).classList.add('active');
+            // Set the clicked tab to active
+            event.currentTarget.classList.add('active');
+        }
+
+        function generatePersonality() {
+            const descriptionPersonality = document.getElementById('descriptionPersonality').value
+            const res = fetch('api/generateSexPersonality.php', {
+                method: 'POST',
+                body: new URLSearchParams({
+                    descriptionPersonality
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                const errEl = document.getElementById('generateError')
+                if(result.status === 'error') {
+                    errEl.style.display = 'block';
+                    errEl.innerHTML = result.message;
+                } else {
+                    errEl.style.display = 'none';
+
+                    document.getElementById('rawResponse').innerHTML = result.data;
+
+                    try {
+                        const pers = JSON.parse(result.data)
+                        document.getElementById('newOrientation').value = pers.orientation
+                        document.getElementById('newRelationshipStyle').value = pers.relationshipStyle
+                        document.getElementById('speakStyleDuringSex').value = pers.speakStyleDuringSex
+                        checkSpeakStyleSelectValue(pers.speakStyleDuringSex)
+                        
+                        document.getElementById('newPreferredSexPositions').value = pers.preferredSexPositions.join(', ')
+                        document.getElementById('newSexFantasies').value = pers.sexFantasies.join(', ')
+                        document.getElementById('newSexPersonalityTraits').value = pers.sexPersonalityTraits.join(', ')
+                        document.getElementById('newSexualBehavior').value = pers.sexualBehavior.join(', ')
+                    } catch(e) {
+                        errEl.style.display = 'block';
+                        errEl.innerHTML = `LLM was able to produce something... which isn't json. You can look at raw response and here is an error: ${e.message}`;
+                    }
+                }
+            });
+
+            function checkSpeakStyleSelectValue(value) {
+                const errorEl = document.getElementById('speakStyleDuringSexError')
+                if(!speakStyleDuringSexOptions.includes(pers.speakStyleDuringSex)) {
+                    errorEl.style.innerText = `${value} isn't valid speak style. You need to select one of 10 provided speak styles: ${speakStyleDuringSexOptions.join('; ')}`
+                    errorEl.style.display = 'block'
+                } else {
+                    errorEl.style.display = 'none'
+                }
+                
+            }
+        }
     </script>
 </body>
+
 </html>

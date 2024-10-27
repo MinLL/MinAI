@@ -6,6 +6,7 @@ minai_Survival survival
 minai_Arousal arousal
 minai_DeviousStuff devious
 minai_Config config
+minai_Reputation reputation
 
 bool bHasAIFF = False
 
@@ -30,6 +31,7 @@ Faction FollowFaction
 Function InitFollow()
   FollowPackage = Game.GetFormFromFile(0x01BC25, "AIAgent.esp") as Package 
   FollowFaction = Game.GetFormFromFile(0x01BC24, "AIAgent.esp") as Faction
+
 EndFunction
 
 Function CleanupFollow()
@@ -68,6 +70,7 @@ Function Maintenance(minai_MainQuestController _main)
   arousal = (Self as Quest)as minai_Arousal
   devious = (Self as Quest)as minai_DeviousStuff
   followers = Game.GetFormFromFile(0x0913, "MinAI.esp") as minai_Followers
+  reputation = (Self as Quest) as minai_Reputation
   if (!followers)
     Main.Fatal("Could not load followers script - Mismatched script and esp versions")
   EndIf
@@ -195,6 +198,7 @@ Function SetContext(actor akTarget)
   arousal.SetContext(akTarget)
   survival.SetContext(akTarget)
   followers.SetContext(akTarget)
+  reputation.SetContext(akTarget)
   StoreKeywords(akTarget)
   StoreFactions(akTarget)
   if config.disableAIAnimations && akTarget != player

@@ -19,7 +19,8 @@ minai_Config config
 minai_Followers followers
 minai_CombatManager combat
 minai_SapienceController sapience
-  
+minai_Reputation reputation  
+
 bool bHasMantella = False;
 bool bHasAIFF = False;
 float lastRequestTime
@@ -32,7 +33,7 @@ Event OnInit()
 EndEvent
 
 Int Function GetVersion()
-  return 39
+  return 40
 EndFunction
 
 Function Maintenance()
@@ -69,6 +70,7 @@ Function Maintenance()
   followers = Game.GetFormFromFile(0x0913, "MinAI.esp") as minai_Followers
   combat = (Self as Quest) as minai_CombatManager
   sapience = Game.GetFormFromFile(0x091D, "MinAI.esp") as minai_SapienceController
+  reputation = (Self as Quest) as minai_Reputation
   if (!followers)
     Fatal("Could not load followers script - Mismatched script and esp versions")
   EndIf
@@ -89,6 +91,7 @@ Function Maintenance()
   followers.Maintenance(Self)
   combat.Maintenance(Self)
   sapience.Maintenance(Self)
+  reputation.Maintenance(Self)
   
   if bHasMantella
     minMantella.Maintenance(Self)

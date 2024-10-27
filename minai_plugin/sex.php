@@ -13,9 +13,10 @@ if ((IsModEnabled("Sexlab") || IsModEnabled("Ostim")) && ((IsEnabled("PLAYER", "
     RegisterAction("ExtCmdPutOnClothes");
     RegisterAction("ExtCmdRemoveClothes");
 
-    if (!IsFollower($GLOBALS['HERIKA_NAME']) && $GLOBALS["target"] == $GLOBALS["PLAYER_NAME"]) {
+    /*
+    if (!IsFollower($GLOBALS['HERIKA_NAME']) && !IsRadiant()) {
         if (IsFollowing($GLOBALS['HERIKA_NAME'])) {
-            RegisterAction("ExtCmdEndFollow");
+            RegisterAction("ExtCmdStopFollowing");
         } else {
             if (!IsInScene($GLOBALS['HERIKA_NAME'])) {
                 error_log($GLOBALS['HERIKA_NAME']." is not in a scene");
@@ -25,7 +26,8 @@ if ((IsModEnabled("Sexlab") || IsModEnabled("Ostim")) && ((IsEnabled("PLAYER", "
             }
         }
     }
-
+    */
+    
     // Always enabled for female actors
     if (IsFemale(GetTargetActor())) {
         RegisterAction("ExtCmdStartFingering");

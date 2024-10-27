@@ -293,6 +293,7 @@ Function IsRadiant() {
 }
 
 $GLOBALS["target"] = GetTargetActor();
+$GLOBALS["speaker"] = $GLOBALS["HERIKA_NAME"];
 $GLOBALS["nearby"] = explode(",", GetActorValue("PLAYER", "nearbyActors"));
 
 function getScene($actor) {
