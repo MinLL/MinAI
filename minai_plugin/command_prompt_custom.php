@@ -16,6 +16,7 @@ $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"]="Choose a coherent ACTION that is ava
 $shouldOverride = ($GLOBALS["PROMPT_HEAD_OVERRIDE"] != "" && isset($GLOBALS["PROMPT_HEAD_OVERRIDE"]));
 
 if (IsRadiant()) { // Is this npc -> npc?
+    $GLOBALS["ADD_PLAYER_BIOS"]  = false;
     if ($shouldOverride) // Override prompt head
         SetPromptHead($GLOBALS["PROMPT_HEAD_OVERRIDE"]);
     else {
@@ -25,9 +26,9 @@ if (IsRadiant()) { // Is this npc -> npc?
 }
 else {
     if ($shouldOverride)
-        SetPromptHead($GLOBALS["PLAYER_BIO"] . " " . $GLOBALS["PROMPT_HEAD_OVERRIDE"]);
+        SetPromptHead($GLOBALS["PROMPT_HEAD_OVERRIDE"]);
     else
-        SetPromptHead($GLOBALS["PLAYER_BIO"] . " " . $GLOBALS["PROMPT_HEAD"]);
+        SetPromptHead($GLOBALS["PROMPT_HEAD"]);
 }
 
 ?>

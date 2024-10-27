@@ -14,7 +14,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     // Prepare the response by extracting all $GLOBALS values
     $configData = array(
-        "PLAYER_BIO" => $GLOBALS["PLAYER_BIO"],
         "PROMPT_HEAD_OVERRIDE" => $GLOBALS["PROMPT_HEAD_OVERRIDE"],
         "use_narrator_profile" => $GLOBALS["use_narrator_profile"],
         "stop_narrator_context_leak" => $GLOBALS["stop_narrator_context_leak"],
@@ -49,7 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Manually build the new config content string
     $newConfig = "<?php\n";
-    $newConfig .= "\$GLOBALS['PLAYER_BIO'] = \"" . ($input['PLAYER_BIO']) . "\";\n";
     $newConfig .= "\$GLOBALS['PROMPT_HEAD_OVERRIDE'] = \"" . ($input['PROMPT_HEAD_OVERRIDE']) . "\";\n";
     $newConfig .= "\$GLOBALS['use_narrator_profile'] = " . ($input['use_narrator_profile'] ? 'true' : 'false') . ";\n";
     $newConfig .= "\$GLOBALS['stop_narrator_context_leak'] = " . ($input['stop_narrator_context_leak'] ? 'true' : 'false') . ";\n";

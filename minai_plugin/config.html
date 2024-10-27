@@ -197,13 +197,6 @@
         <p id="loading-message">Loading configuration...</p>
 
         <div id="config-form" style="display: none;">
-            <!-- PLAYER_BIO -->
-            <div class="option-group text-input">
-                <label class="option-label" for="player-bio">PLAYER_BIO</label>
-                <p>Player description that is added to the prompt head for dialogue that is not NPC -> NPC.</p>
-                <input type="text" id="player-bio">
-            </div>
-
             <!-- PROMPT_HEAD_OVERRIDE -->
             <div class="option-group text-input">
                 <label class="option-label" for="prompt-head-override">PROMPT_HEAD_OVERRIDE</label>
@@ -369,7 +362,6 @@
                 const response = await fetch('api/config.php');
                 const configData = await response.json();
 
-                document.getElementById('player-bio').value = configData.PLAYER_BIO;
                 document.getElementById('prompt-head-override').value = configData.PROMPT_HEAD_OVERRIDE;
                 document.getElementById('use-narrator-profile').checked = configData.use_narrator_profile;
                 document.getElementById('stop-narrator-context-leak').checked = configData.stop_narrator_context_leak;
@@ -401,7 +393,6 @@
 
         async function submitConfiguration() {
             const config = {
-                PLAYER_BIO: document.getElementById('player-bio').value,
                 PROMPT_HEAD_OVERRIDE: document.getElementById('prompt-head-override').value,
                 use_narrator_profile: document.getElementById('use-narrator-profile').checked,
                 stop_narrator_context_leak: document.getElementById('stop-narrator-context-leak').checked,
