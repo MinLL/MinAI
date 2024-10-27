@@ -146,7 +146,8 @@ function Maintenance(minai_MainQuestController _main)
     
     SR_Global_LocalSideQuestFame = Game.GetFormFromFile(0x83A959, "SkyrimReputation_SSE.esp") as GlobalVariable
   EndIf
-      
+  aiff.SetModAvailable("Reputation", bHasReputation)
+  aiff.SetModAvailable("SLSF", bHasSLSF)
 EndFunction
 
 

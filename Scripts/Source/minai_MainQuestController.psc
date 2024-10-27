@@ -33,7 +33,7 @@ Event OnInit()
 EndEvent
 
 Int Function GetVersion()
-  return 39
+  return 40
 EndFunction
 
 Function Maintenance()
