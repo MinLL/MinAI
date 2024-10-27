@@ -288,6 +288,8 @@ Function IsRadiant() {
 }
 
 function getScene($actor) {
+    $actor = str_replace('[', '\[', $actor);
+    $actor = str_replace(']', '\]', $actor);
     $scene = $GLOBALS["db"]->fetchAll("SELECT * from minai_threads WHERE male_actors ~* '(,|^)$actor(,|$)' OR female_actors ~* '(,|^)$actor(,|$)'");
 
     if(!$scene) {

@@ -40,7 +40,7 @@ if(isset($scene)){
     if(!$speakStyle) {
         $speakStyle = $speakStyles[array_rand($speakStyles)];
     }
-
+    error_log("minai: Using speakStyle: {$speakStyle}");
     $talkTo = "(talking to $targetToSpeak)";
     $enforceLength = "You MUST Respond with no more than two sentences.";
     switch($speakStyle) {
