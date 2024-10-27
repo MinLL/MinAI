@@ -1,5 +1,4 @@
 <?php
-$GLOBALS['PLAYER_BIO'] = "I'm #PLAYER_NAME#. ";
 $GLOBALS['PROMPT_HEAD_OVERRIDE'] = "Let's roleplay in the Universe of Skyrim.  ";
 $GLOBALS['use_narrator_profile'] = false;
 $GLOBALS['stop_narrator_context_leak'] = true;

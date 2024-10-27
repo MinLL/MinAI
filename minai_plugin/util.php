@@ -171,11 +171,6 @@ Function IsChildActor($name) {
 }
 
 
-if (IsChildActor($GLOBALS['HERIKA_NAME'])) {
-    $GLOBALS["disable_nsfw"] = true;
-}
-
-
 Function IsMale($name) {
     return HasKeyword($name, "ActorSexMale");
 }
@@ -292,10 +287,9 @@ Function IsRadiant() {
     return (GetTargetActor() != $GLOBALS["PLAYER_NAME"]);
 }
 
-$GLOBALS["target"] = GetTargetActor();
-$GLOBALS["nearby"] = explode(",", GetActorValue("PLAYER", "nearbyActors"));
-
 function getScene($actor) {
+    $actor = str_replace('[', '\[', $actor);
+    $actor = str_replace(']', '\]', $actor);
     $scene = $GLOBALS["db"]->fetchAll("SELECT * from minai_threads WHERE male_actors ~* '(,|^)$actor(,|$)' OR female_actors ~* '(,|^)$actor(,|$)'");
 
     if(!$scene) {
@@ -417,4 +411,69 @@ function getTargetDuringSex($scene) {
 
     return $targetToSpeak;
 }
-?>
+
+function GetRevealedStatus($name) {
+  $cuirass = GetActorValue($name, "cuirass");
+  
+  $wearingBottom = false;
+  $wearingTop = false;
+  
+  // if $eqContext["context"] not empty, then will set ret
+  if (!empty($cuirass)) {
+      $wearingTop = true;
+  }
+  if (HasKeyword($name, "SLA_HalfNakedBikini")) {
+    $wearingTop = true;
+  }
+  if (HasKeyword($name, "SLA_ArmorHalfNaked")) {
+    $wearingTop = true;
+  }
+  if (HasKeyword($name, "SLA_Brabikini" )) {
+    $wearingTop = true;
+  }
+  if (HasKeyword($name, "SLA_Thong")) {
+    $wearingBottom = true;
+  }
+  if (HasKeyword($name, "SLA_PantiesNormal")) {
+    $wearingBottom = true;
+  }
+  if (HasKeyword($name, "SLA_PantsNormal")) {
+    $wearingBottom = true;
+  }
+  if (HasKeyword($name, "SLA_MicroHotPants")) {
+    $wearingBottom = true;
+  }
+
+  if (HasKeyword($name, "SLA_ArmorTransparent")) {
+    $wearingBottom = false;
+    $wearingTop = false;
+  }
+  if (HasKeyword($name, "SLA_ArmorLewdLeotard")) {
+    $wearingBottom = true;
+    $wearingTop = true;
+  }
+  if (HasKeyword($name, "SLA_PelvicCurtain")) {
+    $wearingBottom = true;
+  }
+  if (HasKeyword($name, "SLA_FullSkirt")) {
+    $wearingBottom = true;
+  }
+  if (HasKeyword($name, "SLA_MiniSkirt")) {
+    $wearingBottom = true;
+  }
+  if (HasKeyword($name, "EroticArmor")) {
+      $wearingBottom = true;
+      $wearingTop = true;
+  }
+  return ["wearingTop" => $wearingTop, "wearingBottom" => $wearingBottom];
+}
+
+
+
+
+$GLOBALS["target"] = GetTargetActor();
+$GLOBALS["nearby"] = explode(",", GetActorValue("PLAYER", "nearbyActors"));
+
+if (IsChildActor($GLOBALS['HERIKA_NAME']) || IsChildActor($GLOBALS["target"])) {
+    $GLOBALS["disable_nsfw"] = true;
+}

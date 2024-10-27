@@ -1,6 +1,7 @@
 <?php
 require_once("config.php");
 require_once("util.php");
+$GLOBALS["speaker"] = $GLOBALS["HERIKA_NAME"];
 
 Function SetRadiance($rechat_h, $rechat_p) {
     // error_log("minai: Setting Rechat Parameters (h={$rechat_h}, p={$rechat_p})");

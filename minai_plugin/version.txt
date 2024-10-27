@@ -1,1 +1,1 @@
-beta39.6
+beta39-dev
