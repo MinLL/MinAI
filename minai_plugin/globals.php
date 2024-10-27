@@ -17,8 +17,12 @@ $GLOBALS["TTS_FALLBACK_FNCT"] = function($responseTextUnmooded, $mood, $response
     error_log("minai: Voice type fallback to {$fallback} for {$GLOBALS["speaker"]}");
     $GLOBALS["TTS"]["FORCED_VOICE_DEV"] = $fallback;
     $GLOBALS["TTS"]["MELOTTS"]["voiceid"] = $fallback;
-    if(function_exists("tts")) {
-        return tts($responseTextUnmooded, $mood, $responseText);
+    
+    if(isset($GLOBALS["TTS_IN_USE"])) {
+        return $GLOBALS["TTS_IN_USE"]($responseTextUnmooded, $mood, $responseText);
+    }
+    else {
+        error_log("minai: Not retrying, No TTS function enabled");
     }
     return null;
 };

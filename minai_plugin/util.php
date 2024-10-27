@@ -472,7 +472,6 @@ function GetRevealedStatus($name) {
 
 
 $GLOBALS["target"] = GetTargetActor();
-$GLOBALS["speaker"] = $GLOBALS["HERIKA_NAME"];
 $GLOBALS["nearby"] = explode(",", GetActorValue("PLAYER", "nearbyActors"));
 
 if (IsChildActor($GLOBALS['HERIKA_NAME']) || IsChildActor($GLOBALS["target"])) {
