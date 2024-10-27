@@ -13,6 +13,7 @@ if ((IsModEnabled("Sexlab") || IsModEnabled("Ostim")) && ((IsEnabled("PLAYER", "
     RegisterAction("ExtCmdPutOnClothes");
     RegisterAction("ExtCmdRemoveClothes");
 
+    /*
     if (!IsFollower($GLOBALS['HERIKA_NAME']) && !IsRadiant()) {
         if (IsFollowing($GLOBALS['HERIKA_NAME'])) {
             RegisterAction("ExtCmdStopFollowing");
@@ -25,7 +26,8 @@ if ((IsModEnabled("Sexlab") || IsModEnabled("Ostim")) && ((IsEnabled("PLAYER", "
             }
         }
     }
-
+    */
+    
     // Always enabled for female actors
     if (IsFemale(GetTargetActor())) {
         RegisterAction("ExtCmdStartFingering");
