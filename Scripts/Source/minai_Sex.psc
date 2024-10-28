@@ -746,11 +746,12 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     actors[0] = akSpeaker
     actors[1] = akTarget
     actors[2] = PlayerRef
-    if actors[1] != actors[2]
-      StartSexOrSwitchToGroup(actors, akSpeaker)
-    else
+    if actors[1] == actors[2]
+      actors = PapyrusUtil.SliceActorArray(actors, 0, 1)
       Main.Debug("Threesome attempt - Must target another NPC")
+      Main.RequestLLMResponseNPC(speakerName, "Please join us for sex!", parameter, "chatnf_invite")
     EndIf
+    StartSexOrSwitchToGroup(actors, akSpeaker)
   elseIf command == "ExtCmdStartOrgy"
     actor[] actors = aiff.GetNearbyAI()
     actors = PapyrusUtil.PushActor(actors,playerRef)

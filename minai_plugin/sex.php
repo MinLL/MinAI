@@ -163,7 +163,7 @@ $GLOBALS["FUNCTIONS"][] = [
 $GLOBALS["FUNCRET"]["ExtCmdMasturbate"]=$GLOBALS["GenericFuncRet"];
 
 $GLOBALS["F_NAMES"]["ExtCmdStartThreesome"]="StartThreesome";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartThreesome"]="Immediately start threesome sex with target";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartThreesome"]="Immediately start threesome sex with {$GLOBALS["PLAYER_NAME"]} and target";
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdStartThreesome"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartThreesome"],
