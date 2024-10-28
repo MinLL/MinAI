@@ -123,7 +123,7 @@ Event OnUpdate()
     return
   EndIf
   ; Don't start radiant dialogue while the player is talking already, or in a menu
-  if (Utility.IsInMenuMode() || PlayerRef.GetCurrentScene())
+  if (Utility.IsInMenuMode() || PlayerRef.GetCurrentScene() || UI.IsMenuOpen("Dialogue Menu"))
     Main.Debug("SAPIENCE: Player in menu or in a scene. Not checking radiant dialogue.")
     ; Shorter cooldown if we were in a blocking condition
     StartNextUpdate(5.0)

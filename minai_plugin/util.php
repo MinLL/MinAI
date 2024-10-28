@@ -87,7 +87,7 @@ Function IsEnabled($name, $key) {
 
 Function IsSexActive() {
     // if there is active scene thread involving current speaker
-    getScene($GLOBALS["HERIKA_NAME"]);
+    return getScene($GLOBALS["HERIKA_NAME"]);
 }
 
 Function IsPlayer($name) {
