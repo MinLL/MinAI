@@ -1,5 +1,9 @@
 <?php
 
+// import AIFF funcction to send eventlog to db
+$rootEnginePath = __DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR;
+require_once($rootEnginePath.DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."chat_helper_functions.php");
+
 function CreateThreadsTableIfNotExists() {
     $db = $GLOBALS['db'];
     $db->execQuery(
@@ -13,6 +17,17 @@ function CreateThreadsTableIfNotExists() {
         fallback text
       )"
     );
+}
+
+function addSexEventsToEventLog($sceneDesc) {
+    $gameRequest = $GLOBALS["gameRequest"];
+    
+    logEvent([
+        'info_sexscenechange',
+        $gameRequest[1],
+        $gameRequest[2],
+        $sceneDesc." #SEX_SCENARIO",
+    ]);
 }
 
 function updateThreadsDB() {
@@ -52,6 +67,10 @@ function updateThreadsDB() {
                     "fallback" => $fallback
                 ]);
             }
+            $scene = getScene("", $threadId);
+            $sceneDesc = $scene["description"];
+    
+            addSexEventsToEventLog($sceneDesc);
             break;
         }
         case "end": {
