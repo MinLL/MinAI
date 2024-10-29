@@ -287,7 +287,7 @@ Function IsRadiant() {
     return (GetTargetActor() != $GLOBALS["PLAYER_NAME"]);
 }
 
-function getScene($actor) {
+function getScene($actor, $threadId = null) {
     $actor = str_replace('[', '\[', $actor);
     $actor = str_replace(']', '\]', $actor);
     if(isset($threadId)) {

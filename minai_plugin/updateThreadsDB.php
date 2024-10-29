@@ -19,14 +19,14 @@ function CreateThreadsTableIfNotExists() {
     );
 }
 
-function addSexEventsToEventLog($sceneDesc) {
+function addSexEventsToEventLog($sceneDesc, $threadId) {
     $gameRequest = $GLOBALS["gameRequest"];
     
     logEvent([
         'info_sexscenechange',
         $gameRequest[1],
         $gameRequest[2],
-        $sceneDesc." #SEX_SCENARIO",
+        $sceneDesc." #SEX_SCENARIO #ID_$threadId",
     ]);
 }
 
@@ -51,10 +51,14 @@ function updateThreadsDB() {
         // to avoid such case handle both cases with same logic.
         case "startthread": 
         case "scenechange": {
-            $thread = $db->fetchAll("SELECT * from minai_threads WHERE thread_id = $threadId")[0];
-            $currSceneId = $thread["curr_scene_id"];
-            $prevSceneId = $thread["prev_scene_id"];
-            if($currSceneId && strtolower($type) !== "startthread" && $currSceneId !== $prevSceneId) {
+            $thread = $db->fetchAll("SELECT * from minai_threads WHERE thread_id = $threadId");
+            if(!isset($thread)) {
+                return;
+            }
+            $thread = $thread[0];
+            if(isset($thread) && strtolower($type) !== "startthread") {
+                $currSceneId = $thread["curr_scene_id"];
+            
                 $db->update('minai_threads', "prev_scene_id = '$currSceneId', curr_scene_id = '$sceneId', fallback = '$fallback'", "thread_id = $threadId");
             } else {
                 $db->delete('minai_threads', "thread_id='{$threadId}'");
@@ -70,7 +74,7 @@ function updateThreadsDB() {
             $scene = getScene("", $threadId);
             $sceneDesc = $scene["description"];
     
-            addSexEventsToEventLog($sceneDesc);
+            addSexEventsToEventLog($sceneDesc, $threadId);
             break;
         }
         case "end": {

@@ -373,7 +373,17 @@ $sexInfoElements=[];
 $physicsInfoElements=[];
 foreach ($GLOBALS["contextDataFull"] as $n=>$ctxLine) {
     if (strpos($ctxLine["content"],"#SEX_SCENARIO")!==false) {
-        $locaLastElement[]=$n;
+        preg_match('/#ID_(\d+)/', $ctxLine["content"], $matches);
+        if (!empty($matches)) {
+          $threadId = $matches[1];
+        } else {
+          $threadId = "other";
+        }
+
+        if (!isset($locaLastElement[$threadId])) {
+          $locaLastElement[$threadId] = []; // Initialize as an array if it doesn't exist
+        }
+        array_push($locaLastElement[$threadId], $n);
     }
     if ($GLOBALS["stop_narrator_context_leak"] && $GLOBALS["HERIKA_NAME"] != "The Narrator") {
         if (strpos($ctxLine["content"],"The Narrator:")!==false && strpos($ctxLine["content"],"(talking to")!==false) {
@@ -388,9 +398,19 @@ foreach ($GLOBALS["contextDataFull"] as $n=>$ctxLine) {
     }
 }
 // Remove all references to sex scene, and only keep the last one.
-array_pop($locaLastElement);
-foreach ($locaLastElement as $n) {
-  unset($GLOBALS["contextDataFull"][$n]); 
+// Add support for multithread scenes to keep scene descriptions for all threads
+foreach ($locaLastElement as $thredId => $threadCtxLines) {
+  if(is_array($threadCtxLines) && !empty($threadCtxLines)) {
+    // try to find context #SEX_SCENARIO scene among currently running scenes
+    $scene = getScene("", $thredId);
+    // We want to keep last context line from 'other' category(if any), or for active scenes. If scene stopeed and not playing anymore we don't want to put it into context
+    if($thredId === "other" || isset($scene)) {
+      array_pop($threadCtxLines);
+    }
+    foreach ($threadCtxLines as $n) {
+      unset($GLOBALS["contextDataFull"][$n]); 
+    }
+  }
 }
 
 // Cleanup narrator context for non-narrator actors

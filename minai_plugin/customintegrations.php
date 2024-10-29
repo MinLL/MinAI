@@ -174,6 +174,10 @@ function ProcessIntegrations() {
             )
         );
     }
+    if (isset($GLOBALS["gameRequest"]) && str_starts_with(strtolower($GLOBALS["gameRequest"][0]), "sextalk")) {
+        // rewrite player request as empty, we don't need player request here
+        $GLOBALS["gameRequest"][3] = "";
+    }
     if ($MUST_DIE) {
         error_log("minai: Done procesing custom request");
         die('X-CUSTOM-CLOSE');
