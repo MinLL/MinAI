@@ -5,7 +5,7 @@ $target = GetTargetActor();
 
 function SetPromptHead($override) {
     if (str_starts_with($GLOBALS["PROMPT_HEAD"], "#")) {
-        $GLOBALS["PROMPT_HEAD"] = "{$override} {$GLOBALS["PROMPT_HEAD"]}";
+        // Don't replace it
     }
     else {
         $GLOBALS["PROMPT_HEAD"] = $override;

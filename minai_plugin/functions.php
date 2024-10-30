@@ -97,10 +97,11 @@ RegisterThirdPartyActions();
 
 $commandsToPurge=[];
 foreach ($GLOBALS["ENABLED_FUNCTIONS"] as $n=>$func) {
-    if (in_array($func, $GLOBALS["commands_to_purge"])) {
+    if (in_array($func, $GLOBALS["commands_to_purge"]) || (IsEnabled($GLOBALS["HERIKA_NAME"], "inCombat") && $func == "Attack")) {
         $commandsToPurge[] = $n;
     }
 }
+
 foreach ($commandsToPurge as $n) {
     unset($GLOBALS["ENABLED_FUNCTIONS"][$n]);
 }
