@@ -64,11 +64,11 @@ Bool Property cbpcDisableSelfAssTouch = True Auto
 Bool cbpcDisableSelfTouchDefault = False 
 Bool Property cbpcDisableSelfTouch = False Auto
 
-float cbpcOtherTouchThresholdDefault = 10.0
-float Property cbpcOtherTouchThreshold = 10.0 Auto
+float cbpcOtherTouchThresholdDefault = 4.0
+float Property cbpcOtherTouchThreshold = 4.0 Auto
 
-float cbpcSelfTouchThresholdDefault = 10.0 
-float Property cbpcSelfTouchThreshold = 10.0 Auto
+float cbpcSelfTouchThresholdDefault = 4.0 
+float Property cbpcSelfTouchThreshold = 4.0 Auto
 
 float collisionCooldownDefault = 2.0
 float Property collisionCooldown = 2.0 Auto
