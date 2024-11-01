@@ -267,6 +267,13 @@
                 <input type="checkbox" id="force-aiff-name">
             </div>
 
+	    <!-- always_enable_functions -->
+            <div class="option-group checkbox-group">
+                <label class="option-label" for="enforce-short-responses">Enforce Short Responses</label>
+                <p>Attempt to enforce short 2-3 sentence responses from the LLM. This is "best effort", and does not always work.</p>
+                <input type="checkbox" id="enforce-short-responses">
+            </div>
+
             <!-- commands_to_purge -->
             <div class="option-group">
                 <label class="option-label" for="commands-to-purge">Commands to Purge</label>
@@ -364,6 +371,7 @@
 
                 document.getElementById('prompt-head-override').value = configData.PROMPT_HEAD_OVERRIDE;
                 document.getElementById('use-narrator-profile').checked = configData.use_narrator_profile;
+		document.getElementById('enforce-short-responses').checked = configData.enforce_short_responses;
                 document.getElementById('stop-narrator-context-leak').checked = configData.stop_narrator_context_leak;
                 document.getElementById('eldritch-voice').value = configData.devious_narrator_eldritch_voice;
                 document.getElementById('telvanni-voice').value = configData.devious_narrator_telvanni_voice;
@@ -395,6 +403,7 @@
             const config = {
                 PROMPT_HEAD_OVERRIDE: document.getElementById('prompt-head-override').value,
                 use_narrator_profile: document.getElementById('use-narrator-profile').checked,
+		enforce_short_responses: document.getElementById('enforce-short-responses').checked,
                 stop_narrator_context_leak: document.getElementById('stop-narrator-context-leak').checked,
                 devious_narrator_eldritch_voice: document.getElementById('eldritch-voice').value,
                 devious_narrator_telvanni_voice: document.getElementById('telvanni-voice').value,
