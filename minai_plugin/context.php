@@ -458,6 +458,5 @@ foreach ($nullValues as $n) {
 
 $GLOBALS["contextDataFull"] = array_values($GLOBALS["contextDataFull"]);
 
-
-require "command_prompt_custom.php";
+require "/var/www/html/HerikaServer/ext/minai_plugin/command_prompt_custom.php";
 ?>

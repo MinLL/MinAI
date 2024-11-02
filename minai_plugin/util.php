@@ -30,7 +30,7 @@ Function BuildActorValueCache($name) {
     $name = strtolower($name);
     $GLOBALS[MINAI_ACTOR_VALUE_CACHE][$name] = [];
 
-    $idPrefix = "_minai_{$name}//";
+    $idPrefix = $GLOBALS["db"]->escape("_minai_{$name}//");
 
     $query = "select * from conf_opts where LOWER(id) like LOWER('{$idPrefix}%')";
     $ret = $GLOBALS["db"]->fetchAll($query);

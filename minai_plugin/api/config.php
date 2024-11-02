@@ -1,8 +1,10 @@
 <?php
 
 header('Content-Type: application/json');
-if (!file_exists("..".DIRECTORY_SEPARATOR."config.php")) {
-    copy("..".DIRECTORY_SEPARATOR."config.base.php", "..".DIRECTORY_SEPARATOR."config.php");
+
+$pluginPath = "/var/www/html/HerikaServer/ext/minai_plugin";
+if (!file_exists("$pluginPath/config.php")) {
+    copy("$pluginPath/config.base.php", "$pluginPath/config.php");
 }
 
 // Define the directory where the config file is located

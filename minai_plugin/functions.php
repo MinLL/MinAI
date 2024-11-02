@@ -33,6 +33,10 @@ EndEvent
 
 ***/
 
+$pluginPath = "/var/www/html/HerikaServer/ext/minai_plugin";
+if (!file_exists("$pluginPath/config.php")) {
+    copy("$pluginPath/config.base.php", "$pluginPath/config.php");
+}
 
 require_once("config.php");
 require_once("util.php");
@@ -86,7 +90,7 @@ if (!IsInFaction($GLOBALS["HERIKA_NAME"], "NoActionsFaction")) {
         }
         require "deviousdevices.php";
         require_once("deviousfollower.php");
-        if ($GLOBALS["always_enable_functions"] && $GLOBALS["HERIKA_NAME"] != "The Narrator") {
+        if ($GLOBALS["always_enable_functions"] && $GLOBALS["HERIKA_NAME"] != "The Narrator" && $GLOBALS["HERIKA_NAME"] != "Narrator" && $GLOBALS["HERIKA_NAME"] != "Player") {
             // Always enable actions for followers (During rechats and such)
             $GLOBALS["FUNCTIONS_ARE_ENABLED"]=true;
         }
