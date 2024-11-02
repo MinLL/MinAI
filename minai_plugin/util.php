@@ -287,11 +287,16 @@ Function IsRadiant() {
     return (GetTargetActor() != $GLOBALS["PLAYER_NAME"]);
 }
 
-function getScene($actor) {
+function getScene($actor, $threadId = null) {
     $actor = str_replace('[', '\[', $actor);
     $actor = str_replace(']', '\]', $actor);
-    $scene = $GLOBALS["db"]->fetchAll("SELECT * from minai_threads WHERE male_actors ~* '(,|^)$actor(,|$)' OR female_actors ~* '(,|^)$actor(,|$)'");
+    if(isset($threadId)) {
+        $scene = $GLOBALS["db"]->fetchAll("SELECT * from minai_threads WHERE thread_id = '$threadId'");
+    } else {
+        $scene = $GLOBALS["db"]->fetchAll("SELECT * from minai_threads WHERE male_actors ~* '(,|^)$actor(,|$)' OR female_actors ~* '(,|^)$actor(,|$)'");
+    }
 
+    
     if(!$scene) {
         return null;
     }
@@ -320,7 +325,7 @@ function getScene($actor) {
     return $scene;
 }
 
-function addXPersonality($jsonXPersonality, $isInSex) {
+function addXPersonality($jsonXPersonality) {
     if(!$jsonXPersonality) {
         return;
     }
@@ -329,7 +334,7 @@ function addXPersonality($jsonXPersonality, $isInSex) {
     - Orientation: {$jsonXPersonality["orientation"]}
     - Romantic relationship type: {$jsonXPersonality["relationshipStyle"]}";
 
-    if($isInSex) {
+    if(IsSexActive()) {
         $GLOBALS["HERIKA_PERS"] .= "
 During sex {$GLOBALS["HERIKA_PERS"]}:
 - speaks in this style {$jsonXPersonality["speakStyleDuringSex"]};
@@ -477,3 +482,5 @@ $GLOBALS["nearby"] = explode(",", GetActorValue("PLAYER", "nearbyActors"));
 if (IsChildActor($GLOBALS['HERIKA_NAME']) || IsChildActor($GLOBALS["target"])) {
     $GLOBALS["disable_nsfw"] = true;
 }
+
+?>
