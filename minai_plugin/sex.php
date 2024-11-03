@@ -2,7 +2,7 @@
 require_once("util.php");
 $target = $GLOBALS["target"];
 
-if ((IsModEnabled("Sexlab") || IsModEnabled("Ostim")) && ((IsEnabled("PLAYER", "enableAISex") && IsRadiant()) || !IsRadiant())) {
+if (!IsEnabled($GLOBALS["HERIKA_NAME"], "inCombat") && (IsModEnabled("Sexlab") || IsModEnabled("Ostim")) && ((IsEnabled("PLAYER", "enableAISex") && IsRadiant()) || !IsRadiant())) {
     // Always enabled
     RegisterAction("ExtCmdMasturbate");
     RegisterAction("ExtCmdStartVaginal");
