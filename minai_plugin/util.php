@@ -350,17 +350,17 @@ function getSceneDesc($scene) {
     $currSceneId = $scene["curr_scene_id"];
     
     if($scene["framework"] == "ostim") {
-        $query .= "ostim_id ";
+        $query .= "LOWER(ostim_id) ";
     } else {
-        $query .= "sexlab_id ";
+        $query .= "LOWER(sexlab_id) ";
         // since in scene descriptions there is one description per scene for all actors
         // sexlab id in minai_scenes_descriptions has this format SomeName_S1
         // and original sexlab ids are usually with _A0 on the end: SOmeName_A1_S1
         // need to remove _A0 part from ids to be able to find rows in minai_scenes_descriptions
-        $currSceneId = preg_replace('/_A\d+$/', '', $currSceneId);
+        $currSceneId = preg_replace('/_[Aa]\d+/', '', $currSceneId);
     }
 
-    $query .= "= '$currSceneId'";
+    $query .= "= LOWER('$currSceneId')";
     $queryRet = $GLOBALS["db"]->fetchAll($query);
     if ($queryRet)
         return $queryRet[0]["description"];
