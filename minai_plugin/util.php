@@ -131,7 +131,7 @@ Function IsFollower($name) {
 
 // Check if the specified actor is following (not follower)
 Function IsFollowing($name) {
-    return IsInFaction($name, "FollowFaction");
+    return IsInFaction($name, "FollowingPlayerFaction");
 }
 
 Function IsInScene($name) {

@@ -14,7 +14,9 @@ if ((IsModEnabled("Sexlab") || IsModEnabled("Ostim")) && ((IsEnabled("PLAYER", "
     RegisterAction("ExtCmdPutOnClothes");
     RegisterAction("ExtCmdRemoveClothes");
 
-    /*
+    // NFF keep follower faction active even if they are dismissed
+    // as long as they are imported into NFF. So, IsFollower will 
+    // return true and disable this functionality.
     if (!IsFollower($GLOBALS['HERIKA_NAME']) && !IsRadiant()) {
         if (IsFollowing($GLOBALS['HERIKA_NAME'])) {
             RegisterAction("ExtCmdStopFollowing");
@@ -27,7 +29,6 @@ if ((IsModEnabled("Sexlab") || IsModEnabled("Ostim")) && ((IsEnabled("PLAYER", "
             }
         }
     }
-    */
     
     // Always enabled for female actors
     if (IsFemale(GetTargetActor())) {
