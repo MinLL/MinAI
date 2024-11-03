@@ -1,1 +1,1 @@
-beta39.2-release
+beta39-dev

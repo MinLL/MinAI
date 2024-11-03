@@ -2,18 +2,21 @@
 require_once("util.php");
 $target = $GLOBALS["target"];
 
-if ((IsModEnabled("Sexlab") || IsModEnabled("Ostim")) && ((IsEnabled("PLAYER", "enableAISex") && IsRadiant()) || !IsRadiant())) {
+if (!IsEnabled($GLOBALS["HERIKA_NAME"], "inCombat") && (IsModEnabled("Sexlab") || IsModEnabled("Ostim")) && ((IsEnabled("PLAYER", "enableAISex") && IsRadiant()) || !IsRadiant())) {
     // Always enabled
     RegisterAction("ExtCmdMasturbate");
     RegisterAction("ExtCmdStartVaginal");
     RegisterAction("ExtCmdStartAnal");
     RegisterAction("ExtCmdStartBlowjob");
     RegisterAction("ExtCmdStartHandjob");
+    RegisterAction("ExtCmdStartThreesome");
     RegisterAction("ExtCmdStartOrgy");
     RegisterAction("ExtCmdPutOnClothes");
     RegisterAction("ExtCmdRemoveClothes");
 
-    /*
+    // NFF keep follower faction active even if they are dismissed
+    // as long as they are imported into NFF. So, IsFollower will 
+    // return true and disable this functionality.
     if (!IsFollower($GLOBALS['HERIKA_NAME']) && !IsRadiant()) {
         if (IsFollowing($GLOBALS['HERIKA_NAME'])) {
             RegisterAction("ExtCmdStopFollowing");
@@ -26,7 +29,6 @@ if ((IsModEnabled("Sexlab") || IsModEnabled("Ostim")) && ((IsEnabled("PLAYER", "
             }
         }
     }
-    */
     
     // Always enabled for female actors
     if (IsFemale(GetTargetActor())) {
@@ -160,6 +162,25 @@ $GLOBALS["FUNCTIONS"][] = [
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdMasturbate"]=$GLOBALS["GenericFuncRet"];
+
+$GLOBALS["F_NAMES"]["ExtCmdStartThreesome"]="StartThreesome";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdStartThreesome"]="Immediately start threesome sex with {$GLOBALS["PLAYER_NAME"]} and target";
+$GLOBALS["FUNCTIONS"][] = [
+        "name" => $GLOBALS["F_NAMES"]["ExtCmdStartThreesome"],
+        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartThreesome"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS["nearby"]
+                ]
+            ],
+            "required" => [],
+        ],
+    ];
+$GLOBALS["FUNCRET"]["ExtCmdStartThreesome"]=$GLOBALS["GenericFuncRet"];
 
 $GLOBALS["F_NAMES"]["ExtCmdStartOrgy"]="StartOrgy";
 $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartOrgy"]="Immediately engage in an orgy with multiple participants";

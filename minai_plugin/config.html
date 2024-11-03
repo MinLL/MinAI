@@ -200,7 +200,7 @@
             <!-- PROMPT_HEAD_OVERRIDE -->
             <div class="option-group text-input">
                 <label class="option-label" for="prompt-head-override">PROMPT_HEAD_OVERRIDE</label>
-                <p>Set this to override the prompt head for all profiles. Do not include any player specific information in this prompt. Use the bio for that instead. You can override this for specific NPC's by beginning their prompt head with a #./p>
+                <p>Set this to override the prompt head for all profiles. Do not include any player specific information in this prompt. Use the bio for that instead. You can override this for specific NPC's by beginning their prompt head with a #.</p>
                 <input type="text" id="prompt-head-override">
             </div>
 
@@ -265,6 +265,13 @@
                 <label class="option-label" for="force-aiff-name">Force AIFF Name to Match In-Game Name</label>
                 <p>Force the configured name in AI-FF to match the in-game name.</p>
                 <input type="checkbox" id="force-aiff-name">
+            </div>
+
+	    <!-- always_enable_functions -->
+            <div class="option-group checkbox-group">
+                <label class="option-label" for="enforce-short-responses">Enforce Short Responses</label>
+                <p>Attempt to enforce short 2-3 sentence responses from the LLM. This is "best effort", and does not always work.</p>
+                <input type="checkbox" id="enforce-short-responses">
             </div>
 
             <!-- commands_to_purge -->
@@ -364,6 +371,7 @@
 
                 document.getElementById('prompt-head-override').value = configData.PROMPT_HEAD_OVERRIDE;
                 document.getElementById('use-narrator-profile').checked = configData.use_narrator_profile;
+		document.getElementById('enforce-short-responses').checked = configData.enforce_short_responses;
                 document.getElementById('stop-narrator-context-leak').checked = configData.stop_narrator_context_leak;
                 document.getElementById('eldritch-voice').value = configData.devious_narrator_eldritch_voice;
                 document.getElementById('telvanni-voice').value = configData.devious_narrator_telvanni_voice;
@@ -395,6 +403,7 @@
             const config = {
                 PROMPT_HEAD_OVERRIDE: document.getElementById('prompt-head-override').value,
                 use_narrator_profile: document.getElementById('use-narrator-profile').checked,
+		enforce_short_responses: document.getElementById('enforce-short-responses').checked,
                 stop_narrator_context_leak: document.getElementById('stop-narrator-context-leak').checked,
                 devious_narrator_eldritch_voice: document.getElementById('eldritch-voice').value,
                 devious_narrator_telvanni_voice: document.getElementById('telvanni-voice').value,

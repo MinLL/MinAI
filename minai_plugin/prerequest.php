@@ -28,7 +28,8 @@ Function SetNarratorProfile() {
         }
         $path = GetNarratorConfigPath();
         // error_log("minai: Overwriting profile with narrator profile ($path).");
-        global $HERIKA_NAME;
+        // Ignore narrator name
+        // global $HERIKA_NAME;
         global $PROMPT_HEAD;
         global $HERIKA_PERS;
         global $DYNAMIC_PROFILE;
@@ -58,7 +59,7 @@ Function SetNarratorProfile() {
 if (IsNewRadiantConversation()) {
     error_log("minai: Initial radiant conversation, overriding rechat parameters");
     $GLOBALS["db"]->delete("conf_opts", "id='_minai_RADIANT//initial'");
-    SetRadiance(2, 0); // Always rechat at least once
+    SetRadiance(99999, 0); // Always rechat at least once
 }
 elseif (IsRadiant()) {
     SetRadiance($GLOBALS["radiance_rechat_h"], $GLOBALS["radiance_rechat_p"]);

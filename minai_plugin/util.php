@@ -30,7 +30,7 @@ Function BuildActorValueCache($name) {
     $name = strtolower($name);
     $GLOBALS[MINAI_ACTOR_VALUE_CACHE][$name] = [];
 
-    $idPrefix = "_minai_{$name}//";
+    $idPrefix = $GLOBALS["db"]->escape("_minai_{$name}//");
 
     $query = "select * from conf_opts where LOWER(id) like LOWER('{$idPrefix}%')";
     $ret = $GLOBALS["db"]->fetchAll($query);
@@ -87,7 +87,7 @@ Function IsEnabled($name, $key) {
 
 Function IsSexActive() {
     // if there is active scene thread involving current speaker
-    getScene($GLOBALS["HERIKA_NAME"]);
+    return getScene($GLOBALS["HERIKA_NAME"]);
 }
 
 Function IsPlayer($name) {
@@ -131,7 +131,7 @@ Function IsFollower($name) {
 
 // Check if the specified actor is following (not follower)
 Function IsFollowing($name) {
-    return IsInFaction($name, "FollowFaction");
+    return IsInFaction($name, "FollowingPlayerFaction");
 }
 
 Function IsInScene($name) {
@@ -287,11 +287,16 @@ Function IsRadiant() {
     return (GetTargetActor() != $GLOBALS["PLAYER_NAME"]);
 }
 
-function getScene($actor) {
+function getScene($actor, $threadId = null) {
     $actor = str_replace('[', '\[', $actor);
     $actor = str_replace(']', '\]', $actor);
-    $scene = $GLOBALS["db"]->fetchAll("SELECT * from minai_threads WHERE male_actors ~* '(,|^)$actor(,|$)' OR female_actors ~* '(,|^)$actor(,|$)'");
+    if(isset($threadId)) {
+        $scene = $GLOBALS["db"]->fetchAll("SELECT * from minai_threads WHERE thread_id = '$threadId'");
+    } else {
+        $scene = $GLOBALS["db"]->fetchAll("SELECT * from minai_threads WHERE male_actors ~* '(,|^)$actor(,|$)' OR female_actors ~* '(,|^)$actor(,|$)'");
+    }
 
+    
     if(!$scene) {
         return null;
     }
@@ -320,7 +325,7 @@ function getScene($actor) {
     return $scene;
 }
 
-function addXPersonality($jsonXPersonality, $isInSex) {
+function addXPersonality($jsonXPersonality) {
     if(!$jsonXPersonality) {
         return;
     }
@@ -329,7 +334,7 @@ function addXPersonality($jsonXPersonality, $isInSex) {
     - Orientation: {$jsonXPersonality["orientation"]}
     - Romantic relationship type: {$jsonXPersonality["relationshipStyle"]}";
 
-    if($isInSex) {
+    if(IsSexActive()) {
         $GLOBALS["HERIKA_PERS"] .= "
 During sex {$GLOBALS["HERIKA_PERS"]}:
 - speaks in this style {$jsonXPersonality["speakStyleDuringSex"]};
@@ -345,17 +350,17 @@ function getSceneDesc($scene) {
     $currSceneId = $scene["curr_scene_id"];
     
     if($scene["framework"] == "ostim") {
-        $query .= "ostim_id ";
+        $query .= "LOWER(ostim_id) ";
     } else {
-        $query .= "sexlab_id ";
+        $query .= "LOWER(sexlab_id) ";
         // since in scene descriptions there is one description per scene for all actors
         // sexlab id in minai_scenes_descriptions has this format SomeName_S1
         // and original sexlab ids are usually with _A0 on the end: SOmeName_A1_S1
         // need to remove _A0 part from ids to be able to find rows in minai_scenes_descriptions
-        $currSceneId = preg_replace('/_A\d+$/', '', $currSceneId);
+        $currSceneId = preg_replace('/_[Aa]\d+/', '', $currSceneId);
     }
 
-    $query .= "= '$currSceneId'";
+    $query .= "= LOWER('$currSceneId')";
     $queryRet = $GLOBALS["db"]->fetchAll($query);
     if ($queryRet)
         return $queryRet[0]["description"];
@@ -477,3 +482,5 @@ $GLOBALS["nearby"] = explode(",", GetActorValue("PLAYER", "nearbyActors"));
 if (IsChildActor($GLOBALS['HERIKA_NAME']) || IsChildActor($GLOBALS["target"])) {
     $GLOBALS["disable_nsfw"] = true;
 }
+
+?>

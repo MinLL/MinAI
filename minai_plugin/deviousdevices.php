@@ -337,7 +337,7 @@ $GLOBALS["FUNCTIONS"][] = [
         "required" => [],
     ],
 ];
-if (IsConfigEnabled("allowDeviceLock")) {
+if (!IsEnabled($GLOBALS["HERIKA_NAME"], "inCombat") && IsConfigEnabled("allowDeviceLock")) {
     RegisterAction("ExtCmdEquipCollar");
 	RegisterAction("ExtCmdEquipGag");
 	RegisterAction("ExtCmdEquipBelt");
@@ -345,7 +345,7 @@ if (IsConfigEnabled("allowDeviceLock")) {
 	RegisterAction("ExtCmdEquipVibrator");
 }
 
-if (IsConfigEnabled("allowDeviceUnlock")) {
+if (!IsEnabled($GLOBALS["HERIKA_NAME"], "inCombat") && IsConfigEnabled("allowDeviceUnlock")) {
     RegisterAction("ExtCmdUnequipCollar");
 	RegisterAction("ExtCmdUnequipGag");
 	RegisterAction("ExtCmdUnequipBelt");

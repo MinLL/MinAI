@@ -25,16 +25,32 @@ GlobalVariable minai_SapienceEnabled
 int Property actionRegistry Auto
 int sapientActors = 0
 
-Package FollowPackage
-Faction FollowFaction
+bool bHasFollowPlayer = False
+Package FollowPlayerPackage
+Faction FollowingPlayerFaction
 
 Function InitFollow()
-  FollowPackage = Game.GetFormFromFile(0x01BC25, "AIAgent.esp") as Package 
-  FollowFaction = Game.GetFormFromFile(0x01BC24, "AIAgent.esp") as Faction
+  bHasFollowPlayer = False
+  FollowPlayerPackage = Game.GetFormFromFile(0x000E8E, "MinAI.esp") as Package
+  If FollowPlayerPackage == None
+    Main.Error("[FollowTarget] Could not load follow player package - Mismatched script and esp versions")
+  EndIf
 
+  FollowingPlayerFaction = Game.GetFormFromFile(0x000E8B, "MinAI.esp") as Faction
+  If FollowingPlayerFaction == None
+    Main.Error("[FollowTarget] Could not load follow player faction - Mismatched script and esp versions")
+  EndIf
+
+  Main.Debug("[FollowTarget] FollowTarget initialized")
+  bHasFollowPlayer = True
 EndFunction
 
 Function CleanupFollow()
+  If !bHasFollowPlayer
+    Main.Debug("[FollowTarget] CleanupFollow follow not enable")
+    Return
+  EndIf
+
   actor[] actors = GetNearbyAI()
   int i = 0
   while i < actors.Length
@@ -112,6 +128,11 @@ Function Maintenance(minai_MainQuestController _main)
 EndFunction
 
 Function StartFollowTarget(actor akNpc, actor akTarget)
+  If (!bHasFollowPlayer)
+    Main.Debug("[FollowTarget] StartFollowTarget follow not enable")
+    return
+  EndIf
+  
   If (akNpc == None || akTarget == None)
     Main.Error("[FollowTarget] Npc or target is none")
     return
@@ -121,29 +142,37 @@ Function StartFollowTarget(actor akNpc, actor akTarget)
     return
   EndIf
 
-  akNpc.SetFactionRank(FollowFaction, 1)
-  PO3_SKSEFunctions.SetLinkedRef(akNpc, akTarget)
-  ActorUtil.AddPackageOverride(akNpc, FollowPackage, 100, 0)
+  akNpc.AddToFaction(FollowingPlayerFaction)
+  ; Distance can be configured with faction rank. 1 = close, 2 = medium, 3 = far
+  akNpc.SetFactionRank(FollowingPlayerFaction, 1)
+  ActorUtil.AddPackageOverride(akNpc, FollowPlayerPackage, 100, 0)
   akNpc.EvaluatePackage()
 
   ; refresh faction
   StoreFactions(akNpc)
 
   Main.Info("[FollowTarget] " + akNpc.GetDisplayName() + " is now following " + akTarget.GetDisplayName())
+  Debug.Notification(akNpc.GetDisplayName() + " is now following " + akTarget.GetDisplayName())
 EndFunction
 
 Function EndFollowTarget(actor akNpc)
+  If (!bHasFollowPlayer)
+    Main.Debug("[FollowTarget] EndFollowTarget follow not enable")
+    return
+  EndIf
+
   If (akNpc == None)
     Main.Error("[FollowTarget] Npc is none")
     return
   EndIf
 
-  ActorUtil.RemovePackageOverride(akNpc, FollowPackage)
-  akNpc.RemoveFromFaction(FollowFaction)
+  ActorUtil.RemovePackageOverride(akNpc, FollowPlayerPackage)
+  akNpc.RemoveFromFaction(FollowingPlayerFaction)
 
   ; refresh faction
   StoreFactions(akNpc)
   Main.Info("[FollowTarget] " + akNpc.GetDisplayName() + " is no longer following anyone")
+  Debug.Notification(akNpc.GetDisplayName() + " is no longer following anyone")
 EndFunction
 
 Function CheckIfActorShouldStillFollow(actor akNpc)
@@ -156,12 +185,15 @@ Function CheckIfActorShouldStillFollow(actor akNpc)
     return
   EndIf
 
-  If (akNpc.IsInFaction(FollowFaction) && akNpc.GetCurrentPackage() != FollowPackage)
+  If (akNpc.IsInFaction(FollowingPlayerFaction) && akNpc.GetCurrentPackage() != FollowPlayerPackage)
     Main.Debug("[FollowTarget] Npc is not following anyone, End following target")
     EndFollowTarget(akNpc)
-  ElseIf (akNpc.GetCurrentPackage() == FollowPackage && !akNpc.IsInFaction(FollowFaction))
+  ElseIf (akNpc.GetCurrentPackage() == FollowPlayerPackage && !akNpc.IsInFaction(FollowingPlayerFaction))
     Main.Debug("[FollowTarget] Still following target, but not in faction, End following target")
     EndFollowTarget(akNpc)  
+  ElseIf (followers.IsFollower(akNpc))
+    Main.Debug("[FollowTarget] Is a follower now, clean up follow")
+    EndFollowTarget(akNpc)
   EndIf
 EndFunction
 
@@ -290,7 +322,7 @@ EndFunction
 
 string Function GetFactionsForActor(actor akTarget)
   string ret = ""
-  ret += GetFactionIfExists(akTarget, "FollowFaction", FollowFaction)
+  ret += GetFactionIfExists(akTarget, "FollowingPlayerFaction", FollowingPlayerFaction)
   return ret
 EndFunction
 

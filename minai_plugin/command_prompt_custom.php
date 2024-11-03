@@ -5,14 +5,20 @@ $target = GetTargetActor();
 
 function SetPromptHead($override) {
     if (str_starts_with($GLOBALS["PROMPT_HEAD"], "#")) {
-        $GLOBALS["PROMPT_HEAD"] = "{$override} {$GLOBALS["PROMPT_HEAD"]}";
+        // Don't replace it
     }
     else {
         $GLOBALS["PROMPT_HEAD"] = $override;
     }
 }
 
+
 $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"]="Choose a coherent ACTION that is available to you in order to obey or physically interact with {$target}. You can also use an ACTION to interact with the world, provide services, or indicate your arousal. ";
+
+if (isset($GLOBALS["enforce_short_responses"]) && $GLOBALS["enforce_short_responses"]) {
+    $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"].="You MUST respond with no more than 2-3 sentences and no more than 40 words.";
+}
+
 $shouldOverride = ($GLOBALS["PROMPT_HEAD_OVERRIDE"] != "" && isset($GLOBALS["PROMPT_HEAD_OVERRIDE"]));
 
 if (IsRadiant()) { // Is this npc -> npc?
