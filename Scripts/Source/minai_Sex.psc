@@ -1,10 +1,12 @@
 scriptname minai_Sex extends Quest
 
 SexLabFramework slf
+sslMatchMakerMain slm
 
 
 bool bHasOstim = False
 bool bHasSexlab = False
+bool bHasSexlabPPlus = False
 GlobalVariable minai_UseOstim
 int clothingMap = 0
 int descriptionsMap
@@ -59,11 +61,19 @@ Function Maintenance(minai_MainQuestController _main)
   actorToSayOnEndMap = JValue.releaseAndRetain(actorToSayOnEndMap, JMap.object())
     
   slf = Game.GetFormFromFile(0xD62, "SexLab.esm") as SexLabFramework
+  slm = Game.GetFormFromFile(0xB3302, "SexLab.esm") as sslMatchMakerMain
 
   ambientSexTalk.Maintenance(self, slf)
   if slf != None
     Main.Info("Found Sexlab")
     bHasSexlab = True
+
+	; Only SexLab P+ includes matchmaker, so check for that
+	if slm != None
+	  Main.Info("Found Sexlab P+")
+	  bHasSexlabPPlus = True
+	EndIf
+	
   EndIf
   if Game.GetModByName("OStim.esp") != 255
     Main.Info("Found OStim")
@@ -1116,13 +1126,29 @@ function UpdateThreadTable(string type, string framework = "ostim", int ThreadID
   string sceneId
   
   if(framework == sexlabType) && bHasSexlab
-    sslThreadController controller = slf.GetController(ThreadID)
+	if bHasSexlabPPlus
+	  SexLabThread thread = slf.GetThread(ThreadID)
+	  string sceneHash = thread.GetActiveScene()
+	  string stageHash = thread.GetActiveStage()
+	  string firstStageHash = SexlabRegistry.GetAllstages(sceneHash)[0]
   
-    if (controller.Stage==1) 
-      LoadSexlabDescriptions()
-    EndIf
-    actors = slf.GetController(ThreadID).Positions
-    sceneId = controller.Animation.FetchStage(controller.Stage)[0]
+      if (stageHash == firstStageHash)
+        LoadSexlabDescriptions()
+      EndIf
+      actors = thread.GetPositions()
+
+	  string sceneIdWithPrefix = SexlabRegistry.GetAnimationEvent(sceneHash, stageHash, 0)
+	  sceneId = StringUtil.Substring(sceneIdWithPrefix, 4, -1)
+	else
+	  sslThreadController controller = slf.GetController(ThreadID)
+    
+      if (controller.Stage==1) 
+        LoadSexlabDescriptions()
+      EndIf
+      actors = slf.GetController(ThreadID).Positions
+
+	  sceneId = controller.Animation.FetchStage(controller.Stage)[0]
+	endif
   elseif (framework == ostimType) && bHasOstim
     actors = OThread.GetActors(ThreadID)
     sceneId = OThread.GetScene(ThreadID)
