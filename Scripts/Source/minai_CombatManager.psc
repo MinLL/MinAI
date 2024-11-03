@@ -93,3 +93,13 @@ Function OnCombatEnd(actor akTarget)
     AIAgentFunctions.requestMessage(Main.GetActorName(akTarget) + " was defeated in combat", "minai_combatenddefeat")
   EndIf
 EndFunction
+
+Function OnBleedoutStart(actor akTarget)
+  Main.Info("Combat: OnBleedoutStart()")
+  string targetName = Main.GetActorName(akTarget)
+  Main.RequestLLMResponseFromActor(targetName + " has been knocked down and is badly injured!", "minai_bleedoutstart", targetName)
+EndFunction
+
+Function OnBleedoutEnd(actor akTarget)
+  Main.Info("Combat: OnBleedoutEnd()")
+EndFunction
