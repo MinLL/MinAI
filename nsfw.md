@@ -68,6 +68,9 @@ MinAI includes 3467 ostim/sexlab scene descriptions (as of 10/24/2024) for bette
 ### Sexlab Horrible Harassment
 * The AI will utilize Horrible Harassment to molest the player if they want to do so.
 
+### Binding
+* Adds LLM Awareness and exposes actions for the player's master.
+
 ### Game Interface for Toys (GIFT)
 * Every appropriate interaction that the AI can do is picked up by GIFT, and can be configured to vibrate, etc.
 
