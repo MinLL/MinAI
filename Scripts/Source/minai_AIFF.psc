@@ -25,9 +25,6 @@ GlobalVariable minai_SapienceEnabled
 int Property actionRegistry Auto
 int sapientActors = 0
 
-;Package FollowPackage
-;Faction FollowFaction
-
 bool bHasFollowPlayer = False
 Package FollowPlayerPackage
 Faction FollowingPlayerFaction
