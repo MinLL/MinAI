@@ -54,7 +54,7 @@ Function CleanupFollow()
   actor[] actors = GetNearbyAI()
   int i = 0
   while i < actors.Length
-    EndFollowTarget(actors[i])
+    EndFollowTarget(actors[i], true)
     i += 1
   EndWhile
 EndFunction
@@ -155,7 +155,7 @@ Function StartFollowTarget(actor akNpc, actor akTarget)
   Debug.Notification(akNpc.GetDisplayName() + " is now following " + akTarget.GetDisplayName())
 EndFunction
 
-Function EndFollowTarget(actor akNpc)
+Function EndFollowTarget(actor akNpc, bool beQuiet = false)
   If (!bHasFollowPlayer)
     Main.Debug("[FollowTarget] EndFollowTarget follow not enable")
     return
@@ -172,7 +172,9 @@ Function EndFollowTarget(actor akNpc)
   ; refresh faction
   StoreFactions(akNpc)
   Main.Info("[FollowTarget] " + akNpc.GetDisplayName() + " is no longer following anyone")
-  Debug.Notification(akNpc.GetDisplayName() + " is no longer following anyone")
+  if (!beQuiet)
+    Debug.Notification(akNpc.GetDisplayName() + " is no longer following anyone")
+  EndIf
 EndFunction
 
 Function CheckIfActorShouldStillFollow(actor akNpc)
