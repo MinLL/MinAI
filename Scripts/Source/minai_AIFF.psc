@@ -195,7 +195,7 @@ Function CheckIfActorShouldStillFollow(actor akNpc)
     EndFollowTarget(akNpc)  
   ElseIf (followers.IsFollower(akNpc))
     Main.Debug("[FollowTarget] Is a follower now, clean up follow")
-    EndFollowTarget(akNpc)
+    EndFollowTarget(akNpc, true)
   EndIf
 EndFunction
 
