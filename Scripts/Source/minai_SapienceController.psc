@@ -78,7 +78,7 @@ actor[] Function FindActors()
     if  allNearbyActors[i].IsInDialogueWithPlayer() ; Player is in dialogue with at least one nearby actor. Don't start radiance.
       return ret
     EndIf
-    if Sex.CanAnimate(allNearbyActors[i]) && !allNearbyActors[i].GetCurrentScene()
+    if Sex.CanAnimate(allNearbyActors[i]) && !allNearbyActors[i].GetCurrentScene() && Main.GetActorName(allNearbyActors[i]) != "The Narrator"
       Main.Debug("SAPIENCE: Found nearby actor for dialogue: " + Main.GetActorName(allNearbyActors[i]))
       nearbyActors = PapyrusUtil.PushActor(nearbyActors,allNearbyActors[i])
     EndIf

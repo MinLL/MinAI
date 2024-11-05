@@ -703,8 +703,11 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
         ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_collars)
         Main.RegisterEvent(""+speakerName+" locked a collar on " + targetName)
       elseif (command == "ExtCmdUnequipCollar")
-        libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousCollar)
-        Main.RegisterEvent(""+speakerName+" removed a collar from " + targetName)
+        if(libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousCollar))
+          Main.RegisterEvent(""+speakerName+" removed a collar from " + targetName)
+        else
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove a collar from " + targetName)
+        EndIf
       elseif (command == "ExtCmdEquipGag")
         ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_gags_ball_ebonite)
         Main.RegisterEvent(""+speakerName+" Puts a gag on " + targetName)
@@ -719,18 +722,30 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
         ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_chastitybelts_closed)
         Main.RegisterEvent(""+speakerName+" Puts a Chastity Belt on " + targetName)
       elseif (command == "ExtCmdUnequipBelt")
-        libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousBelt)
-        Main.RegisterEvent(""+speakerName+" removes a Belt from " + targetName)
+        if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousBelt))
+          Main.RegisterEvent(""+speakerName+" removes a Chastity Belt from " + targetName)
+        else
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove a Chastity Belt from " + targetName)
+        EndIf
       elseif (command == "ExtCmdUnequipGag")
-        libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousGag)
-        Main.RegisterEvent(""+speakerName+" removes a Gag from " + targetName)
+        if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousGag))
+          Main.RegisterEvent(""+speakerName+" removes a Gag from " + targetName)
+        else
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove a Gag from " + targetName)
+        EndIf
+            
       elseif (command == "ExtCmdUnequipBinder")
-        libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousArmbinder)
-        Main.RegisterEvent(""+speakerName+" removes a Armbinder from " + targetName)
+        if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousArmbinder))
+          Main.RegisterEvent(""+speakerName+" removes a Armbinder from " + targetName)
+        else
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove a Armbinder from " + targetName)
+        EndIf
       elseif (command == "ExtCmdUnequipVibrator")
-        libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousPlugAnal)
-        libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousPlugAnal)
-        Main.RegisterEvent(""+speakerName+" removes the vibrators from " + targetName)
+        if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousPlugAnal) || libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousPlugAnal))
+          Main.RegisterEvent(""+speakerName+" removes the vibrators from " + targetName)
+        else
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove the vibrators from " + targetName)
+        EndIf
       EndIf
     EndIf
   EndIf

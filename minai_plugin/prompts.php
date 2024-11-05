@@ -65,11 +65,20 @@ $GLOBALS["PROMPTS"]["minai_combatendvictory"]= [
     ],
     "extra"=>["force_tokens_max"=>"50","dontuse"=>(time()%10!=0)]   //10% chance
 ];
-$GLOBALS["PROMPTS"]["minai_combatenddefeat"]= [
-    "cue"=>[
-        "({$GLOBALS["HERIKA_NAME"]} laments having been defeated in combat {$GLOBALS["TEMPLATE_DIALOG"]}"
-    ]
-];
+
+if (IsFollower($GLOBALS["HERIKA_NAME"])) {
+    $GLOBALS["PROMPTS"]["minai_combatenddefeat"]= [
+        "cue"=>[
+            "({$GLOBALS["HERIKA_NAME"]} laments having been defeated in combat {$GLOBALS["TEMPLATE_DIALOG"]}"
+        ]
+    ];
+} else {
+    $GLOBALS["PROMPTS"]["minai_combatenddefeat"]= [
+        "cue"=>[
+            "({$GLOBALS["HERIKA_NAME"]} gloats about defeating {$GLOBALS["target"]} in combat and boasts about what they will do next {$GLOBALS["TEMPLATE_DIALOG"]}"
+        ]
+    ];
+}
 
 function SetInputPrompts($prompt) {
     error_log("minai: Overriding input prompts for combat for {$GLOBALS["HERIKA_NAME"]}");

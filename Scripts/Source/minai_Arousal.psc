@@ -527,6 +527,9 @@ Function SetContext(actor akTarget)
   if cotrIndex != -1
     actorRace = StringUtil.Substring(actorRace, 0, cotrIndex)
   EndIf
+  if actorRace == "fox"
+    actorRace = "human"
+  EndIf
   aiff.SetActorVariable(akTarget, "race", actorRace)
 
   string wornEquipments = GetWornEquipments(akTarget)

@@ -60,12 +60,21 @@ bool Function ShouldRemoveActor(actor akTarget)
   if (!playerRef || !akTarget)
     return true
   EndIf
-  bool distanceCheck = (akTarget.GetDistance(playerRef) <= 1024)
+  bool inRange = (akTarget.GetDistance(playerRef) <= 1024)
   bool isAlive = (akTarget.GetKiller() == None)
   ; bool isNotHostile = !(akTarget.IsHostileToActor(playerRef))
   bool isSapienceEnabled = (minai_SapienceEnabled.GetValueInt() == 1)
-  Main.Debug("ShouldRemoveActor(" + Main.GetActorName(akTarget) + "): distanceCheck=" + distanceCheck +", isAlive=" + isAlive +  ", sapienceEnabled=" + isSapienceEnabled)
-  return (!distanceCheck || !isAlive || !isSapienceEnabled) ; || !isNotHostile
+  bool inLos = (akTarget.HasLOS(playerRef))
+  bool inCombat = (akTarget.GetCombatState() >= 1)
+  bool isInInterior = (akTarget.GetParentCell().IsInterior())
+  Main.Debug("ShouldRemoveActor(" + Main.GetActorName(akTarget) + "): inRange=" + inRange +", isAlive=" + isAlive +  ", sapienceEnabled=" + isSapienceEnabled + ", inLos=" + inLos + ", inCombat=" + inCombat + ", isInInterior=" + isInInterior)
+  bool combatLosCheck = false
+  ; Handle LoS calculations for different situations
+  ; LoS enforced while indoors and not in combat to avoid nosy NPC's in inns and such
+  ; if (inCombat && IsInInterior) || (!inCombat && inLos && isInInterior) || !isInInterior
+  ;   combatLosCheck = true
+  ; EndIf
+  return (!inRange || !isAlive || !isSapienceEnabled) ; || !combatLosCheck) 
 EndFunction
 
 
