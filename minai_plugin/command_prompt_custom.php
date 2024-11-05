@@ -13,7 +13,7 @@ function SetPromptHead($override) {
 }
 
 
-$GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"]="Choose a coherent ACTION that is available to you in order to obey or physically interact with {$target}. You can also use an ACTION to interact with the world, provide services, or indicate your arousal. ";
+$GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"]="Choose a coherent ACTION that is available to you in order to obey or physically interact with {$target}. You can also use an ACTION to interact with the world, provide services, or indicate your arousal. Avoid narration. ";
 
 if (isset($GLOBALS["enforce_short_responses"]) && $GLOBALS["enforce_short_responses"]) {
     $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"].="You MUST respond with no more than 2-3 sentences and no more than 40 words.";

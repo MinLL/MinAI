@@ -338,19 +338,41 @@ $GLOBALS["FUNCTIONS"][] = [
     ],
 ];
 if (!IsEnabled($GLOBALS["HERIKA_NAME"], "inCombat") && IsConfigEnabled("allowDeviceLock")) {
-    RegisterAction("ExtCmdEquipCollar");
-	RegisterAction("ExtCmdEquipGag");
-	RegisterAction("ExtCmdEquipBelt");
-	RegisterAction("ExtCmdEquipBinder");
-	RegisterAction("ExtCmdEquipVibrator");
+    if (!HasKeyword($GLOBALS["target"], "zad_DeviousCollar")) {
+        RegisterAction("ExtCmdEquipCollar");
+    }
+    if (!HasKeyword($GLOBALS["target"], "zad_DeviousGag")) {
+        RegisterAction("ExtCmdEquipGag");
+    }
+    if (!HasKeyword($GLOBALS["target"], "zad_DeviousArmbinder")) {
+        RegisterAction("ExtCmdEquipBinder");
+    }
+    if (!HasKeyword($GLOBALS["target"], "zad_DeviousBelt")) {
+        RegisterAction("ExtCmdEquipBelt");
+        if (!HasKeyword($GLOBALS["target"], "zad_DeviousPlugVaginal") || !HasKeyword($GLOBALS["target"], "zad_DeviousPlugAnal")) {
+            RegisterAction("ExtCmdEquipVibrator");
+        }
+    }
 }
 
 if (!IsEnabled($GLOBALS["HERIKA_NAME"], "inCombat") && IsConfigEnabled("allowDeviceUnlock")) {
-    RegisterAction("ExtCmdUnequipCollar");
-	RegisterAction("ExtCmdUnequipGag");
-	RegisterAction("ExtCmdUnequipBelt");
-	RegisterAction("ExtCmdUnequipBinder");
-	RegisterAction("ExtCmdUnequipVibrator");
+    if (HasKeyword($GLOBALS["target"], "zad_DeviousCollar")) {
+        RegisterAction("ExtCmdUnequipCollar");
+    }
+    if (HasKeyword($GLOBALS["target"], "zad_DeviousGag")) {
+        RegisterAction("ExtCmdUnequipGag");
+    }
+    if (HasKeyword($GLOBALS["target"], "zad_DeviousBelt")) {
+        RegisterAction("ExtCmdUnequipBelt");
+    }
+    if (HasKeyword($GLOBALS["target"], "zad_DeviousArmbinder")) {
+        RegisterAction("ExtCmdUnequipBinder");
+    }
+    if (HasKeyword($GLOBALS["target"], "zad_DeviousPlugVaginal") || HasKeyword($GLOBALS["target"], "zad_DeviousPlugAnal")) {
+        if (!HasKeyword($GLOBALS["target"], "zad_DeviousBelt")) {
+            RegisterAction("ExtCmdUnequipVibrator");
+        }
+    }
 }
 
 ?>

@@ -7,6 +7,8 @@ $GLOBALS["TTS_FALLBACK_FNCT"] = function($responseTextUnmooded, $mood, $response
         $GLOBALS["db"] = new Sql();
     require_once("config.php");
     require_once("util.php");
+    if ($GLOBALS["HERIKA_NAME"] == "Player")
+        return;
     $race = str_replace(" ", "", strtolower(GetActorValue($GLOBALS["speaker"], "Race")));
     $gender = strtolower(GetActorValue($GLOBALS["speaker"], "Gender"));
     $fallback = $GLOBALS["voicetype_fallbacks"][$gender.$race];
