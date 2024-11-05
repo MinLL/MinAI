@@ -28,6 +28,7 @@ int useSapienceOID
 int radiantDialogueFrequencyOID
 int radiantDialogueChanceOID
 int autoUpdateDiaryOID
+int updateNarratorDiaryOID
 int enableAISexOID
 int genderWeightCommentsOID
 int commentsRateOID
@@ -110,6 +111,9 @@ bool Property bulkEnabled = True Auto
 
 bool autoUpdateDiaryDefault = False
 bool Property autoUpdateDiary = False Auto
+
+bool updateNarratorDiaryDefault = False
+bool Property updateNarratorDiary = False Auto
 
 bool enableAISexDefault = true
 bool Property enableAISex = False Auto
@@ -200,6 +204,7 @@ Function RenderGeneralPage()
   SetCursorFillMode(TOP_TO_BOTTOM)		
   AddHeaderOption("LLM Settings")
   autoUpdateDiaryOID = AddToggleOption("Automatically Update Follower Diaries", autoUpdateDiary)
+  updateNarratorDiaryOID = AddToggleOption("Update Narrator Diary on Sleep", updateNarratorDiary)
   requestResponseCooldownOID = AddSliderOption("LLM Response Request Cooldown", requestResponseCooldown, "{1}")
   AddHeaderOption("Sapience Settings")
   useSapienceOID = AddToggleOption("Enable Sapience", minai_SapienceEnabled.GetValueInt() == 1)
@@ -448,6 +453,9 @@ Event OnOptionSelect(int oid)
   elseif oid == autoUpdateDiaryOID
     autoUpdateDiary = !autoUpdateDiary
     SetToggleOptionValue(oid, autoUpdateDiary)
+  elseif oid == updateNarratorDiaryOID
+    updateNarratorDiary = !updateNarratorDiary
+    SetToggleOptionValue(oid, updateNarratorDiary)
   elseif oid == enableAISexOID
     enableAISex = !enableAISex
     aiff.SetAISexEnabled(enableAISex)
@@ -531,6 +539,9 @@ Event OnOptionDefault(int oid)
   elseif oid == autoUpdateDiaryOID
     autoUpdateDiary = autoUpdateDiaryDefault
     SetToggleOptionValue(oid, autoUpdateDiary)
+  elseif oid == updateNarratorDiaryOID
+    updateNarratorDiary = updateNarratorDiaryDefault
+    SetToggleOptionValue(oid, updateNarratorDiary)
   elseif oid == enableAISexOID
     enableAISex = enableAISexDefault
     aiff.SetAISexEnabled(enableAISex)
@@ -620,6 +631,8 @@ Event OnOptionHighlight(int oid)
     SetInfoText("Enables or disables CBPC globally. Requires save/reload to take effect")
   elseif oid == autoUpdateDiaryOID
     SetInfoText("Automatically update the diary for all followers upon sleeping.")
+  elseif oid == updateNarratorDiaryOID
+    SetInfoText("Controls whether the narrator maintains a diary that is updated when sleeping.")
   elseif oid == enableAISexOID
     SetInfoText("Allow NPC's to decide to have sex with eachother.")
   elseif  oid == useSapienceOID
