@@ -5,7 +5,7 @@ This is caused by the LLM you are using. If you are using Llama 70b, be aware th
 
 
 ## What are your favorite models?
-My preferred setup is to use [Command R+ 08-2024](https://openrouter.ai/cohere/command-r-plus-08-2024) for sapient NPC's, and [Hermes 405b](https://openrouter.ai/nousresearch/hermes-3-llama-3.1-405b) for followers.
+At this time, I would consider [Grok 2 Beta](https://openrouter.ai/x-ai/grok-beta) to be the strongest model for both Sapience, and followers. It is both fast, uncensored, and intelligent (Though, isn't quite as smart as Command R+ at action usage).  My old setup was to use [Command R+](https://openrouter.ai/cohere/command-r-plus) for sapient NPC's, and [Hermes 405b](https://openrouter.ai/nousresearch/hermes-3-llama-3.1-405b) for followers.
 
 Command R+ is a pretty solid general purpose LLM that is reasonably intelligent with action usage, while being fast and responsive and uncensored.
 
