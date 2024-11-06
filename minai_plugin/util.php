@@ -30,15 +30,17 @@ Function BuildActorValueCache($name) {
     $name = strtolower($name);
     $GLOBALS[MINAI_ACTOR_VALUE_CACHE][$name] = [];
 
-    $idPrefix = $GLOBALS["db"]->escape("_minai_{$name}//");
-
+    $idPrefix = "_minai_{$name}//";
+    $origLength = strlen($idPrefix);
+    $idPrefix = $GLOBALS["db"]->escape($idPrefix);
     $query = "select * from conf_opts where LOWER(id) like LOWER('{$idPrefix}%')";
     $ret = $GLOBALS["db"]->fetchAll($query);
-
+    // error_log("Building cache for $name");
     foreach ($ret as $row) {
         //do this instead of split // because $name could have // in it
-        $key = substr(strtolower($row['id']), strlen($idPrefix));
+        $key = substr(strtolower($row['id']), $origLength);
         $value = $row['value'];
+        // error_log($name . ':: (' . $key . ') ' . $row['id'] . ' = ' . $row['value']);
         $GLOBALS[MINAI_ACTOR_VALUE_CACHE][$name][$key] = $value;
     }
 }
@@ -50,9 +52,7 @@ function CanVibrate($name) {
 // Return the specified actor value.
 // Caches the results of several queries that are repeatedly referenced.
 Function GetActorValue($name, $key, $preserveCase=false, $skipCache=false) {
-    $name = addslashes($name);
-    $key = addslashes($key);
-
+    // error_log("Looking up $name: $key");
     If (!$preserveCase && !$skipCache) {
         $name = strtolower($name);
         $key = strtolower($key);
@@ -60,7 +60,7 @@ Function GetActorValue($name, $key, $preserveCase=false, $skipCache=false) {
         If (!HasActorValueCache($name)) {
             BuildActorValueCache($name);
         }
-
+        // error_log("Checking cache: $name, $key");
         $ret = GetActorValueCache($name, $key);
         return $ret === null ? "" : strtolower($ret);
     }
@@ -81,8 +81,8 @@ Function GetActorValue($name, $key, $preserveCase=false, $skipCache=false) {
 }
 
 Function IsEnabled($name, $key) {
-  $name = strtolower($name);
-  return $GLOBALS["db"]->fetchAll("select 1 from conf_opts where LOWER(id)=LOWER('_minai_{$name}//{$key}') and LOWER(value)=LOWER('TRUE')");
+    $name = strtolower($GLOBALS["db"]->escape($name));
+    return $GLOBALS["db"]->fetchAll("select 1 from conf_opts where LOWER(id)=LOWER('_minai_{$name}//{$key}') and LOWER(value)=LOWER('TRUE')");
 }
 
 Function IsSexActive() {
@@ -181,8 +181,8 @@ Function IsFemale($name) {
 
 
 Function IsActionEnabled($actionName) {
-  $actionName = strtolower($actionName);
-  return $GLOBALS["db"]->fetchAll("select 1 from conf_opts where LOWER(id)=LOWER('_minai_ACTION//{$actionName}') and LOWER(value)=LOWER('TRUE')");
+    $actionName = strtolower($GLOBALS["db"]->escape($actionName));
+    return $GLOBALS["db"]->fetchAll("select 1 from conf_opts where LOWER(id)=LOWER('_minai_ACTION//{$actionName}') and LOWER(value)=LOWER('TRUE')");
 }
 
 
