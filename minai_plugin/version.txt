@@ -1,1 +1,1 @@
-beta40.1-release
+beta40.2-release
