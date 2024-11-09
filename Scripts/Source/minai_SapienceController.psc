@@ -156,11 +156,9 @@ Event OnUpdate()
   actor[] nearbyActors = FindActors()
   if (nearbyActors && nearbyActors.Length >= 2)
     if Utility.RandomFloat(0, 100) <= config.radiantDialogueChance    
+      ResetRechat()
       rechatActor1 = nearbyActors[0]
       rechatActor2 = nearbyActors[1]
-      lastRechatActor = None
-      bRechatActive = false
-      numRechatsSoFar = 0
       targetRechatCount = PO3_SKSEFunctions.GenerateRandomInt(config.minRadianceRechats, config.maxRadianceRechats)
       string actor1name = Main.GetActorName(nearbyActors[0])
       string actor2name = Main.GetActorName(nearbyActors[1])
@@ -198,6 +196,15 @@ Event OnUpdate()
   EndIf
 EndEvent
 
+Function ResetRechat()
+  lastRechatActor = None
+  bRechatActive = false
+  numRechatsSoFar = 0
+  targetRechatCount = 0
+  rechatActor1 = None
+  rechatActor2 = None
+EndFunction
+
 Function TriggerRechat(string actor1name, string actor2name)
   ; string payload = utility.GetCurrentRealTime() + "|" + utility.GetCurrentGameTime()  + "|" + playerRef.GetCurrentLocation() + "|" + speakerName + " has something to say"
   ; AIAgentFunctions.logMessageForActor("rechat", payload)
@@ -208,8 +215,13 @@ EndFunction
 
 Function CheckForRechat(string speakerName)
   Main.Debug("SAPIENCE: Starting to check for rechat")
+  if rechatActor1 == None || rechatActor2 == None
+    Main.Debug("SAPIENCE: Not rechatting, no actors set")
+    return
+  EndIf
   if numRechatsSoFar > targetRechatCount
     Main.Info("SAPIENCE: Rechat limit reached, stopping radiant dialogue")
+    ResetRechat()
     return
   EndIf
   string actor1name = Main.GetActorName(rechatActor1)

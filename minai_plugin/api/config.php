@@ -31,8 +31,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         "events_to_ignore" => $GLOBALS["events_to_ignore"],
         "use_defeat" => $GLOBALS["use_defeat"],
         "disable_worn_equipment" => $GLOBALS["disable_worn_equipment"],
-        "radiance_rechat_h" => $GLOBALS["radiance_rechat_h"],
-        "radiance_rechat_p" => $GLOBALS["radiance_rechat_p"],
         "xtts_server_override" => $GLOBALS["xtts_server_override"],
         "strip_emotes_from_output" => $GLOBALS["strip_emotes_from_output"],
         "realnames_support" => $GLOBALS["realnames_support"],
@@ -69,8 +67,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     $newConfig .= "\$GLOBALS['use_defeat'] = " . ($input['use_defeat'] ? 'true' : 'false') . ";\n";
     $newConfig .= "\$GLOBALS['disable_worn_equipment'] = " . ($input['disable_worn_equipment'] ? 'true' : 'false') . ";\n";
-    $newConfig .= "\$GLOBALS['radiance_rechat_h'] = " . intval($input['radiance_rechat_h']) . ";\n";
-    $newConfig .= "\$GLOBALS['radiance_rechat_p'] = " . intval($input['radiance_rechat_p']) . ";\n";
     $newConfig .= "\$GLOBALS['xtts_server_override'] = \"" . ($input['xtts_server_override']) . "\";\n";
     $newConfig .= "\$GLOBALS['strip_emotes_from_output'] = " . ($input['strip_emotes_from_output'] ? 'true' : 'false') . ";\n";
     $newConfig .= "\$GLOBALS['realnames_support'] = " . ($input['realnames_support'] ? 'true' : 'false') . ";\n";
