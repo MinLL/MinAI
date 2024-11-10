@@ -107,14 +107,16 @@ actor[] Function FindActors(bool returnAll = False, Actor exclude = None)
     i += 1
   EndWhile
 
+  if returnAll
+    return nearbyActors
+  EndIf
+  
   if main.PlayerInCombat
     ; Let the NPC decide to talk to the player if they're searching for / in combat
     Main.Debug("SAPIENCE: Combat is active, adding player to radiant target list")
     nearbyActors = PapyrusUtil.PushActor(nearbyActors, playerRef)
   EndIf
-  if returnAll
-    return nearbyActors
-  EndIf
+  
   if (nearbyActors.Length >= 2)
     ret = new actor[2]
     int actor1 = PO3_SKSEFunctions.GenerateRandomInt(0, nearbyActors.Length - 1)
@@ -208,8 +210,12 @@ EndFunction
 Function TriggerRechat(string actor1name, string actor2name)
   ; string payload = utility.GetCurrentRealTime() + "|" + utility.GetCurrentGameTime()  + "|" + playerRef.GetCurrentLocation() + "|" + speakerName + " has something to say"
   ; AIAgentFunctions.logMessageForActor("rechat", payload)
-  Main.Debug("SAPIENCE: Rechat triggered (" + actor2name + " => " + actor1name + "): " + numRechatsSoFar + "/" + targetRechatCount)
-  AIAgentFunctions.requestMessageForActor(actor2name + " responds to " + actor1name, "minai_force_rechat", actor2name)
+  if actor2name == Main.GetActorName(playerRef)
+    Main.Debug("SAPIENCE: Not rechatting with player")
+    return
+  EndIf
+  Main.Info("SAPIENCE: Rechat triggered (" + actor2name + " => " + actor1name + "): " + numRechatsSoFar + "/" + targetRechatCount)
+  AIAgentFunctions.requestMessageForActor(actor1name, "minai_force_rechat", actor2name)
   numRechatsSoFar += 1
 EndFunction
 

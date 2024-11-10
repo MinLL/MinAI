@@ -12,11 +12,21 @@ $enforceLength = "You MUST Respond with no more than two sentences.";
 $GLOBALS["PROMPTS"]["radiant"]= [
     "cue"=>[
         "write dialogue for {$GLOBALS["HERIKA_NAME"]}.{$GLOBALS["TEMPLATE_DIALOG"]}  "
-    ], 
+    ],
     "player_request"=>[    
         "The Narrator: {$GLOBALS["HERIKA_NAME"]} starts a dialogue with {$GLOBALS["target"]} about a random topic",
     ]
 ];
+
+$GLOBALS["PROMPTS"]["minai_force_rechat"]= [
+    "cue"=>[
+        "{$GLOBALS["HERIKA_NAME"]} responds to {$GLOBALS["target"]}.{$GLOBALS["TEMPLATE_DIALOG"]}  "
+    ],
+    "player_request"=>[    
+        "The Narrator: {$GLOBALS["HERIKA_NAME"]} responds to {$GLOBALS["target"]} about the ongoing conversation",
+    ]
+];
+
 $GLOBALS["PROMPTS"]["radiantsearchinghostile"]= [
     "cue"=>[
         "write dialogue for {$GLOBALS["HERIKA_NAME"]} who is responding in a hostile, and concerned manner.{$GLOBALS["TEMPLATE_DIALOG"]}  $enforceLength"

@@ -142,8 +142,8 @@ function ProcessIntegrations() {
             ]
         ];
     }
-    if (isset($GLOBALS["gameRequest"]) && in_array(strtolower($GLOBALS["gameRequest"][0]), ["radiant", "radiantsearchinghostile", "radiantsearchingfriend", "radiantcombathostile", "radiantcombatfriend"])) {
-        if (time() > GetLastInput() + $GLOBALS["input_delay_for_radiance"]) {
+    if (isset($GLOBALS["gameRequest"]) && in_array(strtolower($GLOBALS["gameRequest"][0]), ["radiant", "radiantsearchinghostile", "radiantsearchingfriend", "radiantcombathostile", "radiantcombatfriend", "minai_force_rechat"])) {
+        if (strtolower($GLOBALS["gameRequest"][0]) == "minai_force_rechat" || time() > GetLastInput() + $GLOBALS["input_delay_for_radiance"]) {
             // $GLOBALS["HERIKA_NAME"] is npc1
             $GLOBALS["HERIKA_TARGET"] = explode(":", $GLOBALS["gameRequest"][3])[3];
             if ($GLOBALS["HERIKA_TARGET"] == $GLOBALS["HERIKA_NAME"])
@@ -159,8 +159,8 @@ function ProcessIntegrations() {
             $MUST_DIE=true;
         }
     }
-    if (in_array($GLOBALS["gameRequest"][0],["inputtext","inputtext_s","ginputtext","ginputtext_s","rechat","bored", "radiant"])) {
-        if (!in_array($GLOBALS["gameRequest"][0], ["radiant", "rechat"]))
+    if (in_array($GLOBALS["gameRequest"][0],["inputtext","inputtext_s","ginputtext","ginputtext_s","rechat","bored", "radiant", "minai_force_rechat"])) {
+        if (!in_array($GLOBALS["gameRequest"][0], ["radiant", "rechat", "minai_force_rechat"]))
             ClearRadiantActors();
         error_log("minai: Setting lastInput time.");
         $db = $GLOBALS['db'];
