@@ -56,13 +56,8 @@ Function SetNarratorProfile() {
     }
 }
 
-if (IsNewRadiantConversation()) {
-    error_log("minai: Initial radiant conversation, overriding rechat parameters");
-    $GLOBALS["db"]->delete("conf_opts", "id='_minai_RADIANT//initial'");
-    SetRadiance(99999, 0); // Always rechat at least once
-}
-elseif (IsRadiant()) {
-    SetRadiance($GLOBALS["radiance_rechat_h"], $GLOBALS["radiance_rechat_p"]);
+if (IsRadiant()) {
+    SetRadiance(0, 0); // Disable rechat during radiant conversations, as this is handled by MinAI's controller in-game
 }
 
 SetNarratorProfile();

@@ -318,20 +318,6 @@
                 <input type="checkbox" id="use-defeat">
             </div>
 
-	    <!-- radiance_rechat_h -->
-            <div class="option-group slider">
-                <label class="option-label" for="radiance-rechat-h">Radiance Rechat H</label>
-                <p>Overrides for rechat settings during radiant dialogue.</p>
-                <input type="range" id="radiance-rechat-h" min="0" max="20" value="3">
-            </div>
-
-            <!-- radiance_rechat_p -->
-            <div class="option-group slider">
-                <label class="option-label" for="radiance-rechat-p">Radiance Rechat P</label>
-                <p>Controls how frequently rechat should happen during radiant dialogue.</p>
-                <input type="range" id="radiance-rechat-p" min="0" max="50" value="20">
-            </div>
-
             <!-- input_delay_for_radiance -->
             <div class="option-group slider">
                 <label class="option-label" for="input-delay">Input Delay for Radiance (Seconds)</label>
@@ -383,8 +369,6 @@
                 populateDynamicList('commands-to-purge-container', configData.commands_to_purge);
                 populateDynamicList('events-to-ignore-container', configData.events_to_ignore);
                 document.getElementById('disable-worn-equipment').checked = configData.disable_worn_equipment;
-                document.getElementById('radiance-rechat-h').value = configData.radiance_rechat_h;
-                document.getElementById('radiance-rechat-p').value = configData.radiance_rechat_p;
                 document.getElementById('xtts-server-override').value = configData.xtts_server_override;
                 document.getElementById('input-delay').value = configData.input_delay_for_radiance;
 		document.getElementById('strip-emotes').checked = configData.strip_emotes_from_output;
@@ -415,8 +399,6 @@
                 commands_to_purge: getDynamicList('commands-to-purge-container'),
                 events_to_ignore: getDynamicList('events-to-ignore-container'),
                 disable_worn_equipment: document.getElementById('disable-worn-equipment').checked,
-                radiance_rechat_h: document.getElementById('radiance-rechat-h').value,
-                radiance_rechat_p: document.getElementById('radiance-rechat-p').value,
                 xtts_server_override: document.getElementById('xtts-server-override').value,
                 strip_emotes_from_output: document.getElementById('strip-emotes').checked,
 		use_defeat: document.getElementById('use-defeat').checked,

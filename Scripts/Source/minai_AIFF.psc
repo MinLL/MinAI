@@ -45,20 +45,6 @@ Function InitFollow()
   bHasFollowPlayer = True
 EndFunction
 
-Function CleanupFollow()
-  If !bHasFollowPlayer
-    Main.Debug("[FollowTarget] CleanupFollow follow not enable")
-    Return
-  EndIf
-
-  actor[] actors = GetNearbyAI()
-  int i = 0
-  while i < actors.Length
-    EndFollowTarget(actors[i], true)
-    i += 1
-  EndWhile
-EndFunction
-
 Function Maintenance(minai_MainQuestController _main)
   if (main.GetVersion() != main.CurrentVersion)
     Main.Info("AIFF - Maintenance: Version update detected. Resetting action registry.")
@@ -124,7 +110,21 @@ Function Maintenance(minai_MainQuestController _main)
   ; StoreContext("minai", "testKey", "This is dynamically persisted context!", 1200)
 
   InitFollow()
-  CleanupFollow()
+  CleanupStates()
+EndFunction
+
+Function CleanupStates()
+  actor[] actors = GetNearbyAI()
+  int i = 0
+  while i < actors.Length
+    actor akTarget = actors[i]
+    SetActorVariable(akTarget, "inCombat", akTarget.GetCombatState() > 0)
+    SetActorVariable(akTarget, "hostileToPlayer", akTarget.IsHostileToActor(player))
+    SetActorVariable(akTarget, "isBleedingOut", akTarget.isBleedingOut())
+    SetActorVariable(akTarget, "scene", akTarget.GetCurrentScene())
+    EndFollowTarget(actors[i], true)
+    i += 1
+  EndWhile
 EndFunction
 
 Function StartFollowTarget(actor akNpc, actor akTarget)
@@ -195,7 +195,7 @@ Function CheckIfActorShouldStillFollow(actor akNpc)
     EndFollowTarget(akNpc)  
   ElseIf (followers.IsFollower(akNpc))
     Main.Debug("[FollowTarget] Is a follower now, clean up follow")
-    EndFollowTarget(akNpc)
+    EndFollowTarget(akNpc, true)
   EndIf
 EndFunction
 

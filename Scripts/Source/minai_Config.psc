@@ -28,6 +28,7 @@ int useSapienceOID
 int radiantDialogueFrequencyOID
 int radiantDialogueChanceOID
 int autoUpdateDiaryOID
+int updateNarratorDiaryOID
 int enableAISexOID
 int genderWeightCommentsOID
 int commentsRateOID
@@ -35,6 +36,8 @@ int forceOrgasmCommentOID
 int forcePostSceneCommentOID
 int prioritizePlayerThreadOID
 int enableAmbientCommentsOID
+int minRadianceRechatsOID
+int maxRadianceRechatsOID
 
 int aOIDMap ; Jmap for storing action oid's
 int aCategoryMap ; Jmap for storing action categories
@@ -46,8 +49,6 @@ int actionMaxIntervalOID
 int actionDecayWindowOID
 
 int testActionsOID
-
-
 
 ; Legacy globals
 GlobalVariable useCBPC
@@ -111,6 +112,9 @@ bool Property bulkEnabled = True Auto
 bool autoUpdateDiaryDefault = False
 bool Property autoUpdateDiary = False Auto
 
+bool updateNarratorDiaryDefault = False
+bool Property updateNarratorDiary = False Auto
+
 bool enableAISexDefault = true
 bool Property enableAISex = False Auto
 
@@ -132,7 +136,12 @@ bool Property prioritizePlayerThread = true Auto
 bool enableAmbientCommentsDefault = true
 bool Property enableAmbientComments = true Auto
 
-  
+int minRadianceRechatsDefault = 3
+int Property minRadianceRechats = 3 Auto
+
+int maxRadianceRechatsDefault = 5
+int Property maxRadianceRechats = 5 Auto
+
 Event OnConfigInit()
   main.Info("Building mcm menu.")
   InitializeMCM()
@@ -200,11 +209,14 @@ Function RenderGeneralPage()
   SetCursorFillMode(TOP_TO_BOTTOM)		
   AddHeaderOption("LLM Settings")
   autoUpdateDiaryOID = AddToggleOption("Automatically Update Follower Diaries", autoUpdateDiary)
+  updateNarratorDiaryOID = AddToggleOption("Update Narrator Diary on Sleep", updateNarratorDiary)
   requestResponseCooldownOID = AddSliderOption("LLM Response Request Cooldown", requestResponseCooldown, "{1}")
   AddHeaderOption("Sapience Settings")
   useSapienceOID = AddToggleOption("Enable Sapience", minai_SapienceEnabled.GetValueInt() == 1)
   radiantDialogueFrequencyOID = AddSliderOption("Radiant Dialogue (NPC -> NPC) Frequency", radiantDialogueFrequency, "{1}")
   radiantDialogueChanceOID = AddSliderOption("Radiant Dialogue (NPC -> NPC) Chance", radiantDialogueChance, "{1}")
+  minRadianceRechatsOID = AddSliderOption("Minimum Radiance Rechats", minRadianceRechats, "{0}")
+  maxRadianceRechatsOID = AddSliderOption("Maximum Radiance Rechats", maxRadianceRechats, "{0}")
   SetCursorPosition(1) ; Move cursor to top right position
   disableAIAnimationsOID = AddToggleOption("Disable AI-FF Animations", disableAIAnimations)
   AddHeaderOption("Debug")
@@ -448,6 +460,9 @@ Event OnOptionSelect(int oid)
   elseif oid == autoUpdateDiaryOID
     autoUpdateDiary = !autoUpdateDiary
     SetToggleOptionValue(oid, autoUpdateDiary)
+  elseif oid == updateNarratorDiaryOID
+    updateNarratorDiary = !updateNarratorDiary
+    SetToggleOptionValue(oid, updateNarratorDiary)
   elseif oid == enableAISexOID
     enableAISex = !enableAISex
     aiff.SetAISexEnabled(enableAISex)
@@ -531,6 +546,9 @@ Event OnOptionDefault(int oid)
   elseif oid == autoUpdateDiaryOID
     autoUpdateDiary = autoUpdateDiaryDefault
     SetToggleOptionValue(oid, autoUpdateDiary)
+  elseif oid == updateNarratorDiaryOID
+    updateNarratorDiary = updateNarratorDiaryDefault
+    SetToggleOptionValue(oid, updateNarratorDiary)
   elseif oid == enableAISexOID
     enableAISex = enableAISexDefault
     aiff.SetAISexEnabled(enableAISex)
@@ -577,6 +595,12 @@ Event OnOptionDefault(int oid)
   elseif oid ==  arousalForSexOID
     arousalForSex = arousalForSexDefault
     SetSliderOptionValue(arousalForSexOID, arousalForSexDefault, "{0}")
+  elseif oid ==  minRadianceRechatsOID
+    minRadianceRechats = minRadianceRechatsDefault
+    SetSliderOptionValue(minRadianceRechatsOID, minRadianceRechatsDefault, "{0}")
+  elseif oid ==  maxRadianceRechatsOID
+    maxRadianceRechats = maxRadianceRechatsDefault
+    SetSliderOptionValue(maxRadianceRechatsOID, maxRadianceRechatsDefault, "{0}")
   elseif oid ==  arousalForHarassOID
     arousalForHarass = arousalForHarassDefault
     SetSliderOptionValue(arousalForHarassOID, arousalForHarassDefault, "{0}")
@@ -620,6 +644,8 @@ Event OnOptionHighlight(int oid)
     SetInfoText("Enables or disables CBPC globally. Requires save/reload to take effect")
   elseif oid == autoUpdateDiaryOID
     SetInfoText("Automatically update the diary for all followers upon sleeping.")
+  elseif oid == updateNarratorDiaryOID
+    SetInfoText("Controls whether the narrator maintains a diary that is updated when sleeping.")
   elseif oid == enableAISexOID
     SetInfoText("Allow NPC's to decide to have sex with eachother.")
   elseif  oid == useSapienceOID
@@ -650,6 +676,10 @@ Event OnOptionHighlight(int oid)
     SetInfoText("The minimum time in seconds inbetween requests for the LLM to react to an in-game event")
   elseif oid == arousalForSexOID
     SetInfoText("Minimum Arousal level required for the Sex related actions to be exposed to the LLM")
+  elseif oid == minRadianceRechatsOID
+    SetInfoText("Minimum number of times a radiant dialogue can be rechatted")
+  elseif oid == maxRadianceRechatsOID
+    SetInfoText("Maximum number of times a radiant dialogue can be rechatted")
   elseif oid == arousalForHarassOID
     SetInfoText("Minimum Arousal level required for actions like spanking, groping, kissing to be exposed to the LLM")
   elseif oid == confirmSexOID
@@ -741,6 +771,16 @@ Event OnOptionSliderOpen(int oid)
     SetSliderDialogDefaultValue(arousalForSexDefault)
     SetSliderDialogRange(0, 100)
     SetSliderDialogInterval(1.0)
+  elseif oid == minRadianceRechatsOID
+    SetSliderDialogStartValue(minRadianceRechats)
+    SetSliderDialogDefaultValue(minRadianceRechatsDefault)
+    SetSliderDialogRange(0, 30)
+    SetSliderDialogInterval(1.0)
+  elseif oid == maxRadianceRechatsOID
+    SetSliderDialogStartValue(maxRadianceRechats)
+    SetSliderDialogDefaultValue(maxRadianceRechatsDefault)
+    SetSliderDialogRange(0, 30)
+    SetSliderDialogInterval(1.0)
   elseif oid == arousalForHarassOID
     SetSliderDialogStartValue(arousalForHarass)
     SetSliderDialogDefaultValue(arousalForHarassDefault)
@@ -824,6 +864,12 @@ Event OnOptionSliderAccept(int oid, float value)
     arousalForSex = value
     SetSliderOptionValue(oid, value, "{0}")
     StoreConfig("arousalForSex", arousalForSex)
+  elseif oid == minRadianceRechatsOID
+    minRadianceRechats = value as Int
+    SetSliderOptionValue(oid, value, "{0}")
+  elseif oid == maxRadianceRechatsOID
+    maxRadianceRechats = value as Int
+    SetSliderOptionValue(oid, value, "{0}")
   elseif oid == arousalForHarassOID
     arousalForHarass = value
     SetSliderOptionValue(oid, value, "{0}")
@@ -850,3 +896,4 @@ Event OnOptionSliderAccept(int oid, float value)
     SetSliderOptionValue(oid, value, "{0}")
   EndIf
 EndEvent
+

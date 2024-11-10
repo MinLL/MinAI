@@ -71,9 +71,9 @@ This mod enables a number of optional [nsfw](https://github.com/MinLL/MinAI/blob
 ## Installation Steps (AI Follower Framework)
 * Download and install this mod through your mod organizer of choice.
 * Copy the minai_plugin folder to your Herika Server plugins directory (this is in your wsl VM, under This PC in File Explorer). You can easily access this folder by running the "tools/AI-FF Plugins Folder" file in your DwemerAI4Skyrim3 directory.
+* After installing the plugin, run the AIFF Server Update file that came with DwemerDistro.
 * In the web UI for AIFF, validate that the plugin has loaded by clicking "Plugins" on the top right.
-* (Optional) In the Herika Server (wsl) Plugins Folder - minai_plugin/config.php, enable or disable "force_voice_type" for Mantella XTTS compatibility.
-* (Optional) Configure any other options in minai_plugin/config.php to your liking.
+* Navigate to the configuration page for MinAI (From the plugins page), and configure the mod to your liking.
 
 ## Installation Steps (MANTELLA)
 * Download and install this mod's archive through your mod organizer of choice.

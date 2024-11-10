@@ -85,12 +85,20 @@ EndFunction
 Function UpdateFollowerDiaries()
   Main.Info("Updating all follower diaries")
   int i = 0
+  bool didNarrator = false
   while i < nff.mcmScript.activeNames.Length
     string targetName = nff.mcmScript.activeNames[i]
+    if targetName == "The Narrator"
+      didNarrator = true
+    EndIf
     Main.Debug("Updating diary for " + targetName)
     aiff.UpdateDiary(targetName)
     i += 1
   EndWhile
+  if !didNarrator && config.UpdateNarratorDiary
+    Main.Debug("Updating diary for The Narrator")
+    aiff.UpdateDiary("The Narrator")
+  EndIf
 EndFunction
 
 

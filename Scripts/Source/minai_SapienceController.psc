@@ -11,7 +11,13 @@ actor playerRef
 bool bHasAIFF
 GlobalVariable minai_SapienceEnabled
 
-  
+Actor rechatActor1
+Actor rechatActor2
+bool bRechatActive
+Actor lastRechatActor
+int numRechatsSoFar
+int targetRechatCount
+
 function Maintenance(minai_MainQuestController _main)
   playerRef = Game.GetPlayer()
   main = _main
@@ -67,8 +73,24 @@ string Function GetFactionsForActor(actor akTarget)
   return "";
 EndFunction
 
+actor[] Function FindActorsForRechat(actor lastSpeaker)
+  actor[] validActors = FindActors(returnAll=true, exclude=lastSpeaker)
+  return validActors ; LoS checks are not working consistently, so we're not using them for now
+  ; Only return actors that have line of sight  to the speaker
+  actor[] ret
+  int i = 0
+  while i < validActors.Length
+    if validActors[i].HasLOS(lastSpeaker) || lastSpeaker.HasLOS(validActors[i])
+      Main.Debug("SAPIENCE: Found eligible actor for rechat: " + Main.GetActorName(validActors[i]))
+      ret = PapyrusUtil.PushActor(ret, validActors[i])
+    EndIf
+    i += 1
+  EndWhile
+  Main.Debug("SAPIENCE: Found " + ret.Length + " eligible actors for rechat (of " + validActors.Length + " nearby actors)")
+  return ret
+EndFunction 
 
-actor[] Function FindActors()
+actor[] Function FindActors(bool returnAll = False, Actor exclude = None)
   actor[] allNearbyActors = AIAgentFunctions.findAllNearbyAgents()
   actor[] nearbyActors
   actor[] ret
@@ -78,13 +100,17 @@ actor[] Function FindActors()
     if  allNearbyActors[i].IsInDialogueWithPlayer() ; Player is in dialogue with at least one nearby actor. Don't start radiance.
       return ret
     EndIf
-    if Sex.CanAnimate(allNearbyActors[i]) && !allNearbyActors[i].GetCurrentScene() && Main.GetActorName(allNearbyActors[i]) != "The Narrator"
+    if Sex.CanAnimate(allNearbyActors[i]) && !allNearbyActors[i].GetCurrentScene() && Main.GetActorName(allNearbyActors[i]) != "The Narrator" && allNearbyActors[i] != exclude
       Main.Debug("SAPIENCE: Found nearby actor for dialogue: " + Main.GetActorName(allNearbyActors[i]))
       nearbyActors = PapyrusUtil.PushActor(nearbyActors,allNearbyActors[i])
     EndIf
     i += 1
   EndWhile
 
+  if returnAll
+    return nearbyActors
+  EndIf
+  
   if main.PlayerInCombat
     ; Let the NPC decide to talk to the player if they're searching for / in combat
     Main.Debug("SAPIENCE: Combat is active, adding player to radiant target list")
@@ -132,24 +158,33 @@ Event OnUpdate()
   actor[] nearbyActors = FindActors()
   if (nearbyActors && nearbyActors.Length >= 2)
     if Utility.RandomFloat(0, 100) <= config.radiantDialogueChance    
+      ResetRechat()
+      rechatActor1 = nearbyActors[0]
+      rechatActor2 = nearbyActors[1]
+      targetRechatCount = PO3_SKSEFunctions.GenerateRandomInt(config.minRadianceRechats, config.maxRadianceRechats)
       string actor1name = Main.GetActorName(nearbyActors[0])
       string actor2name = Main.GetActorName(nearbyActors[1])
       bool actorsAreFighting = IsFighting(nearbyActors[0], nearbyActors[1])
       if IsSearching(nearbyActors[0], nearbyActors[1]) && !actorsAreFighting
         Main.Info("SAPIENCE: Triggering Search Dialogue ( " + actor1name + " => " + actor2name + ")")
         AIAgentFunctions.requestMessageForActor(actor2name, "radiantsearchingfriend", actor1name)
+        TriggerRechat(actor1name, actor2name)
       elseif IsSearching(nearbyActors[0], nearbyActors[1]) && actorsAreFighting
         Main.Info("SAPIENCE: Triggering Search Dialogue ( " + actor1name + " => " + actor2name + ")")
         AIAgentFunctions.requestMessageForActor(actor2name, "radiantsearchinghostile", actor1name)
+        TriggerRechat(actor1name, actor2name)
       elseIf IsInCombat(nearbyActors[0], nearbyActors[1]) && !actorsAreFighting
         Main.Info("SAPIENCE: Triggering Combat Dialogue ( " + actor1name + " => " + actor2name + ")")
         AIAgentFunctions.requestMessageForActor(actor2name, "radiantcombatfriend", actor1name)
+        TriggerRechat(actor1name, actor2name)
       elseIf IsInCombat(nearbyActors[0], nearbyActors[1]) && actorsAreFighting
         Main.Info("SAPIENCE: Triggering Combat Dialogue ( " + actor1name + " => " + actor2name + ")")
         AIAgentFunctions.requestMessageForActor(actor2name, "radiantcombathostile", actor1name)
+        TriggerRechat(actor1name, actor2name)
       else
         Main.Info("SAPIENCE: Triggering Radiant Dialogue ( " + actor1name + " => " + actor2name + ")")
         AIAgentFunctions.requestMessageForActor(actor2name, "radiant", actor1name)
+        TriggerRechat(actor1name, actor2name)
       EndIf
       ; Set a longer delay after triggering a rechat to avoid overwhelming AIFF if the player has the cooldown set too low.
       ; This will be overridden by OnTextReceived with the proper cooldown after the LLM responds.
@@ -163,9 +198,62 @@ Event OnUpdate()
   EndIf
 EndEvent
 
+Function ResetRechat()
+  lastRechatActor = None
+  bRechatActive = false
+  numRechatsSoFar = 0
+  targetRechatCount = 0
+  rechatActor1 = None
+  rechatActor2 = None
+EndFunction
+
+Function TriggerRechat(string actor1name, string actor2name)
+  ; string payload = utility.GetCurrentRealTime() + "|" + utility.GetCurrentGameTime()  + "|" + playerRef.GetCurrentLocation() + "|" + speakerName + " has something to say"
+  ; AIAgentFunctions.logMessageForActor("rechat", payload)
+  if actor2name == Main.GetActorName(playerRef)
+    Main.Debug("SAPIENCE: Not rechatting with player")
+    return
+  EndIf
+  Main.Info("SAPIENCE: Rechat triggered (" + actor2name + " => " + actor1name + "): " + numRechatsSoFar + "/" + targetRechatCount)
+  AIAgentFunctions.requestMessageForActor(actor1name, "minai_force_rechat", actor2name)
+  numRechatsSoFar += 1
+EndFunction
+
+Function CheckForRechat(string speakerName)
+  Main.Debug("SAPIENCE: Starting to check for rechat")
+  if rechatActor1 == None || rechatActor2 == None
+    Main.Debug("SAPIENCE: Not rechatting, no actors set")
+    return
+  EndIf
+  if numRechatsSoFar > targetRechatCount
+    Main.Info("SAPIENCE: Rechat limit reached, stopping radiant dialogue")
+    ResetRechat()
+    return
+  EndIf
+  string actor1name = Main.GetActorName(rechatActor1)
+  string actor2name = Main.GetActorName(rechatActor2)
+  ; Don't rechat until after actor2 has responded
+  if speakerName == actor2name
+    bRechatActive = true
+  EndIf
+  Actor speaker = AIAgentFunctions.GetAgentByName(speakerName)
+  Main.Debug("SAPIENCE: Checking for rechat (" + speakerName + ", " + actor1name + ", " + actor2name + ", bRechatActive: " + bRechatActive + ")")
+  if speaker && speaker != lastRechatActor && bRechatActive
+    Actor[] eligibleActors = FindActorsForRechat(speaker)
+    if (eligibleActors && eligibleActors.Length >= 1)
+      Actor newSpeaker = eligibleActors[PO3_SKSEFunctions.GenerateRandomInt(0, eligibleActors.Length - 1)]
+      TriggerRechat(speakerName, main.GetActorName(newSpeaker))
+    else
+      Main.Debug("SAPIENCE: Not enough eligible actors for rechat")
+    EndIf
+    lastRechatActor = speaker
+  EndIf
+EndFunction
+
 Event OnTextReceived(String speakerName, String sayLine)
   if minai_SapienceEnabled.GetValueInt() == 1
-    Main.Debug("SAPIENCE: Received LLM response, Resetting radiant dialogue cooldown")
+    Main.Debug("SAPIENCE: Received LLM response, Resetting radiant dialogue cooldown.")
+    CheckForRechat(speakerName)
     StartNextUpdate()
   EndIf
 EndEvent
