@@ -3,6 +3,7 @@ Scriptname minai_AmbientSexTalk extends Quest
 minai_Config config
 minai_Sex sex
 minai_MainQuestController main
+minai_Util MinaiUtil
 
 SexLabFramework slf = None
 ; store registered threads by ostim/sexlab framework:  {ostim: [0,1,2,3], sexlab: [0,1,2,3]}
@@ -13,6 +14,7 @@ function Maintenance(minai_Sex _sex, SexLabFramework _slf)
     config = Game.GetFormFromFile(0x0912, "MinAI.esp") as minai_Config
     sex = _sex
     main = (_sex as Quest) as minai_MainQuestController
+    MinaiUtil = (_sex as Quest) as minai_Util
     slf = _slf
     jThreadsByFrameworkMap = JValue.releaseAndRetain(jThreadsByFrameworkMap, JMap.object())
 endfunction
@@ -85,7 +87,7 @@ Event OnUpdate()
             actors = slf.GetController(ThreadID).Positions
         endif
         
-        actor actorToSpeak = sex.getRandomActor(actors)
+        actor actorToSpeak = MinaiUtil.getRandomActor(actors)
         Main.Info("Request ambient sextalk for: "+actorToSpeak.GetDisplayName())
         sex.sexTalkAmbient(actorToSpeak, playerThread != -1, framework)
         

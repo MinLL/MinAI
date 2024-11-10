@@ -20,6 +20,7 @@ minai_Followers followers
 minai_CombatManager combat
 minai_SapienceController sapience
 minai_Reputation reputation  
+minai_Util MinaiUtil  
 
 bool bHasMantella = False;
 bool bHasAIFF = False;
@@ -71,6 +72,7 @@ Function Maintenance()
   combat = (Self as Quest) as minai_CombatManager
   sapience = Game.GetFormFromFile(0x091D, "MinAI.esp") as minai_SapienceController
   reputation = (Self as Quest) as minai_Reputation
+  MinaiUtil = (Self as Quest) as minai_Util
   if (!followers)
     Fatal("Could not load followers script - Mismatched script and esp versions")
   EndIf
@@ -183,13 +185,9 @@ EndFunction
 
 
 
-
+; deprecated - use global function from minai_Util
 string Function GetActorName(actor akActor)
-  if akActor == playerRef
-    return akActor.GetActorBase().GetName()
-  else
-    return akActor.GetDisplayName()
-  EndIf
+  return MinaiUtil.GetActorName(akActor)
 EndFunction
 
 
@@ -210,48 +208,39 @@ int function CountMatch(string sayLine, string lineToMatch)
   return count
 EndFunction
 
+; deprecated use from minai_Util
 Function Log(String str, string lvl)
-  Debug.Trace("[minai (" + lvl + ")]: " + str)
-  ; MiscUtil.PrintConsole("[minai (" + lvl + ")]: " + str)
+  MinaiUtil.Log(str, lvl)
 EndFunction
 
+; deprecated use from minai_Util
 Function Fatal(String str)
-  ; Always log fatals
-  Log(str, "FATAL")
-  Debug.MessageBox(str)
+  MinaiUtil.Fatal(str)
 EndFunction
 
-
+; deprecated use from minai_Util
 Function Error(String str)
-  if logLevel.GetValueInt() >= 1
-    Log(str, "ERROR")
-  EndIf
+  MinaiUtil.Error(str)
 EndFunction
 
-
+; deprecated use from minai_Util
 Function Warn(String str)
-  if logLevel.GetValueInt() >= 2
-    Log(str, "WARN")
-  EndIf
+  MinaiUtil.Warn(str)
 EndFunction
 
-
+; deprecated use from minai_Util
 Function Info(String str)
-  if logLevel.GetValueInt() >= 3
-    Log(str, "INFO")
-  EndIf
+  MinaiUtil.Info(str)
 EndFunction
 
+; deprecated use from minai_Util
 Function Debug(String str)
-  if LogLevel.GetValueInt() >= 4
-    Log(str, "DEBUG")
-  EndIf
+  MinaiUtil.Debug(str)
 EndFunction
 
+; deprecated use from minai_Util
 Function DebugVerbose(String str)
-  if LogLevel.GetValueInt() >= 5
-    Log(str, "VERBOSE")
-  EndIf
+  MinaiUtil.DebugVerbose(str)
 EndFunction
 
 
