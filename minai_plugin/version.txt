@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-beta40.2-release
-=======
-beta40-dev
->>>>>>> main
+beta40.3-release
