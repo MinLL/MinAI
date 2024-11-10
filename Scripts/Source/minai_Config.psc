@@ -38,6 +38,7 @@ int prioritizePlayerThreadOID
 int enableAmbientCommentsOID
 int minRadianceRechatsOID
 int maxRadianceRechatsOID
+int maxThreadsOID
 
 int aOIDMap ; Jmap for storing action oid's
 int aCategoryMap ; Jmap for storing action categories
@@ -142,6 +143,10 @@ int Property minRadianceRechats = 3 Auto
 int maxRadianceRechatsDefault = 5
 int Property maxRadianceRechats = 5 Auto
 
+float maxThreadsDefault = 5.0
+float Property maxThreads = 5.0 Auto
+
+  
 Event OnConfigInit()
   main.Info("Building mcm menu.")
   InitializeMCM()
@@ -255,6 +260,7 @@ Function RenderSexPage()
   forceOrgasmCommentOID = AddToggleOption("Force orgasm comment", forceOrgasmComment)
   forcePostSceneCommentOID = AddToggleOption("Force post scene comment", forcePostSceneComment)
   enableAmbientCommentsOID = AddToggleOption("Enable ambient comments between events", enableAmbientComments)
+  maxThreadsOID = AddSliderOption("Max threads", maxThreads)
 EndFunction
 
 
@@ -634,6 +640,9 @@ Event OnOptionDefault(int oid)
   elseif oid == enableAmbientCommentsOID
     enableAmbientComments = enableAmbientCommentsDefault
     SetToggleOptionValue(oid, enableAmbientCommentsDefault)
+  elseif oid == maxThreadsOID
+    maxThreads = maxThreadsDefault
+    SetSliderOptionValue(oid, maxThreadsDefault, "{0}")
   EndIf
 EndEvent
 
@@ -710,6 +719,8 @@ Event OnOptionHighlight(int oid)
     SetInfoText("For debugging purposes. Send test mod events to the backend")
   elseif oid == enableAmbientCommentsOID
     SetInfoText("Enable ambient comments between events. Follows comments during sex scene cooldown. Polling mechanism checking each time if there is no cooldown on comments and fires ambient talking.")
+  elseif oid == maxThreadsOID
+    SetInfoText("Maximum concurrent threads for adult frameworks. Ostim usually crashes at 6+, try yourself and set to the number you game can handle.")
   EndIf
   int i = 0
   string[] actions = JMap.allKeysPArray(aiff.actionRegistry)
@@ -828,6 +839,11 @@ Event OnOptionSliderOpen(int oid)
     SetSliderDialogDefaultValue(defaultValue)
     SetSliderDialogRange(0, 1200)
     SetSliderDialogInterval(5)
+  elseif oid == maxThreadsOID
+    SetSliderDialogStartValue(maxThreads)
+    SetSliderDialogDefaultValue(maxThreadsDefault)
+    SetSliderDialogRange(0, 20)
+    SetSliderDialogInterval(1.0)
   EndIf
 EndEvent
 
@@ -894,6 +910,10 @@ Event OnOptionSliderAccept(int oid, float value)
   elseif oid == actionDecayWindowOID
     SetActionDecayWindow(currentAction, value)
     SetSliderOptionValue(oid, value, "{0}")
+  elseif oid == maxThreadsOID
+    maxThreads = value
+    SetSliderOptionValue(oid, value, "{0}")
+    StoreConfig("maxThreads", commentsRate)
   EndIf
 EndEvent
 
