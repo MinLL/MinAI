@@ -35,6 +35,8 @@ GlobalVariable dwp_global_minai
 Spell dwp_eldwhoresp
 Spell dwp_eldwhoresp_neq  
 actor playerRef
+Perk dwp_eldritchwaifueffect_soldsoul
+Perk dwp_eldritchwaifueffect_soldsoul_belted
 
 function Maintenance(minai_MainQuestController _main)
   Main.Info("Initializing Devious Module")
@@ -125,6 +127,8 @@ function Maintenance(minai_MainQuestController _main)
     dwp_watched = Game.GetFormFromFile(0x0AB148, "DeviouslyAccessible.esp") as MagicEffect
     dwp_eldwhoresp = Game.GetFormFromFile(0x16D457, "DeviouslyAccessible.esp") as Spell
     dwp_eldwhoresp_neq  = Game.GetFormFromFile(0x16D45E, "DeviouslyAccessible.esp") as Spell
+    dwp_eldritchwaifueffect_soldsoul = Game.GetFormFromFile(0x19AED2, "DeviouslyAccessible.esp") as Perk
+    dwp_eldritchwaifueffect_soldsoul_belted = Game.GetFormFromFile(0x1BE7BE, "DeviouslyAccessible.esp") as Perk
     if (!eyefucktrack || !eyepenalty || !eyereward || !eyescore || !dwp_watched)
       Main.Error("Could not find DeviouslyAccessible globals")
       Debug.Notification("Incompatible version of DeviouslyAccessible. AI Integrations Disabled.")
@@ -872,7 +876,9 @@ Function SetContext(actor akTarget)
     aiff.SetActorVariable(playerRef, "deviouslyAccessibleBeingWatched", playerRef.HasMagicEffect(dwp_watched))
     aiff.SetActorVariable(playerRef, "deviouslyAccessibleGlobal", dwp_global_minai.GetValueInt())
     aiff.SetActorVariable(playerRef, "dwp_eldwhoresp", PlayerRef.HasSpell(dwp_eldwhoresp))
-    aiff.SetActorVariable(playerRef, "dwp_eldwhoresp_neq", PlayerRef.HasSpell(dwp_eldwhoresp_neq))        
+    aiff.SetActorVariable(playerRef, "dwp_eldwhoresp_neq", PlayerRef.HasSpell(dwp_eldwhoresp_neq))
+    aiff.SetActorVariable(playerRef, "dwp_eldritchwaifueffect_soldsoul", PlayerRef.HasPerk(dwp_eldritchwaifueffect_soldsoul))
+    aiff.SetActorVariable(playerRef, "dwp_eldritchwaifueffect_soldsoul_belted", PlayerRef.HasPerk(dwp_eldritchwaifueffect_soldsoul_belted))
   EndIf
 EndFunction
 
