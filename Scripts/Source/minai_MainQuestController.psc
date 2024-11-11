@@ -34,7 +34,7 @@ Event OnInit()
 EndEvent
 
 Int Function GetVersion()
-  return 40
+  return 41
 EndFunction
 
 Function Maintenance()
