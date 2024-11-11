@@ -76,6 +76,15 @@ $GLOBALS["PROMPTS"]["minai_combatendvictory"]= [
     "extra"=>["force_tokens_max"=>"50","dontuse"=>(time()%10!=0)]   //10% chance
 ];
 
+$GLOBALS["PROMPTS"]["minai_bleedoutself"]= [
+    "cue"=>[
+        "{$GLOBALS["HERIKA_NAME"]} calls out for help after being badly wounded! {$GLOBALS["TEMPLATE_DIALOG"]} ",
+        "{$GLOBALS["HERIKA_NAME"]} cries out in pain after being badly wounded! {$GLOBALS["TEMPLATE_DIALOG"]} ",
+        "{$GLOBALS["HERIKA_NAME"]} expresses their resolve after being badly wounded! {$GLOBALS["TEMPLATE_DIALOG"]} ",
+    ],
+];
+
+
 if (IsFollower($GLOBALS["HERIKA_NAME"])) {
     $GLOBALS["PROMPTS"]["minai_combatenddefeat"]= [
         "cue"=>[
