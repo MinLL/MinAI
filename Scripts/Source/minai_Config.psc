@@ -39,7 +39,8 @@ int enableAmbientCommentsOID
 int minRadianceRechatsOID
 int maxRadianceRechatsOID
 int maxThreadsOID
-
+int allowSexTransitionsOID
+int allowActorsToJoinSexOID
 int aOIDMap ; Jmap for storing action oid's
 int aCategoryMap ; Jmap for storing action categories
 
@@ -146,7 +147,13 @@ int Property maxRadianceRechats = 5 Auto
 float maxThreadsDefault = 5.0
 float Property maxThreads = 5.0 Auto
 
-  
+bool allowSexTransitionsDefault = True
+bool Property allowSexTransitions = True Auto
+
+bool allowActorsToJoinSexDefault = False
+bool Property allowActorsToJoinSex = False Auto
+
+
 Event OnConfigInit()
   main.Info("Building mcm menu.")
   InitializeMCM()
@@ -249,6 +256,8 @@ Function RenderSexPage()
   arousalForSexOID = AddSliderOption("Arousal Threshold for Sex", arousalForSex, "{0}")
   arousalForHarassOID = AddSliderOption("Arousal Threshold for Flirting/Harassment", arousalForHarass, "{0}")
   confirmSexOID = AddToggleOption("Ask before a sex scene is initiated", confirmSex)
+  allowSexTransitionsOId = AddToggleOption("Allow Sex Scene Transitions", allowSexTransitions)
+  allowActorsToJoinSex = AddToggleOption("Allow NPC's to join Ongoing Sex Scenes", allowActorsToJoinSex)
   AddHeaderOption("NPC Sex Settings")
   enableAISexOID = AddToggleOption("Enable NPC -> NPC Sex", enableAISex)
   ; right column
@@ -497,6 +506,12 @@ Event OnOptionSelect(int oid)
   elseif oid == confirmSexOID
     confirmSex = !confirmSex
     SetToggleOptionValue(oid, confirmSex)
+  elseif oid == allowSexTransitionsOID
+    allowSexTransitions = !allowSexTransitions
+    SetToggleOptionValue(oid, allowSexTransitions)
+  elseif oid == allowActorsToJoinSexOID
+    allowActorsToJoinSex = !allowActorsToJoinSex
+    SetToggleOptionValue(oid, allowActorsToJoinSex)
   elseif oid == disableAIAnimationsOID
     disableAIAnimations = !disableAIAnimations
     SetToggleOptionValue(oid, disableAIAnimations)
@@ -613,6 +628,12 @@ Event OnOptionDefault(int oid)
   elseif oid ==  confirmSexOID
     confirmSex = confirmSexDefault
     SetToggleOptionValue(oid, confirmSex)
+  elseif oid == allowSexTransitionsOID
+    allowSexTransitions = allowSexTransitionsDefault
+    SetToggleOptionValue(oid, allowSexTransitions)
+  elseif oid == allowActorsToJoinSexOID
+    allowActorsToJoinSex = allowActorsToJoinSexDefault
+    SetToggleOptionValue(oid, allowActorsToJoinSex)
   elseif oid == disableAIAnimationsOID
     disableAIAnimations = disableAIAnimationsDefault
     SetToggleOptionValue(oid, disableAIAnimationsDefault)
@@ -693,6 +714,10 @@ Event OnOptionHighlight(int oid)
     SetInfoText("Minimum Arousal level required for actions like spanking, groping, kissing to be exposed to the LLM")
   elseif oid == confirmSexOID
     SetInfoText("Show a confirmation message before sex scenes start")
+  elseif oid == allowActorsToJoinSexOID
+    SetInfoText("Allow actors to join ongoing sex scenes")
+  elseif oid == allowSexTransitionsOID
+    SetInfoText("Allow actors to transition between different sex scene types mid-scene")
   elseif oid == disableAIAnimationsOID
     SetInfoText("Forces AI-FF animations to be disabled. There seems to be a CTD in the AIAgent DLL while resetting idle state sometimes, this avoids it.")
   elseif oid == genderWeightCommentsOID

@@ -293,6 +293,13 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
   bool bCanAnimate = True
   bool isNewScene = False
   int actor_idx = 0
+  if CanAnimate(playerRef) && actors.Find(playerRef) >= 0 && config.confirmSex
+    int result = minai_confirmSexMsg.Show()
+    if result == 1
+      Main.Info("User declined sex scene, aborting")
+      return
+    EndIf
+  EndIf
   if useOstim()
     MinaiUtil.Debug("OStim detected - processing scene request")
     ostim.StartSexOrSwitchToGroup(actors, akSpeaker, tags)

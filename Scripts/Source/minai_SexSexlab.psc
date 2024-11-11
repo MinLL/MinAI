@@ -7,7 +7,7 @@ minai_DeviousStuff devious
 minai_SexUtil sexUtil
 minai_Util MinaiUtil
 minai_MainQuestController main
-
+minai_Config config
 int jDescriptionsMap
 
 function Maintenance(SexLabFramework localSlf, minai_DeviousStuff localDevious)
@@ -16,6 +16,7 @@ function Maintenance(SexLabFramework localSlf, minai_DeviousStuff localDevious)
   sexUtil = (self as Quest) as minai_SexUtil
   MinaiUtil = (self as Quest) as minai_Util
   main = (self as Quest) as minai_MainQuestController
+  config = Game.GetFormFromFile(0x0912, "MinAI.esp") as minai_Config
 endfunction
 
 
@@ -76,8 +77,16 @@ function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags = 
   EndIf
   if isNewScene
     StartSexlabScene(bPlayerInScene, actors, tags)
+  elseif !config.allowSexTransitions
+    MinaiUtil.Warn("Aborting StartSexOrSwitchTo: Scene already active, and allowSexTransitions is disabled")
+    return
   else
     if !bSpeakerInScene ; Speaker not in scene, add them to it
+      ; Abort if the speaker is not already in the scene and the option is disabled
+      if !config.allowActorsToJoinSex
+        MinaiUtil.Warn("Aborting StartSexOrSwitchTo: Speaker not in scene and config.allowActorsToJoinSexScene is disabled")
+        return
+      EndIf
       actorsInScene = PapyrusUtil.PushActor(actorsInScene,akSpeaker)
       actorsInScene = slf.SortActors(actorsInScene)
     EndIf

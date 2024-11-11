@@ -4,7 +4,7 @@ Actor Property PlayerRef auto
 
 minai_SexUtil sexUtil
 minai_Util MinaiUtil
-
+minai_Config config
 ; map to store ostim previous speeds per thread. Need to compare if thread sped up or slowed down
 ; {[threadID]: integer}
 int jThreadsPrevSpeedsMap
@@ -12,6 +12,7 @@ int jThreadsPrevSpeedsMap
 function Maintenance()
   sexUtil = (self as Quest) as minai_SexUtil
   MinaiUtil = (self as Quest) as minai_Util
+  config = Game.GetFormFromFile(0x0912, "MinAI.esp") as minai_Config
   jThreadsPrevSpeedsMap = JValue.releaseAndRetain(jThreadsPrevSpeedsMap, JMap.object())
 endfunction
 
@@ -52,11 +53,17 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
       ; there is no ostim scene let's start new one
       MinaiUtil.Debug("OStim detects none of actors are in the thread: " + ActiveOstimThreadID)
       StartOstim(actors, tags)
+    elseif !config.allowActorsToJoinSex
+      MinaiUtil.Warn("Aborting StartSexOrSwitchTo: Speaker not in scene and config.allowActorsToJoinSexScene is disabled")
+      return 
     else
       ; there is active ostim scene let's add akSpeaker to that scene
       MinaiUtil.Debug("OStim detects someone from actors is already in thread: " + ActiveOstimThreadID)
       AddActorsToActiveThread(ActiveOstimThreadID, OActorUtil.ToArray(akSpeaker))
     endif
+  elseif !config.allowSexTransitions
+    MinaiUtil.Warn("Aborting StartSexOrSwitchTo: Scene already active, and allowSexTransitions is disabled")
+    return
   else
     ; akSpeaker is already in an OStim thread
     ostimActors = OThread.GetActors(ActiveOstimThreadID)
