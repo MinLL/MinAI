@@ -1,5 +1,5 @@
 # MinAI Modder's Guide
-MinAI exposes an API to allow mods to easily integrate with AIFF / MinAI without having to write a server plugin, and simplifies the process of making your mod compatible with AI. Currently there are five mod events exposed to facilitate this, which you can send to MinAI.
+MinAI exposes an API to allow mods to easily integrate with CHIM / MinAI without having to write a server plugin, and simplifies the process of making your mod compatible with AI. Currently there are five mod events exposed to facilitate this, which you can send to MinAI.
 
 ## MinAI Factions
 MinAI exposes 3 different factions you can use to control the actions that it adds to NPC's. 
@@ -106,8 +106,8 @@ Subsequent calls to this mod event with the same mod name / key will update the 
 ;  endIf
 Event OnSetContext(string modName, string eventKey, string eventValue, int ttl)
   Info("OnSetContext(" + modName + " => " + eventKey + " (TTL: " + ttl + ")): " + eventValue)
-  if bHasAIFF
-    minAIFF.StoreContext(modName, eventKey, eventValue, ttl)
+  if bHasCHIM
+    minCHIM.StoreContext(modName, eventKey, eventValue, ttl)
   elseif bHasMantella
     ; Not persistent, but better than nothing for mantella users
     RegisterEvent(eventValue, "info_context")
@@ -145,8 +145,8 @@ This command differs from MinAI_SetContext in that it will only persistently exp
 ;  endIf
 Event OnSetContextNPC(string modName, string eventKey, string eventValue, string npcName, int ttl)
   Info("OnSetContextNPC(" + modName + " => " + eventKey + " (TTL: " + ttl + ") ["+npcName+"]): " + eventValue)
-  if bHasAIFF
-    minAIFF.StoreContext(modName, eventKey, eventValue, npcName, ttl)
+  if bHasCHIM
+    minCHIM.StoreContext(modName, eventKey, eventValue, npcName, ttl)
   elseif bHasMantella
     ; Not persistent, but better than nothing for mantella users
     RegisterEvent(eventValue, "info_context")
@@ -173,9 +173,9 @@ This mod event is used to expose new actions that you want the LLM to be able to
 ;  endIf
 Event OnRegisterAction(string actionName, string actionPrompt, string mcmDescription, string targetDescription, string targetEnum, int enabled, float cooldown, int ttl)
   Info("OnRegisterAction(" + actionName + " => " + enabled + " (Cooldown: " + cooldown + ")): " + actionPrompt)
-  if bHasAIFF
-		minaiff.RegisterAction("ExtCmd"+actionName, actionName, mcmDescription, "External", enabled, cooldown, 2, 5, 300, true)
-    minaiff.StoreAction(actionName, actionPrompt, enabled, ttl, targetDescription, targetEnum)
+  if bHasCHIM
+		minCHIM.RegisterAction("ExtCmd"+actionName, actionName, mcmDescription, "External", enabled, cooldown, 2, 5, 300, true)
+    minCHIM.StoreAction(actionName, actionPrompt, enabled, ttl, targetDescription, targetEnum)
   elseif bHasMantella
     ; Nothing to do for mantella.
   endif
@@ -202,7 +202,7 @@ EndFunction
 Function Maintenance()
   RegisterTestAction(1) ; Enable the action for the LLM.
   ; After registering an action, you would register for a modevent to be informed when the command is executed (Like such)
-  RegisterForModEvent("AIFF_CommandReceived", "CommandDispatcher")
+  RegisterForModEvent("CHIM_CommandReceived", "CommandDispatcher")
 EndFunction
 
 ; speakerName is the NPC that triggered your action.
@@ -245,9 +245,9 @@ This differs from MinAI_RegisterAction in that it will only expose this action f
 ;  endIf
 Event OnRegisterActionNPC(string actionName, string actionPrompt, string mcmDescription, string npcName, string targetDescription, string targetEnum, int enabled, float cooldown, int ttl)
   Info("OnRegisterActionNPC(" + actionName + " => " + enabled + " (Cooldown: " + cooldown + ")): " + actionPrompt)
-  if bHasAIFF
-		minaiff.RegisterAction("ExtCmd"+actionName, actionName, mcmDescription, "External", enabled, cooldown, 2, 5, 300, true, true)
-    minaiff.StoreAction(actionName, actionPrompt, enabled, ttl, targetDescription, targetEnum, npcName)
+  if bHasCHIM
+		minCHIM.RegisterAction("ExtCmd"+actionName, actionName, mcmDescription, "External", enabled, cooldown, 2, 5, 300, true, true)
+    minCHIM.StoreAction(actionName, actionPrompt, enabled, ttl, targetDescription, targetEnum, npcName)
   elseif bHasMantella
     ; Nothing to do for mantella.
   endif
@@ -275,7 +275,7 @@ EndFunction
 Function Maintenance()
   RegisterTestAction(1) ; Enable the action for the LLM.
   ; After registering an action, you would register for a modevent to be informed when the command is executed (Like such)
-  RegisterForModEvent("AIFF_CommandReceived", "CommandDispatcher")
+  RegisterForModEvent("CHIM_CommandReceived", "CommandDispatcher")
 EndFunction
 
 ; speakerName is the NPC that triggered your action.

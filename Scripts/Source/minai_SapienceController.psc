@@ -35,8 +35,8 @@ function Maintenance(minai_MainQuestController _main)
   devious = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_DeviousStuff
   Main.Info("Initializing Sapience Module.")
   minai_SapienceEnabled = Game.GetFormFromFile(0x091A, "MinAI.esp") as GlobalVariable
-  RegisterForModEvent("AIFF_CommandReceived", "CommandDispatcher") ; Hook into AIFF - This is a separate quest, so we have to do this separately
-  RegisterForModEvent("AIFF_TextReceived", "OnTextReceived")
+  RegisterForModEvent("CHIM_CommandReceived", "CommandDispatcher") ; Hook into AIFF - This is a separate quest, so we have to do this separately
+  RegisterForModEvent("CHIM_TextReceived", "OnTextReceived")
   StartRadiantDialogue()
   EnableCombatDialogue()
   ; RegisterForKey(aiffConfig._myKey2)

@@ -25,7 +25,7 @@ function Maintenance(minai_MainQuestController _main)
   sex = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_Sex
   devious = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_DeviousStuff
   Main.Info("Initializing Followers Module.")
-  RegisterForModEvent("AIFF_CommandReceived", "CommandDispatcher") ; Hook into AIFF - This is a separate quest, so we have to do this separately
+  RegisterForModEvent("CHIM_CommandReceived", "CommandDispatcher") ; Hook into AIFF - This is a separate quest, so we have to do this separately
   bHasAIFF = (Game.GetModByName("AIAgent.esp") != 255)
   bHasNFF = (Game.GetModByName("nwsFollowerFramework.esp") != 255)
   followerFaction = Game.GetFormFromFile(0x05C84E, "Skyrim.esm") as Faction

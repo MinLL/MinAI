@@ -96,8 +96,10 @@ EndFunction
 
 Function OnBleedoutStart(actor akTarget)
   Main.Info("Combat: OnBleedoutStart()")
-  string targetName = Main.GetActorName(akTarget)
-  Main.RequestLLMResponseFromActor(targetName + " has been knocked down and is badly injured!", "minai_bleedoutstart", targetName)
+  if akTarget != playerRef
+    string targetName = Main.GetActorName(akTarget)
+    Main.RequestLLMResponseFromActor(targetName + " has been knocked down and is badly injured!", "minai_bleedoutself", targetName)
+  EndIf
 EndFunction
 
 Function OnBleedoutEnd(actor akTarget)

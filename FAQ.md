@@ -33,10 +33,10 @@ NSFW actions are only enabled if you have either Sexlab or ostim installed. If y
 ## Sex actions specifically aren't working!
 In addition to the above sections, MinAI offers a feature to only expose sex / general perverted actions to the AI conditionally based on the NPC's arousal level (Disabled by default). Ensure that if you have set minimum arousal thresholds in the MCM, that the NPC is suitably aroused to use these actions.
 
-## How do I set use Mantella's XTTS with AIFF?
-AIFF is not compatible with the xtts from Mantella out of the box. The reason for this, is that AIFF requests the character name from xtts as the name of the voice type, where-as Mantella's XTTS expects the request to be for the base voice type. For example, for a guard in whiterun, AIFF would request a voice of type "whiterun_guard" from xtts, where-as mantella would expect "maleguard" instead.
+## How do I set use Mantella's XTTS with CHIM?
+CHIM is not compatible with the xtts from Mantella out of the box. The reason for this, is that CHIM requests the character name from xtts as the name of the voice type, where-as Mantella's XTTS expects the request to be for the base voice type. For example, for a guard in whiterun, CHIM would request a voice of type "whiterun_guard" from xtts, where-as mantella would expect "maleguard" instead.
 
-MinAI offers a feature allowing you to use the latents from Mantella with AIFF seamlessly. It does this by reading the base voicetype of the NPC's you encounter in the game, and saving them. When AIFF requests a voice from xtts with this mode enabled, it instead sends the base voice type of the actor instead, allowing the Mantella XTTS to work with AIFF.
+MinAI offers a feature allowing you to use the latents from Mantella with CHIM seamlessly. It does this by reading the base voicetype of the NPC's you encounter in the game, and saving them. When CHIM requests a voice from xtts with this mode enabled, it instead sends the base voice type of the actor instead, allowing the Mantella XTTS to work with CHIM.
 ```
 // Force the voice type to use the actor's base voice type (eg, "maleguard") instead of "whiterun_guard".
 // Useful for compatibility with mantella's xtts configuration if you don't want to mess with setting up latents
