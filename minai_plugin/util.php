@@ -200,7 +200,7 @@ Function RegisterAction($actionName) {
 
 // Override player name
 if ($GLOBALS["force_aiff_name_to_ingame_name"]) {
-    $playerName = GetActorValue("PLAYER", "playerName");
+    $playerName = GetActorValue("PLAYER", "playerName", true);
     if ($playerName) {
         $GLOBALS["PLAYER_NAME"] = $playerName;
     }
