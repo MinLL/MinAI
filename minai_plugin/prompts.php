@@ -14,7 +14,7 @@ $GLOBALS["PROMPTS"]["radiant"]= [
         "write dialogue for {$GLOBALS["HERIKA_NAME"]}.{$GLOBALS["TEMPLATE_DIALOG"]}  "
     ],
     "player_request"=>[    
-        "The Narrator: {$GLOBALS["HERIKA_NAME"]} starts a dialogue with {$GLOBALS["target"]} about a random topic",
+        "The Narrator: {$GLOBALS["HERIKA_NAME"]} starts a dialogue with {$GLOBALS["target"]} about a relevant topic",
     ]
 ];
 
