@@ -139,18 +139,34 @@ function BuildEquipmentContext(&$parsedData)
     $name = $segment['name'];
     $description = $segment['description'];
 
-    if (empty($description)) {
-      $context .= "{$name}, ";
-    } else {
-      $context .= "{$name} - {$description}, ";
+    if (!empty($context)) {
+      $context .= ", ";
     }
 
-    foreach ($segment['keywords'] as $keyword) {
-      $skipKeywords[strtolower($keyword)] = true;
+    if (empty($name)) {
+      if (!empty($description)) {
+        $context .= "{$description}";
+      }
+    } else {
+      if (empty($description)) {
+        $context .= "{$name}";
+      } else {
+        $context .= "{$name} - {$description}";
+      }
+    }
+
+    if (!empty($description)) {
+      foreach ($segment['keywords'] as $keyword) {
+        $skipKeywords[strtolower($keyword)] = true;
+      }
     }
   }
+  
+  if (!empty($context)) {
+    $context .= ". ";
+  }
   return [
-    'context' => $context . ". ",
+    'context' => $context,
     'skipKeywords' => $skipKeywords
   ];
 }
