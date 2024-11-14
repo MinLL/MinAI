@@ -9,7 +9,7 @@ MinAI implements many NSFW integrations for users that have either OStim or Sexl
 * Supports multiple actors - If more than one NPC in a conversation decides they want to have sex, an orgy will begin.
 * Have natural dialogue during sex which influences the scene. For example, I tested starting a scene by giving a blowjob to an actor, and asked them to "put it inside of me", which caused them to switch to vaginal sex.
 * AI's can decide to transition sex types on their own during an encounter. It's not uncommon for an AI to want to "finish on your chest" for example, as a female character. Depends on the personality of the AI.
-* (AIFF) Actors have vastly improved awareness of sex scene details in AIFF over Mantella.
+* (CHIM) Actors have vastly improved awareness of sex scene details in CHIM over Mantella.
 * (Sexlab, Optional) This mod ships with a json file for configuration of prompts that are injected at each stage of a given animation. This can be edited to improve AI awareness of what is happening during a given sex scene. See data/minai/sexlab_descriptions.json
 
 ## [Scene Descriptions](./nsfw_Scenes.md) (here you can find tips how to generate your scenes descriptions)
@@ -17,7 +17,7 @@ MinAI includes 3467 ostim/sexlab scene descriptions (as of 10/24/2024) for bette
 
 ## Worn Equipment Customization
 * You can customize the LLM's awareness of any piece of equipment that you are wearing in order to control how it perceives / reacts to specific gear.
-* Currently you can do this by accessing http://10.0.0.144:8081/HerikaServer/ext/minai_plugin/we_manager.html (Replace the IP address with the IP of your AIFF server). A link will be provided to this from within the plugins page in the future.
+* Currently you can do this by accessing http://10.0.0.144:8081/HerikaServer/ext/minai_plugin/we_manager.html (Replace the IP address with the IP of your CHIM server). A link will be provided to this from within the plugins page in the future.
 * If you want to use the old keyword based system instead, you can disable this system in config.php.
 
 ### CBPC
@@ -80,5 +80,5 @@ MinAI includes 3467 ostim/sexlab scene descriptions (as of 10/24/2024) for bette
 * NPC's can pinch the player's nipples if they want. This event needs to be expanded. It's pretty simple at the moment.
 
 ### (In Development) Diary of Mine (DoM, PAH, HSH, AYGAS)
-* Slave context, character info, and events exposed to AIFF/Sapient NPC's
+* Slave context, character info, and events exposed to CHIM/Sapient NPC's
 * Slave actions - TBD

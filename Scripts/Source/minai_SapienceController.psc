@@ -35,8 +35,8 @@ function Maintenance(minai_MainQuestController _main)
   devious = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_DeviousStuff
   Main.Info("Initializing Sapience Module.")
   minai_SapienceEnabled = Game.GetFormFromFile(0x091A, "MinAI.esp") as GlobalVariable
-  RegisterForModEvent("AIFF_CommandReceived", "CommandDispatcher") ; Hook into AIFF - This is a separate quest, so we have to do this separately
-  RegisterForModEvent("AIFF_TextReceived", "OnTextReceived")
+  RegisterForModEvent("CHIM_CommandReceived", "CommandDispatcher") ; Hook into AIFF - This is a separate quest, so we have to do this separately
+  RegisterForModEvent("CHIM_TextReceived", "OnTextReceived")
   StartRadiantDialogue()
   EnableCombatDialogue()
   ; RegisterForKey(aiffConfig._myKey2)
@@ -100,7 +100,7 @@ actor[] Function FindActors(bool returnAll = False, Actor exclude = None)
     if  allNearbyActors[i].IsInDialogueWithPlayer() ; Player is in dialogue with at least one nearby actor. Don't start radiance.
       return ret
     EndIf
-    if Sex.CanAnimate(allNearbyActors[i]) && !allNearbyActors[i].GetCurrentScene() && Main.GetActorName(allNearbyActors[i]) != "The Narrator" && allNearbyActors[i] != exclude
+    if Sex.CanAnimate(allNearbyActors[i]) && !allNearbyActors[i].GetCurrentScene() && !allNearbyActors[i].GetDialogueTarget() && Main.GetActorName(allNearbyActors[i]) != "The Narrator" && allNearbyActors[i] != exclude
       Main.Debug("SAPIENCE: Found nearby actor for dialogue: " + Main.GetActorName(allNearbyActors[i]))
       nearbyActors = PapyrusUtil.PushActor(nearbyActors,allNearbyActors[i])
     EndIf

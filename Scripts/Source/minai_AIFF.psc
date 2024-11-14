@@ -78,9 +78,9 @@ Function Maintenance(minai_MainQuestController _main)
   EndIf
   bHasAIFF = True
   ; Hook into AIFF
-  RegisterForModEvent("AIFF_CommandReceived", "CommandDispatcher")
-  RegisterForModEvent("AIFF_TextReceived", "OnTextReceived")
-  RegisterForModEvent("AIFF_NPC", "OnAIActorChange")
+  RegisterForModEvent("CHIM_CommandReceived", "CommandDispatcher")
+  RegisterForModEvent("CHIM_TextReceived", "OnTextReceived")
+  RegisterForModEvent("CHIM_NPC", "OnAIActorChange")
   NullVoiceType = Game.GetFormFromFile(0x01D70E, "AIAgent.esp") as VoiceType
   minai_SapienceEnabled = Game.GetFormFromFile(0x091A, "MinAI.esp") as GlobalVariable
   if (!NullVoiceType)

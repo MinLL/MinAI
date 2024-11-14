@@ -38,7 +38,9 @@ int prioritizePlayerThreadOID
 int enableAmbientCommentsOID
 int minRadianceRechatsOID
 int maxRadianceRechatsOID
-
+int maxThreadsOID
+int allowSexTransitionsOID
+int allowActorsToJoinSexOID
 int aOIDMap ; Jmap for storing action oid's
 int aCategoryMap ; Jmap for storing action categories
 
@@ -142,6 +144,16 @@ int Property minRadianceRechats = 3 Auto
 int maxRadianceRechatsDefault = 5
 int Property maxRadianceRechats = 5 Auto
 
+float maxThreadsDefault = 5.0
+float Property maxThreads = 5.0 Auto
+
+bool allowSexTransitionsDefault = True
+bool Property allowSexTransitions = True Auto
+
+bool allowActorsToJoinSexDefault = False
+bool Property allowActorsToJoinSex = False Auto
+
+
 Event OnConfigInit()
   main.Info("Building mcm menu.")
   InitializeMCM()
@@ -244,6 +256,8 @@ Function RenderSexPage()
   arousalForSexOID = AddSliderOption("Arousal Threshold for Sex", arousalForSex, "{0}")
   arousalForHarassOID = AddSliderOption("Arousal Threshold for Flirting/Harassment", arousalForHarass, "{0}")
   confirmSexOID = AddToggleOption("Ask before a sex scene is initiated", confirmSex)
+  allowSexTransitionsOID = AddToggleOption("Allow Sex Scene Transitions", allowSexTransitions)
+  allowActorsToJoinSexOID = AddToggleOption("Allow NPC's to join Ongoing Sex Scenes", allowActorsToJoinSex)
   AddHeaderOption("NPC Sex Settings")
   enableAISexOID = AddToggleOption("Enable NPC -> NPC Sex", enableAISex)
   ; right column
@@ -255,6 +269,7 @@ Function RenderSexPage()
   forceOrgasmCommentOID = AddToggleOption("Force orgasm comment", forceOrgasmComment)
   forcePostSceneCommentOID = AddToggleOption("Force post scene comment", forcePostSceneComment)
   enableAmbientCommentsOID = AddToggleOption("Enable ambient comments between events", enableAmbientComments)
+  maxThreadsOID = AddSliderOption("Max threads", maxThreads)
 EndFunction
 
 
@@ -491,6 +506,12 @@ Event OnOptionSelect(int oid)
   elseif oid == confirmSexOID
     confirmSex = !confirmSex
     SetToggleOptionValue(oid, confirmSex)
+  elseif oid == allowSexTransitionsOID
+    allowSexTransitions = !allowSexTransitions
+    SetToggleOptionValue(oid, allowSexTransitions)
+  elseif oid == allowActorsToJoinSexOID
+    allowActorsToJoinSex = !allowActorsToJoinSex
+    SetToggleOptionValue(oid, allowActorsToJoinSex)
   elseif oid == disableAIAnimationsOID
     disableAIAnimations = !disableAIAnimations
     SetToggleOptionValue(oid, disableAIAnimations)
@@ -607,6 +628,12 @@ Event OnOptionDefault(int oid)
   elseif oid ==  confirmSexOID
     confirmSex = confirmSexDefault
     SetToggleOptionValue(oid, confirmSex)
+  elseif oid == allowSexTransitionsOID
+    allowSexTransitions = allowSexTransitionsDefault
+    SetToggleOptionValue(oid, allowSexTransitions)
+  elseif oid == allowActorsToJoinSexOID
+    allowActorsToJoinSex = allowActorsToJoinSexDefault
+    SetToggleOptionValue(oid, allowActorsToJoinSex)
   elseif oid == disableAIAnimationsOID
     disableAIAnimations = disableAIAnimationsDefault
     SetToggleOptionValue(oid, disableAIAnimationsDefault)
@@ -634,6 +661,9 @@ Event OnOptionDefault(int oid)
   elseif oid == enableAmbientCommentsOID
     enableAmbientComments = enableAmbientCommentsDefault
     SetToggleOptionValue(oid, enableAmbientCommentsDefault)
+  elseif oid == maxThreadsOID
+    maxThreads = maxThreadsDefault
+    SetSliderOptionValue(oid, maxThreadsDefault, "{0}")
   EndIf
 EndEvent
 
@@ -684,6 +714,10 @@ Event OnOptionHighlight(int oid)
     SetInfoText("Minimum Arousal level required for actions like spanking, groping, kissing to be exposed to the LLM")
   elseif oid == confirmSexOID
     SetInfoText("Show a confirmation message before sex scenes start")
+  elseif oid == allowActorsToJoinSexOID
+    SetInfoText("Allow actors to join ongoing sex scenes")
+  elseif oid == allowSexTransitionsOID
+    SetInfoText("Allow actors to transition between different sex scene types mid-scene")
   elseif oid == disableAIAnimationsOID
     SetInfoText("Forces AI-FF animations to be disabled. There seems to be a CTD in the AIAgent DLL while resetting idle state sometimes, this avoids it.")
   elseif oid == genderWeightCommentsOID
@@ -710,6 +744,8 @@ Event OnOptionHighlight(int oid)
     SetInfoText("For debugging purposes. Send test mod events to the backend")
   elseif oid == enableAmbientCommentsOID
     SetInfoText("Enable ambient comments between events. Follows comments during sex scene cooldown. Polling mechanism checking each time if there is no cooldown on comments and fires ambient talking.")
+  elseif oid == maxThreadsOID
+    SetInfoText("Maximum concurrent threads for adult frameworks. Ostim usually crashes at 6+, try yourself and set to the number you game can handle.")
   EndIf
   int i = 0
   string[] actions = JMap.allKeysPArray(aiff.actionRegistry)
@@ -828,6 +864,11 @@ Event OnOptionSliderOpen(int oid)
     SetSliderDialogDefaultValue(defaultValue)
     SetSliderDialogRange(0, 1200)
     SetSliderDialogInterval(5)
+  elseif oid == maxThreadsOID
+    SetSliderDialogStartValue(maxThreads)
+    SetSliderDialogDefaultValue(maxThreadsDefault)
+    SetSliderDialogRange(0, 20)
+    SetSliderDialogInterval(1.0)
   EndIf
 EndEvent
 
@@ -894,6 +935,10 @@ Event OnOptionSliderAccept(int oid, float value)
   elseif oid == actionDecayWindowOID
     SetActionDecayWindow(currentAction, value)
     SetSliderOptionValue(oid, value, "{0}")
+  elseif oid == maxThreadsOID
+    maxThreads = value
+    SetSliderOptionValue(oid, value, "{0}")
+    StoreConfig("maxThreads", commentsRate)
   EndIf
 EndEvent
 
