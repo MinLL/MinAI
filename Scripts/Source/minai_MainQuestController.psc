@@ -75,7 +75,7 @@ Function Maintenance()
   sapience = Game.GetFormFromFile(0x091D, "MinAI.esp") as minai_SapienceController
   reputation = (Self as Quest) as minai_Reputation
   MinaiUtil = (Self as Quest) as minai_Util
-  minai_ToggleSapienceSpell = Game.GetFormFromFile(0x0E90, "MinAI.esp") as Spell
+  minai_ToggleSapienceSpell = Game.GetFormFromFile(0x0E93, "MinAI.esp") as Spell
   if (!followers)
     Fatal("Could not load followers script - Mismatched script and esp versions")
   EndIf
@@ -468,3 +468,9 @@ Function SetSapienceKey()
   Info("Set sapience key to " + config.ToggleSapienceKey)
   RegisterForKey(config.ToggleSapienceKey)
 EndFunction
+
+Event OnKeyDown(int keyCode)
+  If(keyCode == config.ToggleSapienceKey)
+    minAiff.ToggleSapience()
+  EndIf
+EndEvent

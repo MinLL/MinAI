@@ -13,7 +13,7 @@ Function StartTrackingPlayer()
     playerRef.RemoveSpell(minai_PlayerStateTracker)
   EndIf
   MainQuestController.Info("Starting player state tracking")
-  playerRef.AddSpell(minai_PlayerStateTracker)
+  playerRef.AddSpell(minai_PlayerStateTracker, false)
 EndFunction
 
 Event OnPlayerLoadGame()
