@@ -21,6 +21,7 @@ minai_CombatManager combat
 minai_SapienceController sapience
 minai_Reputation reputation  
 minai_Util MinaiUtil  
+Spell minai_ToggleSapienceSpell
 
 bool bHasMantella = False;
 bool bHasAIFF = False;
@@ -48,6 +49,7 @@ Function Maintenance()
     Debug.MessageBox("Mismatched MinAI.esp and minai_MainQuestController version")
   EndIf
   Info("Maintenance() - minai v" +GetVersion() + " initializing.")
+  SetSapienceKey()
   ; Register for Mod Events
   ; Public interface functions
   RegisterForModEvent("MinAI_RegisterEvent", "OnRegisterEvent")
@@ -73,6 +75,7 @@ Function Maintenance()
   sapience = Game.GetFormFromFile(0x091D, "MinAI.esp") as minai_SapienceController
   reputation = (Self as Quest) as minai_Reputation
   MinaiUtil = (Self as Quest) as minai_Util
+  minai_ToggleSapienceSpell = Game.GetFormFromFile(0x0E90, "MinAI.esp") as Spell
   if (!followers)
     Fatal("Could not load followers script - Mismatched script and esp versions")
   EndIf
@@ -448,4 +451,20 @@ Function TestModEvents()
   SetTestContextNPC()
   RegisterTestAction()
   RegisterTestActionNPC()
+EndFunction
+
+
+Function AddSpellsToPlayer()
+  Info("Adding spells to player")
+  playerRef.AddSpell(minai_ToggleSapienceSpell)
+EndFunction
+
+Function RemoveSpellsFromPlayer()
+  Info("Removing spells from player")
+  playerRef.RemoveSpell(minai_ToggleSapienceSpell)
+EndFunction
+
+Function SetSapienceKey()
+  Info("Set sapience key to " + config.ToggleSapienceKey)
+  RegisterForKey(config.ToggleSapienceKey)
 EndFunction
