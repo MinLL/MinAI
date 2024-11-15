@@ -735,3 +735,15 @@ Function UpdateDiary(string targetName)
     AIAgentFunctions.requestMessageForActor("Please, update your diary","diary", targetName)
   EndIf
 EndFunction
+
+Function ToggleSapience()
+  if minai_SapienceEnabled.GetValueInt() == 1
+    Main.Info("SAPIENCE: Sapience disabled via toggle.")
+    Debug.Notification("Sapience disabled.")
+    minai_SapienceEnabled.SetValue(0)
+  else
+    Main.Info("SAPIENCE: Sapience enabled via toggle.")
+    Debug.Notification("Sapience enabled.")
+    minai_SapienceEnabled.SetValue(1)
+  EndIf
+EndFunction

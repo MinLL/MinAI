@@ -51,6 +51,11 @@ int actionMaxIntervalOID
 int actionDecayWindowOID
 
 int testActionsOID
+int addSpellsOID
+int removeSpellsOID
+
+int toggleSapienceOID
+int Property toggleSapienceKey = -1 Auto
 
 ; Legacy globals
 GlobalVariable useCBPC
@@ -230,6 +235,10 @@ Function RenderGeneralPage()
   minRadianceRechatsOID = AddSliderOption("Minimum Radiance Rechats", minRadianceRechats, "{0}")
   maxRadianceRechatsOID = AddSliderOption("Maximum Radiance Rechats", maxRadianceRechats, "{0}")
   SetCursorPosition(1) ; Move cursor to top right position
+  AddHeaderOption("General Settings")
+  addSpellsOID = AddTextOption("General", "Add Spells to Player")
+  removeSpellsOID = AddTextOption("General", "Remove Spells from Player")
+  toggleSapienceOID = AddKeyMapOption("Toggle Sapience", toggleSapienceKey)
   disableAIAnimationsOID = AddToggleOption("Disable AI-FF Animations", disableAIAnimations)
   AddHeaderOption("Debug")
   testActionsOID = AddTextOption("Debug", "Test Mod Events")
@@ -527,6 +536,10 @@ Event OnOptionSelect(int oid)
   elseif oid == actionEnabledOID
     ToggleActionEnabled(currentAction)
     SetToggleOptionValue(oid, JMap.getInt(JMap.getObj(aiff.actionRegistry, currentAction), "enabled") == 1)
+  elseif oid == addSpellsOID
+    main.AddSpellsToPlayer()
+  elseif oid == removeSpellsOID
+    main.RemoveSpellsFromPlayer()
   elseif oid == testActionsOID
     main.TestModEvents()
     Debug.MessageBox("Testing mod events...")
@@ -742,6 +755,12 @@ Event OnOptionHighlight(int oid)
     SetInfoText("The duration of time which must pass without the action being used for the cooldown to return to the base value")
   elseif oid == testActionsOID
     SetInfoText("For debugging purposes. Send test mod events to the backend")
+  elseif oid == addSpellsOID
+    SetInfoText("Add spells such as Toggle Sapience, and other mod utility spells to the player")
+  elseif oid == toggleSapienceOID
+    SetInfoText("Hotkey to toggle Sapience on or off")
+  elseif oid == removeSpellsOID
+    SetInfoText("Remove the spells that this mod adds from the player")
   elseif oid == enableAmbientCommentsOID
     SetInfoText("Enable ambient comments between events. Follows comments during sex scene cooldown. Polling mechanism checking each time if there is no cooldown on comments and fires ambient talking.")
   elseif oid == maxThreadsOID
@@ -942,3 +961,24 @@ Event OnOptionSliderAccept(int oid, float value)
   EndIf
 EndEvent
 
+
+event OnOptionKeyMapChange(int a_option, int a_keyCode, string a_conflictControl, string a_conflictName)
+	{Called when a key has been remapped}
+	if (a_option == toggleSapienceOID)
+		bool continue = true
+		if (a_conflictControl != "")
+			string msg
+			if (a_conflictName != "")
+				msg = "This key is already mapped to:\n'" + a_conflictControl + "'\n(" + a_conflictName + ")\n\nAre you sure you want to continue?"
+			else
+				msg = "This key is already mapped to:\n'" + a_conflictControl + "'\n\nAre you sure you want to continue?"
+			endIf
+			continue = ShowMessage(msg, true, "$Yes", "$No")
+		endIf
+		if (continue)
+			toggleSapienceKey = a_keyCode
+			SetKeymapOptionValue(a_option, a_keyCode)
+      main.SetSapienceKey()
+		endIf
+	endIf
+EndEvent
