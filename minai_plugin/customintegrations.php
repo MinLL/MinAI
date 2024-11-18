@@ -194,7 +194,9 @@ function GetThirdpartyContext() {
     );
     foreach ($rows as $row) {
         error_log("minai: Inserting third-party context: {$row["eventvalue"]}");
-        if (strtolower($GLOBALS["HERIKA_NAME"]) == strtolower($row['npcname']) || strtolower($row['npcname']) == "everyone")
+        if ((strtolower(strtolower($GLOBALS["HERIKA_NAME"])) == strtolower($row['npcname'])
+            || (!IsRadiant() && strtolower($GLOBALS["PLAYER_NAME"])) == strtolower($row['npcname'])) 
+            || strtolower($row['npcname']) == "everyone")
             $ret .= $row["eventvalue"] . "\n";
     }
     return $ret;
@@ -209,7 +211,9 @@ function RegisterThirdPartyActions() {
       "SELECT * FROM custom_actions WHERE expiresAt > {$currentTime}"
     );
     foreach ($rows as $row) {
-        if ($row["enabled"] == 1 && (strtolower($row["npcname"]) == strtolower($GLOBALS["HERIKA_NAME"]) || $row["npcname"] == "everyone")) {
+        if ($row["enabled"] == 1 && ((strtolower(strtolower($GLOBALS["HERIKA_NAME"])) == strtolower($row['npcname'])
+            || (!IsRadiant() && strtolower($GLOBALS["PLAYER_NAME"])) == strtolower($row['npcname'])) 
+            || strtolower($row['npcname']) == "everyone")) {
             $actionName = $row["actionname"];
             $cmdName = "ExtCmd{$actionName}";
             $actionPrompt = $row["actionprompt"];
