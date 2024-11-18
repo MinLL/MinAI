@@ -75,7 +75,7 @@ Function Maintenance()
   sapience = Game.GetFormFromFile(0x091D, "MinAI.esp") as minai_SapienceController
   reputation = (Self as Quest) as minai_Reputation
   MinaiUtil = (Self as Quest) as minai_Util
-  minai_ToggleSapienceSpell = Game.GetFormFromFile(0x0E90, "MinAI.esp") as Spell
+  minai_ToggleSapienceSpell = Game.GetFormFromFile(0x0E93, "MinAI.esp") as Spell
   if (!followers)
     Fatal("Could not load followers script - Mismatched script and esp versions")
   EndIf
@@ -414,6 +414,18 @@ Function SetTestContextNPC()
   endIf
 EndFunction 
 
+Function SetTestContextPlayer()
+  int handle = ModEvent.Create("MinAI_SetContextNPC")
+  if (handle)
+    ModEvent.PushString(handle, "testmod")
+    ModEvent.PushString(handle, "testkeyplayer")
+    ModEvent.PushString(handle, "testvalueplayer")
+    ModEvent.PushString(handle, GetActorName(playerRef))
+    ModEvent.PushInt(handle, 1200)
+    ModEvent.Send(handle)
+  endIf
+EndFunction 
+
 Function RegisterTestAction()
   int handle = ModEvent.Create("MinAI_RegisterAction")
   if (handle)
@@ -445,12 +457,30 @@ Function RegisterTestActionNPC()
   endIf
 EndFunction
 
+Function RegisterTestActionPlayer()
+  int handle = ModEvent.Create("MinAI_RegisterActionNPC")
+  if (handle)
+    ModEvent.PushString(handle, "testactionplayer")
+    ModEvent.PushString(handle, "Use the test action player")
+    ModEvent.PushString(handle, "Test Action Description")
+    ModEvent.PushString(handle, GetActorName(PlayerRef))
+    ModEvent.PushString(handle, "Target (Actor, NPC)")
+    ModEvent.PushString(handle, "my,list,of,targets")
+    ModEvent.PushInt(handle, 1)
+    ModEvent.PushFloat(handle, 5)
+    ModEvent.PushInt(handle, 1200)
+    ModEvent.Send(handle)
+  endIf
+EndFunction
+
 Function TestModEvents()
   SendTestEvent()
   SetTestContext()
   SetTestContextNPC()
+  SetTestContextPlayer()
   RegisterTestAction()
   RegisterTestActionNPC()
+  RegisterTestActionPlayer()
 EndFunction
 
 
@@ -468,3 +498,9 @@ Function SetSapienceKey()
   Info("Set sapience key to " + config.ToggleSapienceKey)
   RegisterForKey(config.ToggleSapienceKey)
 EndFunction
+
+Event OnKeyDown(int keyCode)
+  If(keyCode == config.ToggleSapienceKey)
+    minAiff.ToggleSapience()
+  EndIf
+EndEvent
