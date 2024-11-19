@@ -739,7 +739,7 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
         EndIf
             
       elseif (command == "ExtCmdUnequipBinder")
-        if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousArmbinder))
+        if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousHeavyBondage))
           Main.RegisterEvent(""+speakerName+" removes a Armbinder from " + targetName)
         else
           Main.RegisterEvent(""+speakerName+" tried, but was unable to remove a Armbinder from " + targetName)
