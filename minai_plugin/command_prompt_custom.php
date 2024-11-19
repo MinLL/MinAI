@@ -32,6 +32,7 @@ if (IsRadiant()) { // Is this npc -> npc?
         
 }
 else {
+    $GLOBALS["ADD_PLAYER_BIOS"]  = true; //must set true because once false for radiant, remains false for a long time 
     if ($shouldOverride)
         SetPromptHead($GLOBALS["PROMPT_HEAD_OVERRIDE"]);
     else
