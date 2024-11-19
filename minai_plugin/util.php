@@ -405,6 +405,12 @@ function getTargetDuringSex($scene) {
         return $str !== $GLOBALS["HERIKA_NAME"];
     });
     $actorsToSpeak = array_values($actorsToSpeak);
+
+    // if in a solo scene, talk to everyone (or no one in particular)
+    if(count($actorsToSpeak) === 0) {
+        return "everyone";
+    }
+
     $targetToSpeak = $actorsToSpeak[array_rand($actorsToSpeak)];
 
     // if more then 1 actor to speak in scene make it 50% chance speaker will address all participants
