@@ -506,7 +506,9 @@ Function SetContext(actor akTarget)
   aiff.SetActorVariable(akTarget, "isnaked", !cuirass)
   aiff.SetActorVariable(akTarget, "arousal", GetActorArousal(akTarget))
   aiff.SetActorVariable(akTarget, "isexposed", IsTNGExposed(akTarget))
-  if cuirass != None
+  if cuirass == None
+    aiff.SetActorVariable(akTarget, "cuirass", "")
+  Else
     aiff.SetActorVariable(akTarget, "cuirass", cuirass.GetName())
   EndIf
   if !bHasArousedKeywords

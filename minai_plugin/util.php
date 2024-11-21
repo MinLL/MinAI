@@ -424,7 +424,7 @@ function getTargetDuringSex($scene) {
 }
 
 function GetRevealedStatus($name) {
-  $cuirass = GetActorValue($name, "cuirass");
+  $cuirass = GetActorValue($name, "cuirass", false, true);
   
   $wearingBottom = false;
   $wearingTop = false;

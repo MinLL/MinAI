@@ -147,7 +147,7 @@ Function HasKeywordAndNotSkip($name, $eqContext, $keyword) {
 }
 
 Function GetClothingContext($name) {
-  $cuirass = GetActorValue($name, "cuirass");
+  $cuirass = GetActorValue($name, "cuirass", false, true);
   $ret = "";
   
   $eqContext = GetAllEquipmentContext($name);
@@ -159,11 +159,10 @@ Function GetClothingContext($name) {
   // if $eqContext["context"] not empty, then will set ret
   if (!empty($eqContext["context"])) {
     $ret .= "{$name} is wearing {$eqContext["context"]}";
+  } elseif (IsEnabled($name, "isNaked")) {
+    $ret .= "{$name} is naked and exposed.\n";
   } elseif (!empty($cuirass)) {
     $ret .= "{$name} is wearing {$cuirass}.\n";
-  }
-  elseif (IsEnabled($name, "isNaked")) {
-    $ret .= "{$name} is naked and exposed.\n";
   }
 
   if (HasKeywordAndNotSkip($name, $eqContext, "SLA_HalfNakedBikini")) {
