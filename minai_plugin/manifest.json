@@ -1,6 +1,6 @@
 
 {
     "name":"minai",
-    "description":"MinAI is loaded.",
-    "config_url":"<a href=\"/HerikaServer/ext/minai_plugin/index.html\">Configure MinAI</a>"
+    "description":"Extension for CHIM that expands its capabilities and optionally adds NSFW integrations.",
+    "config_url":"/HerikaServer/ext/minai_plugin/index.html"
  }
