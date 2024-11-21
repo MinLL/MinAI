@@ -335,7 +335,7 @@ function addXPersonality($jsonXPersonality) {
     - Romantic relationship type: {$jsonXPersonality["relationshipStyle"]}";
 
     if(IsSexActive()) {
-        $GLOBALS["HERIKA_PERS"] .= "
+        $GLOBALS["HERIKA_PERS"] = "
 During sex {$GLOBALS["HERIKA_PERS"]}:
 - speaks in this style {$jsonXPersonality["speakStyleDuringSex"]};
 - prefers these positions: ".implode(", ", $jsonXPersonality["preferredSexPositions"]).";
