@@ -52,7 +52,7 @@ Function GetSurvivalContext($name) {
 Function GetArousalContext($name) {
   $ret = "";
   $arousal = GetActorValue($name, "arousal");
-  if ($arousal != "" && IsModEnabled("Aroused")) {
+  if ($arousal != "" && (IsModEnabled("OSL") || IsModEnabled("Aroused"))) {
       $ret .= "{$name}'s sexual arousal level is {$arousal}/100, where 0 is not aroused at all, and 100 is desperate for sex.";
   }
   if ($ret != "")
