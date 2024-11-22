@@ -14,20 +14,20 @@ For Papyrus plugin developers:
 Just need to bind to SPG_CommandReceived event.
 
 Event OnInit()
-	RegisterForModEvent("SPG_CommandReceived", "HerikaHealTarget")
+    RegisterForModEvent("SPG_CommandReceived", "HerikaHealTarget")
 EndEvent
 
 Event HerikaHealTarget(String  command, String parameter)
 
-	if (command=="ExtCmdHeal") ; This is my function
+    if (command=="ExtCmdHeal") ; This is my function
         
         ; parse parameters and do stuff
         
         ; Finally, send request of type funcrect with the result. THis will make a request to LLM again.
-		SPGPapFunctions.requestMessage("command@"+command+"@"+parameter+"@"+herikaActor.GetDisplayName()+" heals "+player.GetDisplayName()+ " using the spell 'healing hands'","funcret");	// Pass return function to LLM
+        SPGPapFunctions.requestMessage("command@"+command+"@"+parameter+"@"+herikaActor.GetDisplayName()+" heals "+player.GetDisplayName()+ " using the spell 'healing hands'","funcret");	// Pass return function to LLM
     
-	endif
-	
+    endif
+    
 EndEvent
 
 
@@ -48,14 +48,24 @@ if ($GLOBALS["force_voice_type"]) {
 }
 
 if (ShouldClearFollowerFunctions()) {
-    $GLOBALS["ENABLED_FUNCTIONS"] = array();
     // Enable baseline set of functions
-    // $GLOBALS["ENABLED_FUNCTIONS"][] = 'Inspect';
-    $GLOBALS["ENABLED_FUNCTIONS"][] = 'LookAt';
-    $GLOBALS["ENABLED_FUNCTIONS"][] = 'InspectSurroundings';
-    $GLOBALS["ENABLED_FUNCTIONS"][] = 'TakeASeat';
-    $GLOBALS["ENABLED_FUNCTIONS"][] = 'SearchMemory';
-    $GLOBALS["ENABLED_FUNCTIONS"][] = 'Attack'; // Should this be enabled?
+    $allowed_functions = array();
+
+    // Only add functions if they were already enabled (to avoid deprecated functions)
+    // if (in_array('Inspect', $GLOBALS["ENABLED_FUNCTIONS"]))
+        // $allowed_functions[] = 'Inspect';
+    if (in_array('LookAt', $GLOBALS["ENABLED_FUNCTIONS"]))
+        $allowed_functions[] = 'LookAt';
+    if (in_array('InspectSurroundings', $GLOBALS["ENABLED_FUNCTIONS"]))
+        $allowed_functions[] = 'InspectSurroundings';
+    if (in_array('TakeASeat', $GLOBALS["ENABLED_FUNCTIONS"]))
+        $allowed_functions[] = 'TakeASeat';
+    if (in_array('SearchMemory', $GLOBALS["ENABLED_FUNCTIONS"]))
+        $allowed_functions[] = 'SearchMemory';
+    if (in_array('Attack', $GLOBALS["ENABLED_FUNCTIONS"]))
+        $allowed_functions[] = 'Attack'; // Should this be enabled?
+
+    $GLOBALS["ENABLED_FUNCTIONS"] = $allowed_functions;
 }
 else {
     // Follower specific commands
