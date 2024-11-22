@@ -336,7 +336,7 @@ function addXPersonality($jsonXPersonality) {
 
     if(IsSexActive()) {
         $GLOBALS["HERIKA_PERS"] .= "
-During sex {$GLOBALS["HERIKA_PERS"]}:
+During sex {$GLOBALS["HERIKA_NAME"]}:
 - speaks in this style {$jsonXPersonality["speakStyleDuringSex"]};
 - prefers these positions: ".implode(", ", $jsonXPersonality["preferredSexPositions"]).";
 - likes to participate in such sex activities: ".implode(", ", $jsonXPersonality["sexualBehavior"]).";
@@ -424,7 +424,7 @@ function getTargetDuringSex($scene) {
 }
 
 function GetRevealedStatus($name) {
-  $cuirass = GetActorValue($name, "cuirass");
+  $cuirass = GetActorValue($name, "cuirass", false, true);
   
   $wearingBottom = false;
   $wearingTop = false;

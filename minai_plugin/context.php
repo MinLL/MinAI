@@ -52,7 +52,7 @@ Function GetSurvivalContext($name) {
 Function GetArousalContext($name) {
   $ret = "";
   $arousal = GetActorValue($name, "arousal");
-  if ($arousal != "") {
+  if ($arousal != "" && (IsModEnabled("OSL") || IsModEnabled("Aroused"))) {
       $ret .= "{$name}'s sexual arousal level is {$arousal}/100, where 0 is not aroused at all, and 100 is desperate for sex.";
   }
   if ($ret != "")
@@ -147,7 +147,7 @@ Function HasKeywordAndNotSkip($name, $eqContext, $keyword) {
 }
 
 Function GetClothingContext($name) {
-  $cuirass = GetActorValue($name, "cuirass");
+  $cuirass = GetActorValue($name, "cuirass", false, true);
   $ret = "";
   
   $eqContext = GetAllEquipmentContext($name);
@@ -159,11 +159,10 @@ Function GetClothingContext($name) {
   // if $eqContext["context"] not empty, then will set ret
   if (!empty($eqContext["context"])) {
     $ret .= "{$name} is wearing {$eqContext["context"]}";
+  } elseif (IsEnabled($name, "isNaked")) {
+    $ret .= "{$name} is naked and exposed.\n";
   } elseif (!empty($cuirass)) {
     $ret .= "{$name} is wearing {$cuirass}.\n";
-  }
-  elseif (IsEnabled($name, "isNaked")) {
-    $ret .= "{$name} is naked and exposed.\n";
   }
 
   if (HasKeywordAndNotSkip($name, $eqContext, "SLA_HalfNakedBikini")) {
