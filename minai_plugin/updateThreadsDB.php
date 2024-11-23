@@ -67,7 +67,7 @@ function updateThreadsDB() {
                     "curr_scene_id" => $sceneId,
                     "female_actors" => $femaleActors,
                     "male_actors" => $maleActors,
-                    "framework" => $framework,
+                    "framework" => strtolower($framework),
                     "fallback" => $fallback
                 ]);
             }
