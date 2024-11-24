@@ -684,6 +684,7 @@ Event SLSOOrgasm(Form actorRef, Int tid)
     return
   EndIf
 
+  Main.Debug("[SLSOOrgasm] name = " + actorInAction.GetName() + " tid: " + tid)
   sslThreadController controller = slf.GetController(tid)
   Actor[] actorList = slf.HookActors(tid)
 
