@@ -1,8 +1,6 @@
 scriptname minai_Sex extends Quest
 
 SexLabFramework slf
-sslMatchMakerMain slm
-
 
 bool bHasOstim = False
 bool bHasSexlab = False
@@ -66,7 +64,9 @@ Function Maintenance(minai_MainQuestController _main)
   actorToSayOnEndMap = JValue.releaseAndRetain(actorToSayOnEndMap, JMap.object())
     
   slf = Game.GetFormFromFile(0xD62, "SexLab.esm") as SexLabFramework
-  slm = Game.GetFormFromFile(0xB3302, "SexLab.esm") as sslMatchMakerMain
+
+  ; Only SexLab P+ includes matchmaker, so check for that
+  bHasSexlabPPlus = Game.GetFormFromFile(0xB3302, "SexLab.esm")
 
   ambientSexTalk.Maintenance(self, slf)
   ostim.Maintenance()
@@ -75,13 +75,6 @@ Function Maintenance(minai_MainQuestController _main)
   if slf != None
     Main.Info("Found Sexlab")
     bHasSexlab = True
-
-    ; Only SexLab P+ includes matchmaker, so check for that
-    if slm != None
-      Main.Info("Found Sexlab P+")
-      bHasSexlabPPlus = True
-    EndIf
-    
   EndIf
   if Game.GetModByName("OStim.esp") != 255
     Main.Info("Found OStim")
@@ -686,7 +679,11 @@ Event SLSOOrgasm(Form actorRef, Int tid)
     return
   EndIf
 
-  Main.Debug("[SLSOOrgasm] name = " + actorInAction.GetName() + " tid: " + tid)
+  ; if using sexlab p+ and climaxtype = scene, then handle climax in scenechange
+  If isSLSBClimaxType()
+    return
+  EndIf
+
   sslThreadController controller = slf.GetController(tid)
   Actor[] actorList = slf.HookActors(tid)
 
@@ -701,6 +698,11 @@ EndEvent
 
 Event PostSexScene(int tid, bool HasPlayer)
   Main.Debug("[PostSexScene] tid = " + tid)
+
+  ; if using sexlab p+ and climaxtype = scene, then handle climax in scenechange
+  If isSLSBClimaxType()
+    return
+  EndIf
 
   sslThreadController controller = slf.GetController(tid)
   Actor[] actorList = slf.HookActors(tid)
@@ -937,19 +939,31 @@ function onSceneChange(int ThreadID, string framework)
   bool playerInvolved = sexUtil.isPlayerInvolved(ThreadID, framework)
   ; in case if any framework need to block sex talk during scene change
   bool skipSexTalk = false
+  ; in case the scene change says which actors climax (sexlab p+ with SLSB packs)
+  bool useClimaxTalk = false
   if(playerInvolved)
     AIFF.ChillOut()
   endif
 
   actor[] actors
+  actor[] climaxingActors
   if(framework == ostimType)
     actors = OThread.GetActors(ThreadID)
   elseif(framework == sexlabType)
     sslThreadController controller = slf.GetController(ThreadID)
     actors = controller.Positions
 
+    ; if using sexlab p+ and climaxtype = scene, then handle climax in scenechange
+    If isSLSBClimaxType()
+      ; will be empty if only climax was by the player
+      climaxingActors = getClimaxingActorsArray(ThreadID)
+      If climaxingActors.Length > 0
+        useClimaxTalk = true
+      EndIf
+
     ; we don't want to fire scene change sex talk on last sexlab stage since it will be orgasm stage for actors, where orgasm sex talk will be fired
-    if (controller.Stage == controller.Animation.StageCount())
+    ; elseif to avoid skipping talk in final scene in case SLSB climax took place in an earlier scene
+    elseif (controller.Stage == controller.Animation.StageCount())
       skipSexTalk
     endif
   endif
@@ -962,7 +976,11 @@ function onSceneChange(int ThreadID, string framework)
     i += 1
   EndWhile
   if(!skipSexTalk)
-    sexTalkSceneChage(sexUtil.GetWeightedRandomActorToSpeak(actors, bHasOstim), playerInvolved, framework)
+    If useClimaxTalk
+      sexTalkClimax(sexUtil.GetWeightedRandomActorToSpeak(climaxingActors, bHasOstim), playerInvolved, framework)
+    Else
+      sexTalkSceneChage(sexUtil.GetWeightedRandomActorToSpeak(actors, bHasOstim), playerInvolved, framework)
+    EndIf
   endif
 endfunction
 
@@ -973,3 +991,40 @@ EndFunction
 bool function useOstim()
   return bHasOstim && minai_UseOStim.GetValue() == 1.0
 endfunction
+
+; check if sexlab p+ is active and ClimaxType is set to Scene in its MCM
+bool Function isSLSBClimaxType()
+  If bHasSexlabPPlus
+    int climaxType = sslSystemConfig.GetSettingInt("iClimaxType")
+    ; 0 = from SLSB data, 1 = last scene in animation, 2 = sexlab p+ version of SLSO
+    return climaxType == 0
+  EndIf
+  return false;
+EndFunction
+
+; get which actors are climaxing in a sexlab p+ scene (excluding the player)
+actor[] Function getClimaxingActorsArray(int ThreadID)
+  SexLabThread thread = slf.GetThread(ThreadID)
+  string sceneHash = thread.GetActiveScene()
+  string stageHash = thread.GetActiveStage()
+  ; get the climaxing positions in the scene (0, 1, 2, etc)
+  int[] climaxingPositions = SexlabRegistry.GetClimaxingActors(sceneHash, stageHash)
+
+  actor[] climaxingActors = PapyrusUtil.ActorArray(0)
+  actor[] actorsInScene = thread.GetPositions()
+  int i = 0
+  while i < actorsInScene.Length
+    actor currActor = actorsInScene[i]
+    ; don't add the player
+    If currActor != PlayerRef
+      ; check if the actor is in one of the climaxing positions
+      int actorPosition = thread.GetPositionIdx(currActor)
+      If climaxingPositions.Find(actorPosition) >= 0
+        climaxingActors = PapyrusUtil.PushActor(climaxingActors, currActor)
+      EndIf
+    EndIf
+    i += 1
+  EndWhile
+
+  return climaxingActors
+EndFunction
