@@ -1008,16 +1008,20 @@ actor[] Function getClimaxingActorsArray(int ThreadID)
   SexLabThread thread = slf.GetThread(ThreadID)
   string sceneHash = thread.GetActiveScene()
   string stageHash = thread.GetActiveStage()
+  actor[] climaxingActors = PapyrusUtil.ActorArray(0)
+
   ; get the climaxing positions in the scene (0, 1, 2, etc)
   int[] climaxingPositions = SexlabRegistry.GetClimaxingActors(sceneHash, stageHash)
+  If climaxingPositions.Length == 0
+    return climaxingActors
+  EndIf
 
-  actor[] climaxingActors = PapyrusUtil.ActorArray(0)
   actor[] actorsInScene = thread.GetPositions()
   int i = 0
   while i < actorsInScene.Length
     actor currActor = actorsInScene[i]
     ; don't add the player
-    If currActor != PlayerRef
+    If currActor != PlayerRef && thread.IsOrgasmAllowed(currActor)
       ; check if the actor is in one of the climaxing positions
       int actorPosition = thread.GetPositionIdx(currActor)
       If climaxingPositions.Find(actorPosition) >= 0
