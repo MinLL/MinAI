@@ -132,6 +132,8 @@ string function buildSceneString(string sceneId, string actorString, string even
   elseif(eventType == "scenechange")
     return actorString + " changed the scene to " + result
   endif
+
+  return result
 endfunction
 
 actor[] function BuildGroup(int size, int jMalesArr, int jFemalesArr)
