@@ -13,6 +13,7 @@ bool bHasSLHH = False
 bool bHasSLApp = False
 bool bHasDeviouslyAccessible = False
 bool bHasDDExpansion = False
+bool bHasSubmissiveLola = False
 
 Keyword SLHHScriptEventKeyword
 GlobalVariable Debt
@@ -61,7 +62,6 @@ function Maintenance(minai_MainQuestController _main)
   RegisterForModEvent("DDI_KeyBreak", "OnKeyBreak")
   RegisterForModEvent("DDI_JamLock", "OnJamLock")
   RegisterForModEvent("DDI_DeviceEscapeAttempt", "OnDeviceEscapeAttempt")
-  
   
   libs = Game.GetFormFromFile(0x00F624, "Devious Devices - Integration.esm") as zadlibs
     if libs
@@ -139,18 +139,24 @@ function Maintenance(minai_MainQuestController _main)
       Debug.Notification("Old version of Deviously Accessible. Some integrations will be broken.")
     EndIf
   EndIf  
+
+  if Game.GetModByName("submissivelola_est.esp") != 255
+    bHasSubmissiveLola = True
+    Main.Info("Found Submissive Lola")
+  EndIf  
   aiff.SetModAvailable("DeviousFollowers", bHasDeviousFollowers)
   aiff.SetModAvailable("DD", bHasDD)
   aiff.SetModAvailable("STA", bHasSTA)
   aiff.SetModAvailable("SLHH", bHasSLHH)
   aiff.SetModAvailable("SLApp", bHasSLApp)
   aiff.SetModAvailable("DeviouslyAccessible", bHasDeviouslyAccessible)
+  aiff.SetModAvailable("SubmissiveLola", bHasSubmissiveLola)
   config.StoreAllConfigs()
 
   aiff.RegisterAction("ExtCmdGrope", "Grope", "Grope the Target", "General", 1, 30, 2, 5, 300, True)
   aiff.RegisterAction("ExtCmdPinchNipples", "PinchNipples", "Pinch the Targets Nipples", "General", 1, 30, 2, 5, 300, True)
-  aiff.RegisterAction("ExtCmdSpankAss", "SpankAss", "Spank the Targets Ass", "General", 1, 10, 2, 5, 300, (bHasSTA && bHasDeviousFollowers))
-  aiff.RegisterAction("ExtCmdSpankTits", "SpankTits", "Spank the Targets Tits ", "General", 10, 1, 2, 5, 300, (bHasSTA && bHasDeviousFollowers))
+  aiff.RegisterAction("ExtCmdSpankAss", "SpankAss", "Spank the Targets Ass", "General", 1, 10, 2, 5, 300, (bHasSTA && (bHasDeviousFollowers || bHasSubmissiveLola)))
+  aiff.RegisterAction("ExtCmdSpankTits", "SpankTits", "Spank the Targets Tits ", "General", 10, 1, 2, 5, 300, (bHasSTA && (bHasDeviousFollowers || bHasSubmissiveLola)))
   aiff.RegisterAction("ExtCmdMolest", "Molest", "Sexually Assault the target", "General", 1, 120, 2, 5, 300, bHasSLHH)
   aiff.RegisterAction("ExtCmdKiss", "Kiss", "Kiss the target", "General", 1, 120, 2, 5, 300, bHasSLapp)
   aiff.RegisterAction("ExtCmdHug", "Hug", "Hug the target", "General", 1, 120, 2, 5, 300, bHasSLapp)
@@ -174,6 +180,12 @@ function Maintenance(minai_MainQuestController _main)
   aiff.RegisterAction("ExtCmdGiveDrugs", "GiveDrugs", "Give Drugs to the player", "Devious Followers", 1, 1, 2, 5, 300, bHasDeviousFollowers)
   ; aiff.RegisterAction("ExtCmdRejectDeal", "RejectDeal", "Reject Deal Negotiation", "Devious Followers", 1, 1, 2, 5, 300, bHasDeviousFollowers)
 
+  ; Submissive Lola actions
+  aiff.RegisterAction("ExtCmdGiveTask", "GiveTask", "Give a task to the player", "Submissive Lola", 1, 1, 2, 5, 300, bHasSubmissiveLola)
+  aiff.RegisterAction("ExtCmdPunishDisrespectful", "PunishDisrespectful", "Punish the player", "Submissive Lola", 1, 1, 2, 5, 300, bHasSubmissiveLola)
+  aiff.RegisterAction("ExtCmdPunishWhip", "PunishWhip", "Whip the player", "Submissive Lola", 1, 1, 2, 5, 300, bHasSubmissiveLola)
+  aiff.RegisterAction("ExtCmdSmallReward", "SmallReward", "Reward the player (large)", "Submissive Lola", 1, 1, 2, 5, 300, bHasSubmissiveLola)
+  aiff.RegisterAction("ExtCmdLargeReward", "LargeReward", "Reward the player (large)", "Submissive Lola", 1, 1, 2, 5, 300, bHasSubmissiveLola)
 EndFunction
 
 Function ResetSpankRule()
@@ -184,10 +196,16 @@ Function ResetSpankRule()
   dftools._DFSpankDealRequests.SetValue(spankRequestCount As Float)
 EndFunction
 
+Function DecreaseSubmissionScoreMinor()
+  (Quest.GetQuest("vkjMQ") as vkjMQ).UpdateSubmissionScore(-3)
+EndFunction
 
-Function SpankAss(int count, bool bDeviousFollowerInScene)
+Function SpankAss(int count, bool bDeviousFollowerInScene, bool bLolaOwnerInScene)
   if bDeviousFollowerInScene
     ResetSpankRule()
+  EndIf
+  if bLolaOwnerInScene
+    DecreaseSubmissionScoreMinor()
   EndIf
   int i = 0
   While i < count
@@ -197,9 +215,12 @@ Function SpankAss(int count, bool bDeviousFollowerInScene)
   EndWhile
 EndFunction
 
-Function SpankTits(int count, bool bDeviousFollowerInScene)
+Function SpankTits(int count, bool bDeviousFollowerInScene, bool bLolaOwnerInScene)
   if bDeviousFollowerInScene
     ResetSpankRule()
+  EndIf
+  if bLolaOwnerInScene
+    DecreaseSubmissionScoreMinor()
   EndIf
   int i = 0
   While i < count
@@ -281,7 +302,6 @@ bool Function CanVibrate(Actor akActor)
   EndIf
   return (akActor.WornHasKeyword(libs.zad_DeviousPlugVaginal)  || akActor.WornHasKeyword(libs.zad_DeviousPlugAnal)  || akActor.WornHasKeyword(libs.zad_DeviousPiercingsNipple)  || akActor.WornHasKeyword(libs.zad_DeviousPiercingsVaginal))
 EndFunction
-
 
 function WriteDDString(actor akActor, actor player, bool isYou=false)
     string actorName = main.GetActorName(akActor)
@@ -500,6 +520,13 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
       bDeviousFollowerInScene = True
     EndIf
   EndIf
+
+  bool bLolaOwnerInScene = False
+  if bHasSubmissiveLola
+    Actor slOwner = (Quest.GetQuest("vkjMQ") as vkjMQ).Owner.GetRef() as Actor
+    bLolaOwnerInScene =  (akTarget == slOwner || akSpeaker == slOwner)
+  EndIf
+
   int vibTime = Utility.RandomInt(1,15)
   int vibTimeLong = Utility.RandomInt(10,30)
   if bHasDD && CanVibrate(akTarget)
@@ -568,10 +595,10 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
   EndIf
 
   If stringUtil.Find(sayLine, "-spankass-") != -1 || stringUtil.Find(sayLine, "-spank-") != -1
-    SpankAss(main.CountMatch(sayLine, "-spank"), bDeviousFollowerInScene)
+    SpankAss(main.CountMatch(sayLine, "-spank"), bDeviousFollowerInScene, bLolaOwnerInScene)
   EndIf
   if stringUtil.Find(sayLine, "-spanktits-") != -1
-    SpankTits(main.CountMatch(sayLine, "-spanktits-"), bDeviousFollowerInScene)
+    SpankTits(main.CountMatch(sayLine, "-spanktits-"), bDeviousFollowerInScene, bLolaOwnerInScene)
   EndIf
 
     ; Mutually Exclusive keywords
@@ -659,6 +686,12 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     bDeviousFollowerInScene =  (akSpeaker == deviousFollower)
   EndIf
   
+  bool bLolaOwnerInScene = False
+  if bHasSubmissiveLola
+    Actor slOwner = (Quest.GetQuest("vkjMQ") as vkjMQ).Owner.GetRef() as Actor
+    bLolaOwnerInScene =  (akSpeaker == slOwner)
+  EndIf
+
   if bHasDD ;  && CanVibrate(akTarget)
     int vibTime = Utility.RandomInt(20,60)
     if (command == "ExtCmdForceOrgasm")
@@ -772,10 +805,10 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     EndIf
     Main.RegisterEvent(""+speakerName+" pinches " + targetName + "'s nipples in a vulgar manner.")
   elseif (command=="ExtCmdSpankAss")
-    SpankAss(1, bDeviousFollowerInScene)
+    SpankAss(1, bDeviousFollowerInScene, bLolaOwnerInScene)
     Main.RegisterEvent(""+speakerName+" spanks " + targetName + "'s ass.")
   elseif (command=="ExtCmdSpankTits")
-    SpankTits(1, bDeviousFollowerInScene)
+    SpankTits(1, bDeviousFollowerInScene, bLolaOwnerInScene)
     Main.RegisterEvent(""+speakerName+" spanks " + targetName + "'s tits.")
   EndIf
 
@@ -816,6 +849,36 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
       ClearTargetRule()
     EndIf
   EndIf
+  if (bHasSubmissiveLola)
+    if (command == "ExtCmdGiveTask" && (Quest.GetQuest("vkjMQ") as vkjMQ).MayAskForService)
+      Main.Info("Player asked for a task")
+      Main.RegisterEvent(""+Main.GetActorName(playerRef)+" asked " + speakerName +" for a task.")
+      (Quest.GetQuest("vkjMQ") as vkjMQ).KneelScene.Start()
+    endif
+    if (command == "ExtCmdPunishDisrespectful")
+      Main.Info(speakerName + " punishes player moderatly")
+      Main.RegisterEvent(""+speakerName+" punishes " + Main.GetActorName(playerRef) +" moderatly.")
+      (Quest.GetQuest("vkjMQ") as vkjMQ).Disrespectful(-5)
+    endif
+    if (command == "ExtCmdPunishWhip")
+      Main.Info(speakerName + " punishes player harshly")
+      Main.RegisterEvent(""+speakerName+" punishes " + Main.GetActorName(playerRef) +" harshly.")
+      vkjMQ SubLolaMQ = Quest.GetQuest("vkjMQ") as vkjMQ
+      SubLolaMQ.UpdateSubmissionScore(-10)
+      SubLolaMQ.OwnerWillPunishThisTime()
+      SubLolaMQ.WhipPlayer(true)
+    endif
+    if (command == "ExtCmdSmallReward")
+      Main.Info(speakerName + " rewards the player (small)")
+      Main.RegisterEvent(""+speakerName+" rewards " + Main.GetActorName(playerRef) +" a little.")
+      (Quest.GetQuest("vkjMQ") as vkjMQ).MinimalReward()
+    endif
+    if (command == "ExtCmdLargeReward")
+      Main.Info(speakerName + " rewards the player (large)")
+      Main.RegisterEvent(""+speakerName+" rewards " + Main.GetActorName(playerRef) +" a lot.")
+      (Quest.GetQuest("vkjMQ") as vkjMQ).MediumReward()
+    endif
+  Endif
 EndEvent
 
 Function SetContext(actor akTarget)
@@ -867,6 +930,33 @@ Function SetContext(actor akTarget)
     Else
       aiff.SetActorVariable(playerRef, "deviousFollowerNewRuleDesc",  "")
     EndIf
+  EndIf
+  if bHasSubmissiveLola && akTarget == PlayerRef
+    vkjMQ SubLolaMQ = Quest.GetQuest("vkjMQ") as vkjMQ
+
+    Actor slOwner = SubLolaMQ.Owner.GetRef() as Actor
+    if slOwner
+      Main.Info("Submissive Lola owner=" + main.GetActorName(slOwner))
+      aiff.SetActorVariable(playerRef, "subLolaOwnerName", main.GetActorName(slOwner))
+    else
+      aiff.SetActorVariable(playerRef, "subLolaOwnerName", "")
+    EndIf
+    Actor slPlaymate = SubLolaMQ.Playmate.GetRef() as Actor
+    if slPlaymate
+      aiff.SetActorVariable(playerRef, "subLolaPlaymateName", main.GetActorName(slPlaymate))
+    else
+      aiff.SetActorVariable(playerRef, "subLolaPlaymateName", "")
+    EndIf
+    aiff.SetActorVariable(playerRef, "subLolaGlobalSubmissionScore", SubLolaMQ.GlobalSubmissionScore.GetValue())
+    aiff.SetActorVariable(playerRef, "subLolaTimesSexIsRequired", SubLolaMQ.TimesSexIsRequired)
+    aiff.SetActorVariable(playerRef, "subLolaTimesServiceIsRequired", SubLolaMQ.TimesServiceIsRequired)
+    aiff.SetActorVariable(playerRef, "subLolaSlaveContract", SubLolaMQ.SlaveContract.GetValue())
+    aiff.SetActorVariable(playerRef, "subLolaOwnerAttitude", (Quest.GetQuest("vkj_MCM") as vkjmcm).OwnerAttitude)
+    if (SubLolaMQ.MayAskForService)
+      aiff.SetActorVariable(playerRef, "subLolaMayAskForService",  1)
+    else
+      aiff.SetActorVariable(playerRef, "subLolaMayAskForService",  0)
+    endif
   EndIf
   if bHasDeviouslyAccessible && akTarget == PlayerRef
     aiff.SetActorVariable(playerRef, "deviouslyAccessibleEyeFuckTrack", eyefucktrack.GetValueInt())
@@ -931,4 +1021,33 @@ EndFunction
 
 bool Function HasDD()
   return bHasDD
+EndFunction
+
+Function SexStarted(actor[] actors, actor akSpeaker, string tags="")
+  if !bHasSubmissiveLola
+    return
+  endif
+
+  Main.Info("Received sexstarted event")
+
+  ; Player involved ?
+  if actors.Find(playerRef) == 0
+    return
+  endif
+
+  ; Owner involved ?
+  Actor slOwner = (Quest.GetQuest("vkjMQ") as vkjMQ).Owner.GetRef() as Actor
+  if slOwner != akSpeaker
+    return
+  endif
+  
+  int handle = ModEvent.Create("PlayerOfferedSexToMaster")
+  if handle
+    ModEvent.PushForm(handle, self)
+    ModEvent.PushForm(handle, slOwner)
+	  ModEvent.PushBool(handle, true)
+    ModEvent.Send(handle)
+  endif
+
+  Main.Info("Event sent to SLola")
 EndFunction

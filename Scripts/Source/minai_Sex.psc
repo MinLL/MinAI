@@ -293,6 +293,10 @@ Function StartSexOrSwitchToGroup(actor[] actors, actor akSpeaker, string tags=""
       return
     EndIf
   EndIf
+
+  ; Notify the devious stuff
+  devious.SexStarted(actors, akSpeaker, tags)
+
   if useOstim()
     MinaiUtil.Debug("OStim detected - processing scene request")
     ostim.StartSexOrSwitchToGroup(actors, akSpeaker, tags)

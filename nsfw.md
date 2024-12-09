@@ -68,6 +68,17 @@ MinAI includes 3467 ostim/sexlab scene descriptions (as of 10/24/2024) for bette
 ### Sexlab Horrible Harassment
 * The AI will utilize Horrible Harassment to molest the player if they want to do so.
 
+### Submissive Lola
+* YOU MUST USE THE SUBMISSIVE LOLA NICKNAME MODE
+* The AI will be aware that it is your owner, and will roleplay as such.
+* The AI is aware of the submission score of the player.
+* The AI is aware of duration of the enslavement (willing, contract or life).
+* The AI is aware if the player has to offer sex or not.
+* The AI will know if the player has completed enough tasks for the day or not.
+* When the normal dialog option "May I be of service?" is available, you can directly ask the AI for a task (somewhat hard to trigger).
+* Starting sex with your owner through the AI will count has "having offered sex" to the mod, but only if your owner is the one triggering the action (not if you are both part of an orgy started by another NPC for instance).
+* Being disrespectful can trigger punishment with adequat loss of submission score, while being good will increase the submission score.
+
 ### Binding
 * Adds LLM Awareness and exposes actions for the player's master.
 
