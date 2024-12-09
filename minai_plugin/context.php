@@ -6,6 +6,7 @@ require_once("wornequipment.php");
 require_once("customintegrations.php");
 require_once("weather.php");
 require_once("reputation.php");
+require_once("submissivelola.php");
 
 Function BuildContext($name) {
   if ($name == "The Narrator") {
@@ -17,8 +18,10 @@ Function BuildContext($name) {
   $context .= GetDDContext($name);
   $context .= GetArousalContext($name);
   $context .= GetFollowingContext($name);
-  if (!isset($GLOBALS["HERIKA_TARGET"]))
+  if (!isset($GLOBALS["HERIKA_TARGET"])) {
       $context .= GetDeviousFollowerContext($name);
+      $context .= GetSubmissiveLolaContext($name);
+  }
   $context .= GetSurvivalContext($name);
 
   return $context;
