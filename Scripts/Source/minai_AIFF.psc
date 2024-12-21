@@ -343,10 +343,28 @@ Function StoreFactions(actor akTarget)
   Faction[] factions = akTarget.GetFactions(-128, 127)
   int i = 0
   while i < factions.Length
-   allFactions += factions[i].GetName() + ","
+   string factionName = factions[i].GetName()
+   If factionName == ""
+     factionName = GetVanillaFactionName(factions[i].GetFormID())
+   EndIf
+   If factionName != ""
+     allFactions += factionName + ","
+   EndIf
    i += 1
   EndWhile
   SetActorVariable(akTarget, "AllFactions", allFactions)
+EndFunction
+
+; check for some of the vanilla factions with blank names
+string Function GetVanillaFactionName(int factionId)
+  If factionId == "378957" ; 0005C84D
+    return "PotentialFollowerFaction"
+  ElseIf factionId == "378958" ; 0005C84E
+    return "CurrentFollowerFaction" ; also includes some follower animals like Vigilance not found in PotentialFollowerFaction
+  ElseIf factionId == "33653669" ; 020183A5 (load order dependent, but dawnguard should always be 02)
+    return "DLC1SeranaFaction" ; Serana doesn't join the normal follower factions
+  EndIf
+  return ""
 EndFunction
 
 
