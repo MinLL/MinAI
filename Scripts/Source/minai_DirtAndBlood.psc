@@ -95,7 +95,7 @@ Function SetContext(actor akTarget)
   bDirty_Spell_Blood2 = actor.HasSpell(dirty_Spell_Blood2)
   bDirty_Spell_Blood3 = actor.HasSpell(dirty_Spell_Blood3)
   bDirty_Spell_Blood4 = actor.HasSpell(dirty_Spell_Blood4)
-  bDirty_Spell_Clean = actor.HasSpell(dirty_Spell_Clean, False)
+  bDirty_Spell_Clean = actor.HasSpell(dirty_Spell_Clean)
  
   string dirt_and_blood_tag_list = ""
   If bDirty_SoapEffectSpell 
