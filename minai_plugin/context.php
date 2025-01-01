@@ -7,6 +7,7 @@ require_once("customintegrations.php");
 require_once("weather.php");
 require_once("reputation.php");
 require_once("submissivelola.php");
+require_once("dirtandblood.php");
 
 Function BuildContext($name) {
   if ($name == "The Narrator") {
@@ -14,6 +15,7 @@ Function BuildContext($name) {
   }
   $context = "";
   $context .= GetPhysicalDescription($name);
+  $context .= GetDirtAndBloodContext();
   $context .= GetClothingContext($name);
   $context .= GetDDContext($name);
   $context .= GetArousalContext($name);
