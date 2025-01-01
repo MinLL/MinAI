@@ -56,7 +56,6 @@ function Maintenance(minai_MainQuestController _main)
   if Game.GetModByName("Dirt and Blood - Dynamic Visuals.esp") != 255
     Main.Info("Found Dirt and Blood - Dynamic Visuals")
     bHasDirtAndBlood = True
-    SLA_FullSkirt = Game.GetFormFromFile(0x08F40D, "SexlabAroused.esm") as Keyword
     dirty_SoapEffectSpell = Game.GetFormFromFile(0x000800, "Dirt and Blood - Dynamic Visuals.esp") as Spell
     dirty_Spell_Dirt1 = Game.GetFormFromFile(0x000806, "Dirt and Blood - Dynamic Visuals.esp") as Spell
     dirty_Spell_Dirt2 = Game.GetFormFromFile(0x000807, "Dirt and Blood - Dynamic Visuals.esp") as Spell
@@ -86,16 +85,16 @@ Function SetContext(actor akTarget)
     return
   EndIf
 
-  bDirty_SoapEffectSpell = actor.HasSpell(dirty_SoapEffectSpell)
-  bDirty_Spell_Dirt1 = actor.HasSpell(dirty_Spell_Dirt1)
-  bDirty_Spell_Dirt2 = actor.HasSpell(dirty_Spell_Dirt2)
-  bDirty_Spell_Dirt3 = actor.HasSpell(dirty_Spell_Dirt3)
-  bDirty_Spell_Dirt4 = actor.HasSpell(dirty_Spell_Dirt4)
-  bDirty_Spell_Blood1 = actor.HasSpell(dirty_Spell_Blood1)
-  bDirty_Spell_Blood2 = actor.HasSpell(dirty_Spell_Blood2)
-  bDirty_Spell_Blood3 = actor.HasSpell(dirty_Spell_Blood3)
-  bDirty_Spell_Blood4 = actor.HasSpell(dirty_Spell_Blood4)
-  bDirty_Spell_Clean = actor.HasSpell(dirty_Spell_Clean)
+  bDirty_SoapEffectSpell = akTarget.HasSpell(dirty_SoapEffectSpell)
+  bDirty_Spell_Dirt1 = akTarget.HasSpell(dirty_Spell_Dirt1)
+  bDirty_Spell_Dirt2 = akTarget.HasSpell(dirty_Spell_Dirt2)
+  bDirty_Spell_Dirt3 = akTarget.HasSpell(dirty_Spell_Dirt3)
+  bDirty_Spell_Dirt4 = akTarget.HasSpell(dirty_Spell_Dirt4)
+  bDirty_Spell_Blood1 = akTarget.HasSpell(dirty_Spell_Blood1)
+  bDirty_Spell_Blood2 = akTarget.HasSpell(dirty_Spell_Blood2)
+  bDirty_Spell_Blood3 = akTarget.HasSpell(dirty_Spell_Blood3)
+  bDirty_Spell_Blood4 = akTarget.HasSpell(dirty_Spell_Blood4)
+  bDirty_Spell_Clean = akTarget.HasSpell(dirty_Spell_Clean)
  
   string dirt_and_blood_tag_list = ""
   If bDirty_SoapEffectSpell 
