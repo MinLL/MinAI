@@ -44,6 +44,9 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
 * Players can now request food (A full sunhelm meal) to be served to them by servers or innkeepers.
 * The AI will be aware of the player's general hunger, thirst, and fatigue levels.
 
+### Dirt And Blood
+* The AI will be aware of the player's personal cleanliness, and to what degree they are covered in blood. Does not include clothing.
+
 ### Nether's Follower Framework (NFF)
 * Allows the player to order followers to start / stop looting the nearby area.
 * This will be expanded greatly in the future to provide further integrations.
