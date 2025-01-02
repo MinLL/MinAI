@@ -126,7 +126,14 @@ Function IsConfigEnabled($configKey) {
 }
 
 Function IsFollower($name) {
-    return (IsInFaction($name, "Framework Follower Faction") || IsInFaction($name, "Follower Role Faction") || IsInFaction($name, "PotentialFollowerFaction") || IsInFaction($name, "Potential Follower"));
+    return (
+        IsInFaction($name, "Framework Follower Faction") ||
+        IsInFaction($name, "Follower Role Faction") ||
+        IsInFaction($name, "PotentialFollowerFaction") ||
+        IsInFaction($name, "CurrentFollowerFaction") ||
+        IsInFaction($name, "DLC1SeranaFaction") ||
+        IsInFaction($name, "Potential Follower")
+    );
 }
 
 // Check if the specified actor is following (not follower)
