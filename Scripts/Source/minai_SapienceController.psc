@@ -38,7 +38,9 @@ function Maintenance(minai_MainQuestController _main)
   RegisterForModEvent("CHIM_CommandReceived", "CommandDispatcher") ; Hook into AIFF - This is a separate quest, so we have to do this separately
   RegisterForModEvent("CHIM_TextReceived", "OnTextReceived")
   StartRadiantDialogue()
-  EnableCombatDialogue()
+  if config.toggleCombatDialogue
+    EnableCombatDialogue()
+  EndIf
   ; RegisterForKey(aiffConfig._myKey2)
   ; RegisterForKey(aiffConfig._myKey)
 EndFunction
@@ -47,6 +49,11 @@ EndFunction
 Function EnableCombatDialogue()
   ; Enable combat dialogue
   AIAgentFunctions.setConf("_combat_dialogue",1,0,"")
+EndFunction
+
+Function DisableCombatDialogue()
+  ; Disable combat dialogue
+  AIAgentFunctions.setConf("_combat_dialogue",0,0,"")
 EndFunction
 
 
