@@ -354,7 +354,7 @@ Function RenderActionsPage()
   SetCursorPosition(0)
   string[] actionCategories
   if sex.IsNSFW()
-    actionCategories = new String[9];
+    actionCategories = new String[10];
     actionCategories[0] = "General";
     actionCategories[1] = "Survival";
     actionCategories[2] = "External";
@@ -364,12 +364,14 @@ Function RenderActionsPage()
     actionCategories[6] = "Devious Stuff"; 
     actionCategories[7] = "Devious Followers";
     actionCategories[8] = "Submissive Lola";
+    actionCategories[9] = "DirtAndBlood";
   else
-    actionCategories = new String[4];
+    actionCategories = new String[5];
     actionCategories[0] = "General";
     actionCategories[1] = "Survival";
     actionCategories[2] = "External";
     actionCategories[3] = "Followers";
+    actionCategories[4] = "DirtAndBlood";
   EndIf
   int i = 0
   while i < actionCategories.Length
