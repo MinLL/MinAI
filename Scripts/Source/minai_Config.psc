@@ -56,6 +56,7 @@ int removeSpellsOID
 
 int toggleSapienceOID
 int Property toggleSapienceKey = -1 Auto
+int toggleCombatDialogueOID
 
 ; Legacy globals
 GlobalVariable useCBPC
@@ -158,6 +159,8 @@ bool Property allowSexTransitions = True Auto
 bool allowActorsToJoinSexDefault = False
 bool Property allowActorsToJoinSex = False Auto
 
+bool toggleCombatDialogueDefault = True
+bool property toggleCombatDialogue = True Auto
 
 Event OnConfigInit()
   main.Info("Building mcm menu.")
@@ -236,6 +239,7 @@ Function RenderGeneralPage()
   maxRadianceRechatsOID = AddSliderOption("Maximum Radiance Rechats", maxRadianceRechats, "{0}")
   SetCursorPosition(1) ; Move cursor to top right position
   AddHeaderOption("General Settings")
+  toggleCombatDialogueOID = AddToggleOption("Allow Dialogue during Combat", toggleCombatDialogue)
   addSpellsOID = AddTextOption("General", "Add Spells to Player")
   removeSpellsOID = AddTextOption("General", "Remove Spells from Player")
   toggleSapienceOID = AddKeyMapOption("Toggle Sapience", toggleSapienceKey)
@@ -527,6 +531,14 @@ Event OnOptionSelect(int oid)
   elseif oid == disableAIAnimationsOID
     disableAIAnimations = !disableAIAnimations
     SetToggleOptionValue(oid, disableAIAnimations)
+  elseif oid == toggleCombatDialogueOID
+    toggleCombatDialogue = !toggleCombatDialogue
+    if toggleCombatDialogue
+      sapience.EnableCombatDialogue()
+    else
+      sapience.DisableCombatDialogue()
+    EndIf
+    SetToggleOptionValue(oid, toggleCombatDialogue)
   elseif oid == forceOrgasmCommentOID
     forceOrgasmComment = !forceOrgasmComment
     SetToggleOptionValue(oid, forceOrgasmComment)
@@ -650,6 +662,14 @@ Event OnOptionDefault(int oid)
   elseif oid == allowActorsToJoinSexOID
     allowActorsToJoinSex = allowActorsToJoinSexDefault
     SetToggleOptionValue(oid, allowActorsToJoinSex)
+  elseif oid == toggleCombatDialogueOID
+    toggleCombatDialogue = toggleCombatDialogueDefault
+    if toggleCombatDialogue
+      sapience.EnableCombatDialogue()
+    else
+      sapience.DisableCombatDialogue()
+    EndIf
+    SetToggleOptionValue(oid, toggleCombatDialogue)
   elseif oid == disableAIAnimationsOID
     disableAIAnimations = disableAIAnimationsDefault
     SetToggleOptionValue(oid, disableAIAnimationsDefault)
@@ -734,6 +754,8 @@ Event OnOptionHighlight(int oid)
     SetInfoText("Allow actors to join ongoing sex scenes")
   elseif oid == allowSexTransitionsOID
     SetInfoText("Allow actors to transition between different sex scene types mid-scene")
+  elseif oid == toggleCombatDialogueOID
+    SetInfoText("Allow dialogue to be spoken during combat. Facilitates actor to actor dialogue, trash talking, taunts, etc.")
   elseif oid == disableAIAnimationsOID
     SetInfoText("Forces AI-FF animations to be disabled. There seems to be a CTD in the AIAgent DLL while resetting idle state sometimes, this avoids it.")
   elseif oid == genderWeightCommentsOID

@@ -236,7 +236,7 @@ $GLOBALS["FUNCTIONS"][] = [
     ],
 ];
 $GLOBALS["F_NAMES"]["ExtCmdEquipVibrator"]="EquipVibrator";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdEquipVibrator"]="Lock a Gag on the target";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdEquipVibrator"]="Insert a vibrator into the target";
 $GLOBALS["FUNCTIONS"][] = [
     "name" => $GLOBALS["F_NAMES"]["ExtCmdEquipVibrator"],
     "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdEquipVibrator"],
