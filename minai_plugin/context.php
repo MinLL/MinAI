@@ -15,7 +15,7 @@ Function BuildContext($name) {
   }
   $context = "";
   $context .= GetPhysicalDescription($name);
-  $context .= GetDirtAndBloodContext();
+  $context .= GetDirtAndBloodContext($name);
   $context .= GetClothingContext($name);
   $context .= GetDDContext($name);
   $context .= GetArousalContext($name);
