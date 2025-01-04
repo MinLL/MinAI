@@ -7,6 +7,7 @@ minai_Arousal arousal
 minai_DeviousStuff devious
 minai_Config config
 minai_Reputation reputation
+minai_DirtAndBlood dirtAndBlood
 
 bool bHasAIFF = False
 
@@ -228,6 +229,7 @@ Function SetContext(actor akTarget)
     AIAgentFunctions.logMessage("_minai_PLAYER//nearbyActors@" + GetNearbyAiStr(), "setconf")
   EndIf
   StoreActorVoice(akTarget)
+
   devious.SetContext(akTarget)
   arousal.SetContext(akTarget)
   survival.SetContext(akTarget)
@@ -343,15 +345,15 @@ Function StoreFactions(actor akTarget)
   Faction[] factions = akTarget.GetFactions(-128, 127)
   int i = 0
   while i < factions.Length
-   string factionName = factions[i].GetName()
-   If factionName == ""
-     factionName = GetVanillaFactionName(factions[i].GetFormID())
-   EndIf
-   If factionName != ""
-     allFactions += factionName + ","
-   EndIf
-   i += 1
-  EndWhile
+    string factionName = factions[i].GetName()
+    If factionName == ""
+      factionName = GetVanillaFactionName(factions[i].GetFormID())
+    EndIf
+    If factionName != ""
+      allFactions += factionName + ","
+    EndIf
+    i += 1
+   EndWhile
   SetActorVariable(akTarget, "AllFactions", allFactions)
 EndFunction
 
