@@ -20,9 +20,9 @@ minai_Followers followers
 minai_CombatManager combat
 minai_SapienceController sapience
 minai_Reputation reputation  
+; minai_DirtAndBlood dirtAndBlood
 minai_Util MinaiUtil  
 Spell minai_ToggleSapienceSpell
-minai_DirtAndBlood dirtAndBlood
 
 minai_FertilityModv3 fertilityModv3
 
@@ -78,7 +78,10 @@ Function Maintenance()
   sapience = Game.GetFormFromFile(0x091D, "MinAI.esp") as minai_SapienceController
   reputation = (Self as Quest) as minai_Reputation
   MinaiUtil = (Self as Quest) as minai_Util
+  Info("DIRT AND BLOOD Self as Quest BEGIN")
   dirtAndBlood = (Self as Quest) as minai_DirtAndBlood
+  Info("DIRT AND BLOOD Self as Quest ENDED")
+
   minai_ToggleSapienceSpell = Game.GetFormFromFile(0x0E93, "MinAI.esp") as Spell
 
   if (!followers)
@@ -93,6 +96,9 @@ Function Maintenance()
     minAIFF.Maintenance(Self)
   EndIf
   
+  Info("DIRT AND BLOOD .Maintenance BEGIN")
+  dirtAndBlood.Maintenance(Self)
+  Info("DIRT AND BLOOD .Maintenance ENDED")
   sex.Maintenance(Self)
   survival.Maintenance(Self)
   arousal.Maintenance(Self)
@@ -102,7 +108,6 @@ Function Maintenance()
   combat.Maintenance(Self)
   sapience.Maintenance(Self)
   reputation.Maintenance(Self)
-  dirtAndBlood.Maintenance(Self)
   
   if bHasMantella
     minMantella.Maintenance(Self)

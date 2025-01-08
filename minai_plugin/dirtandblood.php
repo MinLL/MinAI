@@ -4,12 +4,16 @@ require_once("util.php");
 // The script is Structured this way to that it will be easier to implement the playmate part.
 // I never played with one so far, so I am not able to do it from the get go.
 function GetDirtAndBloodContext($name) {
-    error_log("Dirt and Blood entering");
+    $dirt_and_blood_tag_list = GetActorValue($name, "dirtAndBloodTags");
     if (!IsModEnabled("DirtAndBlood")) {
         return "";
     }
-
-    $dirt_and_blood_tag_list = GetActorValue($name, "dirt_and_blood_tag_list");
+    error_log("Dirt and Blood entering");
+    if(!$dirt_and_blood_tag_list) {
+        error_log("Dirt and Blood for " . $name . " exiting with no tag data." . $dirt_and_blood_tag_list);
+        return "";
+    }
+    
 
     $tag_list = explode(",",$dirt_and_blood_tag_list);
 

@@ -72,7 +72,9 @@ Function Maintenance(minai_MainQuestController _main)
   survival = (Self as Quest)as minai_Survival
   arousal = (Self as Quest)as minai_Arousal
   devious = (Self as Quest)as minai_DeviousStuff
-  fertilityModv3 = (Self as Quest)as minai_FertilityModv3
+  Main.Debug("DIRT AND BLOOD Self as Quest in AIFF BEGIN")
+  dirtAndBlood = (Self as Quest)as minai_DirtAndBlood
+  Main.Debug("DIRT AND BLOOD Self as Quest in AIFF End")
   followers = Game.GetFormFromFile(0x0913, "MinAI.esp") as minai_Followers
   reputation = (Self as Quest) as minai_Reputation
   if (!followers)
@@ -110,7 +112,6 @@ Function Maintenance(minai_MainQuestController _main)
   InitializeActionRegistry()
   ; Test, remove this later
   ; StoreContext("minai", "testKey", "This is dynamically persisted context!", 1200)
-
   InitFollow()
   CleanupStates()
 EndFunction
@@ -229,8 +230,10 @@ Function SetContext(actor akTarget)
     AIAgentFunctions.logMessage("_minai_PLAYER//playerName@" + Main.GetActorName(player), "setconf")
     AIAgentFunctions.logMessage("_minai_PLAYER//nearbyActors@" + GetNearbyAiStr(), "setconf")
   EndIf
+  Main.Debug("[MinAI DirtAndBlood] AIFF - calling DIRT AND BLOOD Context")
+  dirtAndBlood.SetContextForAIFF(akTarget)
+  Main.Debug("[MinAI DirtAndBlood] Dirt and Blood context set") 
   StoreActorVoice(akTarget)
-
   devious.SetContext(akTarget)
   arousal.SetContext(akTarget)
   survival.SetContext(akTarget)
