@@ -15,7 +15,6 @@ Function BuildContext($name) {
   }
   $context = "";
   $context .= GetPhysicalDescription($name);
-  $context .= GetDirtAndBloodContext($name);
   $context .= GetClothingContext($name);
   $context .= GetDDContext($name);
   $context .= GetArousalContext($name);
@@ -360,6 +359,9 @@ if (!$GLOBALS["disable_nsfw"]) {
         }*/
     $GLOBALS["COMMAND_PROMPT"].= BuildNSFWReputationContext($GLOBALS["HERIKA_NAME"]);
 }
+
+// SFW Descriptions
+$GLOBALS["COMMAND_PROMPT"] .= GetDirtAndBloodContext(GetTargetActor());
 
 
 $GLOBALS["COMMAND_PROMPT"].= BuildSFWReputationContext($GLOBALS["HERIKA_NAME"]);

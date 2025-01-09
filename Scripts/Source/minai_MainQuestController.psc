@@ -20,7 +20,7 @@ minai_Followers followers
 minai_CombatManager combat
 minai_SapienceController sapience
 minai_Reputation reputation  
-; minai_DirtAndBlood dirtAndBlood
+minai_DirtAndBlood dirtAndBlood
 minai_Util MinaiUtil  
 Spell minai_ToggleSapienceSpell
 
@@ -93,10 +93,8 @@ Function Maintenance()
   if bHasAIFF
     minAIFF.Maintenance(Self)
   EndIf
-  
-  Info("DIRT AND BLOOD .Maintenance BEGIN")
+
   dirtAndBlood.Maintenance(Self)
-  Info("DIRT AND BLOOD .Maintenance ENDED")
   sex.Maintenance(Self)
   survival.Maintenance(Self)
   arousal.Maintenance(Self)
