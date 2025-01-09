@@ -1,6 +1,7 @@
 scriptname minai_DirtAndBlood extends Quest
 
 bool bHasDirtAndBlood = False
+bool bHasMoreSoaps = False
 
 minai_MainQuestController main
 minai_AIFF aiff
@@ -8,6 +9,7 @@ minai_Util MinaiUtil
 
 actor playerRef
 
+; Dirt and Blood Spells
 Spell Dirty_SoapEffectSpell
 Spell Dirty_Spell_Dirt1
 Spell Dirty_Spell_Dirt2
@@ -43,6 +45,24 @@ bool bDirty_CleanYoSelf
 bool bDirty_CleanYoSelfNPC
 bool bDirty_BloodySpellForNPCs
 
+
+; More Soaps extension for nice smells!
+
+Spell SoapBlueMountainSoapEffect 
+Spell SoapDragonsTongueSoapEffect
+Spell SoapLavenderSoapEffect
+Spell SoapPurpleMountainFlowerSoapEffect
+Spell SoapRedMountainFlowerSoapEffect
+Spell SoapSuperiorMountainFlowerSoapEffect
+
+bool bSoapBlueMountainSoapEffect 
+bool bSoapDragonsTongueSoapEffect
+bool bSoapLavenderSoapEffect
+bool bSoapPurpleMountainFlowerSoapEffect
+bool bSoapRedMountainFlowerSoapEffect
+bool bSoapSuperiorMountainFlowerSoapEffect
+
+
 ; set minai_loglevel to 5
 
 function Maintenance(minai_MainQuestController _main)
@@ -74,6 +94,15 @@ function Maintenance(minai_MainQuestController _main)
     ; Dirty_Spell_Swimming = Game.GetFormFromFile(0x000825, "Dirt and Blood - Dynamic Visuals.esp") as Spell
     ; Dirty_Spell_IsRaining = Game.GetFormFromFile(0x00085D, "Dirt and Blood - Dynamic Visuals.esp") as Spell
     aiff.SetModAvailable("DirtAndBlood", bHasDirtAndBlood)
+    If Game.GetModByName("More Soaps.esp") != 255
+      SoapBlueMountainSoapEffect = Game.GetFormFromFile(0x001806, "More Soaps.esp") as Spell
+      SoapDragonsTongueSoapEffect = Game.GetFormFromFile(0x001814, "More Soaps.esp") as Spell
+      SoapLavenderSoapEffect = Game.GetFormFromFile(0x001815, "More Soaps.esp") as Spell
+      SoapPurpleMountainFlowerSoapEffect = Game.GetFormFromFile(0x001816, "More Soaps.esp") as Spell
+      SoapRedMountainFlowerSoapEffect = Game.GetFormFromFile(0x001817, "More Soaps.esp") as Spell
+      SoapSuperiorMountainFlowerSoapEffect = Game.GetFormFromFile(0x001818, "More Soaps.esp") as Spell
+      bHasMoreSoaps = True
+    EndIf
   EndIf
 EndFunction
 
@@ -117,7 +146,14 @@ string Function GetStringForActor(actor currentActor)
   bDirty_CleanYoSelfNPC = currentActor.HasSpell(Dirty_CleanYoSelfNPC) ; orders an npc to go through cleaning animation
   bDirty_NPCIsWashingNow = currentActor.HasSpell(Dirty_NPCisWashingNow) ; npc does washing animation
   bDirty_CleanYoSelf = currentActor.HasSpell(Dirty_CleanYoSelf) ; pc to start cleaning animation
-  
+  If(bHasMoreSoaps)
+    bSoapBlueMountainSoapEffect = currentActor.HasSpell(SoapBlueMountainSoapEffect) 
+    bSoapDragonsTongueSoapEffect = currentActor.HasSpell(SoapDragonsTongueSoapEffect)
+    bSoapLavenderSoapEffect = currentActor.HasSpell(SoapLavenderSoapEffect)
+    bSoapPurpleMountainFlowerSoapEffect = currentActor.HasSpell(SoapPurpleMountainFlowerSoapEffect)
+    bSoapRedMountainFlowerSoapEffect = currentActor.HasSpell(SoapRedMountainFlowerSoapEffect)
+    bSoapSuperiorMountainFlowerSoapEffect = currentActor.HasSpell(SoapSuperiorMountainFlowerSoapEffect)
+  EndIf  
   string msg = ""
   If bDirty_Spell_Clean
     msg = actorName + " is clean and well groomed. "
@@ -139,6 +175,26 @@ string Function GetStringForActor(actor currentActor)
     msg = actorName + " is seeping with blood from battle, it drips off every bit of them, and pools in crevices of their armor. "
   ElseIf (bDirty_SoapEffectSpell || bDirty_NPCIsWashingNow)
     msg = actorName + " is bathing. "
+  EndIf
+  If(bHasMoreSoaps)
+    if(bSoapLavenderSoapEffect)
+      msg = actorName + " looks clean and well groomed. " + actorName + " smells pleasantly of Lavender."  
+    EndIf
+    if(bSoapBlueMountainSoapEffect)
+      msg = actorName + " looks clean and well groomed. " + actorName + " smells pleasantly of Blue Mountain Flowers."
+    EndIf
+    if(bSoapDragonsTongueSoapEffect)
+      msg = actorName + " looks clean and well groomed. " + actorName + " smells pleasantly of Dragons Tongue Flowers."
+    EndIf
+    if(bSoapPurpleMountainFlowerSoapEffect)
+      msg = actorName + " looks clean and well groomed. " + actorName + " smells pleasantly of Purple Mountain Flowers."
+    EndIf
+    if(bSoapRedMountainFlowerSoapEffect)
+      msg = actorName + " looks clean and well groomed. " + actorName + " smells pleasantly of Red Mountain Flowers."
+    EndIf
+    if(bSoapSuperiorMountainFlowerSoapEffect)
+      msg = actorName + " looks clean and well groomed. " + actorName + " smells pleasantly of a complex Mountain Flowers bouquet."
+    EndIf
   EndIf
   return msg
 EndFunction
