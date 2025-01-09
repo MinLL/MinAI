@@ -159,9 +159,9 @@ string Function GetStringForActor(actor currentActor)
     msg = actorName + " is clean and well groomed. "
   ElseIf bDirty_Spell_Dirt1
     msg = actorName + " is barely dirty and fits right in with the people of Skyrim. "
-  ElseIf bDirty_Spell_Dirt2
+  ElseIf (bDirty_Spell_Dirt2|| bDirty_Spell_DirtForNPCs) 
     msg = actorName + " is looking a bit dirty and could use a bath. "
-  ElseIf (bDirty_Spell_Dirt3 || bDirty_Spell_DirtForNPCs) 
+  ElseIf bDirty_Spell_Dirt3 
     msg = actorName + " is grossly dirty and in need of a bath. "
   ElseIf bDirty_Spell_Dirt4
     msg = actorName + " is disgustingly filthy.  " + actorName + " reeks like rotting garbage. "
