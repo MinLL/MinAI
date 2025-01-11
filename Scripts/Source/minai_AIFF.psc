@@ -7,6 +7,7 @@ minai_Arousal arousal
 minai_DeviousStuff devious
 minai_Config config
 minai_Reputation reputation
+minai_FertilityModv3 fertilityModv3
 
 bool bHasAIFF = False
 
@@ -71,6 +72,7 @@ Function Maintenance(minai_MainQuestController _main)
   survival = (Self as Quest)as minai_Survival
   arousal = (Self as Quest)as minai_Arousal
   devious = (Self as Quest)as minai_DeviousStuff
+  fertilityModv3 = (Self as Quest)as minai_FertilityModv3
   followers = Game.GetFormFromFile(0x0913, "MinAI.esp") as minai_Followers
   reputation = (Self as Quest) as minai_Reputation
   if (!followers)
@@ -233,6 +235,7 @@ Function SetContext(actor akTarget)
   survival.SetContext(akTarget)
   followers.SetContext(akTarget)
   reputation.SetContext(akTarget)
+  fertilityModv3.SetContext(akTarget)
   StoreKeywords(akTarget)
   StoreFactions(akTarget)
   if config.disableAIAnimations && akTarget != player
