@@ -72,9 +72,7 @@ Function Maintenance(minai_MainQuestController _main)
   survival = (Self as Quest)as minai_Survival
   arousal = (Self as Quest)as minai_Arousal
   devious = (Self as Quest)as minai_DeviousStuff
-  Main.Debug("DIRT AND BLOOD Self as Quest in AIFF BEGIN")
   dirtAndBlood = (Self as Quest)as minai_DirtAndBlood
-  Main.Debug("DIRT AND BLOOD Self as Quest in AIFF End")
   followers = Game.GetFormFromFile(0x0913, "MinAI.esp") as minai_Followers
   reputation = (Self as Quest) as minai_Reputation
   if (!followers)
@@ -355,7 +353,7 @@ Function StoreFactions(actor akTarget)
       allFactions += factionName + ","
     EndIf
     i += 1
-   EndWhile
+  EndWhile
   SetActorVariable(akTarget, "AllFactions", allFactions)
 EndFunction
 
