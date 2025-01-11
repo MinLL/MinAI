@@ -41,7 +41,6 @@ Function Maintenance(minai_MainQuestController _main)
   devious = (Self as Quest)as minai_DeviousStuff
   dirtAndBlood = (Self as Quest)as minai_DirtAndBlood
 
-
   
   playerRef = Game.GetPlayer()
 EndFunction
@@ -130,7 +129,6 @@ Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking, actor[] actorsF
   arousal.UpdateEvents(actorToSpeakTo, actorSpeaking, actorsFromFormList, bPlayerInScene,  targetName,  speakerName,  playerName)
   survival.UpdateEvents(actorToSpeakTo, actorSpeaking, actorsFromFormList, bPlayerInScene,  targetName,  speakerName,  playerName)
   dirtAndBlood.UpdateEventsForMantella(actorToSpeakTo, actorSpeaking, actorsFromFormList)
-
   RegisterAction(BuildReminderStr(actorToSpeakTo))
 EndFunction
 
