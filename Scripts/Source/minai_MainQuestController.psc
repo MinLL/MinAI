@@ -20,6 +20,7 @@ minai_Followers followers
 minai_CombatManager combat
 minai_SapienceController sapience
 minai_Reputation reputation  
+minai_DirtAndBlood dirtAndBlood
 minai_Util MinaiUtil  
 Spell minai_ToggleSapienceSpell
 
@@ -78,7 +79,10 @@ Function Maintenance()
   reputation = (Self as Quest) as minai_Reputation
   MinaiUtil = (Self as Quest) as minai_Util
   fertilityModv3 = (Self as Quest) as minai_FertilityModv3
+  dirtAndBlood = (Self as Quest) as minai_DirtAndBlood
+
   minai_ToggleSapienceSpell = Game.GetFormFromFile(0x0E93, "MinAI.esp") as Spell
+
   if (!followers)
     Fatal("Could not load followers script - Mismatched script and esp versions")
   EndIf
@@ -90,7 +94,8 @@ Function Maintenance()
   if bHasAIFF
     minAIFF.Maintenance(Self)
   EndIf
-  
+
+  dirtAndBlood.Maintenance(Self)
   sex.Maintenance(Self)
   survival.Maintenance(Self)
   arousal.Maintenance(Self)

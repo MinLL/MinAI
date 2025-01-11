@@ -7,6 +7,7 @@ require_once("customintegrations.php");
 require_once("weather.php");
 require_once("reputation.php");
 require_once("submissivelola.php");
+require_once("dirtandblood.php");
 
 Function BuildContext($name) {
   if ($name == "The Narrator") {
@@ -358,6 +359,9 @@ if (!$GLOBALS["disable_nsfw"]) {
         }*/
     $GLOBALS["COMMAND_PROMPT"].= BuildNSFWReputationContext($GLOBALS["HERIKA_NAME"]);
 }
+
+// SFW Descriptions
+$GLOBALS["COMMAND_PROMPT"] .= GetDirtAndBloodContext(GetTargetActor());
 
 
 $GLOBALS["COMMAND_PROMPT"].= BuildSFWReputationContext($GLOBALS["HERIKA_NAME"]);
