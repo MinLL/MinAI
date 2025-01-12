@@ -3,21 +3,25 @@ require_once("util.php");
 
 // The script is Structured this way to that it will be easier to implement the playmate part.
 // I never played with one so far, so I am not able to do it from the get go.
-function GetFertilityModContext($name) {
+function GetFertilityModContext($name, $viewingActor) {
+    $utilities = new Utilities();
     if (!IsModEnabled("FertilityModV3")) {
         return "";
     }
-    $description = GetActorValue($name, "fertilityModV3Status");
-    $whoAllKnows = GetActorValue($name, "fertilityModV3ContextAwareness")
+    $description = $utilities->GetActorValue($name, "fertilityModV3Status");
+    $whoAllKnows = $utilities->GetActorValue($name, "fertilityModV3ContextAwareness");
     $lowerCaseName = strtolower($name);
-    $result = str_replace($lowerCaseName, $name, $description);
     if(!$description) {
         return "";
     }
+    $result = str_replace($lowerCaseName, $name, $description);
+    if($whoAllKnows=="everybody"){
+        return "\n". $result . "\n";
+    }
+    if(strtolower($whoAllKnows) === strtolower($name)) {
+        return "\n". $result . "\n";
+    }
 
-    
-
-    return "\n". $result . "\n";
 }
 
 
