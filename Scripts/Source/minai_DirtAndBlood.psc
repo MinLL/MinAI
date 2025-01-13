@@ -121,7 +121,7 @@ bool bSoapSuperiorMountainFlowerSoapEffect
 function Maintenance(minai_MainQuestController _main)
   main = _main
   MinaiUtil = (self as Quest) as minai_Util
-  MinaiUtil.Log("Initializing Dirt and Blood minAI Module.", "INFO")
+  MinaiUtil.Info("Initializing Dirt and Blood minAI Module.")
   playerRef = Game.GetPlayer()
   aiff = (Self as Quest) as minai_AIFF
   If Game.GetModByName("Dirt and Blood - Dynamic Visuals.esp") != 255
@@ -155,13 +155,13 @@ function Maintenance(minai_MainQuestController _main)
     Dirty_Effect_Swimming1 = Game.GetFormFromFile(0x000826, "Dirt and Blood - Dynamic Visuals.esp") as MagicEffect
     Dirty_CleaningEffect = Game.GetFormFromFile(0x000830, "Dirt and Blood - Dynamic Visuals.esp") as MagicEffect
     Dirty_Effect_Blood4 = Game.GetFormFromFile(0x00083A, "Dirt and Blood - Dynamic Visuals.esp") as MagicEffect
-    Dirty_Effect_Dirt4 = Game.GetFormFromFile(0x000836, "Dirt and Blood - Dynamic Visuals.esp") as MagicEffect
+    Dirty_Effect_Dirt4 = Game.GetFormFromFile(0x00083B, "Dirt and Blood - Dynamic Visuals.esp") as MagicEffect
     Dirty_NPCEffect_Blood2 = Game.GetFormFromFile(0x00083F, "Dirt and Blood - Dynamic Visuals.esp") as MagicEffect
     Dirty_NPCEffect_Blood1 = Game.GetFormFromFile(0x000843, "Dirt and Blood - Dynamic Visuals.esp") as MagicEffect
     Dirty_Effect_Raining = Game.GetFormFromFile(0x00085F, "Dirt and Blood - Dynamic Visuals.esp") as MagicEffect
-    Dirty_NPCEffect_Dirt2_Bandits_Fix = Game.GetFormFromFile(0x000DBF, "Dirt and Blood - Dynamic Visuals.esp") as MagicEffect
-    Dirty_NPCEffect_Dirt2_Professional = Game.GetFormFromFile(0x000DCE, "Dirt and Blood - Dynamic Visuals.esp") as MagicEffect
-    Dirty_NPCEffect_Dirt3_Professional = Game.GetFormFromFile(0x000DCF, "Dirt and Blood - Dynamic Visuals.esp") as MagicEffect
+    Dirty_NPCEffect_Dirt2_Bandits_Fix = Game.GetFormFromFile(0x000DBE, "Dirt and Blood - Dynamic Visuals.esp") as MagicEffect
+    Dirty_NPCEffect_Dirt2_Professional = Game.GetFormFromFile(0x000DBF, "Dirt and Blood - Dynamic Visuals.esp") as MagicEffect
+    Dirty_NPCEffect_Dirt3_Professional = Game.GetFormFromFile(0x000DC0  , "Dirt and Blood - Dynamic Visuals.esp") as MagicEffect
     Dirty_NPCEffect_Dirt3_Bandits_Fix = Game.GetFormFromFile(0x000DC1, "Dirt and Blood - Dynamic Visuals.esp") as MagicEffect
     Dirty_NPCEffect_Dirt4_Bandits_Fix = Game.GetFormFromFile(0x000DC2, "Dirt and Blood - Dynamic Visuals.esp") as MagicEffect
     Dirty_Effect_SwimmingNPC = Game.GetFormFromFile(0x000DE7, "Dirt and Blood - Dynamic Visuals.esp") as MagicEffect
@@ -232,13 +232,13 @@ string Function GetStringForActor(actor currentActor)
   bDirty_Spell_Blood2 = False
   bDirty_Spell_Blood3 = False
   bDirty_Spell_Blood4 = False
-  bDirty_Spell_Clean = False
-  bDirty_Spell_DirtForNPCs = False
-  bDirty_BloodySpellForNPCs = False
   bDirty_CleanYoSelfNPC = False
   bDirty_NPCIsWashingNow = False
   bDirty_CleanYoSelf = False
-
+  bDirty_Spell_Clean = False
+  bDirty_BloodySpellForNPCs = False
+  bDirty_Spell_DirtForNPCs = False
+  
   bDirty_Effect_Dirt1 = currentActor.HasMagicEffect(Dirty_Effect_Dirt1)
   bDirty_Effect_Dirt2 = currentActor.HasMagicEffect(Dirty_Effect_Dirt2)
   bDirty_Effect_Dirt3 = currentActor.HasMagicEffect(Dirty_Effect_Dirt3)
@@ -271,6 +271,7 @@ string Function GetStringForActor(actor currentActor)
     bSoapSuperiorMountainFlowerSoapEffect = currentActor.HasSpell(SoapSuperiorMountainFlowerSoapEffect)
   EndIf  
   string msg = ""
+  bool isProfessional = False;
   If (bDirty_Spell_Clean || bDirty_Effect_Clean)
     msg = actorName + " is clean and well groomed. "
   ElseIf (bDirty_Spell_Dirt1 || bDirty_Effect_Dirt1)
@@ -290,6 +291,9 @@ string Function GetStringForActor(actor currentActor)
     msg = actorName + " is seeping with blood from battle, it drips off every bit of them, and pools in crevices of their armor. "
   ElseIf (bDirty_SoapEffectSpell || bDirty_NPCIsWashingNow)
     msg = actorName + " is bathing. "
+  EndIf
+  If(bDirty_NPCEffect_Dirt2_Professional || bDirty_NPCEffect_Dirt3_Professional)
+    msg += actorName + " wears the dirt of their profession. "
   EndIf
   If(bHasMoreSoaps)
     if(bSoapLavenderSoapEffect)
