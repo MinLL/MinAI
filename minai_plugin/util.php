@@ -502,6 +502,9 @@ if (IsChildActor($GLOBALS['HERIKA_NAME']) || IsChildActor($GLOBALS["target"])) {
 // object oriented way to organize this
 // use it like $utilities->GetRevealedStatus($actorName);
 class Utilities {
+
+    private $logging = false;
+
     private $existingFunctionsNames = array(
         "GetRevealedStatus",
         "GetActorValueCache",
@@ -550,7 +553,6 @@ class Utilities {
     }
 
     public function __call($name, $params=array()) {
-        error_log("Calling Utilities class with method: '" . $name . "'");
         if(method_exists($this, $name)) {
             // for methods attached to this class
             return call_user_func(array($this, $name), $params);
@@ -565,9 +567,22 @@ class Utilities {
 
     public function beingsInCloseRange() {
         $beingsInCloseRange = DataBeingsInCloseRange();
-        error_log("Beings In Close Range: " . $beingsInCloseRange);
-        return $beingsInCloseRange;
-    }
+        $realBeings = [];
+        $beingsList = explode("|",$beingsInCloseRange);
+        $count = 0;
+        foreach($beingsList as $bListItem) {
+            if(strpos($bListItem, " ")==0) {
+                if(count($realBeings)) {
+                    $realBeings[$count - 1] .= ",".$bListItem;
+                }    
+            } else {
+                $realBeings[] = $bListItem;
+            }
+            $count++;
+        }
+        $result = implode("|", $realBeings);
+        return $result;
+    }   
 
     public function beingsInRange() {
         $beingsInRange = DataBeingsInRange();
@@ -576,6 +591,5 @@ class Utilities {
     }
 }
 
-$utilities = new Utilities();
 
 ?>
