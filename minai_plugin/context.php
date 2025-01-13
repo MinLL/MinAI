@@ -346,6 +346,7 @@ error_log("NEARBY ACTORS: " . $nearbyActors);
 if (!$GLOBALS["disable_nsfw"]) {
   $GLOBALS["COMMAND_PROMPT"].= BuildContext(GetTargetActor());
   $GLOBALS["COMMAND_PROMPT"].= BuildContext($GLOBALS["HERIKA_NAME"]);
+  bundleNSFWContext();
   // This does work, I just need to figure out how to get a bit of the bio + relevant context to insert into the full context for this to work properly. TODO
     /*if ($nearbyActors) {
         $nearbyActors = explode(',', $nearbyActors);
@@ -363,39 +364,67 @@ if (!$GLOBALS["disable_nsfw"]) {
 
 $utilities = new Utilities();
 
-// SFW Descriptions
-$GLOBALS["COMMAND_PROMPT"] .= GetDirtAndBloodContext(GetTargetActor());
-// for highly visible traits of people, like they reek or are filthy or 900 months pregnant
-$localActors = $utilities->beingsInCloseRange();
-if ($localActors) {
-  error_log("NEARBY ACTORS?: " . $localActors);
-  $localActorNamesArray = explode('|', $localActors);
-  $targetActor = GetTargetActor();
-
-  foreach ($localActorNamesArray as $actor) {
-    $actor = str_replace("(", "", $actor);
-    if(str_contains("'s Horse", $actor)) {
-      // every one looks great riding a horse, but if horse only present //
-    } else  {
-      if ($actor != $GLOBALS["HERIKA_NAME"] && $actor != $GLOBALS["PLAYER_NAME"]) {
-        $GLOBALS["COMMAND_PROMPT"] .= "\n". GetDirtAndBloodContext($actor) . "\n";
-        $GLOBALS["COMMAND_PROMPT"] .= GetFertilityModContext($actor, $targetActor);  
-      } else if ($actor == $GLOBALS["HERIKA_NAME"]) {
-        // what the narrator knows
-        $GLOBALS["COMMAND_PROMPT"] .= GetFertilityModContext("The Narrator", GetTargetActor());  
+function bundleNSFWContext() {
+  $localActors = $utilities->beingsInCloseRange();
+  if ($localActors) {
+    $localActorNamesArray = explode('|', $localActors);
+    $targetActor = GetTargetActor();
+    // player is essentially nearby
+    $GLOBALS['COMMAND_PROMPT'] .= GetDirtAndBloodContext($GLOBALS["PLAYER_NAME"]);
+    foreach ($localActorNamesArray as $actor) {
+      $actor = str_replace("(", "", $actor);
+      if(str_contains("'s Horse", $actor)) {
+        // every one looks great riding a horse, but if horse only present //
+      } else  {
+        if ($actor != $GLOBALS["HERIKA_NAME"]) {
+          $GLOBALS["COMMAND_PROMPT"] .= GetFertilityModContext($actor, GetTargetActor());  
+        } else if ($actor == $GLOBALS["HERIKA_NAME"]) {
+          // what the narrator knows
+          $GLOBALS["COMMAND_PROMPT"] .= GetFertilityModContext("The Narrator", GetTargetActor());  
+        }
       }
     }
   }
 }
 
 
+
+// SFW Descriptions
+// We're going to scan everyone who is nearby
+// for highly visible traits of people, like 
+// they reek or are filthy.
+
+function bundleSFWContext() {
+  $localActors = $utilities->beingsInCloseRange();
+  if ($localActors) {
+    $localActorNamesArray = explode('|', $localActors);
+    $targetActor = GetTargetActor();
+    // player is essentially nearby
+    $GLOBALS['COMMAND_PROMPT'] .= GetDirtAndBloodContext($GLOBALS["PLAYER_NAME"]);
+    foreach ($localActorNamesArray as $actor) {
+      $actor = str_replace("(", "", $actor);
+      if(str_contains("'s Horse", $actor)) {
+        // every one looks great riding a horse, but if horse only present //
+      } else  {
+        if ($actor != $GLOBALS["HERIKA_NAME"]) {
+          $GLOBALS["COMMAND_PROMPT"] .= GetDirtAndBloodContext($actor) . "\n";
+        } else if ($actor == $GLOBALS["HERIKA_NAME"]) {
+          // what the narrator knows
+        }
+      }
+    }
+  }
+}
+
+bundleSFWContext();
+$GLOBALS["COMMAND_PROMPT"] .= GetFertilityModContext($actor, $targetActor);  
+
+
 $GLOBALS["COMMAND_PROMPT"].= BuildSFWReputationContext($GLOBALS["HERIKA_NAME"]);
 $GLOBALS["COMMAND_PROMPT"].= GetThirdPartyContext();
 $GLOBALS["COMMAND_PROMPT"].= GetWeatherContext();
 
-$GLOBALS["COMMAND_PROMPT"].="
-
-";
+$GLOBALS["COMMAND_PROMPT"].="\n";
 
 // Clean up context
 $locaLastElement=[];
