@@ -502,9 +502,6 @@ if (IsChildActor($GLOBALS['HERIKA_NAME']) || IsChildActor($GLOBALS["target"])) {
 // object oriented way to organize this
 // use it like $utilities->GetRevealedStatus($actorName);
 class Utilities {
-
-    private $logging = false;
-
     private $existingFunctionsNames = array(
         "GetRevealedStatus",
         "GetActorValueCache",
@@ -571,9 +568,10 @@ class Utilities {
         $beingsList = explode("|",$beingsInCloseRange);
         $count = 0;
         foreach($beingsList as $bListItem) {
-            if(strpos($bListItem, " ")==0) {
-                if(count($realBeings)) {
-                    $realBeings[$count - 1] .= ",".$bListItem;
+            if(strpos($bListItem, " ")===0) {
+                // account for Igor| bandit|
+                if(count($realBeings)>0){
+                    $realBeings[count($realBeings) - 1] .= ",".$bListItem;
                 }    
             } else {
                 $realBeings[] = $bListItem;
@@ -581,13 +579,30 @@ class Utilities {
             $count++;
         }
         $result = implode("|", $realBeings);
+        error_log("Beings In Close Range: " . $result); 
         return $result;
     }   
 
     public function beingsInRange() {
         $beingsInRange = DataBeingsInRange();
-        error_log("Beings In Close Range: " . $beingsInRange);
-        return $beingsInCloseRange;
+
+        $realBeings = [];
+        $beingsList = explode("|",$beingsInRange);
+        $count = 0;
+        foreach($beingsList as $bListItem) {
+            if(strpos($bListItem, " ")===0) {
+                // account for Igor| bandit|
+                if(count($realBeings)>0){
+                    $realBeings[count($realBeings) - 1] .= ",".$bListItem;
+                }    
+            } else {
+                $realBeings[] = $bListItem;
+            }
+            $count++;
+        }
+        $result = implode("|", $realBeings);
+        error_log("Beings In Range: " . $result);
+        return $result;
     }
 }
 

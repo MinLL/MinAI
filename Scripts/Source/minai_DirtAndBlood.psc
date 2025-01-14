@@ -127,21 +127,6 @@ function Maintenance(minai_MainQuestController _main)
   If Game.GetModByName("Dirt and Blood - Dynamic Visuals.esp") != 255
     MinaiUtil.Log("Found Dirt and Blood - Dynamic Visuals","INFO")
     bHasDirtAndBlood = True
-    ; Dirty_SoapEffectSpell = Game.GetFormFromFile(0x000800, "Dirt and Blood - Dynamic Visuals.esp") as Spell
-    ; Dirty_Spell_Dirt1 = Game.GetFormFromFile(0x000806, "Dirt and Blood - Dynamic Visuals.esp") as Spell
-    ; Dirty_Spell_Dirt2 = Game.GetFormFromFile(0x000807, "Dirt and Blood - Dynamic Visuals.esp") as Spell
-    ; Dirty_Spell_Dirt3 = Game.GetFormFromFile(0x000808, "Dirt and Blood - Dynamic Visuals.esp") as Spell
-    ; Dirty_Spell_Dirt4 = Game.GetFormFromFile(0x000838, "Dirt and Blood - Dynamic Visuals.esp") as Spell
-    ; Dirty_Spell_Blood1 = Game.GetFormFromFile(0x000809, "Dirt and Blood - Dynamic Visuals.esp") as Spell
-    ; Dirty_Spell_Blood2 = Game.GetFormFromFile(0x00080A, "Dirt and Blood - Dynamic Visuals.esp") as Spell
-    ; Dirty_Spell_Blood3 = Game.GetFormFromFile(0x00080B, "Dirt and Blood - Dynamic Visuals.esp") as Spell
-    ; Dirty_Spell_Blood4 = Game.GetFormFromFile(0x000839, "Dirt and Blood - Dynamic Visuals.esp") as Spell
-    ; Dirty_Spell_Clean = Game.GetFormFromFile(0x00080C, "Dirt and Blood - Dynamic Visuals.esp") as Spell
-    ; Dirty_Spell_DirtForNPCs = Game.GetFormFromFile(0x000822, "Dirt and Blood - Dynamic Visuals.esp") as Spell
-    ; Dirty_BloodySpellForNPCs = Game.GetFormFromFile(0x000DE6, "Dirt and Blood - Dynamic Visuals.esp") as Spell
-    ; Dirty_CleanYoSelf = Game.GetFormFromFile(0x00082F, "Dirt and Blood - Dynamic Visuals.esp") as Spell 
-    ; Dirty_NPCIsWashingNow = Game.GetFormFromFile(0x00081C, "Dirt and Blood - Dynamic Visuals.esp") as Spell
-    ; Dirty_CleanYoSelfNPC = Game.GetFormFromFile(0x000860, "Dirt and Blood - Dynamic Visuals.esp") as Spell
     Dirty_Effect_Dirt1 = Game.GetFormFromFile(0x00080D, "Dirt and Blood - Dynamic Visuals.esp") as MagicEffect
     Dirty_Effect_Dirt2 = Game.GetFormFromFile(0x00080E, "Dirt and Blood - Dynamic Visuals.esp") as MagicEffect
     Dirty_Effect_Dirt3 = Game.GetFormFromFile(0x00080F, "Dirt and Blood - Dynamic Visuals.esp") as MagicEffect
@@ -165,10 +150,6 @@ function Maintenance(minai_MainQuestController _main)
     Dirty_NPCEffect_Dirt3_Bandits_Fix = Game.GetFormFromFile(0x000DC1, "Dirt and Blood - Dynamic Visuals.esp") as MagicEffect
     Dirty_NPCEffect_Dirt4_Bandits_Fix = Game.GetFormFromFile(0x000DC2, "Dirt and Blood - Dynamic Visuals.esp") as MagicEffect
     Dirty_Effect_SwimmingNPC = Game.GetFormFromFile(0x000DE7, "Dirt and Blood - Dynamic Visuals.esp") as MagicEffect
-    ; Dirty_Spell_NegativeSideEffects = Game.GetFormFromFile(0x000844, "Dirt and Blood - Dynamic Visuals.esp") as Spell
-    ; Dirty_Spell_PositiveSideEffects = Game.GetFormFromFile(0x000848, "Dirt and Blood - Dynamic Visuals.esp") as Spell
-    ; Dirty_Spell_Swimming = Game.GetFormFromFile(0x000825, "Dirt and Blood - Dynamic Visuals.esp") as Spell
-    ; Dirty_Spell_IsRaining = Game.GetFormFromFile(0x00085D, "Dirt and Blood - Dynamic Visuals.esp") as Spell
     aiff.SetModAvailable("DirtAndBlood", bHasDirtAndBlood)
     If Game.GetModByName("More Soaps.esp") != 255
       SoapBlueMountainSoapEffect = Game.GetFormFromFile(0x001806, "More Soaps.esp") as Spell
@@ -207,22 +188,6 @@ EndFunction
 
 string Function GetStringForActor(actor currentActor)
   String actorName = main.GetActorName(currentActor)
-  ; bDirty_SoapEffectSpell = currentActor.HasSpell(Dirty_SoapEffectSpell) ; player in cleaning animation
-  ; bDirty_Spell_Dirt1 = currentActor.HasSpell(Dirty_Spell_Dirt1)
-  ; bDirty_Spell_Dirt2 = currentActor.HasSpell(Dirty_Spell_Dirt2)
-  ; bDirty_Spell_Dirt3 = currentActor.HasSpell(Dirty_Spell_Dirt3)
-  ; bDirty_Spell_Dirt4 = currentActor.HasSpell(Dirty_Spell_Dirt4)
-  ; bDirty_Spell_Blood1 = currentActor.HasSpell(Dirty_Spell_Blood1)
-  ; bDirty_Spell_Blood2 = currentActor.HasSpell(Dirty_Spell_Blood2)
-  ; bDirty_Spell_Blood3 = currentActor.HasSpell(Dirty_Spell_Blood3)
-  ; bDirty_Spell_Blood4 = currentActor.HasSpell(Dirty_Spell_Blood4)
-  ; bDirty_Spell_Clean = currentActor.HasSpell(Dirty_Spell_Clean)
-  ; bDirty_Spell_DirtForNPCs = currentActor.HasSpell(Dirty_Spell_DirtForNPCs)
-  ; bDirty_BloodySpellForNPCs = currentActor.HasSpell(Dirty_BloodySpellForNPCs)
-  ; bDirty_CleanYoSelfNPC = currentActor.HasSpell(Dirty_CleanYoSelfNPC) ; orders an npc to go through cleaning animation
-  ; bDirty_NPCIsWashingNow = currentActor.HasSpell(Dirty_NPCisWashingNow) ; npc does washing animation
-  ; bDirty_CleanYoSelf = currentActor.HasSpell(Dirty_CleanYoSelf) ; pc to start cleaning animation
-
   bDirty_SoapEffectSpell = False
   bDirty_Spell_Dirt1 = False
   bDirty_Spell_Dirt2 = False
