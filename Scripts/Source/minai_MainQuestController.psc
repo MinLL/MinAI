@@ -24,6 +24,8 @@ minai_DirtAndBlood dirtAndBlood
 minai_Util MinaiUtil  
 Spell minai_ToggleSapienceSpell
 
+minai_FertilityModv3 fertilityModv3
+
 bool bHasMantella = False;
 bool bHasAIFF = False;
 float lastRequestTime
@@ -76,6 +78,7 @@ Function Maintenance()
   sapience = Game.GetFormFromFile(0x091D, "MinAI.esp") as minai_SapienceController
   reputation = (Self as Quest) as minai_Reputation
   MinaiUtil = (Self as Quest) as minai_Util
+  fertilityModv3 = (Self as Quest) as minai_FertilityModv3
   dirtAndBlood = (Self as Quest) as minai_DirtAndBlood
 
   minai_ToggleSapienceSpell = Game.GetFormFromFile(0x0E93, "MinAI.esp") as Spell
@@ -102,6 +105,7 @@ Function Maintenance()
   combat.Maintenance(Self)
   sapience.Maintenance(Self)
   reputation.Maintenance(Self)
+  fertilityModv3.Maintenance(Self)
   
   if bHasMantella
     minMantella.Maintenance(Self)
