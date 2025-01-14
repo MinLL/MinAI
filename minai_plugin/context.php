@@ -345,8 +345,7 @@ error_log("NEARBY ACTORS: " . $nearbyActors);
 if (!$GLOBALS["disable_nsfw"]) {
   $GLOBALS["COMMAND_PROMPT"].= BuildContext(GetTargetActor());
   $GLOBALS["COMMAND_PROMPT"].= BuildContext($GLOBALS["HERIKA_NAME"]);
-  bundleNSFWContext();
-  // This does work, I just need to figure out how to get a bit of the bio + relevant context to insert into the full context for this to work properly. TODO
+ // This does work, I just need to figure out how to get a bit of the bio + relevant context to insert into the full context for this to work properly. TODO
     /*if ($nearbyActors) {
         $nearbyActors = explode(',', $nearbyActors);
         
@@ -360,34 +359,6 @@ if (!$GLOBALS["disable_nsfw"]) {
         }*/
     $GLOBALS["COMMAND_PROMPT"].= BuildNSFWReputationContext($GLOBALS["HERIKA_NAME"]);
 }
-
-
-function bundleNSFWContext() {
-  $utilities = new Utilities();
-  $localActors = $utilities->beingsInCloseRange();
-  if ($localActors) {
-    $localActorNamesArray = explode('|', $localActors);
-    $targetActor = GetTargetActor();
-    // player is essentially nearby
-    // hiding fertility mode for now, but here you could add other functions appending to this COMMAND_PROMPT
-    // $GLOBALS['COMMAND_PROMPT'] .= GetFertilityModeV3Context($GLOBALS["PLAYER_NAME"], GetTargetActor());
-    foreach ($localActorNamesArray as $actor) {
-      $actor = str_replace("(", "", $actor);
-      if(str_contains("'s Horse", $actor)) {
-        // every one looks great riding a horse, but if horse only present //
-      } else  {
-        if ($actor != $GLOBALS["HERIKA_NAME"]) {
-          // hiding fertility mode for now, but here you could add other functions appending to this COMMAND_PROMPT
-          // $GLOBALS["COMMAND_PROMPT"] .= GetFertilityModeV3Context($actor, GetTargetActor());  
-        } else if ($actor == $GLOBALS["HERIKA_NAME"]) {
-          // what the narrator knows
-          // $GLOBALS["COMMAND_PROMPT"] .= GetFertilityModeV3Context("The Narrator", GetTargetActor());  
-        }
-      }
-    }
-  }
-}
-
 
 
 // SFW Descriptions
@@ -411,7 +382,7 @@ function bundleSFWContext() {
         if ($actor != $GLOBALS["HERIKA_NAME"]) {
           $GLOBALS["COMMAND_PROMPT"] .= GetDirtAndBloodContext($actor) . "\n";
         } else if ($actor == $GLOBALS["HERIKA_NAME"]) {
-          // what the narrator knows
+          // the narrator has no body to describe
         }
       }
     }
