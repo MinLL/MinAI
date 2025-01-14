@@ -362,25 +362,25 @@ if (!$GLOBALS["disable_nsfw"]) {
     $GLOBALS["COMMAND_PROMPT"].= BuildNSFWReputationContext($GLOBALS["HERIKA_NAME"]);
 }
 
-$utilities = new Utilities();
 
 function bundleNSFWContext() {
+  $utilities = new Utilities();
   $localActors = $utilities->beingsInCloseRange();
   if ($localActors) {
     $localActorNamesArray = explode('|', $localActors);
     $targetActor = GetTargetActor();
     // player is essentially nearby
-    $GLOBALS['COMMAND_PROMPT'] .= GetDirtAndBloodContext($GLOBALS["PLAYER_NAME"]);
+    $GLOBALS['COMMAND_PROMPT'] .= GetFertilityModeV3Context($GLOBALS["PLAYER_NAME"], GetTargetActor());
     foreach ($localActorNamesArray as $actor) {
       $actor = str_replace("(", "", $actor);
       if(str_contains("'s Horse", $actor)) {
         // every one looks great riding a horse, but if horse only present //
       } else  {
         if ($actor != $GLOBALS["HERIKA_NAME"]) {
-          $GLOBALS["COMMAND_PROMPT"] .= GetFertilityModContext($actor, GetTargetActor());  
+          $GLOBALS["COMMAND_PROMPT"] .= GetFertilityModeV3Context($actor, GetTargetActor());  
         } else if ($actor == $GLOBALS["HERIKA_NAME"]) {
           // what the narrator knows
-          $GLOBALS["COMMAND_PROMPT"] .= GetFertilityModContext("The Narrator", GetTargetActor());  
+          $GLOBALS["COMMAND_PROMPT"] .= GetFertilityModeV3Context("The Narrator", GetTargetActor());  
         }
       }
     }
@@ -395,6 +395,7 @@ function bundleNSFWContext() {
 // they reek or are filthy.
 
 function bundleSFWContext() {
+  $utilities = new Utilities();
   $localActors = $utilities->beingsInCloseRange();
   if ($localActors) {
     $localActorNamesArray = explode('|', $localActors);
@@ -417,8 +418,6 @@ function bundleSFWContext() {
 }
 
 bundleSFWContext();
-$GLOBALS["COMMAND_PROMPT"] .= GetFertilityModContext($actor, $targetActor);  
-
 
 $GLOBALS["COMMAND_PROMPT"].= BuildSFWReputationContext($GLOBALS["HERIKA_NAME"]);
 $GLOBALS["COMMAND_PROMPT"].= GetThirdPartyContext();

@@ -1,27 +1,28 @@
 <?php
 require_once("util.php");
 
-// The script is Structured this way to that it will be easier to implement the playmate part.
-// I never played with one so far, so I am not able to do it from the get go.
-function GetFertilityModContext($name, $viewingActor) {
-    $utilities = new Utilities();
+
+function GetFertilityModeV3Context($name, $viewingActor) {
     if (!IsModEnabled("FertilityModV3")) {
         return "";
     }
-    $description = $utilities->GetActorValue($name, "fertilityModV3Status");
-    $whoAllKnows = $utilities->GetActorValue($name, "fertilityModV3ContextAwareness");
-    $lowerCaseName = strtolower($name);
-    if(!$description) {
-        return "";
+    // narrator has no physical presence
+    if($name == $GLOBALS["HERIKA_NAME"]) return "";
+    // player character gets their context from playing the game
+    if($viewingActor == $GLOBALS["PLAYER_NAME"]) return "";
+    
+    $utilities = new Utilities();
+    if($viewingActor == $GLOBALS["HERIKA_NAME"]) {
+        $narrator_description = $utilities->GetActorValue($name, "fertilityModV3NarratorStatus");
+        return $narrator_description . "\n";
     }
-    $result = str_replace($lowerCaseName, $name, $description);
-    if($whoAllKnows=="everybody"){
-        return "\n". $result . "\n";
-    }
-    if(strtolower($whoAllKnows) === strtolower($name)) {
-        return "\n". $result . "\n";
+    if($name == $viewingActor) {
+        $private_description = $utilities->GetActorValue($name, "fertilityModV3PrivateStatus");
+        return $private_description . "\n";
     }
 
+    $public_description = $utilities->GetActorValue($name, "fertilityModV3PublicStatus");
+    return $public_description . "\n";
 }
 
 
