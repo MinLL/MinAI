@@ -368,7 +368,9 @@ if (!$GLOBALS["disable_nsfw"]) {
 
 function bundleSFWContext() {
   $utilities = new Utilities();
+  // list of local npcs (sans narrator)
   $localActors = $utilities->beingsInCloseRange();
+  $GLOBALS['COMMAND_PROMPT'] .= "\n";
   if ($localActors) {
     $localActorNamesArray = explode('|', $localActors);
     $targetActor = GetTargetActor();
