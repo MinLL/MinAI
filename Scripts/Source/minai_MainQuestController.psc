@@ -24,7 +24,6 @@ minai_DirtAndBlood dirtAndBlood
 minai_Util MinaiUtil  
 Spell minai_ToggleSapienceSpell
 
-minai_FertilityModv3 fertilityModv3
 
 bool bHasMantella = False;
 bool bHasAIFF = False;

@@ -8,7 +8,6 @@ require_once("weather.php");
 require_once("reputation.php");
 require_once("submissivelola.php");
 require_once("dirtandblood.php");
-require_once("fertilityModeV3.php");
 
 Function BuildContext($name) {
   if ($name == "The Narrator") {
@@ -370,17 +369,19 @@ function bundleNSFWContext() {
     $localActorNamesArray = explode('|', $localActors);
     $targetActor = GetTargetActor();
     // player is essentially nearby
-    $GLOBALS['COMMAND_PROMPT'] .= GetFertilityModeV3Context($GLOBALS["PLAYER_NAME"], GetTargetActor());
+    // hiding fertility mode for now, but here you could add other functions appending to this COMMAND_PROMPT
+    // $GLOBALS['COMMAND_PROMPT'] .= GetFertilityModeV3Context($GLOBALS["PLAYER_NAME"], GetTargetActor());
     foreach ($localActorNamesArray as $actor) {
       $actor = str_replace("(", "", $actor);
       if(str_contains("'s Horse", $actor)) {
         // every one looks great riding a horse, but if horse only present //
       } else  {
         if ($actor != $GLOBALS["HERIKA_NAME"]) {
-          $GLOBALS["COMMAND_PROMPT"] .= GetFertilityModeV3Context($actor, GetTargetActor());  
+          // hiding fertility mode for now, but here you could add other functions appending to this COMMAND_PROMPT
+          // $GLOBALS["COMMAND_PROMPT"] .= GetFertilityModeV3Context($actor, GetTargetActor());  
         } else if ($actor == $GLOBALS["HERIKA_NAME"]) {
           // what the narrator knows
-          $GLOBALS["COMMAND_PROMPT"] .= GetFertilityModeV3Context("The Narrator", GetTargetActor());  
+          // $GLOBALS["COMMAND_PROMPT"] .= GetFertilityModeV3Context("The Narrator", GetTargetActor());  
         }
       }
     }
