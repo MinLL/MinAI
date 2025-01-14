@@ -1,7 +1,6 @@
 <?php
 define("MINAI_ACTOR_VALUE_CACHE", "minai_actor_value_cache");
 require_once("importDataToDB.php");
-// require_once("../../lib/data_functions.php");
 
 $GLOBALS[MINAI_ACTOR_VALUE_CACHE] = [];
 $targetOverride = null;
