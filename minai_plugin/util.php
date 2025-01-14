@@ -578,7 +578,6 @@ class Utilities {
             $count++;
         }
         $result = implode("|", $realBeings);
-        error_log("Beings In Close Range: " . $result); 
         return $result;
     }   
 
@@ -600,7 +599,6 @@ class Utilities {
             $count++;
         }
         $result = implode("|", $realBeings);
-        error_log("Beings In Range: " . $result);
         return $result;
     }
 }
