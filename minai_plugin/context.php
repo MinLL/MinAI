@@ -357,31 +357,14 @@ bundleSFWContext($new_content);
 function bundleSFWContext(&$nc) {
   $utilities = new Utilities();
   // list of local npcs (sans narrator)
-  $localActors = $utilities->beingsInCloseRange();
   $nc .= "\n";
-  if ($localActors) {
-    $localActorNamesArray = explode('|', $localActors);
-    $targetActor = GetTargetActor();
-    // player is essentially nearby
-    $nc .= GetDirtAndBloodContext($GLOBALS["PLAYER_NAME"]) ."\n";
-    foreach ($localActorNamesArray as $actor) {
-      if(str_contains("'s Horse", $actor)) {
-        // every one looks great riding a horse, but if horse only present //
-      } else  {
-        if ($actor != $GLOBALS["HERIKA_NAME"]) {
-          $nc .= GetDirtAndBloodContext($actor) . "\n";
-        } else if ($actor == $GLOBALS["HERIKA_NAME"]) {
-          // the narrator has no body to describe
-        }
-      }
-    }
-  }
+  $localActors = $utilities->beingsInCloseRange();
+  // send localActors list to GetDirtAndBlood so as to make comma seperated lists
+  $nc .= GetDirtAndBloodContext($localActors);
+  $nc .= BuildSFWReputationContext($GLOBALS["HERIKA_NAME"]);
+  $nc .= GetThirdPartyContext();
+  $nc .= GetWeatherContext() . "\n";
 }
-
-
-$new_content .= BuildSFWReputationContext($GLOBALS["HERIKA_NAME"]);
-$new_content .= GetThirdPartyContext();
-$new_content .= GetWeatherContext() . "\n";
 
 $GLOBALS["COMMAND_PROMPT"] = $new_content . $GLOBALS["COMMAND_PROMPT"];
 
