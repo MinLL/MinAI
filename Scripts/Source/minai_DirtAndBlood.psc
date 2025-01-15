@@ -9,43 +9,6 @@ minai_Util MinaiUtil
 
 actor playerRef
 
-; Dirt and Blood Spells
-; Spell Dirty_SoapEffectSpell
-; Spell Dirty_Spell_Dirt1
-; Spell Dirty_Spell_Dirt2
-; Spell Dirty_Spell_Dirt3
-; Spell Dirty_Spell_Dirt4
-; Spell Dirty_Spell_Blood1
-; Spell Dirty_Spell_Blood2
-; Spell Dirty_Spell_Blood3
-; Spell Dirty_Spell_Blood4
-; Spell Dirty_Spell_Clean
-; Spell Dirty_NPCIsWashingNow
-; Spell Dirty_Spell_DirtForNPCs
-; Spell Dirty_Spell_Swimming
-; Spell Dirty_CleanYoSelf
-; Spell Dirty_Spell_IsRaining
-; Spell Dirty_CleanYoSelfNPC
-; Spell Dirty_BloodySpellForNPCs
-
-bool bDirty_SoapEffectSpell
-bool bDirty_Spell_Dirt1
-bool bDirty_Spell_Dirt2
-bool bDirty_Spell_Dirt3
-bool bDirty_Spell_Dirt4
-bool bDirty_Spell_Blood1
-bool bDirty_Spell_Blood2
-bool bDirty_Spell_Blood3
-bool bDirty_Spell_Blood4
-bool bDirty_Spell_Clean
-
-bool bDirty_NPCIsWashingNow
-bool bDirty_Spell_DirtForNPCs
-bool bDirty_CleanYoSelf
-bool bDirty_CleanYoSelfNPC
-bool bDirty_BloodySpellForNPCs
-
-
 MagicEffect Dirty_Effect_Dirt1
 MagicEffect Dirty_Effect_Dirt2
 MagicEffect Dirty_Effect_Dirt3
@@ -70,7 +33,6 @@ MagicEffect Dirty_NPCEffect_Dirt3_Professional
 MagicEffect Dirty_NPCEffect_Dirt3_Bandits_Fix
 MagicEffect Dirty_NPCEffect_Dirt4_Bandits_Fix
 MagicEffect Dirty_Effect_SwimmingNPC
-
 
 
 bool bDirty_Effect_Dirt1 = False
@@ -100,7 +62,6 @@ bool bDirty_Effect_SwimmingNPC = False
 
 
 ; More Soaps extension for nice smells!
-
 Spell SoapBlueMountainSoapEffect 
 Spell SoapDragonsTongueSoapEffect
 Spell SoapLavenderSoapEffect
@@ -114,9 +75,6 @@ bool bSoapLavenderSoapEffect
 bool bSoapPurpleMountainFlowerSoapEffect
 bool bSoapRedMountainFlowerSoapEffect
 bool bSoapSuperiorMountainFlowerSoapEffect
-
-
-; set minai_loglevel to 5
 
 function Maintenance(minai_MainQuestController _main)
   main = _main
@@ -181,29 +139,16 @@ Function UpdateEventsForMantella(Actor actorToSpeakTo, Actor actorSpeaking, acto
 	EndWhile
 EndFunction
 
+; for CHIM, use tags to pass to the PHP where lists of characters are built 
+; ie tom dick and harry smell like roses
 Function SetContext(actor akActor)
-  string msg = GetStringForActor(akActor)
+  string msg = GetTagsForActor(akActor)
   aiff.SetActorVariable(akActor, "dirtAndBlood", msg) 
 EndFunction
 
+; for mantella, the whole string
 string Function GetStringForActor(actor currentActor)
   String actorName = main.GetActorName(currentActor)
-  bDirty_SoapEffectSpell = False
-  bDirty_Spell_Dirt1 = False
-  bDirty_Spell_Dirt2 = False
-  bDirty_Spell_Dirt3 = False
-  bDirty_Spell_Dirt4 = False
-  bDirty_Spell_Blood1 = False
-  bDirty_Spell_Blood2 = False
-  bDirty_Spell_Blood3 = False
-  bDirty_Spell_Blood4 = False
-  bDirty_CleanYoSelfNPC = False
-  bDirty_NPCIsWashingNow = False
-  bDirty_CleanYoSelf = False
-  bDirty_Spell_Clean = False
-  bDirty_BloodySpellForNPCs = False
-  bDirty_Spell_DirtForNPCs = False
-  
   bDirty_Effect_Dirt1 = currentActor.HasMagicEffect(Dirty_Effect_Dirt1)
   bDirty_Effect_Dirt2 = currentActor.HasMagicEffect(Dirty_Effect_Dirt2)
   bDirty_Effect_Dirt3 = currentActor.HasMagicEffect(Dirty_Effect_Dirt3)
@@ -237,25 +182,24 @@ string Function GetStringForActor(actor currentActor)
   EndIf  
   string msg = ""
   bool isProfessional = False;
-  If (bDirty_Spell_Clean || bDirty_Effect_Clean)
+  If (bDirty_Effect_Clean)
     msg = actorName + " is clean and well groomed. "
-  ElseIf (bDirty_Spell_Dirt1 || bDirty_Effect_Dirt1)
+  ElseIf (bDirty_Effect_Dirt1)
     msg = actorName + " is barely dirty and fits right in with the people of Skyrim. "
-  ElseIf (bDirty_Spell_Dirt2 || bDirty_Effect_Dirt2 || bDirty_NPCEffect_Dirt2_Bandits_Fix || bDirty_NPCEffect_Dirt2_Professional) 
+  ElseIf (bDirty_Effect_Dirt2 || bDirty_NPCEffect_Dirt2_Bandits_Fix || bDirty_NPCEffect_Dirt2_Professional) 
     msg = actorName + " is looking a bit dirty and could use a bath. "
-  ElseIf (bDirty_Spell_Dirt3 || bDirty_Effect_Dirt3 || bDirty_NPCEffect_Dirt3_Professional || bDirty_NPCEffect_Dirt3_Bandits_Fix)
-  ElseIf (bDirty_Spell_Dirt4 || bDirty_Effect_Dirt4 || bDirty_NPCEffect_Dirt4_Bandits_Fix)
+  ElseIf (bDirty_Effect_Dirt3 || bDirty_NPCEffect_Dirt3_Professional || bDirty_NPCEffect_Dirt3_Bandits_Fix)
+    msg = actorName + " is dirty, if they get any worse they will be gross. "
+  ElseIf (bDirty_Effect_Dirt4 || bDirty_NPCEffect_Dirt4_Bandits_Fix)
     msg = actorName + " is disgustingly filthy.  " + actorName + " reeks like rotting garbage. "
-  ElseIf (bDirty_Spell_Blood1 || bDirty_Effect_Blood1 || bDirty_NPCEffect_Blood1)
+  ElseIf (bDirty_Effect_Blood1 || bDirty_NPCEffect_Blood1)
     msg = actorName + " has light blotches of blood on themselves. "
-  ElseIf (bDirty_Spell_Blood2 || bDirty_Effect_Blood2 || bDirty_NPCEffect_Blood2) 
+  ElseIf (bDirty_Effect_Blood2 || bDirty_NPCEffect_Blood2) 
     msg = actorName + " has blotches of blood on themselves. "
-  ElseIf (bDirty_Spell_Blood3 || bDirty_Effect_Blood3 || bDirty_NPCEffect_Blood3)
+  ElseIf (bDirty_Effect_Blood3 || bDirty_NPCEffect_Blood3)
     msg = actorName + " is covered in blood from battle. "
-  ElseIf (bDirty_Spell_Blood4 || bDirty_Effect_Blood4 || bDirty_NPCEffect_Blood4 || bDirty_NPCEffect_Blood5)
+  ElseIf (bDirty_Effect_Blood4 || bDirty_NPCEffect_Blood4 || bDirty_NPCEffect_Blood5)
     msg = actorName + " is seeping with blood from battle, it drips off every bit of them, and pools in crevices of their armor. "
-  ElseIf (bDirty_SoapEffectSpell || bDirty_NPCIsWashingNow)
-    msg = actorName + " is bathing. "
   EndIf
   If(bDirty_NPCEffect_Dirt2_Professional || bDirty_NPCEffect_Dirt3_Professional)
     msg += actorName + " wears the dirt of their profession. "
@@ -278,6 +222,90 @@ string Function GetStringForActor(actor currentActor)
     EndIf
     if(bSoapSuperiorMountainFlowerSoapEffect)
       msg = actorName + " looks clean and well groomed. " + actorName + " smells pleasantly of a complex Mountain Flowers bouquet."
+    EndIf
+  EndIf
+  return msg
+EndFunction
+
+; CHIM tag list maker
+string Function GetTagsForActor(actor currentActor)
+  String actorName = main.GetActorName(currentActor)
+  
+  bDirty_Effect_Dirt1 = currentActor.HasMagicEffect(Dirty_Effect_Dirt1)
+  bDirty_Effect_Dirt2 = currentActor.HasMagicEffect(Dirty_Effect_Dirt2)
+  bDirty_Effect_Dirt3 = currentActor.HasMagicEffect(Dirty_Effect_Dirt3)
+  bDirty_Effect_Blood1 = currentActor.HasMagicEffect(Dirty_Effect_Blood1)
+  bDirty_Effect_Blood2 = currentActor.HasMagicEffect(Dirty_Effect_Blood2)
+  bDirty_Effect_Blood3 = currentActor.HasMagicEffect(Dirty_Effect_Blood3)
+  bDirty_Effect_Clean = currentActor.HasMagicEffect(Dirty_Effect_Clean)
+  bDirty_NPCEffect_Blood3 = currentActor.HasMagicEffect(Dirty_NPCEffect_Blood3)
+  bDirty_NPCEffect_Blood4 = currentActor.HasMagicEffect(Dirty_NPCEffect_Blood4)
+  bDirty_NPCEffect_Blood5 = currentActor.HasMagicEffect(Dirty_NPCEffect_Blood5)
+  bDirty_Effect_Swimming1 = currentActor.HasMagicEffect(Dirty_Effect_Swimming1)
+  bDirty_Effect_Blood4 = currentActor.HasMagicEffect(Dirty_Effect_Blood4)
+  bDirty_Effect_Dirt4 = currentActor.HasMagicEffect(Dirty_Effect_Dirt4)
+  bDirty_NPCEffect_Blood2 = currentActor.HasMagicEffect(Dirty_NPCEffect_Blood2)
+  bDirty_NPCEffect_Blood1 = currentActor.HasMagicEffect(Dirty_NPCEffect_Blood1)
+  bDirty_Effect_Raining = currentActor.HasMagicEffect(Dirty_Effect_Raining)
+  bDirty_NPCEffect_Dirt2_Bandits_Fix = currentActor.HasMagicEffect(Dirty_NPCEffect_Dirt2_Bandits_Fix)
+  bDirty_NPCEffect_Dirt2_Professional = currentActor.HasMagicEffect(Dirty_NPCEffect_Dirt2_Professional)
+  bDirty_NPCEffect_Dirt3_Professional = currentActor.HasMagicEffect(Dirty_NPCEffect_Dirt3_Professional)
+  bDirty_NPCEffect_Dirt3_Bandits_Fix = currentActor.HasMagicEffect(Dirty_NPCEffect_Dirt3_Bandits_Fix)
+  bDirty_NPCEffect_Dirt4_Bandits_Fix = currentActor.HasMagicEffect(Dirty_NPCEffect_Dirt4_Bandits_Fix)
+ 
+  If(bHasMoreSoaps)
+    bSoapBlueMountainSoapEffect = currentActor.HasSpell(SoapBlueMountainSoapEffect) 
+    bSoapDragonsTongueSoapEffect = currentActor.HasSpell(SoapDragonsTongueSoapEffect)
+    bSoapLavenderSoapEffect = currentActor.HasSpell(SoapLavenderSoapEffect)
+    bSoapPurpleMountainFlowerSoapEffect = currentActor.HasSpell(SoapPurpleMountainFlowerSoapEffect)
+    bSoapRedMountainFlowerSoapEffect = currentActor.HasSpell(SoapRedMountainFlowerSoapEffect)
+    bSoapSuperiorMountainFlowerSoapEffect = currentActor.HasSpell(SoapSuperiorMountainFlowerSoapEffect)
+  EndIf  
+  string msg = ""
+  bool isProfessional = False;
+  If (bDirty_Effect_Clean)
+    msg += "Clean,"
+  ElseIf (bDirty_Effect_Dirt1)
+    msg += "Dirt1,"
+  ElseIf (bDirty_Effect_Dirt2 || bDirty_NPCEffect_Dirt2_Bandits_Fix || bDirty_NPCEffect_Dirt2_Professional) 
+    msg += "Dirt2,"
+  ElseIf (bDirty_Effect_Dirt3 || bDirty_NPCEffect_Dirt3_Professional || bDirty_NPCEffect_Dirt3_Bandits_Fix)
+    msg += "Dirt3,"
+  ElseIf (bDirty_Effect_Dirt4 || bDirty_NPCEffect_Dirt4_Bandits_Fix)
+    msg += "Dirt4,"
+  ElseIf (bDirty_Effect_Blood1 || bDirty_NPCEffect_Blood1)
+    msg += "Blood1,"
+  ElseIf (bDirty_Effect_Blood2 || bDirty_NPCEffect_Blood2) 
+    msg += "Blood2,"
+  ElseIf (bDirty_Effect_Blood3 || bDirty_NPCEffect_Blood3)
+    msg += "Blood3,"
+  ElseIf (bDirty_Effect_Blood4 || bDirty_NPCEffect_Blood4 || bDirty_NPCEffect_Blood5)
+    msg += "Blood4,"
+  EndIf
+  If(bDirty_NPCEffect_Dirt2_Professional || bDirty_NPCEffect_Dirt3_Professional)
+    msg += "Professional,"
+  EndIf
+  If(Dirty_NPCEffect_Dirt2_Bandits_Fix || Dirty_NPCEffect_Dirt3_Bandits_Fix || Dirty_NPCEffect_Dirt4_Bandits_Fix)
+    msg += "Bandit,"
+  EndIf
+  If(bHasMoreSoaps)
+    if(bSoapLavenderSoapEffect)
+      msg += "Lavender,"  
+    EndIf
+    if(bSoapBlueMountainSoapEffect)
+      msg += "Blue,"
+    EndIf
+    if(bSoapDragonsTongueSoapEffect)
+      msg += "DragonsTongue,"
+    EndIf
+    if(bSoapPurpleMountainFlowerSoapEffect)
+      msg += "Purple,"
+    EndIf
+    if(bSoapRedMountainFlowerSoapEffect)
+      msg += "Red,"
+    EndIf
+    if(bSoapSuperiorMountainFlowerSoapEffect)
+      msg += "Superior,"
     EndIf
   EndIf
   return msg

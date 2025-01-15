@@ -340,64 +340,34 @@ Function GetDDContext($name) {
 }
 
 $nearbyActors = GetActorValue("PLAYER", "nearbyActors", true);
-error_log("NEARBY ACTORS: " . $nearbyActors);
 // Build context
+$new_content = "";
+
 if (!$GLOBALS["disable_nsfw"]) {
-  $GLOBALS["COMMAND_PROMPT"].= BuildContext(GetTargetActor());
-  $GLOBALS["COMMAND_PROMPT"].= BuildContext($GLOBALS["HERIKA_NAME"]);
- // This does work, I just need to figure out how to get a bit of the bio + relevant context to insert into the full context for this to work properly. TODO
-    /*if ($nearbyActors) {
-        $nearbyActors = explode(',', $nearbyActors);
-        
-        foreach ($nearbyActors as $actor) {
-            if ($actor != $GLOBALS["HERIKA_NAME"] && $actor != $GLOBALS["PLAYER_NAME"]) {
-                $profile = md5($GLOBALS["HERIKA_NAME"]);
-
-                $GLOBALS["COMMAND_PROMPT"] .= BuildContext($actor);
-            }
-        }
-        }*/
-    $GLOBALS["COMMAND_PROMPT"].= BuildNSFWReputationContext($GLOBALS["HERIKA_NAME"]);
+  $new_content .= BuildContext(GetTargetActor()) . "\n";
+  $new_content .= BuildContext($GLOBALS["HERIKA_NAME"]);
+  $new_content .= BuildNSFWReputationContext($GLOBALS["HERIKA_NAME"]) . "\n";
 }
-
 
 // SFW Descriptions
 // We're going to scan everyone who is nearby
 // for highly visible traits of people, like 
 // they reek or are filthy.
-
-function bundleSFWContext() {
+bundleSFWContext($new_content);
+function bundleSFWContext(&$nc) {
   $utilities = new Utilities();
   // list of local npcs (sans narrator)
+  $nc .= "\n";
   $localActors = $utilities->beingsInCloseRange();
-  $GLOBALS['COMMAND_PROMPT'] .= "\n";
-  if ($localActors) {
-    $localActorNamesArray = explode('|', $localActors);
-    $targetActor = GetTargetActor();
-    // player is essentially nearby
-    $GLOBALS['COMMAND_PROMPT'] .= GetDirtAndBloodContext($GLOBALS["PLAYER_NAME"]);
-    foreach ($localActorNamesArray as $actor) {
-      $actor = str_replace("(", "", $actor);
-      if(str_contains("'s Horse", $actor)) {
-        // every one looks great riding a horse, but if horse only present //
-      } else  {
-        if ($actor != $GLOBALS["HERIKA_NAME"]) {
-          $GLOBALS["COMMAND_PROMPT"] .= GetDirtAndBloodContext($actor) . "\n";
-        } else if ($actor == $GLOBALS["HERIKA_NAME"]) {
-          // the narrator has no body to describe
-        }
-      }
-    }
-  }
+  // send localActors list to GetDirtAndBlood so as to make comma seperated lists
+  $nc .= GetDirtAndBloodContext($localActors);
+  $nc .= BuildSFWReputationContext($GLOBALS["HERIKA_NAME"]);
+  $nc .= GetThirdPartyContext();
+  $nc .= GetWeatherContext() . "\n";
 }
 
-bundleSFWContext();
+$GLOBALS["COMMAND_PROMPT"] = $new_content . $GLOBALS["COMMAND_PROMPT"];
 
-$GLOBALS["COMMAND_PROMPT"].= BuildSFWReputationContext($GLOBALS["HERIKA_NAME"]);
-$GLOBALS["COMMAND_PROMPT"].= GetThirdPartyContext();
-$GLOBALS["COMMAND_PROMPT"].= GetWeatherContext();
-
-$GLOBALS["COMMAND_PROMPT"].="\n";
 
 // Clean up context
 $locaLastElement=[];
