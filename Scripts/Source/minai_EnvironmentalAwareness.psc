@@ -151,7 +151,7 @@ function SetContext(actor akActor)
         envDescription += " The sky is overcast."
       endif
 
-      float currentTemp = _Frost_CurrentTemperature.GetValue()
+      float currentTemp = _Frost_CurrentTemperature.GetValueInt()
       ; float currentTemp = FrostUtil.GetCurrentTemperature()
       ; describe the temprature
       string airTemprature = ""
@@ -199,8 +199,8 @@ function SetContext(actor akActor)
       ActorList = lengthenArray(name, ActorList)
     EndIf
     string staticData = "About " + name + ":"
-    isKid = akActor.IsChild()
-    hasAFamily = akActor.HasFamilyRelationship()
+    bool isKid = akActor.IsChild()
+    bool hasAFamily = akActor.HasFamilyRelationship()
     if(isKid && !hasAFamily)
       staticData += "\n\t* is an orphan child."
     ElseIf (isKid)
@@ -400,6 +400,7 @@ function SetContext(actor akActor)
     else
       dynamicData += "\n\t* is drenched"
     endif
+    string actorName = main.GetActorName(akActor)
 
     int playersExposureLevel = _Frost_ExposureLevel.GetValueInt()
     if(playersExposureLevel==-1)
@@ -457,7 +458,7 @@ function SetContext(actor akActor)
     endif
     dynamicData += "\n\t* they feel " + warmthLanguage
     
-    float cTemp = FrostUtil.GetCurrentTemperature()
+    float cTemp = _Frost_CurrentTemperature.GetValueInt()
     ; describe the temprature
     string aTemp = ""
     if cTemp <= -15
