@@ -146,7 +146,6 @@ function Maintenance(minai_MainQuestController _main)
       _Frost_SevereWeatherList = Game.GetFormFromFile(0x024098, "Frostfall.esp") as FormList
     endif
   endif
-  aiff.SetActorVariable(playerRef, "FrostfallModExists", bHasFrostfall)
   followers = Game.GetFormFromFile(0x0913, "MinAI.esp") as minai_Followers
 EndFunction
 
