@@ -1,6 +1,6 @@
 scriptname minai_EnvironmentalAwareness extends Quest
 
-; some support for Frost Fall -- need to know players soggieness and coldness, temprature
+; some support for Frostfall -- would like to know players soggieness and coldness, temprature
 ; followers would notice frostbite setting in etc
 
 bool bHasFrostfall
@@ -17,10 +17,6 @@ GlobalVariable _Frost_IsTakingShelter
 GlobalVariable _Frost_ExposureTarget
 FormList _Frost_OvercastWeatherList
 FormList _Frost_SevereWeatherList
-; \ [03] Frostfall.esp \ [3] GRUP Top "GLOB" \ [143]  [GLOB:] \ [0] Record Header
-; \ [03] Frostfall.esp \ [3] GRUP Top "GLOB" \ [16] _Frost_Setting_FrigidWaterIsLethal [GLOB:0300E5B7] \ [0] Record Header
-
-
 
 ; tracked actors - most attributes don't change so once found we'll save that here
 ; so that we know the db is aready updated 
@@ -31,16 +27,6 @@ string[] Property ActorList Auto
 int actorRelationRankToPlayer
 bool isIntimidated ; if user intimidates someone, by the mechanics of the game they always will so this is permanent flag
 bool willIntimidateSucceed ; they might be your friend but if they got aggressive would you be intimidated? in the war culture of Skyrim people know
-
-; Bool IsGhost()
-
-;     Is this actor flagged as a ghost?
-
-; Bool IsGuard()
-
-;     Obtains whether this actor is a guard or not.
-
-; Bool IsHostileToActor-(Actor akActor) 
 
 
 minai_Util  MinaiUtil
