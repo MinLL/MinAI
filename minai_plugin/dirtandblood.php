@@ -35,8 +35,6 @@ class dnb {
     }
 }
 
-// The script is Structured this way to that it will be easier to implement the playmate part.
-// I never played with one so far, so I am not able to do it from the get go.
 function GetDirtAndBloodContext($localActors) {
     $utilities = new Utilities();
     if (!$utilities->IsModEnabled("DirtAndBlood")) {
