@@ -27,7 +27,7 @@ function GetEnvironmentalContext($localActors, $targetActor) {
     $others = implode("\n", $others_appearances);
     $text = $players_appearance . "\n" . $others . "\n" . $basic_weather . "\n" . $private_knowledge . "\n";
     $text = str_ireplace("a Old People Race", "an elderly person", $text);
-    $text = str_replace("IMPERIAL", "imperial", $text);
+    $text = str_ireplace("IMPERIAL", "imperial", $text);
     $text = str_replace(" , ", " ", $text);
     $text = str_replace(":, ", ":", $text);
     return $text;
