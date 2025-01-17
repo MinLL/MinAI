@@ -201,6 +201,14 @@ function SetContext(actor akActor)
     if(notInList)
       ActorList = lengthenArray(an, ActorList)
     EndIf
+
+    ; has player ever bribed this NPC?
+    bool bIsBribed = false
+    if (akActor.IsBribed())
+      bIsBribed = true
+    endIf
+
+
     ; check if player has intimidated this character, if a player ever has this is true,
     ; and by the laws of the game's mechanics if a player is intimidating to someone in the past even moreso in the future!
     ; maybe though if they meet and the player is laid low by a defeat mod, we can reset the NPC's intimidation
@@ -375,9 +383,13 @@ function SetContext(actor akActor)
     string privateKnowledge = ""
     string playerName = main.GetActorName(playerRef)
     if(akActor!=playerRef)
+      if(bIsBribed)
+        privateKnowledge += an + " has accepted bribes from " + playerName + ". "
+        staticData += an + " seems smug around " + playerName + ". "
+      endif
       if(bIsIntimidated)
         staticData += " " + an + " seems anxious and a little frightend around " + playerName + ". "
-        privateKnowledge = playerName + " has used threats against me in the past, I did what they want, and I am frightend of them. "
+        privateKnowledge = playerName + " has used threats against me in the past, I do what they want because I am frightend of them. "
       endif
       if(bWouldBeIntimidated && !bIsIntimidated)
         staticData += " " + an + " finds " + playerName + " potentially intimidating, though " + playerName + " has never been aggressive with them. " 
