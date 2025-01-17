@@ -203,8 +203,7 @@ function SetContext(actor akActor)
     EndIf
     ; check if player has intimidated this character, if a player ever has this is true,
     ; and by the laws of the game's mechanics if a player is intimidating to someone in the past even moreso in the future!
-    ; maybe though if they meet and the player is laid low by a defeat mod, we can reset the NPC's intimidation, but for another 
-    ; extension elsewhere when we add "COWER" to actions
+    ; maybe though if they meet and the player is laid low by a defeat mod, we can reset the NPC's intimidation
     ; to be future compatible allow the value to change back to false if we add "un-intimidate" mechanics
     bool bIsIntimidated = false
     if(akActor.isIntimidated())
@@ -238,9 +237,7 @@ function SetContext(actor akActor)
     ; 1 - much weaker than
     ; 0 - helpless 
     ; if you're between the upper and lower limit you're something of a peer
-    if(actorLevel>lowerLimt && actorLevel<upperLimt) 
-      ranking = 3
-    elseif(actorLevel<lowerLimt/2)
+    if(actorLevel<lowerLimt/2)
       ranking = 1
     elseif(actorLevel<lowerLimt)
       ranking = 2
@@ -351,8 +348,8 @@ function SetContext(actor akActor)
     if(!bHasFrostfall || playerRef != akActor)
       float actorsWarmth = akActor.GetWarmthRating()
       ; supposedly 140 is max for orc and nord who get +10 to cold benefit
-      ; add 20 because NPCs are always underdressed 
-      ; and some mods add undetected clothes for weather causes
+      ; add 30 because NPCs are always underdressed 
+      ; and some mods add undetected clothes for weather
       ; but if basically naked no bonus
       if(!bIsPlayerOrFollower && actorsWarmth>=30)
         actorsWarmth += 30
@@ -406,7 +403,7 @@ function SetContext(actor akActor)
     string careerName = aClass.GetName()
     string publicCareerText = an + " is a " + careerName + ". "
     if(careerName == "Assassin" || careerName == "Thief" || careerName == "Bandit Archer" || careerName == "Bandit" || careerName == "Bandit Wizard"|| careerName == "Blade" || careerName == "Vampire" || careerName == "Werewolf" || careerName == "dremora")
-      string privateCareerText = an + " is a " + careerName + " but is secretive about that unless in select company - like with other " + careerName + "s. "
+      string privateCareerText = an + " is a " + careerName + " but is secretive about that unless in select company - like with other " + careerName + "s or close friends.  "
       privateKnowledge += " " + privateCareerText
       publicCareerText = an + " has an air of mystery about them. "
     endif
