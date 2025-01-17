@@ -24,11 +24,6 @@ string[] Property ActorList Auto
 
 ; other attributes track with the actor to a certain degree so needs to be updated regularly
 
-int actorRelationRankToPlayer
-bool isIntimidated ; if user intimidates someone, by the mechanics of the game they always will so this is permanent flag
-bool willIntimidateSucceed ; they might be your friend but if they got aggressive would you be intimidated? in the war culture of Skyrim people know
-
-
 minai_Util  MinaiUtil
 minai_MainQuestController main
 minai_AIFF aiff
