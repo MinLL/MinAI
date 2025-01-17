@@ -61,7 +61,6 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
 * NPCs are informed about what they can readily see regarding characters around them: if someone is naked, short, tall, and if they match up against the player in a fight. 
 * NPCs are aware of each other's shoes, clothing, race, and symbols of cultural allegience like shields with icons.
 * NPCs know who is riding a horse, swimming, sleeping and sitting.
-* NPCs are aware of people having family relationships, updated from the game data.
 
 ### Nether's Follower Framework (NFF)
 * Allows the player to order followers to start / stop looting the nearby area.
