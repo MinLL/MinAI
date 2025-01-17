@@ -7,6 +7,7 @@ minai_Arousal arousal
 minai_DeviousStuff devious
 minai_Config config
 minai_Reputation reputation
+minai_DirtAndBlood dirtAndBlood
 
 bool bHasAIFF = False
 
@@ -71,6 +72,7 @@ Function Maintenance(minai_MainQuestController _main)
   survival = (Self as Quest)as minai_Survival
   arousal = (Self as Quest)as minai_Arousal
   devious = (Self as Quest)as minai_DeviousStuff
+  dirtAndBlood = (Self as Quest)as minai_DirtAndBlood
   followers = Game.GetFormFromFile(0x0913, "MinAI.esp") as minai_Followers
   reputation = (Self as Quest) as minai_Reputation
   if (!followers)
@@ -108,7 +110,6 @@ Function Maintenance(minai_MainQuestController _main)
   InitializeActionRegistry()
   ; Test, remove this later
   ; StoreContext("minai", "testKey", "This is dynamically persisted context!", 1200)
-
   InitFollow()
   CleanupStates()
 EndFunction
@@ -233,6 +234,7 @@ Function SetContext(actor akTarget)
   survival.SetContext(akTarget)
   followers.SetContext(akTarget)
   reputation.SetContext(akTarget)
+  dirtAndBlood.SetContext(akTarget)
   StoreKeywords(akTarget)
   StoreFactions(akTarget)
   if config.disableAIAnimations && akTarget != player
@@ -343,14 +345,14 @@ Function StoreFactions(actor akTarget)
   Faction[] factions = akTarget.GetFactions(-128, 127)
   int i = 0
   while i < factions.Length
-   string factionName = factions[i].GetName()
-   If factionName == ""
-     factionName = GetVanillaFactionName(factions[i].GetFormID())
-   EndIf
-   If factionName != ""
-     allFactions += factionName + ","
-   EndIf
-   i += 1
+    string factionName = factions[i].GetName()
+    If factionName == ""
+      factionName = GetVanillaFactionName(factions[i].GetFormID())
+    EndIf
+    If factionName != ""
+      allFactions += factionName + ","
+    EndIf
+    i += 1
   EndWhile
   SetActorVariable(akTarget, "AllFactions", allFactions)
 EndFunction
