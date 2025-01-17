@@ -63,7 +63,6 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
 * NPCs know who is riding a horse, swimming, sleeping and sitting.
 * NPCs are aware of people having family relationships, updated from the game data.
 
-
 ### Nether's Follower Framework (NFF)
 * Allows the player to order followers to start / stop looting the nearby area.
 * This will be expanded greatly in the future to provide further integrations.
