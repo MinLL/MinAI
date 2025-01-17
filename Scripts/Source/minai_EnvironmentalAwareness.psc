@@ -389,7 +389,7 @@ function SetContext(actor akActor)
       endif
       if(bIsIntimidated)
         staticData += " " + an + " seems anxious and a little frightend around " + playerName + ". "
-        privateKnowledge = playerName + " has used threats against me in the past, I do what they want because I am frightend of them. "
+        privateKnowledge = playerName + " has used threats against me in the past, I do what " + playerName + " wants because I am frightend of them. "
       endif
       if(bWouldBeIntimidated && !bIsIntimidated)
         staticData += " " + an + " finds " + playerName + " potentially intimidating, though " + playerName + " has never been aggressive with them. " 
