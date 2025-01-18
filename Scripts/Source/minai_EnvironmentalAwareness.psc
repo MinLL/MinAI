@@ -140,10 +140,6 @@ function SetContext(actor akActor)
       envDescription += "It is snowing outside. "
     elseif(weatherInt == 2) 
       envDescription += "It is raining outside. "
-    elseif(weatherInt ==1 )
-      envDescription += "The sky is cloudy. "
-    else 
-    envDescription += "The sky is clear. "
     endif
     ; Snow is 3, Rain is 2, Cloudy is 1, Clear is 0, and -1 is used 
  
