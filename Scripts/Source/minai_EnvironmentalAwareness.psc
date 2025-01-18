@@ -227,23 +227,25 @@ function SetContext(actor akActor)
     int actorLevel = akActor.GetLevel()
     int playerLevel = playerRef.GetLevel()
     float sqrtOfPlayerLevel = Math.sqrt(playerLevel as float)
+    int levelDifference = actorLevel - playerLevel
     
     int ranking = 3 
+    if(levelDifference<-2*sqrtOfPlayerLevel)
+      ranking = 1
+    elseif(levelDifference<-1*sqrtOfPlayerLevel)
+      ranking = 2
+    elseif(levelDifference>2*sqrtOfPlayerLevel)
+      ranking = 5
+    elseif(levelDifference>sqrtOfPlayerLevel)
+      ranking = 4
+    endif
+    
     ; 5 - much better
     ; 4 - better than
     ; 3 - peer
     ; 2 - weaker than
     ; 1 - much weaker than
     ; if you're between the upper and lower limit you're something of a peer
-    if((playerLevel - 2 * sqrtOfPlayerLevel)>actorLevel)
-      ranking = 1
-    elseif((playerLevel - sqrtOfPlayerLevel)>actorLevel)
-      ranking = 2
-    elseif(actorLevel>(playerLevel + 2 * sqrtOfPlayerLevel))
-      ranking = 5
-    elseif(actorLevel>(playerLevel + sqrtOfPlayerLevel))
-      ranking = 4
-    endif
     
     string staticData = "" + an + " is: "
     bool isKid = akActor.IsChild()
@@ -403,13 +405,17 @@ function SetContext(actor akActor)
     Class aClass = akBase.GetClass()
 
     string careerName = aClass.GetName()
-    string publicCareerText = an + " is a " + careerName + ". "
+    string publicCareerText = " " + an + " is a " + careerName + ". "
+    ; prevent Razita is a Razita 
+    if(careerName == an)
+      publicCareerText = ""
+    endif
     if(careerName == "Assassin" || careerName == "Thief" || careerName == "Bandit Archer" || careerName == "Bandit" || careerName == "Bandit Wizard"|| careerName == "Blade" || careerName == "Vampire" || careerName == "Werewolf" || careerName == "dremora")
       string privateCareerText = an + " is a " + careerName + " but is secretive about that unless in select company - like with other " + careerName + "s or close friends.  "
       privateKnowledge += " " + privateCareerText
       publicCareerText = an + " has an air of mystery about them. "
     endif
-    staticData += " " + publicCareerText
+    staticData +=  publicCareerText
     aiff.SetActorVariable(akActor, "EnvironmentalAwarenessPrivateKnowledge", privateKnowledge) 
     aiff.SetActorVariable(akActor, "EnviromentalAwarenessMoreStableData", staticData)
   EndIF
@@ -624,7 +630,7 @@ function SetContext(actor akActor)
     endif
   Endif
   if(dynamicData != "") 
-    dynamicData =  " " + an + " is " + dynamicData
+    dynamicData =  " " + an + " is " + dynamicData 
   endif
   aiff.SetActorVariable(akActor, "EnvironmentalAwarenessDynamicData", dynamicData)
 EndFunction
