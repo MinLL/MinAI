@@ -221,36 +221,30 @@ function SetContext(actor akActor)
       bWouldBeIntimidated = true
     endif
 
-    ; we're going to apply the rules of who you can date to what level differnce is meainingful
-    ; the rule is divide your age by 2 and add 7 to get the youngest person you should date
-    ; the reverse of that is take your age minus 7 and multiply by 2 to see the oldest person you could date
-    ; that kind of works for level differences.  At level 30 no one below level 22 should fight me, and I should run
-    ; from anyone over level 46
-    ; this is an estimate
-
+    ; use the sqrt of the player's level to assign brackets of peer combat status.
+    ; so a level 9 finds levels like 6-12 peers, 13 through level 15 to be better, 15+ much better  
+    ; level 49 finds level 42-56 to be peers. Works for scaling levels. 
     int actorLevel = akActor.GetLevel()
     int playerLevel = playerRef.GetLevel()
-    int upperLimt = (playerLevel - 7) * 2
-    int lowerLimt = (playerLevel / 2) + 7
-
+    float sqrtOfPlayerLevel = Math.sqrt(playerLevel as float)
+    
     int ranking = 3 
     ; 5 - much better
     ; 4 - better than
     ; 3 - peer
     ; 2 - weaker than
     ; 1 - much weaker than
-    ; 0 - helpless 
     ; if you're between the upper and lower limit you're something of a peer
-    if(actorLevel<lowerLimt/2)
-      ranking = 1
-    elseif(actorLevel<lowerLimt)
-      ranking = 2
-    elseif(actorLevel>upperLimt*1.5)
-      ranking = 5
-    elseif(actorLevel>upperLimt)
-      ranking = 4
-    endif
-
+      if((playerLevel - 2 * sqrtOfPlayerLevel)>actorLevel)
+        ranking = 1
+      elseif((playerLevel - sqrtOfPlayerLevel)>actorLevel)
+        ranking = 2
+      elseif(actorLevel>(playerLevel + 2 * sqrtOfPlayerLevel))
+        ranking = 5
+      elseif(actorLevel>(playerLevel + sqrtOfPlayerLevel))
+        ranking = 4
+      endif
+    
     string staticData = "" + an + " is: "
     bool isKid = akActor.IsChild()
     bool hasAFamily = akActor.HasFamilyRelationship()
