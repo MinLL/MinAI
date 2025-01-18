@@ -8,6 +8,7 @@ minai_DeviousStuff devious
 minai_Config config
 minai_Reputation reputation
 minai_DirtAndBlood dirtAndBlood
+minai_EnvironmentalAwareness envAwareness
 
 bool bHasAIFF = False
 
@@ -73,6 +74,7 @@ Function Maintenance(minai_MainQuestController _main)
   arousal = (Self as Quest)as minai_Arousal
   devious = (Self as Quest)as minai_DeviousStuff
   dirtAndBlood = (Self as Quest)as minai_DirtAndBlood
+  envAwareness = (Self as Quest)as minai_EnvironmentalAwareness
   followers = Game.GetFormFromFile(0x0913, "MinAI.esp") as minai_Followers
   reputation = (Self as Quest) as minai_Reputation
   if (!followers)
@@ -235,6 +237,7 @@ Function SetContext(actor akTarget)
   followers.SetContext(akTarget)
   reputation.SetContext(akTarget)
   dirtAndBlood.SetContext(akTarget)
+  envAwareness.SetContext(akTarget)
   StoreKeywords(akTarget)
   StoreFactions(akTarget)
   if config.disableAIAnimations && akTarget != player

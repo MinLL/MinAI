@@ -46,6 +46,21 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
 
 ### Dirt And Blood
 * The AI will be aware of the player's personal cleanliness, and to what degree they are covered in blood. Does not include clothing.
+* The NPCs are aware of their own dirtiness, though calibrated for the norms of Skyrim where clean people are nobles and elites.
+* With More Soaps extension, NPCs will be aware of your fragrence.
+
+### Frostfall
+* The NPCs are aware of the temprature of the environment, if the player looks cold, how warmly people are dressed, and if someone is wet.
+* The NPCs know if you are near a fire, and if you need to be due to the cold. 
+* NPCs know if someone is nearing frostbite or has it, or if someone is nearing death in the cold.
+
+### Environmental Awareness
+* NPCs know if they have been or could be intimidated by the player. They'll remember the player having used intimidation against them. Maybe they keep it a secret. 
+* NPCs know each other's occupations, except that shady occupations disguise themselves. Who is a merchant or a blacksmith is obvious from clear social cues to the people who live there.
+* NPCs will know who amongst themselves and the player is wearing cheap or expensive clothing.
+* NPCs are informed about what they can readily see regarding characters around them: if someone is naked, short, tall, and if they match up against the player in a fight. 
+* NPCs are aware of each other's shoes, clothing, race, and symbols of cultural allegience like shields with icons.
+* NPCs know who is riding a horse, swimming, sleeping and sitting.
 
 ### Nether's Follower Framework (NFF)
 * Allows the player to order followers to start / stop looting the nearby area.
