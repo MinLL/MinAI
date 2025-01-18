@@ -133,8 +133,10 @@ EndFunction
 function SetContext(actor akActor)
   string an = Main.GetActorName(akActor)
   if(akActor == playerRef)
-    string envDescription = "It is " + GetDayState() + ". "
-
+    string envDescription = GetDayState()
+    if(envDescription)
+      envDescription = "It is " + envDescription + "."
+    endif
     int weatherInt = Weather.GetCurrentWeather().GetClassification()
     if(weatherInt == 3)
       envDescription += "It is snowing outside. "
@@ -503,23 +505,24 @@ function SetContext(actor akActor)
     endif
     string actorName = an
 
+    ; exposure is the measure of a body losing heat faster than it can make it, like when falling into cold water
     int playersExposureLevel = _Frost_ExposureLevel.GetValueInt()
     if(playersExposureLevel==-1)
-      dynamicData += ". " + actorName + " is completely warm"
+      dynamicData += "" ;  in unexposed say nothing
     elseif(playersExposureLevel==0)
-      dynamicData += ". " + actorName + " is warm"
+      dynamicData += ". " + actorName + " is a bit chilled."
     elseif(playersExposureLevel == 1)
-      dynamicData += ". " + actorName + " is comfortable with the temprature"
+      dynamicData += ". " + actorName + " seems chilly, with a reddened nose."
     elseif(playersExposureLevel == 2)
-      dynamicData += ". " + actorName + " is cold"
+      dynamicData += ". " + actorName + " is cold, rubbing their hands together periodically."
     elseif(playersExposureLevel == 3)
-      dynamicData += ". " + actorName + " is very cold"
+      dynamicData += ". " + actorName + " is very cold, shivering lightly, their teeth chatter."
     elseif(playersExposureLevel == 4)
-      dynamicData += ". " + actorName + " is freezing, dangerously cold"
+      dynamicData += ". " + actorName + " is freezing, dangerously cold, their teeth chatter and interupt their speech, they are shivering noticably."
     elseif(playersExposureLevel == 5)
-      dynamicData += ". " + actorName + " is freezing to death"
+      dynamicData += ". " + actorName + " is freezing to death. They are looking blue, their teeth are chattering, and they are shivering in a big hard to control vibrating motion. "
     elseif(playersExposureLevel == 6)
-      dynamicData += ". " + actorName + " is too cold, nearing hypothermia, they are nearing death!"
+      dynamicData += ". " + actorName + " is too cold, nearing hypothermia, they are nearing death! They can't speak and can barely move due to the cold. "
     endif
 
     ; what will the baseline exposure of the player be if they don't take any actions, stand near fires etc
@@ -539,25 +542,25 @@ function SetContext(actor akActor)
       dynamicData += ". The weather is lethally cold for " + actorName + " and they could easily freeze to death. "
     endif
 
+
+    ; how bundled up is the player
     int actorsWarmth = _Frost_AttributeWarmth.GetValueInt()
     ; supposedly 140 is max for orc and nord who get +10 to cold benefit
-    string warmthLanguage = ""
     if(actorsWarmth>=130)
-      warmthLanguage = "completely warm"
+      dynamicData += actorName + " is dressed very warmly, like for a winter evening."
     elseif(actorsWarmth>=110)
-      warmthLanguage = "warm"
+      dynamicData += actorName + " is dressed warmly, like for a winter day."
     elseif(actorsWarmth>=90)
-      warmthLanguage = "mild"
+      dynamicData += actorName + " is dressed lukewarmly, like for a brisk breeze."
     elseif(actorsWarmth>=70)
-      warmthLanguage = "chilly"
+      dynamicData += actorName + " is dressed for moderate weather."
     elseif(actorsWarmth>=50)
-      warmthLanguage = "cold"
+      dynamicData += actorName + " attire clearly has warmth as an afterthought. "
     elseif(actorsWarmth>=30)
-      warmthLanguage = "very cold"
+      dynamicData += actorName + " is as dressed as a summertime swimmer."
     else 
-      warmthLanguage = "frightenly cold"
+      dynamicData += actorName + " is lacking any clothes that would keep them warm."
     endif
-    dynamicData += actorName + " feels " + warmthLanguage + ". "
     
     float cTemp = _Frost_CurrentTemperature.GetValueInt()
     ; describe the temprature
@@ -579,55 +582,29 @@ function SetContext(actor akActor)
     else 
       aTemp = " extremely hot"
     endif
-    float clothesWarmth = akActor.GetWarmthRating()
-    ; int clothesWarmth = FrostUtil.GetPlayerArmorWarmth()
-    if(clothesWarmth>=130)
-      dynamicData += " " + actorName + "'s clothing is extremely warm. "
-    elseif(clothesWarmth>=110)
-      dynamicData += " " + actorName + "'s clothing is very warm. "
-    elseif(clothesWarmth>=90)
-      dynamicData += " " + actorName + "'s clothing is kind of warm. "
-    elseif(clothesWarmth>=70 || cTemp>10)
-      dynamicData += " " + actorName + "'s clothing is not warm. "
-    elseif(clothesWarmth>=50)
-      dynamicData += " " + actorName + "'s clothing is almost no protection from the" + aTemp + " weather. "
-    elseif(clothesWarmth>=30)
-      dynamicData += " " + actorName + "'s clothing is not protecting them from the" + aTemp + " weather. "
-    else 
-      dynamicData += " " + actorName + "'s clothing situation leaves them completely exposed to the" + aTemp + " weather. "
-    endif
+  
+  if(actorsWarmth < 30 && cTemp <= 10)
+    dynamicData += " " + actorName + "'s clothing situation leaves them completely exposed to the" + aTemp + " weather. "
+  elseif(actorsWarmth < 50 && cTemp <= 10)
+    dynamicData += " " + actorName + "'s clothing is not protecting them from the" + aTemp + " weather. "
+  elseif(actorsWarmth < 70 && cTemp <= 10)
+    dynamicData += " " + actorName + "'s clothing is almost no protection from the" + aTemp + " weather. "
+  endif
     
-    ; int playerArmorCoverage = FrostUtil.GetPlayerArmorCoverage()
-    ; if(playerArmorCoverage>=130)
-    ;   dynamicData += " " + actorName + "'s clothing has great protection from the wind and rain"
-    ; elseif(playerArmorCoverage>=110)
-    ;   dynamicData += ", their clothing has good protection from the wind and rain"
-    ; elseif(playerArmorCoverage>=90)
-    ;   dynamicData += ", their clothing has some protection from the wind and rain"
-    ; elseif(playerArmorCoverage>=70 || cTemp>10)
-    ;   dynamicData += ", their clothing has little protection from the wind and rain"
-    ; elseif(playerArmorCoverage>=50)
-    ;   dynamicData += ", their clothing offers miniscule protection from the wind and rain"
-    ; elseif(playerArmorCoverage>=30)
-    ;   dynamicData += ", their clothing is basically no protection from the wind and rain"
-    ; else 
-    ;   dynamicData += ", their clothing situation is is completely vulnerable to the wind and rain"
-    ; endif
-
-    int playerCoverage = _Frost_AttributeCoverage.GetValueInt()
-    if(playerCoverage>=130)
-      dynamicData += actorName + " has great protection from the elements by some combination of their clothes or environment. "
-    elseif(playerCoverage>=100)
-      dynamicData += actorName + " has good protection from the elements by some combination of their clothes or environment. "
-    elseif(playerCoverage>=60)
-      dynamicData += actorName + " has some pretty nice protection from the elements because of their clothes or the things around them. "
-    elseif(playerCoverage>=30)
-      dynamicData += actorName + " has some protection from the elements because of their clothes or the things around them. "
-    elseif(playerCoverage>=10)
-      dynamicData += actorName + " has little protection from the elements. "
-    else
-      dynamicData += actorName + " is completely exposed to any elements. "
-    endif
+  int playerCoverage = _Frost_AttributeCoverage.GetValueInt()
+  if(playerCoverage>=130)
+    dynamicData += actorName + " has great protection from the rain and wind by some combination of their clothes or environment. "
+  elseif(playerCoverage>=100)
+    dynamicData += actorName + " has good protection from the rain and wind by some combination of their clothes or environment. "
+  elseif(playerCoverage>=60)
+    dynamicData += actorName + " has some pretty nice protection from the rain and wind because of their clothes or the things around them. "
+  elseif(playerCoverage>=30)
+    dynamicData += actorName + " has some protection from the rain and wind because of their clothes or the things around them. "
+  elseif(playerCoverage>=10)
+    dynamicData += actorName + " has little protection from the rain and wind. "
+  else
+    dynamicData += actorName + " is completely exposed to any rain and wind. "
+  endif
   Endif
   if(dynamicData != "") 
     dynamicData =  " " + an + " is " + dynamicData 

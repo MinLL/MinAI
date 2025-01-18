@@ -22,6 +22,7 @@ function GetEnvironmentalContext($localActors, $targetActor) {
     foreach($actorList as $actor) {
         $new_text = $utilities->GetActorValue($actor, "EnviromentalAwarenessMoreStableData") . $utilities->GetActorValue($actor, "EnvironmentalAwarenessDynamicData");
         $new_text = str_replace(strtolower($actor), $actor, $new_text);        
+        if($new_text!=""&&!str_ends_with($new_text, ".")) $new_text .= ".";
         $others_appearances[] = $new_text;
     }
     $others = implode("\n", $others_appearances);
