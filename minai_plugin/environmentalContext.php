@@ -30,6 +30,8 @@ function GetEnvironmentalContext($localActors, $targetActor) {
     $text = str_ireplace("IMPERIAL", "imperial", $text);
     $text = str_replace(" , ", " ", $text);
     $text = str_replace(":, ", ":", $text);
+    $text = str_replace("player spellsword class", "spellsword", $text);
+
     return $text;
 }
 
