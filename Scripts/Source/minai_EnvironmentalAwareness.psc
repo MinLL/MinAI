@@ -235,15 +235,15 @@ function SetContext(actor akActor)
     ; 2 - weaker than
     ; 1 - much weaker than
     ; if you're between the upper and lower limit you're something of a peer
-      if((playerLevel - 2 * sqrtOfPlayerLevel)>actorLevel)
-        ranking = 1
-      elseif((playerLevel - sqrtOfPlayerLevel)>actorLevel)
-        ranking = 2
-      elseif(actorLevel>(playerLevel + 2 * sqrtOfPlayerLevel))
-        ranking = 5
-      elseif(actorLevel>(playerLevel + sqrtOfPlayerLevel))
-        ranking = 4
-      endif
+    if((playerLevel - 2 * sqrtOfPlayerLevel)>actorLevel)
+      ranking = 1
+    elseif((playerLevel - sqrtOfPlayerLevel)>actorLevel)
+      ranking = 2
+    elseif(actorLevel>(playerLevel + 2 * sqrtOfPlayerLevel))
+      ranking = 5
+    elseif(actorLevel>(playerLevel + sqrtOfPlayerLevel))
+      ranking = 4
+    endif
     
     string staticData = "" + an + " is: "
     bool isKid = akActor.IsChild()
