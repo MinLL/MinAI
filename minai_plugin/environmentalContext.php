@@ -31,6 +31,7 @@ function GetEnvironmentalContext($localActors, $targetActor) {
     $text = str_replace(" , ", " ", $text);
     $text = str_replace(":, ", ":", $text);
     $text = str_replace("player spellsword class", "spellsword", $text);
+    $text = str_replace(strtolower($player_name), $player_name, $text);
 
     return $text;
 }
