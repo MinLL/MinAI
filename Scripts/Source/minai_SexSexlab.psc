@@ -9,6 +9,7 @@ minai_Util MinaiUtil
 minai_MainQuestController main
 minai_Config config
 int jDescriptionsMap
+bool bHasSexlabPPlus = False
 
 function Maintenance(SexLabFramework localSlf, minai_DeviousStuff localDevious)
   slf = localSlf
@@ -17,6 +18,7 @@ function Maintenance(SexLabFramework localSlf, minai_DeviousStuff localDevious)
   MinaiUtil = (self as Quest) as minai_Util
   main = (self as Quest) as minai_MainQuestController
   config = Game.GetFormFromFile(0x0912, "MinAI.esp") as minai_Config
+  bHasSexlabPPlus = Game.GetFormFromFile(0xB3302, "SexLab.esm")
 endfunction
 
 
@@ -217,20 +219,29 @@ string function buildSceneFallbackDescription(int ThreadID, string eventType)
     return ""
   EndIf
   string[] sceneTags= controller.Animation.GetRawTags()
-  string sceneId = controller.Animation.Name
   Actor[] actors = slf.GetController(ThreadID).Positions
   string actorString = MinaiUtil.JoinActorArray(actors, ", ")
   string sceneTagsString = MinaiUtil.JoinStringArray(sceneTags, ", ")
   string actionString = ""
-  int count = actors.length
-  while(count > 0)
-    count -= 1
-    string stageDescription = GetSexStageDescription(controller.Animation.FetchStage(controller.Stage)[count])
+  string sceneId
+  if bHasSexlabPPlus
+    SexLabThread thread = slf.GetThread(ThreadID)
+    string sceneHash = thread.GetActiveScene()
+    string stageHash = thread.GetActiveStage()
+    string sceneIdWithPrefix = SexlabRegistry.GetAnimationEvent(sceneHash, stageHash, 0)
+    sceneId = StringUtil.Substring(sceneIdWithPrefix, 4, -1)
+  else
+    sceneId = controller.Animation.Name
+    int count = actors.length
+    while(count > 0)
+      count -= 1
+      string stageDescription = GetSexStageDescription(controller.Animation.FetchStage(controller.Stage)[count])
 
-    if(stageDescription != "")
-      actionString += sexUtil.GetActorNameForSex(actors[count])+" is "+ stageDescription
-    endif
-  endwhile
+      if(stageDescription != "")
+        actionString += sexUtil.GetActorNameForSex(actors[count])+" is "+ stageDescription
+      endif
+    endwhile
+  EndIf
 
   return sexUtil.buildSceneString(sceneId, actorString, eventType, sceneTagsString, actionString)
 endfunction

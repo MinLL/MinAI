@@ -11,7 +11,7 @@ minai_Sex sex
 minai_Survival survival
 minai_Arousal arousal
 minai_DeviousStuff devious
-
+minai_DirtAndBlood dirtAndBlood
 
 actor playerRef
 
@@ -39,6 +39,7 @@ Function Maintenance(minai_MainQuestController _main)
   survival = (Self as Quest)as minai_Survival
   arousal = (Self as Quest)as minai_Arousal
   devious = (Self as Quest)as minai_DeviousStuff
+  dirtAndBlood = (Self as Quest)as minai_DirtAndBlood
 
   
   playerRef = Game.GetPlayer()
@@ -127,7 +128,7 @@ Function UpdateEvents(Actor actorToSpeakTo, Actor actorSpeaking, actor[] actorsF
   ; sex.UpdateEvents(actorToSpeakTo, actorSpeaking, actorsFromFormList, bPlayerInScene,  targetName,  speakerName,  playerName)
   arousal.UpdateEvents(actorToSpeakTo, actorSpeaking, actorsFromFormList, bPlayerInScene,  targetName,  speakerName,  playerName)
   survival.UpdateEvents(actorToSpeakTo, actorSpeaking, actorsFromFormList, bPlayerInScene,  targetName,  speakerName,  playerName)
-  
+  dirtAndBlood.UpdateEventsForMantella(actorToSpeakTo, actorSpeaking, actorsFromFormList)
   RegisterAction(BuildReminderStr(actorToSpeakTo))
 EndFunction
 

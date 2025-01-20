@@ -6,6 +6,8 @@ require_once("wornequipment.php");
 require_once("customintegrations.php");
 require_once("weather.php");
 require_once("reputation.php");
+require_once("submissivelola.php");
+require_once("dirtandblood.php");
 
 Function BuildContext($name) {
   if ($name == "The Narrator") {
@@ -17,8 +19,10 @@ Function BuildContext($name) {
   $context .= GetDDContext($name);
   $context .= GetArousalContext($name);
   $context .= GetFollowingContext($name);
-  if (!isset($GLOBALS["HERIKA_TARGET"]))
+  if (!isset($GLOBALS["HERIKA_TARGET"])) {
       $context .= GetDeviousFollowerContext($name);
+      $context .= GetSubmissiveLolaContext($name);
+  }
   $context .= GetSurvivalContext($name);
 
   return $context;
@@ -52,7 +56,7 @@ Function GetSurvivalContext($name) {
 Function GetArousalContext($name) {
   $ret = "";
   $arousal = GetActorValue($name, "arousal");
-  if ($arousal != "") {
+  if ($arousal != "" && (IsModEnabled("OSL") || IsModEnabled("Aroused"))) {
       $ret .= "{$name}'s sexual arousal level is {$arousal}/100, where 0 is not aroused at all, and 100 is desperate for sex.";
   }
   if ($ret != "")
@@ -147,7 +151,7 @@ Function HasKeywordAndNotSkip($name, $eqContext, $keyword) {
 }
 
 Function GetClothingContext($name) {
-  $cuirass = GetActorValue($name, "cuirass");
+  $cuirass = GetActorValue($name, "cuirass", false, true);
   $ret = "";
   
   $eqContext = GetAllEquipmentContext($name);
@@ -159,11 +163,10 @@ Function GetClothingContext($name) {
   // if $eqContext["context"] not empty, then will set ret
   if (!empty($eqContext["context"])) {
     $ret .= "{$name} is wearing {$eqContext["context"]}";
+  } elseif (IsEnabled($name, "isNaked")) {
+    $ret .= "{$name} is naked and exposed.\n";
   } elseif (!empty($cuirass)) {
     $ret .= "{$name} is wearing {$cuirass}.\n";
-  }
-  elseif (IsEnabled($name, "isNaked")) {
-    $ret .= "{$name} is naked and exposed.\n";
   }
 
   if (HasKeywordAndNotSkip($name, $eqContext, "SLA_HalfNakedBikini")) {
@@ -336,35 +339,35 @@ Function GetDDContext($name) {
   return $ret;
 }
 
-
+$nearbyActors = GetActorValue("PLAYER", "nearbyActors", true);
 // Build context
-if (!$GLOBALS["disable_nsfw"]) {
-    $GLOBALS["COMMAND_PROMPT"].= BuildContext(GetTargetActor());
-    $GLOBALS["COMMAND_PROMPT"].= BuildContext($GLOBALS["HERIKA_NAME"]);
-    $nearbyActors = GetActorValue("PLAYER", "nearbyActors", true);
-    // This does work, I just need to figure out how to get a bit of the bio + relevant context to insert into the full context for this to work properly. TODO
-    /*if ($nearbyActors) {
-        $nearbyActors = explode(',', $nearbyActors);
-        
-        foreach ($nearbyActors as $actor) {
-            if ($actor != $GLOBALS["HERIKA_NAME"] && $actor != $GLOBALS["PLAYER_NAME"]) {
-                $profile = md5($GLOBALS["HERIKA_NAME"]);
+$new_content = "";
 
-                $GLOBALS["COMMAND_PROMPT"] .= BuildContext($actor);
-            }
-        }
-        }*/
-    $GLOBALS["COMMAND_PROMPT"].= BuildNSFWReputationContext($GLOBALS["HERIKA_NAME"]);
+if (!$GLOBALS["disable_nsfw"]) {
+  $new_content .= BuildContext(GetTargetActor()) . "\n";
+  $new_content .= BuildContext($GLOBALS["HERIKA_NAME"]);
+  $new_content .= BuildNSFWReputationContext($GLOBALS["HERIKA_NAME"]) . "\n";
 }
 
+// SFW Descriptions
+// We're going to scan everyone who is nearby
+// for highly visible traits of people, like 
+// they reek or are filthy.
+bundleSFWContext($new_content);
+function bundleSFWContext(&$nc) {
+  $utilities = new Utilities();
+  // list of local npcs (sans narrator)
+  $nc .= "\n";
+  $localActors = $utilities->beingsInCloseRange();
+  // send localActors list to GetDirtAndBlood so as to make comma seperated lists
+  $nc .= GetDirtAndBloodContext($localActors);
+  $nc .= BuildSFWReputationContext($GLOBALS["HERIKA_NAME"]);
+  $nc .= GetThirdPartyContext();
+  $nc .= GetWeatherContext() . "\n";
+}
 
-$GLOBALS["COMMAND_PROMPT"].= BuildSFWReputationContext($GLOBALS["HERIKA_NAME"]);
-$GLOBALS["COMMAND_PROMPT"].= GetThirdPartyContext();
-$GLOBALS["COMMAND_PROMPT"].= GetWeatherContext();
+$GLOBALS["COMMAND_PROMPT"] = $new_content . $GLOBALS["COMMAND_PROMPT"];
 
-$GLOBALS["COMMAND_PROMPT"].="
-
-";
 
 // Clean up context
 $locaLastElement=[];

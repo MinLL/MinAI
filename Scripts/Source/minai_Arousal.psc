@@ -506,9 +506,15 @@ Function SetContext(actor akTarget)
   aiff.SetActorVariable(akTarget, "isnaked", !cuirass)
   aiff.SetActorVariable(akTarget, "arousal", GetActorArousal(akTarget))
   aiff.SetActorVariable(akTarget, "isexposed", IsTNGExposed(akTarget))
-  if cuirass != None
+  if cuirass == None
+    aiff.SetActorVariable(akTarget, "cuirass", "")
+  Else
     aiff.SetActorVariable(akTarget, "cuirass", cuirass.GetName())
   EndIf
+
+  string wornEquipments = GetWornEquipments(akTarget)
+  aiff.SetActorVariable(akTarget, "AllWornEquipment", wornEquipments)
+  
   if !bHasArousedKeywords
   	return
   EndIf
@@ -531,9 +537,6 @@ Function SetContext(actor akTarget)
     actorRace = "human"
   EndIf
   aiff.SetActorVariable(akTarget, "race", actorRace)
-
-  string wornEquipments = GetWornEquipments(akTarget)
-  aiff.SetActorVariable(akTarget, "AllWornEquipment", wornEquipments)
 EndFunction
 
 ; Because escaping characters can be expensive, perform length encoding
