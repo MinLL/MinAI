@@ -67,6 +67,8 @@ function GetDirtAndBloodContext($localActors) {
     $actorList = explode("|",$localActors);
     $actorList[] = $GLOBALS["PLAYER_NAME"]; 
     foreach($actorList as $name) {
+        $name = str_replace("(", "", $name);
+        if($name == "") continue;
         $listOfTags = $utilities->GetActorValue($name, "dirtAndBlood");
         if(dnb::includes("Clean", $listOfTags)) $clean[] = $name;
         if(dnb::includes("Dirt1", $listOfTags)) $dirt1[] = $name;

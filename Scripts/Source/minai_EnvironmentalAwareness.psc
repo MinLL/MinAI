@@ -1,5 +1,6 @@
 scriptname minai_EnvironmentalAwareness extends Quest
 
+
 ; some support for Frostfall -- would like to know players soggieness and coldness, temprature
 ; followers would notice frostbite setting in etc
 
@@ -29,6 +30,8 @@ minai_MainQuestController main
 minai_AIFF aiff
 Actor playerRef
 minai_Followers followers
+bool bIsNight = false
+
 
 string function GetDayState() 
 	float Time = Utility.GetCurrentGameTime()
@@ -75,6 +78,7 @@ string function GetDayState()
   elseif(Time==47) 
     str = "almost midnight"
   endif
+    bIsNight = Time<11 || Time>38
   return str
 EndFunction
 
@@ -144,7 +148,12 @@ function SetContext(actor akActor)
       envDescription += "It is raining outside. "
     endif
     ; Snow is 3, Rain is 2, Cloudy is 1, Clear is 0, and -1 is used 
- 
+    envDescription += GetMoonStatus()
+
+    if(akActor.IsInInterior())
+      envDescription = "We are indoors. "
+    endif
+
     if(bHasFrostfall)
       Weather akWeather = Weather.GetCurrentWeather()
       bool IsWeatherOvercast = _Frost_OvercastWeatherList.HasForm(akWeather)
@@ -164,7 +173,7 @@ function SetContext(actor akActor)
       elseif currentTemp < 20
         airTemprature = "mild"
       elseif currentTemp < 23
-        airTemprature = "room temprature"
+        airTemprature = "pleasant"
       elseif currentTemp < 34
         airTemprature = "warm"
       elseif currentTemp < 40
@@ -172,7 +181,7 @@ function SetContext(actor akActor)
       else 
         airTemprature = "extremely hot"
       endif
-      envDescription += "The environment is " + airTemprature + ". "
+      envDescription += "The temperature is " + airTemprature + ". "
       bool IsWeatherSevere = _Frost_SevereWeatherList.HasForm(akWeather)
       if(IsWeatherSevere)
         dynamicData += "The weather is severe and dangerous. People must be careful! "
@@ -545,21 +554,21 @@ function SetContext(actor akActor)
 
     ; how bundled up is the player
     int actorsWarmth = _Frost_AttributeWarmth.GetValueInt()
-    ; supposedly 140 is max for orc and nord who get +10 to cold benefit
-    if(actorsWarmth>=130)
-      dynamicData += actorName + " is dressed very warmly, like for a winter evening."
-    elseif(actorsWarmth>=110)
-      dynamicData += actorName + " is dressed warmly, like for a winter day."
-    elseif(actorsWarmth>=90)
-      dynamicData += actorName + " is dressed lukewarmly, like for a brisk breeze."
-    elseif(actorsWarmth>=70)
-      dynamicData += actorName + " is dressed for moderate weather."
-    elseif(actorsWarmth>=50)
-      dynamicData += actorName + " attire clearly has warmth as an afterthought. "
-    elseif(actorsWarmth>=30)
-      dynamicData += actorName + " is as dressed as a summertime swimmer."
+    ; in frostfall, 300 is a good score, so more like double non-frostfall version
+    if(actorsWarmth>=290)
+      dynamicData += actorName + " is dressed very warmly. "
+    elseif(actorsWarmth>=270)
+      dynamicData += actorName + " is dressed warmly. "
+    elseif(actorsWarmth>=240)
+      dynamicData += actorName + " is dressed lukewarmly. "
+    elseif(actorsWarmth>=200)
+      dynamicData += actorName + " is dressed for moderate weather. "
+    elseif(actorsWarmth>=160)
+      dynamicData += actorName + " does not appear dressed for warmth. "
+    elseif(actorsWarmth>=100)
+      dynamicData += actorName + " is dressed like a summertime swimmer. "
     else 
-      dynamicData += actorName + " is lacking any clothes that would keep them warm."
+      dynamicData += actorName + " is lacking any clothes that would keep them warm. "
     endif
     
     float cTemp = _Frost_CurrentTemperature.GetValueInt()
@@ -583,31 +592,123 @@ function SetContext(actor akActor)
       aTemp = " extremely hot"
     endif
   
-  if(actorsWarmth < 30 && cTemp <= 10)
-    dynamicData += " " + actorName + "'s clothing situation leaves them completely exposed to the" + aTemp + " weather. "
-  elseif(actorsWarmth < 50 && cTemp <= 10)
-    dynamicData += " " + actorName + "'s clothing is not protecting them from the" + aTemp + " weather. "
-  elseif(actorsWarmth < 70 && cTemp <= 10)
-    dynamicData += " " + actorName + "'s clothing is almost no protection from the" + aTemp + " weather. "
-  endif
-    
-  int playerCoverage = _Frost_AttributeCoverage.GetValueInt()
-  if(playerCoverage>=130)
-    dynamicData += actorName + " has great protection from the rain and wind by some combination of their clothes or environment. "
-  elseif(playerCoverage>=100)
-    dynamicData += actorName + " has good protection from the rain and wind by some combination of their clothes or environment. "
-  elseif(playerCoverage>=60)
-    dynamicData += actorName + " has some pretty nice protection from the rain and wind because of their clothes or the things around them. "
-  elseif(playerCoverage>=30)
-    dynamicData += actorName + " has some protection from the rain and wind because of their clothes or the things around them. "
-  elseif(playerCoverage>=10)
-    dynamicData += actorName + " has little protection from the rain and wind. "
-  else
-    dynamicData += actorName + " is completely exposed to any rain and wind. "
-  endif
+    if(actorsWarmth < 30 && cTemp <= 10)
+      dynamicData += " " + actorName + "'s clothing situation leaves them completely exposed to the" + aTemp + " weather. "
+    elseif(actorsWarmth < 50 && cTemp <= 10)
+      dynamicData += " " + actorName + "'s clothing is not protecting them from the" + aTemp + " weather. "
+    elseif(actorsWarmth < 70 && cTemp <= 10)
+      dynamicData += " " + actorName + "'s clothing is almost no protection from the" + aTemp + " weather. "
+    endif
+      
+    int playerCoverage = _Frost_AttributeCoverage.GetValueInt()
+    if(playerCoverage>=300)
+      dynamicData += " " + actorName + " has great protection from rain and wind by some combination of their clothes or environment. "
+    elseif(playerCoverage>=270)
+      dynamicData += " " + actorName + " has good protection from rain and wind by some combination of their clothes or environment. "
+    elseif(playerCoverage>=220)
+      dynamicData += " " + actorName + " has some pretty nice protection from rain and wind because of their clothes or the things around them. "
+    elseif(playerCoverage>=160)
+      dynamicData += " " + actorName + " has some protection from rain and wind because of their clothes or the things around them. "
+    elseif(playerCoverage>=80)
+      dynamicData += " " + actorName + " has little protection from rain and wind. "
+    else
+      dynamicData += " " + actorName + " is completely exposed to any rain and wind. "
+    endif
   Endif
   if(dynamicData != "") 
     dynamicData =  " " + an + " is " + dynamicData 
   endif
   aiff.SetActorVariable(akActor, "EnvironmentalAwarenessDynamicData", dynamicData)
+EndFunction
+
+
+; moon phase logic is from the papyrus wiki
+Int Function GetPassedGameDays()
+	Float GameDaysPassed
+	GameDaysPassed = Utility.GetCurrentGameTime()
+	Return GameDaysPassed As Int
+EndFunction
+
+Int Function GetPassedGameHours() Global
+	Float GameTime
+	Float GameHoursPassed
+ 
+	GameTime = Utility.GetCurrentGameTime()
+	GameHoursPassed = ((GameTime - (GameTime As Int)) * 24)
+	Return GameHoursPassed As Int
+EndFunction
+
+string function GetMoonStatus()
+  int phase = GetCurrentMoonPhase()
+  string txt = "The " + GetCurrentMoonSync()
+  if(bIsNight)
+    txt += " are"
+  else
+    txt += " will be"
+  endif
+  if(phase == 0) 
+    txt += " full"
+  elseif(phase == 1)
+    txt += " wanning gibbious"
+  elseif(phase == 2)
+    txt += " third quarter"
+  elseif(phase == 3)
+    txt += " wanning crescent"
+  elseif(phase == 4)
+    txt += " in new moon"
+  elseif(phase == 5)
+    txt += " waxing crescent"
+  elseif(phase == 6)
+    txt += " first quarter"
+  elseif(phase == 7)
+    txt += " waxing gibbious"
+  endif
+  txt += " tonight."
+  return txt
+endfunction
+
+int Function GetCurrentMoonPhase()
+	Int GameDaysPassed
+	Int GameHoursPassed
+	Int PhaseTest
+	GameDaysPassed = GetPassedGameDays()
+	GameHoursPassed = GetPassedGameHours()
+	If (GameHoursPassed >= 12.0)
+		GameDaysPassed += 1
+	EndIf
+	PhaseTest = GameDaysPassed % 24 ;A full cycle through the moon phases lasts 24 days
+	If PhaseTest >= 22 || PhaseTest == 0
+		Return 7
+	ElseIf PhaseTest < 4
+		Return 0
+	ElseIf PhaseTest < 7
+		Return 1
+	ElseIf PhaseTest < 10
+		Return 2
+	ElseIF PhaseTest < 13
+		Return 3
+	ElseIf PhaseTest < 16
+		Return 4
+	ElseIf PhaseTest < 19
+		Return 5
+	ElseIf PhaseTest < 22
+		Return 6
+	EndIf
+EndFunction
+
+string Function GetCurrentMoonSync()
+	Int GameDaysPassed
+	Int GameHoursPassed
+	Int SyncTest
+	
+	GameDaysPassed = GetPassedGameDays()
+	GameHoursPassed = GetPassedGameHours()
+	If (GameHoursPassed >= 12)
+		GameDaysPassed += 1
+	EndIf
+	SyncTest = GameDaysPassed % 5
+	if(SyncTest == 0)
+    return " two moons"
+  endif
+  return " moon"
 EndFunction
