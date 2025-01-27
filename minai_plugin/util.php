@@ -295,6 +295,7 @@ Function IsRadiant() {
 }
 
 function getScene($actor, $threadId = null) {
+    error_log("minai: getScene($actor, $threadId)");
     $actor = str_replace('[', '\[', $actor);
     $actor = str_replace(']', '\]', $actor);
     if(isset($threadId)) {
@@ -305,10 +306,17 @@ function getScene($actor, $threadId = null) {
 
     
     if(!$scene) {
+        error_log("minai: No scene found.");
         return null;
     }
     $scene = $scene[0];
     $sceneDesc = getSceneDesc($scene);
+    if (!$sceneDesc) {
+        $allActors = $scene["female_actors"] . ', ' . $scene["male_actors"];
+        $sceneDesc = "A sex scene is currently active. ";
+        $sceneDesc .= "These participants are currently engaged in sex in the scene: " . $allActors . ".\n";
+        $sceneDesc .= $scene["fallback"];
+    }
 
     if($scene["female_actors"] && $scene["male_actors"]) {
         // push females at the beginning for sexlab
@@ -324,11 +332,11 @@ function getScene($actor, $threadId = null) {
     } else {
         $scene["actors"] = $scene["male_actors"];
     }
-
     $actors = explode(",", $scene["actors"]);
     $sceneDesc = replaceActorsNamesInSceneDesc($actors, $sceneDesc);
     $scene["description"] = $sceneDesc;
-            
+    error_log("minai: Returning scene: $sceneDesc.");
+
     return $scene;
 }
 
