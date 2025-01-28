@@ -85,6 +85,10 @@ Event OnUpdate()
     return
   EndIf
   string targetName = Main.GetActorName(akTarget)
+  if targetName == "" || targetName == "<Missing Name>"
+    Main.Warn("SAPIENCE: Target actor name is invalid. Aborting.")
+    return
+  EndIf
   Main.Debug("SAPIENCE Processing (" + targetName +")")
   if followers.IsFollower(akTarget)
     Main.Debug("SAPIENCE: Aborting. " + targetName + " is a follower.")

@@ -741,6 +741,10 @@ EndFunction
 
 Function EnableActorAI(actor akTarget)
   string targetName = Main.GetActorName(akTarget)
+  if targetName == "" || targetName == "<Missing Name>"
+    Main.Warn("SAPIENCE: Not adding missing npc, invalid name.")
+    return
+  EndIf
   Actor agent = AIAgentFunctions.getAgentByName(targetName)
   if !agent
     Main.Info("SAPIENCE: Adding " + targetName + " to AI")
