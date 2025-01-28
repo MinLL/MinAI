@@ -127,6 +127,9 @@ Function UpdateEventsForMantella(Actor actorToSpeakTo, Actor actorSpeaking, acto
     MinaiUtil.Log("No AIFF in minai_Dirt And Blood","INFO")
     return
   EndIf
+  if !bHasDirtandBlood
+    return
+  EndIf
 	int numActors = actorsFromFormList.Length
 	int i = 0
 	While (i < numActors)
@@ -142,6 +145,9 @@ EndFunction
 ; for CHIM, use tags to pass to the PHP where lists of characters are built 
 ; ie tom dick and harry smell like roses
 Function SetContext(actor akActor)
+  if !bHasDirtandBlood
+    return
+  EndIf
   string msg = GetTagsForActor(akActor)
   aiff.SetActorVariable(akActor, "dirtAndBlood", msg) 
 EndFunction
