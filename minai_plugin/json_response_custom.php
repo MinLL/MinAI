@@ -1,7 +1,7 @@
 <?php
 require_once("config.php");
 
-if ($GLOBALS["self_narrator"]) {
+if (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"] && $GLOBALS["HERIKA_NAME"] == "The Narrator") {
     $moods=explode(",",$GLOBALS["EMOTEMOODS"]);
     shuffle($moods);
     $GLOBALS["responseTemplate"] = [
