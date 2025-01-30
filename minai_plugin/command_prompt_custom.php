@@ -13,8 +13,8 @@ function SetPromptHead($override) {
 }
 
 
-if ($GLOBALS["self_narrator"]) {
-    $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"]="Choose the ACTION that best fits current context and character mood to respond to {$target}. Respond in first person. You are {$target} thinking to themself. ";
+if (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"]) {
+    $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"]="Respond with a response of {$target} thinking to themself. Respond in first person. You are {$target} thinking to themself. ";
 }
 else {
     $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"]="Choose the ACTION that best fits current context and character mood to interact with {$target}. You can also use an ACTION to interact with items, trade, inspect the world, attack or to express your characters needs. Avoid narration and emoting. ";
