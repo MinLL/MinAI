@@ -23,6 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         "devious_narrator_eldritch_voice" => $GLOBALS["devious_narrator_eldritch_voice"],
         "devious_narrator_telvanni_voice" => $GLOBALS["devious_narrator_telvanni_voice"],
         "force_voice_type" => $GLOBALS["force_voice_type"],
+        "self_narrator" => $GLOBALS["self_narrator"],
         "disable_nsfw" => $GLOBALS["disable_nsfw"],
         "restrict_nonfollower_functions" => $GLOBALS["restrict_nonfollower_functions"],
         "always_enable_functions" => $GLOBALS["always_enable_functions"],
@@ -55,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $newConfig .= "\$GLOBALS['stop_narrator_context_leak'] = " . ($input['stop_narrator_context_leak'] ? 'true' : 'false') . ";\n";
     $newConfig .= "\$GLOBALS['devious_narrator_eldritch_voice'] = \"" . ($input['devious_narrator_eldritch_voice']) . "\";\n";
     $newConfig .= "\$GLOBALS['devious_narrator_telvanni_voice'] = \"" . ($input['devious_narrator_telvanni_voice']) . "\";\n";
+    $newConfig .= "\$GLOBALS['self_narrator'] = " . ($input['self_narrator'] ? 'true' : 'false') . ";\n";
     $newConfig .= "\$GLOBALS['force_voice_type'] = " . ($input['force_voice_type'] ? 'true' : 'false') . ";\n";
     $newConfig .= "\$GLOBALS['disable_nsfw'] = " . ($input['disable_nsfw'] ? 'true' : 'false') . ";\n";
     $newConfig .= "\$GLOBALS['restrict_nonfollower_functions'] = " . ($input['restrict_nonfollower_functions'] ? 'true' : 'false') . ";\n";

@@ -232,6 +232,13 @@
                 <input type="text" id="telvanni-voice">
             </div>
 
+	    <!-- self_narrator_toggle -->
+            <div class="option-group checkbox-group">
+                <label class="option-label" for="self-narrator">Use Self Narrator</label>
+                <p>Add support for the Narrator roleplaying as the character thinking to themself. NOTE: This still requires customization of the narrator's personality to make them RP appropriately.</p>
+                <input type="checkbox" id="self-narrator">
+            </div>
+
             <!-- force_voice_type -->
             <div class="option-group checkbox-group">
                 <label class="option-label" for="force-voice-type">Force Voice Type</label>
@@ -362,6 +369,7 @@
                 document.getElementById('eldritch-voice').value = configData.devious_narrator_eldritch_voice;
                 document.getElementById('telvanni-voice').value = configData.devious_narrator_telvanni_voice;
                 document.getElementById('force-voice-type').checked = configData.force_voice_type;
+		document.getElementById('self-narrator').checked = configData.self_narrator;
                 document.getElementById('disable-nsfw').checked = configData.disable_nsfw;
                 document.getElementById('restrict-nonfollower-functions').checked = configData.restrict_nonfollower_functions;
                 document.getElementById('always-enable-functions').checked = configData.always_enable_functions;
@@ -392,6 +400,7 @@
                 devious_narrator_eldritch_voice: document.getElementById('eldritch-voice').value,
                 devious_narrator_telvanni_voice: document.getElementById('telvanni-voice').value,
                 force_voice_type: document.getElementById('force-voice-type').checked,
+		self_narrator: document.getElementById('self-narrator').checked,
                 disable_nsfw: document.getElementById('disable-nsfw').checked,
                 restrict_nonfollower_functions: document.getElementById('restrict-nonfollower-functions').checked,
                 always_enable_functions: document.getElementById('always-enable-functions').checked,
