@@ -21,7 +21,9 @@ FormList _Frost_SevereWeatherList
 
 ; tracked actors - most attributes don't change so once found we'll save that here
 ; so that we know the db is aready updated 
-string[] Property ActorList Auto 
+; we'll use a map of actorName to boolean true for tracked actors
+; rather than searching a list for a match, just use map
+int iActorMap 
 
 ; other attributes track with the actor to a certain degree so needs to be updated regularly
 
@@ -29,6 +31,7 @@ minai_Util  MinaiUtil
 minai_MainQuestController main
 minai_AIFF aiff
 Actor playerRef
+string playerName
 minai_Followers followers
 bool bIsNight = false
 
@@ -110,7 +113,9 @@ function Maintenance(minai_MainQuestController _main)
   MinaiUtil = (self as Quest) as minai_Util
   bHasFrostfall = False
   MinaiUtil.Info("Environmental Awareness maintenance")
+  iActorMap = JMap.object()
   playerRef = Game.GetPlayer()
+  playerName = main.GetActorName(playerRef)
   If Game.GetModByName("Frostfall.esp") != 255
     MinaiUtil.Info("Environmental Awareness - Frostfall.esp found")
     GlobalVariable FrostfallRunning = Game.GetFormFromFile(0x06DCFB, "Frostfall.esp") as GlobalVariable
@@ -195,7 +200,7 @@ function SetContext(actor akActor)
   ; if name not in list yet lets do some sets of stuff, like family
   ; except for the oddity that is certain family rearing mods where children can grow
   int r = Utility.RandomInt(0,20)
-  bool notInList = ActorList.Find(an) < 0
+  bool bNotInList = (JMap.getInt(iActorMap , an) != 1)
 
   ; the player's data can change pretty often, and so can a follower's
   ; even player's height/race/sex/gender, so run it half the time rather than 1 in 20
@@ -204,34 +209,13 @@ function SetContext(actor akActor)
     r += 9
   endif 
 
-  if(notInList||r>19)
-    if(notInList)
-      ActorList = lengthenArray(an, ActorList)
+  if(bNotInList||r>19)
+    if(bNotInList)
+      JMap.setInt(iActorMap, an, 1)
+      JArray.addForm(iActorMap, akActor)
     EndIf
 
-    ; has player ever bribed this NPC?
-    bool bIsBribed = false
-    if (akActor.IsBribed())
-      bIsBribed = true
-    endIf
-
-
-    ; check if player has intimidated this character, if a player ever has this is true,
-    ; and by the laws of the game's mechanics if a player is intimidating to someone in the past even moreso in the future!
-    ; maybe though if they meet and the player is laid low by a defeat mod, we can reset the NPC's intimidation
-    ; to be future compatible allow the value to change back to false if we add "un-intimidate" mechanics
-    bool bIsIntimidated = false
-    if(akActor.isIntimidated())
-      bIsIntimidated = true
-    endif
    
-    bool bWouldBeIntimidated = false
-    ; check if the player could intimidate the NPC if they wanted to, because in the battle familiar world of Skyrim everyone knows
-    ; who can take who out, so for added flavor of respect, fear, grovelling, or worship
-    if(akActor.willIntimidateSucceed())
-      bWouldBeIntimidated = true
-    endif
-
     ; use the sqrt of the player's level to assign brackets of peer combat status.
     ; so a level 9 finds levels like 6-12 peers, 13 through level 15 to be better, 15+ much better  
     ; level 49 finds level 42-56 to be peers. Works for scaling levels. 
@@ -384,20 +368,8 @@ function SetContext(actor akActor)
       staticData += ", and their attire is " + warmthLanguage + ". "
     endif
     string privateKnowledge = ""
-    string playerName = main.GetActorName(playerRef)
-    if(akActor!=playerRef)
-      if(bIsBribed)
-        privateKnowledge += an + " has accepted bribes from " + playerName + ". "
-        staticData += an + " seems smug around " + playerName + ". "
-      endif
-      if(bIsIntimidated)
-        staticData += " " + an + " seems anxious and a little frightend around " + playerName + ". "
-        privateKnowledge = playerName + " has used threats against me in the past, I do what " + playerName + " wants because I am frightend of them. "
-      endif
-      if(bWouldBeIntimidated && !bIsIntimidated)
-        staticData += " " + an + " finds " + playerName + " potentially intimidating, though " + playerName + " has never been aggressive with them. " 
-      endif
-      
+
+    if(akActor!=playerRef)     
       if(ranking<=1)
         staticData += " " + an + " would be a helpless combatant against " + playerName + ". "
       elseif(ranking==2)
@@ -430,7 +402,7 @@ function SetContext(actor akActor)
     aiff.SetActorVariable(akActor, "EnvironmentalAwarenessPrivateKnowledge", privateKnowledge) 
     aiff.SetActorVariable(akActor, "EnviromentalAwarenessMoreStableData", staticData)
   EndIF
- 
+
   string dynamicData = ""
   ; trying to sit or maybe is sitting or trying to get up
   ; 4: Sitting, wants to stand
@@ -618,6 +590,45 @@ function SetContext(actor akActor)
   if(dynamicData != "") 
     dynamicData =  " " + an + " is " + dynamicData 
   endif
+
+  if(akActor != playerRef)
+    ; has player ever bribed this NPC?
+    bool bIsBribed = false
+    if (akActor.IsBribed())
+      bIsBribed = true
+    endIf
+
+
+    ; check if player has intimidated this character, if a player ever has this is true,
+    ; and by the laws of the game's mechanics if a player is intimidating to someone in the past even moreso in the future!
+    ; maybe though if they meet and the player is laid low by a defeat mod, we can reset the NPC's intimidation
+    ; to be future compatible allow the value to change back to false if we add "un-intimidate" mechanics
+    bool bIsIntimidated = false
+    if(akActor.isIntimidated())
+      bIsIntimidated = true
+    endif
+
+    bool bWouldBeIntimidated = false
+    ; check if the player could intimidate the NPC if they wanted to, because in the battle familiar world of Skyrim everyone knows
+    ; who can take who out, so for added flavor of respect, fear, grovelling, or worship
+    if(akActor.willIntimidateSucceed())
+      bWouldBeIntimidated = true
+    endif
+
+    string dynamicPrivateData = ""
+    if(bIsBribed)
+      dynamicPrivateData += an + " has accepted bribes from " + playerName + ". "
+      dynamicData += an + " seems smug around " + playerName + ". "
+    endif
+    if(bIsIntimidated)
+      dynamicData += " " + an + " seems anxious and a little frightend around " + playerName + ". "
+      dynamicPrivateData = playerName + " has used threats against me in the past, I do what " + playerName + " wants because I am frightend of them. "
+    endif
+    if(bWouldBeIntimidated && !bIsIntimidated)
+      dynamicPrivateData += " " + an + " finds " + playerName + " potentially intimidating, though " + playerName + " has not been aggressive with them. " 
+    endif
+    aiff.SetActorVariable(akActor, "EnvironmentalAwarenessDynamicPrivateData", dynamicPrivateData)
+  endIf
   aiff.SetActorVariable(akActor, "EnvironmentalAwarenessDynamicData", dynamicData)
 EndFunction
 

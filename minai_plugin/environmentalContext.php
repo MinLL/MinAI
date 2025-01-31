@@ -9,11 +9,12 @@ function GetEnvironmentalContext($localActors, $targetActor) {
     // then about player 
     // then list local actors for notable observations
     $player_name = $GLOBALS["PLAYER_NAME"];
-    $players_appearance = $utilities->GetActorValue($player_name, "EnviromentalAwarenessMoreStableData");
-    $players_appearance .= $utilities->GetActorValue($player_name, "EnvironmentalAwarenessDynamicData");
-
-    $private_knowledge = $utilities->GetActorValue($targetActor, "EnvironmentalAwarenessPrivateKnowledge");
-
+    $players_appearance = "" 
+        . $utilities->GetActorValue($player_name, "EnviromentalAwarenessMoreStableData")
+        . $utilities->GetActorValue($player_name, "EnvironmentalAwarenessDynamicData");
+    $private_knowledge = "" 
+        . $utilities->GetActorValue($targetActor, "EnvironmentalAwarenessPrivateKnowledge")
+        . $utilities->GetActorValue($targetActor, "EnvironmentalAwarenessDynamicPrivateData");
     $others_appearances = [];
 
     $actorList = explode("|", $localActors);
@@ -26,7 +27,9 @@ function GetEnvironmentalContext($localActors, $targetActor) {
         // we already did the player -- this can come up if the player forgets to set their name right in CHiM
         $bValidToInclude = $actor!="" && $player_name != $actor && !in_array($actor, $dedupe);
         if($bValidToInclude) {
-            $new_text = $utilities->GetActorValue($actor, "EnviromentalAwarenessMoreStableData") . $utilities->GetActorValue($actor, "EnvironmentalAwarenessDynamicData");
+            $new_text = ""
+                . $utilities->GetActorValue($actor, "EnviromentalAwarenessMoreStableData") 
+                . $utilities->GetActorValue($actor, "EnvironmentalAwarenessDynamicData");
             $new_text = str_replace(strtolower($actor), $actor, $new_text);        
             if($new_text!=""&&!str_ends_with($new_text, ".")) $new_text .= ".";
             $others_appearances[] = $new_text;
