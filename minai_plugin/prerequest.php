@@ -2,6 +2,7 @@
 require_once("config.php");
 require_once("util.php");
 $GLOBALS["speaker"] = $GLOBALS["HERIKA_NAME"];
+$GLOBALS["minai_processing_input"] = false;
 
 Function SetRadiance($rechat_h, $rechat_p) {
     // error_log("minai: Setting Rechat Parameters (h={$rechat_h}, p={$rechat_p})");
@@ -61,6 +62,19 @@ if (IsRadiant()) {
 }
 
 SetNarratorProfile();
+
+// If talking to the narrator, force it to respond.
+if (IsEnabled($GLOBALS["PLAYER_NAME"], "isTalkingToNarrator") && (in_array($GLOBALS["gameRequest"][0],["inputtext","inputtext_s","ginputtext","ginputtext_s"])) ) {
+    SetEnabled($GLOBALS["PLAYER_NAME"], "isTalkingToNarrator", false);
+    $GLOBALS["HERIKA_NAME"] = "The Narrator";
+    $GLOBALS["minai_processing_input"] = true;
+    SetNarratorProfile();
+}
+
+if (IsEnabled($GLOBALS["PLAYER_NAME"], "isSinging")) {
+    $GLOBALS["HERIKA_NAME"] = "The Narrator";
+    SetNarratorProfile();
+}
 
 require_once("deviousnarrator.php");
 if (ShouldUseDeviousNarrator()) {

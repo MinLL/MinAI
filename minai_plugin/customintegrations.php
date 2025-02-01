@@ -178,6 +178,68 @@ function ProcessIntegrations() {
         // rewrite player request as empty, we don't need player request here
         $GLOBALS["gameRequest"][3] = "";
     }
+
+    // Handle singing events
+    if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "minai_sing") {
+        // Set up singing context
+        $GLOBALS["ORIGINAL_HERIKA_NAME"] = $GLOBALS["HERIKA_NAME"];
+        // Intended for use with the "Self Narrator" functionality
+        $GLOBALS["HERIKA_NAME"] = "The Narrator";
+        SetNarratorProfile();
+        $GLOBALS["HERIKA_NAME"] = $GLOBALS["PLAYER_NAME"];
+        $GLOBALS["PROMPTS"]["minai_sing"] = [
+            "cue" => [
+                "write a musical response as {$GLOBALS["PLAYER_NAME"]}. Be creative and match the mood of the scene."
+            ],
+            "player_request"=>[    
+                "{$GLOBALS["PLAYER_NAME"]} begins singing a song: {$GLOBALS["gamerequest"][3]}.",
+            ]
+        ];
+        
+        // Add singing-specific personality traits
+        $GLOBALS["HERIKA_PERS"] .= "\nWhen singing, you should be musical and poetic. Format your responses as song lyrics or poetry.\n";
+        
+        // Force response to be musical
+        $GLOBALS["TEMPLATE_DIALOG"] = "Respond with song lyrics or a musical performance.";
+    }
+
+    // Handle narrator talk events
+    if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "minai_narrator_talk") {
+        
+        // Store original name to restore later if needed
+        $GLOBALS["ORIGINAL_HERIKA_NAME"] = $GLOBALS["HERIKA_NAME"];
+        $GLOBALS["HERIKA_NAME"] = "The Narrator";
+        SetNarratorProfile();
+        // Set up narrator context
+        if (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"]) {
+            // First-person narration from player's perspective
+            $GLOBALS["PROMPTS"]["minai_narrator_talk"] = [
+                "cue" => [
+                    "write a first-person narrative response as {$GLOBALS["PLAYER_NAME"]}, describing your thoughts, feelings, and experiences in this moment. Speak introspectively about your journey and current situation."
+                ],
+                "player_request"=>[    
+                    "{$GLOBALS["PLAYER_NAME"]} thinks to herself about the current situation.",
+                ]
+            ];
+            
+            // Set first-person narrator personality
+            $GLOBALS["HERIKA_PERS"] = "You are {$GLOBALS["PLAYER_NAME"]}, narrating your own story. Share your inner thoughts, emotions, and personal perspective on events. Your narration should be intimate and reflective, revealing your character's inner world.";
+            
+            // Force first-person narrative style
+            $GLOBALS["TEMPLATE_DIALOG"] = "Respond in first-person perspective as {$GLOBALS["PLAYER_NAME"]}, sharing your personal thoughts and feelings.";
+        } else {
+            // Traditional third-person narrator
+            $GLOBALS["PROMPTS"]["minai_narrator_talk"] = [
+                "cue" => [
+                    "write a response as The Narrator, speaking from an omniscient perspective about the world and the player's journey."
+                ]
+            ];
+            
+            // Force narrator style responses
+            $GLOBALS["TEMPLATE_DIALOG"] = "You are The Narrator. Respond in an omniscient, storyteller-like manner.";
+        }
+    }
+
     if ($MUST_DIE) {
         error_log("minai: Done procesing custom request");
         die('X-CUSTOM-CLOSE');

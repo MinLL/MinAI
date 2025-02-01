@@ -12,8 +12,10 @@ function SetPromptHead($override) {
     }
 }
 
-
-if (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"] && $GLOBALS["HERIKA_NAME"] == "The Narrator") {
+if (IsEnabled($GLOBALS["PLAYER_NAME"], "isSinging")) {
+    $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] = "Respond with a song from {$GLOBALS["PLAYER_NAME"]}. Be creative, and match the mood of the scene.";
+}
+elseif (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"] && $GLOBALS["HERIKA_NAME"] == "The Narrator") {
     $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"]="Respond with a response of {$target} thinking to themself. Respond in first person. You are {$target} thinking to themself. ";
 }
 else {
