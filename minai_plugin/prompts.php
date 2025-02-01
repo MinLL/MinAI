@@ -135,5 +135,10 @@ if (isset($GLOBALS["gameRequest"]) && in_array(strtolower($GLOBALS["gameRequest"
         SetInputPrompts($hostilePrompt);
 }
 
-
+if (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"] && $GLOBALS["HERIKA_NAME"] == "The Narrator") {
+    $GLOBALS["PROMPTS"]["diary"] = [ 
+        "cue"=>["Please write a short summary of {$GLOBALS["PLAYER_NAME"]}'s recent thoughts, feelings, and adventures. Respond as if you are writing this into a private diary, including completely unfiltered thoughts and feelings. WRITE AS IF YOU ARE {$GLOBALS["PLAYER_NAME"]}."],
+        "extra"=>["force_tokens_max"=>0]
+    ];
+}
 ?>

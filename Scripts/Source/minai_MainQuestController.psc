@@ -50,7 +50,10 @@ Function Maintenance()
     Debug.MessageBox("Mismatched MinAI.esp and minai_MainQuestController version")
   EndIf
   Info("Maintenance() - minai v" +GetVersion() + " initializing.")
+  ; Set keybinds
   SetSapienceKey()
+  SetNarratorKey()
+  SetSingKey()
   ; Register for Mod Events
   ; Public interface functions
   RegisterForModEvent("MinAI_RegisterEvent", "OnRegisterEvent")
@@ -414,7 +417,7 @@ Function SetTestContextNPC()
     ModEvent.PushInt(handle, 1200)
     ModEvent.Send(handle)
   endIf
-EndFunction 
+EndFunction
 
 Function SetTestContextPlayer()
   int handle = ModEvent.Create("MinAI_SetContextNPC")
@@ -502,7 +505,93 @@ Function SetSapienceKey()
 EndFunction
 
 Event OnKeyDown(int keyCode)
-  If(keyCode == config.ToggleSapienceKey)
-    minAiff.ToggleSapience()
-  EndIf
+    If(keyCode == config.ToggleSapienceKey)
+        minAiff.ToggleSapience()
+    ElseIf(keyCode == config.singKey)
+        OnSingKeyPressed()
+    ElseIf(keyCode == config.narratorKey)
+        OnNarratorKeyPressed()
+    EndIf
 EndEvent
+
+Event OnKeyUp(int keyCode, float holdTime)
+    If(keyCode == config.singKey)
+        OnSingKeyReleased(holdTime)
+    ElseIf(keyCode == config.narratorKey)
+        OnNarratorKeyReleased(holdTime)
+    EndIf
+EndEvent
+
+; Handler functions for the key presses
+Function OnSingKeyPressed()
+    If(bHasAIFF)
+        Info("Starting singing recording")
+        minAIFF.SetActorVariable(playerRef, "isSinging", true)
+        AIAgentFunctions.recordSoundEx(config.singKey)
+        Debug.Notification("Hold to record singing, release quickly to sing without recording")
+    Else
+        Debug.Notification("AIFF not installed - singing requires AIFF")
+    EndIf
+EndFunction
+
+Function OnSingKeyReleased(float holdTime)
+    If(bHasAIFF)
+        Info("Stopping singing recording")
+        AIAgentFunctions.stopRecording(config.singKey)
+        
+        ; Only send message if key was held for less than 1 second
+        if holdTime < 1.0
+            string playerName = GetActorName(playerRef)
+            string eventLine = playerName + " wants to sing"
+            AIAgentFunctions.requestMessageForActor(eventLine, "minai_sing", playerName)
+            Debug.Notification("Quick press - generating song")
+        else
+            Debug.Notification("Recording stopped")
+        EndIf
+    EndIf
+EndFunction
+
+Function OnNarratorKeyPressed()
+    If(bHasAIFF)
+        Info("Starting narrator recording")
+        minAIFF.SetActorVariable(playerRef, "isTalkingToNarrator", true)
+        AIAgentFunctions.recordSoundEx(config.narratorKey)
+        Debug.Notification("Hold to record message for narrator, release quickly to talk without recording")
+    Else
+        Debug.Notification("AIFF not installed - narrator conversations require AIFF")
+    EndIf
+EndFunction
+
+Function OnNarratorKeyReleased(float holdTime)
+    If(bHasAIFF)
+        Info("Stopping narrator recording")
+        AIAgentFunctions.stopRecording(config.narratorKey)
+        
+        ; Only send message if key was held for less than 1 second
+        if holdTime < 1.0
+            string playerName = GetActorName(playerRef)
+            string eventLine = playerName + " wants to talk to the narrator"
+            AIAgentFunctions.requestMessage(eventLine, "minai_narrator_talk")
+            Debug.Notification("Quick press - asking narrator to speak")
+        else
+            Debug.Notification("Recording stopped")
+        EndIf
+    EndIf
+EndFunction
+
+; Functions to handle key registration
+Function SetSingKey()
+    ; Register new key if valid
+    if (config.singKey != -1)
+        RegisterForKey(config.singKey)
+        Debug.Notification("Sing key mapped to " + config.singKey)
+    endIf
+EndFunction
+
+Function SetNarratorKey()
+    ; Register new key if valid
+    if (config.narratorKey != -1)
+        RegisterForKey(config.narratorKey)
+        Debug.Notification("Narrator key mapped to " + config.narratorKey)
+    endIf
+EndFunction

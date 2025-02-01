@@ -448,6 +448,12 @@ foreach ($nullValues as $n) {
     unset($GLOBALS["contextDataFull"][$n]); 
 }*/
 
+
+// Cleanup self narrator dialogue to avoid contaminating general context
+if ($GLOBALS["minai_processing_input"]) {
+    error_log("minai: Cleaning up player input");
+    DeleteLastPlayerInput();
+}
 $GLOBALS["contextDataFull"] = array_values($GLOBALS["contextDataFull"]);
 
 require "/var/www/html/HerikaServer/ext/minai_plugin/command_prompt_custom.php";

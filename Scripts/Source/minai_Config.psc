@@ -53,10 +53,16 @@ int actionDecayWindowOID
 int testActionsOID
 int addSpellsOID
 int removeSpellsOID
-
-int toggleSapienceOID
-int Property toggleSapienceKey = -1 Auto
 int toggleCombatDialogueOID
+int toggleSapienceOID
+
+int singKeyOID          ; New OID for sing keybind
+int narratorKeyOID      ; New OID for narrator keybind
+
+; Key properties
+int Property toggleSapienceKey = -1 Auto
+int Property singKey = -1 Auto          ; New property for sing key
+int Property narratorKey = -1 Auto      ; New property for narrator key
 
 ; Legacy globals
 GlobalVariable useCBPC
@@ -243,6 +249,9 @@ Function RenderGeneralPage()
   addSpellsOID = AddTextOption("General", "Add Spells to Player")
   removeSpellsOID = AddTextOption("General", "Remove Spells from Player")
   toggleSapienceOID = AddKeyMapOption("Toggle Sapience", toggleSapienceKey)
+  ; Disable for now until I finish implementing this
+  ; singKeyOID = AddKeyMapOption("Sing", singKey)              ; New keybind option
+  narratorKeyOID = AddKeyMapOption("Talk to Narrator", narratorKey)  ; New keybind option
   disableAIAnimationsOID = AddToggleOption("Disable AI-FF Animations", disableAIAnimations)
   AddHeaderOption("Debug")
   testActionsOID = AddTextOption("Debug", "Test Mod Events")
@@ -788,6 +797,10 @@ Event OnOptionHighlight(int oid)
     SetInfoText("Enable ambient comments between events. Follows comments during sex scene cooldown. Polling mechanism checking each time if there is no cooldown on comments and fires ambient talking.")
   elseif oid == maxThreadsOID
     SetInfoText("Maximum concurrent threads for adult frameworks. Ostim usually crashes at 6+, try yourself and set to the number you game can handle.")
+  elseif oid == singKeyOID
+    SetInfoText("Hotkey to make your character sing")
+  elseif oid == narratorKeyOID
+    SetInfoText("Hotkey to initiate a private conversation with just the narrator")
   EndIf
   int i = 0
   string[] actions = JMap.allKeysPArray(aiff.actionRegistry)
@@ -987,21 +1000,30 @@ EndEvent
 
 event OnOptionKeyMapChange(int a_option, int a_keyCode, string a_conflictControl, string a_conflictName)
 	{Called when a key has been remapped}
-	if (a_option == toggleSapienceOID)
-		bool continue = true
-		if (a_conflictControl != "")
-			string msg
-			if (a_conflictName != "")
-				msg = "This key is already mapped to:\n'" + a_conflictControl + "'\n(" + a_conflictName + ")\n\nAre you sure you want to continue?"
-			else
-				msg = "This key is already mapped to:\n'" + a_conflictControl + "'\n\nAre you sure you want to continue?"
-			endIf
-			continue = ShowMessage(msg, true, "$Yes", "$No")
+	bool continue = true
+	if (a_conflictControl != "")
+		string msg
+		if (a_conflictName != "")
+			msg = "This key is already mapped to:\n'" + a_conflictControl + "'\n(" + a_conflictName + ")\n\nAre you sure you want to continue?"
+		else
+			msg = "This key is already mapped to:\n'" + a_conflictControl + "'\n\nAre you sure you want to continue?"
 		endIf
-		if (continue)
+		continue = ShowMessage(msg, true, "$Yes", "$No")
+	endIf
+
+	if (continue)
+		if (a_option == toggleSapienceOID)
 			toggleSapienceKey = a_keyCode
 			SetKeymapOptionValue(a_option, a_keyCode)
       main.SetSapienceKey()
+		elseif (a_option == singKeyOID)
+			singKey = a_keyCode
+			SetKeymapOptionValue(a_option, a_keyCode)
+      main.SetSingKey()
+		elseif (a_option == narratorKeyOID)
+			narratorKey = a_keyCode 
+			SetKeymapOptionValue(a_option, a_keyCode)
+      main.SetNarratorKey()
 		endIf
 	endIf
 EndEvent

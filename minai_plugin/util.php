@@ -45,6 +45,18 @@ Function BuildActorValueCache($name) {
     }
 }
 
+function DeleteLastPlayerInput() {
+    return $GLOBALS["db"]->query("
+        DELETE FROM eventlog 
+        WHERE ctid IN (
+            SELECT ctid FROM eventlog 
+            WHERE type IN ('ginputtext', 'user_input') 
+            ORDER BY ts DESC 
+            LIMIT 2
+        )
+    ");
+}
+
 function CanVibrate($name) {
     return IsEnabled($name, "CanVibrate") && IsActionEnabled("MinaiGlobalVibrator");
 }
@@ -84,6 +96,15 @@ Function IsEnabled($name, $key) {
     $name = strtolower($GLOBALS["db"]->escape($name));
     return $GLOBALS["db"]->fetchAll("select 1 from conf_opts where LOWER(id)=LOWER('_minai_{$name}//{$key}') and LOWER(value)=LOWER('TRUE')");
 }
+
+Function SetEnabled($name, $key, $enabled) {
+    $name = strtolower($GLOBALS["db"]->escape($name));
+    $key = strtolower($GLOBALS["db"]->escape($key));
+    $value = $enabled ? 'TRUE' : 'FALSE';
+
+    return $GLOBALS["db"]->query("UPDATE conf_opts SET value = '{$value}' WHERE LOWER(id) = LOWER('_minai_{$name}//{$key}')");
+}
+
 
 Function IsSexActive() {
     // if there is active scene thread involving current speaker

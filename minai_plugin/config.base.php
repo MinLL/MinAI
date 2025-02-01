@@ -1,9 +1,10 @@
 <?php
-$GLOBALS['PROMPT_HEAD_OVERRIDE'] = "Let's roleplay in the Universe of Skyrim.  ";
+$GLOBALS['PROMPT_HEAD_OVERRIDE'] = "";
 $GLOBALS['use_narrator_profile'] = false;
 $GLOBALS['stop_narrator_context_leak'] = true;
 $GLOBALS['devious_narrator_eldritch_voice'] = "dragon";
 $GLOBALS['devious_narrator_telvanni_voice'] = "TelvanniNarrator";
+$GLOBALS['self_narrator'] = false;
 $GLOBALS['force_voice_type'] = false;
 $GLOBALS['disable_nsfw'] = false;
 $GLOBALS['restrict_nonfollower_functions'] = true;
