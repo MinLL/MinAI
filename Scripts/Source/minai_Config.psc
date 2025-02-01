@@ -249,7 +249,8 @@ Function RenderGeneralPage()
   addSpellsOID = AddTextOption("General", "Add Spells to Player")
   removeSpellsOID = AddTextOption("General", "Remove Spells from Player")
   toggleSapienceOID = AddKeyMapOption("Toggle Sapience", toggleSapienceKey)
-  singKeyOID = AddKeyMapOption("Sing", singKey)              ; New keybind option
+  ; Disable for now until I finish implementing this
+  ; singKeyOID = AddKeyMapOption("Sing", singKey)              ; New keybind option
   narratorKeyOID = AddKeyMapOption("Talk to Narrator", narratorKey)  ; New keybind option
   disableAIAnimationsOID = AddToggleOption("Disable AI-FF Animations", disableAIAnimations)
   AddHeaderOption("Debug")
@@ -799,7 +800,7 @@ Event OnOptionHighlight(int oid)
   elseif oid == singKeyOID
     SetInfoText("Hotkey to make your character sing")
   elseif oid == narratorKeyOID
-    SetInfoText("Hotkey to initiate a conversation with just the narrator")
+    SetInfoText("Hotkey to initiate a private conversation with just the narrator")
   EndIf
   int i = 0
   string[] actions = JMap.allKeysPArray(aiff.actionRegistry)
