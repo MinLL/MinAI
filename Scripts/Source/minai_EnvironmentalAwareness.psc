@@ -212,7 +212,6 @@ function SetContext(actor akActor)
   if(bNotInList||r>19)
     if(bNotInList)
       JMap.setInt(iActorMap, an, 1)
-      JArray.addForm(iActorMap, akActor)
     EndIf
 
    
