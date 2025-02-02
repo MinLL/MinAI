@@ -144,13 +144,20 @@ function ProcessIntegrations() {
     }
     if (isset($GLOBALS["gameRequest"]) && in_array(strtolower($GLOBALS["gameRequest"][0]), ["radiant", "radiantsearchinghostile", "radiantsearchingfriend", "radiantcombathostile", "radiantcombatfriend", "minai_force_rechat"])) {
         if (strtolower($GLOBALS["gameRequest"][0]) == "minai_force_rechat" || time() > GetLastInput() + $GLOBALS["input_delay_for_radiance"]) {
-            // $GLOBALS["HERIKA_NAME"] is npc1
-            $GLOBALS["HERIKA_TARGET"] = explode(":", $GLOBALS["gameRequest"][3])[3];
-            if ($GLOBALS["HERIKA_TARGET"] == $GLOBALS["HERIKA_NAME"])
-                $GLOBALS["HERIKA_TARGET"] = $GLOBALS["PLAYER_NAME"];
-            error_log("minai: Starting {$GLOBALS["gameRequest"][0]} dialogue between {$GLOBALS["HERIKA_NAME"]} and {$GLOBALS["HERIKA_TARGET"]}");
-            StoreRadiantActors($GLOBALS["HERIKA_TARGET"], $GLOBALS["HERIKA_NAME"]);
-            $GLOBALS["target"] = $GLOBALS["HERIKA_TARGET"];
+            if ($GLOBALS["HERIKA_NAME"] == "The Narrator") {
+                // Fail safe
+                error_log("minai: WARNING - Radiant dialogue started with narrator");
+                $MUST_DIE=true;
+            }
+            else {
+                // $GLOBALS["HERIKA_NAME"] is npc1
+                $GLOBALS["HERIKA_TARGET"] = explode(":", $GLOBALS["gameRequest"][3])[3];
+                if ($GLOBALS["HERIKA_TARGET"] == $GLOBALS["HERIKA_NAME"])
+                    $GLOBALS["HERIKA_TARGET"] = $GLOBALS["PLAYER_NAME"];
+                error_log("minai: Starting {$GLOBALS["gameRequest"][0]} dialogue between {$GLOBALS["HERIKA_NAME"]} and {$GLOBALS["HERIKA_TARGET"]}");
+                StoreRadiantActors($GLOBALS["HERIKA_TARGET"], $GLOBALS["HERIKA_NAME"]);
+                $GLOBALS["target"] = $GLOBALS["HERIKA_TARGET"];
+            }
         }
         else {
             // Avoid race condition where we send input, the server starts to process the request, and then
@@ -180,7 +187,7 @@ function ProcessIntegrations() {
     }
 
     // Handle singing events
-    if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "minai_sing") {
+    /* if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "minai_sing") {
         // Set up singing context
         $GLOBALS["ORIGINAL_HERIKA_NAME"] = $GLOBALS["HERIKA_NAME"];
         // Intended for use with the "Self Narrator" functionality
@@ -201,7 +208,7 @@ function ProcessIntegrations() {
         
         // Force response to be musical
         $GLOBALS["TEMPLATE_DIALOG"] = "Respond with song lyrics or a musical performance.";
-    }
+        }*/
 
     // Handle narrator talk events
     if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "minai_narrator_talk") {

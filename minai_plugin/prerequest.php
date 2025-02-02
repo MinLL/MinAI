@@ -65,6 +65,7 @@ SetNarratorProfile();
 
 // If talking to the narrator, force it to respond.
 if (IsEnabled($GLOBALS["PLAYER_NAME"], "isTalkingToNarrator") && (in_array($GLOBALS["gameRequest"][0],["inputtext","inputtext_s","ginputtext","ginputtext_s"])) ) {
+    error_log("minai: Forcing herika_name to the narrator: Is talking to narrator");
     SetEnabled($GLOBALS["PLAYER_NAME"], "isTalkingToNarrator", false);
     $GLOBALS["HERIKA_NAME"] = "The Narrator";
     $GLOBALS["minai_processing_input"] = true;
@@ -72,8 +73,9 @@ if (IsEnabled($GLOBALS["PLAYER_NAME"], "isTalkingToNarrator") && (in_array($GLOB
 }
 
 if (IsEnabled($GLOBALS["PLAYER_NAME"], "isSinging")) {
-    $GLOBALS["HERIKA_NAME"] = "The Narrator";
-    SetNarratorProfile();
+    error_log("minai: Forcing herika_name to the narrator: Is singing");
+    // $GLOBALS["HERIKA_NAME"] = "The Narrator";
+    // SetNarratorProfile();
 }
 
 require_once("deviousnarrator.php");
