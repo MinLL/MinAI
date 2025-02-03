@@ -91,12 +91,15 @@ Function Maintenance()
   ;; Initialize AIFF first so that the action registry is initialized
   if bHasAIFF
     minAIFF.Maintenance(Self)
+    minAIFF.SetActorVariable(playerRef, "isSinging", false)
+    minAIFF.SetActorVariable(playerRef, "isTalkingToNarrator", false)
   EndIf
   dirtAndBlood.Maintenance(Self)
   sex.Maintenance(Self)
   survival.Maintenance(Self)
   arousal.Maintenance(Self)
   devious.Maintenance(Self)
+
   vr.Maintenance(Self)
   followers.Maintenance(Self)
   combat.Maintenance(Self)
@@ -564,6 +567,8 @@ EndFunction
 
 Function OnNarratorKeyReleased(float holdTime)
     If(bHasAIFF)
+        ; Reset the last request time to prevent immediate response from other systems
+        lastRequestTime = Utility.GetCurrentRealTime()
         Info("Stopping narrator recording")
         AIAgentFunctions.stopRecording(config.narratorKey)
         

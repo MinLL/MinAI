@@ -17,6 +17,9 @@ if (IsEnabled($GLOBALS["PLAYER_NAME"], "isSinging")) {
 }
 elseif (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"] && $GLOBALS["HERIKA_NAME"] == "The Narrator") {
     $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"]="Respond with a response of {$target} thinking to themself. Respond in first person. You are {$target} thinking to themself. ";
+    if ($GLOBALS["gameRequest"][0] == "minai_narrator_talk") {
+        $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] .= "Keep your response short, with no more than 3 sentences. ";
+    }
 }
 else {
     $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"]="Choose the ACTION that best fits current context and character mood to interact with {$target}. You can also use an ACTION to interact with items, trade, inspect the world, attack or to express your characters needs. Avoid narration and emoting. ";
