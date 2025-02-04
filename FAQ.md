@@ -5,11 +5,15 @@ This is caused by the LLM you are using. If you are using Llama 70b, be aware th
 
 
 ## What are your favorite models?
-At this time, I would consider [Grok 2 Beta](https://openrouter.ai/x-ai/grok-beta) to be the strongest model for both Sapience, and followers. It is both fast, uncensored, and intelligent (Though, isn't quite as smart as Command R+ at action usage).  My old setup was to use [Command R+](https://openrouter.ai/cohere/command-r-plus) for sapient NPC's, and [Hermes 405b](https://openrouter.ai/nousresearch/hermes-3-llama-3.1-405b) for followers.
+At this time, I would consider [Claude Sonnet 3.5](https://openrouter.ai/anthropic/claude-3.5-sonnet) to be the strongest model for both Sapience, and followers. It is both fast, and intelligent, though can suffer with censorship in some situations. [Claude Sonnet 3.0](https://openrouter.ai/anthropic/claude-3-sonnet) is a bit better about censorship, while being close in performance.
+
+[Grok 2 Beta](https://openrouter.ai/x-ai/grok-beta) is also a strong general purpose model (Though, isn't quite as smart as Command R+ or Claude at action usage), and is completely uncensored.
+
+My old setup was to use [Command R+](https://openrouter.ai/cohere/command-r-plus) for sapient NPC's, and [Hermes 405b](https://openrouter.ai/nousresearch/hermes-3-llama-3.1-405b) for followers.
 
 Command R+ is a pretty solid general purpose LLM that is reasonably intelligent with action usage, while being fast and responsive and uncensored.
 
-Hermes 405b is the most intelligent uncensored model available at the moment, but is slower and more expensive than Command R+.
+Hermes 405b is a strong, intelligent uncensored model, but is slower than Command R+.
 
 Honorable mention to [Wizard 8x22b](https://openrouter.ai/microsoft/wizardlm-2-8x22b). This is a fast, cheap uncensored model that is strong at action usage, but is very chatty / verbose in its responses. May be a good choice if you like this sort of RP / dialogue.
 
