@@ -20,7 +20,7 @@ elseif (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"] && $GLOBAL
     $GLOBALS["responseTemplate"] = [
         "character"=>IsExplicitScene() ? $GLOBALS["PLAYER_NAME"] . "'s body" : $GLOBALS["PLAYER_NAME"] . "'s subconscious",
         "listener"=>IsExplicitScene() ? 
-            "{$GLOBALS['PLAYER_NAME']} experiences intense sensations" : 
+            "{$GLOBALS['PLAYER_NAME']} is reacting to physical sensations" : 
             "{$GLOBALS['PLAYER_NAME']} is thinking to herself",
         "message"=>"lines of dialogue",
         "mood"=>implode("|",$moods),

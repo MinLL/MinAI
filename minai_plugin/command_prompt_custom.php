@@ -17,11 +17,12 @@ if (IsEnabled($GLOBALS["PLAYER_NAME"], "isSinging")) {
 }
 elseif (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"] && $GLOBALS["HERIKA_NAME"] == "The Narrator") {
     if (IsExplicitScene()) {
-        $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] = "Respond with {$target}'s thoughts and feelings about the physical and emotional sensations they are experiencing right now. Respond in first person as {$target}, focusing entirely on the present moment, and responding in character with how {$target} would respond to the situation.";
+        $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] = "Respond with {$target}'s immediate thoughts, emotions, and internal reactions to the physical and emotional sensations they are experiencing right now. Focus particularly on any erotic elements happening within the scene. Respond in first person as {$target}, staying fully in the present moment and focusing on their personal, subjective experience rather than describing the situation itself. Keep the response deeply personal and reflective of how {$target} would genuinely react.";
+
     } else {
-        $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] = "Respond with a response of {$target} thinking to themself about the situation, and the latest events that have happened. Respond in first person. You are {$target} thinking to themself.";
+        $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] = "Respond as {$target}, thinking privately to themselves about the current situation and recent events. Stay in first person, capturing their genuine thoughts, emotions, and internal conflicts. Focus on their personal perspective, biases, and feelings rather than an objective summary of events. Keep the response introspective and true to how {$target} would process and react internally.";
     }
-    $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] .= "Keep your response short, with no more than 3 sentences. ";
+    $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] .= "Aim for your responses to be 2-4 sentences. ";
 }
 else {
     if (IsExplicitScene()) {
