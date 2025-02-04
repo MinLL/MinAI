@@ -16,15 +16,20 @@ if (IsEnabled($GLOBALS["PLAYER_NAME"], "isSinging")) {
     $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] = "Respond with a song from {$GLOBALS["PLAYER_NAME"]}. Be creative, and match the mood of the scene.";
 }
 elseif (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"] && $GLOBALS["HERIKA_NAME"] == "The Narrator") {
-    $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"]="Respond with a response of {$target} thinking to themself. Respond in first person. You are {$target} thinking to themself. ";
-    if ($GLOBALS["gameRequest"][0] == "minai_narrator_talk") {
-        $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] .= "Keep your response short, with no more than 3 sentences. ";
+    if (IsExplicitScene()) {
+        $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] = "Respond with {$target}'s thoughts and feelings about the physical and emotional sensations they are experiencing right now. Respond in first person as {$target}, focusing entirely on the present moment, and responding in character with how {$target} would respond to the situation.";
+    } else {
+        $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] = "Respond with a response of {$target} thinking to themself about the situation, and the latest events that have happened. Respond in first person. You are {$target} thinking to themself.";
     }
+    $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] .= "Keep your response short, with no more than 3 sentences. ";
 }
 else {
-    $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"]="Choose the ACTION that best fits current context and character mood to interact with {$target}. You can also use an ACTION to interact with items, trade, inspect the world, attack or to express your characters needs. Avoid narration and emoting. ";
+    if (IsExplicitScene()) {
+        $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] = "Choose the ACTION that best expresses your character's immediate physical and emotional responses. Focus on actions that reflect {$GLOBALS["HERIKA_NAME"]}'s current sensations and feelings when interacting with {$target}. Avoid narration and emoting.";
+    } else {
+        $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] = "Choose the ACTION that best fits current context and character mood to interact with {$target}. You can also use an ACTION to interact with items, trade, inspect the world, attack or to express your characters needs. Avoid narration and emoting.";
+    }
 }
-
 
 if (isset($GLOBALS["enforce_short_responses"]) && $GLOBALS["enforce_short_responses"]) {
     $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"].="You MUST respond with no more than 2-3 sentences and no more than 40 words.";

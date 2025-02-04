@@ -14,7 +14,7 @@ bool bHasSLApp = False
 bool bHasDeviouslyAccessible = False
 bool bHasDDExpansion = False
 bool bHasSubmissiveLola = False
-
+bool bHasTNTR = False
 Keyword SLHHScriptEventKeyword
 GlobalVariable Debt
 GlobalVariable EnslaveDebt
@@ -38,6 +38,8 @@ Spell dwp_eldwhoresp_neq
 actor playerRef
 Perk dwp_eldritchwaifueffect_soldsoul
 Perk dwp_eldritchwaifueffect_soldsoul_belted
+
+; TODO: Break this out into a separate script for each mod.
 
 function Maintenance(minai_MainQuestController _main)
   Main.Info("Initializing Devious Module")
@@ -138,7 +140,13 @@ function Maintenance(minai_MainQuestController _main)
       Main.Error("Old version of Deviously Accessible. Some integrations will be broken.")
       Debug.Notification("Old version of Deviously Accessible. Some integrations will be broken.")
     EndIf
+    if Game.GetModByName("TNTR.esp") != 255
+      Main.Info("Found TNTR - Registering for TNTR events")
+      bHasTNTR = True
+      RegisterForModEvent("minai_tntr", "OnTNTRAnimation")
+    EndIf
   EndIf  
+
 
   if Game.GetModByName("submissivelola_est.esp") != 255
     bHasSubmissiveLola = True
@@ -1051,3 +1059,10 @@ Function SexStarted(actor[] actors, actor akSpeaker, string tags="")
 
   Main.Info("Event sent to SLola")
 EndFunction
+
+; New handler for TNTR animation events
+Event OnTNTRAnimation(Form akTarget, string eventSource, string eventName)
+    string eventLine = main.GetActorName(akTarget as Actor) + " caught caught by a " + eventSource + " and is being animated with " + eventName
+    Main.Info("tntr: " + eventLine)
+    main.RequestLLMResponse(eventLine, "minai_tntr_" + eventSource + "_" + eventName)
+EndEvent

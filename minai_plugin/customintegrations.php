@@ -213,37 +213,17 @@ function ProcessIntegrations() {
     // Handle narrator talk events
     if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "minai_narrator_talk") {
         SetEnabled($GLOBALS["PLAYER_NAME"], "isTalkingToNarrator", false);
-        // Store original name to restore later if needed
         $GLOBALS["ORIGINAL_HERIKA_NAME"] = $GLOBALS["HERIKA_NAME"];
         $GLOBALS["HERIKA_NAME"] = "The Narrator";
         SetNarratorProfile();
-        // Set up narrator context
-        if (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"]) {
-            // First-person narration from player's perspective
-            $GLOBALS["PROMPTS"]["minai_narrator_talk"] = [
-                "cue" => [
-                    "write a first-person narrative response as {$GLOBALS["PLAYER_NAME"]}, describing your thoughts, feelings, and experiences in this moment. Speak introspectively about your journey and current situation."
-                ],
-                "player_request"=>[    
-                    "{$GLOBALS["PLAYER_NAME"]} thinks to herself about the current situation.",
-                ]
-            ];
-            
-            // Set first-person narrator personality
-            $GLOBALS["HERIKA_PERS"] = "You are {$GLOBALS["PLAYER_NAME"]}, narrating your own story. Share your inner thoughts, emotions, and personal perspective on events. Your narration should be intimate and reflective, revealing your character's inner world.";
-            
-            // Force first-person narrative style
-            $GLOBALS["TEMPLATE_DIALOG"] = "Respond in first-person perspective as {$GLOBALS["PLAYER_NAME"]}, sharing your personal thoughts and feelings.";
-        } else {
-            // Traditional third-person narrator
-            $GLOBALS["PROMPTS"]["minai_narrator_talk"] = [
-                "cue" => [
-                    "write a response as The Narrator, speaking from an omniscient perspective about the world and the player's journey."
-                ]
-            ];
-            
-            // Force narrator style responses
-            $GLOBALS["TEMPLATE_DIALOG"] = "You are The Narrator. Respond in an omniscient, storyteller-like manner.";
+        
+        SetNarratorPrompts(isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"]);
+    }
+
+    if (isset($GLOBALS["gameRequest"]) && strpos($GLOBALS["gameRequest"][0], "minai_tntr_") === 0) {
+        if (ShouldBlockTNTREvent($GLOBALS["gameRequest"][0])) {
+            error_log("minai: Blocking TNTR event: {$GLOBALS["gameRequest"][0]}");
+            die('X-CUSTOM-CLOSE');
         }
     }
 
@@ -310,5 +290,33 @@ function RegisterThirdPartyActions() {
             RegisterAction($cmdName);
         }
     }
+}
+
+function ShouldBlockTNTREvent($eventName) {
+    // Extract source and event from full event name (e.g. "minai_tntr_mimic_triggervoreinstant")
+    $parts = explode('_', strtolower($eventName));
+    if (count($parts) < 4) return false;
+    
+    $source = $parts[2];
+    $event = $parts[3];
+    
+    if ($source == "mimic") {
+        $blockedEvents = [
+            "transvorestage02loop",
+            "triggerdie", 
+            "triggerattack",
+            "triggermimicshake"
+        ];
+        return in_array($event, $blockedEvents);
+    }
+    
+    if ($source == "deathworm") {
+        $blockedEvents = [
+            "trigger01"  // Block initial ground trembling event
+        ];
+        return in_array($event, $blockedEvents);
+    }
+    
+    return false;
 }
 ?>

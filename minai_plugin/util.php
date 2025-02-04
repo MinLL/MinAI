@@ -515,8 +515,69 @@ function GetRevealedStatus($name) {
   return ["wearingTop" => $wearingTop, "wearingBottom" => $wearingBottom];
 }
 
+Function IsExplicitScene() {
+    // Check if we're in a sex scene
+    if (IsSexActive()) {
+        return true;
+    }
+    
+    // Check if this is a TNTR event
+    if (isset($GLOBALS["gameRequest"]) && strpos($GLOBALS["gameRequest"][0], "minai_tntr_") === 0) {
+        return true;
+    }
+    
+    return false;
+}
 
-
+Function SetNarratorPrompts($isFirstPerson = false) {
+    if ($isFirstPerson) {
+        if (IsExplicitScene()) {
+            $GLOBALS["PROMPTS"]["minai_narrator_talk"] = [
+                "cue" => [
+                    "write a first-person erotic narrative response as {$GLOBALS["PLAYER_NAME"]}, focusing entirely on your immediate physical sensations and emotional state. Describe in vivid detail exactly what you are feeling in this moment, both physically and mentally."
+                ],
+                "player_request"=>[    
+                    "{$GLOBALS["PLAYER_NAME"]} is overwhelmed by the intense sensations coursing through her body.",
+                ]
+            ];
+            
+            $GLOBALS["HERIKA_PERS"] = "You are {$GLOBALS["PLAYER_NAME"]}, experiencing intense physical and emotional sensations. Focus purely on the present moment - what you're feeling, how your body is responding, and your immediate emotional reactions. Don't reflect on the past or future, stay completely in the now.";
+            
+            $GLOBALS["TEMPLATE_DIALOG"] = "Respond in first-person perspective as {$GLOBALS["PLAYER_NAME"]}, describing only your current physical and emotional state. Focus entirely on the present moment.";
+        } else {
+            $GLOBALS["PROMPTS"]["minai_narrator_talk"] = [
+                "cue" => [
+                    "write a first-person narrative response as {$GLOBALS["PLAYER_NAME"]}, describing your thoughts, feelings, and experiences in this moment. Speak introspectively about your journey and current situation."
+                ],
+                "player_request"=>[    
+                    "{$GLOBALS["PLAYER_NAME"]} thinks to herself about the current situation.",
+                ]
+            ];
+            
+            $GLOBALS["HERIKA_PERS"] = "You are {$GLOBALS["PLAYER_NAME"]}, narrating your own story. Share your inner thoughts, emotions, and personal perspective on events. Your narration should be intimate and reflective, revealing your character's inner world.";
+            
+            $GLOBALS["TEMPLATE_DIALOG"] = "Respond in first-person perspective as {$GLOBALS["PLAYER_NAME"]}, sharing your personal thoughts and feelings.";
+        }
+    } else {
+        if (IsExplicitScene()) {
+            $GLOBALS["PROMPTS"]["minai_narrator_talk"] = [
+                "cue" => [
+                    "write a response as The Narrator, describing {$GLOBALS["PLAYER_NAME"]}'s immediate physical and emotional experiences in vivid sensual detail. Focus entirely on what she is feeling in this exact moment."
+                ]
+            ];
+            
+            $GLOBALS["TEMPLATE_DIALOG"] = "You are The Narrator. Describe the intense sensations and emotions being experienced right now, focusing purely on the present moment.";
+        } else {
+            $GLOBALS["PROMPTS"]["minai_narrator_talk"] = [
+                "cue" => [
+                    "write a response as The Narrator, speaking from an omniscient perspective about the world and the player's journey."
+                ]
+            ];
+            
+            $GLOBALS["TEMPLATE_DIALOG"] = "You are The Narrator. Respond in an omniscient, storyteller-like manner.";
+        }
+    }
+}
 
 $GLOBALS["target"] = GetTargetActor();
 $GLOBALS["nearby"] = explode(",", GetActorValue("PLAYER", "nearbyActors"));
