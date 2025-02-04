@@ -541,9 +541,7 @@ Function SetNarratorPrompts($isFirstPerson = false) {
                 ]
             ];
             
-            $GLOBALS["HERIKA_PERS"] = "You are {$GLOBALS["PLAYER_NAME"]}, experiencing intense physical and emotional sensations. Focus purely on the present moment - what you're feeling, how your body is responding, and your immediate emotional reactions. Don't reflect on the past or future, stay completely in the now.";
-            
-            $GLOBALS["TEMPLATE_DIALOG"] = "Respond in first-person perspective as {$GLOBALS["PLAYER_NAME"]}, describing only your current physical and emotional state. Focus entirely on the present moment.";
+            $GLOBALS["TEMPLATE_DIALOG"] = "Respond in first-person perspective as {$GLOBALS["PLAYER_NAME"]}, describing only your current physical and emotional state. Focus purely on the present moment - what you're feeling, how your body is responding, and your immediate emotional reactions. Don't reflect on the past or future, stay completely in the now.";
         } else {
             $GLOBALS["PROMPTS"]["minai_narrator_talk"] = [
                 "cue" => [
@@ -553,8 +551,6 @@ Function SetNarratorPrompts($isFirstPerson = false) {
                     "{$GLOBALS["PLAYER_NAME"]} thinks to herself about the current situation.",
                 ]
             ];
-            
-            $GLOBALS["HERIKA_PERS"] = "You are {$GLOBALS["PLAYER_NAME"]}, narrating your own story. Share your inner thoughts, emotions, and personal perspective on events. Your narration should be intimate and reflective, revealing your character's inner world.";
             
             $GLOBALS["TEMPLATE_DIALOG"] = "Respond in first-person perspective as {$GLOBALS["PLAYER_NAME"]}, sharing your personal thoughts and feelings.";
         }
