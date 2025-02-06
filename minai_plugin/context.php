@@ -8,6 +8,7 @@ require_once("weather.php");
 require_once("reputation.php");
 require_once("submissivelola.php");
 require_once("dirtandblood.php");
+require_once("environmentalContext.php");
 
 Function BuildContext($name) {
   if ($name == "The Narrator") {
@@ -361,6 +362,7 @@ function bundleSFWContext(&$nc) {
   $localActors = $utilities->beingsInCloseRange();
   // send localActors list to GetDirtAndBlood so as to make comma seperated lists
   $nc .= GetDirtAndBloodContext($localActors);
+  $nc .= GetEnvironmentalContext($localActors, GetTargetActor());
   $nc .= BuildSFWReputationContext($GLOBALS["HERIKA_NAME"]);
   $nc .= GetThirdPartyContext();
   $nc .= GetWeatherContext() . "\n";

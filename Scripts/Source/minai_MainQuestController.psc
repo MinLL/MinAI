@@ -21,6 +21,7 @@ minai_CombatManager combat
 minai_SapienceController sapience
 minai_Reputation reputation  
 minai_DirtAndBlood dirtAndBlood
+minai_EnvironmentalAwareness envAwareness
 minai_Util MinaiUtil  
 Spell minai_ToggleSapienceSpell
 
@@ -80,6 +81,7 @@ Function Maintenance()
   reputation = (Self as Quest) as minai_Reputation
   MinaiUtil = (Self as Quest) as minai_Util
   dirtAndBlood = (Self as Quest) as minai_DirtAndBlood
+  envAwareness = (Self as Quest) as minai_EnvironmentalAwareness
   minai_ToggleSapienceSpell = Game.GetFormFromFile(0x0E93, "MinAI.esp") as Spell
   if (!followers)
     Fatal("Could not load followers script - Mismatched script and esp versions")
@@ -95,6 +97,7 @@ Function Maintenance()
     minAIFF.SetActorVariable(playerRef, "isTalkingToNarrator", false)
   EndIf
   dirtAndBlood.Maintenance(Self)
+  envAwareness.Maintenance(Self)
   sex.Maintenance(Self)
   survival.Maintenance(Self)
   arousal.Maintenance(Self)
