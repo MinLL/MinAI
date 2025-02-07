@@ -18,6 +18,29 @@ Function GetNarratorConfigPath() {
     return $path . "conf".DIRECTORY_SEPARATOR."conf_$newConfFile.php";
 }
 
+Function GetFallbackConfigPath() {
+    $path = getcwd().DIRECTORY_SEPARATOR;
+    $newConfFile=md5("LLMFallback");
+    return $path . "conf".DIRECTORY_SEPARATOR."conf_$newConfFile.php";
+}
+
+Function CreateFallbackConfig() {
+    if (!file_exists(GetFallbackConfigPath())) {
+        error_log("minai: Initializing LLM Fallback Profile");
+        createProfile("LLMFallback", [
+            "HERIKA_NAME" => "LLMFallback",
+            "HERIKA_PERS" => "This is a LLM profile used for retrying when the primary LLM call fails. Only the connector settings will be used, and it will only work with openrouterjson."
+        ], true);
+    }
+}
+
+Function SetLLMFallbackProfile() {
+    CreateFallbackConfig();
+    $path = GetFallbackConfigPath();
+    global $CONNECTOR;
+    global $CONNECTORS;
+    require_once($path);
+}
 Function SetNarratorProfile() {
     if ($GLOBALS["HERIKA_NAME"] == "The Narrator" && $GLOBALS["use_narrator_profile"]) {
         if (!file_exists(GetNarratorConfigPath())) {
@@ -124,5 +147,16 @@ if (isset($GLOBALS["realnames_support"]) && $GLOBALS["realnames_support"]) {
     }
 }
 
+$GLOBALS["LLM_RETRY_FNCT"] = function() {
+    error_log("MinAI: Retrying LLM...");
+    SetLLMFallbackProfile();
+    $outputWasValid = call_llm();   
+    if (!$outputWasValid) {
+        error_log("Warning: LLM returned invalid output after retry.");
+    }
 
+};
+
+// Create the fallback config if it doesn't exist
+CreateFallbackConfig();
 ?>
