@@ -281,6 +281,17 @@
                 <input type="checkbox" id="enforce-short-responses">
             </div>
 
+            <!-- use_llm_fallback -->
+            <div class="option-group checkbox-group">
+                <label class="option-label" for="use-llm-fallback">Use LLM Fallback</label>
+                <p>Enable fallback to alternative LLM configuration when primary LLM call fails. 
+                    This can help recover from errors and censorship, but will result in increased token cost and response time 
+                    when a retry is performed. Response time hit is fairly minimal, but the full token cost of both requests 
+                    will be charged. The connector settings for the "LLMFallback" profile will be used (This will be created if it doesn't exist when you boot the game),
+                    and it will only work with openrouterjson.</p>
+                <input type="checkbox" id="use-llm-fallback">
+            </div>
+
             <!-- commands_to_purge -->
             <div class="option-group">
                 <label class="option-label" for="commands-to-purge">Commands to Purge</label>
@@ -374,6 +385,7 @@
                 document.getElementById('restrict-nonfollower-functions').checked = configData.restrict_nonfollower_functions;
                 document.getElementById('always-enable-functions').checked = configData.always_enable_functions;
                 document.getElementById('force-aiff-name').checked = configData.force_aiff_name_to_ingame_name;
+                document.getElementById('use-llm-fallback').checked = configData.use_llm_fallback;
                 populateDynamicList('commands-to-purge-container', configData.commands_to_purge);
                 populateDynamicList('events-to-ignore-container', configData.events_to_ignore);
                 document.getElementById('disable-worn-equipment').checked = configData.disable_worn_equipment;
@@ -405,6 +417,7 @@
                 restrict_nonfollower_functions: document.getElementById('restrict-nonfollower-functions').checked,
                 always_enable_functions: document.getElementById('always-enable-functions').checked,
                 force_aiff_name_to_ingame_name: document.getElementById('force-aiff-name').checked,
+                use_llm_fallback: document.getElementById('use-llm-fallback').checked,
                 commands_to_purge: getDynamicList('commands-to-purge-container'),
                 events_to_ignore: getDynamicList('events-to-ignore-container'),
                 disable_worn_equipment: document.getElementById('disable-worn-equipment').checked,

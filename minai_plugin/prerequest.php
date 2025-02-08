@@ -148,15 +148,22 @@ if (isset($GLOBALS["realnames_support"]) && $GLOBALS["realnames_support"]) {
 }
 
 $GLOBALS["LLM_RETRY_FNCT"] = function() {
+    if (isset($GLOBALS['use_llm_fallback']) && !$GLOBALS['use_llm_fallback']) {
+        error_log("MinAI: LLM fallback is disabled - skipping retry");
+        return false;
+    }
+    
     error_log("MinAI: Retrying LLM...");
     SetLLMFallbackProfile();
     $outputWasValid = call_llm();   
     if (!$outputWasValid) {
         error_log("Warning: LLM returned invalid output after retry.");
     }
-
+    return $outputWasValid;
 };
 
-// Create the fallback config if it doesn't exist
-CreateFallbackConfig();
+// Only create the fallback config if the feature is enabled
+if (isset($GLOBALS['use_llm_fallback']) && $GLOBALS['use_llm_fallback']) {
+    CreateFallbackConfig();
+}
 ?>
