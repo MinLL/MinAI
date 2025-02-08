@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://www.fomod.net/schemas/fomod_0_1_2.xsd">
+  <moduleName>MinAI</moduleName>
+  <installSteps>
+    <installStep>
+      <name>Main Installation</name>
+      <!-- Your optional splash image: -->
+      <image path="fomod/images/minai_banner.png"/>
+      <optionalFileGroups>
+        <group name="Optional Scripts">
+          <option name="Patch for Baka's TNTR  v0.5">
+            <files>
+              <file source="optional/BakaScripts" destination="Data/Scripts"/>
+            </files>
+          </option>
+        </group>
+      </optionalFileGroups>
+    </installStep>
+  </installSteps>
+</config>
