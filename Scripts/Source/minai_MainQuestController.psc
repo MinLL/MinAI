@@ -508,6 +508,11 @@ Function SetSapienceKey()
 EndFunction
 
 Event OnKeyDown(int keyCode)
+    ; Don't process key events if game is paused
+    If(Utility.IsInMenuMode())
+        return
+    EndIf
+    
     If(keyCode == config.ToggleSapienceKey)
         minAiff.ToggleSapience()
     ElseIf(keyCode == config.singKey)
@@ -518,6 +523,11 @@ Event OnKeyDown(int keyCode)
 EndEvent
 
 Event OnKeyUp(int keyCode, float holdTime)
+    ; Don't process key events if game is paused
+    If(Utility.IsInMenuMode())
+        return
+    EndIf
+    
     If(keyCode == config.singKey)
         OnSingKeyReleased(holdTime)
     ElseIf(keyCode == config.narratorKey)
