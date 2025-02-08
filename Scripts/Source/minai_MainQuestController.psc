@@ -91,12 +91,15 @@ Function Maintenance()
   ;; Initialize AIFF first so that the action registry is initialized
   if bHasAIFF
     minAIFF.Maintenance(Self)
+    minAIFF.SetActorVariable(playerRef, "isSinging", false)
+    minAIFF.SetActorVariable(playerRef, "isTalkingToNarrator", false)
   EndIf
   dirtAndBlood.Maintenance(Self)
   sex.Maintenance(Self)
   survival.Maintenance(Self)
   arousal.Maintenance(Self)
   devious.Maintenance(Self)
+
   vr.Maintenance(Self)
   followers.Maintenance(Self)
   combat.Maintenance(Self)
@@ -505,6 +508,11 @@ Function SetSapienceKey()
 EndFunction
 
 Event OnKeyDown(int keyCode)
+    ; Don't process key events if game is paused
+    If(Utility.IsInMenuMode())
+        return
+    EndIf
+    
     If(keyCode == config.ToggleSapienceKey)
         minAiff.ToggleSapience()
     ElseIf(keyCode == config.singKey)
@@ -515,6 +523,11 @@ Event OnKeyDown(int keyCode)
 EndEvent
 
 Event OnKeyUp(int keyCode, float holdTime)
+    ; Don't process key events if game is paused
+    If(Utility.IsInMenuMode())
+        return
+    EndIf
+    
     If(keyCode == config.singKey)
         OnSingKeyReleased(holdTime)
     ElseIf(keyCode == config.narratorKey)
@@ -564,6 +577,8 @@ EndFunction
 
 Function OnNarratorKeyReleased(float holdTime)
     If(bHasAIFF)
+        ; Reset the last request time to prevent immediate response from other systems
+        lastRequestTime = Utility.GetCurrentRealTime()
         Info("Stopping narrator recording")
         AIAgentFunctions.stopRecording(config.narratorKey)
         

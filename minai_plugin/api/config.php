@@ -37,6 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         "realnames_support" => $GLOBALS["realnames_support"],
         "input_delay_for_radiance" => $GLOBALS["input_delay_for_radiance"],
         "voicetype_fallbacks" => $GLOBALS["voicetype_fallbacks"],
+        "use_llm_fallback" => $GLOBALS["use_llm_fallback"],
     );
 
     // Return the config data as JSON
@@ -76,6 +77,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Write the voicetype_fallbacks array using the Array() format
     $newConfig .= "\$GLOBALS['voicetype_fallbacks'] = " . buildAssociativeArrayString($input['voicetype_fallbacks']) . ";\n";
+
+    // Add the new use_llm_fallback option
+    $newConfig .= "\$GLOBALS['use_llm_fallback'] = " . ($input['use_llm_fallback'] ? 'true' : 'false') . ";\n";
 
     // Save the new config to the config.php file
     $success = (file_put_contents($configFile, $newConfig) !== false);

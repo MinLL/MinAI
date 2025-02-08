@@ -144,13 +144,20 @@ function ProcessIntegrations() {
     }
     if (isset($GLOBALS["gameRequest"]) && in_array(strtolower($GLOBALS["gameRequest"][0]), ["radiant", "radiantsearchinghostile", "radiantsearchingfriend", "radiantcombathostile", "radiantcombatfriend", "minai_force_rechat"])) {
         if (strtolower($GLOBALS["gameRequest"][0]) == "minai_force_rechat" || time() > GetLastInput() + $GLOBALS["input_delay_for_radiance"]) {
-            // $GLOBALS["HERIKA_NAME"] is npc1
-            $GLOBALS["HERIKA_TARGET"] = explode(":", $GLOBALS["gameRequest"][3])[3];
-            if ($GLOBALS["HERIKA_TARGET"] == $GLOBALS["HERIKA_NAME"])
-                $GLOBALS["HERIKA_TARGET"] = $GLOBALS["PLAYER_NAME"];
-            error_log("minai: Starting {$GLOBALS["gameRequest"][0]} dialogue between {$GLOBALS["HERIKA_NAME"]} and {$GLOBALS["HERIKA_TARGET"]}");
-            StoreRadiantActors($GLOBALS["HERIKA_TARGET"], $GLOBALS["HERIKA_NAME"]);
-            $GLOBALS["target"] = $GLOBALS["HERIKA_TARGET"];
+            if ($GLOBALS["HERIKA_NAME"] == "The Narrator") {
+                // Fail safe
+                error_log("minai: WARNING - Radiant dialogue started with narrator");
+                $MUST_DIE=true;
+            }
+            else {
+                // $GLOBALS["HERIKA_NAME"] is npc1
+                $GLOBALS["HERIKA_TARGET"] = explode(":", $GLOBALS["gameRequest"][3])[3];
+                if ($GLOBALS["HERIKA_TARGET"] == $GLOBALS["HERIKA_NAME"])
+                    $GLOBALS["HERIKA_TARGET"] = $GLOBALS["PLAYER_NAME"];
+                error_log("minai: Starting {$GLOBALS["gameRequest"][0]} dialogue between {$GLOBALS["HERIKA_NAME"]} and {$GLOBALS["HERIKA_TARGET"]}");
+                StoreRadiantActors($GLOBALS["HERIKA_TARGET"], $GLOBALS["HERIKA_NAME"]);
+                $GLOBALS["target"] = $GLOBALS["HERIKA_TARGET"];
+            }
         }
         else {
             // Avoid race condition where we send input, the server starts to process the request, and then
@@ -180,7 +187,7 @@ function ProcessIntegrations() {
     }
 
     // Handle singing events
-    if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "minai_sing") {
+    /* if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "minai_sing") {
         // Set up singing context
         $GLOBALS["ORIGINAL_HERIKA_NAME"] = $GLOBALS["HERIKA_NAME"];
         // Intended for use with the "Self Narrator" functionality
@@ -201,42 +208,22 @@ function ProcessIntegrations() {
         
         // Force response to be musical
         $GLOBALS["TEMPLATE_DIALOG"] = "Respond with song lyrics or a musical performance.";
-    }
+        }*/
 
     // Handle narrator talk events
     if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "minai_narrator_talk") {
-        
-        // Store original name to restore later if needed
+        SetEnabled($GLOBALS["PLAYER_NAME"], "isTalkingToNarrator", false);
         $GLOBALS["ORIGINAL_HERIKA_NAME"] = $GLOBALS["HERIKA_NAME"];
         $GLOBALS["HERIKA_NAME"] = "The Narrator";
         SetNarratorProfile();
-        // Set up narrator context
-        if (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"]) {
-            // First-person narration from player's perspective
-            $GLOBALS["PROMPTS"]["minai_narrator_talk"] = [
-                "cue" => [
-                    "write a first-person narrative response as {$GLOBALS["PLAYER_NAME"]}, describing your thoughts, feelings, and experiences in this moment. Speak introspectively about your journey and current situation."
-                ],
-                "player_request"=>[    
-                    "{$GLOBALS["PLAYER_NAME"]} thinks to herself about the current situation.",
-                ]
-            ];
-            
-            // Set first-person narrator personality
-            $GLOBALS["HERIKA_PERS"] = "You are {$GLOBALS["PLAYER_NAME"]}, narrating your own story. Share your inner thoughts, emotions, and personal perspective on events. Your narration should be intimate and reflective, revealing your character's inner world.";
-            
-            // Force first-person narrative style
-            $GLOBALS["TEMPLATE_DIALOG"] = "Respond in first-person perspective as {$GLOBALS["PLAYER_NAME"]}, sharing your personal thoughts and feelings.";
-        } else {
-            // Traditional third-person narrator
-            $GLOBALS["PROMPTS"]["minai_narrator_talk"] = [
-                "cue" => [
-                    "write a response as The Narrator, speaking from an omniscient perspective about the world and the player's journey."
-                ]
-            ];
-            
-            // Force narrator style responses
-            $GLOBALS["TEMPLATE_DIALOG"] = "You are The Narrator. Respond in an omniscient, storyteller-like manner.";
+        
+        SetNarratorPrompts(isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"]);
+    }
+
+    if (isset($GLOBALS["gameRequest"]) && strpos($GLOBALS["gameRequest"][0], "minai_tntr_") === 0) {
+        if (ShouldBlockTNTREvent($GLOBALS["gameRequest"][0])) {
+            error_log("minai: Blocking TNTR event: {$GLOBALS["gameRequest"][0]}");
+            die('X-CUSTOM-CLOSE');
         }
     }
 
@@ -303,5 +290,33 @@ function RegisterThirdPartyActions() {
             RegisterAction($cmdName);
         }
     }
+}
+
+function ShouldBlockTNTREvent($eventName) {
+    // Extract source and event from full event name (e.g. "minai_tntr_mimic_triggervoreinstant")
+    $parts = explode('_', strtolower($eventName));
+    if (count($parts) < 4) return false;
+    
+    $source = $parts[2];
+    $event = $parts[3];
+    
+    if ($source == "mimic") {
+        $blockedEvents = [
+            "transvorestage02loop",
+            "triggerdie", 
+            "triggerattack",
+            "triggermimicshake"
+        ];
+        return in_array($event, $blockedEvents);
+    }
+    
+    if ($source == "deathworm") {
+        $blockedEvents = [
+            "trigger01"  // Block initial ground trembling event
+        ];
+        return in_array($event, $blockedEvents);
+    }
+    
+    return false;
 }
 ?>

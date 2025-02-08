@@ -18,6 +18,29 @@ Function GetNarratorConfigPath() {
     return $path . "conf".DIRECTORY_SEPARATOR."conf_$newConfFile.php";
 }
 
+Function GetFallbackConfigPath() {
+    $path = getcwd().DIRECTORY_SEPARATOR;
+    $newConfFile=md5("LLMFallback");
+    return $path . "conf".DIRECTORY_SEPARATOR."conf_$newConfFile.php";
+}
+
+Function CreateFallbackConfig() {
+    if (!file_exists(GetFallbackConfigPath())) {
+        error_log("minai: Initializing LLM Fallback Profile");
+        createProfile("LLMFallback", [
+            "HERIKA_NAME" => "LLMFallback",
+            "HERIKA_PERS" => "This is a LLM profile used for retrying when the primary LLM call fails. Only the connector settings will be used, and it will only work with openrouterjson."
+        ], true);
+    }
+}
+
+Function SetLLMFallbackProfile() {
+    CreateFallbackConfig();
+    $path = GetFallbackConfigPath();
+    global $CONNECTOR;
+    global $CONNECTORS;
+    require_once($path);
+}
 Function SetNarratorProfile() {
     if ($GLOBALS["HERIKA_NAME"] == "The Narrator" && $GLOBALS["use_narrator_profile"]) {
         if (!file_exists(GetNarratorConfigPath())) {
@@ -30,7 +53,8 @@ Function SetNarratorProfile() {
         $path = GetNarratorConfigPath();
         // error_log("minai: Overwriting profile with narrator profile ($path).");
         // Ignore narrator name
-        // global $HERIKA_NAME;
+        global $HERIKA_NAME;
+        $HERIKA_NAME = "The Narrator";
         global $PROMPT_HEAD;
         global $HERIKA_PERS;
         global $DYNAMIC_PROFILE;
@@ -54,6 +78,7 @@ Function SetNarratorProfile() {
         global $ITT;
         global $FEATURES;
         require_once($path);
+        $_GET["profile"] = md5("Narrator");
     }
 }
 
@@ -65,6 +90,7 @@ SetNarratorProfile();
 
 // If talking to the narrator, force it to respond.
 if (IsEnabled($GLOBALS["PLAYER_NAME"], "isTalkingToNarrator") && (in_array($GLOBALS["gameRequest"][0],["inputtext","inputtext_s","ginputtext","ginputtext_s"])) ) {
+    error_log("minai: Forcing herika_name to the narrator: Is talking to narrator");
     SetEnabled($GLOBALS["PLAYER_NAME"], "isTalkingToNarrator", false);
     $GLOBALS["HERIKA_NAME"] = "The Narrator";
     $GLOBALS["minai_processing_input"] = true;
@@ -72,8 +98,9 @@ if (IsEnabled($GLOBALS["PLAYER_NAME"], "isTalkingToNarrator") && (in_array($GLOB
 }
 
 if (IsEnabled($GLOBALS["PLAYER_NAME"], "isSinging")) {
-    $GLOBALS["HERIKA_NAME"] = "The Narrator";
-    SetNarratorProfile();
+    error_log("minai: Forcing herika_name to the narrator: Is singing");
+    // $GLOBALS["HERIKA_NAME"] = "The Narrator";
+    // SetNarratorProfile();
 }
 
 require_once("deviousnarrator.php");
@@ -122,5 +149,23 @@ if (isset($GLOBALS["realnames_support"]) && $GLOBALS["realnames_support"]) {
     }
 }
 
+$GLOBALS["LLM_RETRY_FNCT"] = function() {
+    if (isset($GLOBALS['use_llm_fallback']) && !$GLOBALS['use_llm_fallback']) {
+        error_log("MinAI: LLM fallback is disabled - skipping retry");
+        return false;
+    }
+    
+    error_log("MinAI: Retrying LLM...");
+    SetLLMFallbackProfile();
+    $outputWasValid = call_llm();   
+    if (!$outputWasValid) {
+        error_log("Warning: LLM returned invalid output after retry.");
+    }
+    return $outputWasValid;
+};
 
+// Only create the fallback config if the feature is enabled
+if (isset($GLOBALS['use_llm_fallback']) && $GLOBALS['use_llm_fallback']) {
+    CreateFallbackConfig();
+}
 ?>

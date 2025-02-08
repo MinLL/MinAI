@@ -42,4 +42,7 @@ Event OnSleepStart(float afSleepStartTime, float afDesiredSleepEndTime)
   if config.autoUpdateDiary
     followers.UpdateFollowerDiaries()
   EndIf
+  if config.updateNarratorProfile && bHasAIFF
+    aiff.UpdateProfile("The Narrator")
+  EndIf
 EndEvent

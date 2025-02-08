@@ -18,8 +18,10 @@ elseif (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"] && $GLOBAL
     $moods=explode(",",$GLOBALS["EMOTEMOODS"]);
     shuffle($moods);
     $GLOBALS["responseTemplate"] = [
-        "character"=>$GLOBALS["PLAYER_NAME"] . "'s subconscious",
-        "listener"=>"{$GLOBALS['PLAYER_NAME']} is thinking to herself",
+        "character"=>IsExplicitScene() ? $GLOBALS["PLAYER_NAME"] . "'s body" : $GLOBALS["PLAYER_NAME"] . "'s subconscious",
+        "listener"=>IsExplicitScene() ? 
+            "{$GLOBALS['PLAYER_NAME']} is reacting to physical sensations" : 
+            "{$GLOBALS['PLAYER_NAME']} is thinking to herself",
         "message"=>"lines of dialogue",
         "mood"=>implode("|",$moods),
         "action"=>implode("|",$GLOBALS["FUNC_LIST"]),

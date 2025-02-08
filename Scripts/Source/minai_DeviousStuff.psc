@@ -14,7 +14,8 @@ bool bHasSLApp = False
 bool bHasDeviouslyAccessible = False
 bool bHasDDExpansion = False
 bool bHasSubmissiveLola = False
-
+bool bHasTNTR = False
+bool bHasSlaveTats = False
 Keyword SLHHScriptEventKeyword
 GlobalVariable Debt
 GlobalVariable EnslaveDebt
@@ -38,6 +39,8 @@ Spell dwp_eldwhoresp_neq
 actor playerRef
 Perk dwp_eldritchwaifueffect_soldsoul
 Perk dwp_eldritchwaifueffect_soldsoul_belted
+
+; TODO: Break this out into a separate script for each mod.
 
 function Maintenance(minai_MainQuestController _main)
   Main.Info("Initializing Devious Module")
@@ -138,7 +141,13 @@ function Maintenance(minai_MainQuestController _main)
       Main.Error("Old version of Deviously Accessible. Some integrations will be broken.")
       Debug.Notification("Old version of Deviously Accessible. Some integrations will be broken.")
     EndIf
+    if Game.GetModByName("TNTR.esp") != 255
+      Main.Info("Found TNTR - Registering for TNTR events")
+      bHasTNTR = True
+      RegisterForModEvent("minai_tntr", "OnTNTRAnimation")
+    EndIf
   EndIf  
+
 
   if Game.GetModByName("submissivelola_est.esp") != 255
     bHasSubmissiveLola = True
@@ -152,6 +161,12 @@ function Maintenance(minai_MainQuestController _main)
   aiff.SetModAvailable("DeviouslyAccessible", bHasDeviouslyAccessible)
   aiff.SetModAvailable("SubmissiveLola", bHasSubmissiveLola)
   config.StoreAllConfigs()
+
+  if Game.GetModByName("SlaveTats.esp") != 255
+    bHasSlaveTats = True
+    Main.Info("Found SlaveTats")
+  endif
+  aiff.SetModAvailable("SlaveTats", bHasSlaveTats)
 
   aiff.RegisterAction("ExtCmdGrope", "Grope", "Grope the Target", "General", 1, 30, 2, 5, 300, True)
   aiff.RegisterAction("ExtCmdPinchNipples", "PinchNipples", "Pinch the Targets Nipples", "General", 1, 30, 2, 5, 300, True)
@@ -970,6 +985,9 @@ Function SetContext(actor akTarget)
     aiff.SetActorVariable(playerRef, "dwp_eldritchwaifueffect_soldsoul", PlayerRef.HasPerk(dwp_eldritchwaifueffect_soldsoul))
     aiff.SetActorVariable(playerRef, "dwp_eldritchwaifueffect_soldsoul_belted", PlayerRef.HasPerk(dwp_eldritchwaifueffect_soldsoul_belted))
   EndIf
+  if bHasSlaveTats && akTarget
+    SerializeTattooForDB(akTarget) ; This will store the data in the DB
+  endif
 EndFunction
 
 
@@ -1051,3 +1069,164 @@ Function SexStarted(actor[] actors, actor akSpeaker, string tags="")
 
   Main.Info("Event sent to SLola")
 EndFunction
+
+; New handler for TNTR animation events
+Event OnTNTRAnimation(Form akTarget, string eventSource, string eventName)
+    string eventLine = main.GetActorName(akTarget as Actor) + " caught caught by a " + eventSource + " and is being animated with " + eventName
+    Main.Info("tntr: " + eventLine)
+    main.RequestLLMResponse(eventLine, "minai_tntr_" + eventSource + "_" + eventName)
+EndEvent
+
+
+; Serializes tattoo information into a length-encoded string format
+; Format: <field_count>:<field1_len>:<field1><field2_len>:<field2>... with ~ between tattoos 
+string Function SerializeTattooInfo(Actor target)
+    string result = ""
+    
+    if !target
+        Main.Error("SerializeTattooInfo called with null target")
+        return "0:"
+    endif
+    
+    int applied = JFormDB.getObj(target, ".SlaveTats.applied")
+    if applied == 0
+        Main.Debug("No tattoos found for " + Main.GetActorName(target))
+        return "0:"
+    endif
+    
+    int i = JArray.count(applied)
+    while i > 0
+        i -= 1
+        
+        int entry = JArray.getObj(applied, i)
+        if SlaveTats.is_tattoo(entry)
+            ; Start a new tattoo entry with field count
+            string tattooStr = "15:" ; Number of standard fields we're including
+            
+            ; Add standard fields with length encoding
+            string[] fields = new string[15]
+            fields[0] = JMap.getStr(entry, "section", "")
+            fields[1] = JMap.getStr(entry, "name", "")
+            fields[2] = JMap.getStr(entry, "area", "")
+            fields[3] = JMap.getInt(entry, "slot", -1)
+            fields[4] = JMap.getInt(entry, "color", 0)
+            fields[5] = JMap.getInt(entry, "glow", 0)
+            fields[6] = JMap.getInt(entry, "gloss", 0)
+            fields[7] = (1.0 - JMap.getFlt(entry, "invertedAlpha", 0.0))
+            fields[8] = JMap.getStr(entry, "texture", "")
+            fields[9] = JMap.getInt(entry, "locked", 0)
+            fields[10] = JMap.getStr(entry, "excluded_by", "")
+            fields[11] = JMap.getStr(entry, "requires", "")
+            fields[12] = JMap.getStr(entry, "requires_plugin", "")
+            fields[13] = JMap.getStr(entry, "requires_formid", "")
+            fields[14] = JMap.getStr(entry, "domain", "")
+            
+            int j = 0
+            while j < fields.Length
+                string fieldStr = fields[j]
+                int fieldLen = StringUtil.GetLength(fieldStr)
+                tattooStr += fieldLen + ":" + fieldStr
+                j += 1
+            endwhile
+            
+            ; Add this tattoo entry to the result
+            if result != ""
+                result += "~"
+            endif
+            result += tattooStr
+        endif
+    endwhile
+    
+    Main.Info("Serialized " + JArray.count(applied) + " tattoos for " + Main.GetActorName(target))
+    return result
+endfunction
+
+; Helper function to test parsing the serialized string
+bool Function TestParseSerializedTattoos(string serialized)
+    Main.Info("Testing parse of serialized tattoo string: " + serialized)
+    
+    string[] tattoos = StringUtil.Split(serialized, "~")
+    int i = 0
+    while i < tattoos.Length
+        string tattoo = tattoos[i]
+        Main.Info("Parsing tattoo: " + tattoo)
+        
+        ; Split by first colon to get field count
+        int colonPos = StringUtil.Find(tattoo, ":")
+        int fieldCount = tattoo as int
+        string remaining = StringUtil.Substring(tattoo, colonPos + 1)
+        
+        int j = 0
+        while j < fieldCount
+            ; Get field length
+            colonPos = StringUtil.Find(remaining, ":")
+            int fieldLen = StringUtil.Substring(remaining, 0, colonPos) as int
+            remaining = StringUtil.Substring(remaining, colonPos + 1)
+            
+            ; Get field value
+            string fieldValue = StringUtil.Substring(remaining, 0, fieldLen)
+            remaining = StringUtil.Substring(remaining, fieldLen)
+            
+            Main.Info("Field " + j + ": " + fieldValue)
+            j += 1
+        endwhile
+        
+        i += 1
+    endwhile
+    
+    return true
+endfunction
+
+; Serializes tattoo information into a length-encoded string format for storage in the database
+string Function SerializeTattooForDB(Actor target)
+    if !target
+        Main.Error("SerializeTattooForDB called with null target")
+        return ""
+    endif
+    
+    int applied = JFormDB.getObj(target, ".SlaveTats.applied")
+    if applied == 0
+        Main.Debug("No tattoos found for " + Main.GetActorName(target))
+        return ""
+    endif
+    
+    string result = ""
+    int i = JArray.count(applied)
+    while i > 0
+        i -= 1
+        
+        int entry = JArray.getObj(applied, i)
+        if SlaveTats.is_tattoo(entry)
+            if result != ""
+                result += "~"
+            endif
+            
+            ; Format: section&name&area&texture&slot&color&glow&gloss&alpha&locked&excluded_by&requires&requires_plugin&requires_formid&domain
+            string tattooEntry = ""
+            tattooEntry += JMap.getStr(entry, "section", "") + "&"
+            tattooEntry += JMap.getStr(entry, "name", "") + "&"
+            tattooEntry += JMap.getStr(entry, "area", "") + "&"
+            tattooEntry += JMap.getStr(entry, "texture", "") + "&"
+            tattooEntry += JMap.getInt(entry, "slot", -1) + "&"
+            tattooEntry += JMap.getInt(entry, "color", 0) + "&"
+            tattooEntry += JMap.getInt(entry, "glow", 0) + "&"
+            tattooEntry += JMap.getInt(entry, "gloss", 0) + "&"
+            tattooEntry += (1.0 - JMap.getFlt(entry, "invertedAlpha", 0.0)) + "&"
+            tattooEntry += JMap.getInt(entry, "locked", 0) + "&"
+            tattooEntry += JMap.getStr(entry, "excluded_by", "") + "&"
+            tattooEntry += JMap.getStr(entry, "requires", "") + "&"
+            tattooEntry += JMap.getStr(entry, "requires_plugin", "") + "&"
+            tattooEntry += JMap.getStr(entry, "requires_formid", "") + "&"
+            tattooEntry += JMap.getStr(entry, "domain", "")
+            
+            result += tattooEntry
+        endif
+    endwhile
+    
+    ; Send the full tattoo data to be stored
+    if result != ""
+        AIAgentFunctions.logMessage(Main.GetActorName(target) + "@" + result, "storetattoodesc")
+    endif
+    
+    return result
+endfunction
