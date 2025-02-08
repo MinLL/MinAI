@@ -52,31 +52,31 @@ jobs:
           $refName = $env:REF_NAME
 
           $infoXml = @"
-<?xml version='1.0' encoding='UTF-16'?>
-<fomod>
-  <Name>MinAI</Name>
-  <Author>Min</Author>
-  <Id>12345</Id>
-  <Version MachineVersion='$refName'>$refName</Version>
-  <Website>https://example.com/MyMod</Website>
-  <Groups>
-    <element>Gameplay</element>
-  </Groups>
-  <Description>
-<![CDATA[
-A short description of your mod.
-
-Features:
- - Core Files
- - Optional Baka Scripts
-
-Version: $refName
-
-Thanks for downloading!
-]]>
-  </Description>
-</fomod>
-"@
+          <?xml version='1.0' encoding='UTF-16'?>
+          <fomod>
+            <Name>MinAI</Name>
+            <Author>Min</Author>
+            <Id>12345</Id>
+            <Version MachineVersion='$refName'>$refName</Version>
+            <Website>https://example.com/MyMod</Website>
+            <Groups>
+              <element>Gameplay</element>
+            </Groups>
+            <Description>
+          <![CDATA[
+          A short description of your mod.
+          
+          Features:
+           - Core Files
+           - Optional Baka Scripts
+          
+          Version: $refName
+          
+          Thanks for downloading!
+          ]]>
+            </Description>
+          </fomod>
+          "@
 
           Set-Content -Path "minai/fomod/info.xml" -Value $infoXml -Encoding Unicode
 
@@ -84,36 +84,36 @@ Thanks for downloading!
         shell: pwsh
         run: |
           $moduleConfig = @"
-<?xml version='1.0' encoding='UTF-16'?>
-<config xmlns:xsi='https://www.w3.org/2001/XMLSchema-instance'
-        xsi:noNamespaceSchemaLocation='https://qconsulting.ca/fo3/ModConfig5.0.xsd'>
-
-  <moduleName>MinAI FOMOD Installer</moduleName>
-
-  <requiredInstallFiles>
-    <folder source='000 Required - Core Files' destination='' priority='0'/>
-  </requiredInstallFiles>
-
-  <installSteps order='Explicit'>
-    <installStep name='Optional Baka Scripts'>
-      <image path='fomod/images/minai_banner.png'/>
-      <optionalFileGroups>
-        <group name='TNTR v0.5 Patch' type='SelectAny'>
-          <option name='Install Baka Scripts'>
-            <files>
-              <folder source='200 Optional - BakaScripts' destination='Scripts' priority='1'/>
-            </files>
-            <description><![CDATA[
-Installs Baka .pex files into Scripts.
-]]></description>
-          </option>
-        </group>
-      </optionalFileGroups>
-    </installStep>
-  </installSteps>
-
-</config>
-"@
+          <?xml version='1.0' encoding='UTF-16'?>
+          <config xmlns:xsi='https://www.w3.org/2001/XMLSchema-instance'
+                  xsi:noNamespaceSchemaLocation='https://qconsulting.ca/fo3/ModConfig5.0.xsd'>
+          
+            <moduleName>MinAI FOMOD Installer</moduleName>
+          
+            <requiredInstallFiles>
+              <folder source='000 Required - Core Files' destination='' priority='0'/>
+            </requiredInstallFiles>
+          
+            <installSteps order='Explicit'>
+              <installStep name='Optional Baka Scripts'>
+                <image path='fomod/images/minai_banner.png'/>
+                <optionalFileGroups>
+                  <group name='TNTR v0.5 Patch' type='SelectAny'>
+                    <option name='Install Baka Scripts'>
+                      <files>
+                        <folder source='200 Optional - BakaScripts' destination='Scripts' priority='1'/>
+                      </files>
+                      <description><![CDATA[
+          Installs Baka .pex files into Scripts.
+          ]]></description>
+                    </option>
+                  </group>
+                </optionalFileGroups>
+              </installStep>
+            </installSteps>
+          
+          </config>
+          "@
 
           Set-Content -Path "minai/fomod/ModuleConfig.xml" -Value $moduleConfig -Encoding Unicode
 
