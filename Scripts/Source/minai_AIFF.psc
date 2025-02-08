@@ -30,6 +30,9 @@ bool bHasFollowPlayer = False
 Package FollowPlayerPackage
 Faction FollowingPlayerFaction
 
+; Add new property to track last dialogue time for actors
+int Property lastDialogueTimes Auto  ; JMap of actor names to timestamps
+
 Function InitFollow()
   bHasFollowPlayer = False
   FollowPlayerPackage = Game.GetFormFromFile(0x000E8E, "MinAI.esp") as Package
@@ -112,7 +115,14 @@ Function Maintenance(minai_MainQuestController _main)
   ; StoreContext("minai", "testKey", "This is dynamically persisted context!", 1200)
   InitFollow()
   CleanupStates()
+
+  if !lastDialogueTimes
+    ; Initialize the dialogue times map
+    lastDialogueTimes = JMap.Object()
+    JValue.Retain(lastDialogueTimes)
+  EndIf
 EndFunction
+
 
 Function CleanupStates()
   actor[] actors = GetNearbyAI()
@@ -733,10 +743,32 @@ Function CleanupSapientActors()
 EndFunction
 
 
+Function UpdateLastDialogueTime(string actorName)
+  if !lastDialogueTimes
+    lastDialogueTimes = JMap.Object()
+    JValue.Retain(lastDialogueTimes)
+  EndIf
+  float currentTime = Utility.GetCurrentRealTime()
+  JMap.SetFlt(lastDialogueTimes, actorName, currentTime)
+  Main.Debug("Updated last dialogue time for " + actorName + " to " + currentTime)
+EndFunction
+
+
 Function RemoveActorAI(string targetName)
+  float lastDialogueTime = JMap.GetFlt(lastDialogueTimes, targetName)
+  float currentTime = Utility.GetCurrentRealTime()
+  
+  ; If actor had dialogue within last 60 seconds, don't remove
+  ; They will get  cleaned up later on location change by cleanup
+  if lastDialogueTime > 0 && (currentTime - lastDialogueTime) < 60.0
+    Main.Debug("SAPIENCE: Not removing " + targetName + " - recent dialogue activity")
+    return
+  EndIf
+
   Main.Info("SAPIENCE: Removing " + targetName + " from AI")
   AIAgentFunctions.removeAgentByName(targetName)
   JMap.RemoveKey(sapientActors, targetName)
+  JMap.RemoveKey(lastDialogueTimes, targetName) ; Clean up the dialogue time entry
 EndFunction
 
 Function EnableActorAI(actor akTarget)

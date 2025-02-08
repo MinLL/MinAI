@@ -215,8 +215,10 @@ Function ResetRechat()
 EndFunction
 
 Function TriggerRechat(string actor1name, string actor2name)
-  ; string payload = utility.GetCurrentRealTime() + "|" + utility.GetCurrentGameTime()  + "|" + playerRef.GetCurrentLocation() + "|" + speakerName + " has something to say"
-  ; AIAgentFunctions.logMessageForActor("rechat", payload)
+  ; Update dialogue times for both actors
+  aiff.UpdateLastDialogueTime(actor1name) 
+  aiff.UpdateLastDialogueTime(actor2name)
+  
   if actor2name == Main.GetActorName(playerRef)
     Main.Debug("SAPIENCE: Not rechatting with player")
     return
@@ -259,6 +261,9 @@ EndFunction
 
 Event OnTextReceived(String speakerName, String sayLine)
   if minai_SapienceEnabled.GetValueInt() == 1
+    ; Update dialogue time when text is received
+    aiff.UpdateLastDialogueTime(speakerName)
+    
     Main.Debug("SAPIENCE: Received LLM response, Resetting radiant dialogue cooldown.")
     CheckForRechat(speakerName)
     StartNextUpdate()
