@@ -23,24 +23,31 @@ jobs:
 
       - name: Create BAIN folders and move files
         run: |
+          # Create the primary packaging folder and BAIN subfolders
           mkdir minai
           mkdir "minai/000 Required - Core Files"
           mkdir "minai/200 Optional - BakaScripts"
+          mkdir "minai/300 Optional - Mantella"
 
+          # Move core files into 000 Required - Core Files
           Move-Item -Path Scripts -Destination "minai/000 Required - Core Files" -Force -ErrorAction SilentlyContinue
           Move-Item -Path Data -Destination "minai/000 Required - Core Files" -Force -ErrorAction SilentlyContinue
-          Move-Item -Path mantella_files -Destination "minai/000 Required - Core Files" -Force -ErrorAction SilentlyContinue
           Move-Item -Path *.esp -Destination "minai/000 Required - Core Files" -Force -ErrorAction SilentlyContinue
           Move-Item -Path *.ini -Destination "minai/000 Required - Core Files" -Force -ErrorAction SilentlyContinue
 
+          # Move Baka scripts (if any) into 200 Optional - BakaScripts
           if (Test-Path "minai/000 Required - Core Files/Scripts") {
             Get-ChildItem -Path "minai/000 Required - Core Files/Scripts" -Filter "Baka*.pex" -Recurse -File |
               Move-Item -Destination "minai/200 Optional - BakaScripts" -Force
           }
 
+          # Move mantella_files into 300 Optional - Mantella
+          Move-Item -Path mantella_files -Destination "minai/300 Optional - Mantella" -Force -ErrorAction SilentlyContinue
+
       - name: Create and populate fomod folder
         run: |
           mkdir -p "minai/fomod/images"
+          # Copy splash image if present
           if (Test-Path "minai_plugin/splash.png") {
             Copy-Item -Path "minai_plugin/splash.png" -Destination "minai/fomod/images/minai_banner.png" -Force
           }
@@ -48,35 +55,35 @@ jobs:
       - name: Generate info.xml
         shell: pwsh
         run: |
-          # Grab the version from the environment variable
           $refName = $env:REF_NAME
 
           $infoXml = @"
-          <?xml version='1.0' encoding='UTF-16'?>
-          <fomod>
-            <Name>MinAI</Name>
-            <Author>Min</Author>
-            <Id>12345</Id>
-            <Version MachineVersion='$refName'>$refName</Version>
-            <Website>https://example.com/MyMod</Website>
-            <Groups>
-              <element>Gameplay</element>
-            </Groups>
-            <Description>
-          <![CDATA[
-          A short description of your mod.
-          
-          Features:
-           - Core Files
-           - Optional Baka Scripts
-          
-          Version: $refName
-          
-          Thanks for downloading!
-          ]]>
-            </Description>
-          </fomod>
-          "@
+<?xml version='1.0' encoding='UTF-16'?>
+<fomod>
+  <Name>MinAI</Name>
+  <Author>Min</Author>
+  <Id>128980</Id>
+  <Version MachineVersion='$refName'>$refName</Version>
+  <Website>https://github.com/MinLL/MinAI</Website>
+  <Groups>
+    <element>Gameplay</element>
+  </Groups>
+  <Description>
+<![CDATA[
+LLM Integrations with Skyrim
+
+Features:
+ - Core Files
+ - Optional TNTR Support
+ - Optional Mantella Files
+
+Version: $refName
+
+Thanks for downloading!
+]]>
+  </Description>
+</fomod>
+"@
 
           Set-Content -Path "minai/fomod/info.xml" -Value $infoXml -Encoding Unicode
 
@@ -84,36 +91,55 @@ jobs:
         shell: pwsh
         run: |
           $moduleConfig = @"
-          <?xml version='1.0' encoding='UTF-16'?>
-          <config xmlns:xsi='https://www.w3.org/2001/XMLSchema-instance'
-                  xsi:noNamespaceSchemaLocation='https://qconsulting.ca/fo3/ModConfig5.0.xsd'>
-          
-            <moduleName>MinAI FOMOD Installer</moduleName>
-          
-            <requiredInstallFiles>
-              <folder source='000 Required - Core Files' destination='' priority='0'/>
-            </requiredInstallFiles>
-          
-            <installSteps order='Explicit'>
-              <installStep name='Optional Baka Scripts'>
-                <image path='fomod/images/minai_banner.png'/>
-                <optionalFileGroups>
-                  <group name='TNTR v0.5 Patch' type='SelectAny'>
-                    <option name='Install Baka Scripts'>
-                      <files>
-                        <folder source='200 Optional - BakaScripts' destination='Scripts' priority='1'/>
-                      </files>
-                      <description><![CDATA[
-          Installs Baka .pex files into Scripts.
-          ]]></description>
-                    </option>
-                  </group>
-                </optionalFileGroups>
-              </installStep>
-            </installSteps>
-          
-          </config>
-          "@
+<?xml version='1.0' encoding='UTF-16'?>
+<config xmlns:xsi='https://www.w3.org/2001/XMLSchema-instance'
+        xsi:noNamespaceSchemaLocation='https://qconsulting.ca/fo3/ModConfig5.0.xsd'>
+
+  <moduleName>MinAI FOMOD Installer</moduleName>
+
+  <!-- Automatically install all core files -->
+  <requiredInstallFiles>
+    <folder source='000 Required - Core Files' destination='' priority='0'/>
+  </requiredInstallFiles>
+
+  <!-- Single install step with an image + 2 optional groups (TNTR + Mantella) -->
+  <installSteps order='Explicit'>
+    <installStep name='Optional Integrations'>
+      <!-- Fixed image path:  "images/minai_banner.png" -->
+      <image path='images/minai_banner.png'/>
+      <optionalFileGroups>
+      
+        <!-- Group #1: TNTR v0.5 Patch -->
+        <group name='TNTR v0.5 Patch' type='SelectAny'>
+          <option name='Install TNTR Baka Scripts'>
+            <files>
+              <folder source='200 Optional - BakaScripts' destination='Scripts' priority='1'/>
+            </files>
+            <description><![CDATA[
+Installs Baka .pex files into Scripts for TNTR v0.5.
+]]></description>
+          </option>
+        </group>
+
+        <!-- Group #2: Mantella Files -->
+        <group name='Mantella Files' type='SelectAny'>
+          <option name='Install mantella_files'>
+            <files>
+              <!-- Installs 300 Optional - Mantella to Data/ -->
+              <folder source='300 Optional - Mantella' destination='' priority='2'/>
+            </files>
+            <description><![CDATA[
+Optional Mantella integration files.
+]]></description>
+          </option>
+        </group>
+
+      </optionalFileGroups>
+    </installStep>
+  </installSteps>
+
+</config>
+"@
 
           Set-Content -Path "minai/fomod/ModuleConfig.xml" -Value $moduleConfig -Encoding Unicode
 
