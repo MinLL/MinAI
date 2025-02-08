@@ -4,40 +4,68 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        required: True
+        required: true
   push:
-    tags:  # Tags need to be annotated with git tag 1.x.x -a; push tags with git push origin 1.x.x, or use follow tags = true in git config file.
-    - '*'
-  
+    tags:
+      - '*'
+
 jobs:
   build:
     runs-on: windows-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Move mod files
-      run: |
-        mkdir minai
-        mv minai_plugin minai/
-        mv *.esp minai/
-        mv *.ini minai/
-        mv Scripts minai/
-        mv Data minai/
-        mv mantella_files minai/
-        
-    - name: Zip the files
-      uses: TheDoctor0/zip-release@0.7.6
-      with:
-        path: "./minai/*"
-        type: "zip"
-        filename: "MinAI-${{github.ref_name}}:.zip"
 
-    - name: Upload Release
-      uses: ncipollo/release-action@v1.14.0
-      with:
-        artifacts: "MinAI-${{github.ref_name}}:.zip"
-        token: ${{ secrets.RELEASE_TOKEN }}
-        generateReleaseNotes: true
-        prerelease: true  # Remember to set release status manually
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Move mod files
+        run: |
+          # Create final mod folder
+          mkdir minai
+          # Exclude minai_plugin from the final zip
+          mv *.esp minai/
+          mv *.ini minai/
+          mv Scripts minai/
+          mv Data minai/
+          mv mantella_files minai/
+
+      - name: Setup FOMOD directories
+        run: |
+          mkdir -p minai/fomod/optional/BakaScripts
+          mkdir -p minai/fomod/scripts
+          mkdir -p minai/fomod/images
+
+          # Move only Baka PEX files to the optional folder
+          Get-ChildItem -Path "minai/Scripts" -Filter "Baka*.pex" -File |
+            Move-Item -Destination "minai/fomod/optional/BakaScripts" -Force
+
+          # Copy the rest of the PEX files to the main FOMOD scripts folder
+          Copy-Item -Path "minai/Scripts" -Destination "minai/fomod/scripts" -Recurse -Force
+
+      - name: Copy FOMOD configuration
+        run: |
+          Copy-Item -Path "fomod/ModuleConfig.xml" -Destination "minai/fomod/" -Force
+
+      - name: Copy local images if needed
+        run: |
+          if (Test-Path "fomod/images") {
+            Copy-Item -Path "fomod/images/*" -Destination "minai/fomod/images/" -Force
+          }
+
+      - name: Copy splash image and rename to minai_banner.png
+        run: |
+          Copy-Item -Path "minai_plugin/splash.png" -Destination "minai/fomod/images/minai_banner.png" -Force
+
+      - name: Zip the files
+        uses: TheDoctor0/zip-release@0.7.6
+        with:
+          path: "./minai/*"
+          type: "zip"
+          filename: "MinAI-${{ github.ref_name }}.zip"
+
+      - name: Upload Release
+        uses: ncipollo/release-action@v1.14.0
+        with:
+          artifacts: "MinAI-${{ github.ref_name }}.zip"
+          token: ${{ secrets.RELEASE_TOKEN }}
+          generateReleaseNotes: true
+          prerelease: true
