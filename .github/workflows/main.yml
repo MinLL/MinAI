@@ -13,6 +13,10 @@ jobs:
   build:
     runs-on: windows-latest
     
+    # Define REF_NAME as an environment variable for the entire job
+    env:
+      REF_NAME: ${{ github.ref_name }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -29,7 +33,6 @@ jobs:
           Move-Item -Path *.esp -Destination "minai/000 Required - Core Files" -Force -ErrorAction SilentlyContinue
           Move-Item -Path *.ini -Destination "minai/000 Required - Core Files" -Force -ErrorAction SilentlyContinue
 
-          # Move any Baka*.pex from Scripts to the optional BakaScripts folder
           if (Test-Path "minai/000 Required - Core Files/Scripts") {
             Get-ChildItem -Path "minai/000 Required - Core Files/Scripts" -Filter "Baka*.pex" -Recurse -File |
               Move-Item -Destination "minai/200 Optional - BakaScripts" -Force
@@ -42,10 +45,11 @@ jobs:
             Copy-Item -Path "minai_plugin/splash.png" -Destination "minai/fomod/images/minai_banner.png" -Force
           }
 
-      - name: Generate info.xml with Git ref as version
+      - name: Generate info.xml
         shell: pwsh
         run: |
-          $refName = '${{ github.ref_name }}'
+          # Grab the version from the environment variable
+          $refName = $env:REF_NAME
 
           $infoXml = @"
 <?xml version='1.0' encoding='UTF-16'?>
@@ -118,12 +122,12 @@ Installs Baka .pex files into Scripts.
         with:
           path: "./minai/*"
           type: "zip"
-          filename: "MinAI-${{ github.ref_name }}.zip"
+          filename: "MinAI-${{ env.REF_NAME }}.zip"
 
       - name: Upload Release
         uses: ncipollo/release-action@v1.14.0
         with:
-          artifacts: "MinAI-${{ github.ref_name }}.zip"
+          artifacts: "MinAI-${{ env.REF_NAME }}.zip"
           token: ${{ secrets.RELEASE_TOKEN }}
           generateReleaseNotes: true
           prerelease: true
