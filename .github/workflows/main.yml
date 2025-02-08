@@ -19,32 +19,24 @@ jobs:
 
       - name: Create BAIN folders and move files
         run: |
-          # Create final mod packaging folder
           mkdir minai
-
-          # 1) Create the BAIN subfolders inside "minai"
           mkdir "minai/000 Required - Core Files"
           mkdir "minai/200 Optional - BakaScripts"
 
-          # 2) Move the core files into "000 Required - Core Files"
-          #    Adjust as needed depending on which files/folders you want to include.
           Move-Item -Path Scripts -Destination "minai/000 Required - Core Files" -Force -ErrorAction SilentlyContinue
           Move-Item -Path Data -Destination "minai/000 Required - Core Files" -Force -ErrorAction SilentlyContinue
           Move-Item -Path mantella_files -Destination "minai/000 Required - Core Files" -Force -ErrorAction SilentlyContinue
           Move-Item -Path *.esp -Destination "minai/000 Required - Core Files" -Force -ErrorAction SilentlyContinue
           Move-Item -Path *.ini -Destination "minai/000 Required - Core Files" -Force -ErrorAction SilentlyContinue
 
-          # 3) Move Baka scripts (named Baka*.pex) into "200 Optional - BakaScripts"
-          #    If your Baka scripts are in the Scripts folder, search them and move them out.
+          # Move Baka .pex files from Scripts -> 200 Optional - BakaScripts
           Get-ChildItem -Path "minai/000 Required - Core Files/Scripts" -Filter "Baka*.pex" -Recurse -File |
             Move-Item -Destination "minai/200 Optional - BakaScripts" -Force
 
       - name: Create and populate fomod folder
         run: |
-          # 1) Create fomod folder structure
           mkdir -p "minai/fomod/images"
-
-          # 2) Copy/rename the splash image if present
+          # If there's a splash image, rename it to minai_banner.png
           if (Test-Path "minai_plugin/splash.png") {
             Copy-Item -Path "minai_plugin/splash.png" -Destination "minai/fomod/images/minai_banner.png" -Force
           }
@@ -53,14 +45,15 @@ jobs:
         shell: pwsh
         run: |
           $refName = "${{ github.ref_name }}"
-          Set-Content -Path "minai/fomod/info.xml" -Value @"
-<?xml version="1.0" encoding="UTF-16"?>
+
+          # Note the single quotes inside the XML for version and encoding:
+          $infoXml = @"
+<?xml version='1.0' encoding='UTF-16'?>
 <fomod>
   <Name>MinAI</Name>
-  <Author>YourNameHere</Author>
+  <Author>YourName</Author>
   <Id>12345</Id>
-  <!-- Use Git ref name for version -->
-  <Version MachineVersion="$refName">$refName</Version>
+  <Version MachineVersion='$refName'>$refName</Version>
   <Website>https://example.com/MyMod</Website>
   <Groups>
     <element>Gameplay</element>
@@ -73,39 +66,42 @@ Features:
  - Core Files
  - Optional Baka Scripts
 
+Version: $refName
+
 Thanks for downloading!
 ]]>
   </Description>
 </fomod>
 "@
 
+          Set-Content -Path "minai/fomod/info.xml" -Value $infoXml -Encoding Unicode
+
       - name: Generate ModuleConfig.xml
         shell: pwsh
         run: |
-          Set-Content -Path "minai/fomod/ModuleConfig.xml" -Value @"
-<?xml version="1.0" encoding="UTF-16"?>
-<config xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="https://qconsulting.ca/fo3/ModConfig5.0.xsd">
+          # Again, escape or use single quotes in the XML line
+          $moduleConfig = @"
+<?xml version='1.0' encoding='UTF-16'?>
+<config xmlns:xsi='https://www.w3.org/2001/XMLSchema-instance'
+        xsi:noNamespaceSchemaLocation='https://qconsulting.ca/fo3/ModConfig5.0.xsd'>
 
   <moduleName>MinAI FOMOD Installer</moduleName>
 
-  <!-- All core files installed automatically -->
   <requiredInstallFiles>
-    <folder source="000 Required - Core Files" destination="" priority="0"/>
+    <folder source='000 Required - Core Files' destination='' priority='0'/>
   </requiredInstallFiles>
 
-  <installSteps order="Explicit">
-    <installStep name="Optional Baka Scripts">
-      <image path="fomod/images/minai_banner.png"/>
+  <installSteps order='Explicit'>
+    <installStep name='Optional Baka Scripts'>
+      <image path='fomod/images/minai_banner.png'/>
       <optionalFileGroups>
-        <group name="TNTR v0.5 Patch" type="SelectAny">
-          <option name="Install Baka Scripts">
+        <group name='TNTR v0.5 Patch' type='SelectAny'>
+          <option name='Install Baka Scripts'>
             <files>
-              <!-- Everything in 200 Optional - BakaScripts -->
-              <folder source="200 Optional - BakaScripts" destination="Scripts" priority="1"/>
+              <folder source='200 Optional - BakaScripts' destination='Scripts' priority='1'/>
             </files>
             <description><![CDATA[
-Installs the Baka .pex files for TNTR v0.5.
+Installs Baka .pex files into Scripts.
 ]]></description>
           </option>
         </group>
@@ -115,6 +111,8 @@ Installs the Baka .pex files for TNTR v0.5.
 
 </config>
 "@
+
+          Set-Content -Path "minai/fomod/ModuleConfig.xml" -Value $moduleConfig -Encoding Unicode
 
       - name: Zip the mod files
         uses: TheDoctor0/zip-release@0.7.6
