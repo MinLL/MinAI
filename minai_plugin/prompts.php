@@ -141,6 +141,12 @@ if (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"] && $GLOBALS["H
         "extra"=>["force_tokens_max"=>0]
     ];
 }
+else {
+    $GLOBALS["PROMPTS"]["diary"] = [ 
+        "cue"=>["Please write a summary of {$GLOBALS["HERIKA_NAME"]}s recent thoughts, feelings, and adventures with {$GLOBALS["PLAYER_NAME"]}. Respond as if you are writing this into a private diary, including completely unfiltered thoughts and feelings, emphasizing in detail any intimate encounters that may have occurred. WRITE AS IF YOU ARE {$GLOBALS["HERIKA_NAME"]}."],
+        "extra"=>["force_tokens_max"=>0]
+    ];
+}
 
 // Early Mimic events - pure fear/resistance
 $GLOBALS["PROMPTS"]["minai_tntr_mimic_triggervoreinstant"] = [
