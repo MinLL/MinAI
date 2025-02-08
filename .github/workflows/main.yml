@@ -29,14 +29,15 @@ jobs:
           Move-Item -Path *.esp -Destination "minai/000 Required - Core Files" -Force -ErrorAction SilentlyContinue
           Move-Item -Path *.ini -Destination "minai/000 Required - Core Files" -Force -ErrorAction SilentlyContinue
 
-          # Move Baka .pex files from Scripts -> 200 Optional - BakaScripts
-          Get-ChildItem -Path "minai/000 Required - Core Files/Scripts" -Filter "Baka*.pex" -Recurse -File |
-            Move-Item -Destination "minai/200 Optional - BakaScripts" -Force
+          # Move any Baka*.pex from Scripts to the optional BakaScripts folder
+          if (Test-Path "minai/000 Required - Core Files/Scripts") {
+            Get-ChildItem -Path "minai/000 Required - Core Files/Scripts" -Filter "Baka*.pex" -Recurse -File |
+              Move-Item -Destination "minai/200 Optional - BakaScripts" -Force
+          }
 
       - name: Create and populate fomod folder
         run: |
           mkdir -p "minai/fomod/images"
-          # If there's a splash image, rename it to minai_banner.png
           if (Test-Path "minai_plugin/splash.png") {
             Copy-Item -Path "minai_plugin/splash.png" -Destination "minai/fomod/images/minai_banner.png" -Force
           }
@@ -44,14 +45,13 @@ jobs:
       - name: Generate info.xml with Git ref as version
         shell: pwsh
         run: |
-          $refName = "${{ github.ref_name }}"
+          $refName = '${{ github.ref_name }}'
 
-          # Note the single quotes inside the XML for version and encoding:
           $infoXml = @"
 <?xml version='1.0' encoding='UTF-16'?>
 <fomod>
   <Name>MinAI</Name>
-  <Author>YourName</Author>
+  <Author>Min</Author>
   <Id>12345</Id>
   <Version MachineVersion='$refName'>$refName</Version>
   <Website>https://example.com/MyMod</Website>
@@ -79,7 +79,6 @@ Thanks for downloading!
       - name: Generate ModuleConfig.xml
         shell: pwsh
         run: |
-          # Again, escape or use single quotes in the XML line
           $moduleConfig = @"
 <?xml version='1.0' encoding='UTF-16'?>
 <config xmlns:xsi='https://www.w3.org/2001/XMLSchema-instance'
