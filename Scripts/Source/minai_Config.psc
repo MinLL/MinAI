@@ -168,6 +168,11 @@ bool Property allowActorsToJoinSex = False Auto
 bool toggleCombatDialogueDefault = True
 bool property toggleCombatDialogue = True Auto
 
+bool updateNarratorProfileDefault = False
+bool Property updateNarratorProfile = False Auto
+
+int updateNarratorProfileOID
+
 Event OnConfigInit()
   main.Info("Building mcm menu.")
   InitializeMCM()
@@ -236,6 +241,7 @@ Function RenderGeneralPage()
   AddHeaderOption("LLM Settings")
   autoUpdateDiaryOID = AddToggleOption("Automatically Update Follower Diaries", autoUpdateDiary)
   updateNarratorDiaryOID = AddToggleOption("Update Narrator Diary on Sleep", updateNarratorDiary)
+  updateNarratorProfileOID = AddToggleOption("Update Narrator Dynamic Profile on Sleep", updateNarratorProfile)
   requestResponseCooldownOID = AddSliderOption("LLM Response Request Cooldown", requestResponseCooldown, "{1}")
   AddHeaderOption("Sapience Settings")
   useSapienceOID = AddToggleOption("Enable Sapience", minai_SapienceEnabled.GetValueInt() == 1)
@@ -501,6 +507,9 @@ Event OnOptionSelect(int oid)
   elseif oid == updateNarratorDiaryOID
     updateNarratorDiary = !updateNarratorDiary
     SetToggleOptionValue(oid, updateNarratorDiary)
+  elseif oid == updateNarratorProfileOID
+    updateNarratorProfile = !updateNarratorProfile
+    SetToggleOptionValue(oid, updateNarratorProfile)
   elseif oid == enableAISexOID
     enableAISex = !enableAISex
     aiff.SetAISexEnabled(enableAISex)
@@ -568,6 +577,9 @@ Event OnOptionSelect(int oid)
   elseif oid == enableAmbientCommentsOID
     enableAmbientComments = !enableAmbientComments
     SetToggleOptionValue(oid, enableAmbientComments)
+  elseif oid == updateNarratorProfileOID
+    updateNarratorProfile = !updateNarratorProfile
+    SetToggleOptionValue(oid, updateNarratorProfile)
   EndIf
   int i = 0
   string[] categories = JMap.allKeysPArray(aCategoryMap)
@@ -605,6 +617,9 @@ Event OnOptionDefault(int oid)
   elseif oid == updateNarratorDiaryOID
     updateNarratorDiary = updateNarratorDiaryDefault
     SetToggleOptionValue(oid, updateNarratorDiary)
+  elseif oid == updateNarratorProfileOID
+    updateNarratorProfile = updateNarratorProfileDefault
+    SetToggleOptionValue(oid, updateNarratorProfile)
   elseif oid == enableAISexOID
     enableAISex = enableAISexDefault
     aiff.SetAISexEnabled(enableAISex)
@@ -707,6 +722,9 @@ Event OnOptionDefault(int oid)
   elseif oid == maxThreadsOID
     maxThreads = maxThreadsDefault
     SetSliderOptionValue(oid, maxThreadsDefault, "{0}")
+  elseif oid == updateNarratorProfileOID
+    updateNarratorProfile = updateNarratorProfileDefault
+    SetToggleOptionValue(oid, updateNarratorProfile)
   EndIf
 EndEvent
 
@@ -719,6 +737,8 @@ Event OnOptionHighlight(int oid)
     SetInfoText("Automatically update the diary for all followers upon sleeping.")
   elseif oid == updateNarratorDiaryOID
     SetInfoText("Controls whether the narrator maintains a diary that is updated when sleeping.")
+  elseif oid == updateNarratorProfileOID
+    SetInfoText("Controls whether the narrator's dynamic profile is updated when sleeping.")
   elseif oid == enableAISexOID
     SetInfoText("Allow NPC's to decide to have sex with eachother.")
   elseif  oid == useSapienceOID

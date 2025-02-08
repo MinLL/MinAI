@@ -792,6 +792,12 @@ Function UpdateDiary(string targetName)
   EndIf
 EndFunction
 
+Function UpdateProfile(string targetName)
+  if bHasAIFF
+    AIAgentFunctions.requestMessageForActor("Please, update your profile", "updateprofile", targetName)
+  EndIf
+EndFunction
+
 Function ToggleSapience()
   if minai_SapienceEnabled.GetValueInt() == 1
     Main.Info("SAPIENCE: Sapience disabled via toggle.")

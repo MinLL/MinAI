@@ -53,7 +53,8 @@ Function SetNarratorProfile() {
         $path = GetNarratorConfigPath();
         // error_log("minai: Overwriting profile with narrator profile ($path).");
         // Ignore narrator name
-        // global $HERIKA_NAME;
+        global $HERIKA_NAME;
+        $HERIKA_NAME = "The Narrator";
         global $PROMPT_HEAD;
         global $HERIKA_PERS;
         global $DYNAMIC_PROFILE;
@@ -77,6 +78,7 @@ Function SetNarratorProfile() {
         global $ITT;
         global $FEATURES;
         require_once($path);
+        $_GET["profile"] = md5("Narrator");
     }
 }
 
