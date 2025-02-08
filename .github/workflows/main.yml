@@ -91,50 +91,55 @@ jobs:
         shell: pwsh
         run: |
           $moduleConfig = @"
-          <config xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-                  xsi:noNamespaceSchemaLocation='http://qconsulting.ca/fo3/ModConfig5.0.xsd'>
+          <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:noNamespaceSchemaLocation="http://qconsulting.ca/fo3/ModConfig5.0.xsd">
           
             <moduleName>MinAI FOMOD Installer</moduleName>
           
-            <!-- Automatically install all core files -->
+            <!-- Optionally install all core files automatically -->
             <requiredInstallFiles>
-              <folder source='000 Required - Core Files' destination='' priority='0'/>
+              <folder source="000 Required - Core Files" destination="" priority="0"/>
             </requiredInstallFiles>
           
-            <!-- Single install step with an image + 2 optional groups (TNTR + Mantella) -->
-            <installSteps order='Explicit'>
-              <installStep name='Optional Integrations'>
-                <image path='fomod/images/minai_banner.png'/>
-                <optionalFileGroups order='Explicit'>
+            <installSteps order="Explicit">
+              <installStep name="Optional Integrations">
+                <!-- 
+                  If you want one big image at the top, place it here:
+                  <image path="fomod/images/minai_banner.png"/>
+                -->
+                <optionalFileGroups order="Explicit">
           
                   <!-- Group #1: TNTR Support -->
-                  <group name='TNTR Support' type='SelectAny'>
-                    <plugins order='Explicit'>
-                      <plugin name='TNTR v0.5 Patch'>
+                  <group name="TNTR Support" type="SelectAny">
+                    <plugins order="Explicit">
+                      <plugin name="TNTR v0.5 Patch">
                         <description>Select this option to install a patch to support TNTR v0.5</description>
-                        <image path='fomod/images/minai_banner.png'/>
+                        <!-- Per-plugin image (optional) -->
+                        <image path="fomod/images/minai_banner.png"/>
                         <files>
-                          <folder source='200 Optional - BakaScripts' destination='Scripts' priority='1'/>
+                          <folder source="200 Optional - BakaScripts" destination="Scripts" priority="1"/>
                         </files>
                         <typeDescriptor>
-                          <type name='Optional'/>
+                          <type name="Optional"/>
                         </typeDescriptor>
                       </plugin>
                     </plugins>
                   </group>
           
                   <!-- Group #2: Mantella Files -->
-                  <group name='Mantella Files' type='SelectAny'>
-                    <plugins order='Explicit'>
-                      <plugin name='Install mantella_files'>
+                  <group name="Mantella Files" type="SelectAny">
+                    <plugins order="Explicit">
+                      <plugin name="Install mantella_files">
                         <description>Install optional files for Mantella Support</description>
-                        <!-- If you want a separate image here, add <image path='fomod/images/mantella_banner.png'/> -->
+                        <!-- Another per-plugin image if you want:
+                             <image path="fomod/images/mantella_banner.png"/>
+                        -->
                         <files>
                           <!-- Installs 300 Optional - Mantella to Data -->
-                          <folder source='300 Optional - Mantella' destination='' priority='2'/>
+                          <folder source="300 Optional - Mantella" destination="" priority="2"/>
                         </files>
                         <typeDescriptor>
-                          <type name='Optional'/>
+                          <type name="Optional"/>
                         </typeDescriptor>
                       </plugin>
                     </plugins>
