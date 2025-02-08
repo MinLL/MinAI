@@ -13,7 +13,7 @@ jobs:
   build:
     runs-on: windows-latest
     
-    # Defines REF_NAME as an environment variable for the job
+    # Define REF_NAME as an environment variable for the entire job
     env:
       REF_NAME: ${{ github.ref_name }}
 
@@ -23,7 +23,7 @@ jobs:
 
       - name: Create BAIN folders and move files
         run: |
-          # Create the main folder and subfolders
+          # Create the main packaging folder and BAIN subfolders
           mkdir minai
           mkdir "minai/000 Required - Core Files"
           mkdir "minai/200 Optional - BakaScripts"
@@ -47,6 +47,7 @@ jobs:
       - name: Create and populate fomod/images
         run: |
           mkdir -p "minai/fomod/images"
+          # Rename splash if present
           if (Test-Path "minai_plugin/splash.png") {
             Copy-Item -Path "minai_plugin/splash.png" -Destination "minai/fomod/images/minai_banner.png" -Force
           }
@@ -89,48 +90,61 @@ jobs:
       - name: Generate ModuleConfig.xml
         shell: pwsh
         run: |
-          # This EXACT snippet below uses <plugins> and <plugin>, as you requested
           $moduleConfig = @"
-          <?xml version='1.0' encoding='UTF-16'?>
-          <config xmlns:xsi='https://www.w3.org/2001/XMLSchema-instance'
-                  xsi:noNamespaceSchemaLocation='https://qconsulting.ca/fo3/ModConfig5.0.xsd'>
+          <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:noNamespaceSchemaLocation="http://qconsulting.ca/fo3/ModConfig5.0.xsd">
           
             <moduleName>MinAI FOMOD Installer</moduleName>
           
-            <!-- Automatically install all core files -->
+            <!-- Optionally install all core files automatically -->
             <requiredInstallFiles>
-              <folder source='000 Required - Core Files' destination='' priority='0'/>
+              <folder source="000 Required - Core Files" destination="" priority="0"/>
             </requiredInstallFiles>
           
-            <!-- Single install step with an image + 2 optional groups (TNTR + Mantella) -->
-            <installSteps order='Explicit'>
-              <installStep name='Optional Integrations'>
-                <image path='fomod/images/minai_banner.png'/>
-                <optionalFileGroups>
-                  <!-- Group #1: TNTR v0.5 Patch -->
-                  <group name='TNTR Support' type='SelectAny'>
-                    <plugins order='Explicit'>
-                      <plugin name='TNTR v0.5 Patch'>
+            <installSteps order="Explicit">
+              <installStep name="Optional Integrations">
+                <!-- 
+                  If you want one big image at the top, place it here:
+                  <image path="fomod/images/minai_banner.png"/>
+                -->
+                <optionalFileGroups order="Explicit">
+          
+                  <!-- Group #1: TNTR Support -->
+                  <group name="TNTR Support" type="SelectAny">
+                    <plugins order="Explicit">
+                      <plugin name="TNTR v0.5 Patch">
                         <description>Select this option to install a patch to support TNTR v0.5</description>
+                        <!-- Per-plugin image (optional) -->
+                        <image path="fomod/images/minai_banner.png"/>
                         <files>
-                          <folder source='200 Optional - BakaScripts' destination='Scripts' priority='1'/>
+                          <folder source="200 Optional - BakaScripts" destination="Scripts" priority="1"/>
                         </files>
+                        <typeDescriptor>
+                          <type name="Optional"/>
+                        </typeDescriptor>
                       </plugin>
                     </plugins>
                   </group>
           
                   <!-- Group #2: Mantella Files -->
-                  <group name='Mantella Files' type='SelectAny'>
-                    <plugins order='Explicit'>
-                      <plugin name='Install mantella_files'>
+                  <group name="Mantella Files" type="SelectAny">
+                    <plugins order="Explicit">
+                      <plugin name="Install mantella_files">
                         <description>Install optional files for Mantella Support</description>
+                        <!-- Another per-plugin image if you want:
+                             <image path="fomod/images/mantella_banner.png"/>
+                        -->
                         <files>
-                          <!-- Installs 300 Optional - Mantella to Data/ -->
-                          <folder source='300 Optional - Mantella' destination='' priority='2'/>
+                          <!-- Installs 300 Optional - Mantella to Data -->
+                          <folder source="300 Optional - Mantella" destination="" priority="2"/>
                         </files>
+                        <typeDescriptor>
+                          <type name="Optional"/>
+                        </typeDescriptor>
                       </plugin>
                     </plugins>
                   </group>
+          
                 </optionalFileGroups>
               </installStep>
             </installSteps>

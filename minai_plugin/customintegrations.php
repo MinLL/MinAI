@@ -223,8 +223,13 @@ function ProcessIntegrations() {
     if (isset($GLOBALS["gameRequest"]) && strpos($GLOBALS["gameRequest"][0], "minai_tntr_") === 0) {
         if (ShouldBlockTNTREvent($GLOBALS["gameRequest"][0])) {
             error_log("minai: Blocking TNTR event: {$GLOBALS["gameRequest"][0]}");
-            die('X-CUSTOM-CLOSE');
+            $MUST_DIE=true;
         }
+    }
+
+    if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "storetattoodesc") {
+        error_log("minai: Processing storetattoodesc event");
+        $MUST_DIE=true;
     }
 
     if ($MUST_DIE) {
