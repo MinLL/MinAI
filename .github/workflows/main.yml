@@ -13,7 +13,7 @@ jobs:
   build:
     runs-on: windows-latest
     
-    # Define REF_NAME as an environment variable for the entire job
+    # Defines REF_NAME as an environment variable for the job
     env:
       REF_NAME: ${{ github.ref_name }}
 
@@ -23,31 +23,30 @@ jobs:
 
       - name: Create BAIN folders and move files
         run: |
-          # Create the primary packaging folder and BAIN subfolders
+          # Create the main folder and subfolders
           mkdir minai
           mkdir "minai/000 Required - Core Files"
           mkdir "minai/200 Optional - BakaScripts"
           mkdir "minai/300 Optional - Mantella"
 
-          # Move core files into 000 Required - Core Files
+          # Move core files -> 000 Required - Core Files
           Move-Item -Path Scripts -Destination "minai/000 Required - Core Files" -Force -ErrorAction SilentlyContinue
           Move-Item -Path Data -Destination "minai/000 Required - Core Files" -Force -ErrorAction SilentlyContinue
           Move-Item -Path *.esp -Destination "minai/000 Required - Core Files" -Force -ErrorAction SilentlyContinue
           Move-Item -Path *.ini -Destination "minai/000 Required - Core Files" -Force -ErrorAction SilentlyContinue
 
-          # Move Baka scripts (if any) into 200 Optional - BakaScripts
+          # Move Baka scripts (Baka*.pex) -> 200 Optional - BakaScripts
           if (Test-Path "minai/000 Required - Core Files/Scripts") {
             Get-ChildItem -Path "minai/000 Required - Core Files/Scripts" -Filter "Baka*.pex" -Recurse -File |
               Move-Item -Destination "minai/200 Optional - BakaScripts" -Force
           }
 
-          # Move mantella_files into 300 Optional - Mantella
+          # Move mantella_files -> 300 Optional - Mantella
           Move-Item -Path mantella_files -Destination "minai/300 Optional - Mantella" -Force -ErrorAction SilentlyContinue
 
-      - name: Create and populate fomod folder
+      - name: Create and populate fomod/images
         run: |
           mkdir -p "minai/fomod/images"
-          # Copy splash image if present
           if (Test-Path "minai_plugin/splash.png") {
             Copy-Item -Path "minai_plugin/splash.png" -Destination "minai/fomod/images/minai_banner.png" -Force
           }
@@ -90,6 +89,7 @@ jobs:
       - name: Generate ModuleConfig.xml
         shell: pwsh
         run: |
+          # This EXACT snippet below uses <plugins> and <plugin>, as you requested
           $moduleConfig = @"
           <?xml version='1.0' encoding='UTF-16'?>
           <config xmlns:xsi='https://www.w3.org/2001/XMLSchema-instance'
@@ -105,35 +105,32 @@ jobs:
             <!-- Single install step with an image + 2 optional groups (TNTR + Mantella) -->
             <installSteps order='Explicit'>
               <installStep name='Optional Integrations'>
-                <!-- Fixed image path:  "images/minai_banner.png" -->
-                <image path='images/minai_banner.png'/>
+                <image path='fomod/images/minai_banner.png'/>
                 <optionalFileGroups>
-                
                   <!-- Group #1: TNTR v0.5 Patch -->
-                  <group name='TNTR v0.5 Patch' type='SelectAny'>
-                    <option name='Install TNTR Baka Scripts'>
-                      <files>
-                        <folder source='200 Optional - BakaScripts' destination='Scripts' priority='1'/>
-                      </files>
-                      <description><![CDATA[
-          Installs Baka .pex files into Scripts for TNTR v0.5.
-          ]]></description>
-                    </option>
+                  <group name='TNTR Support' type='SelectAny'>
+                    <plugins order='Explicit'>
+                      <plugin name='TNTR v0.5 Patch'>
+                        <description>Select this option to install a patch to support TNTR v0.5</description>
+                        <files>
+                          <folder source='200 Optional - BakaScripts' destination='Scripts' priority='1'/>
+                        </files>
+                      </plugin>
+                    </plugins>
                   </group>
           
                   <!-- Group #2: Mantella Files -->
                   <group name='Mantella Files' type='SelectAny'>
-                    <option name='Install mantella_files'>
-                      <files>
-                        <!-- Installs 300 Optional - Mantella to Data/ -->
-                        <folder source='300 Optional - Mantella' destination='' priority='2'/>
-                      </files>
-                      <description><![CDATA[
-          Optional Mantella integration files.
-          ]]></description>
-                    </option>
+                    <plugins order='Explicit'>
+                      <plugin name='Install mantella_files'>
+                        <description>Install optional files for Mantella Support</description>
+                        <files>
+                          <!-- Installs 300 Optional - Mantella to Data/ -->
+                          <folder source='300 Optional - Mantella' destination='' priority='2'/>
+                        </files>
+                      </plugin>
+                    </plugins>
                   </group>
-          
                 </optionalFileGroups>
               </installStep>
             </installSteps>
