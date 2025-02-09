@@ -166,7 +166,8 @@ Function GetClothingContext($name) {
     $ret .= "{$name} is wearing {$eqContext["context"]}";
   } elseif (IsEnabled($name, "isNaked")) {
     $ret .= "{$name} is naked and exposed.\n";
-  } elseif (!empty($cuirass)) {
+  } 
+  elseif (!empty($cuirass)) {
     $ret .= "{$name} is wearing {$cuirass}.\n";
   }
 

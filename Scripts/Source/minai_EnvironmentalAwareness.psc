@@ -141,6 +141,7 @@ EndFunction
 
 function SetContext(actor akActor)
   string an = Main.GetActorName(akActor)
+  MinaiUtil.Info("Environmental Awareness SetContex 001 :: " + an)
   if(akActor == playerRef)
     string envDescription = GetDayState()
     if(envDescription)
@@ -199,8 +200,14 @@ function SetContext(actor akActor)
 
   ; if name not in list yet lets do some sets of stuff, like family
   ; except for the oddity that is certain family rearing mods where children can grow
-  int r = Utility.RandomInt(0,20)
+  int r = PO3_SKSEFunctions.GenerateRandomInt(0,20)
+
   bool bNotInList = (JMap.getInt(iActorMap , an) != 1)
+  string wasInList = an + " was in the list!"
+  if(bNotInList) 
+    wasInList = an + " was NOT in list"
+  endIf
+  MinaiUtil.Info("Environmental Awareness SetContext 002 :: "  + wasInList)
 
   ; the player's data can change pretty often, and so can a follower's
   ; even player's height/race/sex/gender, so run it half the time rather than 1 in 20
@@ -208,10 +215,11 @@ function SetContext(actor akActor)
   if bIsPlayerOrFollower
     r += 9
   endif 
-
+  r += 100 ; debuggin
   if(bNotInList||r>19)
     if(bNotInList)
       JMap.setInt(iActorMap, an, 1)
+      MinaiUtil.Info("Environmental Awareness SetContext 003 added :: "  + an)
     EndIf
 
    
@@ -299,21 +307,8 @@ function SetContext(actor akActor)
       IsLightArmor = torsoArmor.IsLightArmor()
       richClothes = torsoArmor.IsClothingRich()
       poorClothes = torsoArmor.IsClothingPoor()
-    else 
-      torso = " nothing"  
-    endIf
-    if(helmetArmor)
-      helmet = " " + helmetArmor.GetName()
-    endIf
-    if(shoesArmor)
-      shoes = " " + shoesArmor.GetName()
-    else
-      shoes = " no shoes"
-    endIf
-    if(shieldArmor)
-      shield = " " + shieldArmor.GetName()
-    endIf
 
+    endIf
 
     string wealthText = ""
 
@@ -323,21 +318,8 @@ function SetContext(actor akActor)
       wealthText = " cheap"
     EndIf
 
-    string armorWeight = ""
-    if(IsLightArmor)
-      armorWeight = " light"
-    elseif(IsHeavyArmor)
-      armorWeight = " heavy"
-    endif
-
-    string clothes = ", wearing" + wealthText + armorWeight + torso + ", " + shoes
-    if(helmet)
-      clothes += ", a " + helmet 
-    endif
-    if(shield)
-      clothes +=  " and a " + shield
-    endif
-    staticData += clothes
+   
+    staticData += an + " is wearing " + wealthText + " clothes. "
 
     if(!bHasFrostfall || playerRef != akActor)
       float actorsWarmth = akActor.GetWarmthRating()
