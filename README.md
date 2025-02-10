@@ -61,15 +61,13 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
 This mod enables a number of optional [nsfw](https://github.com/MinLL/MinAI/blob/main/nsfw.md) integrations that are disabled by default. These will not effect your game unless you have the nsfw mods installed.
 
 # Installation
-## Hard Requirements
-* This mod requires a functional installation of either CHIM, Mantella, or both (and their respective dependencies). DO THIS FIRST and seek assistance in those forums. When you are up and running well, return here and continue installation as follows:
-* Papyrus Tweaks is required. Install the version appropriate for your game (SE/AE/VR).
-* Requires the latest version of JContainers.
-* Requires the latest version of Papyrus Extender.
-
-## Soft Requirements
+## Requirements
+* This mod requires a functional installation of either [CHIM](https://www.nexusmods.com/skyrimspecialedition/mods/126330), [Mantella](https://www.nexusmods.com/skyrimspecialedition/mods/98631), or both (and their respective dependencies). DO THIS FIRST and seek assistance in those forums. When you are up and running well, return here and continue installation as follows:
+* [Papyrus Tweaks NG](https://www.nexusmods.com/skyrimspecialedition/mods/77779).
+* [JContainers SE](https://www.nexusmods.com/skyrimspecialedition/mods/16495).
+* [powerofthree's Papyrus Extender](https://www.nexusmods.com/skyrimspecialedition/mods/22854). (VR: also install [Papyrus Extender VR](https://www.nexusmods.com/skyrimspecialedition/mods/58296))
+* [Spell Perk Item Distributor (SPID)](https://www.nexusmods.com/skyrimspecialedition/mods/36869), if using MinAI's Sapience feature. (VR: [Spell Perk Item Distributor (SPID) VR](https://www.nexusmods.com/skyrimspecialedition/mods/59121))
 * See the features section. All supported mods are soft requirements. 
-* Sapience requires SPID in order to function.
 
 ## Installation Steps (CHIM)
 * Download and install this mod through your mod organizer of choice.
