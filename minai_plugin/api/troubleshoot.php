@@ -9,11 +9,8 @@ require_once($serverRoot . '/connector/openrouter.php');
 
 $logDir = realpath($serverRoot . '/log/');
 
-error_log("Troubleshooter: Starting request handling");
-
 // Function to safely get real path even for symlinks
 function getSafePath($base, $path) {
-    error_log("Troubleshooter: Getting safe path for $path in $base");
     $realBase = realpath($base);
     $fullPath = realpath($base . DIRECTORY_SEPARATOR . $path);
     
@@ -21,14 +18,12 @@ function getSafePath($base, $path) {
     if ($path === 'apache_error.log') {
         $apacheLogPath = '/var/log/apache2/error.log';
         if (file_exists($apacheLogPath) && is_readable($apacheLogPath)) {
-            error_log("Troubleshooter: Using system Apache error log: $apacheLogPath");
             return $apacheLogPath;
         }
     }
     
     if (is_link($base . DIRECTORY_SEPARATOR . $path)) {
         $fullPath = realpath(readlink($base . DIRECTORY_SEPARATOR . $path));
-        error_log("Troubleshooter: Path is symlink, resolved to: $fullPath");
     }
     
     if ($fullPath === false || (strpos($fullPath, $realBase) !== 0 && $path !== 'apache_error.log')) {
@@ -42,7 +37,6 @@ function getSafePath($base, $path) {
 // Get the latest context, output and error logs
 function getLatestInteraction() {
     global $logDir;
-    error_log("Troubleshooter: Fetching latest interaction and error logs");
     
     $contextPath = getSafePath($logDir, 'context_sent_to_llm.log');
     $outputPath = getSafePath($logDir, 'output_from_llm.log');
@@ -60,10 +54,6 @@ function getLatestInteraction() {
     $errorLines = array_slice(array_filter(explode("\n", file_get_contents($errorPath))), -40);
     $errorLog = implode("\n", $errorLines);
     
-    error_log("Troubleshooter: Raw context length: " . strlen($context));
-    error_log("Troubleshooter: Raw output length: " . strlen($output));
-    error_log("Troubleshooter: Error log lines: " . count($errorLines));
-    
     // Get the last interaction from context
     $contextParts = array_filter(explode("\n=\n", $context));
     $lastContext = end($contextParts);
@@ -72,17 +62,15 @@ function getLatestInteraction() {
     $outputParts = array_filter(explode("\n==\n", $output));
     $lastOutputBlock = end($outputParts);
     
-    error_log("Troubleshooter: Last output block: " . $lastOutputBlock);
-    
     // Extract just the JSON content (between START and END timestamps)
     if (preg_match('/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2}) START\n\s*(\{.*\})\s*\n.*?(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2}) END/s', 
         $lastOutputBlock, $matches)) {
         $startTime = $matches[1];
         $lastOutput = $matches[2];
         $endTime = $matches[3];
-        error_log("Troubleshooter: Successfully extracted JSON from output");
+        error_log("Troubleshooter: Found interaction from $startTime to $endTime");
     } else {
-        error_log("Troubleshooter: Failed to extract JSON from output block");
+        error_log("Troubleshooter: Failed to extract interaction timestamps from output");
         $lastOutput = '';
         $startTime = '';
         $endTime = '';
@@ -107,8 +95,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         $question = $data['question'] ?? '';
-        error_log("Troubleshooter: Received question: " . $question);
-        
         if (empty($question)) {
             throw new Exception('Question is required');
         }
@@ -118,8 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception('Could not retrieve latest interaction');
         }
         
-        error_log("Troubleshooter: Retrieved interaction - Context length: " . strlen($interaction['context']) . 
-                 ", Output length: " . strlen($interaction['output']));
+        error_log("Troubleshooter: Analyzing interaction - Question: $question");
         
         // Prepare the prompt for the troubleshooting LLM
         $systemPrompt = 'You are a helpful AI assistant that analyzes LLM interactions to help troubleshoot and explain the behavior of an AI system. ' . 
@@ -135,9 +120,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                      "End Time: {$interaction['timestamps']['output_end']}\n\n" .
                      "Recent error logs:\n```\n{$interaction['error_log']}\n```\n\n" .
                      "Question: {$question}";
-        
-        error_log("Troubleshooter: System prompt length: " . strlen($systemPrompt));
-        error_log("Troubleshooter: User prompt length: " . strlen($userPrompt));
         
         $prompt = [
             ['role' => 'system', 'content' => $systemPrompt],
@@ -161,8 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'stream' => false
         ];
         
-        error_log("Troubleshooter: Sending request to OpenRouter");
-        error_log("Troubleshooter: Request data: " . json_encode($data, JSON_PRETTY_PRINT));
+        error_log("Troubleshooter: Sending request to OpenRouter for analysis");
         
         $options = [
             'http' => [
@@ -177,11 +158,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $result = file_get_contents($url, false, $context);
         
         if ($result === false) {
-            error_log("Troubleshooter: Failed to get response from OpenRouter");
             throw new Exception('Failed to get analysis from OpenRouter');
         }
-        
-        error_log("Troubleshooter: Received response from OpenRouter: " . $result);
         
         $response = json_decode($result, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
@@ -189,7 +167,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         $analysis = $response['choices'][0]['message']['content'];
-        error_log("Troubleshooter: Analysis length: " . strlen($analysis));
+        error_log("Troubleshooter: Analysis completed successfully");
         
         echo json_encode([
             'analysis' => $analysis,
@@ -206,7 +184,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode(['error' => $e->getMessage()]);
     }
 } else {
-    error_log("Troubleshooter: Invalid request method: " . $_SERVER['REQUEST_METHOD']);
     http_response_code(405);
     echo json_encode(['error' => 'Method not allowed. Received: ' . $_SERVER['REQUEST_METHOD']]);
 }

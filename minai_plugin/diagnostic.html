@@ -288,21 +288,23 @@
 
         .troubleshoot-panel {
             position: fixed;
+            left: 50%;
             bottom: 40px;
-            right: 40px;
+            transform: translateX(-50%);
             background: var(--background-light);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 15px;
-            width: 400px;
-            min-width: 300px;
-            min-height: 200px;
+            width: 600px; /* Fixed width */
+            height: 500px; /* Fixed height */
             max-width: 90vw;
             max-height: 80vh;
-            display: none;
+            display: flex;
+            flex-direction: column;
             z-index: 1000;
             resize: none;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
         }
         
         .resize-handle {
@@ -336,15 +338,65 @@
         }
         
         .troubleshoot-content {
-            height: calc(100% - 100px);
+            flex: 1;
             overflow-y: auto;
-            margin-bottom: 10px;
-            white-space: pre-wrap;
+            padding: 15px;
+            margin: 0;
             word-wrap: break-word;
-            font-family: monospace;
-            position: relative; /* For loading overlay */
+            white-space: pre-wrap;
+            min-height: 0;
+            position: relative;
         }
         
+        .troubleshoot-content pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-x: auto;
+            max-width: 100%;
+            background: var(--background-dark);
+            padding: 10px;
+            border-radius: 4px;
+            margin: 5px 0;
+        }
+        
+        .troubleshoot-content details {
+            margin: 10px 0;
+            background: var(--background-dark);
+            padding: 10px;
+            border-radius: 4px;
+        }
+        
+        .troubleshoot-content details summary {
+            cursor: pointer;
+            padding: 5px;
+            margin: -5px;
+        }
+        
+        .troubleshoot-content details summary:hover {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+        
+        .troubleshoot-input-container {
+            position: relative;
+            background: var(--background-light);
+            padding: 15px;
+            border-top: 1px solid var(--border-color);
+            margin: 0 -15px -15px -15px;
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        
+        .troubleshoot-input {
+            flex: 1;
+            background: var(--background-dark);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px;
+            border-radius: 4px;
+        }
+
         .loading-overlay {
             position: absolute;
             top: 0;
@@ -380,34 +432,30 @@
             100% { transform: rotate(360deg); }
         }
         
-        .troubleshoot-button {
-            position: relative;
-            min-width: 80px;
-        }
-        
-        .troubleshoot-button:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        
-        .troubleshoot-input-container {
-            position: sticky;
-            bottom: 0;
-            background: var(--background-light);
-            padding-top: 10px;
-            border-top: 1px solid var(--border-color);
-            margin: 0 -15px;
-            padding: 15px;
-        }
-        
-        .troubleshoot-input {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            background: var(--background-dark);
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
+        .status-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 12px;
+            padding: 4px 8px;
             border-radius: 4px;
+            background: var(--background-dark);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .status-indicator.visible {
+            opacity: 1;
+        }
+        
+        .status-indicator.error {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+        }
+        
+        .status-indicator.success {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
         }
     </style>
 </head>
@@ -446,6 +494,7 @@
                 <button onclick="toggleTroubleshoot(false)">Close</button>
             </div>
         </div>
+        <div class="status-indicator"></div>
         <div class="troubleshoot-content"></div>
         <div class="troubleshoot-input-container">
             <input type="text" class="troubleshoot-input" placeholder="Ask a question about the latest interaction...">
@@ -1014,6 +1063,7 @@
             const input = document.querySelector('.troubleshoot-input');
             const content = document.querySelector('.troubleshoot-content');
             const button = document.querySelector('.troubleshoot-button');
+            const statusIndicator = document.querySelector('.status-indicator');
             const question = input.value.trim();
             
             if (!question) return;
@@ -1021,6 +1071,14 @@
             // Disable input and button
             input.disabled = true;
             button.disabled = true;
+            
+            // Start timer
+            const startTime = Date.now();
+            const updateTimer = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                statusIndicator.textContent = `Request in progress (${elapsed}s)`;
+                statusIndicator.className = 'status-indicator visible';
+            }, 1000);
             
             // Show loading overlay
             content.innerHTML = `
@@ -1034,14 +1092,20 @@
             `;
             
             try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
+                
                 const response = await fetch('api/troubleshoot.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     },
-                    body: JSON.stringify({ question: question })
+                    body: JSON.stringify({ question: question }),
+                    signal: controller.signal
                 });
+                
+                clearTimeout(timeoutId);
                 
                 if (!response.ok) {
                     const errorData = await response.json();
@@ -1049,6 +1113,13 @@
                 }
                 
                 const data = await response.json();
+                
+                // Show success status briefly
+                statusIndicator.textContent = `Request completed in ${Math.floor((Date.now() - startTime) / 1000)}s`;
+                statusIndicator.className = 'status-indicator visible success';
+                setTimeout(() => {
+                    statusIndicator.className = 'status-indicator';
+                }, 3000);
                 
                 content.innerHTML = `
                     <div style="margin-bottom: 15px;">
@@ -1071,9 +1142,13 @@
                     </div>
                 `;
                 
-                input.value = '';
-                
             } catch (error) {
+                // Show error status
+                statusIndicator.textContent = error.name === 'AbortError' ? 
+                    'Request timed out after 60s' : 
+                    'Request failed';
+                statusIndicator.className = 'status-indicator visible error';
+                
                 content.innerHTML = `
                     <div style="color: #f44336; padding: 15px; background: rgba(244, 67, 54, 0.1); border-radius: 4px;">
                         <strong>Error:</strong> ${error.message}<br>
@@ -1081,7 +1156,9 @@
                     </div>
                 `;
                 console.error('Troubleshooter error:', error);
+                
             } finally {
+                clearInterval(updateTimer);
                 // Re-enable input and button
                 input.disabled = false;
                 button.disabled = false;
@@ -1105,13 +1182,25 @@
             });
         }, 1000);
 
+        function resetTroubleshootSize() {
+            const panel = document.querySelector('.troubleshoot-panel');
+            panel.style.width = '600px';
+            panel.style.height = '500px';
+            panel.style.left = '50%';
+            panel.style.bottom = '40px';
+            panel.style.transform = 'translateX(-50%)';
+            panel.style.right = 'auto';
+            panel.style.top = 'auto';
+            localStorage.removeItem('troubleshootSize');
+        }
+        
         function initTroubleshootPanel() {
             const panel = document.querySelector('.troubleshoot-panel');
             const header = panel.querySelector('.troubleshoot-header');
             const resizeHandle = panel.querySelector('.resize-handle');
             let isResizing = false;
             let isDragging = false;
-            let startX, startY, startWidth, startHeight, startLeft, startTop;
+            let startX, startY, startWidth, startHeight, startLeft;
             
             // Load saved size and position
             const savedSize = JSON.parse(localStorage.getItem('troubleshootSize') || '{}');
@@ -1119,11 +1208,9 @@
                 panel.style.width = savedSize.width + 'px';
                 panel.style.height = savedSize.height + 'px';
             }
-            if (savedSize.left && savedSize.top) {
+            if (savedSize.left) {
                 panel.style.left = savedSize.left + 'px';
-                panel.style.right = 'auto';
-                panel.style.top = savedSize.top + 'px';
-                panel.style.bottom = 'auto';
+                panel.style.transform = 'none';
             }
             
             // Resize functionality
@@ -1134,26 +1221,44 @@
                 startWidth = panel.offsetWidth;
                 startHeight = panel.offsetHeight;
                 startLeft = panel.offsetLeft;
-                startTop = panel.offsetTop;
                 e.preventDefault();
             });
             
+            // Drag functionality - constrained to bottom
+            header.addEventListener('mousedown', (e) => {
+                if (e.target === header || e.target.parentElement === header) {
+                    isDragging = true;
+                    startX = e.clientX;
+                    startLeft = panel.offsetLeft;
+                    panel.style.transform = 'none';
+                }
+            });
+            
             document.addEventListener('mousemove', (e) => {
-                if (!isResizing) return;
-                
-                const dx = startX - e.clientX;
-                const dy = startY - e.clientY;
-                
-                const newWidth = startWidth + dx;
-                const newHeight = startHeight + dy;
-                const newLeft = startLeft - dx;
-                const newTop = startTop - dy;
-                
-                if (newWidth >= 300 && newHeight >= 200) {
-                    panel.style.width = newWidth + 'px';
-                    panel.style.height = newHeight + 'px';
-                    panel.style.left = newLeft + 'px';
-                    panel.style.top = newTop + 'px';
+                if (isResizing) {
+                    const dx = startX - e.clientX;
+                    const dy = startY - e.clientY;
+                    
+                    const newWidth = startWidth + dx;
+                    const newHeight = startHeight + dy;
+                    const newLeft = startLeft - dx;
+                    
+                    // Enforce minimum and maximum sizes
+                    if (newWidth >= 300 && newWidth <= window.innerWidth * 0.9) {
+                        panel.style.width = newWidth + 'px';
+                        panel.style.left = newLeft + 'px';
+                    }
+                    if (newHeight >= 200 && newHeight <= window.innerHeight * 0.8) {
+                        panel.style.height = newHeight + 'px';
+                    }
+                } else if (isDragging) {
+                    const dx = e.clientX - startX;
+                    const newLeft = startLeft + dx;
+                    
+                    // Keep panel within window bounds
+                    if (newLeft >= 0 && newLeft + panel.offsetWidth <= window.innerWidth) {
+                        panel.style.left = newLeft + 'px';
+                    }
                 }
             });
             
@@ -1162,46 +1267,12 @@
                     localStorage.setItem('troubleshootSize', JSON.stringify({
                         width: panel.offsetWidth,
                         height: panel.offsetHeight,
-                        left: panel.offsetLeft,
-                        top: panel.offsetTop
+                        left: panel.offsetLeft
                     }));
                 }
                 isResizing = false;
                 isDragging = false;
             });
-            
-            // Dragging functionality
-            header.addEventListener('mousedown', (e) => {
-                if (e.target === header || e.target.parentElement === header) {
-                    isDragging = true;
-                    startX = e.clientX;
-                    startY = e.clientY;
-                    startLeft = panel.offsetLeft;
-                    startTop = panel.offsetTop;
-                }
-            });
-            
-            document.addEventListener('mousemove', (e) => {
-                if (isDragging) {
-                    const dx = e.clientX - startX;
-                    const dy = e.clientY - startY;
-                    panel.style.left = (startLeft + dx) + 'px';
-                    panel.style.top = (startTop + dy) + 'px';
-                    panel.style.right = 'auto';
-                    panel.style.bottom = 'auto';
-                }
-            });
-        }
-        
-        function resetTroubleshootSize() {
-            const panel = document.querySelector('.troubleshoot-panel');
-            panel.style.width = '400px';
-            panel.style.height = 'auto';
-            panel.style.right = '20px';
-            panel.style.bottom = '20px';
-            panel.style.left = 'auto';
-            panel.style.top = 'auto';
-            localStorage.removeItem('troubleshootSize');
         }
         
         // Initialize the panel when the page loads
