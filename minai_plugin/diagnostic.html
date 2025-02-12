@@ -285,12 +285,139 @@
         .download-button:hover {
             background-color: #45a049;
         }
+
+        .troubleshoot-panel {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            background: var(--background-light);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            width: 400px;
+            min-width: 300px;
+            min-height: 200px;
+            max-width: 90vw;
+            max-height: 80vh;
+            display: none;
+            z-index: 1000;
+            resize: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .resize-handle {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            cursor: nw-resize;
+            z-index: 1001;
+        }
+        
+        .resize-handle::before {
+            content: '';
+            position: absolute;
+            left: 4px;
+            top: 4px;
+            width: 6px;
+            height: 6px;
+            border-left: 2px solid var(--text-color);
+            border-top: 2px solid var(--text-color);
+            opacity: 0.5;
+        }
+        
+        .troubleshoot-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            cursor: move; /* Show move cursor for drag handle */
+        }
+        
+        .troubleshoot-content {
+            height: calc(100% - 100px);
+            overflow-y: auto;
+            margin-bottom: 10px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: monospace;
+            position: relative; /* For loading overlay */
+        }
+        
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1002;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 10px;
+        }
+        
+        .loading-text {
+            color: var(--text-color);
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .troubleshoot-button {
+            position: relative;
+            min-width: 80px;
+        }
+        
+        .troubleshoot-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .troubleshoot-input-container {
+            position: sticky;
+            bottom: 0;
+            background: var(--background-light);
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+            margin: 0 -15px;
+            padding: 15px;
+        }
+        
+        .troubleshoot-input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            background: var(--background-dark);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
     <div class="nav-panel">
         <a href="index.html">Return to Home</a>
         <a href="https://github.com/MinLL/MinAI">Documentation</a>
+        <button onclick="toggleTroubleshoot()" style="margin-left: auto">
+            Troubleshoot
+        </button>
     </div>
 
     <div class="log-selector-controls">
@@ -308,6 +435,22 @@
 
     <div class="log-container" id="logContainer">
         <!-- Log viewers will be dynamically added here -->
+    </div>
+
+    <div class="troubleshoot-panel">
+        <div class="resize-handle"></div>
+        <div class="troubleshoot-header">
+            <span>Troubleshoot Assistant</span>
+            <div class="log-controls">
+                <button onclick="resetTroubleshootSize()">Reset Size</button>
+                <button onclick="toggleTroubleshoot(false)">Close</button>
+            </div>
+        </div>
+        <div class="troubleshoot-content"></div>
+        <div class="troubleshoot-input-container">
+            <input type="text" class="troubleshoot-input" placeholder="Ask a question about the latest interaction...">
+            <button class="troubleshoot-button" onclick="askQuestion()">Ask</button>
+        </div>
     </div>
 
     <script>
@@ -852,6 +995,97 @@
             document.body.removeChild(link);
         }
 
+        function toggleTroubleshoot(show = true) {
+            const panel = document.querySelector('.troubleshoot-panel');
+            panel.style.display = show ? 'block' : 'none';
+        }
+        
+        async function askQuestion() {
+            const input = document.querySelector('.troubleshoot-input');
+            const content = document.querySelector('.troubleshoot-content');
+            const button = document.querySelector('.troubleshoot-button');
+            const question = input.value.trim();
+            
+            if (!question) return;
+            
+            // Disable input and button
+            input.disabled = true;
+            button.disabled = true;
+            
+            // Show loading overlay
+            content.innerHTML = `
+                <div class="loading-overlay">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">
+                        Analyzing interaction...<br>
+                        <small>This may take a few moments</small>
+                    </div>
+                </div>
+            `;
+            
+            try {
+                const response = await fetch('api/troubleshoot.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ question: question })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                content.innerHTML = `
+                    <div style="margin-bottom: 15px;">
+                        <strong>Question:</strong> ${question}<br><br>
+                        <strong>Analysis:</strong> ${data.analysis}<br><br>
+                        <details>
+                            <summary>Show Context and Output</summary>
+                            <div style="margin-top: 10px;">
+                                <strong>Context:</strong><br>
+                                <pre>${data.context}</pre><br>
+                                <strong>Output:</strong><br>
+                                <div class="timestamp">Start: ${data.timestamps.output_start}</div>
+                                <pre>${data.output}</pre>
+                                <div class="timestamp">End: ${data.timestamps.output_end}</div>
+                                <br>
+                                <strong>Recent Error Logs:</strong><br>
+                                <pre class="error-log">${data.error_log}</pre>
+                            </div>
+                        </details>
+                    </div>
+                `;
+                
+                input.value = '';
+                
+            } catch (error) {
+                content.innerHTML = `
+                    <div style="color: #f44336; padding: 15px; background: rgba(244, 67, 54, 0.1); border-radius: 4px;">
+                        <strong>Error:</strong> ${error.message}<br>
+                        <small>Please try again or check the error logs for more details.</small>
+                    </div>
+                `;
+                console.error('Troubleshooter error:', error);
+            } finally {
+                // Re-enable input and button
+                input.disabled = false;
+                button.disabled = false;
+                input.focus();
+            }
+        }
+
+        // Add enter key support for the input
+        document.querySelector('.troubleshoot-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                askQuestion();
+            }
+        });
+
         fetchLogFiles();
         
         setInterval(() => {
@@ -860,6 +1094,108 @@
                 if (config) fetchAndUpdateLog(config);
             });
         }, 1000);
+
+        function initTroubleshootPanel() {
+            const panel = document.querySelector('.troubleshoot-panel');
+            const header = panel.querySelector('.troubleshoot-header');
+            const resizeHandle = panel.querySelector('.resize-handle');
+            let isResizing = false;
+            let isDragging = false;
+            let startX, startY, startWidth, startHeight, startLeft, startTop;
+            
+            // Load saved size and position
+            const savedSize = JSON.parse(localStorage.getItem('troubleshootSize') || '{}');
+            if (savedSize.width) {
+                panel.style.width = savedSize.width + 'px';
+                panel.style.height = savedSize.height + 'px';
+            }
+            if (savedSize.left && savedSize.top) {
+                panel.style.left = savedSize.left + 'px';
+                panel.style.right = 'auto';
+                panel.style.top = savedSize.top + 'px';
+                panel.style.bottom = 'auto';
+            }
+            
+            // Resize functionality
+            resizeHandle.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                startWidth = panel.offsetWidth;
+                startHeight = panel.offsetHeight;
+                startLeft = panel.offsetLeft;
+                startTop = panel.offsetTop;
+                e.preventDefault();
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (!isResizing) return;
+                
+                const dx = startX - e.clientX;
+                const dy = startY - e.clientY;
+                
+                const newWidth = startWidth + dx;
+                const newHeight = startHeight + dy;
+                const newLeft = startLeft - dx;
+                const newTop = startTop - dy;
+                
+                if (newWidth >= 300 && newHeight >= 200) {
+                    panel.style.width = newWidth + 'px';
+                    panel.style.height = newHeight + 'px';
+                    panel.style.left = newLeft + 'px';
+                    panel.style.top = newTop + 'px';
+                }
+            });
+            
+            document.addEventListener('mouseup', () => {
+                if (isResizing || isDragging) {
+                    localStorage.setItem('troubleshootSize', JSON.stringify({
+                        width: panel.offsetWidth,
+                        height: panel.offsetHeight,
+                        left: panel.offsetLeft,
+                        top: panel.offsetTop
+                    }));
+                }
+                isResizing = false;
+                isDragging = false;
+            });
+            
+            // Dragging functionality
+            header.addEventListener('mousedown', (e) => {
+                if (e.target === header || e.target.parentElement === header) {
+                    isDragging = true;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    startLeft = panel.offsetLeft;
+                    startTop = panel.offsetTop;
+                }
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    const dx = e.clientX - startX;
+                    const dy = e.clientY - startY;
+                    panel.style.left = (startLeft + dx) + 'px';
+                    panel.style.top = (startTop + dy) + 'px';
+                    panel.style.right = 'auto';
+                    panel.style.bottom = 'auto';
+                }
+            });
+        }
+        
+        function resetTroubleshootSize() {
+            const panel = document.querySelector('.troubleshoot-panel');
+            panel.style.width = '400px';
+            panel.style.height = 'auto';
+            panel.style.right = '20px';
+            panel.style.bottom = '20px';
+            panel.style.left = 'auto';
+            panel.style.top = 'auto';
+            localStorage.removeItem('troubleshootSize');
+        }
+        
+        // Initialize the panel when the page loads
+        document.addEventListener('DOMContentLoaded', initTroubleshootPanel);
     </script>
 </body>
 </html> 

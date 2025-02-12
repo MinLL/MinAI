@@ -123,7 +123,7 @@
 
     <div class="container">
         <h1>Welcome to the MinAI Configuration Page</h1>
-        <p>Manage your game settings, configuration, and more from here.</p>
+        <p>Manage your game settings, configuration, diagnose problems, and more from here.</p>
 
         <!-- Splash Image -->
         <img src="splash.png" alt="Splash Image" class="splash-image">
@@ -155,20 +155,21 @@
 
         <!-- Navigation Links -->
         <div class="links">
-            <a href="config.html">Configuration</a>
-            <a href="we_manager.html">Equipment Manager</a>
-	    <br />
-	    <div class="nsfw-options" id="nsfw-options" style="display:none;">
-	      <a href="personalities.html">Edit NPC Sex Personalities</a>
-	      <a href="scene_descriptions.html">Edit Sex Scene Descriptions</a>
-	    </div>
-	    <table>
-	      <tr><td>
-		  <a href="https://github.com/MinLL/MinAI/tree/main">Github</a>
-		  </td><td>
-		  <a href="/HerikaServer/">Back to Main AI-FF Page</a>
-	      </td></tr>
-	    </table>
+            <a href="config.html" class="cache-bust">Configuration</a>
+            <a href="diagnostic.html" class="cache-bust">Log Viewer & Troubleshooter</a>
+            <a href="we_manager.html" class="cache-bust">Equipment Manager</a>
+            <br />
+            <div class="nsfw-options" id="nsfw-options" style="display:none;">
+                <a href="personalities.html" class="cache-bust">Edit NPC Sex Personalities</a>
+                <a href="scene_descriptions.html" class="cache-bust">Edit Sex Scene Descriptions</a>
+            </div>
+            <table>
+                <tr><td>
+                    <a href="https://github.com/MinLL/MinAI/tree/main">Github</a>
+                    </td><td>
+                    <a href="/HerikaServer/" class="cache-bust">Back to Main AI-FF Page</a>
+                </td></tr>
+            </table>
         </div>
     </div>
 
@@ -316,6 +317,14 @@
                 nsfwOptionsDiv.style.display = 'block';  // Show the NSFW options div
             }
         };
+
+        // Add this to your existing script section
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add cache busting to all links with class 'cache-bust'
+            document.querySelectorAll('a.cache-bust').forEach(link => {
+                link.href = link.href + (link.href.includes('?') ? '&' : '?') + 'v=' + new Date().getTime();
+            });
+        });
     </script>
 
 </body>
