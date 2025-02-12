@@ -85,10 +85,37 @@
             padding: 10px;
             overflow-y: auto;
             font-family: monospace;
-            white-space: pre-wrap;
             font-size: 0.9em;
             will-change: transform;
             contain: content;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .log-viewer.nowrap .log-content {
+            white-space: pre;
+            overflow-x: auto;
+        }
+        
+        .log-viewer.wrap .log-content {
+            white-space: pre-wrap;
+            word-break: break-all;
+            overflow-x: hidden;
+        }
+        
+        .log-line {
+            display: block;
+            width: 100%;
+            white-space: inherit;
+        }
+        
+        .wrap-button {
+            opacity: 0.5;
+        }
+        
+        .wrap-button.active {
+            opacity: 1;
+            background-color: var(--primary-color);
         }
 
         .filter-container {
@@ -124,19 +151,41 @@
         .json-boolean { color: #569cd6; }
         .json-null { color: #569cd6; }
 
+        @keyframes timestampGradient {
+            0% {
+                background: rgba(86, 156, 214, 0.1);
+                color: #569cd6;
+            }
+            50% {
+                background: rgba(97, 175, 239, 0.1);
+                color: #61afef;
+            }
+            100% {
+                background: rgba(86, 156, 214, 0.1);
+                color: #569cd6;
+            }
+        }
+        
         .timestamp {
-            color: #569cd6;
+            color: #569cd6;  /* Consistent blue color */
             font-style: italic;
             padding: 2px 6px;
             background: rgba(86, 156, 214, 0.1);
             border-radius: 3px;
-            display: inline-block;
-            margin: 2px 0;
+            display: inline;
+            white-space: nowrap;
         }
         
-        .timestamp-label {
-            color: #9cdcfe;
-            font-weight: bold;
+        /* Update log components to ensure inline display */
+        .log-module, .log-pid, .log-client, .log-message {
+            white-space: nowrap;
+            display: inline;
+        }
+        
+        /* Container for log line to prevent unwanted breaks */
+        .log-line {
+            white-space: pre;
+            display: block;
         }
 
         .error { color: #f44336; }
@@ -481,8 +530,66 @@
             color: #ce9178; /* Light orange */
         }
         
-        .log-client {
-            color: #9cdcfe; /* Light blue */
+        .log-level-notice {
+            color: #4CAF50; /* Green */
+        }
+        
+        .log-level-warn {
+            color: #ffc107; /* Yellow */
+        }
+        
+        .log-level-error {
+            color: #f44336; /* Red */
+        }
+        
+        
+        
+        .log-message {
+            color: var(--text-color) !important;
+            display: inline;
+            white-space: inherit;
+            word-break: break-word;
+        }
+
+        /* Line highlighting for error/warning/notice */
+        .log-line.error { background: rgba(244, 67, 54, 0.1); }
+        .log-line.warning { background: rgba(255, 193, 7, 0.1); }
+        .log-line.notice { background: transparent; }
+        
+        /* Ensure all text in log lines is white by default */
+        .log-line {
+            white-space: pre;
+            display: block;
+            color: var(--text-color);
+        }
+
+        /* Update log line styles to handle Apache format better */
+        .log-line {
+            display: block;
+            width: 100%;
+            white-space: inherit; /* Inherit from parent container */
+        }
+        
+        .log-content {
+            flex-grow: 1;
+            background-color: var(--background-dark);
+            border-radius: 4px;
+            padding: 10px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.9em;
+            will-change: transform;
+            contain: content;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        /* Ensure components stay inline and wrap properly */
+        .timestamp, .log-module, .log-level-notice, 
+        .log-level-warn, .log-level-error {
+            display: inline-flex;
+            align-items: center;
+            white-space: nowrap; /* Keep these components from breaking */
         }
     </style>
 </head>
@@ -545,6 +652,9 @@
 
         function defaultLogParser(content) {
             return content.split('\n').map(line => {
+                // Skip empty lines
+                if (!line.trim()) return '';
+                
                 // Handle the equals separator lines in context logs
                 if (line.trim() === '=') {
                     return '<hr style="border: 1px dashed var(--border-color); margin: 10px 0;">';
@@ -552,81 +662,126 @@
                 
                 try {
                     const json = JSON.parse(line);
-                    return syntaxHighlightJSON(json);
+                    return `<div class="log-line">${syntaxHighlightJSON(json)}</div>`;
                 } catch (e) {
                     if (line.includes('array (')) {
-                        return formatPhpArray(line);
+                        return `<div class="log-line">${formatPhpArray(line)}</div>`;
                     }
-                    return line;
+                    return `<div class="log-line">${line}</div>`;
                 }
-            }).join('\n');
+            }).filter(line => line).join('');
         }
 
         function parseContextLog(content) {
             const entries = content.split('=\n');
             return entries.map(entry => {
+                if (!entry.trim()) return '';
+                
+                let formattedEntry;
                 if (entry.trim().startsWith('array (')) {
-                    return formatPhpArray(entry.trim());
+                    formattedEntry = formatPhpArray(entry.trim());
+                } else {
+                    try {
+                        const json = JSON.parse(entry.trim());
+                        let highlighted = syntaxHighlightJSON(json);
+                        highlighted = highlighted.replace(
+                            /(AVAILABLE ACTION[^"]*)/g,
+                            '<span class="available-action">$1</span>'
+                        );
+                        formattedEntry = highlighted;
+                    } catch (e) {
+                        formattedEntry = entry;
+                    }
                 }
-                try {
-                    const json = JSON.parse(entry.trim());
-                    let highlighted = syntaxHighlightJSON(json);
-                    highlighted = highlighted.replace(
-                        /(AVAILABLE ACTION[^"]*)/g,
-                        '<span class="available-action">$1</span>'
-                    );
-                    return highlighted;
-                } catch (e) {
-                    return entry;
-                }
-            }).join('\n=\n');
+                return `<div class="log-line">${formattedEntry}</div>`;
+            }).filter(entry => entry).join('<hr style="border: 1px dashed var(--border-color); margin: 10px 0;">');
         }
 
         function parseOutputLog(content) {
             const entries = content.split('==\n');
             return entries.map(entry => {
+                if (!entry.trim()) return '';
+                
                 const lines = entry.split('\n');
                 const formattedLines = lines.map(line => {
+                    if (!line.trim()) return '';
+                    
+                    let formattedLine = line;
                     // Match ISO format timestamps
                     if (line.includes('START') || line.includes('END')) {
                         const timestamp = line.match(/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2})/);
                         if (timestamp) {
-                            return line.replace(timestamp[0], `<span class="timestamp">${timestamp[0]}</span>`);
+                            formattedLine = line.replace(timestamp[0], `<span class="timestamp">${timestamp[0]}</span>`);
                         }
                     }
                     // Match Apache style timestamps
                     if (line.match(/\[.*?\d{4}\]/)) {
-                        return line.replace(/\[(.*?\d{4})\]/g, '<span class="timestamp">[$1]</span>');
+                        formattedLine = line.replace(/\[(.*?\d{4})\]/g, '<span class="timestamp">[$1]</span>');
                     }
                     try {
                         const json = JSON.parse(line);
-                        return syntaxHighlightJSON(json);
+                        formattedLine = syntaxHighlightJSON(json);
                     } catch (e) {
-                        return line;
+                        // Keep as is if not JSON
                     }
+                    return `<div class="log-line">${formattedLine}</div>`;
                 });
-                return formattedLines.join('\n');
-            }).join('\n==\n');
+                return formattedLines.filter(line => line).join('');
+            }).filter(entry => entry).join('<hr style="border: 1px dashed var(--border-color); margin: 10px 0;">');
         }
 
         function parseApacheLog(content) {
             return content.split('\n').map(line => {
-                // Match and highlight different components
-                line = line
-                    // Timestamp
-                    .replace(/\[(.*?\d{4})\]/g, '<span class="timestamp">[$1]</span>')
-                    // Module and level [php:notice]
-                    .replace(/\[([^:\]]+:[^\]]+)\]/g, '<span class="log-module">[$1]</span>')
-                    // PID and thread [pid 22703:tid 22703]
-                    .replace(/\[(pid \d+:tid \d+)\]/g, '<span class="log-pid">[$1]</span>')
-                    // Client address [client 172.28.176.1:60720]
-                    .replace(/\[(client [^\]]+)\]/g, '<span class="log-client">[$1]</span>');
+                if (!line.trim()) return '';
                 
-                // Add error/warning/notice highlighting last to wrap the whole line
-                if (line.includes('[php:error]')) return `<span class="error">${line}</span>`;
-                if (line.includes('[php:warn]')) return `<span class="warning">${line}</span>`;
-                if (line.includes('[php:notice]')) return `<span class="info">${line}</span>`;
-                return line;
+                // First, escape any HTML to prevent XSS
+                line = line.replace(/[&<>"']/g, char => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                }[char]));
+                
+                // Determine line type for highlighting
+                let lineClass = '';
+                if (line.includes('[php:error]')) lineClass = 'error';
+                else if (line.includes('[php:warn]')) lineClass = 'warning';
+                else if (line.includes('[php:notice]')) lineClass = 'notice';
+                
+                // Split the line into components and message
+                let components = [];
+                let message = line;
+                
+                // Extract timestamp
+                const timestampMatch = message.match(/\[([A-Za-z]{3} [A-Za-z]{3} \d{2} \d{2}:\d{2}:\d{2}\.\d{6} \d{4})\]/);
+                if (timestampMatch) {
+                    components.push(`<span class="timestamp">[${timestampMatch[1]}]</span>`);
+                    message = message.slice(timestampMatch[0].length).trimLeft();
+                }
+                
+                // Extract module/level
+                const moduleMatch = message.match(/\[php:(notice|warn|error)\]/);
+                if (moduleMatch) {
+                    components.push(
+                        `<span class="log-module">[php:</span>` +
+                        `<span class="log-level-${moduleMatch[1]}">${moduleMatch[1]}</span>` +
+                        `<span class="log-module">]</span>`
+                    );
+                    message = message.slice(moduleMatch[0].length).trimLeft();
+                }
+                
+                // Remove PID and client info
+                message = message.replace(/\[pid [^\]]+\]/g, '').replace(/\[client [^\]]+\]/g, '');
+                
+                // Handle referer at the end of the line
+                const refererMatch = message.match(/, referer: [^$\n]+$/);
+                if (refererMatch) {
+                    message = message.slice(0, -refererMatch[0].length);
+                }
+                
+                // Wrap the components and message in a line container
+                return `<div class="log-line ${lineClass}">${components.join(' ')}<span class="log-message">${message.trimLeft()}</span></div>`;
             }).join('\n');
         }
 
@@ -816,43 +971,52 @@
             if (input.value === input.dataset.lastValue) return;
             input.dataset.lastValue = input.value;
             
-            const content = input.closest('.log-viewer').querySelector('.log-content');
-            const originalContent = content.dataset.originalContent || '';
+            const viewer = input.closest('.log-viewer');
+            const content = viewer.querySelector('.log-content');
             
             if (!input.value) {
-                requestAnimationFrame(() => {
-                    content.innerHTML = originalContent;
-                });
+                // Show original content when filter is empty
+                content.innerHTML = content.dataset.originalContent || '';
                 return;
             }
-
-            if (input.filterTimeout) {
-                clearTimeout(input.filterTimeout);
-            }
             
-            input.filterTimeout = setTimeout(() => {
-                try {
-                    const regex = new RegExp(input.value, 'gi');
-                    const lines = originalContent.split('\n');
-                    const filteredContent = lines
-                        .filter(line => regex.test(line))
-                        .join('\n');
+            try {
+                const regex = new RegExp(input.value, 'i'); // Case insensitive search
+                const lines = content.dataset.originalContent.split('\n');
+                
+                // Filter and join lines that match
+                const filteredContent = lines
+                    .filter(line => {
+                        // Skip empty lines and separators
+                        if (!line.trim() || line.includes('<hr')) return false;
                         
-                    requestAnimationFrame(() => {
-                        content.innerHTML = filteredContent;
-                    });
-                } catch (e) {
-                    const searchText = input.value.toLowerCase();
-                    const lines = originalContent.split('\n');
-                    const filteredContent = lines
-                        .filter(line => line.toLowerCase().includes(searchText))
-                        .join('\n');
-                        
-                    requestAnimationFrame(() => {
-                        content.innerHTML = filteredContent;
-                    });
-                }
-            }, 250);
+                        // Extract text content from HTML
+                        const div = document.createElement('div');
+                        div.innerHTML = line;
+                        const textContent = div.textContent || div.innerText;
+                        return regex.test(textContent);
+                    })
+                    .join('\n');
+                
+                content.innerHTML = filteredContent;
+                
+            } catch (e) {
+                // If regex is invalid, fall back to simple text search
+                const searchText = input.value.toLowerCase();
+                const lines = content.dataset.originalContent.split('\n');
+                
+                const filteredContent = lines
+                    .filter(line => {
+                        if (!line.trim() || line.includes('<hr')) return false;
+                        const div = document.createElement('div');
+                        div.innerHTML = line;
+                        const textContent = (div.textContent || div.innerText).toLowerCase();
+                        return textContent.includes(searchText);
+                    })
+                    .join('\n');
+                
+                content.innerHTML = filteredContent;
+            }
         }
 
         function restoreDefaultLogs() {
@@ -1041,12 +1205,13 @@
 
         function createLogViewer(config) {
             const viewer = document.createElement('div');
-            viewer.className = 'log-viewer';
+            viewer.className = 'log-viewer wrap'; // Default to wrap
             
             viewer.innerHTML = `
                 <div class="log-header">
                     <span class="log-title">${config.name}</span>
                     <div class="log-controls">
+                        <button class="wrap-button active" onclick="toggleWrap(this)">Wrap</button>
                         <button class="follow-button active" onclick="toggleFollow(this)">Follow</button>
                         <button class="download-button" onclick="downloadLog('${config.file}')">Download</button>
                         <button onclick="closeLogViewer(this)">Close</button>
@@ -1103,7 +1268,8 @@
 
         function toggleTroubleshoot(show = true) {
             const panel = document.querySelector('.troubleshoot-panel');
-            panel.style.display = show ? 'block' : 'none';
+            panel.style.display = show ? 'flex' : 'none';
+            localStorage.setItem('troubleshootVisible', show);
         }
         
         async function askQuestion() {
@@ -1327,7 +1493,20 @@
         }
         
         // Initialize the panel when the page loads
-        document.addEventListener('DOMContentLoaded', initTroubleshootPanel);
+        document.addEventListener('DOMContentLoaded', function() {
+            initTroubleshootPanel();
+            
+            // Restore troubleshooter visibility state
+            const troubleshootVisible = localStorage.getItem('troubleshootVisible') === 'true';
+            toggleTroubleshoot(troubleshootVisible);
+        });
+
+        function toggleWrap(button) {
+            const viewer = button.closest('.log-viewer');
+            const isWrapped = viewer.classList.toggle('wrap');
+            viewer.classList.toggle('nowrap', !isWrapped);
+            button.classList.toggle('active', isWrapped);
+        }
     </script>
 </body>
 </html> 
