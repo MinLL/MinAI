@@ -75,7 +75,13 @@
 
         .log-controls {
             display: flex;
-            gap: 10px;
+            gap: 5px;
+        }
+
+        .log-controls button {
+            padding: 3px 6px;
+            font-size: 0.9em;
+            min-width: 50px;
         }
 
         .log-content {
@@ -287,10 +293,6 @@
             box-shadow: 0 0 5px var(--primary-color);
         }
         
-        .log-controls button {
-            min-width: 80px;
-        }
-
         .log-selector-controls {
             display: flex;
             gap: 10px;
@@ -343,6 +345,7 @@
 
         .download-button {
             background-color: #4CAF50;  /* Green color for download */
+            padding: 3px 6px !important;
         }
         
         .download-button:hover {
@@ -591,6 +594,24 @@
             align-items: center;
             white-space: nowrap; /* Keep these components from breaking */
         }
+
+        .model-toggle {
+            display: flex;
+            align-items: center;
+            margin-right: 10px;
+            font-size: 0.9em;
+        }
+
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .toggle-label input[type="checkbox"] {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -623,6 +644,12 @@
         <div class="resize-handle"></div>
         <div class="troubleshoot-header">
             <span>Troubleshoot Assistant</span>
+            <div class="model-toggle">
+                <label class="toggle-label">
+                    <input type="checkbox" id="useRecommendedModel" checked>
+                    Use Claude-3.5 (Model in summary adapter is used otherwise)
+                </label>
+            </div>
             <div class="log-controls">
                 <button onclick="resetTroubleshootSize()">Reset Size</button>
                 <button onclick="toggleTroubleshoot(false)">Close</button>
@@ -1277,6 +1304,7 @@
             const content = document.querySelector('.troubleshoot-content');
             const button = document.querySelector('.troubleshoot-button');
             const statusIndicator = document.querySelector('.status-indicator');
+            const useRecommendedModel = document.getElementById('useRecommendedModel').checked;
             const question = input.value.trim();
             
             if (!question) return;
@@ -1314,7 +1342,10 @@
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     },
-                    body: JSON.stringify({ question: question }),
+                    body: JSON.stringify({ 
+                        question: question,
+                        useRecommendedModel: useRecommendedModel
+                    }),
                     signal: controller.signal
                 });
                 
@@ -1496,8 +1527,13 @@
         document.addEventListener('DOMContentLoaded', function() {
             initTroubleshootPanel();
             
-            // Restore troubleshooter visibility state
+            // Restore troubleshooter visibility and model preference
             const troubleshootVisible = localStorage.getItem('troubleshootVisible') === 'true';
+            const useRecommendedModel = localStorage.getItem('useRecommendedModel') !== 'false'; // Default to true
+            
+            document.getElementById('useRecommendedModel').checked = useRecommendedModel;
+            document.getElementById('useRecommendedModel').addEventListener('change', saveModelPreference);
+            
             toggleTroubleshoot(troubleshootVisible);
         });
 
@@ -1506,6 +1542,11 @@
             const isWrapped = viewer.classList.toggle('wrap');
             viewer.classList.toggle('nowrap', !isWrapped);
             button.classList.toggle('active', isWrapped);
+        }
+
+        function saveModelPreference() {
+            const useRecommendedModel = document.getElementById('useRecommendedModel').checked;
+            localStorage.setItem('useRecommendedModel', useRecommendedModel);
         }
     </script>
 </body>
