@@ -95,6 +95,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         $question = $data['question'] ?? '';
+        $useRecommendedModel = $data['useRecommendedModel'] ?? true;
+        
         if (empty($question)) {
             throw new Exception('Question is required');
         }
@@ -126,6 +128,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ['role' => 'user', 'content' => $userPrompt]
         ];
         
+        // Use recommended model or configured adapter
+        if ($useRecommendedModel) {
+            $model = 'anthropic/claude-3.5-sonnet';
+            error_log("Troubleshooter: Using recommended model (Claude-3.5 Sonnet)");
+        } else {
+            $model = $GLOBALS['CONNECTOR']['openrouter']['model'];
+            error_log("Troubleshooter: Using configured model: " . $model);
+        }
+        
         // Use OpenRouter to get analysis
         $url = $GLOBALS['CONNECTOR']['openrouter']['url'];
         $headers = [
@@ -136,10 +147,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ];
         
         $data = [
-            'model' => $GLOBALS['CONNECTOR']['openrouter']['model'],
+            'model' => $model,
             'messages' => $prompt,
-            'max_tokens' => $GLOBALS['CONNECTOR']['openrouter']['max_tokens'],
-            'temperature' => $GLOBALS['CONNECTOR']['openrouter']['temperature'],
+            'max_tokens' => 300,
+            'temperature' => 0.3,
             'stream' => false
         ];
         
