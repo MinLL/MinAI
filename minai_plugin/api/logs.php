@@ -49,6 +49,34 @@ if (isset($_GET['list'])) {
     exit;
 }
 
+// Add download handler
+if (isset($_GET['download'])) {
+    $requestedFile = $_GET['download'];
+    
+    // Use safe path resolution
+    $requestedPath = getSafePath($logDir, $requestedFile);
+    if ($requestedPath === false || !preg_match('/\.log$/', $requestedPath)) {
+        http_response_code(403);
+        echo json_encode(['error' => 'Access denied']);
+        exit;
+    }
+    
+    if (!file_exists($requestedPath)) {
+        http_response_code(404);
+        echo json_encode(['error' => 'Log file not found']);
+        exit;
+    }
+    
+    // Set headers for download
+    header('Content-Type: text/plain');
+    header('Content-Disposition: attachment; filename="' . basename($requestedPath) . '"');
+    header('Content-Length: ' . filesize($requestedPath));
+    
+    // Output file contents
+    readfile($requestedPath);
+    exit;
+}
+
 $requestedFile = $_GET['file'] ?? '';
 
 // Use safe path resolution

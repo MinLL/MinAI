@@ -277,6 +277,14 @@
             background-color: var(--primary-color);
             box-shadow: 0 0 5px var(--primary-color);
         }
+
+        .download-button {
+            background-color: #4CAF50;  /* Green color for download */
+        }
+        
+        .download-button:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
@@ -791,6 +799,7 @@
                     <span class="log-title">${config.name}</span>
                     <div class="log-controls">
                         <button class="follow-button active" onclick="toggleFollow(this)">Follow</button>
+                        <button class="download-button" onclick="downloadLog('${config.file}')">Download</button>
                         <button onclick="closeLogViewer(this)">Close</button>
                     </div>
                 </div>
@@ -831,6 +840,16 @@
                 saveConfiguration();
                 updateLayout();  // Update layout after removing a viewer
             }
+        }
+
+        function downloadLog(filename) {
+            // Create a hidden link and click it to trigger the download
+            const link = document.createElement('a');
+            link.href = `api/logs.php?download=${encodeURIComponent(filename)}`;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         fetchLogFiles();
