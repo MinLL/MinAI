@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MinAI Diagnostics</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2196F3;
+            --background-dark: #1a1a1a;
+            --background-light: #2d2d2d;
+            --text-color: #e0e0e0;
+            --border-color: #404040;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-dark);
+            color: var(--text-color);
+        }
+
+        .nav-panel {
+            background-color: var(--primary-color);
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .nav-panel a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            margin-right: 40px;
+        }
+
+        .log-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+            width: 100%;
+            padding-bottom: 20px;
+        }
+
+        .log-viewer {
+            min-height: 200px;
+            min-width: 300px;
+            height: calc(100vh - 300px);
+            background-color: var(--background-light);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            transition: width 0.3s ease;
+            resize: none;
+        }
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .log-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .log-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .log-content {
+            flex-grow: 1;
+            background-color: var(--background-dark);
+            border-radius: 4px;
+            padding: 10px;
+            overflow-y: auto;
+            font-family: monospace;
+            white-space: pre-wrap;
+            font-size: 0.9em;
+            will-change: transform;
+            contain: content;
+        }
+
+        .filter-container {
+            margin-bottom: 10px;
+        }
+
+        .filter-input {
+            background-color: var(--background-dark);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 5px 10px;
+            border-radius: 4px;
+            width: 200px;
+        }
+
+        button {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #1976D2;
+        }
+
+        .json-key { color: #9cdcfe; }
+        .json-string { color: #ce9178; }
+        .json-number { color: #b5cea8; }
+        .json-boolean { color: #569cd6; }
+        .json-null { color: #569cd6; }
+
+        .timestamp { color: #569cd6; }
+        .error { color: #f44336; }
+        .warning { color: #ffc107; }
+        .info { color: #4CAF50; }
+
+        .expand-button {
+            background-color: var(--primary-color);
+            margin-left: 10px;
+        }
+
+        .clear-button {
+            background-color: #f44336;
+        }
+
+        .preset-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .preset-filter {
+            background-color: var(--background-light);
+            border: 1px solid var(--border-color);
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .preset-filter.active {
+            background-color: var(--primary-color);
+        }
+
+        .log-selector {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .log-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            background: var(--background-light);
+            padding: 10px;
+            border-radius: 4px;
+        }
+        
+        .log-item {
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            background: var(--background-dark);
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .log-item:hover {
+            background: var(--border-color);
+        }
+        
+        .log-item-name {
+            font-weight: bold;
+        }
+        
+        .log-item-details {
+            font-size: 0.8em;
+            color: #888;
+        }
+        
+        .php-array { color: #569cd6; }
+        .php-array-key { color: #9cdcfe; }
+        .php-array-arrow { color: #d4d4d4; }
+        .php-string { color: #ce9178; }
+        .php-number { color: #b5cea8; }
+
+        .available-action {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        .log-viewer {
+            min-height: 200px;
+            min-width: 300px;
+        }
+
+        .follow-button {
+            background-color: var(--secondary-color);
+            opacity: 0.5;
+            transition: all 0.3s ease;
+        }
+        
+        .follow-button.active {
+            opacity: 1;
+            background-color: var(--primary-color);
+            box-shadow: 0 0 5px var(--primary-color);
+        }
+        
+        .log-controls button {
+            min-width: 80px;
+        }
+
+        .log-selector-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .log-selector-dropdown {
+            flex: 1;
+            padding: 8px;
+            background-color: var(--background-light);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        .available-action-keyword { 
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        .available-action-name {
+            color: #2196F3;
+            font-weight: bold;
+        }
+        
+        .available-action-desc {
+            color: #9E9E9E;
+            font-style: italic;
+        }
+
+        .layout-controls {
+            display: flex;
+            gap: 10px;
+            margin-left: auto;
+        }
+        
+        .layout-button {
+            padding: 5px 15px;
+            background-color: var(--background-light);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .layout-button.active {
+            background-color: var(--primary-color);
+            box-shadow: 0 0 5px var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-panel">
+        <a href="index.html">Return to Home</a>
+        <a href="https://github.com/MinLL/MinAI">Documentation</a>
+    </div>
+
+    <div class="log-selector-controls">
+        <select class="log-selector-dropdown" id="logSelect">
+            <option value="">Add Log Viewer...</option>
+        </select>
+        <button onclick="restoreDefaultLogs()">Restore Defaults</button>
+        <div class="layout-controls">
+            <button class="layout-button" onclick="setLayout(1)">1x</button>
+            <button class="layout-button active" onclick="setLayout(2)">2x</button>
+            <button class="layout-button" onclick="setLayout(3)">3x</button>
+            <button class="layout-button" onclick="setLayout(4)">4x</button>
+        </div>
+    </div>
+
+    <div class="log-container" id="logContainer">
+        <!-- Log viewers will be dynamically added here -->
+    </div>
+
+    <script>
+        let availableLogConfigs = [];
+        
+        let activeLogViewers = new Map();
+        
+        const DEFAULT_LOGS = [
+            'context_sent_to_llm.log',
+            'output_from_llm.log',
+            'apache_error.log'
+        ];
+
+        // Add layout preference to localStorage
+        let currentLayout = parseInt(localStorage.getItem('logViewerLayout') || '2');
+
+        function defaultLogParser(content) {
+            return content.split('\n').map(line => {
+                // Handle the equals separator lines in context logs
+                if (line.trim() === '=') {
+                    return '<hr style="border: 1px dashed var(--border-color); margin: 10px 0;">';
+                }
+                
+                try {
+                    const json = JSON.parse(line);
+                    return syntaxHighlightJSON(json);
+                } catch (e) {
+                    if (line.includes('array (')) {
+                        return formatPhpArray(line);
+                    }
+                    return line;
+                }
+            }).join('\n');
+        }
+
+        function parseContextLog(content) {
+            const entries = content.split('=\n');
+            return entries.map(entry => {
+                if (entry.trim().startsWith('array (')) {
+                    return formatPhpArray(entry.trim());
+                }
+                try {
+                    const json = JSON.parse(entry.trim());
+                    let highlighted = syntaxHighlightJSON(json);
+                    highlighted = highlighted.replace(
+                        /(AVAILABLE ACTION[^"]*)/g,
+                        '<span class="available-action">$1</span>'
+                    );
+                    return highlighted;
+                } catch (e) {
+                    return entry;
+                }
+            }).join('\n=\n');
+        }
+
+        function parseOutputLog(content) {
+            const entries = content.split('==\n');
+            return entries.map(entry => {
+                const lines = entry.split('\n');
+                const formattedLines = lines.map(line => {
+                    if (line.includes('START') || line.includes('END')) {
+                        return `<span class="timestamp">${line}</span>`;
+                    }
+                    try {
+                        const json = JSON.parse(line);
+                        return syntaxHighlightJSON(json);
+                    } catch (e) {
+                        return line;
+                    }
+                });
+                return formattedLines.join('\n');
+            }).join('\n==\n');
+        }
+
+        function parseApacheLog(content) {
+            return content.split('\n').map(line => {
+                if (line.includes('[error]')) return `<span class="error">${line}</span>`;
+                if (line.includes('[warn]')) return `<span class="warning">${line}</span>`;
+                if (line.includes('[notice]')) return `<span class="info">${line}</span>`;
+                return line;
+            }).join('\n');
+        }
+
+        function syntaxHighlightJSON(json) {
+            const jsonStr = JSON.stringify(json, null, 2);
+            return jsonStr.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
+                let cls = 'json-number';
+                if (/^"/.test(match)) {
+                    cls = /:$/.test(match) ? 'json-key' : 'json-string';
+                } else if (/true|false/.test(match)) {
+                    cls = 'json-boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'json-null';
+                }
+                return `<span class="${cls}">${match}</span>`;
+            });
+        }
+
+        function clearLog(button) {
+            const content = button.closest('.log-viewer').querySelector('.log-content');
+            content.innerHTML = '';
+        }
+
+        function applyPreset(element, filter) {
+            const viewer = element.closest('.log-viewer');
+            const filterInput = viewer.querySelector('.filter-input');
+            filterInput.value = filter;
+            filterLog(filterInput);
+            
+            viewer.querySelectorAll('.preset-filter').forEach(preset => 
+                preset.classList.remove('active')
+            );
+            element.classList.add('active');
+        }
+
+        function toggleFollow(button) {
+            button.classList.toggle('active');
+            const viewer = button.closest('.log-viewer');
+            const content = viewer.querySelector('.log-content');
+            const config = Array.from(activeLogViewers.entries())
+                .find(([_, v]) => v.viewer === viewer);
+            
+            if (config) {
+                const isActive = button.classList.contains('active');
+                activeLogViewers.get(config[0]).follow = isActive;
+                if (isActive) {
+                    content.scrollTop = content.scrollHeight;
+                }
+            }
+        }
+
+        function isFollowEnabled(viewer) {
+            return viewer.querySelector('.follow-button').classList.contains('active');
+        }
+
+        function setupScrollHandler(viewer) {
+            const content = viewer.querySelector('.log-content');
+            const followButton = viewer.querySelector('.follow-button');
+            
+            let scrollTimeout;
+            content.addEventListener('scroll', () => {
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    const isAtBottom = content.scrollHeight - content.clientHeight <= content.scrollTop + 1;
+                    if (!isAtBottom && followButton.classList.contains('active')) {
+                        followButton.classList.remove('active');
+                        const config = Array.from(activeLogViewers.entries())
+                            .find(([_, v]) => v.viewer === viewer);
+                        if (config) {
+                            activeLogViewers.get(config[0]).follow = false;
+                        }
+                    } else if (isAtBottom && !followButton.classList.contains('active')) {
+                        followButton.classList.add('active');
+                        const config = Array.from(activeLogViewers.entries())
+                            .find(([_, v]) => v.viewer === viewer);
+                        if (config) {
+                            activeLogViewers.get(config[0]).follow = true;
+                        }
+                    }
+                }, 100);
+            });
+        }
+
+        function formatPhpArray(content) {
+            let depth = 0;
+            const indent = '  ';
+            
+            function getIndent(n) {
+                return indent.repeat(n);
+            }
+            
+            function processValue(value, currentDepth) {
+                if (!value) return '';
+                
+                // Handle AVAILABLE ACTION lines
+                if (value.includes('AVAILABLE ACTION:')) {
+                    return value.replace(
+                        /AVAILABLE ACTION: (\w+) \((.*?)\)/g,
+                        '<span class="available-action-keyword">AVAILABLE ACTION:</span> ' +
+                        '<span class="available-action-name">$1</span> ' +
+                        '<span class="available-action-desc">($2)</span>'
+                    );
+                }
+                
+                // Handle nested arrays
+                if (value.trim().startsWith('array (')) {
+                    return formatPhpArrayInternal(value.slice(value.indexOf('(') + 1, -1), currentDepth + 1);
+                }
+                
+                // Handle string values
+                if (value.trim().startsWith("'") && value.trim().endsWith("'")) {
+                    return `<span class="php-string">${value}</span>`;
+                }
+                
+                // Handle numeric values
+                if (!isNaN(value.trim())) {
+                    return `<span class="php-number">${value}</span>`;
+                }
+                
+                return `<span class="php-string">${value}</span>`;
+            }
+            
+            function formatPhpArrayInternal(inner, currentDepth) {
+                const lines = inner.split('\n');
+                let formattedLines = [];
+                
+                for (let i = 0; i < lines.length; i++) {
+                    let line = lines[i].trim();
+                    if (!line) continue;
+                    
+                    // Handle key => value pairs
+                    if (line.includes('=>')) {
+                        let [key, ...valueParts] = line.split('=>');
+                        let value = valueParts.join('=>').trim();
+                        
+                        // Collect multi-line values
+                        let openParens = (value.match(/\(/g) || []).length;
+                        let closeParens = (value.match(/\)/g) || []).length;
+                        
+                        while (i + 1 < lines.length && 
+                               (openParens > closeParens || 
+                                value.trim().startsWith('array (') && !value.trim().endsWith(')'))) {
+                            i++;
+                            let nextLine = lines[i];
+                            value += '\n' + nextLine;
+                            openParens += (nextLine.match(/\(/g) || []).length;
+                            closeParens += (nextLine.match(/\)/g) || []).length;
+                        }
+                        
+                        formattedLines.push(
+                            getIndent(currentDepth) +
+                            `<span class="php-array-key">${key.trim()}</span>` +
+                            `<span class="php-array-arrow"> => </span>` +
+                            processValue(value, currentDepth)
+                        );
+                    } else {
+                        formattedLines.push(getIndent(currentDepth) + processValue(line, currentDepth));
+                    }
+                }
+                
+                return `<span class="php-array">array</span> (\n${formattedLines.join('\n')}\n${getIndent(currentDepth-1)})`;
+            }
+            
+            if (!content.startsWith('array (')) {
+                return content;
+            }
+            
+            return formatPhpArrayInternal(content.slice(content.indexOf('(') + 1, -1), 1);
+        }
+
+        function saveConfiguration() {
+            const config = Array.from(activeLogViewers.keys());
+            localStorage.setItem('logViewerConfig', JSON.stringify(config));
+        }
+
+        function filterLog(input) {
+            if (input.value === input.dataset.lastValue) return;
+            input.dataset.lastValue = input.value;
+            
+            const content = input.closest('.log-viewer').querySelector('.log-content');
+            const originalContent = content.dataset.originalContent || '';
+            
+            if (!input.value) {
+                requestAnimationFrame(() => {
+                    content.innerHTML = originalContent;
+                });
+                return;
+            }
+
+            if (input.filterTimeout) {
+                clearTimeout(input.filterTimeout);
+            }
+            
+            input.filterTimeout = setTimeout(() => {
+                try {
+                    const regex = new RegExp(input.value, 'gi');
+                    const lines = originalContent.split('\n');
+                    const filteredContent = lines
+                        .filter(line => regex.test(line))
+                        .join('\n');
+                        
+                    requestAnimationFrame(() => {
+                        content.innerHTML = filteredContent;
+                    });
+                } catch (e) {
+                    const searchText = input.value.toLowerCase();
+                    const lines = originalContent.split('\n');
+                    const filteredContent = lines
+                        .filter(line => line.toLowerCase().includes(searchText))
+                        .join('\n');
+                        
+                    requestAnimationFrame(() => {
+                        content.innerHTML = filteredContent;
+                    });
+                }
+            }, 250);
+        }
+
+        function restoreDefaultLogs() {
+            // Close all current viewers
+            Array.from(activeLogViewers.entries()).forEach(([_, data]) => {
+                data.viewer.remove();
+            });
+            activeLogViewers.clear();
+            
+            // Open default logs
+            DEFAULT_LOGS.forEach(logFile => {
+                const config = availableLogConfigs.find(c => c.file === logFile);
+                if (config) {
+                    const viewer = createLogViewer(config);
+                    document.getElementById('logContainer').appendChild(viewer);
+                    fetchAndUpdateLog(config);
+                }
+            });
+            
+            saveConfiguration();
+        }
+
+        function updateLogSelector() {
+            const select = document.getElementById('logSelect');
+            select.innerHTML = '<option value="">Add Log Viewer...</option>' +
+                availableLogConfigs
+                    .filter(config => !activeLogViewers.has(config.file))
+                    .map(config => `<option value="${config.file}">${config.name}</option>`)
+                    .join('');
+                    
+            select.onchange = function() {
+                if (this.value) {
+                    const config = availableLogConfigs.find(c => c.file === this.value);
+                    if (config) {
+                        const viewer = createLogViewer(config);
+                        document.getElementById('logContainer').appendChild(viewer);
+                        fetchAndUpdateLog(config);
+                        saveConfiguration();
+                    }
+                    this.value = '';
+                }
+            };
+        }
+
+        function optimizeLogContent(content) {
+            const maxLines = 5000;
+            const lines = content.split('\n');
+            if (lines.length > maxLines) {
+                content = lines.slice(-maxLines).join('\n');
+            }
+            return content;
+        }
+
+        async function fetchAndUpdateLog(config) {
+            const viewerData = activeLogViewers.get(config.file);
+            if (!viewerData) return;
+
+            try {
+                const response = await fetch(
+                    `api/logs.php?file=${config.file}&position=${viewerData.position}`
+                );
+                const data = await response.json();
+                
+                if (data.content) {
+                    const content = viewerData.viewer.querySelector('.log-content');
+                    
+                    if (viewerData.updateTimeout) {
+                        clearTimeout(viewerData.updateTimeout);
+                    }
+                    
+                    viewerData.updateTimeout = setTimeout(() => {
+                        const parsedContent = config.parser(data.content);
+                        
+                        content.dataset.originalContent = optimizeLogContent(
+                            (content.dataset.originalContent || '') + parsedContent
+                        );
+                        
+                        const filterInput = viewerData.viewer.querySelector('.filter-input');
+                        if (filterInput.value) {
+                            filterLog(filterInput);
+                        } else {
+                            requestAnimationFrame(() => {
+                                content.innerHTML = content.dataset.originalContent;
+                                if (viewerData.follow) {
+                                    content.scrollTop = content.scrollHeight;
+                                }
+                            });
+                        }
+                    }, 100);
+                }
+                
+                viewerData.position = data.position;
+            } catch (error) {
+                console.error(`Error fetching ${config.file}:`, error);
+            }
+        }
+
+        async function fetchLogFiles() {
+            try {
+                const response = await fetch('api/logs.php?list=1');
+                const data = await response.json();
+                
+                // Create configs for all available logs
+                availableLogConfigs = data.files.map(file => ({
+                    name: file.name,
+                    file: file.name,
+                    parser: file.name.includes('apache') ? parseApacheLog :
+                           file.name.includes('context') ? parseContextLog :
+                           file.name.includes('output') ? parseOutputLog :
+                           defaultLogParser,
+                    presets: file.name.includes('apache') ? [
+                        { name: 'MinAI Only', filter: 'minai' },
+                        { name: 'Errors Only', filter: '[error]' },
+                        { name: 'Warnings Only', filter: '[warn]' }
+                    ] : []
+                }));
+
+                // Load saved configuration or defaults
+                const savedConfig = JSON.parse(localStorage.getItem('logViewerConfig') || '[]');
+                const logsToLoad = savedConfig.length > 0 ? savedConfig : DEFAULT_LOGS;
+
+                // Create viewers for default/saved logs
+                logsToLoad.forEach(logFile => {
+                    const config = availableLogConfigs.find(c => c.file === logFile);
+                    if (config && !activeLogViewers.has(config.file)) {
+                        const viewer = createLogViewer(config);
+                        document.getElementById('logContainer').appendChild(viewer);
+                        fetchAndUpdateLog(config);
+                    }
+                });
+
+                updateLayout();
+                updateLogSelector();
+            } catch (error) {
+                console.error('Error fetching log files:', error);
+            }
+        }
+
+        function formatFileSize(bytes) {
+            const units = ['B', 'KB', 'MB', 'GB'];
+            let size = bytes;
+            let unit = 0;
+            while (size >= 1024 && unit < units.length - 1) {
+                size /= 1024;
+                unit++;
+            }
+            return `${Math.round(size * 100) / 100} ${units[unit]}`;
+        }
+
+        function formatDate(timestamp) {
+            return new Date(timestamp * 1000).toLocaleString();
+        }
+
+        function setLayout(columns) {
+            currentLayout = columns;
+            localStorage.setItem('logViewerLayout', columns);
+            
+            // Update button states
+            document.querySelectorAll('.layout-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            document.querySelector(`.layout-button:nth-child(${columns})`).classList.add('active');
+            
+            updateLayout();
+        }
+
+        function updateLayout() {
+            const container = document.getElementById('logContainer');
+            const viewers = Array.from(document.querySelectorAll('.log-viewer'));
+            const containerWidth = container.clientWidth;
+            
+            // Set grid columns based on layout selection
+            container.style.gridTemplateColumns = `repeat(${currentLayout}, 1fr)`;
+            
+            // Reset all viewer widths to auto
+            viewers.forEach(viewer => {
+                viewer.style.width = 'auto';
+                viewer.style.maxWidth = '100%';
+            });
+        }
+
+        // Update window.onload to set initial layout
+        window.addEventListener('load', () => {
+            setLayout(currentLayout);
+        });
+
+        function createLogViewer(config) {
+            const viewer = document.createElement('div');
+            viewer.className = 'log-viewer';
+            
+            viewer.innerHTML = `
+                <div class="log-header">
+                    <span class="log-title">${config.name}</span>
+                    <div class="log-controls">
+                        <button class="follow-button active" onclick="toggleFollow(this)">Follow</button>
+                        <button onclick="closeLogViewer(this)">Close</button>
+                    </div>
+                </div>
+                ${config.presets.length > 0 ? `
+                    <div class="preset-filters">
+                        ${config.presets.map(preset => 
+                            `<div class="preset-filter" onclick="applyPreset(this, '${preset.filter}')">${preset.name}</div>`
+                        ).join('')}
+                    </div>
+                ` : ''}
+                <div class="filter-container">
+                    <input type="text" class="filter-input" placeholder="Filter log (supports regex)..." 
+                           oninput="filterLog(this)" data-last-value="">
+                </div>
+                <div class="log-content"></div>
+            `;
+            
+            activeLogViewers.set(config.file, { 
+                position: 0, 
+                viewer,
+                follow: true
+            });
+            
+            setupScrollHandler(viewer);
+            saveConfiguration();
+            
+            return viewer;
+        }
+
+        function closeLogViewer(button) {
+            const viewer = button.closest('.log-viewer');
+            const config = Array.from(activeLogViewers.entries())
+                .find(([_, v]) => v.viewer === viewer);
+            
+            if (config) {
+                activeLogViewers.delete(config[0]);
+                viewer.remove();
+                saveConfiguration();
+                updateLayout();  // Update layout after removing a viewer
+            }
+        }
+
+        fetchLogFiles();
+        
+        setInterval(() => {
+            activeLogViewers.forEach((_, file) => {
+                const config = availableLogConfigs.find(c => c.file === file);
+                if (config) fetchAndUpdateLog(config);
+            });
+        }, 1000);
+    </script>
+</body>
+</html> 
