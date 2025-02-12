@@ -557,13 +557,23 @@
         function applyPreset(element, filter) {
             const viewer = element.closest('.log-viewer');
             const filterInput = viewer.querySelector('.filter-input');
-            filterInput.value = filter;
-            filterLog(filterInput);
             
-            viewer.querySelectorAll('.preset-filter').forEach(preset => 
-                preset.classList.remove('active')
-            );
-            element.classList.add('active');
+            // If this preset is already active, clear it
+            if (element.classList.contains('active')) {
+                filterInput.value = '';
+                element.classList.remove('active');
+            } else {
+                // Clear other active presets
+                viewer.querySelectorAll('.preset-filter').forEach(preset => 
+                    preset.classList.remove('active')
+                );
+                // Apply the new filter
+                filterInput.value = filter;
+                element.classList.add('active');
+            }
+            
+            // Trigger the filter
+            filterLog(filterInput);
         }
 
         function toggleFollow(button) {
@@ -859,8 +869,8 @@
                            defaultLogParser,
                     presets: file.name.includes('apache') ? [
                         { name: 'MinAI Only', filter: 'minai' },
-                        { name: 'Errors Only', filter: '[error]' },
-                        { name: 'Warnings Only', filter: '[warn]' }
+                        { name: 'Errors Only', filter: 'php:error' },
+                        { name: 'Warnings Only', filter: 'php:warn' }
                     ] : []
                 }));
 
