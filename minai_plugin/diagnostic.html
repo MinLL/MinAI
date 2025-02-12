@@ -124,7 +124,21 @@
         .json-boolean { color: #569cd6; }
         .json-null { color: #569cd6; }
 
-        .timestamp { color: #569cd6; }
+        .timestamp {
+            color: #569cd6;
+            font-style: italic;
+            padding: 2px 6px;
+            background: rgba(86, 156, 214, 0.1);
+            border-radius: 3px;
+            display: inline-block;
+            margin: 2px 0;
+        }
+        
+        .timestamp-label {
+            color: #9cdcfe;
+            font-weight: bold;
+        }
+
         .error { color: #f44336; }
         .warning { color: #ffc107; }
         .info { color: #4CAF50; }
@@ -457,6 +471,19 @@
             background: rgba(76, 175, 80, 0.2);
             color: #4CAF50;
         }
+
+        .log-pid {
+            color: #b5cea8; /* Light green */
+            font-style: italic;
+        }
+        
+        .log-module {
+            color: #ce9178; /* Light orange */
+        }
+        
+        .log-client {
+            color: #9cdcfe; /* Light blue */
+        }
     </style>
 </head>
 <body>
@@ -560,8 +587,16 @@
             return entries.map(entry => {
                 const lines = entry.split('\n');
                 const formattedLines = lines.map(line => {
+                    // Match ISO format timestamps
                     if (line.includes('START') || line.includes('END')) {
-                        return `<span class="timestamp">${line}</span>`;
+                        const timestamp = line.match(/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2})/);
+                        if (timestamp) {
+                            return line.replace(timestamp[0], `<span class="timestamp">${timestamp[0]}</span>`);
+                        }
+                    }
+                    // Match Apache style timestamps
+                    if (line.match(/\[.*?\d{4}\]/)) {
+                        return line.replace(/\[(.*?\d{4})\]/g, '<span class="timestamp">[$1]</span>');
                     }
                     try {
                         const json = JSON.parse(line);
@@ -576,9 +611,21 @@
 
         function parseApacheLog(content) {
             return content.split('\n').map(line => {
-                if (line.includes('[error]')) return `<span class="error">${line}</span>`;
-                if (line.includes('[warn]')) return `<span class="warning">${line}</span>`;
-                if (line.includes('[notice]')) return `<span class="info">${line}</span>`;
+                // Match and highlight different components
+                line = line
+                    // Timestamp
+                    .replace(/\[(.*?\d{4})\]/g, '<span class="timestamp">[$1]</span>')
+                    // Module and level [php:notice]
+                    .replace(/\[([^:\]]+:[^\]]+)\]/g, '<span class="log-module">[$1]</span>')
+                    // PID and thread [pid 22703:tid 22703]
+                    .replace(/\[(pid \d+:tid \d+)\]/g, '<span class="log-pid">[$1]</span>')
+                    // Client address [client 172.28.176.1:60720]
+                    .replace(/\[(client [^\]]+)\]/g, '<span class="log-client">[$1]</span>');
+                
+                // Add error/warning/notice highlighting last to wrap the whole line
+                if (line.includes('[php:error]')) return `<span class="error">${line}</span>`;
+                if (line.includes('[php:warn]')) return `<span class="warning">${line}</span>`;
+                if (line.includes('[php:notice]')) return `<span class="info">${line}</span>`;
                 return line;
             }).join('\n');
         }
@@ -1131,9 +1178,13 @@
                                 <strong>Context:</strong><br>
                                 <pre>${data.context}</pre><br>
                                 <strong>Output:</strong><br>
-                                <div class="timestamp">Start: ${data.timestamps.output_start}</div>
+                                <div class="timestamp">
+                                    <span class="timestamp-label">Start:</span> ${data.timestamps.output_start}
+                                </div>
                                 <pre>${data.output}</pre>
-                                <div class="timestamp">End: ${data.timestamps.output_end}</div>
+                                <div class="timestamp">
+                                    <span class="timestamp-label">End:</span> ${data.timestamps.output_end}
+                                </div>
                                 <br>
                                 <strong>Recent Error Logs:</strong><br>
                                 <pre class="error-log">${data.error_log}</pre>
