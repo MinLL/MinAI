@@ -64,9 +64,11 @@ function ProcessIntegrations() {
     if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "minai_init") {
         // This is sent once by the SKSE plugin when the game is loaded. Do our initialization here.
         error_log("minai: Initializing");
+        DropThreadsTableIfExists();
         CreateThreadsTableIfNotExists();
         CreateActionsTableIfNotExists();
         CreateContextTableIfNotExists();
+        CreateThreadsTableIfNotExists();
         importXPersonalities();
         importScenesDescriptions();
         $MUST_DIE=true;
@@ -144,10 +146,15 @@ function ProcessIntegrations() {
     }
     if (isset($GLOBALS["gameRequest"]) && in_array(strtolower($GLOBALS["gameRequest"][0]), ["radiant", "radiantsearchinghostile", "radiantsearchingfriend", "radiantcombathostile", "radiantcombatfriend", "minai_force_rechat"])) {
         if (strtolower($GLOBALS["gameRequest"][0]) == "minai_force_rechat" || time() > GetLastInput() + $GLOBALS["input_delay_for_radiance"]) {
-            if ($GLOBALS["HERIKA_NAME"] == "The Narrator") {
+            // Block rechat/radiant during sex scenes
+            if (IsSexActive()) {
+                error_log("minai: Blocking rechat/radiant during sex scene");
+                $MUST_DIE = true;
+            }
+            else if ($GLOBALS["HERIKA_NAME"] == "The Narrator") {
                 // Fail safe
                 error_log("minai: WARNING - Radiant dialogue started with narrator");
-                $MUST_DIE=true;
+                $MUST_DIE = true;
             }
             else {
                 // $GLOBALS["HERIKA_NAME"] is npc1

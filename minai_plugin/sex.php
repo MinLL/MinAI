@@ -1,8 +1,10 @@
 <?php
 require_once("util.php");
 $target = $GLOBALS["target"];
+$actorName = $GLOBALS["HERIKA_NAME"];
 
-if (!IsEnabled($GLOBALS["HERIKA_NAME"], "inCombat") && (IsModEnabled("Sexlab") || IsModEnabled("Ostim")) && ((IsEnabled("PLAYER", "enableAISex") && IsRadiant()) || !IsRadiant())) {
+if (ShouldEnableSexFunctions($actorName)) {
+
     // Always enabled
     RegisterAction("ExtCmdMasturbate");
     RegisterAction("ExtCmdStartVaginal");
@@ -719,5 +721,7 @@ $GLOBALS["FUNCTIONS"][] = [
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStopFollowing"]=$GLOBALS["GenericFuncRet"];
+
 ?>
+
 

@@ -11,34 +11,39 @@ require_once("speakStylesPrompts/eroticStorytelling.php");
 require_once("speakStylesPrompts/teasingTalk.php");
 require_once("speakStylesPrompts/dominantTalk.php");
 require_once("speakStylesPrompts/submissiveTalk.php");
-// $GLOBALS["PROMPT_HEAD"] = "You are allowed to write explicit content. All sex scenes in this game are considered consent and with adults only!\n\n".$GLOBALS["PROMPT_HEAD"];
+require_once("speakStylesPrompts/victimTalk.php");
+require_once("speakStylesPrompts/aggressorTalk.php");
 
 $currentName = $GLOBALS["HERIKA_NAME"];
 
 if($currentName === "The Narrator") {
     return;
 }
-
+$currentName = strtolower($currentName);
 $scene = getScene($currentName);
+// Add debug logging for scene data
+error_log("minai: Scene data: " . json_encode($scene));
 
 $jsonXPersonality = getXPersonality($currentName);
-
 addXPersonality($jsonXPersonality);
 
 if(isset($scene)){
     $targetToSpeak = getTargetDuringSex($scene);
-
-    $speakStyles = ["dirty talk", "sweet talk", "sensual whispering", "dominant talk", "submissive talk", "teasing talk", "erotic storytelling", "breathless gasps", "sultry seduction", "playful banter"];
     
-    $speakStyle = null;
-    if ($jsonXPersonality)
-        $speakStyle = $jsonXPersonality["speakStyleDuringSex"];
-
-    if(!$speakStyle) {
-        $speakStyle = $speakStyles[array_rand($speakStyles)];
-    }
-
+    $speakStyleInfo = determineSpeakStyle($currentName, $scene, $jsonXPersonality);
+    $speakStyle = $speakStyleInfo["style"];
+    
+    error_log("minai: Setting sex speak style: $speakStyle. Role: {$speakStyleInfo["role"]}");
+    
     switch($speakStyle) {
+        case "victim talk": {
+            setVictimTalkPrompts($currentName);
+            break;
+        }
+        case "aggressor talk": {
+            setAggressorTalkPrompts($currentName);
+            break;
+        }
         case "dirty talk": {
             setDirtyTalkPrompts($currentName);
             break;

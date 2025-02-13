@@ -178,6 +178,11 @@ bool Property preserveQueue = True Auto
 
 int preserveQueueOID
 
+bool trackVictimAwarenessDefault = True
+bool Property trackVictimAwareness = True Auto
+
+int trackVictimAwarenessOID
+
 Event OnConfigInit()
   main.Info("Building mcm menu.")
   InitializeMCM()
@@ -292,6 +297,7 @@ Function RenderSexPage()
   confirmSexOID = AddToggleOption("Ask before a sex scene is initiated", confirmSex)
   allowSexTransitionsOID = AddToggleOption("Allow Sex Scene Transitions", allowSexTransitions)
   allowActorsToJoinSexOID = AddToggleOption("Allow NPC's to join Ongoing Sex Scenes", allowActorsToJoinSex)
+  trackVictimAwarenessOID = AddToggleOption("Track Victim Actor Awareness", trackVictimAwareness)
   AddHeaderOption("NPC Sex Settings")
   enableAISexOID = AddToggleOption("Enable NPC -> NPC Sex", enableAISex)
   ; right column
@@ -547,6 +553,7 @@ Event OnOptionSelect(int oid)
   elseif oid == allowSexTransitionsOID
     allowSexTransitions = !allowSexTransitions
     SetToggleOptionValue(oid, allowSexTransitions)
+    aiff.SetActorVariable(game.GetPlayer(), "allowSexTransitions", allowSexTransitions)
   elseif oid == allowActorsToJoinSexOID
     allowActorsToJoinSex = !allowActorsToJoinSex
     SetToggleOptionValue(oid, allowActorsToJoinSex)
@@ -594,6 +601,9 @@ Event OnOptionSelect(int oid)
       aiff.DisablePreserveQueue() 
     EndIf
     SetToggleOptionValue(oid, preserveQueue)
+  elseif oid == trackVictimAwarenessOID
+    trackVictimAwareness = !trackVictimAwareness
+    SetToggleOptionValue(oid, trackVictimAwareness)
   EndIf
   int i = 0
   string[] categories = JMap.allKeysPArray(aCategoryMap)
@@ -695,9 +705,7 @@ Event OnOptionDefault(int oid)
   elseif oid == allowSexTransitionsOID
     allowSexTransitions = allowSexTransitionsDefault
     SetToggleOptionValue(oid, allowSexTransitions)
-  elseif oid == allowActorsToJoinSexOID
-    allowActorsToJoinSex = allowActorsToJoinSexDefault
-    SetToggleOptionValue(oid, allowActorsToJoinSex)
+    aiff.SetActorVariable(game.GetPlayer(), "allowSexTransitions", allowSexTransitions)
   elseif oid == toggleCombatDialogueOID
     toggleCombatDialogue = toggleCombatDialogueDefault
     if toggleCombatDialogue
@@ -747,6 +755,9 @@ Event OnOptionDefault(int oid)
       aiff.DisablePreserveQueue()
     EndIf
     SetToggleOptionValue(oid, preserveQueueDefault)
+  elseif oid == trackVictimAwarenessOID
+    trackVictimAwareness = trackVictimAwarenessDefault
+    SetToggleOptionValue(oid, trackVictimAwareness)
   EndIf
 EndEvent
 
@@ -845,6 +856,8 @@ Event OnOptionHighlight(int oid)
     SetInfoText("Hotkey to initiate a private conversation with just the narrator")
   elseif oid == preserveQueueOID
     SetInfoText("When enabled, the dialogue queue will be preserved when actions are enabled. This allows for more natural conversation flow.")
+  elseif oid == trackVictimAwarenessOID
+    SetInfoText("When enabled, tracks whether actors in sex scenes are victims or aggressors. This may not be completely accurate, and is mod-dependent.")
   EndIf
   int i = 0
   string[] actions = JMap.allKeysPArray(aiff.actionRegistry)

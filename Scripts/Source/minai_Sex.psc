@@ -90,6 +90,7 @@ Function Maintenance(minai_MainQuestController _main)
   SetSexSceneState("off")
   ; clean any threads from table
   UpdateThreadTable("clean")
+  aiff.SetActorVariable(playerRef, "allowSexTransitions", config.allowSexTransitions)
   sexlab.InitializeSexDescriptions()
   lastSexTalk = 0.0
   if (clothingMap == 0)
@@ -801,11 +802,23 @@ function UpdateThreadTable(string type, string framework = "ostim", int ThreadID
 
   actor[] maleActors = PapyrusUtil.ActorArray(0)
   actor[] femaleActors = PapyrusUtil.ActorArray(0)
+  actor[] victimActors = PapyrusUtil.ActorArray(0)
+  
   int i = 0
   int count = actors.Length
   while i < count
     actor currActor = actors[i]
     int currSex = sexUtil.GetGender(currActor)
+    
+    ; Check if actor is a victim
+    bool isVictim = false
+    if framework == sexlabType
+      isVictim = slf.GetController(ThreadID).IsVictim(currActor)
+   
+      if isVictim
+        victimActors = PapyrusUtil.PushActor(victimActors, currActor)
+      endif
+    endif
     
     if(currSex == 0)
       maleActors = PapyrusUtil.PushActor(maleActors, currActor)
@@ -818,10 +831,14 @@ function UpdateThreadTable(string type, string framework = "ostim", int ThreadID
 
   string maleActorsString = MinaiUtil.JoinActorArray(maleActors)
   string femaleActorsString = MinaiUtil.JoinActorArray(femaleActors)
+  string victimActorsString = MinaiUtil.JoinActorArray(victimActors)
+  if !config.trackVictimAwareness
+    victimActorsString = ""
+  EndIf
 
   string fallback = buildSceneFallbackDescription(ThreadID, framework, type)
 
-  string jsonToSend = "{ \"type\": \""+type+"\", \"framework\": \""+framework+"\", \"threadId\": "+ThreadID+", \"maleActors\": \""+maleActorsString+"\", \"femaleActors\": \""+femaleActorsString+"\", \"scene\": \""+sceneId+"\""
+  string jsonToSend = "{ \"type\": \""+type+"\", \"framework\": \""+framework+"\", \"threadId\": "+ThreadID+", \"maleActors\": \""+maleActorsString+"\", \"femaleActors\": \""+femaleActorsString+"\", \"victimActors\": \""+victimActorsString+"\", \"scene\": \""+sceneId+"\""
 
   if(fallback != "")
     jsonToSend += ", \"fallback\": \""+fallback+"\""
