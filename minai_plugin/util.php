@@ -349,7 +349,7 @@ function getScene($actor, $threadId = null) {
     }
 
     if(!$scene) {
-        error_log("minai: No scene found.");
+        error_log("minai: No scene found.")     ;
         return null;
     }
     $scene = $scene[0];
@@ -368,21 +368,21 @@ function getScene($actor, $threadId = null) {
     if (!empty($scene["victim_actors"]) && $scene["victim_actors"] !== null) {
         $victims = array_map('trim', explode(",", $scene["victim_actors"]));
         $aggressors = array_diff($allActors, $victims);
-        
+        $isAre = (count($aggressors) > 1 ? "are" : "is") ;
         if (!$sceneDesc) {
-            $sceneDesc = "A non-consensual sex scene is occurring. ";
-            $sceneDesc .= implode(", ", $aggressors) . " are raping " . implode(", ", $victims) . ". ";
+            $sceneDesc = "A non-consensual sexual act is actively taking place. ";
+            $sceneDesc .= implode(", ", $aggressors) . " $isAre raping " . implode(", ", $victims) . ". ";
             if ($scene["fallback"]) {
                 $sceneDesc .= $scene["fallback"];
             }
         } else {
             // Add assault context to existing scene description
-            $assaultContext = implode(", ", $aggressors) . " are raping " . implode(", ", $victims) . ". ";
+            $assaultContext = implode(", ", $aggressors) . " $isAre raping " . implode(", ", $victims) . ". ";
             $sceneDesc = $assaultContext . $sceneDesc;
         }
     } else if (!$sceneDesc) {
         // Original fallback description for consensual scenes
-        $sceneDesc = "A sex scene is currently active. ";
+        $sceneDesc = "A sex scene is actively taking place. ";
         $sceneDesc .= "These participants are currently engaged in sex in the scene: " . implode(", ", $allActors) . ".\n";
         if ($scene["fallback"]) {
             $sceneDesc .= $scene["fallback"];

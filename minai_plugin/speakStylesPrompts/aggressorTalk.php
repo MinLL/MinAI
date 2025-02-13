@@ -1,7 +1,7 @@
 <?php
 function setAggressorTalkPrompts($currentName) {
     $context = $GLOBALS["SEX_SCENE_CONTEXT"];
-    $victims = isset($context["victimActors"]) ? (is_array($context["victimActors"]) ? implode(" and ", $context["victimActors"]) : $context["victimActors"]) : $currentName;
+    $victims = isset($context["victimActors"]) ? (is_array($context["victimActors"]) ? implode(" and ", $context["victimActors"]) : $context["victimActors"]) : GetTargetActor();
     $GLOBALS["PROMPTS"]["sextalk_climaxchastity"] = [
         "cue" => [
             "$currentName mocks the sexual frustration of {$victims}, describing how the chastity device you've locked on them prevents any release. {$GLOBALS["TEMPLATE_DIALOG"]}",
@@ -22,11 +22,11 @@ function setAggressorTalkPrompts($currentName) {
     ];
     $GLOBALS["PROMPTS"]["sextalk_scenechange"] = [
         "cue" => [
-            "$currentName graphically outlines what you're about to do next, emphasizing the physicality of the new act. {$GLOBALS["TEMPLATE_DIALOG"]}",
-            "$currentName mocks the physical struggle of {$victims} as you reposition them, focusing on how their body responds to your touch. {$GLOBALS["TEMPLATE_DIALOG"]}",
-            "$currentName describes with pleasure how you control every move and sensation of {$victims}, detailing the physical manipulation. {$GLOBALS["TEMPLATE_DIALOG"]}",
-            "$currentName teases about the new position, detailing how it will physically intensify the experience for {$victims}. {$GLOBALS["TEMPLATE_DIALOG"]}",
-            "$currentName expresses excitement over the control you'll exert in the new scene, describing the anticipated physical reactions. {$GLOBALS["TEMPLATE_DIALOG"]}",
+            "$currentName graphically describes how you're shifting positions, focusing on the physical sensations and movements involved. {$GLOBALS["TEMPLATE_DIALOG"]}",
+            "$currentName mocks the physical effort of {$victims} as you adjust their position, highlighting how their body reacts to your touch. {$GLOBALS["TEMPLATE_DIALOG"]}",
+            "$currentName details with delight how you control each physical movement and sensation of {$victims}, emphasizing the tactile experience. {$GLOBALS["TEMPLATE_DIALOG"]}",
+            "$currentName teases about the new physical arrangement, explaining how it will enhance the immediate sensory experience for {$victims}. {$GLOBALS["TEMPLATE_DIALOG"]}",
+            "$currentName shows excitement about the physical control you'll have in this new setup, describing the anticipated bodily responses. {$GLOBALS["TEMPLATE_DIALOG"]}",
         ],
     ];
     $GLOBALS["PROMPTS"]["sextalk_speedincrease"] = [
