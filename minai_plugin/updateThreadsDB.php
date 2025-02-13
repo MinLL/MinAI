@@ -44,7 +44,7 @@ function updateThreadsDB() {
     $threadId = $obj["threadId"];
     $type = $obj["type"];
     $framework = $obj["framework"];
-    $fallback = $obj["fallback"];
+    $fallback = isset($obj["fallback"]) ? $obj["fallback"] : "";
 
     switch(strtolower($type)) {
         // at least in ostim for some reason it fires scenechange event before start thread event
