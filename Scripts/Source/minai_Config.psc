@@ -173,6 +173,11 @@ bool Property updateNarratorProfile = False Auto
 
 int updateNarratorProfileOID
 
+bool preserveQueueDefault = True
+bool Property preserveQueue = True Auto
+
+int preserveQueueOID
+
 Event OnConfigInit()
   main.Info("Building mcm menu.")
   InitializeMCM()
@@ -251,7 +256,8 @@ Function RenderGeneralPage()
   maxRadianceRechatsOID = AddSliderOption("Maximum Radiance Rechats", maxRadianceRechats, "{0}")
   SetCursorPosition(1) ; Move cursor to top right position
   AddHeaderOption("General Settings")
-  toggleCombatDialogueOID = AddToggleOption("Allow Dialogue during Combat", toggleCombatDialogue)
+  toggleCombatDialogueOID = AddToggleOption("CHIM Config - Allow Dialogue during Combat", toggleCombatDialogue)
+  preserveQueueOID = AddToggleOption("CHIM Config - Preserve Dialogue Queue", preserveQueue)
   addSpellsOID = AddTextOption("General", "Add Spells to Player")
   removeSpellsOID = AddTextOption("General", "Remove Spells from Player")
   toggleSapienceOID = AddKeyMapOption("Toggle Sapience", toggleSapienceKey)
@@ -580,6 +586,14 @@ Event OnOptionSelect(int oid)
   elseif oid == updateNarratorProfileOID
     updateNarratorProfile = !updateNarratorProfile
     SetToggleOptionValue(oid, updateNarratorProfile)
+  elseif oid == preserveQueueOID
+    preserveQueue = !preserveQueue
+    if preserveQueue
+      aiff.EnablePreserveQueue()
+    else
+      aiff.DisablePreserveQueue() 
+    EndIf
+    SetToggleOptionValue(oid, preserveQueue)
   EndIf
   int i = 0
   string[] categories = JMap.allKeysPArray(aCategoryMap)
@@ -725,6 +739,14 @@ Event OnOptionDefault(int oid)
   elseif oid == updateNarratorProfileOID
     updateNarratorProfile = updateNarratorProfileDefault
     SetToggleOptionValue(oid, updateNarratorProfile)
+  elseif oid == preserveQueueOID
+    preserveQueue = preserveQueueDefault
+    if preserveQueue
+      aiff.EnablePreserveQueue()
+    else
+      aiff.DisablePreserveQueue()
+    EndIf
+    SetToggleOptionValue(oid, preserveQueueDefault)
   EndIf
 EndEvent
 
@@ -821,6 +843,8 @@ Event OnOptionHighlight(int oid)
     SetInfoText("Hotkey to make your character sing")
   elseif oid == narratorKeyOID
     SetInfoText("Hotkey to initiate a private conversation with just the narrator")
+  elseif oid == preserveQueueOID
+    SetInfoText("When enabled, the dialogue queue will be preserved when actions are enabled. This allows for more natural conversation flow.")
   EndIf
   int i = 0
   string[] actions = JMap.allKeysPArray(aiff.actionRegistry)

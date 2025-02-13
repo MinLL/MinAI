@@ -123,6 +123,10 @@ Function Maintenance(minai_MainQuestController _main)
     lastDialogueTimes = JMap.Object()
     JValue.Retain(lastDialogueTimes)
   EndIf
+
+  if config.preserveQueue
+    EnablePreserveQueue()
+  EndIf
 EndFunction
 
 
@@ -810,5 +814,19 @@ Function ToggleSapience()
     Main.Info("SAPIENCE: Sapience enabled via toggle.")
     Debug.Notification("Sapience enabled.")
     minai_SapienceEnabled.SetValue(1)
+  EndIf
+EndFunction
+
+Function EnablePreserveQueue()
+  if bHasAIFF
+    Main.Info("CHIM CONFIG: Preserving dialogue queue.")
+    AIAgentFunctions.setConf("_preserve_queue", 1, 0, "")
+  EndIf
+EndFunction
+
+Function DisablePreserveQueue()
+  if bHasAIFF
+    Main.Info("CHIM CONFIG: Not preserving dialogue queue.")
+    AIAgentFunctions.setConf("_preserve_queue", 0, 0, "")
   EndIf
 EndFunction
