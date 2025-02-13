@@ -38,6 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         "input_delay_for_radiance" => $GLOBALS["input_delay_for_radiance"],
         "voicetype_fallbacks" => $GLOBALS["voicetype_fallbacks"],
         "use_llm_fallback" => $GLOBALS["use_llm_fallback"],
+        "enforce_single_json" => $GLOBALS["enforce_single_json"],
     );
 
     // Return the config data as JSON
@@ -80,6 +81,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Add the new use_llm_fallback option
     $newConfig .= "\$GLOBALS['use_llm_fallback'] = " . ($input['use_llm_fallback'] ? 'true' : 'false') . ";\n";
+
+    // Add the new enforce_single_json option
+    $newConfig .= "\$GLOBALS['enforce_single_json'] = " . ($input['enforce_single_json'] ? 'true' : 'false') . ";\n";
 
     // Save the new config to the config.php file
     $success = (file_put_contents($configFile, $newConfig) !== false);

@@ -32,8 +32,12 @@ else {
     }
 }
 
+if (isset($GLOBALS["enforce_single_json"]) && $GLOBALS["enforce_single_json"]) {
+    $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] .= " Important: Provide only ONE single JSON response object per interaction. If multiple actions are desired, choose the most immediately relevant/important action and save additional actions for subsequent interactions. The response must be a single valid JSON object containing the character's next action or dialogue.";
+}
+
 if (isset($GLOBALS["enforce_short_responses"]) && $GLOBALS["enforce_short_responses"]) {
-    $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"].="You MUST respond with no more than 2-3 sentences and no more than 40 words.";
+    $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"].=" You MUST respond with no more than 2-3 sentences and no more than 40 words.";
 }
 
 $shouldOverride = ($GLOBALS["PROMPT_HEAD_OVERRIDE"] != "" && isset($GLOBALS["PROMPT_HEAD_OVERRIDE"]));

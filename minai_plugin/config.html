@@ -269,6 +269,13 @@
                         <p>Remove anything between two astericks from the response. Useful if your LLM likes to respond with things like *smirking*, *laughing*, etc.</p>
                         <input type="checkbox" id="strip-emotes">
                     </div>
+
+                    <!-- enforce_single_json -->
+                    <div class="option-group checkbox-group">
+                        <label class="option-label" for="enforce-single-json">Enforce Single JSON Response</label>
+                        <p>Forces the LLM to provide only one single JSON response object per interaction. This helps prevent multiple action attempts in a single response.</p>
+                        <input type="checkbox" id="enforce-single-json">
+                    </div>
                 </div>
             </div>
 
@@ -468,6 +475,7 @@
                 document.getElementById('always-enable-functions').checked = configData.always_enable_functions;
                 document.getElementById('force-aiff-name').checked = configData.force_aiff_name_to_ingame_name;
                 document.getElementById('use-llm-fallback').checked = configData.use_llm_fallback;
+                document.getElementById('enforce-single-json').checked = configData.enforce_single_json;
                 populateDynamicList('commands-to-purge-container', configData.commands_to_purge);
                 populateDynamicList('events-to-ignore-container', configData.events_to_ignore);
                 document.getElementById('disable-worn-equipment').checked = configData.disable_worn_equipment;
@@ -500,6 +508,7 @@
                 always_enable_functions: document.getElementById('always-enable-functions').checked,
                 force_aiff_name_to_ingame_name: document.getElementById('force-aiff-name').checked,
                 use_llm_fallback: document.getElementById('use-llm-fallback').checked,
+                enforce_single_json: document.getElementById('enforce-single-json').checked,
                 commands_to_purge: getDynamicList('commands-to-purge-container'),
                 events_to_ignore: getDynamicList('events-to-ignore-container'),
                 disable_worn_equipment: document.getElementById('disable-worn-equipment').checked,
