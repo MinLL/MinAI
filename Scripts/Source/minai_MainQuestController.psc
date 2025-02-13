@@ -23,6 +23,7 @@ minai_Reputation reputation
 minai_DirtAndBlood dirtAndBlood
 minai_Util MinaiUtil  
 Spell minai_ToggleSapienceSpell
+minai_FertilityMode fertility
 
 bool bHasMantella = False;
 bool bHasAIFF = False;
@@ -73,6 +74,7 @@ Function Maintenance()
   survival = (Self as Quest) as minai_Survival
   arousal = (Self as Quest) as minai_Arousal
   devious = (Self as Quest) as minai_DeviousStuff
+  fertility = (Self as Quest) as minai_FertilityMode
   vr = Game.GetFormFromFile(0x090E, "MinAI.esp") as minai_VR
   followers = Game.GetFormFromFile(0x0913, "MinAI.esp") as minai_Followers
   combat = (Self as Quest) as minai_CombatManager
@@ -99,7 +101,7 @@ Function Maintenance()
   survival.Maintenance(Self)
   arousal.Maintenance(Self)
   devious.Maintenance(Self)
-
+  fertility.Maintenance(Self)
   vr.Maintenance(Self)
   followers.Maintenance(Self)
   combat.Maintenance(Self)
