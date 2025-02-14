@@ -82,6 +82,10 @@ MinAI includes 3467 ostim/sexlab scene descriptions (as of 10/24/2024) for bette
 ### Binding
 * Adds LLM Awareness and exposes actions for the player's master.
 
+### Traps Needs Trappy Reality
+* Adds LLM awareness for the traps from TNTR.
+* Includes a compatibility patch for TNTR v0.5.
+  
 ### Game Interface for Toys (GIFT)
 * Every appropriate interaction that the AI can do is picked up by GIFT, and can be configured to vibrate, etc.
 
