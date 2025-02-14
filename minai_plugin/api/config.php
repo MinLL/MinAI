@@ -46,8 +46,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         // Server settings
         "xtts_server_override" => isset($GLOBALS["xtts_server_override"]) ? $GLOBALS["xtts_server_override"] : "",
         "input_delay_for_radiance" => isset($GLOBALS["input_delay_for_radiance"]) ? $GLOBALS["input_delay_for_radiance"] : 15,
-        "radiance_rechat_h" => isset($GLOBALS["radiance_rechat_h"]) ? $GLOBALS["radiance_rechat_h"] : 8,
-        "radiance_rechat_p" => isset($GLOBALS["radiance_rechat_p"]) ? $GLOBALS["radiance_rechat_p"] : 20,
         
         // Action prompts
         "action_prompts" => isset($GLOBALS["action_prompts"]) ? $GLOBALS["action_prompts"] : array(
@@ -101,8 +99,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Server settings
     $newConfig .= "\$GLOBALS['xtts_server_override'] = \"" . ($input['xtts_server_override']) . "\";\n";
     $newConfig .= "\$GLOBALS['input_delay_for_radiance'] = " . intval($input['input_delay_for_radiance']) . ";\n";
-    $newConfig .= "\$GLOBALS['radiance_rechat_h'] = " . intval($input['radiance_rechat_h']) . ";\n";
-    $newConfig .= "\$GLOBALS['radiance_rechat_p'] = " . intval($input['radiance_rechat_p']) . ";\n";
     
     // Action prompts
     $newConfig .= "\$GLOBALS['action_prompts'] = " . buildAssociativeArrayString($input['action_prompts']) . ";\n";
