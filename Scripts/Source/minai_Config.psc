@@ -159,8 +159,8 @@ int Property maxRadianceRechats = 5 Auto
 float maxThreadsDefault = 5.0
 float Property maxThreads = 5.0 Auto
 
-bool allowSexTransitionsDefault = True
-bool Property allowSexTransitions = True Auto
+bool allowSexTransitionsDefault = False
+bool Property allowSexTransitions = False Auto
 
 bool allowActorsToJoinSexDefault = False
 bool Property allowActorsToJoinSex = False Auto
