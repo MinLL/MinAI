@@ -12,7 +12,9 @@ require_once("fertilitymode.php");
 
 Function BuildContext($name) {
   if ($name == "The Narrator") {
-      return BuildContext($GLOBALS["PLAYER_NAME"]);
+      // The narrator is always talking to the player, don't need to do this
+      //return BuildContext($GLOBALS["PLAYER_NAME"]);
+      return "";
   }
   $context = "";
   $context .= GetPhysicalDescription($name);
