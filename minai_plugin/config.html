@@ -220,6 +220,21 @@
             display: none;
         }
 
+        .prompt-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+            resize: vertical;
+            margin-bottom: 15px;
+        }
+
+        .prompt-textarea:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
     </style>
 </head>
 <body>
@@ -447,6 +462,53 @@
                 </div>
             </div>
 
+            <!-- Action Prompts Section -->
+            <div class="config-section">
+                <div class="section-header collapsed" onclick="toggleSection(this)">
+                    Action Prompts
+                </div>
+                <div class="section-content collapsed">
+                    <div class="info-section">
+                        <p>Customize the prompts used to instruct the LLM on how to use actions in different situations. Available variables:</p>
+                        <ul>
+                            <li>#target# - The target actor's name</li>
+                            <li>#player_name# - The player's name</li>
+                            <li>#herika_name# - Herika's name</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Singing Prompt -->
+                    <div class="option-group">
+                        <label class="option-label" for="singing-prompt">Singing Prompt</label>
+                        <textarea id="singing-prompt" class="prompt-textarea" rows="3"></textarea>
+                    </div>
+
+                    <!-- Self Narrator (Explicit) -->
+                    <div class="option-group">
+                        <label class="option-label" for="self-narrator-explicit">Self Narrator (Explicit Scene)</label>
+                        <textarea id="self-narrator-explicit" class="prompt-textarea" rows="4"></textarea>
+                    </div>
+
+                    <!-- Self Narrator (Normal) -->
+                    <div class="option-group">
+                        <label class="option-label" for="self-narrator-normal">Self Narrator (Normal Scene)</label>
+                        <textarea id="self-narrator-normal" class="prompt-textarea" rows="4"></textarea>
+                    </div>
+
+                    <!-- Explicit Scene -->
+                    <div class="option-group">
+                        <label class="option-label" for="explicit-scene">Explicit Dialogue</label>
+                        <textarea id="explicit-scene" class="prompt-textarea" rows="4"></textarea>
+                    </div>
+
+                    <!-- Normal Scene -->
+                    <div class="option-group">
+                        <label class="option-label" for="normal-scene">Normal Dialogue</label>
+                        <textarea id="normal-scene" class="prompt-textarea" rows="4"></textarea>
+                    </div>
+                </div>
+            </div>
+
             <!-- Submit Button -->
             <button class="submit-button" onclick="submitConfiguration()">Submit Configuration</button>
         </div>
@@ -485,6 +547,11 @@
                 document.getElementById('use-defeat').checked = configData.use_defeat;
                 document.getElementById('realnames-support').checked = configData.realnames_support;
                 populateVoiceTypeFallbacks(configData.voicetype_fallbacks);
+                document.getElementById('singing-prompt').value = configData.action_prompts.singing;
+                document.getElementById('self-narrator-explicit').value = configData.action_prompts.self_narrator_explicit;
+                document.getElementById('self-narrator-normal').value = configData.action_prompts.self_narrator_normal;
+                document.getElementById('explicit-scene').value = configData.action_prompts.explicit_scene;
+                document.getElementById('normal-scene').value = configData.action_prompts.normal_scene;
 
                 document.getElementById('loading-message').style.display = 'none';
                 document.getElementById('config-form').style.display = 'block';
@@ -518,6 +585,13 @@
                 realnames_support: document.getElementById('realnames-support').checked,
                 input_delay_for_radiance: document.getElementById('input-delay').value,
                 voicetype_fallbacks: getVoiceTypeFallbacks(),
+                action_prompts: {
+                    singing: document.getElementById('singing-prompt').value,
+                    self_narrator_explicit: document.getElementById('self-narrator-explicit').value,
+                    self_narrator_normal: document.getElementById('self-narrator-normal').value,
+                    explicit_scene: document.getElementById('explicit-scene').value,
+                    normal_scene: document.getElementById('normal-scene').value
+                }
             };
 
             try {
