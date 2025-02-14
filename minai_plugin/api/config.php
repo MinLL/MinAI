@@ -14,6 +14,35 @@ if (!file_exists("$pluginPath/config.php")) {
     require_once("$pluginPath/config.php");
 }
 
+// Function to build a string for indexed arrays using Array("value1", "value2") format
+function buildArrayString($array) {
+    $arrayString = 'Array(';
+    $values = array_map(function($value) {
+        return '"' . ($value) . '"';
+    }, $array);
+    $arrayString .= implode(', ', $values);
+    $arrayString .= ')';
+    return $arrayString;
+}
+
+// Function to build a string for associative arrays using Array("key" => "value") format
+function buildAssociativeArrayString($array) {
+    $arrayString = 'Array(';
+    $elements = [];
+    foreach ($array as $key => $value) {
+        // Escape only double quotes and backslashes in the value
+        $escapedValue = str_replace(
+            ['\\', '"'], 
+            ['\\\\', '\\"'], 
+            $value
+        );
+        $elements[] = '"' . $key . '" => "' . $escapedValue . '"';
+    }
+    $arrayString .= implode(', ', $elements);
+    $arrayString .= ')';
+    return $arrayString;
+}
+
 // Read config data from the file (GET request)
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // Prepare the response using the loaded configuration
