@@ -28,12 +28,14 @@ function AddVictimActorsColumn() {
 function Beta395Migration() {
     error_log("minai: Executing update to beta39.5");
     // Clean up DB and perform migrations
-    $GLOBALS["db"] = new sql();
+    if(!isset($GLOBALS["db"])) {
+        $GLOBALS["db"] = new sql();
+    }
     $GLOBALS["db"]->execQuery("DROP TABLE IF EXISTS custom_context");
     $GLOBALS["db"]->execQuery("DROP TABLE IF EXISTS custom_actions");
     CreateContextTableIfNotExists();
     CreateActionsTableIfNotExists();
-    error_log("minai: Migration complete");
+    error_log("minai: Beta39.5 Migration complete");
 }
 
 // Function to be executed for version 1.0.7
@@ -41,7 +43,8 @@ function Version107Migration() {
     error_log("minai: Executing update to 1.0.7");
     $GLOBALS["db"] = new sql();
     AddVictimActorsColumn();
-    error_log("minai: Migration complete");
+    Beta395Migration();
+    error_log("minai: 1.0.7 Migration complete");
 }
 
 $versionFile = "$pluginPath/version.txt";
