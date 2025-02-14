@@ -33,7 +33,7 @@ function Beta395Migration() {
     $GLOBALS["db"]->execQuery("DROP TABLE IF EXISTS custom_actions");
     CreateContextTableIfNotExists();
     CreateActionsTableIfNotExists();
-    error_log("minai: Migration complete");
+    error_log("minai: Beta39.5 Migration complete");
 }
 
 // Function to be executed for version 1.0.7
@@ -41,7 +41,8 @@ function Version107Migration() {
     error_log("minai: Executing update to 1.0.7");
     $GLOBALS["db"] = new sql();
     AddVictimActorsColumn();
-    error_log("minai: Migration complete");
+    Beta395Migration();
+    error_log("minai: 1.0.7 Migration complete");
 }
 
 $versionFile = "$pluginPath/version.txt";
