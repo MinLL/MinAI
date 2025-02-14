@@ -748,6 +748,18 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     elseIf (command == "ExtCmdshock")
       libs.ShockActor(akTarget)
       Main.RegisterEvent(""+speakerName+" remotely shocks  " + targetName + ".")
+    elseIf (command == "ExtCmdEquipVibrator")
+      ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_plugs_anal)
+      ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_plugs_vaginal)
+      
+      ; Turn on vibrators - edge only if not already in a scene
+      bool edgeOnly = sex.CanAnimate(akTarget)
+      StartVibration(akTarget, 3, 60, edgeOnly)
+      if edgeOnly
+        Main.RegisterEvent(speakerName + " locked vibrating plugs inside " + targetName + ". The plugs immediately began teasing " + targetName + " with moderate vibrations, but won't let them climax.")
+      else
+        Main.RegisterEvent(speakerName + " locked vibrating plugs inside " + targetName + ". The plugs immediately began stimulating " + targetName + " with moderate vibrations that could potentially make them climax.")
+      EndIf
     EndIf
     ; Device equip events
     if bHasDDExpansion
@@ -770,6 +782,7 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
         ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_plugs_anal)
         ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_plugs_vaginal)
         Main.RegisterEvent(""+speakerName+" Puts a Vibrator in " + targetName)
+        
       elseif (command == "ExtCmdEquipBelt")
         ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_chastitybelts_closed)
         Main.RegisterEvent(""+speakerName+" Puts a Chastity Belt on " + targetName)
