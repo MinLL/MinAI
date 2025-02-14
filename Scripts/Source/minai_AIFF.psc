@@ -8,6 +8,7 @@ minai_DeviousStuff devious
 minai_Config config
 minai_Reputation reputation
 minai_DirtAndBlood dirtAndBlood
+minai_FertilityMode fertility
 
 bool bHasAIFF = False
 
@@ -76,6 +77,7 @@ Function Maintenance(minai_MainQuestController _main)
   arousal = (Self as Quest)as minai_Arousal
   devious = (Self as Quest)as minai_DeviousStuff
   dirtAndBlood = (Self as Quest)as minai_DirtAndBlood
+  fertility = (Self as Quest)as minai_FertilityMode
   followers = Game.GetFormFromFile(0x0913, "MinAI.esp") as minai_Followers
   reputation = (Self as Quest) as minai_Reputation
   if (!followers)
@@ -120,6 +122,10 @@ Function Maintenance(minai_MainQuestController _main)
     ; Initialize the dialogue times map
     lastDialogueTimes = JMap.Object()
     JValue.Retain(lastDialogueTimes)
+  EndIf
+
+  if config.preserveQueue
+    EnablePreserveQueue()
   EndIf
 EndFunction
 
@@ -245,6 +251,7 @@ Function SetContext(actor akTarget)
   followers.SetContext(akTarget)
   reputation.SetContext(akTarget)
   dirtAndBlood.SetContext(akTarget)
+  fertility.SetContext(akTarget)
   StoreKeywords(akTarget)
   StoreFactions(akTarget)
   if config.disableAIAnimations && akTarget != player
@@ -807,5 +814,19 @@ Function ToggleSapience()
     Main.Info("SAPIENCE: Sapience enabled via toggle.")
     Debug.Notification("Sapience enabled.")
     minai_SapienceEnabled.SetValue(1)
+  EndIf
+EndFunction
+
+Function EnablePreserveQueue()
+  if bHasAIFF
+    Main.Info("CHIM CONFIG: Preserving dialogue queue.")
+    AIAgentFunctions.setConf("_preserve_queue", 1, 0, "")
+  EndIf
+EndFunction
+
+Function DisablePreserveQueue()
+  if bHasAIFF
+    Main.Info("CHIM CONFIG: Not preserving dialogue queue.")
+    AIAgentFunctions.setConf("_preserve_queue", 0, 0, "")
   EndIf
 EndFunction

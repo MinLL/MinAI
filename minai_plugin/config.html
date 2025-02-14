@@ -220,6 +220,26 @@
             display: none;
         }
 
+        .prompt-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+            resize: vertical;
+            margin-bottom: 15px;
+        }
+
+        .prompt-textarea:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
+        /* Hide singing prompt */
+        #singing-prompt {
+            display: none;
+        }
+
     </style>
 </head>
 <body>
@@ -268,6 +288,13 @@
                         <label class="option-label" for="strip-emotes">Strip emotes from output</label>
                         <p>Remove anything between two astericks from the response. Useful if your LLM likes to respond with things like *smirking*, *laughing*, etc.</p>
                         <input type="checkbox" id="strip-emotes">
+                    </div>
+
+                    <!-- enforce_single_json -->
+                    <div class="option-group checkbox-group">
+                        <label class="option-label" for="enforce-single-json">Enforce Single JSON Response</label>
+                        <p>Forces the LLM to provide only one single JSON response object per interaction. This helps prevent multiple action attempts in a single response.</p>
+                        <input type="checkbox" id="enforce-single-json">
                     </div>
                 </div>
             </div>
@@ -440,6 +467,61 @@
                 </div>
             </div>
 
+            <!-- Action Prompts Section -->
+            <div class="config-section">
+                <div class="section-header collapsed" onclick="toggleSection(this)">
+                    Action Prompts
+                </div>
+                <div class="section-content collapsed">
+                    <div class="info-section">
+                        <p>Customize the prompts used to instruct the LLM on how to use actions in different situations. Available variables:</p>
+                        <ul>
+                            <li>#target# - The name of the target actor</li>
+                            <li>#player_name# - The player's name</li>
+                            <li>#herika_name# - The name of the NPC that's going to respond to the prompt</li>
+                        </ul>
+                        <details>
+                            <summary>Pronoun Variables</summary>
+                            <ul>
+                                <li><strong>Target pronouns:</strong> #target_subject# (he/she/they), #target_object# (him/her/them), #target_possessive# (his/her/their)</li>
+                                <li><strong>Player pronouns:</strong> #player_subject#, #player_object#, #player_possessive#</li>
+                                <li><strong>Herika pronouns:</strong> #herika_subject#, #herika_object#, #herika_possessive#</li>
+                            </ul>
+                        </details>
+                    </div>
+                    
+                    <!-- Singing Prompt -->
+                    <div class="option-group">
+                        <label class="option-label" for="singing-prompt">Singing Prompt</label>
+                        <textarea id="singing-prompt" class="prompt-textarea" rows="3"></textarea>
+                    </div>
+
+                    <!-- Self Narrator (Explicit) -->
+                    <div class="option-group">
+                        <label class="option-label" for="self-narrator-explicit">Self Narrator (Explicit Scene)</label>
+                        <textarea id="self-narrator-explicit" class="prompt-textarea" rows="4"></textarea>
+                    </div>
+
+                    <!-- Self Narrator (Normal) -->
+                    <div class="option-group">
+                        <label class="option-label" for="self-narrator-normal">Self Narrator (Normal Scene)</label>
+                        <textarea id="self-narrator-normal" class="prompt-textarea" rows="4"></textarea>
+                    </div>
+
+                    <!-- Explicit Scene -->
+                    <div class="option-group">
+                        <label class="option-label" for="explicit-scene">Explicit Dialogue</label>
+                        <textarea id="explicit-scene" class="prompt-textarea" rows="4"></textarea>
+                    </div>
+
+                    <!-- Normal Scene -->
+                    <div class="option-group">
+                        <label class="option-label" for="normal-scene">Normal Dialogue</label>
+                        <textarea id="normal-scene" class="prompt-textarea" rows="4"></textarea>
+                    </div>
+                </div>
+            </div>
+
             <!-- Submit Button -->
             <button class="submit-button" onclick="submitConfiguration()">Submit Configuration</button>
         </div>
@@ -468,6 +550,7 @@
                 document.getElementById('always-enable-functions').checked = configData.always_enable_functions;
                 document.getElementById('force-aiff-name').checked = configData.force_aiff_name_to_ingame_name;
                 document.getElementById('use-llm-fallback').checked = configData.use_llm_fallback;
+                document.getElementById('enforce-single-json').checked = configData.enforce_single_json;
                 populateDynamicList('commands-to-purge-container', configData.commands_to_purge);
                 populateDynamicList('events-to-ignore-container', configData.events_to_ignore);
                 document.getElementById('disable-worn-equipment').checked = configData.disable_worn_equipment;
@@ -477,6 +560,11 @@
                 document.getElementById('use-defeat').checked = configData.use_defeat;
                 document.getElementById('realnames-support').checked = configData.realnames_support;
                 populateVoiceTypeFallbacks(configData.voicetype_fallbacks);
+                document.getElementById('singing-prompt').value = configData.action_prompts.singing;
+                document.getElementById('self-narrator-explicit').value = configData.action_prompts.self_narrator_explicit;
+                document.getElementById('self-narrator-normal').value = configData.action_prompts.self_narrator_normal;
+                document.getElementById('explicit-scene').value = configData.action_prompts.explicit_scene;
+                document.getElementById('normal-scene').value = configData.action_prompts.normal_scene;
 
                 document.getElementById('loading-message').style.display = 'none';
                 document.getElementById('config-form').style.display = 'block';
@@ -500,6 +588,7 @@
                 always_enable_functions: document.getElementById('always-enable-functions').checked,
                 force_aiff_name_to_ingame_name: document.getElementById('force-aiff-name').checked,
                 use_llm_fallback: document.getElementById('use-llm-fallback').checked,
+                enforce_single_json: document.getElementById('enforce-single-json').checked,
                 commands_to_purge: getDynamicList('commands-to-purge-container'),
                 events_to_ignore: getDynamicList('events-to-ignore-container'),
                 disable_worn_equipment: document.getElementById('disable-worn-equipment').checked,
@@ -509,6 +598,13 @@
                 realnames_support: document.getElementById('realnames-support').checked,
                 input_delay_for_radiance: document.getElementById('input-delay').value,
                 voicetype_fallbacks: getVoiceTypeFallbacks(),
+                action_prompts: {
+                    singing: document.getElementById('singing-prompt').value,
+                    self_narrator_explicit: document.getElementById('self-narrator-explicit').value,
+                    self_narrator_normal: document.getElementById('self-narrator-normal').value,
+                    explicit_scene: document.getElementById('explicit-scene').value,
+                    normal_scene: document.getElementById('normal-scene').value
+                }
             };
 
             try {

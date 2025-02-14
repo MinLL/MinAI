@@ -8,10 +8,11 @@ require_once("weather.php");
 require_once("reputation.php");
 require_once("submissivelola.php");
 require_once("dirtandblood.php");
+require_once("fertilitymode.php");
 
 Function BuildContext($name) {
   if ($name == "The Narrator") {
-    return "";
+      return BuildContext($GLOBALS["PLAYER_NAME"]);
   }
   $context = "";
   $context .= GetPhysicalDescription($name);
@@ -19,6 +20,7 @@ Function BuildContext($name) {
   $context .= GetDDContext($name);
   $context .= GetArousalContext($name);
   $context .= GetFollowingContext($name);
+  $context .= GetFertilityContext($name);
   if (!isset($GLOBALS["HERIKA_TARGET"])) {
       $context .= GetDeviousFollowerContext($name);
       $context .= GetSubmissiveLolaContext($name);
@@ -159,6 +161,7 @@ Function GetClothingContext($name) {
   $tmp = GetRevealedStatus($name);
   $wearingBottom = $tmp["wearingBottom"];
   $wearingTop = $tmp["wearingTop"];
+  $isNarrator = ($GLOBALS["HERIKA_NAME"]  == "The Narrator");
   
   // if $eqContext["context"] not empty, then will set ret
   if (!empty($eqContext["context"])) {
@@ -169,59 +172,79 @@ Function GetClothingContext($name) {
     $ret .= "{$name} is wearing {$cuirass}.\n";
   }
 
-  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_HalfNakedBikini")) {
-    $ret .= "{$name} is wearing a set of revealing bikini armor.\n";
+  // Only show detailed clothing info if narrator or the area is revealed
+  if ($isNarrator || !$wearingTop) {
+    $concealedPrefix = !empty($cuirass) ? "Concealed by {$cuirass}, " : "";
+    
+    if (HasKeywordAndNotSkip($name, $eqContext, "SLA_Brabikini")) {
+      $ret .= "{$concealedPrefix}{$name} is wearing a bra underneath her other equipment.\n";
+    }
   }
-  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorHalfNaked")) {
-    $ret .= "{$name} is wearing very revealing attire, leaving them half naked.\n";
+
+  if ($isNarrator || !$wearingBottom) {
+    $concealedPrefix = !empty($cuirass) ? "Concealed by {$cuirass}, " : "";
+    
+    if (HasKeywordAndNotSkip($name, $eqContext, "SLA_Thong")) {
+      $ret .= "{$concealedPrefix}{$name} is wearing a thong underneath her other equipment.\n";
+    }
+    if (HasKeywordAndNotSkip($name, $eqContext, "SLA_PantiesNormal")) {
+      $ret .= "{$concealedPrefix}{$name} is wearing plain panties underneath her other equipment.\n";
+    }
+    if (HasKeywordAndNotSkip($name, $eqContext, "SLA_PantsNormal")) {
+      $ret .= "{$concealedPrefix}{$name} is wearing a set of ordinary pants.\n";
+    }
+    if (HasKeywordAndNotSkip($name, $eqContext, "SLA_PelvicCurtain")) {
+      $ret .= "{$concealedPrefix}{$name}'s pussy is covered only by a sheer curtain of fabric.\n";
+    }
+    if (HasKeywordAndNotSkip($name, $eqContext, "SLA_FullSkirt")) {
+      $ret .= "{$concealedPrefix}{$name} is wearing a full length skirt that goes down to her knees.\n";
+    }
+    if (HasKeywordAndNotSkip($name, $eqContext, "SLA_MiniSkirt")) {
+      $ret .= "{$concealedPrefix}{$name} is wearing a short mini-skirt that barely covers her ass. Her underwear or panties are sometimes visible underneath when she moves.\n";
+    }
+    if (HasKeywordAndNotSkip($name, $eqContext, "SLA_MicroHotPants")) {
+      $ret .= "{$concealedPrefix}{$name} is wearing a set of short hot-pants that accentuate her ass.\n";
+    }
   }
-  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_Brabikini" )) {
-    $ret .= "{$name} is wearing a bra underneath her other equipment.\n";
+
+  // Full body outfits only show if narrator or both top and bottom are revealed
+  if ($isNarrator || (!$wearingTop && !$wearingBottom)) {
+    $concealedPrefix = !empty($cuirass) ? "Concealed by {$cuirass}, " : "";
+
+    if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorHarness")) {
+      $ret .= "{$concealedPrefix}{$name} is wearing a form-fitting body harness.\n";
+    }
+    if (HasKeywordAndNotSkip($name, $eqContext, "SLA_HalfNakedBikini")) {
+      $ret .= "{$concealedPrefix}{$name} is wearing a set of revealing bikini armor.\n";
+    }
+    if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorHalfNaked")) {
+      $ret .= "{$concealedPrefix}{$name} is wearing very revealing attire, leaving them half naked.\n";
+    }
+    if (HasKeywordAndNotSkip($name, $eqContext, "EroticArmor")) {
+      $ret .= "{$concealedPrefix}{$name} is wearing a sexy revealing outfit.\n";
+    }
+    if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorSpendex")) {
+      $ret .= "{$concealedPrefix}{$name}'s outfit is made out of latex (Referred to as Ebonite).\n";
+    }
+    if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorTransparent")) {
+      $ret .= "{$concealedPrefix}{$name}'s outfit is transparent, leaving nothing to the imagination.\n";
+    }
+    if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorLewdLeotard")) {
+      $ret .= "{$concealedPrefix}{$name} is wearing a sheer, revealing leotard leaving very little to the imagination.\n";
+    }
+    if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorRubber")) {
+      $ret .= "{$concealedPrefix}{$name}'s outfit is made out of tight form-fitting rubber (Referred to as Ebonite).\n";
+    }
   }
-  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_Thong")) {
-    $ret .= "{$name} is wearing a thong underneath her other equipment.\n";
-  }
-  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_PantiesNormal")) {
-    $ret .= "{$name} is wearing plain panties underneath her other equipment.\n";
-  }
+
+  // Always visible accessories
   if (HasKeywordAndNotSkip($name, $eqContext, "SLA_Heels")) {
     $ret .= "{$name} is wearing a set of high-heels.\n";
   }
-  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_PantsNormal")) {
-    $ret .= "{$name} is wearing a set of ordinary pants.\n";
-  }
-  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_MicroHotPants")) {
-    $ret .= "{$name} is wearing a set of short hot-pants that accentuate her ass.\n";
-  }
-  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorHarness")) {
-    $ret .= "{$name} is wearing a form-fitting body harness.\n";
-  }
-  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorSpendex")) {
-    $ret .= "{$name}'s outfit is made out of latex (Referred to as Ebonite).\n";
-  }
-  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorTransparent")) {
-    $ret .= "{$name}'s outfit is transparent, leaving nothing to the imagination.\n";
-  }
-  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorLewdLeotard")) {
-    $ret .= "{$name} is wearing a sheer, revealing leotard leaving very little to the imagination.\n";
-  }
-  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_PelvicCurtain")) {
-    $ret .= "{$name}'s pussy is covered only by a sheer curtain of fabric.\n";
-  }
-  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_FullSkirt")) {
-    $ret .= "{$name} is wearing a full length skirt that goes down to her knees.\n";
-  }
-  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_MiniSkirt")) {
-    $ret .= "{$name} is wearing a short mini-skirt that barely covers her ass. Her underwear or panties are sometimes visible underneath when she moves.\n";
-  }
-  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorRubber")) {
-    $ret .= "{$name}'s outfit is made out of tight form-fitting rubber (Referred to as Ebonite).\n";
-  }
-  if (HasKeywordAndNotSkip($name, $eqContext, "EroticArmor")) {
-      $ret .= "{$name} is wearing a sexy revealing outfit.\n";
-  }
+
+  // Rest of the piercings code remains unchanged...
   if (!$wearingBottom && HasKeywordAndNotSkip($name, $eqContext, "SLA_PiercingVulva")) {
-      $ret .= "{$name} has labia piercings.\n";
+    $ret .= "{$name} has labia piercings.\n";
   }
   if (HasKeywordAndNotSkip($name, $eqContext, "SLA_PiercingBelly")) {
       $ret .= "{$name} has a navel piercing.\n";
@@ -253,16 +276,31 @@ Function GetDDContext($name) {
   $tmp = GetRevealedStatus($name);
   $wearingBottom = $tmp["wearingBottom"];
   $wearingTop = $tmp["wearingTop"];
-  // Piercings are handled in GetClothingContext instead
-  if (HasKeyword($name, "zad_DeviousPlugVaginal") && !$wearingBottom) {
-    $ret .= "{$name} has a remotely controlled plug in her pussy capable of powerful vibrations.\n";
+  $isNarrator = ($GLOBALS["HERIKA_NAME"] == "The Narrator");
+  $cuirass = GetActorValue($name, "cuirass", false, true);
+  $concealedPrefix = !empty($cuirass) ? "Concealed by {$cuirass}, " : "";
+
+  // Items that require bottom area to be visible
+  if ($isNarrator || !$wearingBottom) {
+    if (HasKeyword($name, "zad_DeviousPlugVaginal")) {
+      $ret .= "{$concealedPrefix}{$name} has a remotely controlled plug in her pussy capable of powerful vibrations.\n";
+    }
+    if (HasKeyword($name, "zad_DeviousPlugAnal")) {
+      $ret .= "{$concealedPrefix}{$name} has a remotely controlled plug in her ass capable of powerful vibrations.\n";
+    }
+    if (HasKeyword($name, "zad_DeviousBelt")) {
+      $ret .= "{$concealedPrefix}{$name}'s pussy is locked away by a chastity belt, preventing her from touching it or having sex.\n";
+    }
   }
-  if (HasKeyword($name, "zad_DeviousPlugAnal") && !$wearingBottom) {
-    $ret .= "{$name} has a remotely controlled plug in her ass capable of powerful vibrations.\n";
+
+  // Items that require top area to be visible
+  if ($isNarrator || !$wearingTop) {
+    if (HasKeyword($name, "zad_DeviousBra")) {
+      $ret .= "{$concealedPrefix}{$name}'s breasts are locked away in a chastity bra.\n";
+    }
   }
-  if (HasKeyword($name, "zad_DeviousBelt") && !$wearingBottom) {
-    $ret .= "{$name}'s pussy is locked away by a chastity belt, preventing her from touching it or having sex.\n";
-  }
+
+  // Always visible items (or items that show even with clothing)
   if (HasKeyword($name, "zad_DeviousCollar")) {
     $ret .= "{$name} is wearing a collar marking her as someone's property.\n";
   }
@@ -272,38 +310,44 @@ Function GetDDContext($name) {
   if (HasKeyword($name, "zad_DeviousLegCuffs")) {
     $ret .= "{$name} is wearing a leg cuff on each leg.\n";
   }
-  if (HasKeyword($name, "zad_DeviousBra") && !$wearingTop) {
-    $ret .= "{$name}'s breasts are locked away in a chastity bra.\n";
+
+  // Full body restraints - only show if narrator or fully revealed
+  if ($isNarrator || (!$wearingTop && !$wearingBottom)) {
+    if (HasKeyword($name, "zad_DeviousArmbinder")) {
+      $ret .= "{$concealedPrefix}{$name}'s hands are secured behind her back by an armbinder, leaving her helpless.\n";
+    }
+    if (HasKeyword($name, "zad_DeviousYoke")) {
+      $ret .= "{$concealedPrefix}{$name}'s hands and neck are locked in an uncomfortable yoke, leaving her helpless.\n";
+    }
+    if (HasKeyword($name, "zad_DeviousElbowTie")) {
+      $ret .= "{$concealedPrefix}{$name}'s arms are tied behind her back in-a strict elbow tie, leaving her helpless.\n";
+    }
+    if (HasKeyword($name, "zad_DeviousPetSuit")) {
+      $ret .= "{$concealedPrefix}{$name} is wearing a full-body suit made out of shiny latex (Referred to as Ebonite) leaving nothing to the imagination.\n";
+    }
+    if (HasKeyword($name, "zad_DeviousStraitJacket")) {
+      $ret .= "{$concealedPrefix}{$name}'s arms are secured by a strait jacket, leaving her helpless.\n";
+    }
+    if (HasKeyword($name, "zad_DeviousCorset")) {
+      $ret .= "{$concealedPrefix}{$name} is wearing a corset around her waist.\n";
+    }
+    if (HasKeyword($name, "zad_DeviousHobbleSkirt")) {
+      $ret .= "{$concealedPrefix}{$name} is wearing a confining hobble-skirt that is restricting her movements.\n";
+    }
+    if (HasKeyword($name, "zad_DeviousGloves")) {
+      $ret .= "{$concealedPrefix}{$name} is wearing a a pair of locking gloves.\n";
+    }
+    if (HasKeyword($name, "zad_DeviousSuit")) {
+      $ret .= "{$concealedPrefix}{$name} is wearing skin tight body-suit.\n";
+    }
+    if (HasKeyword($name, "zad_DeviousHarness")) {
+      $ret .= "{$concealedPrefix}{$name} is wearing a form-fitting leather harness.\n";
+    }
   }
-  if (HasKeyword($name, "zad_DeviousArmbinder")) {
-    $ret .= "{$name}'s hands are secured behind her back by an armbinder, leaving her helpless.\n";
-  }
-  if (HasKeyword($name, "zad_DeviousYoke")) {
-    $ret .= "{$name}'s hands and neck are locked in an uncomfortable yoke, leaving her helpless.\n";
-  }
-  if (HasKeyword($name, "zad_DeviousElbowTie")) {
-    $ret .= "{$name}'s arms are tied behind her back in-a strict elbow tie, leaving her helpless.\n";
-  }
-  if (HasKeyword($name, "zad_DeviousPetSuit")) {
-    $ret .= "{$name} is wearing a full-body suit made out of shiny latex (Referred to as Ebonite) leaving nothing to the imagination.\n";
-  }
-  if (HasKeyword($name, "zad_DeviousStraitJacket")) {
-    $ret .= "{$name}'s arms are secured by a strait jacket, leaving her helpless.\n";
-  }
-  if (HasKeyword($name, "zad_DeviousCorset")) {
-    $ret .= "{$name} is wearing a corset around her waist.\n";
-  }
+
+  // Always visible head items
   if (HasKeyword($name, "zad_DeviousHood")) {
     $ret .= "{$name} is wearing a hood over her head.\n";
-  }
-  if (HasKeyword($name, "zad_DeviousHobbleSkirt")) {
-    $ret .= "{$name} is wearing a confining hobble-skirt that is restricting her movements.\n";
-  }
-  if (HasKeyword($name, "zad_DeviousGloves")) {
-    $ret .= "{$name} is wearing a a pair of locking gloves.\n";
-  }
-  if (HasKeyword($name, "zad_DeviousSuit")) {
-    $ret .= "{$name} is wearing skin tight body-suit.\n";
   }
   if (HasKeyword($name, "zad_DeviousGag")) {
     $ret .= "{$name} is gagged and is drooling.\n";
@@ -314,28 +358,31 @@ Function GetDDContext($name) {
   if (HasKeyword($name, "zad_DeviousGagLarge")) {
     $ret .= "{$name} is gagged with a large gag and cannot speak clearly.\n";
   }
-  if (HasKeyword($name, "zad_DeviousHarness")) {
-    $ret .= "{$name} is wearing a form-fitting leather harness.\n";
-  }
   if (HasKeyword($name, "zad_DeviousBlindfold")) {
     $ret .= "{$name} is blindfolded and cannot see where she is going.\n";
   }
   if (HasKeyword($name, "zad_DeviousAnkleShackles")) {
     $ret .= "{$name} is wearing a set of ankle shackles, restricting her ability to move quickly.\n";
   }
-  if (HasKeyword($name, "zad_DeviousClamps") && !$wearingTop) {
-    $ret .= "{$name} is wearing a set of painful nipple clamps.\n";
+
+  // Items requiring exposed chest
+  if ($isNarrator || !$wearingTop) {
+    if (HasKeyword($name, "zad_DeviousClamps")) {
+      $ret .= "{$concealedPrefix}{$name} is wearing a set of painful nipple clamps.\n";
+    }
   }
-  if (CanVibrate($name) && (!$wearingTop || !$wearingBottom)) {
-      if (IsInFaction($name, "Vibrator Effect Faction")) {
-          $ret .= "{$name}'s vibrator is currently on, and is actively stimulating her.\n";
-      }
-      else {
-          $ret .= "{$name}'s vibrator is currently off.\n";
-      }
+
+  // Vibration status - only show if relevant areas are exposed
+  if (CanVibrate($name) && ($isNarrator || (!$wearingTop || !$wearingBottom))) {
+    if (IsInFaction($name, "Vibrator Effect Faction")) {
+      $ret .= "{$concealedPrefix}{$name}'s vibrator is currently on, and is actively stimulating her.\n";
+    } else {
+      $ret .= "{$concealedPrefix}{$name}'s vibrator is currently off.\n";
+    }
   }
+
   if ($ret != "")
-      $ret .= "\n";
+    $ret .= "\n";
   return $ret;
 }
 
