@@ -28,7 +28,9 @@ function AddVictimActorsColumn() {
 function Beta395Migration() {
     error_log("minai: Executing update to beta39.5");
     // Clean up DB and perform migrations
-    $GLOBALS["db"] = new sql();
+    if(!isset($GLOBALS["db"])) {
+        $GLOBALS["db"] = new sql();
+    }
     $GLOBALS["db"]->execQuery("DROP TABLE IF EXISTS custom_context");
     $GLOBALS["db"]->execQuery("DROP TABLE IF EXISTS custom_actions");
     CreateContextTableIfNotExists();
