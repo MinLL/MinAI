@@ -19,10 +19,24 @@ $currentName = $GLOBALS["HERIKA_NAME"];
 if($currentName === "The Narrator") {
     return;
 }
+
+
 $currentName = strtolower($currentName);
 $scene = getScene($currentName);
 // Add debug logging for scene data
 error_log("minai: Scene data: " . json_encode($scene));
+
+// Initialize sex scene context with scene data
+$GLOBALS["SEX_SCENE_CONTEXT"] = [
+    "victimActors" => isset($scene["victim_actors"]) ? $scene["victim_actors"] : null,
+    "femaleActors" => isset($scene["female_actors"]) ? $scene["female_actors"] : null,
+    "maleActors" => isset($scene["male_actors"]) ? $scene["male_actors"] : null,
+    "framework" => isset($scene["framework"]) ? $scene["framework"] : "",
+    "threadId" => isset($scene["thread_id"]) ? $scene["thread_id"] : null,
+    "scene" => isset($scene["curr_scene_id"]) ? $scene["curr_scene_id"] : "",
+    "description" => isset($scene["description"]) ? $scene["description"] : "",
+    "fallback" => isset($scene["fallback"]) ? $scene["fallback"] : ""
+];
 
 $jsonXPersonality = getXPersonality($currentName);
 addXPersonality($jsonXPersonality);
