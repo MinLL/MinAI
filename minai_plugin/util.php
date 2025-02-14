@@ -336,8 +336,13 @@ Function IsRadiant() {
 
 function getScene($actor, $threadId = null) {
     error_log("minai: getScene($actor, $threadId)");
+    
+    // Properly escape the actor name for PostgreSQL
+    $actor = $GLOBALS["db"]->escape($actor);
+    // Also escape square brackets
     $actor = str_replace('[', '\[', $actor);
     $actor = str_replace(']', '\]', $actor);
+    
     if(isset($threadId)) {
         $scene = $GLOBALS["db"]->fetchAll("SELECT * from minai_threads WHERE thread_id = '$threadId'");
     } else {
