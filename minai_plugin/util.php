@@ -390,14 +390,22 @@ function getScene($actor, $threadId = null) {
     }
 
     if($scene["female_actors"] && $scene["male_actors"]) {
-        // push females at the beginning for sexlab
+        /*
+        Scene with mixed gender actors.
+        If the placeholders in the description consistently respect the gender order of the actors ({actor0} is always male), framework does not matter at this stage.
+        Framework was only relevant when collecting information about the gender of the actors in the $scene replacement list.
+        */
+        /*
+        // push females at the beginning for sexlab  
         if($scene["framework"] == "sexlab") {
             $scene["actors"] = $scene["female_actors"].",".$scene["male_actors"];
         }
         // push males at the beginning for ostim
-        else {
+        else {   
             $scene["actors"] = $scene["male_actors"].",".$scene["female_actors"];
         }
+        */
+        $scene["actors"] = $scene["male_actors"].",".$scene["female_actors"];
     } elseif($scene["female_actors"]) {
         $scene["actors"] = $scene["female_actors"];
     } else {
