@@ -171,20 +171,6 @@ function BuildEquipmentContext(&$parsedData)
   ];
 }
 
-function CreateEquipmentDescriptionTableIfNotExist()
-{
-  $db = $GLOBALS['db'];
-  $db->execQuery(
-    "CREATE TABLE IF NOT EXISTS equipment_description (
-      baseFormId TEXT NOT NULL,
-      modName TEXT NOT NULL,
-      name TEXT NOT NULL,
-      description TEXT,
-      PRIMARY KEY (baseFormId, modName)
-    )"
-  );
-}
-
 function GetAllEquipmentContext($actorName)
 {
   // only support postgresql for now / not sure which case sqllite is used
@@ -197,7 +183,6 @@ function GetAllEquipmentContext($actorName)
 
   // if this fails, still be able to continue without this functionality
   try {
-    CreateEquipmentDescriptionTableIfNotExist();
     $encodedString = GetActorValue($actorName, "AllWornEquipment");
     error_log("AllWornEquipment: " . $encodedString);
     // we can potentially cache this by hashing the encodedString since equipment doesn't change often

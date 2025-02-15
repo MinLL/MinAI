@@ -4,7 +4,7 @@ $path = ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . ".." . DIRECTO
 require_once($path . "conf" . DIRECTORY_SEPARATOR . "conf.php");
 require_once($path . "lib" . DIRECTORY_SEPARATOR . "{$GLOBALS['DBDRIVER']}.class.php");
 
-$db = new Sql();
+$db = new sql();
 
 // Handle GET request to fetch table data
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {

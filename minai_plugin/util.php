@@ -1,5 +1,6 @@
 <?php
 define("MINAI_ACTOR_VALUE_CACHE", "minai_actor_value_cache");
+require_once("db_utils.php");
 require_once("importDataToDB.php");
 
 $GLOBALS[MINAI_ACTOR_VALUE_CACHE] = [];
@@ -335,7 +336,7 @@ Function IsRadiant() {
 }
 
 function getScene($actor, $threadId = null) {
-    error_log("minai: getScene($actor, $threadId)");
+    //error_log("minai: getScene($actor, $threadId)");
     
     // Properly escape the actor name for PostgreSQL
     $actor = $GLOBALS["db"]->escape($actor);
@@ -354,7 +355,7 @@ function getScene($actor, $threadId = null) {
     }
 
     if(!$scene) {
-        error_log("minai: No scene found.")     ;
+        // error_log("minai: No scene found.")     ;
         return null;
     }
     $scene = $scene[0];
@@ -594,6 +595,9 @@ Function IsExplicitScene() {
 }
 
 Function SetNarratorPrompts($isFirstPerson = false) {
+    // Get the player's input if any
+    $playerInput = isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"] != "" ? $GLOBALS["gameRequest"][3] : "";
+    
     if ($isFirstPerson) {
         if (IsExplicitScene()) {
             $GLOBALS["PROMPTS"]["minai_narrator_talk"] = [
@@ -636,6 +640,13 @@ Function SetNarratorPrompts($isFirstPerson = false) {
             
             $GLOBALS["TEMPLATE_DIALOG"] = "You are The Narrator. Respond in an omniscient, storyteller-like manner.";
         }
+    }
+
+    // Add player_request only if there was actual input
+    if (!empty($playerInput)) {
+        $GLOBALS["PROMPTS"]["minai_narrator_talk"]["player_request"] = [
+            $playerInput
+        ];
     }
 }
 
@@ -846,4 +857,112 @@ function GetActorPronouns($name) {
     return $pronouns;
 }
 
-?>
+/**
+ * Makes a call to the LLM using OpenRouter
+ * 
+ * @param array $messages Array of message objects with 'role' and 'content'
+ * @param string|null $model Optional model override
+ * @param array $options Optional parameters like temperature, max_tokens
+ * @return string|null Returns the LLM response content or null on failure
+ */
+function callLLM($messages, $model = null, $options = []) {
+    // Example usage:
+    /*
+    $messages = [
+        ['role' => 'system', 'content' => 'You are a helpful assistant.'],
+        ['role' => 'user', 'content' => 'What is 2+2?']
+    ];
+
+    $response = callLLM($messages, 'anthropic/claude-3-sonnet', [
+        'temperature' => 0.3,
+        'max_tokens' => 150
+    ]);
+
+    if ($response !== null) {
+        echo $response;
+    } else {
+        echo "Failed to get response from LLM";
+    }
+    */
+    try {
+        // Use provided model or fall back to configured model
+        if (!$model && isset($GLOBALS['CONNECTOR']['openrouter']['model'])) {
+            $model = $GLOBALS['CONNECTOR']['openrouter']['model'];
+        }
+        
+        if (!$model) {
+            error_log("minai: callLLM: No model specified");
+            return null;
+        }
+
+        // Get API URL and key from globals
+        if (!isset($GLOBALS['CONNECTOR']['openrouter']['url']) || 
+            !isset($GLOBALS['CONNECTOR']['openrouter']['API_KEY'])) {
+            error_log("minai: callLLM: Missing OpenRouter configuration");
+            return null;
+        }
+
+        $url = $GLOBALS['CONNECTOR']['openrouter']['url'];
+        $apiKey = $GLOBALS['CONNECTOR']['openrouter']['API_KEY'];
+
+        // Set up headers
+        $headers = [
+            'Content-Type: application/json',
+            "Authorization: Bearer {$apiKey}",
+            "HTTP-Referer: https://www.nexusmods.com/skyrimspecialedition/mods/126330",
+            "X-Title: CHIM"
+        ];
+
+        // Prepare request data
+        $data = array_merge([
+            'model' => $model,
+            'messages' => $messages,
+            'max_tokens' => $GLOBALS['CONNECTOR']['openrouter']['max_tokens'],
+            'temperature' => $GLOBALS['CONNECTOR']['openrouter']['temperature'],
+            'stream' => false
+        ], $options);
+
+        // Set up request options
+        $options = [
+            'http' => [
+                'method' => 'POST',
+                'header' => implode("\r\n", $headers),
+                'content' => json_encode($data),
+                'timeout' => 30
+            ]
+        ];
+
+        error_log("minai: callLLM: Sending request to model: $model");
+        
+        // Make the request
+        $context = stream_context_create($options);
+        $result = file_get_contents($url, false, $context);
+
+        if ($result === false) {
+            error_log("minai: callLLM: Request failed");
+            return null;
+        }
+
+        $response = json_decode($result, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            error_log("minai: callLLM: Invalid JSON response: " . json_last_error_msg());
+            return null;
+        }
+
+        if (!isset($response['choices'][0]['message']['content'])) {
+            error_log("minai: callLLM: Unexpected response format");
+            return null;
+        }
+
+        return $response['choices'][0]['message']['content'];
+
+    } catch (Exception $e) {
+        error_log("minai: callLLM Error: " . $e->getMessage());
+        error_log("minai: callLLM Stack Trace: " . $e->getTraceAsString());
+        return null;
+    }
+}
+
+function isPlayerInput() {
+    return  in_array($GLOBALS["gameRequest"][0],["inputtext","inputtext_s","ginputtext","ginputtext_s","instruction","init"]);
+}

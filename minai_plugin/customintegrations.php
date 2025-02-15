@@ -2,56 +2,14 @@
 // We need access to gameRequest here, but it's not global.
 // Impl copied from main.php
 
+require_once("util.php");
 require_once(__DIR__.DIRECTORY_SEPARATOR."updateThreadsDB.php");
 
-function CreateContextTableIfNotExists() {
-  $db = $GLOBALS['db'];
-  $db->execQuery(
-    "CREATE TABLE IF NOT EXISTS custom_context (
-      modName TEXT NOT NULL,
-      eventKey TEXT NOT NULL,
-      eventValue TEXT NOT NULL,
-      ttl INT,
-      expiresAt INT,
-      npcName TEXT NOT NULL,
-      PRIMARY KEY (modName, eventKey)
-    )"
-  );
-}
 
-
-function CreateActionsTableIfNotExists() {
-  $db = $GLOBALS['db'];
-  $db->execQuery(
-    "CREATE TABLE IF NOT EXISTS custom_actions (
-      actionName TEXT NOT NULL,
-      actionPrompt TEXT NOT NULL,
-      targetDescription TEXT NOT NULL,
-      targetEnum TEXT NOT NULL,
-      enabled INT,
-      ttl INT,
-      npcName TEXT NOT NULL,
-      expiresAt INT,
-      PRIMARY KEY (actionName, actionPrompt)
-    )"
-  );
-}
-
-
-function SetGameRequest() {
-    if (strpos($_SERVER["QUERY_STRING"],"&")===false)
-        $receivedData = mb_scrub(base64_decode(substr($_SERVER["QUERY_STRING"],5)));
-    else
-        $receivedData = mb_scrub(base64_decode(substr($_SERVER["QUERY_STRING"],5,strpos($_SERVER["QUERY_STRING"],"&")-4)));
-    $GLOBALS["gameRequest"] = explode("|", $receivedData);
-    error_log("minai: Received Data: {$receivedData}");
-}
 
 
 function ProcessIntegrations() {
     // Handle allowing third party mods to register things with the context system
-    SetGameRequest();
-    CreateContextTableIfNotExists();
     $MUST_DIE=false;
     if (isset($GLOBALS["use_defeat"]) && $GLOBALS["use_defeat"] && IsModEnabled("SexlabDefeat")) {
         $GLOBALS["events_to_ignore"][] = "combatend";
@@ -64,11 +22,7 @@ function ProcessIntegrations() {
     if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "minai_init") {
         // This is sent once by the SKSE plugin when the game is loaded. Do our initialization here.
         error_log("minai: Initializing");
-        DropThreadsTableIfExists();
-        CreateThreadsTableIfNotExists();
-        CreateActionsTableIfNotExists();
-        CreateContextTableIfNotExists();
-        CreateThreadsTableIfNotExists();
+        InitiateDBTables();
         importXPersonalities();
         importScenesDescriptions();
         $MUST_DIE=true;
@@ -187,10 +141,6 @@ function ProcessIntegrations() {
                 'value' => time()
             )
         );
-    }
-    if (isset($GLOBALS["gameRequest"]) && str_starts_with(strtolower($GLOBALS["gameRequest"][0]), "sextalk")) {
-        // rewrite player request as empty, we don't need player request here
-        $GLOBALS["gameRequest"][3] = "";
     }
 
     // Handle singing events

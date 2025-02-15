@@ -4,28 +4,6 @@
 $rootEnginePath = __DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR;
 require_once($rootEnginePath.DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."chat_helper_functions.php");
 
-function DropThreadsTableIfExists() {
-    $db = $GLOBALS['db'];
-    $db->execQuery("DROP TABLE IF EXISTS minai_threads");
-}
-
-function CreateThreadsTableIfNotExists() {
-    $db = $GLOBALS['db'];
-    
-    $db->execQuery(
-      "CREATE TABLE IF NOT EXISTS minai_threads (
-        prev_scene_id character varying(256),
-        curr_scene_id character varying(256),
-        female_actors text,
-        male_actors text,
-        victim_actors text,
-        thread_id integer PRIMARY KEY,
-        framework character varying(256),
-        fallback text
-      )"
-    );
-}
-
 function addSexEventsToEventLog($sceneDesc, $threadId) {
     $gameRequest = $GLOBALS["gameRequest"];
     

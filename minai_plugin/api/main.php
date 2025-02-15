@@ -7,7 +7,7 @@ header("Access-Control-Allow-Headers: X-Requested-With, Content-Type, Authorizat
 $path = "..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR;
 require_once($path . "conf".DIRECTORY_SEPARATOR."conf.php");
 require_once($path. "lib" .DIRECTORY_SEPARATOR."{$GLOBALS["DBDRIVER"]}.class.php");
-$GLOBALS["db"] = new Sql();
+$GLOBALS["db"] = new sql();
 require_once("..".DIRECTORY_SEPARATOR."config.php");
 require_once("..".DIRECTORY_SEPARATOR."importDataToDB.php");
 require_once("..".DIRECTORY_SEPARATOR."util.php");

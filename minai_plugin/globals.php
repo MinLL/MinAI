@@ -5,11 +5,10 @@ if (!file_exists("$pluginPath/config.php")) {
     copy("$pluginPath/config.base.php", "$pluginPath/config.php");
 }
 require_once("config.php");
-
 $GLOBALS["TTS_FALLBACK_FNCT"] = function($responseTextUnmooded, $mood, $responseText) {
 
     if (!isset($GLOBALS["db"]))
-        $GLOBALS["db"] = new Sql();
+        $GLOBALS["db"] = new sql();
     require_once("config.php");
     require_once("util.php");
     if ($GLOBALS["HERIKA_NAME"] == "Player")
@@ -35,6 +34,4 @@ $GLOBALS["TTS_FALLBACK_FNCT"] = function($responseTextUnmooded, $mood, $response
     }
     return null;
 };
-
-
 
