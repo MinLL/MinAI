@@ -582,7 +582,13 @@ Function ResetActionBackoff(string actionName, bool bypassCooldown)
     Main.Warn("ActionRegistry: Could not find action " + actionName + " to reset backoff.")
     return
   EndIf
+  int hasMod = JMap.getInt(actionObj, "hasMod")
+  if hasMod == 0
+    Main.Debug("ActionRegistry: The mod for action " + actionName + " is not installed, skipping backoff reset.")
+    return
+  EndIf
   
+
   float interval = JMap.getFlt(actionObj, "interval")
   float exponent = JMap.getFlt(actionObj, "exponent")
   float decayWindow = JMap.getFlt(actionObj, "decayWindow")

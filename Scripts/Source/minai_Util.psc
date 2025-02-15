@@ -2,6 +2,7 @@ scriptname minai_Util extends Quest
 
 Actor Property PlayerRef auto
 GlobalVariable property logLevel Auto
+minai_Config Property config Auto
 
 string Function GetActorName(actor akActor)
   if akActor == playerRef
@@ -67,7 +68,9 @@ endfunction
 
 Function Log(String str, string lvl)
   Debug.Trace("[minai (" + lvl + ")]: " + str)
-  MiscUtil.PrintConsole("[minai (" + lvl + ")]: " + str)
+  if config.enableConsoleLogging
+    MiscUtil.PrintConsole("[minai (" + lvl + ")]: " + str)
+  EndIf
 EndFunction
 
 Function Fatal(String str)
