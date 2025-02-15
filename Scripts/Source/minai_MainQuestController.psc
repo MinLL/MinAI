@@ -703,7 +703,7 @@ Function OnRoleplayTextKeyPressed()
         If(messageText != "")
             ; Reset the last request time to prevent immediate response
             lastRequestTime = Utility.GetCurrentRealTime()
-            AIAgentFunctions.requestMessage(messageText, "minai_roleplay")
+            AIAgentFunctions.requestMessage(messageText, "inputtext")
             Debug.Notification("Message sent")
         EndIf
     Else

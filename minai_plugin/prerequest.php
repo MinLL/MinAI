@@ -89,7 +89,7 @@ if (IsRadiant()) {
 SetNarratorProfile();
 
 // If talking to the narrator, force it to respond.
-if (IsEnabled($GLOBALS["PLAYER_NAME"], "isTalkingToNarrator") && (in_array($GLOBALS["gameRequest"][0],["inputtext","inputtext_s","ginputtext","ginputtext_s"])) ) {
+if (IsEnabled($GLOBALS["PLAYER_NAME"], "isTalkingToNarrator") && isPlayerInput() ) {
     error_log("minai: Forcing herika_name to the narrator: Is talking to narrator");
     SetEnabled($GLOBALS["PLAYER_NAME"], "isTalkingToNarrator", false);
     $GLOBALS["HERIKA_NAME"] = "The Narrator";

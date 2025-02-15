@@ -600,7 +600,7 @@ Function SetNarratorPrompts($isFirstPerson = false) {
     
     if ($isFirstPerson) {
         if (IsExplicitScene()) {
-            $GLOBALS["PROMPTS"]["minai_narrator_talk"] = [
+            $narratorPrompt = [
                 "cue" => [
                     "write a first-person erotic narrative response as {$GLOBALS["PLAYER_NAME"]}, focusing entirely on your immediate physical sensations and emotional state. Describe in vivid detail exactly what you are feeling in this moment, both physically and mentally."
                 ],
@@ -609,9 +609,9 @@ Function SetNarratorPrompts($isFirstPerson = false) {
                 ]
             ];
             
-            $GLOBALS["TEMPLATE_DIALOG"] = "Respond in first-person perspective as {$GLOBALS["PLAYER_NAME"]}, describing only your current physical and emotional state. Focus purely on the present moment - what you're feeling, how your body is responding, and your immediate emotional reactions. Don't reflect on the past or future, stay completely in the now.";
+            $templateDialog = "Respond in first-person perspective as {$GLOBALS["PLAYER_NAME"]}, describing only your current physical and emotional state. Focus purely on the present moment - what you're feeling, how your body is responding, and your immediate emotional reactions. Don't reflect on the past or future, stay completely in the now.";
         } else {
-            $GLOBALS["PROMPTS"]["minai_narrator_talk"] = [
+            $narratorPrompt = [
                 "cue" => [
                     "write a first-person narrative response as {$GLOBALS["PLAYER_NAME"]}, describing your thoughts, feelings, and experiences in this moment. Speak introspectively about your journey and current situation."
                 ],
@@ -620,33 +620,45 @@ Function SetNarratorPrompts($isFirstPerson = false) {
                 ]
             ];
             
-            $GLOBALS["TEMPLATE_DIALOG"] = "Respond in first-person perspective as {$GLOBALS["PLAYER_NAME"]}, sharing your personal thoughts and feelings.";
+            $templateDialog = "Respond in first-person perspective as {$GLOBALS["PLAYER_NAME"]}, sharing your personal thoughts and feelings.";
         }
     } else {
         if (IsExplicitScene()) {
-            $GLOBALS["PROMPTS"]["minai_narrator_talk"] = [
+            $narratorPrompt = [
                 "cue" => [
                     "write a response as The Narrator, describing {$GLOBALS["PLAYER_NAME"]}'s immediate physical and emotional experiences in vivid sensual detail. Focus entirely on what she is feeling in this exact moment."
                 ]
             ];
             
-            $GLOBALS["TEMPLATE_DIALOG"] = "You are The Narrator. Describe the intense sensations and emotions being experienced right now, focusing purely on the present moment.";
+            $templateDialog = "You are The Narrator. Describe the intense sensations and emotions being experienced right now, focusing purely on the present moment.";
         } else {
-            $GLOBALS["PROMPTS"]["minai_narrator_talk"] = [
+            $narratorPrompt = [
                 "cue" => [
                     "write a response as The Narrator, speaking from an omniscient perspective about the world and the player's journey."
                 ]
             ];
             
-            $GLOBALS["TEMPLATE_DIALOG"] = "You are The Narrator. Respond in an omniscient, storyteller-like manner.";
+            $templateDialog = "You are The Narrator. Respond in an omniscient, storyteller-like manner.";
         }
     }
 
     // Add player_request only if there was actual input
     if (!empty($playerInput)) {
-        $GLOBALS["PROMPTS"]["minai_narrator_talk"]["player_request"] = [
+        $narratorPrompt["player_request"] = [
             $playerInput
         ];
+    }
+
+    // Set the base prompts
+    $GLOBALS["PROMPTS"]["minai_narrator_talk"] = $narratorPrompt;
+    $GLOBALS["TEMPLATE_DIALOG"] = $templateDialog;
+
+    // If Herika is The Narrator, set additional prompts for player input types
+    if ($GLOBALS["HERIKA_NAME"] == "The Narrator") {
+        $inputTypes = ["inputtext", "inputtext_s", "ginputtext", "ginputtext_s", "instruction", "init"];
+        foreach ($inputTypes as $type) {
+            $GLOBALS["PROMPTS"][$type] = $narratorPrompt;
+        }
     }
 }
 
@@ -866,25 +878,16 @@ function GetActorPronouns($name) {
  * @return string|null Returns the LLM response content or null on failure
  */
 function callLLM($messages, $model = null, $options = []) {
-    // Example usage:
-    /*
-    $messages = [
-        ['role' => 'system', 'content' => 'You are a helpful assistant.'],
-        ['role' => 'user', 'content' => 'What is 2+2?']
-    ];
-
-    $response = callLLM($messages, 'anthropic/claude-3-sonnet', [
-        'temperature' => 0.3,
-        'max_tokens' => 150
-    ]);
-
-    if ($response !== null) {
-        echo $response;
-    } else {
-        echo "Failed to get response from LLM";
-    }
-    */
     try {
+        // Log the prompt
+        $timestamp = date('Y-m-d\TH:i:sP');
+        $promptLog = $timestamp . "\n";
+        foreach ($messages as $message) {
+            $promptLog .= "Role: " . $message['role'] . "\nContent: " . $message['content'] . "\n";
+        }
+        $promptLog .= "\n";
+        file_put_contents('/var/www/html/HerikaServer/log/context_sent_to_llm.log', $promptLog, FILE_APPEND);
+
         // Use provided model or fall back to configured model
         if (!$model && isset($GLOBALS['CONNECTOR']['openrouter']['model'])) {
             $model = $GLOBALS['CONNECTOR']['openrouter']['model'];
@@ -954,7 +957,16 @@ function callLLM($messages, $model = null, $options = []) {
             return null;
         }
 
-        return $response['choices'][0]['message']['content'];
+        $responseContent = $response['choices'][0]['message']['content'];
+        
+        // Log the response
+        $timestamp = date('Y-m-d\TH:i:sP');
+        $responseLog = "== $timestamp START\n";
+        $responseLog .= $responseContent . "\n";
+        $responseLog .= date('Y-m-d\TH:i:sP') . " END\n\n";
+        file_put_contents('/var/www/html/HerikaServer/log/output_from_llm.log', $responseLog, FILE_APPEND);
+
+        return $responseContent;
 
     } catch (Exception $e) {
         error_log("minai: callLLM Error: " . $e->getMessage());
