@@ -4,7 +4,7 @@ header('Content-Type: application/json');
 $path = "..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR;
 require_once($path . "conf".DIRECTORY_SEPARATOR."conf.php");
 require_once($path. "lib" .DIRECTORY_SEPARATOR."{$GLOBALS["DBDRIVER"]}.class.php");
-
+$GLOBALS["db"] = new sql();
 // Get the branch from the request
 $branch = isset($_GET['branch']) ? $_GET['branch'] : 'main';
 
