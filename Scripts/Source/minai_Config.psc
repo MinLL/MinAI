@@ -183,6 +183,11 @@ bool Property trackVictimAwareness = True Auto
 
 int trackVictimAwarenessOID
 
+bool enableConsoleLoggingDefault = True
+bool Property enableConsoleLogging = True Auto
+
+int enableConsoleLoggingOID
+
 Event OnConfigInit()
   main.Info("Building mcm menu.")
   InitializeMCM()
@@ -271,6 +276,7 @@ Function RenderGeneralPage()
   narratorKeyOID = AddKeyMapOption("Talk to Narrator", narratorKey)  ; New keybind option
   disableAIAnimationsOID = AddToggleOption("Disable AI-FF Animations", disableAIAnimations)
   AddHeaderOption("Debug")
+  enableConsoleLoggingOID = AddToggleOption("Enable Console Logging", enableConsoleLogging)
   testActionsOID = AddTextOption("Debug", "Test Mod Events")
 EndFunction
 
@@ -510,7 +516,10 @@ EndFunction
 
 Event OnOptionSelect(int oid)
   Main.Debug("OnOptionSelect(" + oid + ")")
-  if oid == UseCBPCOID
+  if oid == enableConsoleLoggingOID
+    enableConsoleLogging = !enableConsoleLogging
+    SetToggleOptionValue(oid, enableConsoleLogging)
+  elseif oid == UseCBPCOID
     toggleGlobal(oid, useCBPC)
     Debug.Notification("CBPC setting changed. Save/Reload to take effect")
   elseif oid == autoUpdateDiaryOID
@@ -632,7 +641,10 @@ EndEvent
 
 Event OnOptionDefault(int oid)
   bool changedAction = False
-  if oid == UseCBPCOID
+  if oid == enableConsoleLoggingOID
+    enableConsoleLogging = enableConsoleLoggingDefault
+    SetToggleOptionValue(oid, enableConsoleLogging)
+  elseif oid == UseCBPCOID
     SetGlobalToggle(oid, UseCBPC, true)
     Debug.Notification("CBPC setting changed. Save/Reload to take effect")
   elseif oid == autoUpdateDiaryOID
@@ -764,7 +776,9 @@ EndEvent
 
 Event OnOptionHighlight(int oid)
   Main.Debug("OnOptionHighlight(" + oid + ")")
-  if oid == UseCBPCOID
+  if oid == enableConsoleLoggingOID
+    SetInfoText("Controls whether log messages are printed to the console in addition to the Papyrus log")
+  elseif oid == UseCBPCOID
     SetInfoText("Enables or disables CBPC globally. Requires save/reload to take effect")
   elseif oid == autoUpdateDiaryOID
     SetInfoText("Automatically update the diary for all followers upon sleeping.")
