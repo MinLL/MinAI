@@ -55,6 +55,9 @@ Function Maintenance()
   SetSapienceKey()
   SetNarratorKey()
   SetSingKey()
+  SetNarratorTextKey()
+  SetRoleplayKey()
+  SetRoleplayTextKey()
   ; Register for Mod Events
   ; Public interface functions
   RegisterForModEvent("MinAI_RegisterEvent", "OnRegisterEvent")
@@ -504,9 +507,14 @@ Function RemoveSpellsFromPlayer()
   playerRef.RemoveSpell(minai_ToggleSapienceSpell)
 EndFunction
 
-Function SetSapienceKey()
-  Info("Set sapience key to " + config.ToggleSapienceKey)
-  RegisterForKey(config.ToggleSapienceKey)
+Function SetSapienceKey(bool showNotification = false)
+    ; Register new key if valid
+    if (config.toggleSapienceKey != -1)
+        RegisterForKey(config.toggleSapienceKey)
+        if showNotification
+            Debug.Notification("Sapience toggle key mapped to " + config.toggleSapienceKey)
+        endif
+    endIf
 EndFunction
 
 Event OnKeyDown(int keyCode)
@@ -521,6 +529,12 @@ Event OnKeyDown(int keyCode)
         OnSingKeyPressed()
     ElseIf(keyCode == config.narratorKey)
         OnNarratorKeyPressed()
+    ElseIf(keyCode == config.narratorTextKey)
+        OnNarratorTextKeyPressed()
+    ElseIf(keyCode == config.roleplayKey)
+        OnRoleplayKeyPressed()
+    ElseIf(keyCode == config.roleplayTextKey)
+        OnRoleplayTextKeyPressed()
     EndIf
 EndEvent
 
@@ -534,6 +548,8 @@ Event OnKeyUp(int keyCode, float holdTime)
         OnSingKeyReleased(holdTime)
     ElseIf(keyCode == config.narratorKey)
         OnNarratorKeyReleased(holdTime)
+    ElseIf(keyCode == config.roleplayKey)
+        OnRoleplayKeyReleased(holdTime)
     EndIf
 EndEvent
 
@@ -586,9 +602,7 @@ Function OnNarratorKeyReleased(float holdTime)
         
         ; Only send message if key was held for less than 1 second
         if holdTime < 1.0
-            string playerName = GetActorName(playerRef)
-            string eventLine = playerName + " wants to talk to the narrator"
-            AIAgentFunctions.requestMessage(eventLine, "minai_narrator_talk")
+            AIAgentFunctions.requestMessage("", "minai_narrator_talk")
             Debug.Notification("Quick press - asking narrator to speak")
         else
             Debug.Notification("Recording stopped")
@@ -597,18 +611,123 @@ Function OnNarratorKeyReleased(float holdTime)
 EndFunction
 
 ; Functions to handle key registration
-Function SetSingKey()
+Function SetSingKey(bool showNotification = false)
     ; Register new key if valid
     if (config.singKey != -1)
         RegisterForKey(config.singKey)
-        Debug.Notification("Sing key mapped to " + config.singKey)
+        if showNotification
+            Debug.Notification("Sing key mapped to " + config.singKey)
+        endif
     endIf
 EndFunction
 
-Function SetNarratorKey()
+Function SetNarratorKey(bool showNotification = false)
     ; Register new key if valid
     if (config.narratorKey != -1)
         RegisterForKey(config.narratorKey)
-        Debug.Notification("Narrator key mapped to " + config.narratorKey)
+        if showNotification
+            Debug.Notification("Narrator key mapped to " + config.narratorKey)
+        endif
+    endIf
+EndFunction
+
+Function OnNarratorTextKeyPressed()
+    If(bHasAIFF)
+        Info("Opening narrator text input")
+        minAIFF.SetActorVariable(playerRef, "isTalkingToNarrator", true)
+        
+        ; Open text input menu
+        UIExtensions.OpenMenu("UITextEntryMenu") 
+        string messageText = UIExtensions.GetMenuResultString("UITextEntryMenu")
+        
+        If(messageText != "")
+            ; Reset the last request time to prevent immediate response
+            lastRequestTime = Utility.GetCurrentRealTime()
+            string playerName = GetActorName(playerRef)
+            AIAgentFunctions.requestMessage(messageText, "minai_narrator_talk")
+            Debug.Notification("Message sent to narrator")
+        EndIf
+    Else
+        Debug.Notification("AIFF not installed - narrator conversations require AIFF")
+    EndIf
+EndFunction
+
+; Add to key registration functions
+Function SetNarratorTextKey(bool showNotification = false)
+    ; Register new key if valid
+    if (config.narratorTextKey != -1)
+        RegisterForKey(config.narratorTextKey)
+        if showNotification
+            Debug.Notification("Narrator text key mapped to " + config.narratorTextKey)
+        endif
+    endIf
+EndFunction
+
+Function OnRoleplayKeyPressed()
+    If(bHasAIFF)
+        Info("Starting roleplay recording")
+        minAIFF.SetActorVariable(playerRef, "isRoleplaying", true)
+        AIAgentFunctions.recordSoundEx(config.roleplayKey)
+        Debug.Notification("Hold to record, release quickly to roleplay without recording")
+    Else
+        Debug.Notification("AIFF not installed - roleplay requires AIFF")
+    EndIf
+EndFunction
+
+Function OnRoleplayKeyReleased(float holdTime)
+    If(bHasAIFF)
+        ; Reset the last request time to prevent immediate response
+        lastRequestTime = Utility.GetCurrentRealTime()
+        Info("Stopping roleplay recording")
+        AIAgentFunctions.stopRecording(config.roleplayKey)
+        
+        ; Only send message if key was held for less than 1 second
+        if holdTime < 1.0
+            AIAgentFunctions.requestMessage("", "minai_roleplay")
+            Debug.Notification("Quick press - generating roleplay response")
+        else
+            Debug.Notification("Recording stopped")
+        EndIf
+    EndIf
+EndFunction
+
+Function OnRoleplayTextKeyPressed()
+    If(bHasAIFF)
+        Info("Opening roleplay text input")
+        minAIFF.SetActorVariable(playerRef, "isRoleplaying", true)
+        
+        ; Open text input menu
+        UIExtensions.OpenMenu("UITextEntryMenu") 
+        string messageText = UIExtensions.GetMenuResultString("UITextEntryMenu")
+        
+        If(messageText != "")
+            ; Reset the last request time to prevent immediate response
+            lastRequestTime = Utility.GetCurrentRealTime()
+            AIAgentFunctions.requestMessage(messageText, "minai_roleplay")
+            Debug.Notification("Message sent")
+        EndIf
+    Else
+        Debug.Notification("AIFF not installed - roleplay requires AIFF")
+    EndIf
+EndFunction
+
+; Add to key registration functions
+Function SetRoleplayKey(bool showNotification = false)
+    ; Register new key if valid
+    if (config.roleplayKey != -1)
+        RegisterForKey(config.roleplayKey)
+        if showNotification
+            Debug.Notification("Roleplay key mapped to " + config.roleplayKey)
+        endif
+    endIf
+EndFunction
+
+Function SetRoleplayTextKey(bool showNotification = false)
+    ; Register new key if valid
+    if (config.roleplayTextKey != -1)
+        RegisterForKey(config.roleplayTextKey)
+        if showNotification
+            Debug.Notification("Roleplay text key mapped to " + config.roleplayTextKey)
+        endif
     endIf
 EndFunction
