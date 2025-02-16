@@ -5,204 +5,181 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Configuration Page</title>
     <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2196F3;
+            --background-dark: #1a1a1a;
+            --background-light: #2d2d2d;
+            --text-color: #e0e0e0;
+            --border-color: #404040;
+            --success-color: #40c057;
+            --error-color: #f44336;
+            --warning-color: #ffc107;
+            --info-color: #4dabf7;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f7f7f7;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--background-dark);
+            color: var(--text-color);
             margin: 0;
-            padding: 20px;
-        }
-
-        .nav-panel {
-            background-color: #4CAF50;
-            padding: 15px;
-            text-align: center;
-        }
-
-        .nav-panel a {
-            color: white;
-            text-decoration: none;
-            font-size: 18px;
-            margin-right: 40px;
-        }
-
-        .nav-panel a:last-child {
-            margin-right: 0;
+            padding: 0;
+            line-height: 1.6;
+            background: radial-gradient(circle at center, var(--background-light) 0%, var(--background-dark) 100%);
+            min-height: 100vh;
         }
 
         .config-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-panel {
+            background-color: var(--background-light);
+            padding: 15px;
+            text-align: center;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(4px);
+        }
+
+        .nav-panel a {
+            display: inline-block;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 1.1rem;
+            margin: 0 20px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
+            border: 1px solid var(--border-color);
+        }
+
+        .nav-panel a:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.15) 0%,
+                rgba(255, 255, 255, 0.08) 100%
+            );
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         h1 {
             text-align: center;
-            color: #333;
-        }
-
-        .info-section {
-            padding: 10px;
-            background-color: #ffefc1;
-            color: #555;
-            border-radius: 5px;
-            margin-bottom: 20px;
+            color: var(--text-color);
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .option-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            padding: 20px;
+            background-color: rgba(45, 45, 45, 0.4);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(4px);
         }
 
         .option-label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #333;
-            font-size: 14px;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--text-color);
+            font-size: 1.1rem;
         }
 
-        .text-input input,
-        .slider input,
-        .dynamic-list-entry input {
+        .option-group p {
+            color: var(--text-color);
+            opacity: 0.8;
+            margin: 10px 0;
+            font-size: 0.95rem;
+        }
+
+        input[type="text"],
+        textarea {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s ease, border-color 0.3s ease;
+            padding: 12px;
+            background-color: var(--background-dark);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
         }
 
-        .text-input input:focus,
-        .slider input:focus,
-        .dynamic-list-entry input:focus {
-            background-color: #f4f4f4;
-            border-color: #4CAF50;
+        input[type="text"]:focus,
+        textarea:focus {
+            border-color: var(--primary-color);
             outline: none;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
         }
 
-        .checkbox-group input {
+        .checkbox-group input[type="checkbox"] {
             margin-right: 10px;
             transform: scale(1.2);
+            accent-color: var(--primary-color);
         }
 
         .submit-button {
             display: block;
             width: 100%;
-            padding: 12px;
-            background-color: #4CAF50;
-            color: white;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
+            padding: 15px;
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.2) 0%,
+                rgba(76, 175, 80, 0.3) 100%
+            );
+            color: var(--text-color);
+            font-size: 1.2rem;
+            border: 1px solid rgba(76, 175, 80, 0.4);
+            border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.3s ease;
+            transition: all 0.3s ease;
+            margin-top: 30px;
+            font-weight: 500;
         }
 
         .submit-button:hover {
-            background-color: #45a049;
-            transform: scale(1.02);
-        }
-
-        .dynamic-list-container,
-        .voicetype-container {
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 10px;
-            background-color: #f9f9f9;
-        }
-
-        .dynamic-list-entry,
-        .voicetype-entry {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .dynamic-list-entry input,
-        .voicetype-entry input {
-            flex: 1;
-            margin-right: 10px;
-        }
-
-        .dynamic-list-entry button,
-        .voicetype-entry button {
-            padding: 10px;
-            background-color: #f44336;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .dynamic-list-entry button:hover,
-        .voicetype-entry button:hover {
-            background-color: #e53935;
-        }
-
-        .add-list-item,
-        .add-voicetype {
-            padding: 10px;
-            background-color: #2196F3;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.3s ease;
-        }
-
-        .add-list-item:hover,
-        .add-voicetype:hover {
-            background-color: #1976D2;
-            transform: scale(1.02);
-        }
-
-        /* Error and success message styles */
-        .message {
-            margin-top: 10px;
-            padding: 10px;
-            display: none;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-
-        .message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-
-        .message.success {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .config-section {
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            overflow: hidden;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.25) 0%,
+                rgba(76, 175, 80, 0.35) 100%
+            );
         }
 
         .section-header {
-            background-color: #4CAF50;
-            color: white;
-            padding: 15px;
+            background: linear-gradient(135deg,
+                rgba(33, 150, 243, 0.1) 0%,
+                rgba(33, 150, 243, 0.2) 100%
+            );
+            color: var(--text-color);
+            padding: 15px 20px;
             cursor: pointer;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(33, 150, 243, 0.3);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: background-color 0.3s ease;
-        }
-
-        .section-header:hover {
-            background-color: #45a049;
+            position: relative;
         }
 
         .section-header::after {
             content: '▼';
-            font-size: 12px;
+            font-size: 0.8rem;
             transition: transform 0.3s ease;
         }
 
@@ -210,91 +187,63 @@
             transform: rotate(-90deg);
         }
 
+        .section-header:hover {
+            background: linear-gradient(135deg,
+                rgba(33, 150, 243, 0.15) 0%,
+                rgba(33, 150, 243, 0.25) 100%
+            );
+            transform: translateY(-1px);
+        }
+
         .section-content {
             padding: 20px;
-            background-color: white;
-            transition: max-height 0.3s ease;
+            background-color: rgba(45, 45, 45, 0.4);
+            border-radius: 8px;
+            margin-top: 5px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(4px);
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out, margin 0.3s ease-out;
+            max-height: 2000px;
+            opacity: 1;
+            overflow: hidden;
         }
 
         .section-content.collapsed {
-            display: none;
-        }
-
-        .prompt-textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-family: monospace;
-            font-size: 14px;
-            line-height: 1.4;
-            resize: vertical;
-            min-height: 60px;
-        }
-
-        .prompt-textarea:focus {
-            border-color: #4CAF50;
-            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
-            outline: none;
-        }
-
-        /* Hide singing prompt */
-        #singing-prompt {
-            display: none;
-        }
-
-        .section-entry {
-            background-color: #f9f9f9;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-        }
-
-        .section-entry h4 {
+            max-height: 0;
+            opacity: 0;
             margin-top: 0;
-            margin-bottom: 10px;
-            color: #333;
+            padding-top: 0;
+            padding-bottom: 0;
+            border: none;
         }
 
-        .section-entry input[type="text"] {
-            width: 100%;
-            margin: 5px 0;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+        .info-section {
+            padding: 15px;
+            background: linear-gradient(135deg,
+                rgba(255, 193, 7, 0.1) 0%,
+                rgba(255, 193, 7, 0.15) 100%
+            );
+            color: var(--text-color);
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 193, 7, 0.3);
         }
 
-        .section-entry textarea {
-            width: 100%;
-            margin: 5px 0;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
+        @media (max-width: 768px) {
+            .config-container {
+                margin: 20px;
+                padding: 20px;
+            }
 
-        .section-entry label {
-            display: block;
-            margin: 5px 0;
-        }
+            .nav-panel a {
+                display: block;
+                margin: 10px 0;
+            }
 
-        .section-header-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
+            h1 {
+                font-size: 2rem;
+            }
         }
-
-        .drag-handle {
-            cursor: move;
-            padding: 0 10px;
-            color: #666;
-            font-size: 20px;
-        }
-
-        .drag-handle:hover {
-            color: #333;
-        }
-
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
 </head>
@@ -310,7 +259,7 @@
         <!-- Information Section -->
         <div class="info-section">
             <br />
-            <p>If the configuration does not update, please run the server update script.</p>
+            <p>If the configuration does not update, please run the server update script.</p>G
         </div>
         <p id="loading-message">Loading configuration...</p>
 
@@ -915,8 +864,8 @@
         }
 
         function toggleSection(header) {
-            const content = header.nextElementSibling;
             header.classList.toggle('collapsed');
+            const content = header.nextElementSibling;
             content.classList.toggle('collapsed');
         }
 

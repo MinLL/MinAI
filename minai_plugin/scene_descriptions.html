@@ -7,117 +7,193 @@
     <title>Manage Scene Descriptions</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2196F3;
+            --background-dark: #1a1a1a;
+            --background-light: #2d2d2d;
+            --text-color: #e0e0e0;
+            --border-color: #404040;
+            --success-color: #40c057;
+            --error-color: #f44336;
+            --warning-color: #ffc107;
+        }
+
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f4f7f6;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--background-dark);
+            color: var(--text-color);
+            margin: 0;
             padding: 20px;
+            line-height: 1.6;
         }
 
-        h1 {
-            color: #333;
+        h1, h2, h3, h4 {
+            color: var(--text-color);
+            margin-bottom: 20px;
         }
 
-        input,
-        textarea,
-        button {
-            padding: 10px;
-            margin: 5px;
-            font-size: 14px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
+        a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #1976D2;
+        }
+
+        input, textarea, button {
+            padding: 12px;
+            margin: 5px 0;
+            font-size: 0.9rem;
+            border-radius: 6px;
+            background-color: var(--background-dark);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
             width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
         }
 
         button {
-            background-color: #28a745;
-            color: white;
+            background-color: var(--primary-color);
             border: none;
             cursor: pointer;
-            margin-right: 5px;
+            font-weight: 500;
         }
 
         button:hover {
-            background-color: #218838;
+            background-color: #45a049;
+            transform: translateY(-2px);
         }
 
         table {
             width: 100%;
-            margin-top: 20px;
+            margin: 20px 0;
             border-collapse: collapse;
+            background-color: var(--background-light);
+            border-radius: 8px;
+            overflow: hidden;
         }
 
-        table,
-        th,
-        td {
-            border: 1px solid #ddd;
-        }
-
-        th,
-        td {
-            padding: 8px;
+        th, td {
+            padding: 12px;
             text-align: left;
+            border-bottom: 1px solid var(--border-color);
         }
 
         th {
-            background-color: #f2f2f2;
+            background-color: var(--background-light);
+            font-weight: 500;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
-        .form-container {
-            background-color: white;
-            padding: 20px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
+        th:hover {
+            background-color: rgba(76, 175, 80, 0.1);
         }
 
-        .pagination {
-            margin-top: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .pagination button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px;
-            border: none;
-            cursor: pointer;
-        }
-
-        .pagination button:hover {
-            background-color: #0056b3;
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.05);
         }
 
         .navigation {
-            margin-top: 20px;
+            background-color: var(--background-light);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: #007bff;
-            padding: 10px;
-            color: white;
-            border-radius: 5px;
+            border: 1px solid var(--border-color);
         }
 
-        .navigation a,
-        .navigation button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px;
+        .navigation a, .navigation button {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            padding: 10px 20px;
             border: none;
             cursor: pointer;
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 500;
+            border-radius: 6px;
+            transition: all 0.3s ease;
         }
 
-        .navigation a:hover,
-        .navigation button:hover {
-            background-color: #0056b3;
+        .navigation a:hover, .navigation button:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
         }
 
-        .pagination-info {
-            font-size: 14px;
+        .tab {
+            display: inline-block;
+            padding: 12px 24px;
+            cursor: pointer;
+            background-color: var(--background-light);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            margin-right: 5px;
+            font-weight: 500;
+            border-radius: 6px 6px 0 0;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .tab-content {
+            background-color: var(--background-light);
+            border: 1px solid var(--border-color);
+            border-radius: 0 8px 8px 8px;
+            padding: 20px;
+        }
+
+        details {
+            background-color: var(--background-dark);
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            border: 1px solid var(--border-color);
+        }
+
+        details summary {
+            cursor: pointer;
+            color: var(--text-color);
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        details[open] summary {
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        pre {
+            background-color: var(--background-dark);
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            font-family: 'Consolas', monospace;
+        }
+
+        #generateError {
+            background-color: rgba(244, 67, 54, 0.1);
+            color: var(--error-color);
+            padding: 12px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border: 1px solid var(--error-color);
         }
 
         .search-container {
@@ -125,67 +201,37 @@
         }
 
         .search-container input {
-            width: 300px;
-            padding: 10px;
+            background-color: var(--background-dark);
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 6px;
+            width: 100%;
+            max-width: 400px;
         }
 
-        .new-entry-form {
-            margin-top: 20px;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+            padding: 10px;
+            background-color: var(--background-light);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .pagination-info {
+            color: var(--text-color);
+            font-size: 0.9rem;
         }
 
         .tooltip {
-            position: absolute;
-            background-color: #333;
-            color: #fff;
-            padding: 5px;
-            border-radius: 5px;
-            font-size: 12px;
-            visibility: hidden;
-            max-width: 300px;
-            z-index: 1000;
-        }
-
-        /* Basic styles for the tabs */
-        .tab {
-            display: inline-block;
-            padding: 10px 20px;
-            cursor: pointer;
-            background-color: #f1f1f1;
-            border: 1px solid #ccc;
-            border-bottom: none;
-            margin-right: 5px;
-            font-weight: bold;
-        }
-
-        /* Active tab styling */
-        .tab.active {
-            background-color: #fff;
-            border-bottom: 2px solid #000;
-        }
-
-        /* Content for each tab */
-        .tab-content {
-            padding: 20px;
-            border: 1px solid #ccc;
-            background-color: #fff;
-        }
-
-        .tab-content-item {
-            display: none;
-        }
-
-        /* Show active tab content */
-        .tab-content-item.active {
-            display: block;
-        }
-
-        #generateError {
-            display: none;
-            color: #dc3545;
-            margin: 20px 0;
+            background-color: var(--background-light);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
@@ -262,10 +308,6 @@ He thrusts his hard cock into her wet pussy, their bodies moving in sync as they
             </form>
         </div>
     </div>
-
-
-
-
 
     <div id="tooltip" class="tooltip"></div>
 
@@ -485,7 +527,6 @@ He thrusts his hard cock into her wet pussy, their bodies moving in sync as they
         const tooltip = document.getElementById('tooltip');
         const tooltipTarget = document.getElementById('dataTable');
 
-
         console.log('AAA', tooltipTarget)
         // Function to show the tooltip
         function showTooltip(event) {
@@ -497,12 +538,10 @@ He thrusts his hard cock into her wet pussy, their bodies moving in sync as they
 
             let title = cellTooltips[target.cellIndex]
 
-
             tooltip.style.visibility = 'visible';
             tooltip.textContent = title;
             tooltip.style.left = (event.pageX - tooltip.clientWidth / 2) + 'px';
             tooltip.style.top = (event.pageY + 10) + 'px';
-
         }
         // Function to hide the tooltip
         function hideTooltip() {

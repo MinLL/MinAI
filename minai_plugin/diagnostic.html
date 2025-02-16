@@ -12,654 +12,524 @@
             --background-light: #2d2d2d;
             --text-color: #e0e0e0;
             --border-color: #404040;
+            --success-color: #40c057;
+            --error-color: #f44336;
+            --warning-color: #ffc107;
+            --info-color: #4dabf7;
         }
 
         body {
             margin: 0;
-            padding: 20px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--background-dark);
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: radial-gradient(circle at center, var(--background-light) 0%, var(--background-dark) 100%);
             color: var(--text-color);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 98vw;
+            margin: 20px auto;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
         .nav-panel {
-            background-color: var(--primary-color);
+            background-color: var(--background-light);
             padding: 15px;
             text-align: center;
-            border-radius: 8px;
-            margin-bottom: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(4px);
         }
 
         .nav-panel a {
-            color: white;
+            display: inline-block;
+            color: var(--text-color);
             text-decoration: none;
-            font-size: 18px;
-            margin-right: 40px;
+            font-size: 1.1rem;
+            margin: 0 20px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
+            border: 1px solid var(--border-color);
+        }
+
+        .nav-panel a:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.15) 0%,
+                rgba(255, 255, 255, 0.08) 100%
+            );
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .log-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            gap: 15px;
             margin-top: 20px;
             width: 100%;
-            padding-bottom: 20px;
+            height: calc(90vh - 200px);
         }
 
         .log-viewer {
-            min-height: 200px;
-            min-width: 300px;
-            height: calc(100vh - 300px);
-            background-color: var(--background-light);
+            background: rgba(0, 0, 0, 0.2);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: 12px;
             padding: 15px;
             display: flex;
             flex-direction: column;
-            transition: width 0.3s ease;
-            resize: none;
+            backdrop-filter: blur(4px);
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
         }
 
         .log-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .log-title {
-            font-size: 1.2em;
-            font-weight: bold;
+            font-size: 1.2rem;
+            font-weight: 500;
             color: var(--primary-color);
         }
 
         .log-controls {
             display: flex;
-            gap: 5px;
+            gap: 10px;
         }
 
         .log-controls button {
-            padding: 3px 6px;
-            font-size: 0.9em;
-            min-width: 50px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .log-controls button:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.15) 0%,
+                rgba(255, 255, 255, 0.08) 100%
+            );
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .log-content {
             flex-grow: 1;
             background-color: var(--background-dark);
-            border-radius: 4px;
-            padding: 10px;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
             overflow-y: auto;
-            font-family: monospace;
-            font-size: 0.9em;
-            will-change: transform;
-            contain: content;
-            width: 100%;
-            box-sizing: border-box;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            white-space: pre-wrap;
+            word-break: break-word;
+            height: calc(100% - 100px);
         }
 
-        .log-viewer.nowrap .log-content {
-            white-space: pre;
+        .log-line {
+            margin: 2px 0;
+            padding: 2px 5px;
+            border-radius: 4px;
             overflow-x: auto;
         }
-        
-        .log-viewer.wrap .log-content {
-            white-space: pre-wrap;
-            word-break: break-all;
-            overflow-x: hidden;
+
+        .log-line:hover {
+            background-color: rgba(255, 255, 255, 0.05);
         }
-        
-        .log-line {
-            display: block;
-            width: 100%;
-            white-space: inherit;
-        }
-        
-        .wrap-button {
-            opacity: 0.5;
-        }
-        
-        .wrap-button.active {
-            opacity: 1;
-            background-color: var(--primary-color);
+
+        .timestamp {
+            color: var(--info-color);
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(77, 171, 247, 0.1);
+            margin-right: 8px;
         }
 
         .filter-container {
-            margin-bottom: 10px;
+            margin-bottom: 20px;
         }
 
         .filter-input {
+            width: 100%;
+            padding: 12px;
             background-color: var(--background-dark);
             border: 1px solid var(--border-color);
             color: var(--text-color);
-            padding: 5px 10px;
-            border-radius: 4px;
-            width: 200px;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
         }
 
-        button {
-            background-color: var(--secondary-color);
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #1976D2;
-        }
-
-        .json-key { color: #9cdcfe; }
-        .json-string { color: #ce9178; }
-        .json-number { color: #b5cea8; }
-        .json-boolean { color: #569cd6; }
-        .json-null { color: #569cd6; }
-
-        @keyframes timestampGradient {
-            0% {
-                background: rgba(86, 156, 214, 0.1);
-                color: #569cd6;
-            }
-            50% {
-                background: rgba(97, 175, 239, 0.1);
-                color: #61afef;
-            }
-            100% {
-                background: rgba(86, 156, 214, 0.1);
-                color: #569cd6;
-            }
-        }
-        
-        .timestamp {
-            color: #569cd6;  /* Consistent blue color */
-            font-style: italic;
-            padding: 2px 6px;
-            background: rgba(86, 156, 214, 0.1);
-            border-radius: 3px;
-            display: inline;
-            white-space: nowrap;
-        }
-        
-        /* Update log components to ensure inline display */
-        .log-module, .log-pid, .log-client, .log-message {
-            white-space: nowrap;
-            display: inline;
-        }
-        
-        /* Container for log line to prevent unwanted breaks */
-        .log-line {
-            white-space: pre;
-            display: block;
-        }
-
-        .error { color: #f44336; }
-        .warning { color: #ffc107; }
-        .info { color: #4CAF50; }
-
-        .expand-button {
-            background-color: var(--primary-color);
-            margin-left: 10px;
-        }
-
-        .clear-button {
-            background-color: #f44336;
+        .filter-input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
         }
 
         .preset-filters {
             display: flex;
             gap: 10px;
-            margin-bottom: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
         }
 
         .preset-filter {
-            background-color: var(--background-light);
+            padding: 8px 16px;
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
             border: 1px solid var(--border-color);
-            padding: 5px 10px;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-color);
+        }
+
+        .preset-filter:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.15) 0%,
+                rgba(255, 255, 255, 0.08) 100%
+            );
         }
 
         .preset-filter.active {
-            background-color: var(--primary-color);
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.2) 0%,
+                rgba(76, 175, 80, 0.3) 100%
+            );
+            border-color: var(--primary-color);
         }
 
-        .log-selector {
-            margin-bottom: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .log-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 10px;
-            max-height: 300px;
-            overflow-y: auto;
-            background: var(--background-light);
-            padding: 10px;
-            border-radius: 4px;
-        }
-        
-        .log-item {
-            display: flex;
-            flex-direction: column;
-            padding: 10px;
-            background: var(--background-dark);
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        
-        .log-item:hover {
-            background: var(--border-color);
-        }
-        
-        .log-item-name {
-            font-weight: bold;
-        }
-        
-        .log-item-details {
-            font-size: 0.8em;
-            color: #888;
-        }
-        
-        .php-array { color: #569cd6; }
-        .php-array-key { color: #9cdcfe; }
-        .php-array-arrow { color: #d4d4d4; }
-        .php-string { color: #ce9178; }
-        .php-number { color: #b5cea8; }
+        .error { color: var(--error-color); }
+        .warning { color: var(--warning-color); }
+        .info { color: var(--success-color); }
 
-        .available-action {
-            color: #4CAF50;
-            font-weight: bold;
-        }
-        
-        .log-viewer {
-            min-height: 200px;
-            min-width: 300px;
+        .wrap-button.active {
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.2) 0%,
+                rgba(76, 175, 80, 0.3) 100%
+            );
+            border-color: var(--primary-color);
         }
 
         .follow-button {
-            background-color: var(--secondary-color);
-            opacity: 0.5;
-            transition: all 0.3s ease;
-        }
-        
-        .follow-button.active {
-            opacity: 1;
-            background-color: var(--primary-color);
-            box-shadow: 0 0 5px var(--primary-color);
-        }
-        
-        .log-selector-controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .log-selector-dropdown {
-            flex: 1;
-            padding: 8px;
-            background-color: var(--background-light);
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
+            position: relative;
+            padding-left: 28px !important; /* Space for the indicator */
         }
 
-        .available-action-keyword { 
-            color: #4CAF50;
-            font-weight: bold;
+        .follow-button::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--border-color);
+            transition: background-color 0.3s ease;
         }
-        
-        .available-action-name {
-            color: #2196F3;
-            font-weight: bold;
+
+        .follow-button.active {
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.2) 0%,
+                rgba(76, 175, 80, 0.3) 100%
+            );
+            border-color: var(--success-color);
         }
-        
-        .available-action-desc {
-            color: #9E9E9E;
-            font-style: italic;
+
+        .follow-button.active::before {
+            background-color: var(--success-color);
+            box-shadow: 0 0 5px var(--success-color);
+        }
+
+        @media (max-width: 1200px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+
+            .log-container {
+                height: calc(90vh - 150px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 5px;
+                padding: 10px;
+            }
+
+            .log-container {
+                height: calc(90vh - 120px);
+            }
+
+            .nav-panel a {
+                display: block;
+                margin: 10px 0;
+            }
+
+            .preset-filters {
+                flex-direction: column;
+            }
+
+            .log-viewer {
+                min-height: 300px;
+            }
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--text-color);
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .log-selector-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin: 20px;
+            flex-wrap: wrap;
+        }
+
+        .log-selector-dropdown {
+            padding: 10px;
+            background-color: var(--background-dark);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            min-width: 200px;
+            font-size: 1rem;
         }
 
         .layout-controls {
             display: flex;
             gap: 10px;
-            margin-left: auto;
         }
-        
+
         .layout-button {
-            padding: 5px 15px;
-            background-color: var(--background-light);
-            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
             color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
-        .layout-button.active {
-            background-color: var(--primary-color);
-            box-shadow: 0 0 5px var(--primary-color);
+
+        .layout-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
-        .download-button {
-            background-color: #4CAF50;  /* Green color for download */
-            padding: 3px 6px !important;
-        }
-        
-        .download-button:hover {
-            background-color: #45a049;
+        .layout-button.active {
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.2) 0%,
+                rgba(76, 175, 80, 0.3) 100%
+            );
+            border-color: var(--primary-color);
         }
 
         .troubleshoot-panel {
             position: fixed;
-            left: 50%;
             bottom: 40px;
+            left: 50%;
             transform: translateX(-50%);
+            width: 600px;
+            height: 500px;
             background: var(--background-light);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 15px;
-            width: 600px; /* Fixed width */
-            height: 500px; /* Fixed height */
-            max-width: 90vw;
-            max-height: 80vh;
-            display: flex;
+            border-radius: 12px;
+            display: none;
             flex-direction: column;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
             z-index: 1000;
-            resize: none;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
         }
-        
-        .resize-handle {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 20px;
-            height: 20px;
-            cursor: nw-resize;
-            z-index: 1001;
-        }
-        
-        .resize-handle::before {
-            content: '';
-            position: absolute;
-            left: 4px;
-            top: 4px;
-            width: 6px;
-            height: 6px;
-            border-left: 2px solid var(--text-color);
-            border-top: 2px solid var(--text-color);
-            opacity: 0.5;
-        }
-        
+
         .troubleshoot-header {
+            padding: 15px;
+            background: linear-gradient(135deg,
+                rgba(33, 150, 243, 0.1) 0%,
+                rgba(33, 150, 243, 0.2) 100%
+            );
+            border-bottom: 1px solid var(--border-color);
+            cursor: move;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
-            cursor: move; /* Show move cursor for drag handle */
+            border-radius: 12px 12px 0 0;
         }
-        
+
         .troubleshoot-content {
             flex: 1;
+            padding: 15px;
             overflow-y: auto;
-            padding: 15px;
-            margin: 0;
-            word-wrap: break-word;
-            white-space: pre-wrap;
-            min-height: 0;
-            position: relative;
         }
-        
-        .troubleshoot-content pre {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            overflow-x: auto;
-            max-width: 100%;
-            background: var(--background-dark);
-            padding: 10px;
-            border-radius: 4px;
-            margin: 5px 0;
-        }
-        
-        .troubleshoot-content details {
-            margin: 10px 0;
-            background: var(--background-dark);
-            padding: 10px;
-            border-radius: 4px;
-        }
-        
-        .troubleshoot-content details summary {
-            cursor: pointer;
-            padding: 5px;
-            margin: -5px;
-        }
-        
-        .troubleshoot-content details summary:hover {
-            background: var(--border-color);
-            border-radius: 4px;
-        }
-        
-        .troubleshoot-input-container {
-            position: relative;
-            background: var(--background-light);
-            padding: 15px;
-            border-top: 1px solid var(--border-color);
-            margin: 0 -15px -15px -15px;
-            display: flex;
-            gap: 10px;
-            flex-shrink: 0;
-        }
-        
+
         .troubleshoot-input {
-            flex: 1;
-            background: var(--background-dark);
+            width: 100%;
+            padding: 12px;
+            background-color: var(--background-dark);
             border: 1px solid var(--border-color);
             color: var(--text-color);
-            padding: 8px;
-            border-radius: 4px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .troubleshoot-button {
+            padding: 10px 20px;
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.2) 0%,
+                rgba(76, 175, 80, 0.3) 100%
+            );
+            color: var(--text-color);
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .resize-handle {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            width: 15px;
+            height: 15px;
+            cursor: se-resize;
         }
 
         .loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 1002;
+            gap: 20px;
+            padding: 20px;
         }
-        
+
         .loading-spinner {
             width: 40px;
             height: 40px;
-            border: 3px solid var(--border-color);
-            border-top: 3px solid var(--primary-color);
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin-bottom: 10px;
         }
-        
-        .loading-text {
-            color: var(--text-color);
-            font-size: 14px;
-            text-align: center;
-        }
-        
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
+
         .status-indicator {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 12px;
-            padding: 4px 8px;
-            border-radius: 4px;
-            background: var(--background-dark);
+            top: 15px;
+            right: 15px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
             opacity: 0;
-            transition: opacity 0.3s;
+            transition: opacity 0.3s ease;
         }
-        
+
         .status-indicator.visible {
             opacity: 1;
         }
-        
-        .status-indicator.error {
-            background: rgba(244, 67, 54, 0.2);
-            color: #f44336;
-        }
-        
+
         .status-indicator.success {
-            background: rgba(76, 175, 80, 0.2);
-            color: #4CAF50;
+            background-color: rgba(64, 192, 87, 0.2);
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
         }
 
-        .log-pid {
-            color: #b5cea8; /* Light green */
-            font-style: italic;
-        }
-        
-        .log-module {
-            color: #ce9178; /* Light orange */
-        }
-        
-        .log-level-notice {
-            color: #4CAF50; /* Green */
-        }
-        
-        .log-level-warn {
-            color: #ffc107; /* Yellow */
-        }
-        
-        .log-level-error {
-            color: #f44336; /* Red */
-        }
-        
-        
-        
-        .log-message {
-            color: var(--text-color) !important;
-            display: inline;
-            white-space: inherit;
-            word-break: break-word;
-        }
-
-        /* Line highlighting for error/warning/notice */
-        .log-line.error { background: rgba(244, 67, 54, 0.1); }
-        .log-line.warning { background: rgba(255, 193, 7, 0.1); }
-        .log-line.notice { background: transparent; }
-        
-        /* Ensure all text in log lines is white by default */
-        .log-line {
-            white-space: pre;
-            display: block;
-            color: var(--text-color);
-        }
-
-        /* Update log line styles to handle Apache format better */
-        .log-line {
-            display: block;
-            width: 100%;
-            white-space: inherit; /* Inherit from parent container */
-        }
-        
-        .log-content {
-            flex-grow: 1;
-            background-color: var(--background-dark);
-            border-radius: 4px;
-            padding: 10px;
-            overflow-y: auto;
-            font-family: monospace;
-            font-size: 0.9em;
-            will-change: transform;
-            contain: content;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        
-        /* Ensure components stay inline and wrap properly */
-        .timestamp, .log-module, .log-level-notice, 
-        .log-level-warn, .log-level-error {
-            display: inline-flex;
-            align-items: center;
-            white-space: nowrap; /* Keep these components from breaking */
-        }
-
-        .model-toggle {
-            display: flex;
-            align-items: center;
-            margin-right: 10px;
-            font-size: 0.9em;
-        }
-
-        .toggle-label {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-        }
-
-        .toggle-label input[type="checkbox"] {
-            cursor: pointer;
+        .status-indicator.error {
+            background-color: rgba(244, 67, 54, 0.2);
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
         }
     </style>
 </head>
 <body>
-    <div class="nav-panel">
-        <a href="index.html">Return to Home</a>
-        <a href="https://github.com/MinLL/MinAI">Documentation</a>
-        <button onclick="toggleTroubleshoot()" style="margin-left: auto">
-            Troubleshoot
-        </button>
-    </div>
-
-    <div class="log-selector-controls">
-        <select class="log-selector-dropdown" id="logSelect">
-            <option value="">Add Log Viewer...</option>
-        </select>
-        <button onclick="restoreDefaultLogs()">Restore Defaults</button>
-        <div class="layout-controls">
-            <button class="layout-button" onclick="setLayout(1)">1x</button>
-            <button class="layout-button active" onclick="setLayout(2)">2x</button>
-            <button class="layout-button" onclick="setLayout(3)">3x</button>
-            <button class="layout-button" onclick="setLayout(4)">4x</button>
+    <div class="container">
+        <h1>MinAI Diagnostics</h1>
+        
+        <div class="nav-panel">
+            <a href="index.html">Return to Home</a>
+            <a href="https://github.com/MinLL/MinAI">Documentation</a>
+            <button onclick="toggleTroubleshoot()" class="troubleshoot-button">
+                Troubleshoot
+            </button>
         </div>
-    </div>
 
-    <div class="log-container" id="logContainer">
-        <!-- Log viewers will be dynamically added here -->
+        <div class="log-selector-controls">
+            <select class="log-selector-dropdown" id="logSelect">
+                <option value="">Add Log Viewer...</option>
+            </select>
+            <button onclick="restoreDefaultLogs()" class="layout-button">Restore Defaults</button>
+            <div class="layout-controls">
+                <button class="layout-button" onclick="setLayout(1)">1x</button>
+                <button class="layout-button active" onclick="setLayout(2)">2x</button>
+                <button class="layout-button" onclick="setLayout(3)">3x</button>
+                <button class="layout-button" onclick="setLayout(4)">4x</button>
+            </div>
+        </div>
+
+        <div class="log-container" id="logContainer">
+            <!-- Log viewers will be dynamically added here -->
+        </div>
     </div>
 
     <div class="troubleshoot-panel">
-        <div class="resize-handle"></div>
         <div class="troubleshoot-header">
-            <span>Troubleshoot Assistant</span>
-            <div class="model-toggle">
-                <label class="toggle-label">
-                    <input type="checkbox" id="useRecommendedModel" checked>
-                    Use Claude-3.5 (Model in summary adapter is used otherwise)
-                </label>
-            </div>
-            <div class="log-controls">
-                <button onclick="resetTroubleshootSize()">Reset Size</button>
-                <button onclick="toggleTroubleshoot(false)">Close</button>
-            </div>
+            <span>Troubleshoot</span>
+            <button onclick="toggleTroubleshoot(false)" class="layout-button">Close</button>
         </div>
-        <div class="status-indicator"></div>
-        <div class="troubleshoot-content"></div>
-        <div class="troubleshoot-input-container">
-            <input type="text" class="troubleshoot-input" placeholder="Ask a question about the latest interaction...">
-            <button class="troubleshoot-button" onclick="askQuestion()">Ask</button>
+        <div class="resize-handle"></div>
+        <div class="troubleshoot-content">
+            <input type="text" class="troubleshoot-input" placeholder="Describe your issue...">
+            <div class="model-selection">
+                <input type="checkbox" id="useRecommendedModel" checked>
+                <label for="useRecommendedModel">Use recommended model</label>
+            </div>
+            <button onclick="askQuestion()" class="troubleshoot-button">Ask</button>
+            <div class="status-indicator"></div>
+            <div class="troubleshoot-response"></div>
         </div>
     </div>
 
@@ -674,15 +544,12 @@
             'apache_error.log'
         ];
 
-        // Add layout preference to localStorage
         let currentLayout = parseInt(localStorage.getItem('logViewerLayout') || '2');
 
         function defaultLogParser(content) {
             return content.split('\n').map(line => {
-                // Skip empty lines
                 if (!line.trim()) return '';
                 
-                // Handle the equals separator lines in context logs
                 if (line.trim() === '=') {
                     return '<hr style="border: 1px dashed var(--border-color); margin: 10px 0;">';
                 }
@@ -734,14 +601,12 @@
                     if (!line.trim()) return '';
                     
                     let formattedLine = line;
-                    // Match ISO format timestamps
                     if (line.includes('START') || line.includes('END')) {
                         const timestamp = line.match(/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2})/);
                         if (timestamp) {
                             formattedLine = line.replace(timestamp[0], `<span class="timestamp">${timestamp[0]}</span>`);
                         }
                     }
-                    // Match Apache style timestamps
                     if (line.match(/\[.*?\d{4}\]/)) {
                         formattedLine = line.replace(/\[(.*?\d{4})\]/g, '<span class="timestamp">[$1]</span>');
                     }
@@ -761,7 +626,6 @@
             return content.split('\n').map(line => {
                 if (!line.trim()) return '';
                 
-                // First, escape any HTML to prevent XSS
                 line = line.replace(/[&<>"']/g, char => ({
                     '&': '&amp;',
                     '<': '&lt;',
@@ -770,24 +634,20 @@
                     "'": '&#39;'
                 }[char]));
                 
-                // Determine line type for highlighting
                 let lineClass = '';
                 if (line.includes('[php:error]')) lineClass = 'error';
                 else if (line.includes('[php:warn]')) lineClass = 'warning';
                 else if (line.includes('[php:notice]')) lineClass = 'notice';
                 
-                // Split the line into components and message
                 let components = [];
                 let message = line;
                 
-                // Extract timestamp
                 const timestampMatch = message.match(/\[([A-Za-z]{3} [A-Za-z]{3} \d{2} \d{2}:\d{2}:\d{2}\.\d{6} \d{4})\]/);
                 if (timestampMatch) {
                     components.push(`<span class="timestamp">[${timestampMatch[1]}]</span>`);
                     message = message.slice(timestampMatch[0].length).trimLeft();
                 }
                 
-                // Extract module/level
                 const moduleMatch = message.match(/\[php:(notice|warn|error)\]/);
                 if (moduleMatch) {
                     components.push(
@@ -798,16 +658,13 @@
                     message = message.slice(moduleMatch[0].length).trimLeft();
                 }
                 
-                // Remove PID and client info
                 message = message.replace(/\[pid [^\]]+\]/g, '').replace(/\[client [^\]]+\]/g, '');
                 
-                // Handle referer at the end of the line
                 const refererMatch = message.match(/, referer: [^$\n]+$/);
                 if (refererMatch) {
                     message = message.slice(0, -refererMatch[0].length);
                 }
                 
-                // Wrap the components and message in a line container
                 return `<div class="log-line ${lineClass}">${components.join(' ')}<span class="log-message">${message.trimLeft()}</span></div>`;
             }).join('\n');
         }
@@ -836,70 +693,71 @@
             const viewer = element.closest('.log-viewer');
             const filterInput = viewer.querySelector('.filter-input');
             
-            // If this preset is already active, clear it
             if (element.classList.contains('active')) {
                 filterInput.value = '';
                 element.classList.remove('active');
             } else {
-                // Clear other active presets
                 viewer.querySelectorAll('.preset-filter').forEach(preset => 
                     preset.classList.remove('active')
                 );
-                // Apply the new filter
                 filterInput.value = filter;
                 element.classList.add('active');
             }
             
-            // Trigger the filter
             filterLog(filterInput);
         }
 
+        function setupScrollHandler(viewer) {
+            const logContent = viewer.querySelector('.log-content');
+            const followButton = viewer.querySelector('.follow-button');
+            let isUserScrolling = false;
+            let scrollTimeout;
+
+            logContent.addEventListener('scroll', () => {
+                clearTimeout(scrollTimeout);
+                
+                // Calculate if we're near the bottom
+                const isNearBottom = logContent.scrollHeight - logContent.scrollTop - logContent.clientHeight < 50;
+                
+                if (!isNearBottom && !isUserScrolling) {
+                    // User has scrolled up
+                    isUserScrolling = true;
+                    followButton.classList.remove('active');
+                    const config = Array.from(activeLogViewers.entries())
+                        .find(([_, v]) => v.viewer === viewer);
+                    if (config) {
+                        activeLogViewers.get(config[0]).follow = false;
+                    }
+                }
+
+                // Reset the user scrolling flag after 2 seconds of no scrolling
+                scrollTimeout = setTimeout(() => {
+                    isUserScrolling = false;
+                }, 2000);
+            });
+        }
+
         function toggleFollow(button) {
-            button.classList.toggle('active');
             const viewer = button.closest('.log-viewer');
-            const content = viewer.querySelector('.log-content');
+            const logContent = viewer.querySelector('.log-content');
+            button.classList.toggle('active');
+            
             const config = Array.from(activeLogViewers.entries())
                 .find(([_, v]) => v.viewer === viewer);
             
             if (config) {
-                const isActive = button.classList.contains('active');
-                activeLogViewers.get(config[0]).follow = isActive;
-                if (isActive) {
-                    content.scrollTop = content.scrollHeight;
+                const following = button.classList.contains('active');
+                activeLogViewers.get(config[0]).follow = following;
+                
+                if (following) {
+                    // Scroll to bottom when enabling follow
+                    logContent.scrollTop = logContent.scrollHeight;
                 }
             }
         }
 
         function isFollowEnabled(viewer) {
             return viewer.querySelector('.follow-button').classList.contains('active');
-        }
-
-        function setupScrollHandler(viewer) {
-            const content = viewer.querySelector('.log-content');
-            const followButton = viewer.querySelector('.follow-button');
-            
-            let scrollTimeout;
-            content.addEventListener('scroll', () => {
-                clearTimeout(scrollTimeout);
-                scrollTimeout = setTimeout(() => {
-                    const isAtBottom = content.scrollHeight - content.clientHeight <= content.scrollTop + 1;
-                    if (!isAtBottom && followButton.classList.contains('active')) {
-                        followButton.classList.remove('active');
-                        const config = Array.from(activeLogViewers.entries())
-                            .find(([_, v]) => v.viewer === viewer);
-                        if (config) {
-                            activeLogViewers.get(config[0]).follow = false;
-                        }
-                    } else if (isAtBottom && !followButton.classList.contains('active')) {
-                        followButton.classList.add('active');
-                        const config = Array.from(activeLogViewers.entries())
-                            .find(([_, v]) => v.viewer === viewer);
-                        if (config) {
-                            activeLogViewers.get(config[0]).follow = true;
-                        }
-                    }
-                }, 100);
-            });
         }
 
         function formatPhpArray(content) {
@@ -913,7 +771,6 @@
             function processValue(value, currentDepth) {
                 if (!value) return '';
                 
-                // Handle AVAILABLE ACTION lines
                 if (value.includes('AVAILABLE ACTION:')) {
                     return value.replace(
                         /AVAILABLE ACTION: (\w+) \((.*?)\)/g,
@@ -923,17 +780,14 @@
                     );
                 }
                 
-                // Handle nested arrays
                 if (value.trim().startsWith('array (')) {
                     return formatPhpArrayInternal(value.slice(value.indexOf('(') + 1, -1), currentDepth + 1);
                 }
                 
-                // Handle string values
                 if (value.trim().startsWith("'") && value.trim().endsWith("'")) {
                     return `<span class="php-string">${value}</span>`;
                 }
                 
-                // Handle numeric values
                 if (!isNaN(value.trim())) {
                     return `<span class="php-number">${value}</span>`;
                 }
@@ -949,12 +803,10 @@
                     let line = lines[i].trim();
                     if (!line) continue;
                     
-                    // Handle key => value pairs
                     if (line.includes('=>')) {
                         let [key, ...valueParts] = line.split('=>');
                         let value = valueParts.join('=>').trim();
                         
-                        // Collect multi-line values
                         let openParens = (value.match(/\(/g) || []).length;
                         let closeParens = (value.match(/\)/g) || []).length;
                         
@@ -1002,22 +854,18 @@
             const content = viewer.querySelector('.log-content');
             
             if (!input.value) {
-                // Show original content when filter is empty
                 content.innerHTML = content.dataset.originalContent || '';
                 return;
             }
             
             try {
-                const regex = new RegExp(input.value, 'i'); // Case insensitive search
+                const regex = new RegExp(input.value, 'i');
                 const lines = content.dataset.originalContent.split('\n');
                 
-                // Filter and join lines that match
                 const filteredContent = lines
                     .filter(line => {
-                        // Skip empty lines and separators
                         if (!line.trim() || line.includes('<hr')) return false;
                         
-                        // Extract text content from HTML
                         const div = document.createElement('div');
                         div.innerHTML = line;
                         const textContent = div.textContent || div.innerText;
@@ -1028,7 +876,6 @@
                 content.innerHTML = filteredContent;
                 
             } catch (e) {
-                // If regex is invalid, fall back to simple text search
                 const searchText = input.value.toLowerCase();
                 const lines = content.dataset.originalContent.split('\n');
                 
@@ -1047,13 +894,11 @@
         }
 
         function restoreDefaultLogs() {
-            // Close all current viewers
             Array.from(activeLogViewers.entries()).forEach(([_, data]) => {
                 data.viewer.remove();
             });
             activeLogViewers.clear();
             
-            // Open default logs
             DEFAULT_LOGS.forEach(logFile => {
                 const config = availableLogConfigs.find(c => c.file === logFile);
                 if (config) {
@@ -1136,6 +981,12 @@
                 }
                 
                 viewerData.position = data.position;
+
+                // When updating the log content:
+                if (viewerData && viewerData.follow) {
+                    const logContent = viewerData.viewer.querySelector('.log-content');
+                    logContent.scrollTop = logContent.scrollHeight;
+                }
             } catch (error) {
                 console.error(`Error fetching ${config.file}:`, error);
             }
@@ -1146,7 +997,6 @@
                 const response = await fetch('api/logs.php?list=1');
                 const data = await response.json();
                 
-                // Create configs for all available logs
                 availableLogConfigs = data.files.map(file => ({
                     name: file.name,
                     file: file.name,
@@ -1161,11 +1011,9 @@
                     ] : []
                 }));
 
-                // Load saved configuration or defaults
                 const savedConfig = JSON.parse(localStorage.getItem('logViewerConfig') || '[]');
                 const logsToLoad = savedConfig.length > 0 ? savedConfig : DEFAULT_LOGS;
 
-                // Create viewers for default/saved logs
                 logsToLoad.forEach(logFile => {
                     const config = availableLogConfigs.find(c => c.file === logFile);
                     if (config && !activeLogViewers.has(config.file)) {
@@ -1201,13 +1049,13 @@
             currentLayout = columns;
             localStorage.setItem('logViewerLayout', columns);
             
-            // Update button states
-            document.querySelectorAll('.layout-button').forEach(button => {
-                button.classList.remove('active');
-            });
-            document.querySelector(`.layout-button:nth-child(${columns})`).classList.add('active');
+            const container = document.getElementById('logContainer');
+            container.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
             
-            updateLayout();
+            document.querySelectorAll('.layout-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.layout-button[onclick="setLayout(${columns})"]`).classList.add('active');
         }
 
         function updateLayout() {
@@ -1215,24 +1063,21 @@
             const viewers = Array.from(document.querySelectorAll('.log-viewer'));
             const containerWidth = container.clientWidth;
             
-            // Set grid columns based on layout selection
             container.style.gridTemplateColumns = `repeat(${currentLayout}, 1fr)`;
             
-            // Reset all viewer widths to auto
             viewers.forEach(viewer => {
                 viewer.style.width = 'auto';
                 viewer.style.maxWidth = '100%';
             });
         }
 
-        // Update window.onload to set initial layout
-        window.addEventListener('load', () => {
+        document.addEventListener('DOMContentLoaded', () => {
             setLayout(currentLayout);
         });
 
         function createLogViewer(config) {
             const viewer = document.createElement('div');
-            viewer.className = 'log-viewer wrap'; // Default to wrap
+            viewer.className = 'log-viewer wrap';
             
             viewer.innerHTML = `
                 <div class="log-header">
@@ -1279,12 +1124,11 @@
                 activeLogViewers.delete(config[0]);
                 viewer.remove();
                 saveConfiguration();
-                updateLayout();  // Update layout after removing a viewer
+                updateLayout();
             }
         }
 
         function downloadLog(filename) {
-            // Create a hidden link and click it to trigger the download
             const link = document.createElement('a');
             link.href = `api/logs.php?download=${encodeURIComponent(filename)}`;
             link.download = filename;
@@ -1309,11 +1153,9 @@
             
             if (!question) return;
             
-            // Disable input and button
             input.disabled = true;
             button.disabled = true;
             
-            // Start timer
             const startTime = Date.now();
             const updateTimer = setInterval(() => {
                 const elapsed = Math.floor((Date.now() - startTime) / 1000);
@@ -1321,7 +1163,6 @@
                 statusIndicator.className = 'status-indicator visible';
             }, 1000);
             
-            // Show loading overlay
             content.innerHTML = `
                 <div class="loading-overlay">
                     <div class="loading-spinner"></div>
@@ -1334,7 +1175,7 @@
             
             try {
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
+                const timeoutId = setTimeout(() => controller.abort(), 60000);
                 
                 const response = await fetch('api/troubleshoot.php', {
                     method: 'POST',
@@ -1358,7 +1199,6 @@
                 
                 const data = await response.json();
                 
-                // Show success status briefly
                 statusIndicator.textContent = `Request completed in ${Math.floor((Date.now() - startTime) / 1000)}s`;
                 statusIndicator.className = 'status-indicator visible success';
                 setTimeout(() => {
@@ -1391,7 +1231,6 @@
                 `;
                 
             } catch (error) {
-                // Show error status
                 statusIndicator.textContent = error.name === 'AbortError' ? 
                     'Request timed out after 60s' : 
                     'Request failed';
@@ -1407,14 +1246,12 @@
                 
             } finally {
                 clearInterval(updateTimer);
-                // Re-enable input and button
                 input.disabled = false;
                 button.disabled = false;
                 input.focus();
             }
         }
 
-        // Add enter key support for the input
         document.querySelector('.troubleshoot-input').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 askQuestion();
@@ -1450,7 +1287,6 @@
             let isDragging = false;
             let startX, startY, startWidth, startHeight, startLeft;
             
-            // Load saved size and position
             const savedSize = JSON.parse(localStorage.getItem('troubleshootSize') || '{}');
             if (savedSize.width) {
                 panel.style.width = savedSize.width + 'px';
@@ -1461,7 +1297,6 @@
                 panel.style.transform = 'none';
             }
             
-            // Resize functionality
             resizeHandle.addEventListener('mousedown', (e) => {
                 isResizing = true;
                 startX = e.clientX;
@@ -1472,7 +1307,6 @@
                 e.preventDefault();
             });
             
-            // Drag functionality - constrained to bottom
             header.addEventListener('mousedown', (e) => {
                 if (e.target === header || e.target.parentElement === header) {
                     isDragging = true;
@@ -1491,7 +1325,6 @@
                     const newHeight = startHeight + dy;
                     const newLeft = startLeft - dx;
                     
-                    // Enforce minimum and maximum sizes
                     if (newWidth >= 300 && newWidth <= window.innerWidth * 0.9) {
                         panel.style.width = newWidth + 'px';
                         panel.style.left = newLeft + 'px';
@@ -1503,7 +1336,6 @@
                     const dx = e.clientX - startX;
                     const newLeft = startLeft + dx;
                     
-                    // Keep panel within window bounds
                     if (newLeft >= 0 && newLeft + panel.offsetWidth <= window.innerWidth) {
                         panel.style.left = newLeft + 'px';
                     }
@@ -1523,13 +1355,11 @@
             });
         }
         
-        // Initialize the panel when the page loads
         document.addEventListener('DOMContentLoaded', function() {
             initTroubleshootPanel();
             
-            // Restore troubleshooter visibility and model preference
             const troubleshootVisible = localStorage.getItem('troubleshootVisible') === 'true';
-            const useRecommendedModel = localStorage.getItem('useRecommendedModel') !== 'false'; // Default to true
+            const useRecommendedModel = localStorage.getItem('useRecommendedModel') !== 'false';
             
             document.getElementById('useRecommendedModel').checked = useRecommendedModel;
             document.getElementById('useRecommendedModel').addEventListener('change', saveModelPreference);
