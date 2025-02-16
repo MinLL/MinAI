@@ -225,13 +225,16 @@
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
-            font-family: Arial, sans-serif;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.4;
             resize: vertical;
-            margin-bottom: 15px;
+            min-height: 60px;
         }
 
         .prompt-textarea:focus {
             border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
             outline: none;
         }
 
@@ -624,19 +627,19 @@
                         </div>
 
                         <label class="option-label" for="system-prompt">Translation System Prompt</label>
-                        <textarea id="system-prompt" class="prompt-textarea" rows="3"></textarea>
+                        <textarea id="system-prompt" class="prompt-textarea" rows="4"></textarea>
 
                         <label class="option-label" for="roleplay-system-prompt">Roleplay System Prompt</label>
-                        <textarea id="roleplay-system-prompt" class="prompt-textarea" rows="3"></textarea>
+                        <textarea id="roleplay-system-prompt" class="prompt-textarea" rows="4"></textarea>
                     </div>
 
                     <!-- Request Formats -->
                     <div class="option-group">
                         <label class="option-label" for="translation-request">Translation Request Format</label>
-                        <textarea id="translation-request" class="prompt-textarea" rows="2"></textarea>
+                        <textarea id="translation-request" class="prompt-textarea" rows="3"></textarea>
 
                         <label class="option-label" for="roleplay-request">Roleplay Request Format</label>
-                        <textarea id="roleplay-request" class="prompt-textarea" rows="2"></textarea>
+                        <textarea id="roleplay-request" class="prompt-textarea" rows="3"></textarea>
                     </div>
 
                     <!-- Section Configuration -->
