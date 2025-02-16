@@ -98,7 +98,7 @@ function interceptRoleplayInput() {
         $originalInput = trim($originalInput);
 
         // Get recent context - use configured value for context messages
-        $contextMessages = $settings['CONTEXT_MESSAGES'];
+        $contextMessages = $settings['context_messages'];
         $contextDataHistoric = DataLastDataExpandedFor("", $contextMessages * -1);
         
         // Get info about location and NPCs
