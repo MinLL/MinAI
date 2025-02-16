@@ -44,7 +44,7 @@ $GLOBALS['roleplay_settings'] = Array(
     "system_prompt" => "You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking.",
     "roleplay_system_prompt" => "You are #PLAYER_NAME#. Your responses should reflect your character's personality, background, and current situation.",
     "translation_request" => "Translate this casual speech into your character's manner: \"#ORIGINAL_INPUT#\"",
-    "roleplay_request" => "You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue appropriate for the situation.",
+    "roleplay_request" => "You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue appropriate for the situation. You must pay especially close attention to recent events and dialogue.",
     "sections" => Array(
         "CHARACTER_BACKGROUND" => Array(
             "enabled" => true,
@@ -73,7 +73,7 @@ $GLOBALS['roleplay_settings'] = Array(
         "INSTRUCTIONS" => Array(
             "enabled" => true,
             "header" => "=== INSTRUCTIONS ===",
-            "content" => "#INSTRUCTIONS#",
+            "content" => "1. Correct any misheard names using the nearby names list\n2. Keep responses brief and true to the original meaning\n3. Do not add character name prefixes to your response\n4. Provide only the translated dialogue\n5. Emphasize recent events and dialogue in your response.",
             "order" => 4
         )
     )

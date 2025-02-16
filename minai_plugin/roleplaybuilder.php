@@ -98,7 +98,7 @@ function interceptRoleplayInput() {
         $originalInput = trim($originalInput);
 
         // Get recent context - use configured value for context messages
-        $contextMessages = $settings['context_messages'];
+        $contextMessages = $settings['CONTEXT_MESSAGES'];
         $contextDataHistoric = DataLastDataExpandedFor("", $contextMessages * -1);
         
         // Get info about location and NPCs
@@ -126,32 +126,32 @@ function interceptRoleplayInput() {
         $fertilityStatus = convertToFirstPerson(GetFertilityContext($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
         // Replace variables in system prompt and request
         $variableReplacements = [
-            '#PLAYER_NAME#' => $PLAYER_NAME,
-            '#PLAYER_BIOS#' => replaceVariables($PLAYER_BIOS, ['PLAYER_NAME' => $PLAYER_NAME]),
-            '#NEARBY_ACTORS#' => implode(", ", $nearbyActors),
-            '#NEARBY_LOCATIONS#' => implode(", ", $possibleLocations),
-            '#RECENT_EVENTS#' => implode("\n", array_map(function($ctx) { 
+            'PLAYER_NAME' => $PLAYER_NAME,
+            'PLAYER_BIOS' => replaceVariables($PLAYER_BIOS, ['PLAYER_NAME' => $PLAYER_NAME]),
+            'NEARBY_ACTORS' => implode(", ", $nearbyActors),
+            'NEARBY_LOCATIONS' => implode(", ", $possibleLocations),
+            'RECENT_EVENTS' => implode("\n", array_map(function($ctx) { 
                 return $ctx['content']; 
             }, array_slice($contextDataFull, -$settings['context_messages']))),
-            '#PLAYER_SUBJECT#' => $playerPronouns['subject'],
-            '#PLAYER_OBJECT#' => $playerPronouns['object'],
-            '#PLAYER_POSSESSIVE#' => $playerPronouns['possessive'],
-            '#HERIKA_DYNAMIC#' => $HERIKA_DYNAMIC,
-            '#ORIGINAL_INPUT#' => $originalInput,
-            '#INSTRUCTIONS#' => $instructions,
-            '#PHYSICAL_DESCRIPTION#' => $physDesc,
-            '#AROUSAL_STATUS#' => $arousalStatus,
-            '#SURVIVAL_STATUS#' => $survivalStatus,
-            '#CLOTHING_STATUS#' => $clothingStatus,
-            '#DEVICES_STATUS#' => $devicesStatus,
-            '#FERTILITY_STATUS#' => $fertilityStatus
+            'PLAYER_SUBJECT' => $playerPronouns['subject'],
+            'PLAYER_OBJECT' => $playerPronouns['object'],
+            'PLAYER_POSSESSIVE' => $playerPronouns['possessive'],
+            'HERIKA_DYNAMIC' => $HERIKA_DYNAMIC,
+            'ORIGINAL_INPUT' => $originalInput,
+            'INSTRUCTIONS' => $settings['INSTRUCTIONS'],
+            'PHYSICAL_DESCRIPTION' => $physDesc,
+            'AROUSAL_STATUS' => $arousalStatus,
+            'SURVIVAL_STATUS' => $survivalStatus,
+            'CLOTHING_STATUS' => $clothingStatus,
+            'DEVICES_STATUS' => $devicesStatus,
+            'FERTILITY_STATUS' => $fertilityStatus
         ];
 
         // Apply replacements to system prompt
         $systemPrompt = replaceVariables(
             $GLOBALS["gameRequest"][0] == "minai_roleplay" 
-                ? $settings['roleplay_system_prompt']
-                : $settings['system_prompt'],
+                ? $settings['ROLEPLAY_SYSTEM_PROMPT']
+                : $settings['SYSTEM_PROMPT'],
             $variableReplacements
         );
 
@@ -218,7 +218,7 @@ function interceptRoleplayInput() {
                 // Format the response with a single character name prefix
                 $GLOBALS["gameRequest"][3] = $contextPrefix . $PLAYER_NAME . ": " . $response;
             }
-            error_log("minai: Final gameRequest[3]: " . $GLOBALS["gameRequest"][3]);
+            # error_log("minai: Final gameRequest[3]: " . $GLOBALS["gameRequest"][3]);
         } else {
             error_log("minai: Failed to generate roleplay response, using original input");
         }
