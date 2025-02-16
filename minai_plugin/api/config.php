@@ -79,7 +79,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         "input_delay_for_radiance" => $GLOBALS["input_delay_for_radiance"],
         
         // Action prompts
-        "action_prompts" => $GLOBALS["action_prompts"]
+        "action_prompts" => $GLOBALS["action_prompts"],
+        
+        // Add roleplay settings to GET response
+        "roleplay_settings" => $GLOBALS["roleplay_settings"],
     );
 
     // Return the config data as JSON
@@ -132,6 +135,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Action prompts
         $newConfig .= "\$GLOBALS['action_prompts'] = " . buildAssociativeArrayString($input['action_prompts']) . ";\n";
+        
+        // Save roleplay settings
+        $newConfig .= "\$GLOBALS['roleplay_settings'] = " . var_export($input['roleplay_settings'], true) . ";\n";
 
         // Write only the overrides to config.php
         $configFile = "$pluginPath/config.php";

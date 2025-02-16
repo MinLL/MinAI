@@ -240,7 +240,60 @@
             display: none;
         }
 
+        .section-entry {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .section-entry h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .section-entry input[type="text"] {
+            width: 100%;
+            margin: 5px 0;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .section-entry textarea {
+            width: 100%;
+            margin: 5px 0;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .section-entry label {
+            display: block;
+            margin: 5px 0;
+        }
+
+        .section-header-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .drag-handle {
+            cursor: move;
+            padding: 0 10px;
+            color: #666;
+            font-size: 20px;
+        }
+
+        .drag-handle:hover {
+            color: #333;
+        }
+
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
 </head>
 <body>
 
@@ -522,6 +575,90 @@
                 </div>
             </div>
 
+            <!-- Roleplay Translation Settings Section -->
+            <div class="config-section">
+                <div class="section-header collapsed" onclick="toggleSection(this)">
+                    Roleplay Translation Settings
+                </div>
+                <div class="section-content collapsed">
+                    <!-- Context Messages -->
+                    <div class="option-group">
+                        <label class="option-label" for="context-messages">Context Messages</label>
+                        <p>Number of recent messages to include for context</p>
+                        <input type="number" id="context-messages" min="1" max="25">
+                    </div>
+
+                    <!-- System Prompt -->
+                    <div class="option-group">
+                        <label class="option-label" for="system-prompt">System Prompt</label>
+                        <div class="info-section">
+                            <p>Available variables:</p>
+                            <ul>
+                                <li><strong>#player_bios#</strong> - The player's character background (Pulled from the Narrator profile)</li>
+                                <li><strong>#herika_dynamic#</strong> - Herika's current state and recent experiences</li>
+                                <li><strong>#nearby_actors#</strong> - List of NPCs in the area</li>
+                                <li><strong>#nearby_locations#</strong> - List of accessible locations</li>
+                                <li><strong>#recent_events#</strong> - Recent conversation and events history</li>
+                                <li><strong>#original_input#</strong> - The player's input being translated</li>
+                                <li><strong>Pronouns:</strong>
+                                    <ul>
+                                        <li><strong>#player_subject#</strong> - he/she/they</li>
+                                        <li><strong>#player_object#</strong> - him/her/them</li>
+                                        <li><strong>#player_possessive#</strong> - his/her/their</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <textarea id="system-prompt" class="prompt-textarea" rows="3"></textarea>
+                    </div>
+
+                    <!-- Translation Request Format -->
+                    <div class="option-group">
+                        <label class="option-label" for="translation-request">Translation Request Format</label>
+                        <div class="info-section">
+                            <p>Format of the translation request. Available variables:</p>
+                            <ul>
+                                <li><strong>#original_input#</strong> - The text to be translated</li>
+                            </ul>
+                        </div>
+                        <textarea id="translation-request" class="prompt-textarea" rows="2"></textarea>
+                    </div>
+
+                    <!-- Section Configuration -->
+                    <div class="option-group">
+                        <label class="option-label">Prompt Sections</label>
+                        <div class="info-section">
+                            <p>Each section can use these variables:</p>
+                            <ul>
+                                <li><strong>#player_bios#</strong> - The player's character background (Pulled from the Narrator profile)</li>
+                                <li><strong>#herika_dynamic#</strong> - Herika's current state and recent experiences</li>
+                                <li><strong>#nearby_actors#</strong> - List of NPCs in the area</li>
+                                <li><strong>#nearby_locations#</strong> - List of accessible locations</li>
+                                <li><strong>#recent_events#</strong> - Recent conversation and events history</li>
+                                <li><strong>#original_input#</strong> - The player's input being translated</li>
+                                <li><strong>Pronouns:</strong>
+                                    <ul>
+                                        <li><strong>#player_subject#</strong> - he/she/they</li>
+                                        <li><strong>#player_object#</strong> - him/her/them</li>
+                                        <li><strong>#player_possessive#</strong> - his/her/their</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            <p>Tips:</p>
+                            <ul>
+                                <li>Use sections to organize the context for the LLM</li>
+                                <li>Disable sections you don't need to reduce token usage</li>
+                                <li>Keep instructions clear and concise</li>
+                                <li>Order sections from most to least important</li>
+                            </ul>
+                        </div>
+                        <div id="section-config">
+                            <!-- Dynamically populated sections -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Submit Button -->
             <button class="submit-button" onclick="submitConfiguration()">Submit Configuration</button>
         </div>
@@ -566,6 +703,43 @@
                 document.getElementById('explicit-scene').value = configData.action_prompts.explicit_scene;
                 document.getElementById('normal-scene').value = configData.action_prompts.normal_scene;
 
+                // Load roleplay settings
+                document.getElementById('context-messages').value = configData.roleplay_settings.context_messages;
+                document.getElementById('system-prompt').value = configData.roleplay_settings.system_prompt;
+                document.getElementById('translation-request').value = configData.roleplay_settings.translation_request;
+                
+                // Populate section configuration
+                const sectionConfig = document.getElementById('section-config');
+                sectionConfig.innerHTML = ''; // Clear existing content
+                
+                Object.entries(configData.roleplay_settings.sections).forEach(([key, section]) => {
+                    const sectionDiv = document.createElement('div');
+                    sectionDiv.className = 'option-group';
+                    sectionDiv.innerHTML = `
+                        <div class="section-entry">
+                            <div class="section-header-row">
+                                <div class="drag-handle">⋮⋮</div>
+                                <h4>${key}</h4>
+                            </div>
+                            <label>
+                                <input type="checkbox" class="section-enabled" 
+                                    data-section="${key}" 
+                                    ${section.enabled ? 'checked' : ''}>
+                                Enabled
+                            </label>
+                            <input type="text" class="section-header" 
+                                data-section="${key}" 
+                                value="${section.header}" 
+                                placeholder="Section Header">
+                            <textarea class="prompt-textarea section-content" 
+                                data-section="${key}" 
+                                rows="3">${section.content}</textarea>
+                        </div>
+                    `;
+                    sectionConfig.appendChild(sectionDiv);
+                });
+                initializeSortableSections();
+
                 document.getElementById('loading-message').style.display = 'none';
                 document.getElementById('config-form').style.display = 'block';
             } catch (error) {
@@ -604,8 +778,27 @@
                     self_narrator_normal: document.getElementById('self-narrator-normal').value,
                     explicit_scene: document.getElementById('explicit-scene').value,
                     normal_scene: document.getElementById('normal-scene').value
+                },
+                roleplay_settings: {
+                    context_messages: parseInt(document.getElementById('context-messages').value),
+                    system_prompt: document.getElementById('system-prompt').value,
+                    translation_request: document.getElementById('translation-request').value,
+                    sections: {}
                 }
             };
+
+            // Gather section configurations in DOM order
+            const orderedSections = {};
+            document.querySelectorAll('.section-entry').forEach(section => {
+                const key = section.querySelector('.section-enabled').dataset.section;
+                orderedSections[key] = {
+                    enabled: section.querySelector('.section-enabled').checked,
+                    header: section.querySelector('.section-header').value,
+                    content: section.querySelector('.section-content').value,
+                    order: Object.keys(orderedSections).length  // Add order property
+                };
+            });
+            config.roleplay_settings.sections = orderedSections;
 
             try {
                 const response = await fetch('api/config.php', {
@@ -622,7 +815,7 @@
                     alert('Failed to save configuration.');
                 }
             } catch (error) {
-                alert('Failed to submit configuration:', error);
+                alert('Failed to submit configuration: ' + error);
             }
         }
 
@@ -735,6 +928,18 @@
             `;
             document.getElementById('config-form').insertBefore(controlsDiv, document.getElementById('config-form').firstChild);
         });
+
+        function initializeSortableSections() {
+            const container = document.getElementById('section-config');
+            new Sortable(container, {
+                animation: 150,
+                handle: '.drag-handle',
+                onEnd: function() {
+                    // Order is automatically maintained in the DOM
+                    // We'll collect it when saving
+                }
+            });
+        }
     </script>
 
 </body>

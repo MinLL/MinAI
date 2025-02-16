@@ -37,3 +37,36 @@ $GLOBALS['action_prompts'] = Array(
     
     "normal_scene" => "Choose the ACTION that best fits the current context and #herika_name#'s mood when interacting with #target#. Prioritize dialogue for expressing thoughts and intentions. Use ACTIONS for tasks like interacting with items, trading, or showing physical needs. Avoid narration and emoting."
 );
+
+// Roleplay translation settings
+$GLOBALS['roleplay_settings'] = Array(
+    "context_messages" => 10,  // Number of recent messages to include for context
+    "system_prompt" => "You are #player_name#, a noble Altmer. Your task is to translate casual speech into your manner of speaking.",
+    "translation_request" => "Translate this casual speech into your noble manner: \"#original_input#\"",
+    "sections" => Array(
+        "CHARACTER_BACKGROUND" => Array(
+            "enabled" => true,
+            "header" => "=== YOUR BACKGROUND ===",
+            "content" => "#player_bios#\nPronouns: #player_subject#/#player_object#/#player_possessive#\n\n#player_name#'s Current State: #herika_dynamic#",
+            "order" => 0
+        ),
+        "NEARBY_ENTITIES" => Array(
+            "enabled" => true,
+            "header" => "=== NEARBY ENTITIES ===",
+            "content" => "Characters: #nearby_actors#\nLocations: #nearby_locations#",
+            "order" => 1
+        ),
+        "RECENT_EVENTS" => Array(
+            "enabled" => true,
+            "header" => "=== RECENT EVENTS ===",
+            "content" => "#recent_events#",
+            "order" => 2
+        ),
+        "INSTRUCTIONS" => Array(
+            "enabled" => true,
+            "header" => "=== INSTRUCTIONS ===",
+            "content" => "1. Correct any misheard names using the nearby names list\n2. Keep responses brief and true to the original meaning\n3. Do not add character name prefixes to your response\n4. Provide only the translated dialogue",
+            "order" => 3
+        )
+    )
+);

@@ -879,34 +879,10 @@ function GetActorPronouns($name) {
  */
 function callLLM($messages, $model = null, $options = []) {
     try {
-        // Combine consecutive system messages to reduce token usage
-        $optimizedMessages = [];
-        $currentSystemContent = '';
-        
-        foreach ($messages as $message) {
-            if ($message['role'] === 'system') {
-                if ($currentSystemContent) {
-                    $currentSystemContent .= "\n\n" . $message['content'];
-                } else {
-                    $currentSystemContent = $message['content'];
-                }
-            } else {
-                if ($currentSystemContent) {
-                    $optimizedMessages[] = ['role' => 'system', 'content' => $currentSystemContent];
-                    $currentSystemContent = '';
-                }
-                $optimizedMessages[] = $message;
-            }
-        }
-        
-        if ($currentSystemContent) {
-            $optimizedMessages[] = ['role' => 'system', 'content' => $currentSystemContent];
-        }
-
         // Log the prompt
         $timestamp = date('Y-m-d\TH:i:sP');
         $promptLog = $timestamp . "\n";
-        foreach ($optimizedMessages as $message) {
+        foreach ($messages as $message) {
             $promptLog .= "Role: " . $message['role'] . "\nContent: " . $message['content'] . "\n";
         }
         $promptLog .= "\n";
@@ -943,7 +919,7 @@ function callLLM($messages, $model = null, $options = []) {
         // Prepare request data
         $data = array_merge([
             'model' => $model,
-            'messages' => $optimizedMessages,
+            'messages' => $messages,
             'max_tokens' => $GLOBALS['CONNECTOR']['openrouter']['max_tokens'],
             'temperature' => $GLOBALS['CONNECTOR']['openrouter']['temperature'],
             'stream' => false

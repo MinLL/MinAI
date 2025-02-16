@@ -54,33 +54,87 @@ function interceptRoleplayInput() {
         // Combine contexts
         $contextDataFull = array_merge($contextDataWorld, $contextDataHistoric);
         
-        // Build messages array with distinct roles
+        // Build messages array using config settings
+        $messages = [];
+        $settings = $GLOBALS['roleplay_settings'];
+        
+        // Get player pronouns
+        $playerPronouns = GetActorPronouns($PLAYER_NAME);
+        
+        // Replace variables in system prompt
+        $systemPrompt = str_replace(
+            ['#player_name#', '#player_subject#', '#player_object#', '#player_possessive#'],
+            [$PLAYER_NAME, $playerPronouns['subject'], $playerPronouns['object'], $playerPronouns['possessive']],
+            $settings['system_prompt']
+        );
+
+        // Sort sections by their order if it exists, otherwise maintain config file order
+        $sections = $settings['sections'];
+        if (isset(reset($sections)['order'])) {
+            uasort($sections, function($a, $b) {
+                return ($a['order'] ?? 0) - ($b['order'] ?? 0);
+            });
+        }
+
+        // Build the context message
+        $contextMessage = '';
+        foreach ($sections as $sectionName => $section) {
+            if (!$section['enabled']) continue;
+
+            // Add spacing before each section (except the first one)
+            if ($contextMessage !== '') {
+                $contextMessage .= "\n\n";
+            }
+
+            $content = $section['header'] . "\n";
+            
+            $content .= str_replace(
+                [
+                    '#player_name#',
+                    '#player_bios#',
+                    '#nearby_actors#',
+                    '#nearby_locations#',
+                    '#recent_events#',
+                    '#player_subject#',
+                    '#player_object#',
+                    '#player_possessive#',
+                    '#herika_dynamic#',
+                    '#original_input#'
+                ],
+                [
+                    $PLAYER_NAME,     // Add corresponding replacement
+                    $PLAYER_BIOS,
+                    implode(", ", $nearbyActors),
+                    implode(", ", $possibleLocations),
+                    implode("\n", array_map(function($ctx) { 
+                        return $ctx['content']; 
+                    }, array_slice($contextDataFull, -$settings['context_messages']))),
+                    $playerPronouns['subject'],
+                    $playerPronouns['object'],
+                    $playerPronouns['possessive'],
+                    $HERIKA_DYNAMIC,
+                    $originalInput
+                ],
+                $section['content']
+            );
+
+            $contextMessage .= $content;
+        }
+
+        // Build the messages array with proper spacing
         $messages = [
-            // Core identity
-            ['role' => 'system', 'content' => "You are {$PLAYER_NAME}, translating casual speech into your noble manner of speaking. Be brief and keep the same meaning."],
+            // System prompt for identity
+            ['role' => 'system', 'content' => $systemPrompt . "\n\n"],
             
-            // Character background
-            ['role' => 'system', 'content' => "=== YOUR BACKGROUND ===\n" . $PLAYER_BIOS],
+            // Context as system message
+            ['role' => 'system', 'content' => $contextMessage],
             
-            // Environment context
-            ['role' => 'system', 'content' => "=== NEARBY ENTITIES ===\nCharacters: " . implode(", ", $nearbyActors) . 
-                "\nLocations: " . implode(", ", $possibleLocations)],
-            
-            // Recent conversation context
-            ['role' => 'system', 'content' => "=== RECENT EVENTS ===\n" . 
-                implode("\n", array_map(function($ctx) { return $ctx['content']; }, $contextDataFull))],
-
-            // Instructions with example
-            ['role' => 'system', 'content' => "Instructions:\n" .
-                "1. Correct any misheard names using the nearby names list\n" .
-                "2. Keep responses brief and true to the original meaning\n" .
-                "Example:\n" .
-                "Input: \"Hello there\"\n" .
-                "Output: \"Greetings\"\n" .
-                "NOT: \"Greetings, though my heart weighs heavy with...\""],
-
-            // The actual input to translate
-            ['role' => 'user', 'content' => "Translate: \"{$originalInput}\""]
+            // The actual request as user message
+            ['role' => 'user', 'content' => "\n" . str_replace(
+                '#original_input#',
+                $originalInput,
+                $settings['translation_request']
+            )]
         ];
 
         // Call LLM with specific parameters for dialogue generation
@@ -92,10 +146,15 @@ function interceptRoleplayInput() {
         if ($response !== null) {
             // Clean up the response - remove quotes and ensure it's dialogue-ready
             $response = trim($response, "\"' \n");
+            
+            // Remove any character name prefixes the LLM might have added
+            $response = preg_replace('/^' . preg_quote($PLAYER_NAME . ':') . '\s*/', '', $response);
+            $response = preg_replace('/^' . preg_quote($PLAYER_NAME) . ':\s*/', '', $response);
+            
             error_log("minai: Roleplay input transformed from \"{$originalInput}\" to \"{$response}\"");
             
-            // Preserve the original format with context prefix and player name
-            $GLOBALS["gameRequest"][3] = $contextPrefix . "{$PLAYER_NAME}:" . $response;
+            // Format the response with a single character name prefix
+            $GLOBALS["gameRequest"][3] = $contextPrefix . $PLAYER_NAME . ": " . $response;
             error_log("minai: Final gameRequest[3]: " . $GLOBALS["gameRequest"][3]);
         } else {
             error_log("minai: Failed to generate roleplay response, using original input");
