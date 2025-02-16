@@ -5,9 +5,13 @@ require_once("util.php");
 InitiateDBTables();
 
 function interceptRoleplayInput() {
-    if (IsEnabled($GLOBALS["PLAYER_NAME"], "isRoleplaying") && isPlayerInput() ) {
-        error_log("minai: Intercepting dialogue input for Roleplay");
-        error_log("minai: Original input: " . $GLOBALS["gameRequest"][3]);
+    if (IsEnabled($GLOBALS["PLAYER_NAME"], "isRoleplaying") && (isPlayerInput() || $GLOBALS["gameRequest"][0] == "minai_roleplay")) {
+        if ($GLOBALS["gameRequest"][0] == "minai_roleplay") {
+            error_log("minai: Intercepting minai_roleplay.");
+        }
+        else {
+            error_log("minai: Intercepting dialogue input for Translation. Original input: " . $GLOBALS["gameRequest"][3]);
+        }
         
         // Initialize local variables with global defaults
         $PLAYER_NAME = $GLOBALS["PLAYER_NAME"];
@@ -16,6 +20,9 @@ function interceptRoleplayInput() {
         $HERIKA_PERS = $GLOBALS["HERIKA_PERS"];
         $CONNECTOR = $GLOBALS["CONNECTOR"];
         $HERIKA_DYNAMIC = $GLOBALS["HERIKA_DYNAMIC"];
+
+        // Disable roleplay mode after processing begins
+        SetEnabled($PLAYER_NAME, "isRoleplaying", false);
 
         // Import narrator profile which may override the above variables
         if (file_exists(GetNarratorConfigPath())) {
@@ -61,11 +68,30 @@ function interceptRoleplayInput() {
         // Get player pronouns
         $playerPronouns = GetActorPronouns($PLAYER_NAME);
         
-        // Replace variables in system prompt
+        // Replace variables in system prompt and request
+        $variableReplacements = [
+            '#player_name#' => $PLAYER_NAME,
+            '#player_bios#' => $PLAYER_BIOS,
+            '#nearby_actors#' => implode(", ", $nearbyActors),
+            '#nearby_locations#' => implode(", ", $possibleLocations),
+            '#recent_events#' => implode("\n", array_map(function($ctx) { 
+                return $ctx['content']; 
+            }, array_slice($contextDataFull, -$settings['context_messages']))),
+            '#player_subject#' => $playerPronouns['subject'],
+            '#player_object#' => $playerPronouns['object'],
+            '#player_possessive#' => $playerPronouns['possessive'],
+            '#herika_dynamic#' => $HERIKA_DYNAMIC,
+            '#original_input#' => $originalInput,
+            '#instructions#' => $instructions
+        ];
+
+        // Apply replacements to system prompt
         $systemPrompt = str_replace(
-            ['#player_name#', '#player_subject#', '#player_object#', '#player_possessive#'],
-            [$PLAYER_NAME, $playerPronouns['subject'], $playerPronouns['object'], $playerPronouns['possessive']],
-            $settings['system_prompt']
+            array_keys($variableReplacements),
+            array_values($variableReplacements),
+            $GLOBALS["gameRequest"][0] == "minai_roleplay" 
+                ? $settings['roleplay_system_prompt']
+                : $settings['system_prompt']
         );
 
         // Sort sections by their order if it exists, otherwise maintain config file order
@@ -81,40 +107,14 @@ function interceptRoleplayInput() {
         foreach ($sections as $sectionName => $section) {
             if (!$section['enabled']) continue;
 
-            // Add spacing before each section (except the first one)
             if ($contextMessage !== '') {
                 $contextMessage .= "\n\n";
             }
 
             $content = $section['header'] . "\n";
-            
             $content .= str_replace(
-                [
-                    '#player_name#',
-                    '#player_bios#',
-                    '#nearby_actors#',
-                    '#nearby_locations#',
-                    '#recent_events#',
-                    '#player_subject#',
-                    '#player_object#',
-                    '#player_possessive#',
-                    '#herika_dynamic#',
-                    '#original_input#'
-                ],
-                [
-                    $PLAYER_NAME,     // Add corresponding replacement
-                    $PLAYER_BIOS,
-                    implode(", ", $nearbyActors),
-                    implode(", ", $possibleLocations),
-                    implode("\n", array_map(function($ctx) { 
-                        return $ctx['content']; 
-                    }, array_slice($contextDataFull, -$settings['context_messages']))),
-                    $playerPronouns['subject'],
-                    $playerPronouns['object'],
-                    $playerPronouns['possessive'],
-                    $HERIKA_DYNAMIC,
-                    $originalInput
-                ],
+                array_keys($variableReplacements),
+                array_values($variableReplacements),
                 $section['content']
             );
 
@@ -123,17 +123,14 @@ function interceptRoleplayInput() {
 
         // Build the messages array with proper spacing
         $messages = [
-            // System prompt for identity
             ['role' => 'system', 'content' => $systemPrompt . "\n\n"],
-            
-            // Context as system message
             ['role' => 'system', 'content' => $contextMessage],
-            
-            // The actual request as user message
             ['role' => 'user', 'content' => "\n" . str_replace(
-                '#original_input#',
-                $originalInput,
-                $settings['translation_request']
+                array_keys($variableReplacements),
+                array_values($variableReplacements),
+                $GLOBALS["gameRequest"][0] == "minai_roleplay" 
+                    ? $settings['roleplay_request']
+                    : $settings['translation_request']
             )]
         ];
 
@@ -153,15 +150,20 @@ function interceptRoleplayInput() {
             
             error_log("minai: Roleplay input transformed from \"{$originalInput}\" to \"{$response}\"");
             
-            // Format the response with a single character name prefix
-            $GLOBALS["gameRequest"][3] = $contextPrefix . $PLAYER_NAME . ": " . $response;
+            if ($GLOBALS["gameRequest"][0] == "minai_roleplay") {
+                // rewrite as player input
+                $GLOBALS["gameRequest"][0] = "inputtext";
+                $GLOBALS["gameRequest"][3] = $response;
+            }
+            else {
+                // Format the response with a single character name prefix
+                $GLOBALS["gameRequest"][3] = $contextPrefix . $PLAYER_NAME . ": " . $response;
+            }
             error_log("minai: Final gameRequest[3]: " . $GLOBALS["gameRequest"][3]);
         } else {
             error_log("minai: Failed to generate roleplay response, using original input");
         }
 
-        // Disable roleplay mode after processing
-        SetEnabled($PLAYER_NAME, "isRoleplaying", false);
     }
 }
 

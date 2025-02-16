@@ -581,47 +581,57 @@
                     Roleplay Translation Settings
                 </div>
                 <div class="section-content collapsed">
-                    <!-- Context Messages -->
+                    <!-- System Prompts -->
                     <div class="option-group">
-                        <label class="option-label" for="context-messages">Context Messages</label>
-                        <p>Number of recent messages to include for context</p>
-                        <input type="number" id="context-messages" min="1" max="25">
-                    </div>
-
-                    <!-- System Prompt -->
-                    <div class="option-group">
-                        <label class="option-label" for="system-prompt">System Prompt</label>
                         <div class="info-section">
-                            <p>Available variables:</p>
-                            <ul>
-                                <li><strong>#player_bios#</strong> - The player's character background (Pulled from the Narrator profile)</li>
-                                <li><strong>#herika_dynamic#</strong> - Herika's current state and recent experiences</li>
-                                <li><strong>#nearby_actors#</strong> - List of NPCs in the area</li>
-                                <li><strong>#nearby_locations#</strong> - List of accessible locations</li>
-                                <li><strong>#recent_events#</strong> - Recent conversation and events history</li>
-                                <li><strong>#original_input#</strong> - The player's input being translated</li>
-                                <li><strong>Pronouns:</strong>
-                                    <ul>
-                                        <li><strong>#player_subject#</strong> - he/she/they</li>
-                                        <li><strong>#player_object#</strong> - him/her/them</li>
-                                        <li><strong>#player_possessive#</strong> - his/her/their</li>
-                                    </ul>
-                                </li>
-                            </ul>
+                            <p>Available variables for all prompts and requests:</p>
+                            <details>
+                                <summary>Character Information</summary>
+                                <ul>
+                                    <li><strong>#player_name#</strong> - The player's name</li>
+                                    <li><strong>#player_bios#</strong> - The player's character background</li>
+                                    <li><strong>#herika_dynamic#</strong> - Current state and recent experiences</li>
+                                </ul>
+                            </details>
+                            <details>
+                                <summary>Context Information</summary>
+                                <ul>
+                                    <li><strong>#original_input#</strong> - The player's input text</li>
+                                    <li><strong>#nearby_actors#</strong> - List of NPCs in the area</li>
+                                    <li><strong>#nearby_locations#</strong> - List of accessible locations</li>
+                                    <li><strong>#recent_events#</strong> - Recent conversation history</li>
+                                </ul>
+                            </details>
+                            <details>
+                                <summary>Pronouns</summary>
+                                <ul>
+                                    <li><strong>#player_subject#</strong> - he/she/they</li>
+                                    <li><strong>#player_object#</strong> - him/her/them</li>
+                                    <li><strong>#player_possessive#</strong> - his/her/their</li>
+                                </ul>
+                            </details>
+                            <details>
+                                <summary>Special</summary>
+                                <ul>
+                                    <li><strong>#instructions#</strong> - The current mode's instructions (translation or roleplay)</li>
+                                </ul>
+                            </details>
                         </div>
+
+                        <label class="option-label" for="system-prompt">Translation System Prompt</label>
                         <textarea id="system-prompt" class="prompt-textarea" rows="3"></textarea>
+
+                        <label class="option-label" for="roleplay-system-prompt">Roleplay System Prompt</label>
+                        <textarea id="roleplay-system-prompt" class="prompt-textarea" rows="3"></textarea>
                     </div>
 
-                    <!-- Translation Request Format -->
+                    <!-- Request Formats -->
                     <div class="option-group">
                         <label class="option-label" for="translation-request">Translation Request Format</label>
-                        <div class="info-section">
-                            <p>Format of the translation request. Available variables:</p>
-                            <ul>
-                                <li><strong>#original_input#</strong> - The text to be translated</li>
-                            </ul>
-                        </div>
                         <textarea id="translation-request" class="prompt-textarea" rows="2"></textarea>
+
+                        <label class="option-label" for="roleplay-request">Roleplay Request Format</label>
+                        <textarea id="roleplay-request" class="prompt-textarea" rows="2"></textarea>
                     </div>
 
                     <!-- Section Configuration -->
@@ -706,7 +716,9 @@
                 // Load roleplay settings
                 document.getElementById('context-messages').value = configData.roleplay_settings.context_messages;
                 document.getElementById('system-prompt').value = configData.roleplay_settings.system_prompt;
+                document.getElementById('roleplay-system-prompt').value = configData.roleplay_settings.roleplay_system_prompt;
                 document.getElementById('translation-request').value = configData.roleplay_settings.translation_request;
+                document.getElementById('roleplay-request').value = configData.roleplay_settings.roleplay_request;
                 
                 // Populate section configuration
                 const sectionConfig = document.getElementById('section-config');
@@ -782,7 +794,9 @@
                 roleplay_settings: {
                     context_messages: parseInt(document.getElementById('context-messages').value),
                     system_prompt: document.getElementById('system-prompt').value,
+                    roleplay_system_prompt: document.getElementById('roleplay-system-prompt').value,
                     translation_request: document.getElementById('translation-request').value,
+                    roleplay_request: document.getElementById('roleplay-request').value,
                     sections: {}
                 }
             };

@@ -41,8 +41,12 @@ $GLOBALS['action_prompts'] = Array(
 // Roleplay translation settings
 $GLOBALS['roleplay_settings'] = Array(
     "context_messages" => 10,  // Number of recent messages to include for context
-    "system_prompt" => "You are #player_name#, a noble Altmer. Your task is to translate casual speech into your manner of speaking.",
-    "translation_request" => "Translate this casual speech into your noble manner: \"#original_input#\"",
+    "system_prompt" => "You are #player_name#. Your task is to translate casual speech into your manner of speaking.",
+    "roleplay_system_prompt" => "You are #player_name#. Your responses should reflect your character's personality, background, and current situation.",
+    "translation_request" => "Translate this casual speech into your character's manner: \"#original_input#\"",
+    "roleplay_request" => "You are roleplaying as #player_name#. Respond naturally as your character would in this situation with a succinct line of dialogue appropriate for the situation.",
+    "translation_instructions" => "1. Correct any misheard names using the nearby names list\n2. Keep responses brief and true to the original meaning\n3. Do not add character name prefixes to your response\n4. Provide only the translated dialogue",
+    "roleplay_instructions" => "1. Stay in character as #player_name#\n2. Keep responses brief and natural\n3. Do not add character name prefixes\n4. Respond as if you are speaking directly\n5. Emphasize your reaction to the most recent events in the RECENT EVENTS section.",
     "sections" => Array(
         "CHARACTER_BACKGROUND" => Array(
             "enabled" => true,
@@ -65,7 +69,7 @@ $GLOBALS['roleplay_settings'] = Array(
         "INSTRUCTIONS" => Array(
             "enabled" => true,
             "header" => "=== INSTRUCTIONS ===",
-            "content" => "1. Correct any misheard names using the nearby names list\n2. Keep responses brief and true to the original meaning\n3. Do not add character name prefixes to your response\n4. Provide only the translated dialogue",
+            "content" => "#instructions#",
             "order" => 3
         )
     )
