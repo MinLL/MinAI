@@ -216,7 +216,7 @@ function interceptRoleplayInput() {
             }
             else {
                 // Format the response with a single character name prefix
-                $GLOBALS["gameRequest"][3] = $contextPrefix . $PLAYER_NAME . ": " . $response;
+                $GLOBALS["gameRequest"][3] = $PLAYER_NAME . ": " . $response;
             }
             # error_log("minai: Final gameRequest[3]: " . $GLOBALS["gameRequest"][3]);
         } else {
