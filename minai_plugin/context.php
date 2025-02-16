@@ -415,8 +415,13 @@ function bundleSFWContext(&$nc) {
   $nc .= GetWeatherContext() . "\n";
 }
 
+// Near the end of the file, before adding to COMMAND_PROMPT
+error_log("minai: Built context: " . $new_content);
+error_log("minai: Existing COMMAND_PROMPT before adding context: " . $GLOBALS["COMMAND_PROMPT"]);
+
 $GLOBALS["COMMAND_PROMPT"] = $new_content . $GLOBALS["COMMAND_PROMPT"];
 
+error_log("minai: Final COMMAND_PROMPT: " . $GLOBALS["COMMAND_PROMPT"]);
 
 // Clean up context
 $locaLastElement=[];

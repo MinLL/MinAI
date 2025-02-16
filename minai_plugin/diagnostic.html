@@ -141,35 +141,60 @@
             flex-grow: 1;
             background-color: var(--background-dark);
             border-radius: 8px;
-            padding: 15px;
+            padding: 10px;
             font-family: 'Consolas', monospace;
             font-size: 0.9rem;
-            line-height: 1.5;
+            line-height: 1.3;
             overflow-y: auto;
-            overflow-x: auto;
+            overflow-x: hidden;
             border: 1px solid var(--border-color);
-            white-space: pre-wrap;
-            word-break: break-word;
             height: calc(100% - 100px);
         }
 
         .log-line {
-            margin: 2px 0;
-            padding: 2px 5px;
-            border-radius: 4px;
-            overflow-x: auto;
+            margin: 1px 0;
+            padding: 1px 4px;
+            border-radius: 2px;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            min-height: 20px;
+            white-space: nowrap;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .log-line.error {
+            background-color: rgba(244, 67, 54, 0.1);
+        }
+
+        .log-line.warning {
+            background-color: rgba(255, 193, 7, 0.1);
         }
 
         .log-line:hover {
             background-color: rgba(255, 255, 255, 0.05);
         }
 
+        .log-line.error:hover {
+            background-color: rgba(244, 67, 54, 0.15);
+        }
+
+        .log-line.warning:hover {
+            background-color: rgba(255, 193, 7, 0.15);
+        }
+
         .timestamp {
             color: var(--info-color);
-            padding: 2px 6px;
-            border-radius: 4px;
+            padding: 0 4px;
+            border-radius: 2px;
             background: rgba(77, 171, 247, 0.1);
-            margin-right: 8px;
+            font-size: 0.75em;
+            flex: 0 0 auto;
+            min-width: 50px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .filter-container {
@@ -483,6 +508,357 @@
             color: var(--error-color);
             border: 1px solid var(--error-color);
         }
+
+        .json-string {
+            color: #7ec699;
+        }
+        
+        .json-number {
+            color: #f08d49;
+        }
+        
+        .json-boolean {
+            color: #cc99cd;
+        }
+        
+        .json-null {
+            color: #cc99cd;
+        }
+        
+        .json-key {
+            color: #67cdcc;
+        }
+
+        .php-string {
+            color: #7ec699;
+        }
+
+        .php-number {
+            color: #f08d49;
+        }
+
+        .php-array {
+            color: #cc99cd;
+        }
+
+        .php-array-key {
+            color: #67cdcc;
+        }
+
+        .php-array-arrow {
+            color: #e0e0e0;
+        }
+
+        .available-action-keyword {
+            color: #f08d49;
+            font-weight: bold;
+        }
+
+        .available-action-name {
+            color: #7ec699;
+        }
+
+        .available-action-desc {
+            color: #67cdcc;
+            font-style: italic;
+        }
+
+        .log-module {
+            color: #67cdcc;
+            flex: 0 0 auto;
+            font-size: 0.85em;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            min-width: 80px;
+            white-space: nowrap;
+        }
+
+        .log-level-error {
+            color: var(--error-color);
+        }
+
+        .log-level-warn {
+            color: var(--warning-color);
+        }
+
+        .log-level-notice {
+            color: var(--info-color);
+        }
+
+        .log-message {
+            color: var(--text-color);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1 1 auto;
+            min-width: 0;
+            padding: 0 4px;
+            margin-left: 0;
+        }
+
+        /* Default wrap behavior */
+        .log-viewer.wrap .log-line {
+            white-space: normal;
+        }
+
+        .log-viewer.wrap .log-message {
+            white-space: pre-wrap;
+            word-break: break-word;
+            overflow: visible;
+        }
+
+        /* No-wrap behavior */
+        .log-viewer.nowrap .log-line {
+            white-space: pre;
+        }
+
+        .log-viewer.nowrap .log-message {
+            white-space: pre;
+            text-overflow: clip;
+            overflow: hidden;
+        }
+
+        /* Make the log content container scrollable horizontally in nowrap mode */
+        .log-viewer.nowrap .log-content {
+            overflow-x: auto;
+        }
+
+        /* Special handling for JSON content */
+        .log-viewer.wrap .json-string,
+        .log-viewer.wrap .json-number,
+        .log-viewer.wrap .json-boolean,
+        .log-viewer.wrap .json-null,
+        .log-viewer.wrap .json-key {
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* Add these styles */
+        .collapsible-entry {
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            margin: 5px 0;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .collapsible-header {
+            padding: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+
+        .collapsible-header:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .collapsible-content {
+            padding: 8px;
+            display: none;
+        }
+
+        .collapsible-entry.expanded .collapsible-content {
+            display: block;
+        }
+
+        .collapse-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .expand-all-button,
+        .collapse-all-button {
+            padding: 8px 16px;
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .expand-all-button:hover,
+        .collapse-all-button:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.15) 0%,
+                rgba(255, 255, 255, 0.08) 100%
+            );
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .expand-all-button.active,
+        .collapse-all-button.active {
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.2) 0%,
+                rgba(76, 175, 80, 0.3) 100%
+            );
+            border-color: var(--primary-color);
+        }
+
+        .troubleshoot-response {
+            margin-top: 20px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .troubleshoot-section {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .troubleshoot-section h3 {
+            color: var(--primary-color);
+            margin: 0 0 10px 0;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .troubleshoot-section pre {
+            background: var(--background-dark);
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            overflow-x: auto;
+            margin: 10px 0;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9rem;
+        }
+
+        .troubleshoot-section .timestamp {
+            font-size: 0.85em;
+            color: var(--info-color);
+            background: rgba(77, 171, 247, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 4px 0;
+        }
+
+        .troubleshoot-section .error-log {
+            color: var(--error-color);
+        }
+
+        .troubleshoot-details {
+            margin-top: 15px;
+        }
+
+        .troubleshoot-details summary {
+            cursor: pointer;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .troubleshoot-details summary:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Add these new styles */
+        .analysis-content {
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        .analysis-content h2 {
+            color: var(--secondary-color);
+            margin: 25px 0 15px 0;
+            font-size: 1.1rem;
+            font-weight: 500;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .analysis-content .bullet-point {
+            margin: 8px 0 4px 20px;
+            position: relative;
+            padding-left: 5px;
+        }
+
+        .analysis-content .sub-bullet-point {
+            margin: 4px 0 4px 40px;
+            position: relative;
+            padding-left: 5px;
+            color: var(--text-color);
+            opacity: 0.9;
+        }
+
+        /* Add spacing after bullet points that have sub-bullets */
+        .analysis-content .bullet-point + .sub-bullet-point {
+            margin-top: 2px;
+        }
+
+        /* Add spacing between bullet point groups */
+        .analysis-content .bullet-point + .bullet-point {
+            margin-top: 12px;
+        }
+
+        .analysis-content code {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9em;
+            color: #7ec699;
+        }
+
+        .analysis-content blockquote {
+            margin: 15px 0;
+            padding: 10px 15px;
+            border-left: 4px solid var(--primary-color);
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 0 4px 4px 0;
+        }
+
+        .analysis-content strong {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .analysis-content br {
+            display: block;
+            margin: 8px 0;
+            content: "";
+        }
+
+        /* Add compact mode for narrow views */
+        @media (max-width: 600px), (max-width: 1200px) and (min-width: 601px) {
+            .log-line .timestamp {
+                max-width: 80px;
+            }
+            
+            .log-line .log-module {
+                font-size: 0.75em;
+                min-width: 60px;
+            }
+            
+            .log-line .log-level-error,
+            .log-line .log-level-warn,
+            .log-line .log-level-notice {
+                max-width: 40px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+
+        /* Hover state for timestamps */
+        .log-line:hover .timestamp {
+            max-width: none;
+            position: relative;
+            z-index: 1;
+            background: var(--background-dark);
+        }
     </style>
 </head>
 <body>
@@ -525,7 +901,7 @@
             <input type="text" class="troubleshoot-input" placeholder="Describe your issue...">
             <div class="model-selection">
                 <input type="checkbox" id="useRecommendedModel" checked>
-                <label for="useRecommendedModel">Use recommended model</label>
+                <label for="useRecommendedModel">Use Claude 3.5 Sonnet (Recommended). Summary adaptor used if disabled</label>
             </div>
             <button onclick="askQuestion()" class="troubleshoot-button">Ask</button>
             <div class="status-indicator"></div>
@@ -568,7 +944,9 @@
 
         function parseContextLog(content) {
             const entries = content.split('=\n');
-            return entries.map(entry => {
+            let entryNumber = 1;
+            
+            const formattedEntries = entries.map(entry => {
                 if (!entry.trim()) return '';
                 
                 let formattedEntry;
@@ -587,8 +965,29 @@
                         formattedEntry = entry;
                     }
                 }
-                return `<div class="log-line">${formattedEntry}</div>`;
-            }).filter(entry => entry).join('<hr style="border: 1px dashed var(--border-color); margin: 10px 0;">');
+                
+                // Create a preview of the first line
+                const previewText = entry.trim().split('\n')[0].slice(0, 100) + '...';
+                
+                // Determine if this is the last entry
+                const isLastEntry = entryNumber === entries.filter(e => e.trim()).length;
+                
+                return `
+                    <div class="collapsible-entry${isLastEntry ? ' expanded' : ''}">
+                        <div class="collapsible-header" onclick="toggleEntry(this)">
+                            <span>Entry ${entryNumber++}: ${previewText}</span>
+                            <span class="expand-indicator">${isLastEntry ? '▼' : '▶'}</span>
+                        </div>
+                        <div class="collapsible-content">
+                            <div class="log-line">
+                                <span class="log-message">${formattedEntry}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).filter(entry => entry).join('\n');
+            
+            return formattedEntries;
         }
 
         function parseOutputLog(content) {
@@ -623,9 +1022,13 @@
         }
 
         function parseApacheLog(content) {
-            return content.split('\n').map(line => {
+            const lines = content.split('\n');
+            const processedLines = new Map(); // Use Map to track unique messages
+            
+            return lines.map(line => {
                 if (!line.trim()) return '';
                 
+                // Basic sanitization
                 line = line.replace(/[&<>"']/g, char => ({
                     '&': '&amp;',
                     '<': '&lt;',
@@ -634,44 +1037,84 @@
                     "'": '&#39;'
                 }[char]));
                 
-                let lineClass = '';
-                if (line.includes('[php:error]')) lineClass = 'error';
-                else if (line.includes('[php:warn]')) lineClass = 'warning';
-                else if (line.includes('[php:notice]')) lineClass = 'notice';
+                // Extract timestamp and message
+                const timestampMatch = line.match(/\[([A-Za-z]{3} [A-Za-z]{3} \d{2} \d{2}:\d{2}:\d{2}\.\d{6} \d{4})\]/);
+                if (!timestampMatch) return '';
                 
-                let components = [];
-                let message = line;
+                const timestamp = timestampMatch[1];
+                let message = line.slice(timestampMatch[0].length).trim();
                 
-                const timestampMatch = message.match(/\[([A-Za-z]{3} [A-Za-z]{3} \d{2} \d{2}:\d{2}:\d{2}\.\d{6} \d{4})\]/);
-                if (timestampMatch) {
-                    components.push(`<span class="timestamp">[${timestampMatch[1]}]</span>`);
-                    message = message.slice(timestampMatch[0].length).trimLeft();
+                // Extract log level
+                const levelMatch = message.match(/\[php:(notice|warn|error)\]/);
+                if (!levelMatch) return '';
+                
+                const level = levelMatch[1];
+                message = message.slice(levelMatch[0].length).trim();
+                
+                // Skip redundant speech generation logs
+                if (message.includes('Speech sent for') && message.includes('generator')) {
+                    return '';
                 }
                 
-                const moduleMatch = message.match(/\[php:(notice|warn|error)\]/);
-                if (moduleMatch) {
-                    components.push(
-                        `<span class="log-module">[php:</span>` +
-                        `<span class="log-level-${moduleMatch[1]}">${moduleMatch[1]}</span>` +
-                        `<span class="log-module">]</span>`
-                    );
-                    message = message.slice(moduleMatch[0].length).trimLeft();
+                // Skip redundant audit logs
+                if (message.startsWith('Audit') && message.includes('elapsed time')) {
+                    return '';
                 }
                 
-                message = message.replace(/\[pid [^\]]+\]/g, '').replace(/\[client [^\]]+\]/g, '');
+                // Remove common prefixes and client info
+                message = message
+                    .replace(/\[pid [^\]]+\]/, '')
+                    .replace(/\[client [^\]]+\]/, '')
+                    .replace(/, referer: [^$\n]+$/, '');
                 
-                const refererMatch = message.match(/, referer: [^$\n]+$/);
-                if (refererMatch) {
-                    message = message.slice(0, -refererMatch[0].length);
+                // Create a unique key for the message content
+                const messageKey = message.trim();
+                
+                // Skip if we've seen this exact message recently (within last 5 seconds)
+                const existingEntry = processedLines.get(messageKey);
+                if (existingEntry) {
+                    const existingTime = new Date(existingEntry.timestamp.replace(/\.\d+/, ''));
+                    const currentTime = new Date(timestamp.replace(/\.\d+/, ''));
+                    if (currentTime - existingTime < 5000) { // 5 seconds
+                        return '';
+                    }
                 }
                 
-                return `<div class="log-line ${lineClass}">${components.join(' ')}<span class="log-message">${message.trimLeft()}</span></div>`;
-            }).join('\n');
+                // Store this message with its timestamp
+                processedLines.set(messageKey, { timestamp });
+                
+                // If Map gets too large, remove old entries
+                if (processedLines.size > 1000) {
+                    const oldestKey = processedLines.keys().next().value;
+                    processedLines.delete(oldestKey);
+                }
+                
+                // Format the log line
+                let lineClass = level === 'error' ? 'error' : 
+                               level === 'warn' ? 'warning' : 
+                               'notice';
+                
+                return `<div class="log-line ${lineClass}">
+                    <span class="timestamp" title="${timestamp}">[${timestamp}]</span>
+                    <span class="log-module">
+                        <span>[php:</span><span class="log-level-${level}">${level}</span><span>]</span>
+                    </span>
+                    <span class="log-message">${message.trim()}</span>
+                </div>`;
+            }).filter(line => line).join('\n');
         }
 
         function syntaxHighlightJSON(json) {
-            const jsonStr = JSON.stringify(json, null, 2);
-            return jsonStr.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
+            // Add more spacing in the JSON stringification
+            const jsonStr = JSON.stringify(json, null, 4);  // Changed from 2 to 4
+            
+            // Add extra padding after colons in key-value pairs
+            let formattedStr = jsonStr.replace(/":"/g, '": "')  // Add space after colon for strings
+                             .replace(/":\[/g, '": [')   // Add space after colon for arrays
+                             .replace(/":{\s*/g, '": {') // Add space after colon for objects
+                             .replace(/":(\d)/g, '": $1'); // Add space after colon for numbers
+            
+            return formattedStr.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
                 let cls = 'json-number';
                 if (/^"/.test(match)) {
                     cls = /:$/.test(match) ? 'json-key' : 'json-string';
@@ -860,34 +1303,37 @@
             
             try {
                 const regex = new RegExp(input.value, 'i');
-                const lines = content.dataset.originalContent.split('\n');
+                const lines = (content.dataset.originalContent || '').split(/(?=<div class="log-line)/);
                 
                 const filteredContent = lines
                     .filter(line => {
-                        if (!line.trim() || line.includes('<hr')) return false;
+                        if (!line.trim()) return false;
                         
+                        // Create a temporary div to parse HTML and get text content
                         const div = document.createElement('div');
                         div.innerHTML = line;
                         const textContent = div.textContent || div.innerText;
                         return regex.test(textContent);
                     })
-                    .join('\n');
+                    .join('');
                 
                 content.innerHTML = filteredContent;
                 
             } catch (e) {
+                // Fallback to simple text search if regex is invalid
                 const searchText = input.value.toLowerCase();
-                const lines = content.dataset.originalContent.split('\n');
+                const lines = (content.dataset.originalContent || '').split(/(?=<div class="log-line)/);
                 
                 const filteredContent = lines
                     .filter(line => {
-                        if (!line.trim() || line.includes('<hr')) return false;
+                        if (!line.trim()) return false;
+                        
                         const div = document.createElement('div');
                         div.innerHTML = line;
                         const textContent = (div.textContent || div.innerText).toLowerCase();
                         return textContent.includes(searchText);
                     })
-                    .join('\n');
+                    .join('');
                 
                 content.innerHTML = filteredContent;
             }
@@ -1079,11 +1525,18 @@
             const viewer = document.createElement('div');
             viewer.className = 'log-viewer wrap';
             
+            // Add expand/collapse buttons only for context log
+            const extraControls = config.file === 'context_sent_to_llm.log' ? `
+                <button class="expand-all-button" onclick="expandAllEntries(this)">Expand All</button>
+                <button class="collapse-all-button" onclick="collapseAllEntries(this)">Collapse All</button>
+            ` : '';
+            
             viewer.innerHTML = `
                 <div class="log-header">
                     <span class="log-title">${config.name}</span>
                     <div class="log-controls">
                         <button class="wrap-button active" onclick="toggleWrap(this)">Wrap</button>
+                        ${extraControls}
                         <button class="follow-button active" onclick="toggleFollow(this)">Follow</button>
                         <button class="download-button" onclick="downloadLog('${config.file}')">Download</button>
                         <button onclick="closeLogViewer(this)">Close</button>
@@ -1206,24 +1659,55 @@
                 }, 3000);
                 
                 content.innerHTML = `
-                    <div style="margin-bottom: 15px;">
-                        <strong>Question:</strong> ${question}<br><br>
-                        <strong>Analysis:</strong> ${data.analysis}<br><br>
-                        <details>
-                            <summary>Show Context and Output</summary>
-                            <div style="margin-top: 10px;">
-                                <strong>Context:</strong><br>
-                                <pre>${data.context}</pre><br>
-                                <strong>Output:</strong><br>
-                                <div class="timestamp">
-                                    <span class="timestamp-label">Start:</span> ${data.timestamps.output_start}
-                                </div>
+                    <div class="troubleshoot-response">
+                        <div class="troubleshoot-section">
+                            <h3>Question</h3>
+                            ${question}
+                        </div>
+                        
+                        <div class="troubleshoot-section">
+                            <h3>Analysis</h3>
+                            <div class="analysis-content">${data.analysis
+                                // Convert markdown to HTML
+                                .replace(/##\s+([^\n]+)/g, '<h2>$1</h2>')
+                                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                                .replace(/^\s*>\s*(.+)$/gm, '<blockquote>$1</blockquote>')
+                                // Handle bullet points with different levels and styles
+                                .replace(/^•\s+([^\n]+)/gm, '<div class="bullet-point">• $1</div>')
+                                .replace(/^\s{2,}\*\s+([^\n]+)/gm, '<div class="sub-bullet-point">∗ $1</div>')
+                                .replace(/^\s*-\s+([^\n]+)/gm, '<div class="bullet-point">• $1</div>')
+                                .replace(/^\s{2,}-\s+([^\n]+)/gm, '<div class="sub-bullet-point">∗ $1</div>')
+                                // Handle newlines
+                                .replace(/\n\n+/g, '<br><br>')
+                                .replace(/\n(?![<\s])/g, '<br>')
+                                // Clean up
+                                .replace(/<br>\s*<h2>/g, '<h2>')
+                                .replace(/<\/h2>\s*<br>/g, '</h2>')
+                                .replace(/<br>\s*<blockquote>/g, '<blockquote>')
+                                .replace(/<\/blockquote>\s*<br>/g, '</blockquote>')
+                                .replace(/<br>\s*<div class="bullet-point">/g, '<div class="bullet-point">')
+                                .replace(/<br>\s*<div class="sub-bullet-point">/g, '<div class="sub-bullet-point">')
+                            }</div>
+                        </div>
+
+                        <details class="troubleshoot-details">
+                            <summary>Show Technical Details</summary>
+                            
+                            <div class="troubleshoot-section">
+                                <h3>Context</h3>
+                                <pre>${data.context}</pre>
+                            </div>
+
+                            <div class="troubleshoot-section">
+                                <h3>Output</h3>
+                                <div class="timestamp">Start: ${data.timestamps.output_start}</div>
                                 <pre>${data.output}</pre>
-                                <div class="timestamp">
-                                    <span class="timestamp-label">End:</span> ${data.timestamps.output_end}
-                                </div>
-                                <br>
-                                <strong>Recent Error Logs:</strong><br>
+                                <div class="timestamp">End: ${data.timestamps.output_end}</div>
+                            </div>
+
+                            <div class="troubleshoot-section">
+                                <h3>Recent Error Logs</h3>
                                 <pre class="error-log">${data.error_log}</pre>
                             </div>
                         </details>
@@ -1377,6 +1861,30 @@
         function saveModelPreference() {
             const useRecommendedModel = document.getElementById('useRecommendedModel').checked;
             localStorage.setItem('useRecommendedModel', useRecommendedModel);
+        }
+
+        // Add these functions
+        function toggleEntry(header) {
+            const entry = header.closest('.collapsible-entry');
+            entry.classList.toggle('expanded');
+            const indicator = header.querySelector('.expand-indicator');
+            indicator.textContent = entry.classList.contains('expanded') ? '▼' : '▶';
+        }
+
+        function expandAllEntries(button) {
+            const viewer = button.closest('.log-viewer');
+            viewer.querySelectorAll('.collapsible-entry').forEach(entry => {
+                entry.classList.add('expanded');
+                entry.querySelector('.expand-indicator').textContent = '▼';
+            });
+        }
+
+        function collapseAllEntries(button) {
+            const viewer = button.closest('.log-viewer');
+            viewer.querySelectorAll('.collapsible-entry').forEach(entry => {
+                entry.classList.remove('expanded');
+                entry.querySelector('.expand-indicator').textContent = '▶';
+            });
         }
     </script>
 </body>

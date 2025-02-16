@@ -112,7 +112,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $systemPrompt = 'You are a helpful AI assistant that analyzes LLM interactions to help troubleshoot and explain the behavior of an AI system. ' . 
                        'Focus on explaining the relationship between the context sent and the output received, and help identify any issues or explain the behavior. ' .
                        'Pay attention to timestamps to understand the sequence of events. ' .
-                       'Be specific and technical in your analysis.';
+                       'Be specific and technical in your analysis. ' .
+                       'Format your response using markdown with these elements:\n' .
+                       '- Use ## for main section headers\n' .
+                       '- Use bullet points for lists\n' .
+                       '- Use `code` for technical terms or JSON keys\n' .
+                       '- Use > for important notes or observations\n' .
+                       '- Use **bold** for emphasis\n' .
+                       'Keep your analysis well-structured and easy to read.';
         
         $userPrompt = "Here is the latest interaction with the LLM:\n\n" .
                      "Context sent to LLM:\n```\n{$interaction['context']}\n```\n\n" .
@@ -149,7 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $data = [
             'model' => $model,
             'messages' => $prompt,
-            'max_tokens' => 300,
+            'max_tokens' => 1000,
             'temperature' => 0.3,
             'stream' => false
         ];

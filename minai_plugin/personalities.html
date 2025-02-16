@@ -434,6 +434,31 @@
         .subsection:last-child {
             margin-bottom: 0;
         }
+
+        .exportBtn {
+            background: linear-gradient(135deg,
+                rgba(33, 150, 243, 0.1) 0%,
+                rgba(33, 150, 243, 0.2) 100%
+            );
+            border-color: var(--info-color);
+        }
+
+        .importBtn {
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.1) 0%,
+                rgba(76, 175, 80, 0.2) 100%
+            );
+            border-color: var(--success-color);
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .importBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
 
@@ -454,7 +479,7 @@
                 <div class="subsection">
                     <h3>Generate New Personality</h3>
                     <div class="form-grid">
-                        <textarea id="generatePrompt" placeholder="Enter personality generation prompt..."></textarea>
+                        <textarea id="generatePrompt" placeholder="Describe the personality you want to generate (e.g., 'A flirtatious tavern maid who loves to tease customers')"></textarea>
                     </div>
                     <details>
                         <summary>Raw response from LLM text</summary>
@@ -467,7 +492,7 @@
                     </div>
                 </div>
 
-                <!-- New Entry Form -->
+                <!-- Add New Personality -->
                 <div class="subsection">
                     <h3>Add New Personality</h3>
                     <form id="newEntryForm">
@@ -475,7 +500,7 @@
                             <input type="text" id="newId" name="id" placeholder="ID" required>
                             <input type="text" id="newOrientation" name="orientation" placeholder="Orientation" required>
                             <select id="speakStyleDuringSex" name="speakStyle" required>
-                                <!-- Options will be populated by JavaScript -->
+                                <!-- Options are populated by JavaScript -->
                             </select>
                             <input type="text" id="newSexFantasies" name="sexFantasies" placeholder="Sex Fantasies (comma separated)">
                         </div>
@@ -492,6 +517,11 @@
                 <h3>Existing Personalities</h3>
                 <div class="header-controls">
                     <input type="text" id="searchInput" placeholder="Search personalities..." onkeyup="filterEntries()">
+                    <button onclick="exportToCSV()" class="exportBtn">Export CSV</button>
+                    <label for="importCSV" class="importBtn">
+                        Import CSV
+                        <input type="file" id="importCSV" accept=".csv" onchange="importFromCSV(this)" style="display: none;">
+                    </label>
                     <button onclick="resetPersonalities()" class="resetBtn">Reset Personalities</button>
                 </div>
             </div>
@@ -521,6 +551,7 @@
             fetch('api/personalities.php')
                 .then(response => response.json())
                 .then(result => {
+                    console.log('Load table response:', result); // Debug log
                     if (result.status === 'success') {
                         data = result.data;
                         filteredData = data.sort((a, b) => a.id.localeCompare(b.id));
@@ -764,12 +795,12 @@
         // Function to reset all personalities
         function resetPersonalities() {
             if (confirm('Are you sure you want to reset all personalities to their default values? This cannot be undone.')) {
-                fetch('api/personalities.php?action=reset', {
+                fetch('api/main.php?endpoint=reset_personalities', {
                     method: 'POST'
                 })
                 .then(response => response.json())
                 .then(result => {
-                    if (result.status === 'success') {
+                    if (result.message === 'Success') {
                         loadTable(); // Reload the table after reset
                     } else {
                         const errEl = document.getElementById('generateError');
@@ -802,52 +833,61 @@
         }
 
         function generatePersonality() {
-            const descriptionPersonality = document.getElementById('descriptionPersonality').value
-            const res = fetch('api/generateSexPersonality.php', {
+            const prompt = document.getElementById('generatePrompt').value;
+            const errEl = document.getElementById('generateError');
+            
+            if (!prompt) {
+                errEl.style.display = 'block';
+                errEl.innerHTML = 'Please enter a description for the personality';
+                return;
+            }
+
+            fetch('api/generateSexPersonality.php', {
                 method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
                 body: new URLSearchParams({
-                    descriptionPersonality
+                    descriptionPersonality: prompt
                 })
             })
             .then(response => response.json())
             .then(result => {
-                const errEl = document.getElementById('generateError')
-                if(result.status === 'error') {
+                if (result.status === 'error') {
                     errEl.style.display = 'block';
                     errEl.innerHTML = result.message;
                 } else {
                     errEl.style.display = 'none';
-
                     document.getElementById('rawResponse').innerHTML = result.data;
 
                     try {
-                        const pers = JSON.parse(result.data)
-                        document.getElementById('newOrientation').value = pers.orientation
-                        document.getElementById('newRelationshipStyle').value = pers.relationshipStyle
-                        document.getElementById('speakStyleDuringSex').value = pers.speakStyleDuringSex
-                        checkSpeakStyleSelectValue(pers.speakStyleDuringSex)
+                        const personality = JSON.parse(result.data);
+                        // Auto-fill the new entry form with generated data
+                        document.getElementById('newId').value = generateUniqueId();
+                        document.getElementById('newOrientation').value = personality.orientation;
+                        document.getElementById('speakStyleDuringSex').value = personality.speakStyleDuringSex;
+                        document.getElementById('newSexFantasies').value = personality.sexFantasies.join(', ');
                         
-                        document.getElementById('newPreferredSexPositions').value = pers.preferredSexPositions.join(', ')
-                        document.getElementById('newSexFantasies').value = pers.sexFantasies.join(', ')
-                        document.getElementById('newSexPersonalityTraits').value = pers.sexPersonalityTraits.join(', ')
-                        document.getElementById('newSexualBehavior').value = pers.sexualBehavior.join(', ')
+                        // Show success message
+                        errEl.style.display = 'block';
+                        errEl.style.color = 'var(--success-color)';
+                        errEl.innerHTML = 'Personality generated successfully! You can now edit the values and click "Add Personality" to save it.';
                     } catch(e) {
                         errEl.style.display = 'block';
-                        errEl.innerHTML = `LLM was able to produce something... which isn't json. You can look at raw response and here is an error: ${e.message}`;
+                        errEl.style.color = 'var(--error-color)';
+                        errEl.innerHTML = `Failed to parse generated personality: ${e.message}`;
                     }
                 }
+            })
+            .catch(error => {
+                errEl.style.display = 'block';
+                errEl.innerHTML = `Error generating personality: ${error.message}`;
             });
+        }
 
-            function checkSpeakStyleSelectValue(value) {
-                const errorEl = document.getElementById('speakStyleDuringSexError')
-                if(!speakStyleDuringSexOptions.includes(pers.speakStyleDuringSex)) {
-                    errorEl.style.innerText = `${value} isn't valid speak style. You need to select one of 10 provided speak styles: ${speakStyleDuringSexOptions.join('; ')}`
-                    errorEl.style.display = 'block'
-                } else {
-                    errorEl.style.display = 'none'
-                }
-                
-            }
+        // Helper function to generate a unique ID
+        function generateUniqueId() {
+            return 'npc_' + Math.random().toString(36).substr(2, 9);
         }
 
         function renderEntries() {
@@ -1066,6 +1106,175 @@
             element.style.borderRadius = '4px';
             element.style.border = '1px solid var(--border-color)';
         }
+
+        function exportToCSV() {
+            // Convert the data to CSV format
+            const csvRows = [];
+            
+            // Add header row
+            csvRows.push(['ID', 'Orientation', 'Relationship Style', 'Speak Style', 
+                          'Preferred Positions', 'Sexual Behavior', 'Fantasies', 'Personality Traits']);
+            
+            // Add data rows
+            data.forEach(entry => {
+                const personality = JSON.parse(entry.x_personality);
+                csvRows.push([
+                    entry.id,
+                    personality.orientation,
+                    personality.relationshipStyle,
+                    personality.speakStyleDuringSex,
+                    Array.isArray(personality.preferredSexPositions) ? personality.preferredSexPositions.join('|') : personality.preferredSexPositions,
+                    Array.isArray(personality.sexualBehavior) ? personality.sexualBehavior.join('|') : personality.sexualBehavior,
+                    Array.isArray(personality.sexFantasies) ? personality.sexFantasies.join('|') : personality.sexFantasies,
+                    Array.isArray(personality.sexPersonalityTraits) ? personality.sexPersonalityTraits.join('|') : personality.sexPersonalityTraits
+                ]);
+            });
+            
+            // Convert to CSV string
+            const csvString = csvRows.map(row => 
+                row.map(cell => `"${cell.replace(/"/g, '""')}"`)
+                   .join(',')
+            ).join('\n');
+            
+            // Create and trigger download
+            const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            if (navigator.msSaveBlob) { // IE 10+
+                navigator.msSaveBlob(blob, 'personalities.csv');
+            } else {
+                link.href = URL.createObjectURL(blob);
+                link.download = 'personalities.csv';
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+
+        function importFromCSV(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const rows = text.split('\n').map(row => {
+                    // Handle quoted CSV properly
+                    const matches = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+                    if (!matches) return [];
+                    return matches.map(cell => cell.replace(/^"(.*)"$/, '$1').replace(/""/g, '"'));
+                });
+                
+                // Skip header row
+                const importedData = rows.slice(1).filter(row => row.length >= 8).map(row => ({
+                    id: row[0],
+                    x_personality: JSON.stringify({
+                        orientation: row[1],
+                        relationshipStyle: row[2],
+                        speakStyleDuringSex: row[3],
+                        preferredSexPositions: row[4].split('|'),
+                        sexualBehavior: row[5].split('|'),
+                        sexFantasies: row[6].split('|'),
+                        sexPersonalityTraits: row[7].split('|')
+                    })
+                }));
+
+                if (importedData.length === 0) {
+                    alert('No valid data found in CSV file');
+                    return;
+                }
+
+                if (confirm(`Are you sure you want to import ${importedData.length} personalities? This will add to existing entries.`)) {
+                    importPersonalities(importedData);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function importPersonalities(importedData) {
+            fetch('api/personalities.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    action: 'import',
+                    data: JSON.stringify(importedData)
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    alert('Import successful!');
+                    loadTable();
+                } else {
+                    alert('Import failed: ' + (result.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                alert('Import failed: ' + error.message);
+            });
+        }
+
+        // Add this after the existing script tag
+        document.getElementById('newEntryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const personality = {
+                id: document.getElementById('newId').value,
+                x_personality: {
+                    orientation: document.getElementById('newOrientation').value,
+                    speakStyleDuringSex: document.getElementById('speakStyleDuringSex').value,
+                    sexFantasies: document.getElementById('newSexFantasies').value.split(',').map(f => f.trim()).filter(f => f),
+                    sexualBehavior: [],
+                    relationshipStyle: "casual",
+                    sexPersonalityTraits: [],
+                    preferredSexPositions: []
+                }
+            };
+
+            // Add validation
+            if (!personality.id || !personality.x_personality.orientation || !personality.x_personality.speakStyleDuringSex) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            const errEl = document.getElementById('generateError');
+            errEl.style.display = 'none';
+
+            fetch('api/personalities.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    action: 'update',
+                    id: personality.id,
+                    data: JSON.stringify(personality)
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    errEl.style.display = 'block';
+                    errEl.style.color = 'var(--success-color)';
+                    errEl.innerHTML = result.message || 'New personality added successfully!';
+                    resetForm();
+                    loadTable();
+                } else {
+                    console.error('Server error:', result);
+                    errEl.style.display = 'block';
+                    errEl.style.color = 'var(--error-color)';
+                    errEl.innerHTML = `Failed to add personality: ${result.message}${result.details ? `<br>${result.details}` : ''}`;
+                }
+            })
+            .catch(error => {
+                console.error('Network error:', error);
+                errEl.style.display = 'block';
+                errEl.style.color = 'var(--error-color)';
+                errEl.innerHTML = `Error adding personality: ${error.message}`;
+            });
+        });
     </script>
 </body>
 

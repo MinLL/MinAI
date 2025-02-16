@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 // Handle POST request for all operations
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $table = 'minai_x_personalities'; // Set default table
+    $table = 'minai_x_personalities';
     
     if (!isset($_POST['action'])) {
         echo json_encode(['status' => 'error', 'message' => 'No action specified']);
@@ -28,14 +28,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!isset($_POST['data']) || !isset($_POST['id'])) {
                     throw new Exception('Missing data or id for update');
                 }
+                
                 $data = json_decode($_POST['data'], true);
                 $id = $_POST['id'];
-                $jsonData = json_encode($data['x_personality']);
                 
-                $result = $db->update($table, 
-                    "x_personality = '" . $db->escape($jsonData) . "'", 
-                    "id = '" . $db->escape($id) . "'"
-                );
+                // Check if entry exists
+                $exists = $db->fetchAll("SELECT id FROM $table WHERE id = '" . $db->escape($id) . "'");
+                
+                if (empty($exists)) {
+                    // Insert new entry
+                    try {
+                        $db->insert($table, [
+                            'id' => $id,
+                            'x_personality' => json_encode($data['x_personality'])
+                        ]);
+                        // Verify the insert worked by checking if the record exists
+                        $verify = $db->fetchAll("SELECT id FROM $table WHERE id = '" . $db->escape($id) . "'");
+                        if (!empty($verify)) {
+                            echo json_encode([
+                                'status' => 'success',
+                                'message' => 'New personality created successfully',
+                                'id' => $id
+                            ]);
+                        } else {
+                            throw new Exception('Failed to verify new personality creation');
+                        }
+                    } catch (Exception $e) {
+                        error_log("Insert error: " . $e->getMessage());
+                        throw new Exception('Failed to create new personality: ' . $e->getMessage());
+                    }
+                } else {
+                    // Update existing entry
+                    try {
+                        $db->update($table, 
+                            "x_personality = '" . $db->escape(json_encode($data['x_personality'])) . "'",
+                            "id = '" . $db->escape($id) . "'"
+                        );
+                        echo json_encode([
+                            'status' => 'success',
+                            'message' => 'Personality updated successfully',
+                            'id' => $id
+                        ]);
+                    } catch (Exception $e) {
+                        error_log("Update error: " . $e->getMessage());
+                        throw new Exception('Failed to update personality: ' . $e->getMessage());
+                    }
+                }
                 break;
                 
             case 'delete':
@@ -43,13 +81,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     throw new Exception('Missing id for delete');
                 }
                 $id = $_POST['id'];
-                $result = $db->delete($table, "id = '" . $db->escape($id) . "'");
+                try {
+                    $db->delete($table, "id = '" . $db->escape($id) . "'");
+                    echo json_encode([
+                        'status' => 'success',
+                        'message' => 'Personality deleted successfully',
+                        'id' => $id
+                    ]);
+                } catch (Exception $e) {
+                    error_log("Delete error: " . $e->getMessage());
+                    throw new Exception('Failed to delete personality: ' . $e->getMessage());
+                }
                 break;
+
+            case 'import':
+                if (!isset($_POST['data'])) {
+                    throw new Exception('No data provided for import');
+                }
+                $importData = json_decode($_POST['data'], true);
+                $imported = 0;
+                $skipped = 0;
+                
+                foreach ($importData as $entry) {
+                    // Check if ID already exists
+                    $exists = $db->fetchAll("SELECT id FROM $table WHERE id = '" . $db->escape($entry['id']) . "'");
+                    if (empty($exists)) {
+                        try {
+                            $db->insert($table, [
+                                "id" => $entry['id'],
+                                "x_personality" => $entry['x_personality']
+                            ]);
+                            $imported++;
+                        } catch (Exception $e) {
+                            error_log("Import error for ID {$entry['id']}: " . $e->getMessage());
+                            $skipped++;
+                        }
+                    } else {
+                        $skipped++;
+                    }
+                }
+                
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => "Import completed: $imported added, $skipped skipped",
+                    'imported' => $imported,
+                    'skipped' => $skipped
+                ]);
+                break;
+
+            default:
+                throw new Exception('Invalid action specified');
         }
-        echo json_encode(['status' => 'success']);
     } catch (Exception $e) {
-        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        error_log("Personalities API error: " . $e->getMessage());
+        echo json_encode([
+            'status' => 'error',
+            'message' => $e->getMessage(),
+            'details' => 'Check server logs for more information'
+        ]);
     }
+    exit;
 }
 
 // Handle PUT request to update existing data

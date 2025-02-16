@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Scene Descriptions</title>
+    <title>Scene Descriptions Management</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -17,6 +17,7 @@
             --success-color: #40c057;
             --error-color: #f44336;
             --warning-color: #ffc107;
+            --info-color: #4dabf7;
         }
 
         body {
@@ -62,15 +63,34 @@
         }
 
         button {
-            background-color: var(--primary-color);
-            border: none;
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
             cursor: pointer;
-            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 8px 16px;
+            width: auto;
         }
 
         button:hover {
-            background-color: #45a049;
             transform: translateY(-2px);
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.15) 0%,
+                rgba(255, 255, 255, 0.08) 100%
+            );
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .primary {
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.2) 0%,
+                rgba(76, 175, 80, 0.3) 100%
+            );
+            border-color: var(--primary-color);
         }
 
         table {
@@ -233,79 +253,252 @@
             border: 1px solid var(--border-color);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
+
+        .container {
+            max-width: 95vw;
+            margin: 20px auto;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .entry-content {
+            display: grid;
+            grid-template-areas:
+                "ostim sexlab controls"
+                "desc desc desc";
+            grid-template-columns: 1fr 1fr auto;
+            gap: 10px;
+        }
+
+        .entry-field[data-field="ostim_id"] {
+            grid-area: ostim;
+        }
+
+        .entry-field[data-field="sexlab_id"] {
+            grid-area: sexlab;
+        }
+
+        .description-field {
+            grid-area: desc;
+        }
+
+        .entry-controls {
+            grid-area: controls;
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+            margin-bottom: 4px;
+        }
+
+        .entry-row {
+            background: rgba(45, 45, 45, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        .entry-row:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .entry-label {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-bottom: 2px;
+        }
+
+        .entry-value {
+            background: var(--background-dark);
+            padding: 6px 8px;
+            min-height: 18px;
+            font-size: 0.95rem;
+            border-radius: 4px;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .header-controls input {
+            min-width: 200px;
+            flex-grow: 1;
+        }
+
+        .exportBtn {
+            background: linear-gradient(135deg,
+                rgba(33, 150, 243, 0.1) 0%,
+                rgba(33, 150, 243, 0.2) 100%
+            );
+            border-color: var(--info-color);
+        }
+
+        .importBtn {
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            height: 35px;
+            line-height: 18px;
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.1) 0%,
+                rgba(76, 175, 80, 0.2) 100%
+            );
+            border: 1px solid var(--success-color);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .importBtn input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        /* Remove the default button appearance */
+        .importBtn input[type="file"]::-webkit-file-upload-button {
+            display: none;
+        }
+
+        .resetBtn {
+            background: linear-gradient(135deg,
+                rgba(244, 67, 54, 0.1) 0%,
+                rgba(244, 67, 54, 0.2) 100%
+            );
+            border-color: var(--error-color);
+        }
+
+        .editBtn {
+            background: linear-gradient(135deg,
+                rgba(33, 150, 243, 0.1) 0%,
+                rgba(33, 150, 243, 0.2) 100%
+            );
+            border-color: var(--info-color);
+        }
+
+        .deleteBtn {
+            background: linear-gradient(135deg,
+                rgba(244, 67, 54, 0.1) 0%,
+                rgba(244, 67, 54, 0.2) 100%
+            );
+            border-color: var(--error-color);
+        }
+
+        .nav-panel {
+            background-color: var(--background-light);
+            padding: 15px;
+            text-align: center;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(4px);
+        }
+
+        .nav-panel a {
+            display: inline-block;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 1.1rem;
+            margin: 0 20px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
+            border: 1px solid var(--border-color);
+        }
+
+        .nav-panel a:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.15) 0%,
+                rgba(255, 255, 255, 0.08) 100%
+            );
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Make buttons more compact */
+        .entry-controls button {
+            padding: 6px 12px;
+            font-size: 0.9rem;
+            height: 32px;
+        }
     </style>
 </head>
 
 <body>
-    <h1>Manage Scene Descriptions</h1>
-    <h3><a href="https://github.com/MinLL/MinAI/blob/main/nsfw_Scenes.md">Scene descriptions guide</a></h4>
-    <!-- Navigation Bar -->
-    <div class="navigation">
-        <a href="index.html">Back to Home</a>
-        <button onclick="confirmResetScenes()">Reset Scenes</button>
-    </div>
-
-    <!-- Search Bar -->
-    <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Search scene descriptions..." oninput="searchTable()">
-    </div>
-
-    <!-- Table for displaying scene descriptions -->
-    <table id="dataTable"></table>
-
-    <!-- Pagination Controls -->
-    <div class="pagination">
-        <button onclick="prevPage()">Previous</button>
-        <div class="pagination-info">
-            Page <span id="currentPage">1</span> of <span id="totalPages">1</span>
+    <div class="container">
+        <h1>Scene Descriptions Management</h1>
+        
+        <div class="nav-panel">
+            <a href="index.html">Return to Home</a>
+            <a href="https://github.com/MinLL/MinAI">Documentation</a>
         </div>
-        <button onclick="nextPage()">Next</button>
-    </div>
 
-    <div class="tabs">
-        <div class="tab active" onclick="openTab(event, 'create')">Create manually</div>
-        <div class="tab" onclick="openTab(event, 'generate')">Generate with LLM</div>
-    </div>
+        <!-- Collapsible Add/Edit Section -->
+        <details class="personality-section collapsible">
+            <summary>Generate & Add New Scene Description</summary>
+            <div class="collapsible-content">
+                <!-- Generate Section -->
+                <div class="subsection">
+                    <h3>Generate Description</h3>
+                    <div class="form-grid">
+                        <textarea id="descriptionPrompt" placeholder="Enter scene description prompt..."></textarea>
+                    </div>
+                    <div id="generateError" style="display: none;"></div>
+                    <button type="button" onclick="generateDescription()" class="primary">Generate</button>
+                </div>
 
-    <div class="tab-content">
-        <div class="new-entry-form">
-            <div id="create" class="tab-content-item active">
-                <!-- Form for creating new entries -->
-                <h2>Create New Scene Description</h2>
+                <!-- Add Section -->
+                <div class="subsection">
+                    <h3>Add New Scene Description</h3>
+                    <form id="newEntryForm">
+                        <div class="form-grid">
+                            <input type="text" id="newOstimId" name="ostim_id" placeholder="OStim ID" required>
+                            <input type="text" id="newSexlabId" name="sexlab_id" placeholder="Sexlab ID" required>
+                            <textarea id="newDescription" name="description" placeholder="Scene Description" required></textarea>
+                        </div>
+                        <div id="addError" style="display: none;"></div>
+                        <button type="submit" class="primary">Add Scene</button>
+                    </form>
+                </div>
             </div>
+        </details>
 
-            <div id="generate" class="tab-content-item" style="margin-bottom: 20px;">
-                <h2>Generate Scene Description with LLM</h2>
-                <p>It will use LLM endpoint from your CHIM diary configuration. You still need manually to privde
-                    ostim_id/sexlab_id</p>
-                    <details style="margin: 10px 0;">
-                        <summary>Example of not-pretty description you can feed to LLM</summary>
-                        <pre>
-{actor0}, {actor1} participate in scene. Scene is at bed. Scene can be described by this tags: anubs
-{actor0}(male) - is with feet on ground, their position can be described by these tags: standing.
-{actor1}(female) - their position can be described by these tags: lyingside.
-List of actions in the scene(all actions happen at the same time):
-  - vaginalsex. Action can be described by these tags: sexual. {actor0}(the one with the penis). {actor1}(the one with the vulva).
-                    </pre>
-                    </details>
-                    <details style="margin: 10px 0;">
-                        <summary>Possible LLM output(not guaranteed, since there is no way LLM will return 2 identical responses):</summary>
-                        <pre>{actor0} stands beside the bed, his feet firmly on the ground, while {actor1} lies on her side, her legs slightly parted. 
-He thrusts his hard cock into her wet pussy, their bodies moving in sync as they engage in passionate vaginal sex.</pre>
-                    </details>
-                <textarea name="prompt" rows="5" id="descriptionPrompt"></textarea>
-                <div id="generateError"></div>
-                <button type="button" onclick="generateDescription()">Generate</button>
+        <!-- Existing Scenes Section -->
+        <div class="personality-section">
+            <div class="section-header">
+                <h3>Existing Scene Descriptions</h3>
+                <div class="header-controls">
+                    <input type="text" id="searchInput" placeholder="Search scenes..." onkeyup="filterEntries()">
+                    <button onclick="exportToCSV()" class="exportBtn">Export CSV</button>
+                    <label class="importBtn">
+                        Import CSV
+                        <input type="file" id="importCSV" accept=".csv" onchange="importFromCSV(this)">
+                    </label>
+                    <button onclick="resetScenes()" class="resetBtn">Reset Scenes</button>
+                </div>
             </div>
-            <form id="newEntryForm">
-                <label for="newOstimId">OStim ID</label>
-                <input type="text" id="newOstimId" name="ostim_id" required>
-                <label for="newSexlabId">SexLab ID</label>
-                <input type="text" id="newSexlabId" name="sexlab_id">
-                <label for="newDescription">Description</label>
-                <textarea id="newDescription" name="description" rows="4" required></textarea>
-                <button type="button" onclick="createNewEntry()">Create Entry</button>
-            </form>
+            <div class="search-info">Search by OStim ID, Sexlab ID, or description</div>
+            <div id="entriesContainer">
+                <!-- Entries will be populated by JavaScript -->
+            </div>
         </div>
     </div>
 
@@ -318,204 +511,314 @@ He thrusts his hard cock into her wet pussy, their bodies moving in sync as they
         let filteredData = [];
         let editedRow = {};
 
-        window.onload = function () {
+        window.onload = function() {
             loadTable();
         };
 
-        // Function to load table data from the backend
         function loadTable() {
-            fetch('api/scenes.php?table=minai_scenes_descriptions')
+            fetch('api/scenes.php')
                 .then(response => response.json())
                 .then(result => {
-                    data = result;
-                    filteredData = data;
-                    updatePagination();
-                    renderTable();
-                });
-        }
-
-        // Function to render the table based on the current page
-        function renderTable() {
-            const tableElem = document.getElementById('dataTable');
-            tableElem.innerHTML = '';
-
-            if (filteredData.length > 0) {
-                const headers = ['OStim ID', 'SexLab ID', 'Description', 'Actions'];
-                const headerRow = document.createElement('tr');
-                headers.forEach(header => {
-                    const th = document.createElement('th');
-                    th.innerText = header;
-                    th.onclick = () => sortTable(header.toLowerCase().replace(" ", "_"));
-                    headerRow.appendChild(th);
-                });
-                tableElem.appendChild(headerRow);
-
-                const startIndex = (currentPage - 1) * rowsPerPage;
-                const endIndex = startIndex + rowsPerPage;
-                const pageData = filteredData.slice(startIndex, endIndex);
-
-                pageData.forEach(row => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td contenteditable="true" onblur="editRow(this, 'ostim_id', '${row.ostim_id}')">${row.ostim_id}</td>
-                        <td contenteditable="true" onblur="editRow(this, 'sexlab_id', '${row.ostim_id}')">${row.sexlab_id || ''}</td>
-                        <td contenteditable="true" onblur="editRow(this, 'description', '${row.ostim_id}')">${row.description}</td>
-                    `;
-
-                    const actionTd = document.createElement('td');
-                    const saveBtn = document.createElement('button');
-                    saveBtn.innerText = 'Save';
-                    saveBtn.onclick = () => saveRow(row.ostim_id);
-                    const deleteBtn = document.createElement('button');
-                    deleteBtn.innerText = 'Delete';
-                    deleteBtn.onclick = () => deleteRow(row.ostim_id);
-                    actionTd.appendChild(saveBtn);
-                    actionTd.appendChild(deleteBtn);
-                    tr.appendChild(actionTd);
-
-                    tableElem.appendChild(tr);
-                });
-            }
-        }
-
-        // Function to edit an in-line row
-        function editRow(td, field, id) {
-            const value = td.innerText.trim();
-            if (!editedRow[id]) {
-                editedRow[id] = {};
-            }
-            editedRow[id][field] = value;
-        }
-
-        // Function to save the edited row to the backend
-        function saveRow(id) {
-            const updatedData = {
-                sexlab_id: editedRow[id]?.sexlab_id || '',
-                description: editedRow[id]?.description || ''
-            };
-
-            fetch('api/scenes.php', {
-                method: 'PUT',
-                body: new URLSearchParams({
-                    table: 'minai_scenes_descriptions',
-                    id: id,
-                    data: JSON.stringify(updatedData)
+                    if (result.status === 'success') {
+                        data = result.data;
+                        filteredData = [...data].sort((a, b) => a.ostim_id.localeCompare(b.ostim_id));
+                        renderEntries();
+                    } else {
+                        console.error('Failed to load data:', result.message);
+                    }
                 })
-            })
-                .then(response => response.json())
-                .then(result => {
-                    alert(result.status === 'success' ? 'Data saved!' : 'Failed to save data');
-                    loadTable();
+                .catch(error => {
+                    console.error('Error loading data:', error);
                 });
         }
 
-        // Function to delete a row from the backend
-        function deleteRow(id) {
-            fetch('api/scenes.php', {
-                method: 'DELETE',
-                body: new URLSearchParams({
-                    table: 'minai_scenes_descriptions',
-                    id: id
-                })
-            })
-                .then(response => response.json())
-                .then(result => {
-                    alert(result.status === 'success' ? 'Data deleted!' : 'Failed to delete data');
-                    loadTable();
-                });
-        }
+        function renderEntries() {
+            const container = document.getElementById('entriesContainer');
+            container.innerHTML = '';
 
-        // Function to search for scene descriptions in the table
-        function searchTable() {
-            const searchText = document.getElementById('searchInput').value.toLowerCase();
-            filteredData = data.filter(row => {
-                return (
-                    row.ostim_id.toLowerCase().includes(searchText) ||
-                    (row.sexlab_id || '').toLowerCase().includes(searchText) ||
-                    row.description.toLowerCase().includes(searchText)
-                );
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const pageData = filteredData.slice(startIndex, endIndex);
+
+            pageData.forEach(entry => {
+                const entryDiv = document.createElement('div');
+                entryDiv.className = 'entry-row';
+                entryDiv.innerHTML = `
+                    <div class="entry-content">
+                        <div class="entry-field">
+                            <span class="entry-label">OStim ID</span>
+                            <div class="entry-value" data-field="ostim_id" data-value="${entry.ostim_id}">${entry.ostim_id}</div>
+                        </div>
+                        <div class="entry-field">
+                            <span class="entry-label">Sexlab ID</span>
+                            <div class="entry-value" data-field="sexlab_id">${entry.sexlab_id}</div>
+                        </div>
+                        <div class="entry-field description-field">
+                            <span class="entry-label">Description</span>
+                            <div class="entry-value" data-field="description">${entry.description}</div>
+                        </div>
+                    </div>
+                    <div class="entry-controls">
+                        <button class="editBtn" onclick="editEntry('${entry.ostim_id}')">Edit</button>
+                        <button class="deleteBtn" onclick="deleteEntry('${entry.ostim_id}')">Delete</button>
+                    </div>
+                `;
+                container.appendChild(entryDiv);
             });
-            currentPage = 1; // Reset to first page when searching
-            updatePagination();
-            renderTable();
-        }
 
-        // Function to sort the table by column
-        function sortTable(column) {
-            filteredData.sort((a, b) => {
-                const valA = a[column] || '';
-                const valB = b[column] || '';
-
-                if (valA < valB) return -1;
-                if (valA > valB) return 1;
-                return 0;
-            });
-            renderTable();
-        }
-
-        // Pagination Functions
-        function updatePagination() {
+            // Add pagination controls
             const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-            document.getElementById('totalPages').innerText = totalPages;
-            document.getElementById('currentPage').innerText = currentPage;
+            container.innerHTML += `
+                <div class="pagination-controls">
+                    <button onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''}>Previous</button>
+                    <button onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''}>Next</button>
+                </div>
+                <div class="pagination-info">
+                    Page ${currentPage} of ${totalPages} (${filteredData.length} total entries)
+                </div>
+            `;
         }
 
-        function nextPage() {
-            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-            if (currentPage < totalPages) {
-                currentPage++;
-                renderTable();
-                updatePagination();
-            }
-        }
+        function editEntry(id) {
+            const entryDiv = document.querySelector(`.entry-row .entry-value[data-field="ostim_id"][data-value="${id}"]`).closest('.entry-row');
+            const editBtn = entryDiv.querySelector('.editBtn');
+            
+            if (entryDiv.classList.contains('editing')) {
+                // Save changes
+                const updatedData = {
+                    ostim_id: id,
+                    sexlab_id: entryDiv.querySelector('[data-field="sexlab_id"]').textContent,
+                    description: entryDiv.querySelector('[data-field="description"]').textContent
+                };
 
-        function prevPage() {
-            if (currentPage > 1) {
-                currentPage--;
-                renderTable();
-                updatePagination();
-            }
-        }
-
-        // Function to create a new scene description entry
-        function createNewEntry() {
-            const formData = new FormData(document.getElementById('newEntryForm'));
-            const newEntryData = {
-                ostim_id: formData.get('ostim_id'),
-                sexlab_id: formData.get('sexlab_id'),
-                description: formData.get('description'),
-            };
-
-            fetch('api/scenes.php', {
-                method: 'POST',
-                body: new URLSearchParams({
-                    table: 'minai_scenes_descriptions',
-                    data: JSON.stringify(newEntryData)
+                fetch('api/scenes.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        action: 'update',
+                        id: id,
+                        data: JSON.stringify(updatedData)
+                    })
                 })
-            })
                 .then(response => response.json())
                 .then(result => {
-                    loadTable();
+                    if (result.status === 'success') {
+                        loadTable();
+                    } else {
+                        console.error('Failed to update:', result.message);
+                    }
                 });
-        }
 
-        // Confirmation popup for resetting scenes
-        function confirmResetScenes() {
-            if (confirm("Are you sure you want to reset all scenes? This action cannot be undone.")) {
-                resetScenes();
+                // Remove editable state
+                entryDiv.querySelectorAll('.entry-value').forEach(el => {
+                    el.contentEditable = false;
+                    el.style = '';
+                });
+                entryDiv.classList.remove('editing');
+                editBtn.textContent = 'Edit';
+            } else {
+                // Enable editing
+                entryDiv.querySelectorAll('.entry-value:not([data-field="ostim_id"])').forEach(el => {
+                    makeEditable(el);
+                });
+                entryDiv.classList.add('editing');
+                editBtn.textContent = 'Save';
             }
         }
 
-        // Function to reset all scenes
+        function deleteEntry(id) {
+            if (confirm('Are you sure you want to delete this scene description?')) {
+                fetch('api/scenes.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        action: 'delete',
+                        id: id
+                    })
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.status === 'success') {
+                        loadTable();
+                    } else {
+                        console.error('Failed to delete:', result.message);
+                    }
+                });
+            }
+        }
+
+        function changePage(direction) {
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+            const newPage = currentPage + direction;
+            
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                renderEntries();
+            }
+        }
+
+        function exportToCSV() {
+            const csvRows = [];
+            
+            // Add header row
+            csvRows.push(['OStim ID', 'Sexlab ID', 'Description']);
+            
+            // Add data rows with proper escaping and null checks
+            data.forEach(entry => {
+                const escapedDescription = (entry.description || '').replace(/"/g, '""');
+                const escapedSexlabId = (entry.sexlab_id || '').replace(/"/g, '""');
+                const escapedOstimId = (entry.ostim_id || '').replace(/"/g, '""');
+                
+                csvRows.push([
+                    `"${escapedOstimId}"`,
+                    `"${escapedSexlabId}"`,
+                    `"${escapedDescription}"`
+                ]);
+            });
+            
+            const csvString = csvRows.join('\n');
+            
+            const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'scene_descriptions.csv';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function importFromCSV(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                
+                // More robust CSV parsing
+                let rows = [];
+                let currentRow = [];
+                let currentField = '';
+                let inQuotes = false;
+                
+                for (let i = 0; i < text.length; i++) {
+                    const char = text[i];
+                    const nextChar = text[i + 1];
+                    
+                    if (char === '"') {
+                        if (inQuotes && nextChar === '"') {
+                            currentField += '"';
+                            i++; // Skip next quote
+                        } else {
+                            inQuotes = !inQuotes;
+                        }
+                    } else if (char === ',' && !inQuotes) {
+                        currentRow.push(currentField.trim());
+                        currentField = '';
+                    } else if ((char === '\n' || char === '\r') && !inQuotes) {
+                        if (currentField) {
+                            currentRow.push(currentField.trim());
+                            currentField = '';
+                        }
+                        if (currentRow.length > 0) {
+                            rows.push(currentRow);
+                            currentRow = [];
+                        }
+                    } else {
+                        currentField += char;
+                    }
+                }
+                
+                // Add the last field and row if they exist
+                if (currentField) {
+                    currentRow.push(currentField.trim());
+                }
+                if (currentRow.length > 0) {
+                    rows.push(currentRow);
+                }
+
+                // Skip header and validate data
+                const importedData = rows.slice(1)
+                    .filter(row => row.length >= 3)
+                    .map(row => ({
+                        ostim_id: row[0].replace(/^"(.*)"$/, '$1').trim(),
+                        sexlab_id: row[1].replace(/^"(.*)"$/, '$1').trim(),
+                        description: row[2].replace(/^"(.*)"$/, '$1').trim()
+                    }))
+                    .filter(entry => 
+                        entry.ostim_id && 
+                        entry.sexlab_id && 
+                        entry.description &&
+                        entry.ostim_id !== '{actor2}' // Explicitly filter out the garbage row
+                    );
+
+                if (importedData.length === 0) {
+                    alert('No valid data found in CSV file');
+                    return;
+                }
+
+                if (confirm(`Are you sure you want to import ${importedData.length} scene descriptions? This will add to existing entries.`)) {
+                    fetch('api/scenes.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            action: 'import',
+                            data: JSON.stringify(importedData)
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.status === 'success') {
+                            alert('Import successful!');
+                            loadTable();
+                            input.value = ''; // Reset file input
+                        } else {
+                            alert('Import failed: ' + (result.message || 'Unknown error'));
+                        }
+                    })
+                    .catch(error => {
+                        alert('Import failed: ' + error.message);
+                    });
+                }
+            };
+            reader.readAsText(file);
+        }
+
         function resetScenes() {
-            fetch('api/main.php?endpoint=reset_scenes', {
-                method: 'POST'
-            })
+            if (confirm('Are you sure you want to reset all scene descriptions to their default values? This cannot be undone.')) {
+                fetch('api/main.php?endpoint=reset_scenes', {
+                    method: 'POST'
+                })
                 .then(response => response.json())
                 .then(result => {
-                    alert('Scenes reset successfully!');
-                    loadTable();
+                    if (result.status === 'success') {
+                        loadTable();
+                    } else {
+                        console.error('Failed to reset scenes:', result.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error resetting scenes:', error);
                 });
+            }
+        }
+
+        function filterEntries() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            filteredData = data.filter(entry => {
+                const ostimMatch = (entry.ostim_id || '').toLowerCase().includes(searchText);
+                const sexlabMatch = (entry.sexlab_id || '').toLowerCase().includes(searchText);
+                const descriptionMatch = (entry.description || '').toLowerCase().includes(searchText);
+                return ostimMatch || sexlabMatch || descriptionMatch;
+            });
+            currentPage = 1;
+            renderEntries();
         }
 
         const cellTooltips = [
@@ -525,23 +828,34 @@ He thrusts his hard cock into her wet pussy, their bodies moving in sync as they
         ]
 
         const tooltip = document.getElementById('tooltip');
-        const tooltipTarget = document.getElementById('dataTable');
+        const tooltipTarget = document.getElementById('entriesContainer');
 
         console.log('AAA', tooltipTarget)
         // Function to show the tooltip
         function showTooltip(event) {
-            const target = event.target
-            console.log('BBB', target)
-            if (target.tagName.toLowerCase() !== 'td') {
-                return
+            const target = event.target;
+            if (!target.classList.contains('entry-value')) return;
+            
+            let title;
+            const field = target.getAttribute('data-field');
+            switch(field) {
+                case 'ostim_id':
+                    title = cellTooltips[0];
+                    break;
+                case 'sexlab_id':
+                    title = cellTooltips[1];
+                    break;
+                case 'description':
+                    title = cellTooltips[2];
+                    break;
             }
 
-            let title = cellTooltips[target.cellIndex]
-
-            tooltip.style.visibility = 'visible';
-            tooltip.textContent = title;
-            tooltip.style.left = (event.pageX - tooltip.clientWidth / 2) + 'px';
-            tooltip.style.top = (event.pageY + 10) + 'px';
+            if (title) {
+                tooltip.style.visibility = 'visible';
+                tooltip.textContent = title;
+                tooltip.style.left = (event.pageX - tooltip.clientWidth / 2) + 'px';
+                tooltip.style.top = (event.pageY + 10) + 'px';
+            }
         }
         // Function to hide the tooltip
         function hideTooltip() {
@@ -588,6 +902,68 @@ He thrusts his hard cock into her wet pussy, their bodies moving in sync as they
                 }
             });
         }
+
+        function makeEditable(element) {
+            element.contentEditable = true;
+            element.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
+            element.style.padding = '4px 8px';
+            element.style.borderRadius = '4px';
+            element.style.border = '1px solid var(--border-color)';
+        }
+
+        document.getElementById('newEntryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const errEl = document.getElementById('addError');
+            errEl.style.display = 'none';
+            
+            // Get form data
+            const newData = {
+                ostim_id: document.getElementById('newOstimId').value.trim(),
+                sexlab_id: document.getElementById('newSexlabId').value.trim(),
+                description: document.getElementById('newDescription').value.trim()
+            };
+            
+            // Validate data
+            if (!newData.ostim_id || !newData.sexlab_id || !newData.description) {
+                errEl.style.display = 'block';
+                errEl.textContent = 'All fields are required';
+                return;
+            }
+
+            // Send request
+            fetch('api/scenes.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    action: 'add',
+                    data: JSON.stringify(newData)
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    // Clear form
+                    document.getElementById('newEntryForm').reset();
+                    // Hide error message if it was showing
+                    errEl.style.display = 'none';
+                    // Reload table
+                    loadTable();
+                    // Close the details section
+                    document.querySelector('.personality-section.collapsible').removeAttribute('open');
+                } else {
+                    // Show error
+                    errEl.style.display = 'block';
+                    errEl.textContent = result.message || 'Failed to add scene';
+                }
+            })
+            .catch(error => {
+                errEl.style.display = 'block';
+                errEl.textContent = 'Network error: ' + error.message;
+            });
+        });
     </script>
 </body>
 
