@@ -155,7 +155,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } catch (Exception $e) {
         error_log("Config save error: " . $e->getMessage());
         http_response_code(500);
-        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        $errorDetails = [
+            'status' => 'error',
+            'message' => $e->getMessage(),
+            'details' => ''
+        ];
+        
+        // Add file permission details
+        if (!is_writable("$pluginPath/config.php")) {
+            $errorDetails['details'] .= "Config file is not writable\n";
+            $errorDetails['details'] .= "Current permissions: " . decoct(fileperms("$pluginPath/config.php") & 0777) . "\n";
+            $errorDetails['details'] .= "Current owner: " . posix_getpwuid(fileowner("$pluginPath/config.php"))['name'] . "\n";
+        }
+        
+        // Add directory permission details
+        if (!is_writable($pluginPath)) {
+            $errorDetails['details'] .= "Plugin directory is not writable\n";
+            $errorDetails['details'] .= "Directory permissions: " . decoct(fileperms($pluginPath) & 0777) . "\n";
+            $errorDetails['details'] .= "Directory owner: " . posix_getpwuid(fileowner($pluginPath))['name'] . "\n";
+        }
+        
+        // Add PHP error details if any
+        $error = error_get_last();
+        if ($error !== null) {
+            $errorDetails['details'] .= "\nPHP Error:\n";
+            $errorDetails['details'] .= "Type: " . $error['type'] . "\n";
+            $errorDetails['details'] .= "Message: " . $error['message'] . "\n";
+            $errorDetails['details'] .= "File: " . $error['file'] . " (Line " . $error['line'] . ")\n";
+        }
+        
+        echo json_encode($errorDetails);
     }
 }
 

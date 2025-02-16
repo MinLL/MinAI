@@ -1013,3 +1013,41 @@ Function SetLLMFallbackProfile() {
     global $CONNECTORS;
     require_once($path);
 }
+
+function replaceVariables($content, $replacements, $depth = 0) {
+    if (empty($content) || $depth > 10) { // Prevent infinite recursion
+        return $content;
+    }
+    
+    // Ensure all values are strings
+    $stringReplacements = array_map(function($value) {
+        return (string)$value;
+    }, $replacements);
+    
+    // Create search array with #variable# format
+    $search = array_map(function($key) {
+        return "#{$key}#";
+    }, array_keys($stringReplacements));
+    
+    // Do the initial replacement
+    $result = str_replace($search, array_values($stringReplacements), $content);
+    
+    // Look for any remaining #VARIABLE# patterns
+    while (strpos($result, '#') !== false && preg_match_all('/#([A-Z_]+)#/', $result, $matches)) {
+        $hasReplacement = false;
+        foreach ($matches[0] as $match) {
+            if (isset($replacements[trim($match, '#')])) {
+                $hasReplacement = true;
+                break;
+            }
+        }
+        // Only continue if we found a replaceable variable
+        if ($hasReplacement) {
+            $result = replaceVariables($result, $replacements, $depth + 1);
+        } else {
+            break; // No more replaceable variables found
+        }
+    }
+    
+    return $result;
+}

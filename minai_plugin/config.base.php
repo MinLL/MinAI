@@ -40,37 +40,41 @@ $GLOBALS['action_prompts'] = Array(
 
 // Roleplay translation settings
 $GLOBALS['roleplay_settings'] = Array(
-    "context_messages" => 10,  // Number of recent messages to include for context
-    "system_prompt" => "You are #player_name#. Your task is to translate casual speech into your manner of speaking.",
-    "roleplay_system_prompt" => "You are #player_name#. Your responses should reflect your character's personality, background, and current situation.",
-    "translation_request" => "Translate this casual speech into your character's manner: \"#original_input#\"",
-    "roleplay_request" => "You are roleplaying as #player_name#. Respond naturally as your character would in this situation with a succinct line of dialogue appropriate for the situation.",
-    "translation_instructions" => "1. Correct any misheard names using the nearby names list\n2. Keep responses brief and true to the original meaning\n3. Do not add character name prefixes to your response\n4. Provide only the translated dialogue",
-    "roleplay_instructions" => "1. Stay in character as #player_name#\n2. Keep responses brief and natural\n3. Do not add character name prefixes\n4. Respond as if you are speaking directly\n5. Emphasize your reaction to the most recent events in the RECENT EVENTS section.",
+    "context_messages" => 10,
+    "system_prompt" => "You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking.",
+    "roleplay_system_prompt" => "You are #PLAYER_NAME#. Your responses should reflect your character's personality, background, and current situation.",
+    "translation_request" => "Translate this casual speech into your character's manner: \"#ORIGINAL_INPUT#\"",
+    "roleplay_request" => "You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue appropriate for the situation.",
     "sections" => Array(
         "CHARACTER_BACKGROUND" => Array(
             "enabled" => true,
             "header" => "=== YOUR BACKGROUND ===",
-            "content" => "#player_bios#\nPronouns: #player_subject#/#player_object#/#player_possessive#\n\n#player_name#'s Current State: #herika_dynamic#",
+            "content" => "#PLAYER_BIOS#\nPronouns: #PLAYER_SUBJECT#/#PLAYER_OBJECT#/#PLAYER_POSSESSIVE#\n\nCurrent State: #HERIKA_DYNAMIC#\n\nPhysical Description: #PHYSICAL_DESCRIPTION#",
             "order" => 0
+        ),
+        "CHARACTER_STATUS" => Array(
+            "enabled" => true,
+            "header" => "=== YOUR CURRENT STATUS ===",
+            "content" => "#AROUSAL_STATUS#\n#SURVIVAL_STATUS#\n#CLOTHING_STATUS#\n#DEVICES_STATUS#\n#FERTILITY_STATUS#",
+            "order" => 1
         ),
         "NEARBY_ENTITIES" => Array(
             "enabled" => true,
             "header" => "=== NEARBY ENTITIES ===",
-            "content" => "Characters: #nearby_actors#\nLocations: #nearby_locations#",
-            "order" => 1
+            "content" => "Characters: #NEARBY_ACTORS#\nLocations: #NEARBY_LOCATIONS#",
+            "order" => 2
         ),
         "RECENT_EVENTS" => Array(
             "enabled" => true,
             "header" => "=== RECENT EVENTS ===",
-            "content" => "#recent_events#",
-            "order" => 2
+            "content" => "#RECENT_EVENTS#",
+            "order" => 3
         ),
         "INSTRUCTIONS" => Array(
             "enabled" => true,
             "header" => "=== INSTRUCTIONS ===",
-            "content" => "#instructions#",
-            "order" => 3
+            "content" => "#INSTRUCTIONS#",
+            "order" => 4
         )
     )
 );

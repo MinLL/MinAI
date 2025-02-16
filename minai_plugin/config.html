@@ -30,7 +30,7 @@
         }
 
         .config-container {
-            max-width: 1000px;
+            max-width: 1400px;
             margin: 40px auto;
             padding: 30px;
             background: rgba(0, 0, 0, 0.2);
@@ -38,6 +38,24 @@
             backdrop-filter: blur(10px);
             border: 1px solid var(--border-color);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .config-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Ensure full-width sections stay full width */
+        .config-section.full-width {
+            grid-column: 1 / -1;
         }
 
         .nav-panel {
@@ -203,7 +221,7 @@
             border: 1px solid var(--border-color);
             backdrop-filter: blur(4px);
             transition: max-height 0.3s ease-out, opacity 0.3s ease-out, margin 0.3s ease-out;
-            max-height: 2000px;
+            max-height: none;
             opacity: 1;
             overflow: hidden;
         }
@@ -229,7 +247,57 @@
             border: 1px solid rgba(255, 193, 7, 0.3);
         }
 
+        .preview-panel {
+            background-color: var(--background-light);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border: 1px solid var(--border-color);
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+        
+        .preview-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+        
+        .preview-label {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        
+        .preview-content {
+            color: var(--text-color);
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-width: 100%;
+            overflow-wrap: break-word;
+        }
+        
+        .refresh-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        
+        .refresh-button:hover {
+            background: var(--secondary-color);
+        }
+
         @media (max-width: 768px) {
+            .config-grid {
+                grid-template-columns: 1fr;
+            }
+
             .config-container {
                 margin: 20px;
                 padding: 20px;
@@ -243,6 +311,166 @@
             h1 {
                 font-size: 2rem;
             }
+
+            .preview-panel {
+                padding: 10px;
+            }
+            
+            .section-preview {
+                padding: 10px;
+            }
+            
+            .preview-content {
+                font-size: 14px;
+            }
+        }
+
+        .variable-entry {
+            margin: 10px 0;
+            padding: 5px 0;
+            border-bottom: 1px solid var(--border-color);
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .variable-entry code {
+            color: var(--primary-color);
+            background: rgba(0, 0, 0, 0.2);
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        .section-preview {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            overflow-x: auto;
+        }
+
+        .section-preview h3 {
+            color: var(--primary-color);
+            margin: 0 0 10px 0;
+        }
+
+        .error {
+            color: var(--error-color);
+            background: rgba(244, 67, 54, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--error-color);
+            margin: 10px 0;
+        }
+
+        pre {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            color: var(--text-color);
+        }
+
+        #preview .section-header {
+            margin-bottom: 0;
+        }
+        
+        #preview .section-content {
+            margin-top: 10px;
+        }
+        
+        #preview .option-description {
+            margin-top: 0;
+        }
+
+        /* Improve spacing in two-column layout */
+        .config-column .config-section:first-child {
+            margin-top: 0;
+        }
+
+        .config-column .config-section:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Ensure consistent heights for option groups */
+        .option-group {
+            height: fit-content;
+        }
+
+        /* Improve spacing for the submit button */
+        .submit-button {
+            margin: 30px auto;
+            max-width: 800px;
+        }
+
+        .control-buttons {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .control-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.2) 0%,
+                rgba(76, 175, 80, 0.3) 100%
+            );
+            color: var(--text-color);
+            border: 1px solid rgba(76, 175, 80, 0.4);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            font-weight: 500;
+            margin: 0 10px;
+        }
+
+        .control-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.25) 0%,
+                rgba(76, 175, 80, 0.35) 100%
+            );
+        }
+
+        .voicetype-entry {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .voicetype-entry input {
+            flex: 1;
+            padding: 8px;
+            background-color: var(--background-dark);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+        }
+
+        .voicetype-entry button {
+            padding: 8px 16px;
+            background: linear-gradient(135deg,
+                rgba(244, 67, 54, 0.2) 0%,
+                rgba(244, 67, 54, 0.3) 100%
+            );
+            color: var(--text-color);
+            border: 1px solid rgba(244, 67, 54, 0.4);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .voicetype-entry button:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg,
+                rgba(244, 67, 54, 0.25) 0%,
+                rgba(244, 67, 54, 0.35) 100%
+            );
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
@@ -257,365 +485,396 @@
         </div>
 
         <!-- Information Section -->
-        <div class="info-section">
-            <br />
-            <p>If the configuration does not update, please run the server update script.</p>
+        <div class="info-section" id="info-section" style="display: none;">
+            <div id="error-display" style="display: none;">
+                <h3 style="color: var(--error-color);">Configuration Error</h3>
+                <pre id="error-details" class="error"></pre>
+            </div>
         </div>
         <p id="loading-message">Loading configuration...</p>
 
         <div id="config-form" style="display: none;">
-            <!-- LLM Settings Section -->
-            <div class="config-section">
-                <div class="section-header collapsed" onclick="toggleSection(this)">
-                    LLM Settings
-                </div>
-                <div class="section-content collapsed">
-                    <!-- enforce_short_responses -->
-                    <div class="option-group checkbox-group">
-                        <label class="option-label" for="enforce-short-responses">Enforce Short Responses</label>
-                        <p>Attempt to enforce short 2-3 sentence responses from the LLM. This is "best effort", and does not always work.</p>
-                        <input type="checkbox" id="enforce-short-responses">
-                    </div>
-
-                    <!-- use_llm_fallback -->
-                    <div class="option-group checkbox-group">
-                        <label class="option-label" for="use-llm-fallback">Use LLM Fallback</label>
-                        <p>Enable fallback to alternative LLM configuration when primary LLM call fails. 
-                            This can help recover from errors and censorship, but will result in increased token cost and response time 
-                            when a retry is performed. Response time hit is fairly minimal, but the full token cost of both requests 
-                            will be charged. The connector settings for the "LLMFallback" profile will be used (This will be created if it doesn't exist when you boot the game),
-                            and it will only work with openrouterjson.</p>
-                        <input type="checkbox" id="use-llm-fallback">
-                    </div>
-
-                    <!-- strip_emotes_from_output -->
-                    <div class="option-group checkbox-group">
-                        <label class="option-label" for="strip-emotes">Strip emotes from output</label>
-                        <p>Remove anything between two astericks from the response. Useful if your LLM likes to respond with things like *smirking*, *laughing*, etc.</p>
-                        <input type="checkbox" id="strip-emotes">
-                    </div>
-
-                    <!-- enforce_single_json -->
-                    <div class="option-group checkbox-group">
-                        <label class="option-label" for="enforce-single-json">Enforce Single JSON Response</label>
-                        <p>Forces the LLM to provide only one single JSON response object per interaction. This helps prevent multiple action attempts in a single response.</p>
-                        <input type="checkbox" id="enforce-single-json">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Gameplay Features Section -->
-            <div class="config-section">
-                <div class="section-header collapsed" onclick="toggleSection(this)">
-                    Gameplay Features
-                </div>
-                <div class="section-content collapsed">
-                    <!-- disable_nsfw -->
-                    <div class="option-group checkbox-group">
-                        <label class="option-label" for="disable-nsfw">Disable NSFW</label>
-                        <p>Globally disable all NSFW features.</p>
-                        <input type="checkbox" id="disable-nsfw">
-                    </div>
-
-                    <!-- restrict_nonfollower_functions -->
-                    <div class="option-group checkbox-group">
-                        <label class="option-label" for="restrict-nonfollower-functions">Restrict Non-Follower Functions</label>
-                        <p>Restrict actions that only make sense for followers to followers.</p>
-                        <input type="checkbox" id="restrict-nonfollower-functions">
-                    </div>
-
-                    <!-- always_enable_functions -->
-                    <div class="option-group checkbox-group">
-                        <label class="option-label" for="always-enable-functions">Always Enable Functions</label>
-                        <p>Enable functions during things like rechat. Disabled for the narrator to avoid crashes (CTD).</p>
-                        <input type="checkbox" id="always-enable-functions">
-                    </div>
-
-                    <!-- force_aiff_name_to_ingame_name -->
-                    <div class="option-group checkbox-group">
-                        <label class="option-label" for="force-aiff-name">Force CHIM Name to Match In-Game Name</label>
-                        <p>Force the configured name in CHIM to match the in-game name.</p>
-                        <input type="checkbox" id="force-aiff-name">
-                    </div>
-
-                    <!-- disable_worn_equipment -->
-                    <div class="option-group checkbox-group">
-                        <label class="option-label" for="disable-worn-equipment">Disable Worn Equipment</label>
-                        <p>Disable the worn equipment system, which customizes the description of items that actors are wearing.</p>
-                        <input type="checkbox" id="disable-worn-equipment">
-                    </div>
-
-                    <!-- use_defeat -->
-                    <div class="option-group checkbox-group">
-                        <label class="option-label" for="use-defeat">Add Support for Defeat mods</label>
-                        <p>If using a supported defeat mod, the LLM will differentiate between victory and defeat in combat.</p>
-                        <input type="checkbox" id="use-defeat">
-                    </div>
-
-                    <!-- realnames_support -->
-                    <div class="option-group checkbox-group">
-                        <label class="option-label" for="realnames-support">Add Support for Realnames Extended</label>
-                        <p>Automatically seed NPC profiles that are renamed via Realnames Extended. For example, if a guard were renamed to Fred [Whiterun Guard], his personality would be initially seeded with the "Whiterun Guard" template.</p>
-                        <input type="checkbox" id="realnames-support">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Event Settings Section -->
-            <div class="config-section">
-                <div class="section-header collapsed" onclick="toggleSection(this)">
-                    Event Settings
-                </div>
-                <div class="section-content collapsed">
-                    <!-- commands_to_purge -->
-                    <div class="option-group">
-                        <label class="option-label" for="commands-to-purge">Commands to Purge</label>
-                        <p>List of commands to disable.</p>
-                        <div id="commands-to-purge-container" class="dynamic-list-container"></div>
-                        <button class="add-list-item" onclick="addListItem('commands-to-purge-container')">Add Command to Purge</button>
-                    </div>
-
-                    <!-- events_to_ignore -->
-                    <div class="option-group">
-                        <label class="option-label" for="events-to-ignore">Events to Ignore</label>
-                        <p>List of game events to ignore. For example, ignoring rpg_lvlup events will prevent the LLM from commenting on the player leveling up.</p>
-                        <div id="events-to-ignore-container" class="dynamic-list-container"></div>
-                        <button class="add-list-item" onclick="addListItem('events-to-ignore-container')">Add Event to Ignore</button>
-                    </div>
-
-                    <!-- input_delay_for_radiance -->
-                    <div class="option-group slider">
-                        <label class="option-label" for="input-delay">Input Delay for Radiance (Seconds)</label>
-                        <p>Prevents radiant dialogue from triggering too quickly after player input, ensuring proper timing of responses.</p>
-                        <input type="range" id="input-delay" min="0" max="30" value="15">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Narrator Settings Section -->
-            <div class="config-section">
-                <div class="section-header collapsed" onclick="toggleSection(this)">
-                    Narrator Settings
-                </div>
-                <div class="section-content collapsed">
-                    <!-- PROMPT_HEAD_OVERRIDE -->
-                    <div class="option-group text-input">
-                        <label class="option-label" for="prompt-head-override">PROMPT_HEAD_OVERRIDE</label>
-                        <p>Set this to override the prompt head for all profiles. Do not include any player specific information in this prompt. Use the bio for that instead. You can override this for specific NPC's by beginning their prompt head with a #.</p>
-                        <input type="text" id="prompt-head-override">
-                    </div>
-
-                    <!-- use_narrator_profile -->
-                    <div class="option-group checkbox-group">
-                        <label class="option-label" for="use-narrator-profile">Use Narrator Profile</label>
-                        <p>Use an alternative profile for the narrator instead of the default one. The profile name is "Narrator", and will be created the first time you load the game.</p>
-                        <input type="checkbox" id="use-narrator-profile">
-                    </div>
-
-                    <!-- stop_narrator_context_leak -->
-                    <div class="option-group checkbox-group">
-                        <label class="option-label" for="stop-narrator-context-leak">Stop Narrator Context Leak</label>
-                        <p>Purge narrator dialogue from the context that is shared with nearby NPC's in order to avoid them commenting on narrator dialogue.</p>
-                        <input type="checkbox" id="stop-narrator-context-leak">
-                    </div>
-
-                    <!-- devious_narrator_eldritch_voice -->
-                    <div class="option-group text-input">
-                        <label class="option-label" for="eldritch-voice">Devious Narrator Eldritch Voice</label>
-                        <p>If the Eldritch Devious Narrator is active, override it's voice type with the specified id.</p>
-                        <input type="text" id="eldritch-voice">
-                    </div>
-
-                    <!-- devious_narrator_telvanni_voice -->
-                    <div class="option-group text-input">
-                        <label class="option-label" for="telvanni-voice">Devious Narrator Telvanni Voice</label>
-                        <p>If the Telvanni Devious Narrator is active, override it's voice type with the specified id.</p>
-                        <input type="text" id="telvanni-voice">
-                    </div>
-
-                    <!-- self_narrator_toggle -->
-                    <div class="option-group checkbox-group">
-                        <label class="option-label" for="self-narrator">Use Self Narrator</label>
-                        <p>Add support for the Narrator roleplaying as the character thinking to themself. NOTE: This still requires customization of the narrator's personality to make them RP appropriately.</p>
-                        <input type="checkbox" id="self-narrator">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Voice Settings Section -->
-            <div class="config-section">
-                <div class="section-header collapsed" onclick="toggleSection(this)">
-                    Voice Settings
-                </div>
-                <div class="section-content collapsed">
-                    <!-- force_voice_type -->
-                    <div class="option-group checkbox-group">
-                        <label class="option-label" for="force-voice-type">Force Voice Type</label>
-                        <p>Force the voice type to use the actor's base voice type (e.g., "maleguard") instead of a specific one (e.g., "whiterun_guard"). Useful for compatibility with Mantella's XTTS configuration. You can still manually set the voice type for a specific actor by prefixing their voiceid with a #. For example, if you wanted Lydia to have a whiterun guard voice, you could set her voicetype to #maleguard.</p>
-                        <input type="checkbox" id="force-voice-type">
-                    </div>
-
-                    <!-- xtts_server_override -->
-                    <div class="option-group text-input" style="display: none;">
-                        <label class="option-label" for="xtts-server-override">XTTS Server Override</label>
-                        <p>Set this to force the XTTS server to be the same for all profiles.</p>
-                        <input type="text" id="xtts-server-override">
-                    </div>
-
-                    <!-- VoiceType Fallbacks -->
-                    <div class="option-group">
-                        <label class="option-label" for="voicetype-fallbacks">VoiceType Fallbacks</label>
-                        <p>Provide default voices for specific gender and race combinations if the XTTS server does not have a valid voice type: genderRace = voiceid.</p>
-                        <div id="voicetype-container" class="voicetype-container"></div>
-                        <button class="add-voicetype" onclick="addVoiceTypeEntry()">Add VoiceType Fallback</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Action Prompts Section -->
-            <div class="config-section">
-                <div class="section-header collapsed" onclick="toggleSection(this)">
-                    Action Prompts
-                </div>
-                <div class="section-content collapsed">
-                    <div class="info-section">
-                        <p>Customize the prompts used to instruct the LLM on how to use actions in different situations. Available variables:</p>
-                        <ul>
-                            <li>#target# - The name of the target actor</li>
-                            <li>#player_name# - The player's name</li>
-                            <li>#herika_name# - The name of the NPC that's going to respond to the prompt</li>
-                        </ul>
-                        <details>
-                            <summary>Pronoun Variables</summary>
-                            <ul>
-                                <li><strong>Target pronouns:</strong> #target_subject# (he/she/they), #target_object# (him/her/them), #target_possessive# (his/her/their)</li>
-                                <li><strong>Player pronouns:</strong> #player_subject#, #player_object#, #player_possessive#</li>
-                                <li><strong>Herika pronouns:</strong> #herika_subject#, #herika_object#, #herika_possessive#</li>
-                            </ul>
-                        </details>
-                    </div>
-                    
-                    <!-- Singing Prompt -->
-                    <div class="option-group">
-                        <label class="option-label" for="singing-prompt">Singing Prompt</label>
-                        <textarea id="singing-prompt" class="prompt-textarea" rows="3"></textarea>
-                    </div>
-
-                    <!-- Self Narrator (Explicit) -->
-                    <div class="option-group">
-                        <label class="option-label" for="self-narrator-explicit">Self Narrator (Explicit Scene)</label>
-                        <textarea id="self-narrator-explicit" class="prompt-textarea" rows="4"></textarea>
-                    </div>
-
-                    <!-- Self Narrator (Normal) -->
-                    <div class="option-group">
-                        <label class="option-label" for="self-narrator-normal">Self Narrator (Normal Scene)</label>
-                        <textarea id="self-narrator-normal" class="prompt-textarea" rows="4"></textarea>
-                    </div>
-
-                    <!-- Explicit Scene -->
-                    <div class="option-group">
-                        <label class="option-label" for="explicit-scene">Explicit Dialogue</label>
-                        <textarea id="explicit-scene" class="prompt-textarea" rows="4"></textarea>
-                    </div>
-
-                    <!-- Normal Scene -->
-                    <div class="option-group">
-                        <label class="option-label" for="normal-scene">Normal Dialogue</label>
-                        <textarea id="normal-scene" class="prompt-textarea" rows="4"></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Roleplay Translation Settings Section -->
-            <div class="config-section">
-                <div class="section-header collapsed" onclick="toggleSection(this)">
-                    Roleplay Translation Settings
-                </div>
-                <div class="section-content collapsed">
-                    <!-- System Prompts -->
-                    <div class="option-group">
-                        <!-- Context Messages -->
-                        <label class="option-label" for="context-messages">Context Messages</label>
-                        <p>Number of recent messages to include for context</p>
-                        <input type="number" id="context-messages" min="1" max="100">
-
-                        <div class="info-section">
-                            <p>Available variables for all prompts and requests:</p>
-                            <details>
-                                <summary>Character Information</summary>
-                                <ul>
-                                    <li><strong>#player_name#</strong> - The player's name</li>
-                                    <li><strong>#player_bios#</strong> - The player's character background</li>
-                                    <li><strong>#herika_dynamic#</strong> - Current state and recent experiences</li>
-                                </ul>
-                            </details>
-                            <details>
-                                <summary>Context Information</summary>
-                                <ul>
-                                    <li><strong>#original_input#</strong> - The player's input text</li>
-                                    <li><strong>#nearby_actors#</strong> - List of NPCs in the area</li>
-                                    <li><strong>#nearby_locations#</strong> - List of accessible locations</li>
-                                    <li><strong>#recent_events#</strong> - Recent conversation history</li>
-                                </ul>
-                            </details>
-                            <details>
-                                <summary>Pronouns</summary>
-                                <ul>
-                                    <li><strong>#player_subject#</strong> - he/she/they</li>
-                                    <li><strong>#player_object#</strong> - him/her/them</li>
-                                    <li><strong>#player_possessive#</strong> - his/her/their</li>
-                                </ul>
-                            </details>
-                            <details>
-                                <summary>Special</summary>
-                                <ul>
-                                    <li><strong>#instructions#</strong> - The current mode's instructions (translation or roleplay)</li>
-                                </ul>
-                            </details>
+            <div class="config-grid">
+                <div class="config-column">
+                    <!-- LLM Settings Section -->
+                    <div class="config-section">
+                        <div class="section-header collapsed" onclick="toggleSection(this)">
+                            LLM Settings
                         </div>
+                        <div class="section-content collapsed">
+                            <!-- enforce_short_responses -->
+                            <div class="option-group checkbox-group">
+                                <label class="option-label" for="enforce-short-responses">Enforce Short Responses</label>
+                                <p>Attempt to enforce short 2-3 sentence responses from the LLM. This is "best effort", and does not always work.</p>
+                                <input type="checkbox" id="enforce-short-responses">
+                            </div>
 
-                        <label class="option-label" for="system-prompt">Translation System Prompt</label>
-                        <textarea id="system-prompt" class="prompt-textarea" rows="4"></textarea>
+                            <!-- use_llm_fallback -->
+                            <div class="option-group checkbox-group">
+                                <label class="option-label" for="use-llm-fallback">Use LLM Fallback</label>
+                                <p>Enable fallback to alternative LLM configuration when primary LLM call fails. 
+                                    This can help recover from errors and censorship, but will result in increased token cost and response time 
+                                    when a retry is performed. Response time hit is fairly minimal, but the full token cost of both requests 
+                                    will be charged. The connector settings for the "LLMFallback" profile will be used (This will be created if it doesn't exist when you boot the game),
+                                    and it will only work with openrouterjson.</p>
+                                <input type="checkbox" id="use-llm-fallback">
+                            </div>
 
-                        <label class="option-label" for="roleplay-system-prompt">Roleplay System Prompt</label>
-                        <textarea id="roleplay-system-prompt" class="prompt-textarea" rows="4"></textarea>
-                    </div>
+                            <!-- strip_emotes_from_output -->
+                            <div class="option-group checkbox-group">
+                                <label class="option-label" for="strip-emotes">Strip emotes from output</label>
+                                <p>Remove anything between two astericks from the response. Useful if your LLM likes to respond with things like *smirking*, *laughing*, etc.</p>
+                                <input type="checkbox" id="strip-emotes">
+                            </div>
 
-                    <!-- Request Formats -->
-                    <div class="option-group">
-                        <label class="option-label" for="translation-request">Translation Request Format</label>
-                        <textarea id="translation-request" class="prompt-textarea" rows="3"></textarea>
-
-                        <label class="option-label" for="roleplay-request">Roleplay Request Format</label>
-                        <textarea id="roleplay-request" class="prompt-textarea" rows="3"></textarea>
-                    </div>
-
-                    <!-- Section Configuration -->
-                    <div class="option-group">
-                        <label class="option-label">Prompt Sections</label>
-                        <div class="info-section">
-                            <p>Tips:</p>
-                            <ul>
-                                <li>Use sections to organize different types of context for the LLM</li>
-                                <li>Disable sections you don't need to reduce token usage</li>
-                                <li>Keep instructions clear and concise</li>
-                            </ul>
-                            <details>
-                                <summary>How Section Order Affects Responses</summary>
-                                <p>Sections are sent to the LLM in the order shown, with two newlines between each section. The order matters because:</p>
-                                <ul>
-                                    <li>LLMs tend to weigh earlier information more heavily in their responses</li>
-                                    <li>The default order (Background → Nearby → Recent → Instructions) provides context from general to specific</li>
-                                    <li>Putting CHARACTER_BACKGROUND first helps maintain consistent character personality</li>
-                                    <li>Putting INSTRUCTIONS last ensures they apply to all the previous context</li>
-                                    <li>RECENT_EVENTS placement affects how much the response focuses on immediate vs background context</li>
-                                </ul>
-                                <p>Drag sections using ⋮⋮ to experiment with different orderings and see how they affect your character's responses.</p>
-                            </details>
+                            <!-- enforce_single_json -->
+                            <div class="option-group checkbox-group">
+                                <label class="option-label" for="enforce-single-json">Enforce Single JSON Response</label>
+                                <p>Forces the LLM to provide only one single JSON response object per interaction. This helps prevent multiple action attempts in a single response.</p>
+                                <input type="checkbox" id="enforce-single-json">
+                            </div>
                         </div>
-                        <div id="section-config">
-                            <!-- Dynamically populated sections -->
+                    </div>
+
+                    <!-- Gameplay Features Section -->
+                    <div class="config-section">
+                        <div class="section-header collapsed" onclick="toggleSection(this)">
+                            Gameplay Features
+                        </div>
+                        <div class="section-content collapsed">
+                            <!-- disable_nsfw -->
+                            <div class="option-group checkbox-group">
+                                <label class="option-label" for="disable-nsfw">Disable NSFW</label>
+                                <p>Globally disable all NSFW features.</p>
+                                <input type="checkbox" id="disable-nsfw">
+                            </div>
+
+                            <!-- restrict_nonfollower_functions -->
+                            <div class="option-group checkbox-group">
+                                <label class="option-label" for="restrict-nonfollower-functions">Restrict Non-Follower Functions</label>
+                                <p>Restrict actions that only make sense for followers to followers.</p>
+                                <input type="checkbox" id="restrict-nonfollower-functions">
+                            </div>
+
+                            <!-- always_enable_functions -->
+                            <div class="option-group checkbox-group">
+                                <label class="option-label" for="always-enable-functions">Always Enable Functions</label>
+                                <p>Enable functions during things like rechat. Disabled for the narrator to avoid crashes (CTD).</p>
+                                <input type="checkbox" id="always-enable-functions">
+                            </div>
+
+                            <!-- force_aiff_name_to_ingame_name -->
+                            <div class="option-group checkbox-group">
+                                <label class="option-label" for="force-aiff-name">Force CHIM Name to Match In-Game Name</label>
+                                <p>Force the configured name in CHIM to match the in-game name.</p>
+                                <input type="checkbox" id="force-aiff-name">
+                            </div>
+
+                            <!-- disable_worn_equipment -->
+                            <div class="option-group checkbox-group">
+                                <label class="option-label" for="disable-worn-equipment">Disable Worn Equipment</label>
+                                <p>Disable the worn equipment system, which customizes the description of items that actors are wearing.</p>
+                                <input type="checkbox" id="disable-worn-equipment">
+                            </div>
+
+                            <!-- use_defeat -->
+                            <div class="option-group checkbox-group">
+                                <label class="option-label" for="use-defeat">Add Support for Defeat mods</label>
+                                <p>If using a supported defeat mod, the LLM will differentiate between victory and defeat in combat.</p>
+                                <input type="checkbox" id="use-defeat">
+                            </div>
+
+                            <!-- realnames_support -->
+                            <div class="option-group checkbox-group">
+                                <label class="option-label" for="realnames-support">Add Support for Realnames Extended</label>
+                                <p>Automatically seed NPC profiles that are renamed via Realnames Extended. For example, if a guard were renamed to Fred [Whiterun Guard], his personality would be initially seeded with the "Whiterun Guard" template.</p>
+                                <input type="checkbox" id="realnames-support">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Event Settings Section -->
+                    <div class="config-section">
+                        <div class="section-header collapsed" onclick="toggleSection(this)">
+                            Event Settings
+                        </div>
+                        <div class="section-content collapsed">
+                            <!-- commands_to_purge -->
+                            <div class="option-group">
+                                <label class="option-label" for="commands-to-purge">Commands to Purge</label>
+                                <p>List of commands to disable.</p>
+                                <div id="commands-to-purge-container" class="dynamic-list-container"></div>
+                                <button class="add-list-item" onclick="addListItem('commands-to-purge-container')">Add Command to Purge</button>
+                            </div>
+
+                            <!-- events_to_ignore -->
+                            <div class="option-group">
+                                <label class="option-label" for="events-to-ignore">Events to Ignore</label>
+                                <p>List of game events to ignore. For example, ignoring rpg_lvlup events will prevent the LLM from commenting on the player leveling up.</p>
+                                <div id="events-to-ignore-container" class="dynamic-list-container"></div>
+                                <button class="add-list-item" onclick="addListItem('events-to-ignore-container')">Add Event to Ignore</button>
+                            </div>
+
+                            <!-- input_delay_for_radiance -->
+                            <div class="option-group slider">
+                                <label class="option-label" for="input-delay">Input Delay for Radiance (Seconds)</label>
+                                <p>Prevents radiant dialogue from triggering too quickly after player input, ensuring proper timing of responses.</p>
+                                <input type="range" id="input-delay" min="0" max="30" value="15">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-column">
+                    <!-- Narrator Settings Section -->
+                    <div class="config-section">
+                        <div class="section-header collapsed" onclick="toggleSection(this)">
+                            Narrator Settings
+                        </div>
+                        <div class="section-content collapsed">
+                            <!-- PROMPT_HEAD_OVERRIDE -->
+                            <div class="option-group text-input">
+                                <label class="option-label" for="prompt-head-override">PROMPT_HEAD_OVERRIDE</label>
+                                <p>Set this to override the prompt head for all profiles. Do not include any player specific information in this prompt. Use the bio for that instead. You can override this for specific NPC's by beginning their prompt head with a #.</p>
+                                <input type="text" id="prompt-head-override">
+                            </div>
+
+                            <!-- use_narrator_profile -->
+                            <div class="option-group checkbox-group">
+                                <label class="option-label" for="use-narrator-profile">Use Narrator Profile</label>
+                                <p>Use an alternative profile for the narrator instead of the default one. The profile name is "Narrator", and will be created the first time you load the game.</p>
+                                <input type="checkbox" id="use-narrator-profile">
+                            </div>
+
+                            <!-- stop_narrator_context_leak -->
+                            <div class="option-group checkbox-group">
+                                <label class="option-label" for="stop-narrator-context-leak">Stop Narrator Context Leak</label>
+                                <p>Purge narrator dialogue from the context that is shared with nearby NPC's in order to avoid them commenting on narrator dialogue.</p>
+                                <input type="checkbox" id="stop-narrator-context-leak">
+                            </div>
+
+                            <!-- devious_narrator_eldritch_voice -->
+                            <div class="option-group text-input">
+                                <label class="option-label" for="eldritch-voice">Devious Narrator Eldritch Voice</label>
+                                <p>If the Eldritch Devious Narrator is active, override it's voice type with the specified id.</p>
+                                <input type="text" id="eldritch-voice">
+                            </div>
+
+                            <!-- devious_narrator_telvanni_voice -->
+                            <div class="option-group text-input">
+                                <label class="option-label" for="telvanni-voice">Devious Narrator Telvanni Voice</label>
+                                <p>If the Telvanni Devious Narrator is active, override it's voice type with the specified id.</p>
+                                <input type="text" id="telvanni-voice">
+                            </div>
+
+                            <!-- self_narrator_toggle -->
+                            <div class="option-group checkbox-group">
+                                <label class="option-label" for="self-narrator">Use Self Narrator</label>
+                                <p>Add support for the Narrator roleplaying as the character thinking to themself. NOTE: This still requires customization of the narrator's personality to make them RP appropriately.</p>
+                                <input type="checkbox" id="self-narrator">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Voice Settings Section -->
+                    <div class="config-section">
+                        <div class="section-header collapsed" onclick="toggleSection(this)">
+                            Voice Settings
+                        </div>
+                        <div class="section-content collapsed">
+                            <!-- force_voice_type -->
+                            <div class="option-group checkbox-group">
+                                <label class="option-label" for="force-voice-type">Force Voice Type</label>
+                                <p>Force the voice type to use the actor's base voice type (e.g., "maleguard") instead of a specific one (e.g., "whiterun_guard"). Useful for compatibility with Mantella's XTTS configuration. You can still manually set the voice type for a specific actor by prefixing their voiceid with a #. For example, if you wanted Lydia to have a whiterun guard voice, you could set her voicetype to #maleguard.</p>
+                                <input type="checkbox" id="force-voice-type">
+                            </div>
+
+                            <!-- xtts_server_override -->
+                            <div class="option-group text-input" style="display: none;">
+                                <label class="option-label" for="xtts-server-override">XTTS Server Override</label>
+                                <p>Set this to force the XTTS server to be the same for all profiles.</p>
+                                <input type="text" id="xtts-server-override">
+                            </div>
+
+                            <!-- VoiceType Fallbacks -->
+                            <div class="option-group">
+                                <label class="option-label" for="voicetype-fallbacks">VoiceType Fallbacks</label>
+                                <p>Provide default voices for specific gender and race combinations if the XTTS server does not have a valid voice type: genderRace = voiceid.</p>
+                                <div id="voicetype-container" class="voicetype-container"></div>
+                                <button class="add-voicetype" onclick="addVoiceTypeEntry()">Add VoiceType Fallback</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Prompts Section -->
+                    <div class="config-section">
+                        <div class="section-header collapsed" onclick="toggleSection(this)">
+                            Action Prompts
+                        </div>
+                        <div class="section-content collapsed">
+                            <div class="info-section">
+                                <p>Customize the prompts used to instruct the LLM on how to use actions in different situations. Available variables:</p>
+                                <ul>
+                                    <li>#target# - The name of the target actor</li>
+                                    <li>#player_name# - The player's name</li>
+                                    <li>#herika_name# - The name of the NPC that's going to respond to the prompt</li>
+                                </ul>
+                                <details>
+                                    <summary>Pronoun Variables</summary>
+                                    <ul>
+                                        <li><strong>Target pronouns:</strong> #target_subject# (he/she/they), #target_object# (him/her/them), #target_possessive# (his/her/their)</li>
+                                        <li><strong>Player pronouns:</strong> #player_subject#, #player_object#, #player_possessive#</li>
+                                        <li><strong>Herika pronouns:</strong> #herika_subject#, #herika_object#, #herika_possessive#</li>
+                                    </ul>
+                                </details>
+                            </div>
+                            
+                            <!-- Singing Prompt -->
+                            <div class="option-group">
+                                <label class="option-label" for="singing-prompt">Singing Prompt</label>
+                                <textarea id="singing-prompt" class="prompt-textarea" rows="3"></textarea>
+                            </div>
+
+                            <!-- Self Narrator (Explicit) -->
+                            <div class="option-group">
+                                <label class="option-label" for="self-narrator-explicit">Self Narrator (Explicit Scene)</label>
+                                <textarea id="self-narrator-explicit" class="prompt-textarea" rows="4"></textarea>
+                            </div>
+
+                            <!-- Self Narrator (Normal) -->
+                            <div class="option-group">
+                                <label class="option-label" for="self-narrator-normal">Self Narrator (Normal Scene)</label>
+                                <textarea id="self-narrator-normal" class="prompt-textarea" rows="4"></textarea>
+                            </div>
+
+                            <!-- Explicit Scene -->
+                            <div class="option-group">
+                                <label class="option-label" for="explicit-scene">Explicit Dialogue</label>
+                                <textarea id="explicit-scene" class="prompt-textarea" rows="4"></textarea>
+                            </div>
+
+                            <!-- Normal Scene -->
+                            <div class="option-group">
+                                <label class="option-label" for="normal-scene">Normal Dialogue</label>
+                                <textarea id="normal-scene" class="prompt-textarea" rows="4"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Full width sections -->
+            <div class="config-grid">
+                <div class="config-section full-width">
+                    <!-- Roleplay Translation Settings Section -->
+                    <div class="config-section">
+                        <div class="section-header collapsed" onclick="toggleSection(this)">
+                            Roleplay Translation Settings
+                        </div>
+                        <div class="section-content collapsed">
+                            <!-- System Prompts -->
+                            <div class="option-group">
+                                <!-- Context Messages -->
+                                <label class="option-label" for="context-messages">Context Messages</label>
+                                <p>Number of recent messages to include for context</p>
+                                <input type="number" id="context-messages" min="1" max="100">
+
+                                <div class="info-section">
+                                    <p>Available variables for all prompts and requests:</p>
+                                    <details>
+                                        <summary>Character Information</summary>
+                                        <ul>
+                                            <li><strong>#player_name#</strong> - The player's name</li>
+                                            <li><strong>#player_bios#</strong> - The player's character background</li>
+                                            <li><strong>#herika_dynamic#</strong> - Current state and recent experiences</li>
+                                        </ul>
+                                    </details>
+                                    <details>
+                                        <summary>Context Information</summary>
+                                        <ul>
+                                            <li><strong>#original_input#</strong> - The player's input text</li>
+                                            <li><strong>#nearby_actors#</strong> - List of NPCs in the area</li>
+                                            <li><strong>#nearby_locations#</strong> - List of accessible locations</li>
+                                            <li><strong>#recent_events#</strong> - Recent conversation history</li>
+                                        </ul>
+                                    </details>
+                                    <details>
+                                        <summary>Pronouns</summary>
+                                        <ul>
+                                            <li><strong>#player_subject#</strong> - he/she/they</li>
+                                            <li><strong>#player_object#</strong> - him/her/them</li>
+                                            <li><strong>#player_possessive#</strong> - his/her/their</li>
+                                        </ul>
+                                    </details>
+                                    <details>
+                                        <summary>Special</summary>
+                                        <ul>
+                                            <li><strong>#instructions#</strong> - The current mode's instructions (translation or roleplay)</li>
+                                        </ul>
+                                    </details>
+                                </div>
+
+                                <label class="option-label" for="system-prompt">Translation System Prompt</label>
+                                <textarea id="system-prompt" class="prompt-textarea" rows="4"></textarea>
+
+                                <label class="option-label" for="roleplay-system-prompt">Roleplay System Prompt</label>
+                                <textarea id="roleplay-system-prompt" class="prompt-textarea" rows="4"></textarea>
+                            </div>
+
+                            <!-- Request Formats -->
+                            <div class="option-group">
+                                <label class="option-label" for="translation-request">Translation Request Format</label>
+                                <textarea id="translation-request" class="prompt-textarea" rows="3"></textarea>
+
+                                <label class="option-label" for="roleplay-request">Roleplay Request Format</label>
+                                <textarea id="roleplay-request" class="prompt-textarea" rows="3"></textarea>
+                            </div>
+
+                            <!-- Section Configuration -->
+                            <div class="option-group">
+                                <label class="option-label">Prompt Sections</label>
+                                <div class="info-section">
+                                    <p>Tips:</p>
+                                    <ul>
+                                        <li>Use sections to organize different types of context for the LLM</li>
+                                        <li>Disable sections you don't need to reduce token usage</li>
+                                        <li>Keep instructions clear and concise</li>
+                                    </ul>
+                                    <details>
+                                        <summary>How Section Order Affects Responses</summary>
+                                        <p>Sections are sent to the LLM in the order shown, with two newlines between each section. The order matters because:</p>
+                                        <ul>
+                                            <li>LLMs tend to weigh earlier information more heavily in their responses</li>
+                                            <li>The default order (Background → Nearby → Recent → Instructions) provides context from general to specific</li>
+                                            <li>Putting CHARACTER_BACKGROUND first helps maintain consistent character personality</li>
+                                            <li>Putting INSTRUCTIONS last ensures they apply to all the previous context</li>
+                                            <li>RECENT_EVENTS placement affects how much the response focuses on immediate vs background context</li>
+                                        </ul>
+                                        <p>Drag sections using ⋮⋮ to experiment with different orderings and see how they affect your character's responses.</p>
+                                    </details>
+                                </div>
+                                <div id="section-config">
+                                    <!-- Dynamically populated sections -->
+                                </div>
+                            </div>
+
+                            <!-- Preview Section -->
+                            <div id="preview" class="option-group">
+                                <div class="section-header collapsed" onclick="toggleSection(this)">
+                                    Context Preview
+                                </div>
+                                <div class="section-content collapsed">
+                                    <p class="option-description">This shows how the context variables will appear in the roleplay prompt.</p>
+                                    
+                                    <button onclick="refreshPreview()" class="refresh-button">
+                                        Refresh Preview
+                                    </button>
+                                    
+                                    <div class="preview-panel" id="preview-content">
+                                        Loading preview...
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -703,6 +962,11 @@
                 });
                 initializeSortableSections();
 
+                // After populating all the fields, remove the collapsed class
+                document.querySelectorAll('.section-header, .section-content').forEach(element => {
+                    element.classList.remove('collapsed');
+                });
+
                 document.getElementById('loading-message').style.display = 'none';
                 document.getElementById('config-form').style.display = 'block';
             } catch (error) {
@@ -773,13 +1037,29 @@
                     body: JSON.stringify(config),
                 });
 
+                const data = await response.json();
+                const errorDisplay = document.getElementById('error-display');
+                const errorDetails = document.getElementById('error-details');
+                const infoSection = document.getElementById('info-section');
+
                 if (response.ok) {
+                    errorDisplay.style.display = 'none';
+                    infoSection.style.display = 'none';
                     alert('Configuration saved successfully!');
                 } else {
-                    alert('Failed to save configuration.');
+                    errorDisplay.style.display = 'block';
+                    infoSection.style.display = 'block';
+                    errorDetails.textContent = `Error saving configuration:\n${data.message}\n\nServer details:\n${data.details || 'No additional details provided'}`;
+                    alert('Failed to save configuration. See error details above.');
                 }
             } catch (error) {
-                alert('Failed to submit configuration: ' + error);
+                const errorDisplay = document.getElementById('error-display');
+                const errorDetails = document.getElementById('error-details');
+                const infoSection = document.getElementById('info-section');
+                errorDisplay.style.display = 'block';
+                infoSection.style.display = 'block';
+                errorDetails.textContent = `Failed to submit configuration: ${error.message}`;
+                alert('Failed to submit configuration. See error details above.');
             }
         }
 
@@ -885,12 +1165,15 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const controlsDiv = document.createElement('div');
-            controlsDiv.style.marginBottom = '20px';
+            controlsDiv.className = 'control-buttons';
             controlsDiv.innerHTML = `
-                <button onclick="toggleAllSections(true)" class="add-list-item" style="margin-right: 10px">Expand All</button>
-                <button onclick="toggleAllSections(false)" class="add-list-item">Collapse All</button>
+                <button onclick="toggleAllSections(true)" class="control-button">Expand All</button>
+                <button onclick="toggleAllSections(false)" class="control-button">Collapse All</button>
             `;
             document.getElementById('config-form').insertBefore(controlsDiv, document.getElementById('config-form').firstChild);
+            
+            // Make everything expanded by default
+            toggleAllSections(true);
         });
 
         function initializeSortableSections() {
@@ -904,6 +1187,95 @@
                 }
             });
         }
+
+        async function refreshPreview() {
+            try {
+                const response = await fetch('api/preview.php');
+                const text = await response.text(); // Get raw response text
+                
+                try {
+                    const data = JSON.parse(text);
+                    
+                    // Build variables preview
+                    let variablesHtml = '<div class="preview-item"><div class="preview-label">Available Variables:</div>';
+                    if (data && data.variables) {
+                        for (const [key, value] of Object.entries(data.variables)) {
+                            const displayValue = value === null ? '(null)' : 
+                                               value === '' ? '(empty)' : 
+                                               value;
+                            variablesHtml += `
+                                <div class="variable-entry">
+                                    <code>#${key.toUpperCase()}#</code>: 
+                                    <div class="preview-content">${displayValue}</div>
+                                </div>`;
+                        }
+                    } else {
+                        variablesHtml += '<div class="error">No variables available</div>';
+                    }
+                    variablesHtml += '</div>';
+
+                    // Build sections preview
+                    let sectionsHtml = '<div class="preview-item"><div class="preview-label">Section Preview:</div>';
+                    if (data && data.sections && Object.keys(data.sections).length > 0) {
+                        for (const section of Object.values(data.sections)) {
+                            if (!section || !section.enabled) continue;
+                            const header = section.header || 'Unnamed Section';
+                            const content = section.content || '(empty section)';
+                            sectionsHtml += `
+                                <div class="section-preview">
+                                    <h3>${header}</h3>
+                                    <div class="preview-content">${content}</div>
+                                </div>`;
+                        }
+                    } else {
+                        sectionsHtml += '<div class="error">No sections found in preview data</div>';
+                    }
+                    sectionsHtml += '</div>';
+                    
+                    // After the sections preview...
+                    let promptsHtml = '<div class="preview-item"><div class="preview-label">Prompt Preview:</div>';
+                    if (data && data.prompts) {
+                        promptsHtml += `
+                            <div class="section-preview">
+                                <h3>System Prompt</h3>
+                                <div class="preview-content">${data.prompts.system_prompt}</div>
+                            </div>
+                            <div class="section-preview">
+                                <h3>Roleplay System Prompt</h3>
+                                <div class="preview-content">${data.prompts.roleplay_system_prompt}</div>
+                            </div>
+                            <div class="section-preview">
+                                <h3>Translation Request</h3>
+                                <div class="preview-content">${data.prompts.translation_request}</div>
+                            </div>
+                            <div class="section-preview">
+                                <h3>Roleplay Request</h3>
+                                <div class="preview-content">${data.prompts.roleplay_request}</div>
+                            </div>
+                        `;
+                    } else {
+                        promptsHtml += '<div class="error">No prompt data available</div>';
+                    }
+                    promptsHtml += '</div>';
+                    
+                    document.getElementById('preview-content').innerHTML = 
+                        variablesHtml + sectionsHtml + promptsHtml;
+                } catch (parseError) {
+                    console.error('JSON Parse Error:', parseError);
+                    console.log('Raw response:', text);
+                    document.getElementById('preview-content').innerHTML = 
+                        `<div class="error">Failed to parse preview data. Check console for details.</div>
+                         <pre>${text.substring(0, 500)}...</pre>`;
+                }
+            } catch (error) {
+                console.error('Fetch Error:', error);
+                document.getElementById('preview-content').innerHTML = 
+                    `<div class="error">Failed to load preview. ${error.message}</div>`;
+            }
+        }
+
+        // Load preview on page load
+        document.addEventListener('DOMContentLoaded', refreshPreview);
     </script>
 
 </body>
