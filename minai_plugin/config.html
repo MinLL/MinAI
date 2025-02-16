@@ -504,7 +504,7 @@
                     </div>
 
                     <!-- xtts_server_override -->
-                    <div class="option-group text-input">
+                    <div class="option-group text-input" style="display: none;">
                         <label class="option-label" for="xtts-server-override">XTTS Server Override</label>
                         <p>Set this to force the XTTS server to be the same for all profiles.</p>
                         <input type="text" id="xtts-server-override">
@@ -583,6 +583,11 @@
                 <div class="section-content collapsed">
                     <!-- System Prompts -->
                     <div class="option-group">
+                        <!-- Context Messages -->
+                        <label class="option-label" for="context-messages">Context Messages</label>
+                        <p>Number of recent messages to include for context</p>
+                        <input type="number" id="context-messages" min="1" max="100">
+
                         <div class="info-section">
                             <p>Available variables for all prompts and requests:</p>
                             <details>
@@ -638,29 +643,24 @@
                     <div class="option-group">
                         <label class="option-label">Prompt Sections</label>
                         <div class="info-section">
-                            <p>Each section can use these variables:</p>
-                            <ul>
-                                <li><strong>#player_bios#</strong> - The player's character background (Pulled from the Narrator profile)</li>
-                                <li><strong>#herika_dynamic#</strong> - Herika's current state and recent experiences</li>
-                                <li><strong>#nearby_actors#</strong> - List of NPCs in the area</li>
-                                <li><strong>#nearby_locations#</strong> - List of accessible locations</li>
-                                <li><strong>#recent_events#</strong> - Recent conversation and events history</li>
-                                <li><strong>#original_input#</strong> - The player's input being translated</li>
-                                <li><strong>Pronouns:</strong>
-                                    <ul>
-                                        <li><strong>#player_subject#</strong> - he/she/they</li>
-                                        <li><strong>#player_object#</strong> - him/her/them</li>
-                                        <li><strong>#player_possessive#</strong> - his/her/their</li>
-                                    </ul>
-                                </li>
-                            </ul>
                             <p>Tips:</p>
                             <ul>
-                                <li>Use sections to organize the context for the LLM</li>
+                                <li>Use sections to organize different types of context for the LLM</li>
                                 <li>Disable sections you don't need to reduce token usage</li>
                                 <li>Keep instructions clear and concise</li>
-                                <li>Order sections from most to least important</li>
                             </ul>
+                            <details>
+                                <summary>How Section Order Affects Responses</summary>
+                                <p>Sections are sent to the LLM in the order shown, with two newlines between each section. The order matters because:</p>
+                                <ul>
+                                    <li>LLMs tend to weigh earlier information more heavily in their responses</li>
+                                    <li>The default order (Background → Nearby → Recent → Instructions) provides context from general to specific</li>
+                                    <li>Putting CHARACTER_BACKGROUND first helps maintain consistent character personality</li>
+                                    <li>Putting INSTRUCTIONS last ensures they apply to all the previous context</li>
+                                    <li>RECENT_EVENTS placement affects how much the response focuses on immediate vs background context</li>
+                                </ul>
+                                <p>Drag sections using ⋮⋮ to experiment with different orderings and see how they affect your character's responses.</p>
+                            </details>
                         </div>
                         <div id="section-config">
                             <!-- Dynamically populated sections -->
@@ -701,7 +701,6 @@
                 populateDynamicList('commands-to-purge-container', configData.commands_to_purge);
                 populateDynamicList('events-to-ignore-container', configData.events_to_ignore);
                 document.getElementById('disable-worn-equipment').checked = configData.disable_worn_equipment;
-                document.getElementById('xtts-server-override').value = configData.xtts_server_override;
                 document.getElementById('input-delay').value = configData.input_delay_for_radiance;
                 document.getElementById('strip-emotes').checked = configData.strip_emotes_from_output;
                 document.getElementById('use-defeat').checked = configData.use_defeat;
@@ -778,11 +777,10 @@
                 commands_to_purge: getDynamicList('commands-to-purge-container'),
                 events_to_ignore: getDynamicList('events-to-ignore-container'),
                 disable_worn_equipment: document.getElementById('disable-worn-equipment').checked,
-                xtts_server_override: document.getElementById('xtts-server-override').value,
+                input_delay_for_radiance: document.getElementById('input-delay').value,
                 strip_emotes_from_output: document.getElementById('strip-emotes').checked,
                 use_defeat: document.getElementById('use-defeat').checked,
                 realnames_support: document.getElementById('realnames-support').checked,
-                input_delay_for_radiance: document.getElementById('input-delay').value,
                 voicetype_fallbacks: getVoiceTypeFallbacks(),
                 action_prompts: {
                     singing: document.getElementById('singing-prompt').value,
