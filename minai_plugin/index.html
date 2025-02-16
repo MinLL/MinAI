@@ -9,8 +9,9 @@
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #1a1a1a;
             height: 100%;
+            color: #e0e0e0;
         }
 
         .container {
@@ -20,7 +21,7 @@
             align-items: center;
             height: 100vh;
             text-align: center;
-            background: linear-gradient(to bottom, #ffffff, #e0e0e0);
+            background: linear-gradient(to bottom, #2d2d2d, #1a1a1a);
         }
 
         .splash-image {
@@ -33,29 +34,29 @@
         h1 {
             font-size: 48px;
             margin-bottom: 20px;
-            color: #333;
+            color: #ffffff;
         }
 
         p {
             font-size: 18px;
-            color: #666;
+            color: #b0b0b0;
             margin-bottom: 40px;
         }
 
         .version-info {
             margin-bottom: 20px;
-            color: #666;
+            color: #b0b0b0;
             font-size: 16px;
         }
 
         .update-warning {
-            color: #FF5733;
+            color: #ff7f50;
             font-size: 18px;
             margin-bottom: 20px;
         }
 
         .development-info {
-            color: #2196F3;
+            color: #4dabf7;
             font-size: 16px;
             margin-bottom: 20px;
         }
@@ -72,7 +73,7 @@
             text-decoration: none;
             font-size: 20px;
             color: #ffffff;
-            background-color: #4CAF50;
+            background-color: #2d5a27;
             padding: 15px 30px;
             margin: 10px;
             border-radius: 5px;
@@ -80,7 +81,7 @@
         }
 
         .links a:hover, .update-button:hover {
-            background-color: #45a049;
+            background-color: #367c2b;
         }
 
         .update-buttons {
@@ -88,13 +89,13 @@
         }
 
         .error-message {
-            color: red;
+            color: #ff6b6b;
             font-size: 16px;
             margin-bottom: 20px;
         }
 	
 	.nsfw-mode {
-            color: purple;
+            color: #da77f2;
             font-size: 16px;
             margin-bottom: 20px;
         }
@@ -104,7 +105,105 @@
             bottom: 10px;
             width: 100%;
             text-align: center;
-            color: #777;
+            color: #888;
+        }
+
+        /* Update the update status styles */
+        .update-status {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            margin: 0;
+            padding: 20px;
+            background-color: #2d2d2d;
+            border-radius: 8px;
+            max-width: 800px;
+            width: 90%;
+            display: none;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            border: 1px solid #3d3d3d;
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+        }
+
+        /* Add overlay background */
+        .update-status::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+
+        .update-status h3 {
+            color: #4dabf7;
+            margin: 0 0 15px 0;
+            font-size: 1.4em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .update-status h3::before {
+            content: "\1F504"; /* 🔄 in Unicode */
+            font-family: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+        }
+
+        .update-status pre {
+            text-align: left;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: #b0b0b0;
+            margin: 0;
+            padding: 15px;
+            background-color: #1a1a1a;
+            border-radius: 6px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            border: 1px solid #3d3d3d;
+        }
+
+        /* Style for different message types with emoji */
+        .status-progress {
+            color: #4dabf7;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .status-success {
+            color: #40c057;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .status-error {
+            color: #ff6b6b;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        /* Scrollbar styling for the pre element */
+        .update-status pre::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .update-status pre::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 4px;
+        }
+
+        .update-status pre::-webkit-scrollbar-thumb {
+            background: #3d3d3d;
+            border-radius: 4px;
+        }
+
+        .update-status pre::-webkit-scrollbar-thumb:hover {
+            background: #4d4d4d;
         }
 
         @media (max-width: 768px) {
@@ -116,6 +215,34 @@
                 font-size: 18px;
                 padding: 12px 20px;
             }
+        }
+
+        /* Update emoji-related styles */
+        @font-face {
+            font-family: 'Noto Color Emoji';
+            src: url('https://cdn.jsdelivr.net/npm/noto-color-emoji@1.0.1/fonts/NotoColorEmoji.ttf') format('truetype');
+        }
+
+        .emoji {
+            font-family: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+            font-style: normal;
+            font-variant: normal;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .update-status h3::before {
+            content: "\1F504"; /* 🔄 in Unicode */
+            font-family: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+        }
+
+        /* Update the message type styles to include emoji font */
+        .status-progress, .status-success, .status-error {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .status-progress .emoji, .status-success .emoji, .status-error .emoji {
+            font-family: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
         }
     </style>
 </head>
@@ -173,6 +300,12 @@
         </div>
     </div>
 
+    <!-- Update the update status div -->
+    <div id="update-status" class="update-status">
+        <h3>Update Progress</h3>
+        <pre id="update-log"></pre>
+    </div>
+
     <footer>
         MinAI
     </footer>
@@ -215,25 +348,85 @@
 
         // Function to call the PHP API to update to the selected branch
         async function updateToLatestVersion(branch) {
-            try {
-                const response = await fetch(`api/update.php?branch=${branch}`, { method: 'POST' });
-                const result = await response.json();
-                const errorMessageDiv = document.getElementById('error-message');
+            const updateStatus = document.getElementById('update-status');
+            const updateLog = document.getElementById('update-log');
+            const errorMessageDiv = document.getElementById('error-message');
+            
+            updateStatus.style.display = 'block';
+            updateLog.textContent = '';  // Clear previous logs
+            errorMessageDiv.style.display = 'none';
 
-                if (response.ok && result.status === 'success') {
-                    alert(`Updated to the latest version on the ${branch} branch! Please refresh the page.`);
-                } else {
-                    const errorDetails = result.message || 'Unknown error';
-                    errorMessageDiv.textContent = `Error updating to the latest ${branch} branch: ${errorDetails}`;
-                    if (result.output) {
-                        errorMessageDiv.textContent += `\nDetails: ${result.output.join('\n')}`;
+            function appendMessage(status, message) {
+                const timestamp = new Date().toLocaleTimeString();
+                const statusClass = `status-${status}`;
+                let icon = '';
+                
+                // Add status-specific icons using Unicode
+                switch(status) {
+                    case 'progress':
+                        icon = '<span class="emoji">📋</span> '; // U+1F4CB
+                        break;
+                    case 'success':
+                        icon = '<span class="emoji">✅</span> '; // U+2705
+                        break;
+                    case 'error':
+                        icon = '<span class="emoji">❌</span> '; // U+274C
+                        break;
+                }
+                
+                const messageHtml = `[${timestamp}] <span class="${statusClass}">${icon}${message}</span>\n`;
+                updateLog.innerHTML += messageHtml;
+                updateLog.scrollTop = updateLog.scrollHeight;
+            }
+
+            try {
+                const response = await fetch(`api/update.php?branch=${branch}`, { 
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'text/event-stream'
                     }
-                    errorMessageDiv.style.display = 'block';
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+
+                while (true) {
+                    const {value, done} = await reader.read();
+                    if (done) break;
+                    
+                    buffer += decoder.decode(value, {stream: true});
+                    
+                    // Split buffer by newlines and process each complete message
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || ''; // Keep the last incomplete line in buffer
+                    
+                    for (const line of lines) {
+                        if (line.trim()) {
+                            try {
+                                const result = JSON.parse(line);
+                                appendMessage(result.status, result.message);
+                                
+                                if (result.status === 'success') {
+                                    setTimeout(() => {
+                                        alert('Update completed! Please refresh the page.');
+                                    }, 1000);
+                                }
+                            } catch (e) {
+                                console.error('Error parsing line:', line, e);
+                                appendMessage('error', `Failed to parse update message: ${line}`);
+                            }
+                        }
+                    }
                 }
             } catch (error) {
-                const errorMessageDiv = document.getElementById('error-message');
                 errorMessageDiv.textContent = `Error updating to the latest version: ${error.message}`;
                 errorMessageDiv.style.display = 'block';
+                appendMessage('error', `Error: ${error.message}`);
                 console.error('Error updating to the latest version:', error);
             }
         }
