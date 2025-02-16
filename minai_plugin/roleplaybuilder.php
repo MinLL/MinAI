@@ -82,7 +82,7 @@ function interceptRoleplayInput() {
         }
         
         SetEnabled($GLOBALS["PLAYER_NAME"], "isRoleplaying", false);
-        
+        $settings = $GLOBALS['roleplay_settings'];
         // Get the original input and strip the player name prefix if it exists
         $originalInput = $GLOBALS["gameRequest"][3];
         
@@ -113,7 +113,6 @@ function interceptRoleplayInput() {
         
         // Build messages array using config settings
         $messages = [];
-        $settings = $GLOBALS['roleplay_settings'];
         
         // Get player pronouns
         $playerPronouns = GetActorPronouns($PLAYER_NAME);
@@ -181,8 +180,8 @@ function interceptRoleplayInput() {
 
         // Build the messages array with proper spacing
         $messages = [
-            ['role' => 'system', 'content' => $systemPrompt . "\n\n"],
-            ['role' => 'system', 'content' => $contextMessage],
+            ['role' => 'system', 'content' => replaceVariables($systemPrompt, $variableReplacements) . "\n\n"],
+            ['role' => 'system', 'content' => replaceVariables($contextMessage, $variableReplacements)],
             ['role' => 'user', 'content' => "\n" . replaceVariables(
                 $GLOBALS["gameRequest"][0] == "minai_roleplay" 
                     ? $settings['roleplay_request']
@@ -190,6 +189,9 @@ function interceptRoleplayInput() {
                 $variableReplacements
             )]
         ];
+
+        // Debug log the messages being sent to LLM
+        error_log("minai: Messages being sent to LLM: " . json_encode($messages, JSON_PRETTY_PRINT));
 
         // Call LLM with specific parameters for dialogue generation
         $response = callLLM($messages, $CONNECTOR["openrouter"]["model"], [
