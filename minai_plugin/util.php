@@ -879,10 +879,34 @@ function GetActorPronouns($name) {
  */
 function callLLM($messages, $model = null, $options = []) {
     try {
+        // Combine consecutive system messages to reduce token usage
+        $optimizedMessages = [];
+        $currentSystemContent = '';
+        
+        foreach ($messages as $message) {
+            if ($message['role'] === 'system') {
+                if ($currentSystemContent) {
+                    $currentSystemContent .= "\n\n" . $message['content'];
+                } else {
+                    $currentSystemContent = $message['content'];
+                }
+            } else {
+                if ($currentSystemContent) {
+                    $optimizedMessages[] = ['role' => 'system', 'content' => $currentSystemContent];
+                    $currentSystemContent = '';
+                }
+                $optimizedMessages[] = $message;
+            }
+        }
+        
+        if ($currentSystemContent) {
+            $optimizedMessages[] = ['role' => 'system', 'content' => $currentSystemContent];
+        }
+
         // Log the prompt
         $timestamp = date('Y-m-d\TH:i:sP');
         $promptLog = $timestamp . "\n";
-        foreach ($messages as $message) {
+        foreach ($optimizedMessages as $message) {
             $promptLog .= "Role: " . $message['role'] . "\nContent: " . $message['content'] . "\n";
         }
         $promptLog .= "\n";
@@ -919,7 +943,7 @@ function callLLM($messages, $model = null, $options = []) {
         // Prepare request data
         $data = array_merge([
             'model' => $model,
-            'messages' => $messages,
+            'messages' => $optimizedMessages,
             'max_tokens' => $GLOBALS['CONNECTOR']['openrouter']['max_tokens'],
             'temperature' => $GLOBALS['CONNECTOR']['openrouter']['temperature'],
             'stream' => false
@@ -977,4 +1001,39 @@ function callLLM($messages, $model = null, $options = []) {
 
 function isPlayerInput() {
     return  in_array($GLOBALS["gameRequest"][0],["inputtext","inputtext_s","ginputtext","ginputtext_s","instruction","init"]);
+}
+
+
+
+
+Function GetNarratorConfigPath() {
+    // If use symlink, php code is actually in repo folder but included in wsl php server
+    // with just dirname((__FILE__)) it was getting directory of repo not php server 
+    $path = getcwd().DIRECTORY_SEPARATOR;
+    $newConfFile=md5("Narrator");
+    return $path . "conf".DIRECTORY_SEPARATOR."conf_$newConfFile.php";
+}
+
+Function GetFallbackConfigPath() {
+    $path = getcwd().DIRECTORY_SEPARATOR;
+    $newConfFile=md5("LLMFallback");
+    return $path . "conf".DIRECTORY_SEPARATOR."conf_$newConfFile.php";
+}
+
+Function CreateFallbackConfig() {
+    if (!file_exists(GetFallbackConfigPath())) {
+        error_log("minai: Initializing LLM Fallback Profile");
+        createProfile("LLMFallback", [
+            "HERIKA_NAME" => "LLMFallback",
+            "HERIKA_PERS" => "This is a LLM profile used for retrying when the primary LLM call fails. Only the connector settings will be used, and it will only work with openrouterjson."
+        ], true);
+    }
+}
+
+Function SetLLMFallbackProfile() {
+    CreateFallbackConfig();
+    $path = GetFallbackConfigPath();
+    global $CONNECTOR;
+    global $CONNECTORS;
+    require_once($path);
 }
