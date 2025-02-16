@@ -23,6 +23,17 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
 ### Action Registry (CHIM)
 * All commands can be enabled or disabled in the MCM.
 * All commands can be configured with cooldowns, with exponential backoff parameters. Effectively, this means that you can set a cooldown on a command, and have the cooldown increase every time that command is used, until enough time passes for the cooldown to reset back to base values.
+
+### Roleplay Assistant
+* This system can optionally preprocess player messages to better match their character's roleplay style
+* Can transform casual modern speech into lore-appropriate Skyrim dialogue that will automatically adapt to the character's personality, roleplay, and the situation.
+* Allows players to prompt their character to respond to situations without explicit direction
+* Uses the summary connector from either the narrator profile (if enabled) or the default profile
+* Examples of transformations:
+  * "Min: What the fuck?" → "Min: By the Nine, what in Oblivion is this?!"
+  * "Min: I'm really tired" → "Min: These weary bones could use some rest at an inn..."
+  * "Min: That's awesome!" → "Min: By Ysmir, that's incredible!"
+
 ### Sapience
 * This mod exposes an option allowing you to dynamically enable / disable AI for all actors near the player. This generally means that you can just walk up to any NPC in the world, and start interacting with them seamlessly. This also implements radiant dialogue (Similar to the mantella feature), except more powerful / less buggy.
 ### CHIM-Specific Configuration Options:
