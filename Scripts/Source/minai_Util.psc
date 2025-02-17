@@ -4,6 +4,11 @@ Actor Property PlayerRef auto
 GlobalVariable property logLevel Auto
 minai_Config Property config Auto
 
+Function Maintenance()
+  config = Game.GetFormFromFile(0x0912, "MinAI.esp") as minai_Config
+EndFunction
+
+
 string Function GetActorName(actor akActor)
   if akActor == playerRef
     return akActor.GetActorBase().GetName()

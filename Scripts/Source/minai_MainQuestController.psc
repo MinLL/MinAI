@@ -84,6 +84,7 @@ Function Maintenance()
   sapience = Game.GetFormFromFile(0x091D, "MinAI.esp") as minai_SapienceController
   reputation = (Self as Quest) as minai_Reputation
   MinaiUtil = (Self as Quest) as minai_Util
+  MinaiUtil.Maintenance()
   dirtAndBlood = (Self as Quest) as minai_DirtAndBlood
   minai_ToggleSapienceSpell = Game.GetFormFromFile(0x0E93, "MinAI.esp") as Spell
   if (!followers)
