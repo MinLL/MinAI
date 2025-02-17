@@ -1598,20 +1598,21 @@
                     }
                 }
                 
-                // Try to parse as JSON first
+                // First check if it's a simple quoted string (not a JSON object)
+                const quotedStringMatch = line.trim().match(/^"(.*)"$/);
+                if (quotedStringMatch) {
+                    const content = quotedStringMatch[1]
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;');
+                    return `<div class="log-line"><span class="json-string">${content}</span></div>`;
+                }
+                
+                // Try to parse as JSON if it wasn't a simple quoted string
                 try {
                     const json = JSON.parse(line);
                     return `<div class="log-line">${formatDialogueJson(json)}</div>`;
                 } catch (e) {
-                    // If it's a quoted string (starts and ends with quotes)
-                    if (line.trim().match(/^".*"$/)) {
-                        const sanitizedLine = line
-                            .replace(/&/g, '&amp;')
-                            .replace(/</g, '&lt;')
-                            .replace(/>/g, '&gt;');
-                        return `<div class="log-line"><span class="json-string">${sanitizedLine}</span></div>`;
-                    }
-                    
                     // If not valid JSON, try to highlight JSON-like content
                     if (line.includes('{') && line.includes('}')) {
                         return `<div class="log-line">${highlightIncompleteJson(line)}</div>`;
