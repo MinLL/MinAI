@@ -34,23 +34,25 @@ Function BuildContext($name) {
 
 Function GetSurvivalContext($name) {
     $ret = "";
-    if (!IsPlayer($name) || !IsModEnabled("Sunhelm")) {
+    if (!IsPlayer($name) || (!IsModEnabled("Sunhelm") && !IsModEnabled("SurvivalMode"))) {
         return $ret;
     }
-    $hunger = GetActorValue($name, "hunger");
-    $thirst = GetActorValue($name, "thirst");
-    $fatigue = GetActorValue($name, "fatigue");
+    $hunger = floatval(GetActorValue($name, "hunger"));
+    $thirst = floatval(GetActorValue($name, "thirst"));
+    $fatigue = floatval(GetActorValue($name, "fatigue"));
+    $cold = floatval(GetActorValue($name, "cold"));
+
     if ($hunger > 0) {
-        $hunger = (floatval($hunger)/5) * 100;
         $ret .= "{$name}'s hunger level is at {$hunger}%. ";
     }
-    if ($thirst > 0) {
-        $thirst = (floatval($thirst)/5) * 100;
+    if ($thirst > 0 && IsModEnabled("Sunhelm")) {
         $ret .= "{$name}'s thirst level is at {$thirst}%. ";
     }
     if ($fatigue > 0) {
-        $fatigue = (floatval($fatigue)/5) * 100;
         $ret .= "{$name}'s fatigue level is at {$fatigue}%. ";
+    }
+    if ($cold > 0 && IsModEnabled("SurvivalMode")) {
+        $ret .= "{$name}'s cold level is at {$cold}%. ";
     }
     if ($ret != "")
         $ret .= "\n";
