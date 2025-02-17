@@ -1399,232 +1399,302 @@
             return content.split('\n').map(line => {
                 if (!line.trim()) return '';
                 
-                if (line.trim() === '=') {
-                    return '<hr style="border: 1px dashed var(--border-color); margin: 10px 0;">';
-                }
+                // Simple sanitization
+                const sanitizedLine = line
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
                 
-                try {
-                    const json = JSON.parse(line);
-                    return `<div class="log-line">${syntaxHighlightJSON(json)}</div>`;
-                } catch (e) {
-                    if (line.includes('array (')) {
-                        return `<div class="log-line">${formatPhpArray(line)}</div>`;
-                    }
-                    return `<div class="log-line">${line}</div>`;
-                }
+                return `<div class="log-line">${sanitizedLine}</div>`;
             }).filter(line => line).join('');
         }
 
         function parseContextLog(content) {
-            // First check if this is the new timestamp format
-            const hasTimestamps = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2}/.test(content);
+            return content.split('\n').map(line => {
+                if (!line.trim()) return '';
+                
+                // Skip separator lines
+                if (line.trim() === '=') {
+                    return '<hr style="border: 1px dashed var(--border-color); margin: 10px 0;">';
+                }
+                
+                // Sanitize the line
+                let sanitizedLine = line
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
+                
+                // Highlight AVAILABLE ACTION
+                sanitizedLine = sanitizedLine.replace(
+                    /AVAILABLE ACTION: (\w+) \((.*?)\)/g,
+                    '<span class="available-action-keyword">AVAILABLE ACTION:</span> ' +
+                    '<span class="available-action-name">$1</span> ' +
+                    '<span class="available-action-desc">($2)</span>'
+                );
+                
+                // Highlight quoted strings
+                sanitizedLine = sanitizedLine.replace(
+                    /(['"])(.*?)\1/g, 
+                    '<span class="php-string">$1$2$1</span>'
+                );
+                
+                // Highlight array keys
+                sanitizedLine = sanitizedLine.replace(
+                    /(\w+)\s*=>/g,
+                    '<span class="php-array-key">$1</span> =>'
+                );
+                
+                // Highlight array keyword
+                sanitizedLine = sanitizedLine.replace(
+                    /\barray\s*\(/g,
+                    '<span class="php-array">array</span> ('
+                );
+                
+                // Highlight numbers
+                sanitizedLine = sanitizedLine.replace(
+                    /\b(\d+)\b/g,
+                    '<span class="php-number">$1</span>'
+                );
+                
+                return `<div class="log-line">${sanitizedLine}</div>`;
+            }).filter(line => line).join('\n');
+        }
+
+        function parseMinaiLog(content) {
+            return content.split('\n').map(line => {
+                if (!line.trim()) return '';
+                
+                // Extract timestamp if present
+                const timestampMatch = line.match(/^\[([\d\-: ]+)\]/);
+                const timestamp = timestampMatch ? timestampMatch[1] : '';
+                let message = timestampMatch ? line.slice(timestampMatch[0].length).trim() : line;
+                
+                // Determine log level
+                let levelClass = 'notice';
+                if (message.toLowerCase().includes('error')) levelClass = 'error';
+                else if (message.toLowerCase().includes('warning')) levelClass = 'warning';
+                
+                // Extract module/component if present
+                const moduleMatch = message.match(/^\[([\w\-_]+)\]/);
+                const module = moduleMatch ? moduleMatch[1] : '';
+                message = moduleMatch ? message.slice(moduleMatch[0].length).trim() : message;
+                
+                // Sanitize the message
+                message = message
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
+                
+                return `<div class="log-line ${levelClass}">
+                    ${timestamp ? `<span class="timestamp">[${timestamp}]</span>` : ''}
+                    ${module ? `<span class="log-module">[${module}]</span>` : ''}
+                    <span class="log-message">${message}</span>
+                </div>`;
+            }).filter(line => line).join('\n');
+        }
+
+        function formatPhpArray(content) {
+            let depth = 0;
+            const indent = '  ';
             
-            let entries;
-            if (hasTimestamps) {
-                // Split only by timestamps that are followed by "Role:"
-                entries = content.split(/(?=\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2}\s+Role:)/);
-            } else {
-                // Split by '=' for original format, but only on lines that contain just '='
-                entries = content.split(/^=\s*$/m);
+            function getIndent(n) {
+                return indent.repeat(n);
             }
             
-            let entryNumber = 1;
-            
-            const formattedEntries = entries.map(entry => {
-                if (!entry.trim()) return '';
+            function processValue(value, currentDepth) {
+                if (!value) return '';
                 
-                let timestamp = '';
-                let processedContent = '';
-                let previewText = '';
+                // Handle AVAILABLE ACTION format
+                if (value.includes('AVAILABLE ACTION:')) {
+                    return value.replace(
+                        /AVAILABLE ACTION: (\w+) \((.*?)\)/g,
+                        '<span class="available-action-keyword">AVAILABLE ACTION:</span> ' +
+                        '<span class="available-action-name">$1</span> ' +
+                        '<span class="available-action-desc">($2)</span>'
+                    );
+                }
                 
-                if (hasTimestamps) {
-                    // Handle new timestamp format
-                    const timestampMatch = entry.match(/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2})/);
-                    timestamp = timestampMatch ? timestampMatch[1] : '';
-                    let content = entry.replace(timestamp, '').trim();
+                // Handle string values (both single and double quotes)
+                if ((value.trim().startsWith("'") && value.trim().endsWith("'")) ||
+                    (value.trim().startsWith('"') && value.trim().endsWith('"'))) {
+                    return `<span class="php-string">${value}</span>`;
+                }
+                
+                // Handle numeric values
+                if (!isNaN(value.trim())) {
+                    return `<span class="php-number">${value}</span>`;
+                }
+                
+                // Handle nested arrays
+                if (value.trim().startsWith('array (')) {
+                    // Prevent infinite recursion by checking depth
+                    if (currentDepth > 10) {
+                        return '<span class="php-array">array</span> ( ... )';
+                    }
                     
-                    // Split into role-based sections, but only at the start of a new Role: section
-                    const sections = content.split(/(?=^Role:\s*(?:system|user|assistant)\s*\nContent:)/m);
+                    // Extract the array content between the outermost parentheses
+                    let openParens = 0;
+                    let startIndex = value.indexOf('(');
+                    let endIndex = value.length;
                     
-                    // Process each section
-                    processedContent = sections.map(section => {
-                        if (!section.trim()) return '';
-                        
-                        const roleMatch = section.match(/^Role:\s*(system|user|assistant)\s*\nContent:\s*([\s\S]*)/);
-                        if (!roleMatch) return section; // Not a role-based section
-                        
-                        const [_, role, roleContent] = roleMatch;
-                        
-                        // Process the content based on its type
-                        let formattedContent = roleContent.trim();
-                        
-                        // Handle special formatting for system role content
-                        if (role === 'system') {
-                            formattedContent = formattedContent
-                                .replace(/=== ([^=]+) ===/g, '<h3 class="section-header">$1</h3>')
-                                .replace(/^(Characters|Locations):\s*(.+)$/gm, '<div class="info-line"><span class="info-label">$1:</span> $2</div>')
-                                .replace(/(\d+)\/100/g, '<span class="numeric-value">$1/100</span>')
-                                .replace(/^([A-Za-z]+):\s+(.+)$/gm, '<div class="info-line"><span class="info-label">$1:</span> $2</div>')
-                                .replace(/The Narrator:\s+(.+?)(?=\n|$)/g, '<div class="narrator-line">$1</div>')
-                                .replace(/([^:]+?):\s+(.+?)\s*(?:\(talking to ([^)]+)\))?(?=\n|$)/g, (match, speaker, text, target) => {
-                                    return `<div class="dialogue-line">
-                                        <span class="speaker">${speaker}</span>
-                                        <span class="dialogue-text">${text}</span>
-                                        ${target ? `<span class="dialogue-target">(to ${target})</span>` : ''}
-                                    </div>`;
-                                });
-                        }
-                        
-                        // Try to parse as JSON if possible
-                        try {
-                            const json = JSON.parse(formattedContent);
-                            formattedContent = syntaxHighlightJSON(json);
-                        } catch (e) {
-                            // If it contains PHP array notation
-                            if (formattedContent.includes('array (')) {
-                                formattedContent = formatPhpArray(formattedContent);
+                    for (let i = startIndex; i < value.length; i++) {
+                        if (value[i] === '(') openParens++;
+                        if (value[i] === ')') {
+                            openParens--;
+                            if (openParens === 0) {
+                                endIndex = i;
+                                break;
                             }
-                        }
-                        
-                        return `
-                            <div class="role-entry">
-                                <span class="role-label ${role.toLowerCase()}">${role}</span>
-                                <div class="role-content">${formattedContent}</div>
-                            </div>
-                        `;
-                    }).join('\n');
-                    
-                    // Create preview from the first meaningful line
-                    previewText = content
-                        .replace(/Role:\s*(system|user|assistant)\s*\nContent:\s*/g, '')
-                        .split('\n')
-                        .find(line => line.trim() && !line.startsWith('==='))
-                        ?.slice(0, 100) + '...';
-                        
-                } else {
-                    // Handle original array-based format
-                    let formattedEntry;
-                    const trimmedEntry = entry.trim();
-                    
-                    if (trimmedEntry.startsWith('array (')) {
-                        formattedEntry = formatPhpArray(trimmedEntry);
-                    } else {
-                        try {
-                            const json = JSON.parse(trimmedEntry);
-                            formattedEntry = syntaxHighlightJSON(json);
-                        } catch (e) {
-                            formattedEntry = trimmedEntry
-                                .replace(/&/g, '&amp;')
-                                .replace(/</g, '&lt;')
-                                .replace(/>/g, '&gt;');
                         }
                     }
                     
-                    processedContent = `
-                        <div class="log-line">
-                            <span class="log-message">${formattedEntry}</span>
-                        </div>
-                    `;
-                    
-                    // Create preview from the first line
-                    previewText = trimmedEntry.split('\n')[0].slice(0, 100) + '...';
+                    const nestedContent = value.slice(startIndex + 1, endIndex).trim();
+                    return formatPhpArrayInternal(nestedContent, currentDepth + 1);
                 }
                 
-                // Determine if this is the last entry
-                const isLastEntry = entryNumber === entries.filter(e => e.trim()).length;
-                
-                return `
-                    <div class="collapsible-entry${isLastEntry ? ' expanded' : ''}">
-                        <div class="collapsible-header" onclick="toggleEntry(this)">
-                            <span>
-                                ${timestamp ? `<span class="entry-timestamp">${timestamp}</span> - ` : ''}
-                                Entry ${entryNumber++}: ${previewText || 'Empty entry'}
-                            </span>
-                            <span class="expand-indicator">${isLastEntry ? '▼' : '▶'}</span>
-                        </div>
-                        <div class="collapsible-content">
-                            ${processedContent}
-                        </div>
-                    </div>
-                `;
-            }).filter(entry => entry).join('\n');
+                return value;
+            }
             
-            return formattedEntries;
+            function formatPhpArrayInternal(content, currentDepth = 0) {
+                const lines = content.split('\n');
+                let formattedLines = [];
+                
+                for (let i = 0; i < lines.length; i++) {
+                    let line = lines[i].trim();
+                    if (!line) continue;
+                    
+                    if (line.includes('=>')) {
+                        let [key, ...valueParts] = line.split('=>');
+                        let value = valueParts.join('=>').trim();
+                        
+                        // Handle multi-line array values
+                        let openParens = (value.match(/\(/g) || []).length;
+                        let closeParens = (value.match(/\)/g) || []).length;
+                        
+                        while (i + 1 < lines.length && openParens > closeParens) {
+                            i++;
+                            const nextLine = lines[i].trim();
+                            value += '\n' + nextLine;
+                            openParens += (nextLine.match(/\(/g) || []).length;
+                            closeParens += (nextLine.match(/\)/g) || []).length;
+                        }
+                        
+                        formattedLines.push(
+                            getIndent(currentDepth) +
+                            `<span class="php-array-key">${key.trim()}</span>` +
+                            `<span class="php-array-arrow"> => </span>` +
+                            processValue(value, currentDepth)
+                        );
+                    } else {
+                        formattedLines.push(getIndent(currentDepth) + processValue(line, currentDepth));
+                    }
+                }
+                
+                return `<span class="php-array">array</span> (\n${formattedLines.join('\n')}\n${getIndent(Math.max(0, currentDepth - 1))})`;
+            }
+            
+            // Start the formatting process
+            if (!content.startsWith('array (')) {
+                return content;
+            }
+            
+            const arrayContent = content.slice(content.indexOf('(') + 1, content.lastIndexOf(')')).trim();
+            return formatPhpArrayInternal(arrayContent, 1);
         }
 
         function parseOutputLog(content) {
-            const entries = content.split('==\n');
-            return entries.map(entry => {
-                if (!entry.trim()) return '';
+            return content.split('\n').map(line => {
+                if (!line.trim()) return '';
                 
-                const lines = entry.split('\n');
-                let formattedLines = [];
-                
-                // Try to parse the entire entry as a single JSON object first
-                try {
-                    const json = JSON.parse(entry.trim());
-                    return `<div class="log-line">${syntaxHighlightJSON(json)}</div>`;
-                } catch (e) {
-                    // If not a complete JSON, process line by line
-                    let jsonBuffer = '';
-                    let isCollectingJSON = false;
-                    
-                    lines.forEach(line => {
-                        if (!line.trim()) return;
-                        
-                        // Handle timestamps
-                        if (line.includes('START') || line.includes('END')) {
-                            const timestamp = line.match(/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2})/);
-                            if (timestamp) {
-                                formattedLines.push(`<div class="log-line"><span class="timestamp">${timestamp[0]}</span></div>`);
-                                return;
-                            }
-                        }
-                        
-                        // Try to parse single-line JSON first
-                        try {
-                            const json = JSON.parse(line);
-                            formattedLines.push(`<div class="log-line">${syntaxHighlightJSON(json)}</div>`);
-                            return;
-                        } catch (e) {
-                            // If not valid JSON, check if it's part of a multi-line JSON
-                            if (line.trim().startsWith('{')) {
-                                isCollectingJSON = true;
-                                jsonBuffer = line;
-                            } else if (isCollectingJSON) {
-                                jsonBuffer += '\n' + line;
-                                if (line.trim().endsWith('}')) {
-                                    isCollectingJSON = false;
-                                    try {
-                                        const json = JSON.parse(jsonBuffer);
-                                        formattedLines.push(`<div class="log-line">${syntaxHighlightJSON(json)}</div>`);
-                                    } catch (e) {
-                                        // If parsing fails, format each line individually
-                                        jsonBuffer.split('\n').forEach(jsonLine => {
-                                            if (jsonLine.trim().startsWith('{') || jsonLine.trim().startsWith('[')) {
-                                                formattedLines.push(`<div class="log-line"><span class="json-string">${jsonLine}</span></div>`);
-                                            } else if (jsonLine.trim() === '}' || jsonLine.trim() === ']') {
-                                                formattedLines.push(`<div class="log-line"><span class="json-string">${jsonLine}</span></div>`);
-                                            } else if (jsonLine.includes(':')) {
-                                                const [key, ...rest] = jsonLine.split(':');
-                                                const value = rest.join(':');
-                                                formattedLines.push(`<div class="log-line"><span class="json-key">${key}</span>:<span class="json-string">${value}</span></div>`);
-                                            } else {
-                                                formattedLines.push(`<div class="log-line">${jsonLine}</div>`);
-                                            }
-                                        });
-                                    }
-                                    jsonBuffer = '';
-                                }
-                            } else {
-                                formattedLines.push(`<div class="log-line">${line}</div>`);
-                            }
-                        }
-                    });
+                // Skip separator lines
+                if (line.trim() === '==') {
+                    return '<hr style="border: 1px dashed var(--border-color); margin: 10px 0;">';
                 }
                 
-                return formattedLines.join('');
-            }).filter(entry => entry).join('<hr style="border: 1px dashed var(--border-color); margin: 10px 0;">');
+                // Handle timestamps
+                if (line.includes('START') || line.includes('END')) {
+                    const timestamp = line.match(/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2})/);
+                    if (timestamp) {
+                        return `<div class="log-line"><span class="timestamp">${timestamp[0]}</span></div>`;
+                    }
+                }
+                
+                // Try to parse as JSON first
+                try {
+                    const json = JSON.parse(line);
+                    return `<div class="log-line">${formatDialogueJson(json)}</div>`;
+                } catch (e) {
+                    // If not valid JSON, try to highlight JSON-like content
+                    if (line.includes('{') && line.includes('}')) {
+                        return `<div class="log-line">${highlightIncompleteJson(line)}</div>`;
+                    }
+                    
+                    // Default sanitization for non-JSON lines
+                    const sanitizedLine = line
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;');
+                    return `<div class="log-line">${sanitizedLine}</div>`;
+                }
+            }).filter(line => line).join('\n');
+        }
+
+        function formatDialogueJson(json) {
+            const parts = [];
+            
+            function sanitizeAndQuote(str) {
+                return `"${String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')}"`;
+            }
+            
+            if (json.character) {
+                parts.push(`<span class="json-key">character</span>: <span class="json-string">${sanitizeAndQuote(json.character)}</span>`);
+            }
+            if (json.listener) {
+                parts.push(`<span class="json-key">listener</span>: <span class="json-string">${sanitizeAndQuote(json.listener)}</span>`);
+            }
+            if (json.mood) {
+                parts.push(`<span class="json-key">mood</span>: <span class="json-string">${sanitizeAndQuote(json.mood)}</span>`);
+            }
+            if (json.action) {
+                parts.push(`<span class="json-key">action</span>: <span class="json-string">${sanitizeAndQuote(json.action)}</span>`);
+            }
+            if (json.target) {
+                parts.push(`<span class="json-key">target</span>: <span class="json-string">${sanitizeAndQuote(json.target)}</span>`);
+            }
+            if (json.message) {
+                parts.push(`<span class="json-key">message</span>: <span class="json-string">${sanitizeAndQuote(json.message)}</span>`);
+            }
+            
+            return `{ ${parts.join(', ')} }`;
+        }
+
+        function highlightIncompleteJson(line) {
+            // Sanitize the line first
+            let sanitized = line
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+            
+            // Highlight property names
+            let highlighted = sanitized.replace(/"(\w+)"\s*:/g, '<span class="json-key">"$1"</span>:');
+            
+            // Highlight string values
+            highlighted = highlighted.replace(/:\s*"([^"]*?)"/g, ': <span class="json-string">"$1"</span>');
+            
+            // Highlight numbers
+            highlighted = highlighted.replace(/:\s*(\d+)/g, ': <span class="json-number">$1</span>');
+            
+            // Highlight booleans
+            highlighted = highlighted.replace(/:\s*(true|false)\b/g, ': <span class="json-boolean">$1</span>');
+            
+            // Highlight null
+            highlighted = highlighted.replace(/:\s*(null)\b/g, ': <span class="json-null">$1</span>');
+            
+            return highlighted;
         }
 
         function parseApacheLog(content) {
@@ -1769,8 +1839,8 @@
             logContent.addEventListener('scroll', () => {
                 clearTimeout(scrollTimeout);
                 
-                // Calculate if we're near the bottom
-                const isNearBottom = logContent.scrollHeight - logContent.scrollTop - logContent.clientHeight < 50;
+                // Calculate if we're near the bottom (increased threshold)
+                const isNearBottom = logContent.scrollHeight - logContent.scrollTop - logContent.clientHeight < 100;
                 
                 if (!isNearBottom && !isUserScrolling) {
                     // User has scrolled up
@@ -1783,10 +1853,19 @@
                     }
                 }
 
-                // Reset the user scrolling flag after 2 seconds of no scrolling
+                // Reset the user scrolling flag after 1 second of no scrolling
                 scrollTimeout = setTimeout(() => {
                     isUserScrolling = false;
-                }, 2000);
+                    // Check if we should re-enable follow
+                    if (isNearBottom) {
+                        followButton.classList.add('active');
+                        const config = Array.from(activeLogViewers.entries())
+                            .find(([_, v]) => v.viewer === viewer);
+                        if (config) {
+                            activeLogViewers.get(config[0]).follow = true;
+                        }
+                    }
+                }, 1000);
             });
         }
 
@@ -1808,87 +1887,6 @@
 
         function isFollowEnabled(viewer) {
             return viewer.querySelector('.follow-button').classList.contains('active');
-        }
-
-        function formatPhpArray(content) {
-            let depth = 0;
-            const indent = '  ';
-            
-            function getIndent(n) {
-                return indent.repeat(n);
-            }
-            
-            function processValue(value, currentDepth) {
-                if (!value) return '';
-                
-                if (value.includes('AVAILABLE ACTION:')) {
-                    return value.replace(
-                        /AVAILABLE ACTION: (\w+) \((.*?)\)/g,
-                        '<span class="available-action-keyword">AVAILABLE ACTION:</span> ' +
-                        '<span class="available-action-name">$1</span> ' +
-                        '<span class="available-action-desc">($2)</span>'
-                    );
-                }
-                
-                if (value.trim().startsWith('array (')) {
-                    return formatPhpArrayInternal(value.slice(value.indexOf('(') + 1, -1), currentDepth + 1);
-                }
-                
-                if (value.trim().startsWith("'") && value.trim().endsWith("'")) {
-                    return `<span class="php-string">${value}</span>`;
-                }
-                
-                if (!isNaN(value.trim())) {
-                    return `<span class="php-number">${value}</span>`;
-                }
-                
-                return `<span class="php-string">${value}</span>`;
-            }
-            
-            function formatPhpArrayInternal(inner, currentDepth) {
-                const lines = inner.split('\n');
-                let formattedLines = [];
-                
-                for (let i = 0; i < lines.length; i++) {
-                    let line = lines[i].trim();
-                    if (!line) continue;
-                    
-                    if (line.includes('=>')) {
-                        let [key, ...valueParts] = line.split('=>');
-                        let value = valueParts.join('=>').trim();
-                        
-                        let openParens = (value.match(/\(/g) || []).length;
-                        let closeParens = (value.match(/\)/g) || []).length;
-                        
-                        while (i + 1 < lines.length && 
-                               (openParens > closeParens || 
-                                value.trim().startsWith('array (') && !value.trim().endsWith(')'))) {
-                            i++;
-                            let nextLine = lines[i];
-                            value += '\n' + nextLine;
-                            openParens += (nextLine.match(/\(/g) || []).length;
-                            closeParens += (nextLine.match(/\)/g) || []).length;
-                        }
-                        
-                        formattedLines.push(
-                            getIndent(currentDepth) +
-                            `<span class="php-array-key">${key.trim()}</span>` +
-                            `<span class="php-array-arrow"> => </span>` +
-                            processValue(value, currentDepth)
-                        );
-                    } else {
-                        formattedLines.push(getIndent(currentDepth) + processValue(line, currentDepth));
-                    }
-                }
-                
-                return `<span class="php-array">array</span> (\n${formattedLines.join('\n')}\n${getIndent(currentDepth-1)})`;
-            }
-            
-            if (!content.startsWith('array (')) {
-                return content;
-            }
-            
-            return formatPhpArrayInternal(content.slice(content.indexOf('(') + 1, -1), 1);
         }
 
         function saveConfiguration() {
@@ -2140,8 +2138,9 @@
                     file: file.name,
                     tooltip: getLogTooltip(file.name),
                     parser: file.name.includes('apache') ? parseApacheLog :
-                           file.name.includes('context') ? parseContextLog :
-                           file.name.includes('output') ? parseOutputLog :
+                           file.name.includes('context_sent_to_llm') ? parseContextLog :
+                           file.name.includes('minai.log') ? parseMinaiLog :
+                           file.name.includes('output_from_llm') ? parseOutputLog :
                            defaultLogParser,
                     presets: file.name.includes('apache') ? [
                         { name: 'MinAI Only', filter: 'minai' },
