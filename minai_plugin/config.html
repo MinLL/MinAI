@@ -824,32 +824,37 @@
                                     <details>
                                         <summary>Character Information</summary>
                                         <ul>
-                                            <li><strong>#player_name#</strong> - The player's name</li>
-                                            <li><strong>#player_bios#</strong> - The player's character background</li>
-                                            <li><strong>#herika_dynamic#</strong> - Current state and recent experiences</li>
+                                            <li><strong>#PLAYER_NAME#</strong> - The player character's name</li>
+                                            <li><strong>#PLAYER_BIOS#</strong> - The player's background and personality description (From PLAYER_BIO)</li>
+                                            <li><strong>#HERIKA_DYNAMIC#</strong> - The Dynamic Profile for the character (If using Narrator profile)</li>
+                                            <li><strong>#PHYSICAL_DESCRIPTION#</strong> - Physical appearance and characteristics</li>
+                                        </ul>
+                                    </details>
+                                    <details>
+                                        <summary>Status Information</summary>
+                                        <ul>
+                                            <li><strong>#AROUSAL_STATUS#</strong> - Current arousal state</li>
+                                            <li><strong>#SURVIVAL_STATUS#</strong> - Current needs like hunger and fatigue</li>
+                                            <li><strong>#CLOTHING_STATUS#</strong> - Currently worn clothing and armor</li>
+                                            <li><strong>#DEVICES_STATUS#</strong> - Worn devices and equipment</li>
+                                            <li><strong>#FERTILITY_STATUS#</strong> - Current fertility state</li>
                                         </ul>
                                     </details>
                                     <details>
                                         <summary>Context Information</summary>
                                         <ul>
-                                            <li><strong>#original_input#</strong> - The player's input text</li>
-                                            <li><strong>#nearby_actors#</strong> - List of NPCs in the area</li>
-                                            <li><strong>#nearby_locations#</strong> - List of accessible locations</li>
-                                            <li><strong>#recent_events#</strong> - Recent conversation history</li>
+                                            <li><strong>#ORIGINAL_INPUT#</strong> - The player's input text to be processed</li>
+                                            <li><strong>#NEARBY_ACTORS#</strong> - Comma-separated list of NPCs in range</li>
+                                            <li><strong>#NEARBY_LOCATIONS#</strong> - Comma-separated list of accessible locations</li>
+                                            <li><strong>#RECENT_EVENTS#</strong> - Recent conversation and event history</li>
                                         </ul>
                                     </details>
                                     <details>
                                         <summary>Pronouns</summary>
                                         <ul>
-                                            <li><strong>#player_subject#</strong> - he/she/they</li>
-                                            <li><strong>#player_object#</strong> - him/her/them</li>
-                                            <li><strong>#player_possessive#</strong> - his/her/their</li>
-                                        </ul>
-                                    </details>
-                                    <details>
-                                        <summary>Special</summary>
-                                        <ul>
-                                            <li><strong>#instructions#</strong> - The current mode's instructions (translation or roleplay)</li>
+                                            <li><strong>#PLAYER_SUBJECT#</strong> - Subject pronoun (he/she/they)</li>
+                                            <li><strong>#PLAYER_OBJECT#</strong> - Object pronoun (him/her/them)</li>
+                                            <li><strong>#PLAYER_POSSESSIVE#</strong> - Possessive pronoun (his/her/their)</li>
                                         </ul>
                                     </details>
                                 </div>
