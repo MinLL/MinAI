@@ -95,13 +95,13 @@ function Maintenance(minai_MainQuestController _main)
     Main.Info("Found Survival Mode")
     
     ; Get essential global variables
-    Survival_ModeEnabled = Game.GetFormFromFile(0xFE000826, "ccQDRSSE001-SurvivalMode.esl") as GlobalVariable
-    Survival_HungerNeedValue = Game.GetFormFromFile(0xFE00081A, "ccQDRSSE001-SurvivalMode.esl") as GlobalVariable
-    Survival_ColdNeedValue = Game.GetFormFromFile(0xFE00081B, "ccQDRSSE001-SurvivalMode.esl") as GlobalVariable
-    Survival_ExhaustionNeedValue = Game.GetFormFromFile(0xFE000816, "ccQDRSSE001-SurvivalMode.esl") as GlobalVariable
-    Survival_HungerNeedMaxValue = Game.GetFormFromFile(0xFE00080C, "ccQDRSSE001-SurvivalMode.esl") as GlobalVariable
-    Survival_ColdNeedMaxValue = Game.GetFormFromFile(0xFE00084B, "ccQDRSSE001-SurvivalMode.esl") as GlobalVariable
-    Survival_ExhaustionNeedMaxValue = Game.GetFormFromFile(0xFE00084A, "ccQDRSSE001-SurvivalMode.esl") as GlobalVariable
+    Survival_ModeEnabled = Game.GetFormFromFile(0x0826, "ccQDRSSE001-SurvivalMode.esl") as GlobalVariable
+    Survival_HungerNeedValue = Game.GetFormFromFile(0x081A, "ccQDRSSE001-SurvivalMode.esl") as GlobalVariable
+    Survival_ColdNeedValue = Game.GetFormFromFile(0x081B, "ccQDRSSE001-SurvivalMode.esl") as GlobalVariable
+    Survival_ExhaustionNeedValue = Game.GetFormFromFile(0x0816, "ccQDRSSE001-SurvivalMode.esl") as GlobalVariable
+    Survival_HungerNeedMaxValue = Game.GetFormFromFile(0x080C, "ccQDRSSE001-SurvivalMode.esl") as GlobalVariable
+    Survival_ColdNeedMaxValue = Game.GetFormFromFile(0x084B, "ccQDRSSE001-SurvivalMode.esl") as GlobalVariable
+    Survival_ExhaustionNeedMaxValue = Game.GetFormFromFile(0x084A, "ccQDRSSE001-SurvivalMode.esl") as GlobalVariable
     
     if !Survival_ModeEnabled || !Survival_HungerNeedValue || !Survival_ColdNeedValue || !Survival_ExhaustionNeedValue
         Main.Error("Could not load all Survival Mode references")
@@ -109,6 +109,7 @@ function Maintenance(minai_MainQuestController _main)
         Main.Debug("Survival_HungerNeedValue: " + Survival_HungerNeedValue)
         Main.Debug("Survival_ColdNeedValue: " + Survival_ColdNeedValue)
         Main.Debug("Survival_ExhaustionNeedValue: " + Survival_ExhaustionNeedValue)
+        bHasSurvivalMode = False
     EndIf
     Main.Debug("Survival Mode Values - Hunger: " + Survival_HungerNeedValue.GetValue() + "/" + Survival_HungerNeedMaxValue.GetValue() + ", Cold: " + Survival_ColdNeedValue.GetValue() + "/" + Survival_ColdNeedMaxValue.GetValue() + ", Exhaustion: " + Survival_ExhaustionNeedValue.GetValue() + "/" + Survival_ExhaustionNeedMaxValue.GetValue())
   EndIf
@@ -345,7 +346,7 @@ Function SetContext(actor akTarget)
     aiff.SetActorVariable(playerRef, "fatigue", sunhelmMain.Fatigue.CurrentFatigueStage)
   ElseIf bHasSurvivalMode && Survival_ModeEnabled.GetValueInt() == 1
     ; Convert needs to percentage values for consistency
-    float hungerPercent = (1 - (Survival_HungerNeedValue.GetValue() / Survival_HungerNeedMaxValue.GetValue())) * 100
+    float hungerPercent = ((Survival_HungerNeedValue.GetValue() / Survival_HungerNeedMaxValue.GetValue())) * 100
     float coldPercent = (Survival_ColdNeedValue.GetValue() / Survival_ColdNeedMaxValue.GetValue()) * 100
     float exhaustionPercent = (Survival_ExhaustionNeedValue.GetValue() / Survival_ExhaustionNeedMaxValue.GetValue()) * 100
     

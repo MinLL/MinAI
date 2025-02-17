@@ -42,18 +42,18 @@ Function GetSurvivalContext($name) {
     $fatigue = floatval(GetActorValue($name, "fatigue"));
     $cold = floatval(GetActorValue($name, "cold"));
 
-    if ($hunger > 0) {
-        $ret .= "{$name}'s hunger level is at {$hunger}%. ";
+    $ret .= "{$name}'s hunger level is at {$hunger}%, where 0 is not hungry at all, and 100 is starving. ";
+
+    if (IsModEnabled("Sunhelm")) {
+        $ret .= "{$name}'s thirst level is at {$thirst}%, where 0 is not thirsty at all, and 100 is dying of thirst. ";
     }
-    if ($thirst > 0 && IsModEnabled("Sunhelm")) {
-        $ret .= "{$name}'s thirst level is at {$thirst}%. ";
+
+    $ret .= "{$name}'s fatigue level is at {$fatigue}%, where 0 is not tired at all, and 100 is exhausted. ";
+
+    if (IsModEnabled("SurvivalMode")) {
+        $ret .= "{$name}'s cold level is at {$cold}%, where 0 is not cold at all, and 100 is freezing to death. ";
     }
-    if ($fatigue > 0) {
-        $ret .= "{$name}'s fatigue level is at {$fatigue}%. ";
-    }
-    if ($cold > 0 && IsModEnabled("SurvivalMode")) {
-        $ret .= "{$name}'s cold level is at {$cold}%. ";
-    }
+
     if ($ret != "")
         $ret .= "\n";
     return $ret;
