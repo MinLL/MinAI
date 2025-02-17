@@ -1,5 +1,6 @@
 <?php
 require_once("config.base.php");
+require_once("logger.php");
 $pluginPath = "/var/www/html/HerikaServer/ext/minai_plugin";
 if (!file_exists("$pluginPath/config.php")) {
     copy("$pluginPath/config.base.php", "$pluginPath/config.php");
