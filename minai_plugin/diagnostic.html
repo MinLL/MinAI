@@ -1203,29 +1203,6 @@
             font-weight: 500;
             flex: 0 0 auto;
         }
-
-        // Add to the existing <style> section
-        .incomplete-json {
-            position: relative;
-            background: rgba(255, 193, 7, 0.05);
-            border-left: 3px solid var(--warning-color);
-        }
-
-        .incomplete-json::after {
-            content: '(incomplete)';
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--warning-color);
-            font-size: 0.8em;
-            opacity: 0.7;
-        }
-
-        .json-syntax {
-            color: var(--text-color);
-            opacity: 0.7;
-        }
     </style>
 </head>
 <body>
@@ -1481,26 +1458,33 @@
                             formattedLines.push(`<div class="log-line">${syntaxHighlightJSON(json)}</div>`);
                             return;
                         } catch (e) {
-                            // Check if line starts with a JSON object
+                            // If not valid JSON, check if it's part of a multi-line JSON
                             if (line.trim().startsWith('{')) {
-                                // If we were already collecting JSON, format what we have
-                                if (isCollectingJSON && jsonBuffer) {
-                                    formattedLines.push(formatIncompleteJSON(jsonBuffer));
-                                    jsonBuffer = '';
-                                }
                                 isCollectingJSON = true;
                                 jsonBuffer = line;
                             } else if (isCollectingJSON) {
                                 jsonBuffer += '\n' + line;
-                                // Check if this completes the JSON
                                 if (line.trim().endsWith('}')) {
+                                    isCollectingJSON = false;
                                     try {
                                         const json = JSON.parse(jsonBuffer);
                                         formattedLines.push(`<div class="log-line">${syntaxHighlightJSON(json)}</div>`);
                                     } catch (e) {
-                                        formattedLines.push(formatIncompleteJSON(jsonBuffer));
+                                        // If parsing fails, format each line individually
+                                        jsonBuffer.split('\n').forEach(jsonLine => {
+                                            if (jsonLine.trim().startsWith('{') || jsonLine.trim().startsWith('[')) {
+                                                formattedLines.push(`<div class="log-line"><span class="json-string">${jsonLine}</span></div>`);
+                                            } else if (jsonLine.trim() === '}' || jsonLine.trim() === ']') {
+                                                formattedLines.push(`<div class="log-line"><span class="json-string">${jsonLine}</span></div>`);
+                                            } else if (jsonLine.includes(':')) {
+                                                const [key, ...rest] = jsonLine.split(':');
+                                                const value = rest.join(':');
+                                                formattedLines.push(`<div class="log-line"><span class="json-key">${key}</span>:<span class="json-string">${value}</span></div>`);
+                                            } else {
+                                                formattedLines.push(`<div class="log-line">${jsonLine}</div>`);
+                                            }
+                                        });
                                     }
-                                    isCollectingJSON = false;
                                     jsonBuffer = '';
                                 }
                             } else {
@@ -1508,62 +1492,10 @@
                             }
                         }
                     });
-                    
-                    // Handle any remaining incomplete JSON buffer
-                    if (isCollectingJSON && jsonBuffer) {
-                        formattedLines.push(formatIncompleteJSON(jsonBuffer));
-                    }
                 }
                 
                 return formattedLines.join('');
             }).filter(entry => entry).join('<hr style="border: 1px dashed var(--border-color); margin: 10px 0;">');
-        }
-
-        function formatIncompleteJSON(jsonString) {
-            // Remove any trailing commas that might cause parsing issues
-            jsonString = jsonString.replace(/,\s*$/, '');
-            
-            // Create a copy of the original string for manual formatting if needed
-            const originalString = jsonString;
-            
-            // Try to close the JSON object if it's incomplete
-            if (!jsonString.trim().endsWith('}')) {
-                jsonString += '}';
-            }
-            
-            try {
-                // Try to parse the "fixed" JSON
-                const json = JSON.parse(jsonString);
-                return `<div class="log-line incomplete-json">${syntaxHighlightJSON(json)}</div>`;
-            } catch (e) {
-                // If still can't parse, format manually using the original string
-                return `<div class="log-line incomplete-json">${
-                    originalString
-                        // First handle the key-value pairs
-                        .replace(/"([^"]+)":\s*("[^"]*"|[^",\s}]+)?/g, (match, key, value) => {
-                            if (value === undefined) {
-                                // Handle incomplete value
-                                return `<span class="json-key">"${key}":</span> `;
-                            }
-                            if (value.startsWith('"')) {
-                                // Handle string value
-                                return `<span class="json-key">"${key}":</span> <span class="json-string">${value}</span>`;
-                            }
-                            if (/^(true|false|null)$/.test(value)) {
-                                // Handle boolean/null value
-                                return `<span class="json-key">"${key}":</span> <span class="json-boolean">${value}</span>`;
-                            }
-                            if (/^\d+$/.test(value)) {
-                                // Handle number value
-                                return `<span class="json-key">"${key}":</span> <span class="json-number">${value}</span>`;
-                            }
-                            return `<span class="json-key">"${key}":</span> ${value}`;
-                        })
-                        // Clean up any remaining unformatted quotes
-                        .replace(/^{/, '<span class="json-syntax">{</span>')
-                        .replace(/}$/, '<span class="json-syntax">}</span>')
-                }</div>`;
-            }
         }
 
         function parseApacheLog(content) {
