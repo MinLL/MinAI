@@ -57,10 +57,10 @@ function convertToFirstPerson($text, $name, $pronouns) {
 function interceptRoleplayInput() {
     if (IsEnabled($GLOBALS["PLAYER_NAME"], "isRoleplaying") && (isPlayerInput() || $GLOBALS["gameRequest"][0] == "minai_roleplay")) {
         if ($GLOBALS["gameRequest"][0] == "minai_roleplay") {
-            error_log("minai: Intercepting minai_roleplay.");
+            minai_log("info", "Intercepting minai_roleplay.");
         }
         else {
-            error_log("minai: Intercepting dialogue input for Translation. Original input: " . $GLOBALS["gameRequest"][3]);
+            minai_log("info", "Intercepting dialogue input for Translation. Original input: " . $GLOBALS["gameRequest"][3]);
         }
         
         // Initialize local variables with global defaults
@@ -76,7 +76,7 @@ function interceptRoleplayInput() {
 
         // Import narrator profile which may override the above variables
         if (file_exists(GetNarratorConfigPath())) {
-            error_log("minai: Using Narrator Profile");
+            minai_log("info", "Using Narrator Profile");
             $path = GetNarratorConfigPath();    
             include($path);
         }
@@ -191,7 +191,7 @@ function interceptRoleplayInput() {
         ];
 
         // Debug log the messages being sent to LLM
-        error_log("minai: Messages being sent to LLM: " . json_encode($messages, JSON_PRETTY_PRINT));
+        minai_log("info", "Messages being sent to LLM: " . json_encode($messages, JSON_PRETTY_PRINT));
 
         // Call LLM with specific parameters for dialogue generation
         $response = callLLM($messages, $CONNECTOR["openrouter"]["model"], [
@@ -207,7 +207,7 @@ function interceptRoleplayInput() {
             $response = preg_replace('/^' . preg_quote($PLAYER_NAME . ':') . '\s*/', '', $response);
             $response = preg_replace('/^' . preg_quote($PLAYER_NAME) . ':\s*/', '', $response);
             
-            error_log("minai: Roleplay input transformed from \"{$originalInput}\" to \"{$response}\"");
+            minai_log("info", "Roleplay input transformed from \"{$originalInput}\" to \"{$response}\"");
             
             if ($GLOBALS["gameRequest"][0] == "minai_roleplay") {
                 // rewrite as player input
@@ -218,9 +218,9 @@ function interceptRoleplayInput() {
                 // Format the response with a single character name prefix
                 $GLOBALS["gameRequest"][3] = $PLAYER_NAME . ": " . $response;
             }
-            # error_log("minai: Final gameRequest[3]: " . $GLOBALS["gameRequest"][3]);
+            # minai_log("info", "Final gameRequest[3]: " . $GLOBALS["gameRequest"][3]);
         } else {
-            error_log("minai: Failed to generate roleplay response, using original input");
+            minai_log("info", "Failed to generate roleplay response, using original input");
         }
 
     }

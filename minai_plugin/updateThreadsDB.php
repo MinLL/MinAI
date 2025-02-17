@@ -24,7 +24,7 @@ function updateThreadsDB() {
     $jsonData = json_decode($param, true);
 
     if (!$jsonData) {
-        error_log("minai: Failed to parse JSON data in updateThreadsDB: $param");
+        minai_log("info", "Failed to parse JSON data in updateThreadsDB: $param");
         return;
     }
 

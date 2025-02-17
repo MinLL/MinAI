@@ -48,7 +48,7 @@ $cloneCmd = "git clone --branch $branch $repoUrl $tempDir 2>&1";
 $output = [];
 $returnVar = 0;
 exec($cloneCmd, $output, $returnVar);
-error_log("Clone output: " . implode("\n", $output));
+minai_log("info", "Clone output: " . implode("\n", $output));
 
 if ($returnVar !== 0) {
     send_message('error', "❌ Failed to clone repository from branch $branch:\n" . implode("\n", $output));
@@ -70,7 +70,7 @@ send_message('progress', "✅ Plugin folder found");
 send_message('progress', "🔒 Updating file permissions...");
 $chmodCmd = "chmod -R 775 $pluginFolder 2>&1";
 exec($chmodCmd, $output, $returnVar);
-error_log("Chmod output: " . implode("\n", $output));
+minai_log("info", "Chmod output: " . implode("\n", $output));
 
 if ($returnVar !== 0) {
     send_message('error', "❌ Failed to update permissions:\n" . implode("\n", $output));
@@ -82,7 +82,7 @@ send_message('progress', "✅ Permissions updated successfully");
 send_message('progress', "📋 Copying new files...");
 $copyCmd = "cp -Rf $pluginFolder/* $repoDir 2>&1";
 exec($copyCmd, $output, $returnVar);
-error_log("Copy output: " . implode("\n", $output));
+minai_log("info", "Copy output: " . implode("\n", $output));
 
 if ($returnVar !== 0) {
     send_message('error', "❌ Failed to copy files:\n" . implode("\n", $output));

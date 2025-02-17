@@ -27,7 +27,7 @@ function getSafePath($base, $path) {
     }
     
     if ($fullPath === false || (strpos($fullPath, $realBase) !== 0 && $path !== 'apache_error.log')) {
-        error_log("Troubleshooter: Invalid path access attempt: $path");
+        minai_log("info", "Troubleshooter: Invalid path access attempt: $path");
         return false;
     }
     
@@ -43,7 +43,7 @@ function getLatestInteraction() {
     $errorPath = getSafePath($logDir, 'apache_error.log');
     
     if (!$contextPath || !$outputPath || !$errorPath) {
-        error_log("Troubleshooter: Failed to get valid paths for log files");
+        minai_log("info", "Troubleshooter: Failed to get valid paths for log files");
         return null;
     }
     
@@ -68,9 +68,9 @@ function getLatestInteraction() {
         $startTime = $matches[1];
         $lastOutput = $matches[2];
         $endTime = $matches[3];
-        error_log("Troubleshooter: Found interaction from $startTime to $endTime");
+        minai_log("info", "Troubleshooter: Found interaction from $startTime to $endTime");
     } else {
-        error_log("Troubleshooter: Failed to extract interaction timestamps from output");
+        minai_log("info", "Troubleshooter: Failed to extract interaction timestamps from output");
         $lastOutput = '';
         $startTime = '';
         $endTime = '';
@@ -106,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception('Could not retrieve latest interaction');
         }
         
-        error_log("Troubleshooter: Analyzing interaction - Question: $question");
+        minai_log("info", "Troubleshooter: Analyzing interaction - Question: $question");
         
         // Prepare the prompt for the troubleshooting LLM
         $systemPrompt = 'You are a helpful AI assistant that analyzes LLM interactions to help troubleshoot and explain the behavior of an AI system. ' . 
@@ -138,10 +138,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Use recommended model or configured adapter
         if ($useRecommendedModel) {
             $model = 'anthropic/claude-3.5-sonnet';
-            error_log("Troubleshooter: Using recommended model (Claude-3.5 Sonnet)");
+            minai_log("info", "Troubleshooter: Using recommended model (Claude-3.5 Sonnet)");
         } else {
             $model = $GLOBALS['CONNECTOR']['openrouter']['model'];
-            error_log("Troubleshooter: Using configured model: " . $model);
+            minai_log("info", "Troubleshooter: Using configured model: " . $model);
         }
         
         // Use OpenRouter to get analysis
@@ -161,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'stream' => false
         ];
         
-        error_log("Troubleshooter: Sending request to OpenRouter for analysis");
+        minai_log("info", "Troubleshooter: Sending request to OpenRouter for analysis");
         
         $options = [
             'http' => [
@@ -185,7 +185,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         $analysis = $response['choices'][0]['message']['content'];
-        error_log("Troubleshooter: Analysis completed successfully");
+        minai_log("info", "Troubleshooter: Analysis completed successfully");
         
         echo json_encode([
             'analysis' => $analysis,
@@ -196,8 +196,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
         
     } catch (Exception $e) {
-        error_log("Troubleshooter Error: " . $e->getMessage());
-        error_log("Troubleshooter Error Stack Trace: " . $e->getTraceAsString());
+        minai_log("info", "Troubleshooter Error: " . $e->getMessage());
+        minai_log("info", "Troubleshooter Error Stack Trace: " . $e->getTraceAsString());
         http_response_code(500);
         echo json_encode(['error' => $e->getMessage()]);
     }

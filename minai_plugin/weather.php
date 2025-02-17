@@ -127,13 +127,13 @@ function GetWeatherContext() {
         // Extract weather ID from the format: "Weather < (XXXXXXXX)>"
         $matches = [];
         if (!preg_match('/\(([0-9a-fA-F]{8})\)/', $weather, $matches)) {
-            error_log("minai: Invalid weather format: " . $weather);
+            minai_log("info", "Invalid weather format: " . $weather);
             return $ret;
         }
         
         $weatherId = $matches[1];
         if (!isset($weathers[$weatherId])) {
-            error_log("minai: Unknown weather ID: " . $weatherId);
+            minai_log("info", "Unknown weather ID: " . $weatherId);
             return $ret;
         }
 

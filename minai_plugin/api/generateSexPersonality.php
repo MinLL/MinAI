@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $prompt[] = ["role" => "system", "content" => "$personalityGenerationPrompt".json_encode($sexPersonalityJsonSchema)];
         $prompt[] = ["role" => "user", "content" => $_POST['descriptionPersonality']];
 
-        error_log(json_encode($prompt));
+        minai_log("info", json_encode($prompt));
 
         $connectionHandler = new connector();
 

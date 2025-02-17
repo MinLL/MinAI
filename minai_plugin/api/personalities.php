@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             throw new Exception('Failed to verify new personality creation');
                         }
                     } catch (Exception $e) {
-                        error_log("Insert error: " . $e->getMessage());
+                        minai_log("info", "Insert error: " . $e->getMessage());
                         throw new Exception('Failed to create new personality: ' . $e->getMessage());
                     }
                 } else {
@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             'id' => $id
                         ]);
                     } catch (Exception $e) {
-                        error_log("Update error: " . $e->getMessage());
+                        minai_log("info", "Update error: " . $e->getMessage());
                         throw new Exception('Failed to update personality: ' . $e->getMessage());
                     }
                 }
@@ -89,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         'id' => $id
                     ]);
                 } catch (Exception $e) {
-                    error_log("Delete error: " . $e->getMessage());
+                    minai_log("info", "Delete error: " . $e->getMessage());
                     throw new Exception('Failed to delete personality: ' . $e->getMessage());
                 }
                 break;
@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             ]);
                             $imported++;
                         } catch (Exception $e) {
-                            error_log("Import error for ID {$entry['id']}: " . $e->getMessage());
+                            minai_log("info", "Import error for ID {$entry['id']}: " . $e->getMessage());
                             $skipped++;
                         }
                     } else {
@@ -133,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception('Invalid action specified');
         }
     } catch (Exception $e) {
-        error_log("Personalities API error: " . $e->getMessage());
+        minai_log("info", "Personalities API error: " . $e->getMessage());
         echo json_encode([
             'status' => 'error',
             'message' => $e->getMessage(),
@@ -173,7 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     parse_str(file_get_contents("php://input"), $_DELETE);
     $table = $_DELETE['table'];
     $id = $_DELETE['id'];
-    error_log("Deleting $id from $table");
+    minai_log("info", "Deleting $id from $table");
     // Delete the entry
     $result = $db->delete($table, "id = '$id'");
     echo json_encode(['status' => 'success']);

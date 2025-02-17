@@ -141,8 +141,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Write only the overrides to config.php
         $configFile = "$pluginPath/config.php";
-        error_log("Writing config to $configFile");
-        error_log("Config contents: " . $newConfig);
+        minai_log("info", "Writing config to $configFile");
+        minai_log("info", "Config contents: " . $newConfig);
         
         $success = (file_put_contents($configFile, $newConfig) !== false);
         if (!$success) {
@@ -153,7 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode(['status' => 'success']);
         
     } catch (Exception $e) {
-        error_log("Config save error: " . $e->getMessage());
+        minai_log("info", "Config save error: " . $e->getMessage());
         http_response_code(500);
         $errorDetails = [
             'status' => 'error',

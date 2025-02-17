@@ -22,7 +22,7 @@ $response = ['status' => 'success'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'];
-    error_log('post action: ' . $action);
+    minai_log("info", 'post action: ' . $action);
     if ($action === 'add') {
         // Add new row
         $baseFormId = $db->escape($_POST['baseFormId']);
@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Update existing record
         $updateQuery = "UPDATE equipment_description SET description = '{$description}' WHERE baseFormId = '{$baseFormId}' AND modName = '{$modName}'";
-        error_log('update query: ' . $updateQuery);
+        minai_log("info", 'update query: ' . $updateQuery);
         $db->execQuery($updateQuery);
 
     } elseif ($action === 'delete') {

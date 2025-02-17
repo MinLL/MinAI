@@ -111,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     $table = $_PUT['table'];
     $data = json_decode($_PUT['data'], true);
     $id = $_PUT['id'];  // Use the ID from the request
-    error_log("updating for $id");
+    minai_log("info", "updating for $id");
     // Update the scene description
     $setClause = "sexlab_id = '{$db->escape($data['sexlab_id'])}', description = '{$db->escape($data['description'])}'";
     $result = $db->update($table, $setClause, "ostim_id = '$id'");

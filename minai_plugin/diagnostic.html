@@ -138,29 +138,61 @@
 
         .log-controls {
             display: flex;
-            gap: 10px;
+            align-items: center;
+            gap: 8px;
+            margin-left: 15px;
         }
 
         .log-controls button {
-            padding: 8px 16px;
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
             background: linear-gradient(135deg,
                 rgba(255, 255, 255, 0.1) 0%,
                 rgba(255, 255, 255, 0.05) 100%
             );
-            color: var(--text-color);
             border: 1px solid var(--border-color);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            border-radius: 4px;
+            color: var(--text-color);
+            transition: all 0.2s ease;
         }
 
         .log-controls button:hover {
-            transform: translateY(-2px);
             background: linear-gradient(135deg,
                 rgba(255, 255, 255, 0.15) 0%,
                 rgba(255, 255, 255, 0.08) 100%
             );
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .log-controls button.active {
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.2) 0%,
+                rgba(76, 175, 80, 0.3) 100%
+            );
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .follow-all-button {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px !important;
+            font-size: 14px;
+        }
+
+        .follow-all-button.active {
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.2) 0%,
+                rgba(76, 175, 80, 0.3) 100%
+            ) !important;
+            border-color: var(--primary-color) !important;
+            color: var(--primary-color);
         }
 
         .log-content {
@@ -1203,6 +1235,97 @@
             font-weight: 500;
             flex: 0 0 auto;
         }
+
+        .tooltip-icon {
+            font-size: 0.8em;
+            color: var(--info-color);
+            margin-left: 5px;
+            opacity: 0.7;
+        }
+
+        .log-title {
+            display: flex;
+            align-items: center;
+            cursor: help;
+        }
+
+        .log-title:hover {
+            text-decoration: underline;
+            text-decoration-style: dotted;
+        }
+
+        /* Add these styles in the <style> section */
+        .maximize-button {
+            padding: 8px 16px;
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .maximize-button:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.15) 0%,
+                rgba(255, 255, 255, 0.08) 100%
+            );
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .log-viewer.maximized {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 1000;
+            margin: 0;
+            border-radius: 0;
+            background: var(--background-dark);
+        }
+
+        .log-viewer.maximized .log-content {
+            height: calc(100vh - 150px);
+        }
+
+        /* Add these styles to the <style> section */
+        .log-controls button {
+            width: 32px;
+            height: 32px;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .log-controls button:hover::after {
+            content: attr(title);
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--background-dark);
+            color: var(--text-color);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            border: 1px solid var(--border-color);
+            z-index: 1000;
+        }
+
+        .log-controls {
+            position: relative;
+            gap: 5px;
+        }
     </style>
 </head>
 <body>
@@ -1221,10 +1344,13 @@
                     <option value="">Add Log Viewer...</option>
                 </select>
                 <button onclick="restoreDefaultLogs()" class="layout-button">Restore Defaults</button>
+                <button onclick="toggleFollowAll(this)" class="layout-button follow-all-button" title="Toggle auto-scroll for all logs">
+                    <span style="font-size: 14px;">⟱</span> Follow All
+                </button>
                 <div class="layout-controls">
                     <button class="layout-button" onclick="setLayout(1)">1x</button>
-                    <button class="layout-button active" onclick="setLayout(2)">2x</button>
-                    <button class="layout-button" onclick="setLayout(3)">3x</button>
+                    <button class="layout-button" onclick="setLayout(2)">2x</button>
+                    <button class="layout-button active" onclick="setLayout(3)">3x</button>
                     <button class="layout-button" onclick="setLayout(4)">4x</button>
                 </div>
             </div>
@@ -1261,7 +1387,10 @@
         const DEFAULT_LOGS = [
             'context_sent_to_llm.log',
             'output_from_llm.log',
-            'apache_error.log'
+            'apache_error.log',
+            'minai.log',
+            'minai_context_sent_to_llm.log',
+            'minai_output_from_llm.log'
         ];
 
         let currentLayout = parseInt(localStorage.getItem('logViewerLayout') || '2');
@@ -1664,20 +1793,17 @@
         function toggleFollow(button) {
             const viewer = button.closest('.log-viewer');
             const logContent = viewer.querySelector('.log-content');
-            button.classList.toggle('active');
-            
             const config = Array.from(activeLogViewers.entries())
                 .find(([_, v]) => v.viewer === viewer);
             
-            if (config) {
-                const following = button.classList.contains('active');
-                activeLogViewers.get(config[0]).follow = following;
-                
-                if (following) {
-                    // Scroll to bottom when enabling follow
-                    logContent.scrollTop = logContent.scrollHeight;
-                }
-            }
+            if (!config) return;
+            
+            const following = !button.classList.contains('active');
+            button.classList.toggle('active', following);
+            activeLogViewers.get(config[0]).follow = following;
+            
+            // Always scroll to bottom when toggling follow
+            logContent.scrollTop = logContent.scrollHeight;
         }
 
         function isFollowEnabled(viewer) {
@@ -1970,7 +2096,6 @@
                     
                     viewerData.updateTimeout = setTimeout(() => {
                         content.classList.add('updating');
-                        const wasAtBottom = content.scrollHeight - content.scrollTop <= content.clientHeight + 50;
                         
                         const parsedContent = config.parser(data.content);
                         content.dataset.originalContent = optimizeLogContent(
@@ -1984,9 +2109,16 @@
                                 content.innerHTML = content.dataset.originalContent;
                             }
                             
-                            if (viewerData.follow && wasAtBottom) {
+                            // Always scroll to bottom on initial load or if follow is enabled
+                            if (!viewerData.initialized || viewerData.follow) {
                                 content.scrollTop = content.scrollHeight;
                             }
+                            
+                            // Mark as initialized after first content load
+                            if (!viewerData.initialized) {
+                                viewerData.initialized = true;
+                            }
+                            
                             content.classList.remove('updating');
                         });
                     }, 100);
@@ -2006,6 +2138,7 @@
                 availableLogConfigs = data.files.map(file => ({
                     name: file.name,
                     file: file.name,
+                    tooltip: getLogTooltip(file.name),
                     parser: file.name.includes('apache') ? parseApacheLog :
                            file.name.includes('context') ? parseContextLog :
                            file.name.includes('output') ? parseOutputLog :
@@ -2098,13 +2231,33 @@
             
             viewer.innerHTML = `
                 <div class="log-header">
-                    <span class="log-title">${config.name}</span>
+                    <span class="log-title" title="${config.tooltip}">${config.name}
+                        ${config.tooltip ? `<span class="tooltip-icon">ⓘ</span>` : ''}
+                    </span>
                     <div class="log-controls">
-                        <button class="wrap-button active" onclick="toggleWrap(this)">Wrap</button>
-                        ${extraControls}
-                        <button class="follow-button active" onclick="toggleFollow(this)">Follow</button>
-                        <button class="download-button" onclick="downloadLog('${config.file}')">Download</button>
-                        <button onclick="closeLogViewer(this)">Close</button>
+                        <button class="wrap-button active" onclick="toggleWrap(this)" title="Toggle Word Wrap">
+                            ↵
+                        </button>
+                        ${config.file === 'context_sent_to_llm.log' ? `
+                            <button class="expand-all-button" onclick="expandAllEntries(this)" title="Expand All">
+                                ⤵
+                            </button>
+                            <button class="collapse-all-button" onclick="collapseAllEntries(this)" title="Collapse All">
+                                ⤴
+                            </button>
+                        ` : ''}
+                        <button class="follow-button active" onclick="toggleFollow(this)" title="Auto-scroll to Bottom">
+                            ⟱
+                        </button>
+                        <button class="download-button" onclick="downloadLog('${config.file}')" title="Download Log">
+                            ⭳
+                        </button>
+                        <button class="maximize-button" onclick="toggleMaximize(this)" title="Maximize">
+                            ⛶
+                        </button>
+                        <button onclick="closeLogViewer(this)" title="Close">
+                            ✕
+                        </button>
                     </div>
                 </div>
                 ${config.presets.length > 0 ? `
@@ -2124,12 +2277,19 @@
             activeLogViewers.set(config.file, { 
                 position: 0, 
                 viewer,
-                follow: true
+                follow: true,  // Set follow to true by default
+                initialized: false  // Add initialization flag
             });
             
             setupScrollHandler(viewer);
             setupCopyHandlers(viewer);
             saveConfiguration();
+            
+            // Ensure initial scroll to bottom
+            const logContent = viewer.querySelector('.log-content');
+            requestAnimationFrame(() => {
+                logContent.scrollTop = logContent.scrollHeight;
+            });
             
             return viewer;
         }
@@ -2603,6 +2763,85 @@
 
         // Call this when the document loads
         document.addEventListener('DOMContentLoaded', addContextLogStyles);
+
+        // Add this helper function to get tooltips
+        function getLogTooltip(filename) {
+            const tooltips = {
+                'context_sent_to_llm.log': 'Prompt sent to LLM for CHIM requests',
+                'output_from_llm.log': 'Response from LLM for CHIM requests. Most responses will be here.',
+                'apache_error.log': 'CHIM server log',
+                'minai.log': 'MinAI server log',
+                'minai_context_sent_to_llm.log': 'Requests sent to the LLM from MinAI for things like the roleplay feature',
+                'minai_output_from_llm.log': 'Responses from the LLM for things like the roleplay feature'
+            };
+            return tooltips[filename] || '';
+        }
+
+        // Add this new function to handle maximize/restore
+        function toggleMaximize(button) {
+            const viewer = button.closest('.log-viewer');
+            const container = document.getElementById('logContainer');
+            const isMaximized = viewer.classList.toggle('maximized');
+            
+            // Update button text
+            button.innerHTML = isMaximized ? '⮌' : '⛶';
+            button.title = isMaximized ? 'Restore' : 'Maximize';
+            
+            // Save previous layout if maximizing
+            if (isMaximized) {
+                viewer.dataset.previousParent = viewer.parentElement.id;
+                viewer.dataset.previousPosition = Array.from(viewer.parentElement.children).indexOf(viewer);
+                document.body.style.overflow = 'hidden';
+                document.body.appendChild(viewer);
+            } else {
+                // Restore to previous position
+                document.body.style.overflow = '';
+                const previousPosition = parseInt(viewer.dataset.previousPosition);
+                const children = Array.from(container.children);
+                
+                if (previousPosition >= children.length) {
+                    container.appendChild(viewer);
+                } else {
+                    container.insertBefore(viewer, children[previousPosition]);
+                }
+            }
+            
+            // Trigger a resize event to update any internal layouts
+            window.dispatchEvent(new Event('resize'));
+        }
+
+        // Add event listener to handle Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const maximizedViewer = document.querySelector('.log-viewer.maximized');
+                if (maximizedViewer) {
+                    const maximizeButton = maximizedViewer.querySelector('.maximize-button');
+                    toggleMaximize(maximizeButton);
+                }
+            }
+        });
+
+        // Add these new functions to handle follow all and fix the double-click issue
+        function toggleFollowAll(button) {
+            const isFollowing = button.classList.toggle('active');
+            document.querySelectorAll('.log-viewer').forEach(viewer => {
+                const followButton = viewer.querySelector('.follow-button');
+                const logContent = viewer.querySelector('.log-content');
+                
+                // Update follow button state
+                followButton.classList.toggle('active', isFollowing);
+                
+                // Get config and update follow state
+                const config = Array.from(activeLogViewers.entries())
+                    .find(([_, v]) => v.viewer === viewer);
+                if (config) {
+                    activeLogViewers.get(config[0]).follow = isFollowing;
+                    if (isFollowing) {
+                        logContent.scrollTop = logContent.scrollHeight;
+                    }
+                }
+            });
+        }
     </script>
 </body>
 </html> 

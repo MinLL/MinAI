@@ -100,21 +100,21 @@ foreach ($physicsInfoElements as $n) {
 
 /*$nullValues = [];
 foreach ($GLOBALS["contextDataFull"] as $n=>$ctxLine) {
-    error_log("minai: Checking ({$n}) {$ctxLine["content"]}");
+    minai_log("info", "Checking ({$n}) {$ctxLine["content"]}");
     if (!$ctxLine["content"] || $ctxLine["content"] == null || $ctxLine["content"]  == "") {
         $nullValues[] = $n;
-        error_log("minai: Found null value in context ({$n})");
+        minai_log("info", "Found null value in context ({$n})");
     }
 }
 foreach ($nullValues as $n) {
-    error_log("minai: Unsetting null value $n");
+    minai_log("info", "Unsetting null value $n");
     unset($GLOBALS["contextDataFull"][$n]); 
 }*/
 
 
 // Cleanup self narrator dialogue to avoid contaminating general context
 if ($GLOBALS["minai_processing_input"]) {
-    error_log("minai: Cleaning up player input");
+    minai_log("info", "Cleaning up player input");
     DeleteLastPlayerInput();
 }
 $GLOBALS["contextDataFull"] = array_values($GLOBALS["contextDataFull"]);

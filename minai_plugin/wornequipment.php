@@ -184,15 +184,15 @@ function GetAllEquipmentContext($actorName)
   // if this fails, still be able to continue without this functionality
   try {
     $encodedString = GetActorValue($actorName, "AllWornEquipment");
-    error_log("AllWornEquipment: " . $encodedString);
+    minai_log("info", "AllWornEquipment: " . $encodedString);
     // we can potentially cache this by hashing the encodedString since equipment doesn't change often
     // especially for npc, but this should be fine for now
     $parsedResult = ParseEncodedEquipmentData($encodedString);
     EnrichEquipmentDataFromDb($parsedResult);
     return BuildEquipmentContext($parsedResult);
   } catch (Exception $e) {
-    error_log("Failed to get equipment context: " . $e->getMessage());
-    error_log($e->getTraceAsString());
+    minai_log("info", "Failed to get equipment context: " . $e->getMessage());
+    minai_log("info", $e->getTraceAsString());
     return [
       'context' => "",
       'skipKeywords' => []

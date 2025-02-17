@@ -36,12 +36,12 @@ Function BuildActorValueCache($name) {
     $idPrefix = $GLOBALS["db"]->escape($idPrefix);
     $query = "select * from conf_opts where LOWER(id) like LOWER('{$idPrefix}%')";
     $ret = $GLOBALS["db"]->fetchAll($query);
-    // error_log("Building cache for $name");
+    // minai_log("info", "Building cache for $name");
     foreach ($ret as $row) {
         //do this instead of split // because $name could have // in it
         $key = substr(strtolower($row['id']), $origLength);
         $value = $row['value'];
-        // error_log($name . ':: (' . $key . ') ' . $row['id'] . ' = ' . $row['value']);
+        // minai_log("info", $name . ':: (' . $key . ') ' . $row['id'] . ' = ' . $row['value']);
         $GLOBALS[MINAI_ACTOR_VALUE_CACHE][$name][$key] = $value;
     }
 }
@@ -65,7 +65,7 @@ function CanVibrate($name) {
 // Return the specified actor value.
 // Caches the results of several queries that are repeatedly referenced.
 Function GetActorValue($name, $key, $preserveCase=false, $skipCache=false) {
-    // error_log("Looking up $name: $key");
+    // minai_log("info", "Looking up $name: $key");
     If (!$preserveCase && !$skipCache) {
         $name = strtolower($name);
         $key = strtolower($key);
@@ -73,7 +73,7 @@ Function GetActorValue($name, $key, $preserveCase=false, $skipCache=false) {
         If (!HasActorValueCache($name)) {
             BuildActorValueCache($name);
         }
-        // error_log("Checking cache: $name, $key");
+        // minai_log("info", "Checking cache: $name, $key");
         $ret = GetActorValueCache($name, $key);
         return $ret === null ? "" : strtolower($ret);
     }
@@ -237,10 +237,10 @@ Function IsActionEnabled($actionName) {
 Function RegisterAction($actionName) {
     if (IsActionEnabled($actionName)) {
         $GLOBALS["ENABLED_FUNCTIONS"][]=$actionName;
-        // error_log("minai: Registering {$actionName}");
+        // minai_log("info", "Registering {$actionName}");
     }
     else {
-        // error_log("minai: Not Registering {$actionName}");
+        // minai_log("info", "Not Registering {$actionName}");
     }
 }
 
@@ -284,11 +284,11 @@ Function StoreRadiantActors($actor1, $actor2) {
             'value' => 'TRUE'
         )
     );
-    error_log("minai: Storing Radiant Actors");
+    minai_log("info", "Storing Radiant Actors");
 }
 
 Function ClearRadiantActors() {
-    // error_log("minai: Clearing Radiant Actors");
+    // minai_log("info", "Clearing Radiant Actors");
     $db = $GLOBALS['db'];
     $id = "_minai_RADIANT//actor1";
     $db->delete("conf_opts", "id='{$id}'");
@@ -336,7 +336,7 @@ Function IsRadiant() {
 }
 
 function getScene($actor, $threadId = null) {
-    //error_log("minai: getScene($actor, $threadId)");
+    //minai_log("info", "getScene($actor, $threadId)");
     
     // Properly escape the actor name for PostgreSQL
     $actor = $GLOBALS["db"]->escape($actor);
@@ -355,7 +355,7 @@ function getScene($actor, $threadId = null) {
     }
 
     if(!$scene) {
-        // error_log("minai: No scene found.")     ;
+        // minai_log("info", "No scene found.")     ;
         return null;
     }
     $scene = $scene[0];
@@ -421,7 +421,7 @@ function getScene($actor, $threadId = null) {
     $actors = explode(",", $scene["actors"]);
     $sceneDesc = replaceActorsNamesInSceneDesc($actors, $sceneDesc);
     $scene["description"] = $sceneDesc;
-    error_log("minai: Returning scene: $sceneDesc.");
+    minai_log("info", "Returning scene: $sceneDesc.");
 
     return $scene;
 }
@@ -730,7 +730,7 @@ class Utilities {
            return $name(...$params); 
         }
         else {
-            error_log("Error calling Utilities clas: ". $name . " is not defined as a method or function in util.php");
+            minai_log("info", "Error calling Utilities clas: ". $name . " is not defined as a method or function in util.php");
         }
     }
 
@@ -886,7 +886,7 @@ function callLLM($messages, $model = null, $options = []) {
             $promptLog .= "Role: " . $message['role'] . "\nContent: " . $message['content'] . "\n";
         }
         $promptLog .= "\n";
-        file_put_contents('/var/www/html/HerikaServer/log/context_sent_to_llm.log', $promptLog, FILE_APPEND);
+        file_put_contents('/var/www/html/HerikaServer/log/minai_context_sent_to_llm.log', $promptLog, FILE_APPEND);
 
         // Use provided model or fall back to configured model
         if (!$model && isset($GLOBALS['CONNECTOR']['openrouter']['model'])) {
@@ -894,14 +894,14 @@ function callLLM($messages, $model = null, $options = []) {
         }
         
         if (!$model) {
-            error_log("minai: callLLM: No model specified");
+            minai_log("info", "callLLM: No model specified");
             return null;
         }
 
         // Get API URL and key from globals
         if (!isset($GLOBALS['CONNECTOR']['openrouter']['url']) || 
             !isset($GLOBALS['CONNECTOR']['openrouter']['API_KEY'])) {
-            error_log("minai: callLLM: Missing OpenRouter configuration");
+            minai_log("info", "callLLM: Missing OpenRouter configuration");
             return null;
         }
 
@@ -935,25 +935,25 @@ function callLLM($messages, $model = null, $options = []) {
             ]
         ];
 
-        error_log("minai: callLLM: Sending request to model: $model");
+        minai_log("info", "callLLM: Sending request to model: $model");
         
         // Make the request
         $context = stream_context_create($options);
         $result = file_get_contents($url, false, $context);
 
         if ($result === false) {
-            error_log("minai: callLLM: Request failed");
+            minai_log("info", "callLLM: Request failed");
             return null;
         }
 
         $response = json_decode($result, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            error_log("minai: callLLM: Invalid JSON response: " . json_last_error_msg());
+            minai_log("info", "callLLM: Invalid JSON response: " . json_last_error_msg());
             return null;
         }
 
         if (!isset($response['choices'][0]['message']['content'])) {
-            error_log("minai: callLLM: Unexpected response format");
+            minai_log("info", "callLLM: Unexpected response format");
             return null;
         }
 
@@ -964,13 +964,13 @@ function callLLM($messages, $model = null, $options = []) {
         $responseLog = "== $timestamp START\n";
         $responseLog .= $responseContent . "\n";
         $responseLog .= date('Y-m-d\TH:i:sP') . " END\n\n";
-        file_put_contents('/var/www/html/HerikaServer/log/output_from_llm.log', $responseLog, FILE_APPEND);
+        file_put_contents('/var/www/html/HerikaServer/log/minai_output_from_llm.log', $responseLog, FILE_APPEND);
 
         return $responseContent;
 
     } catch (Exception $e) {
-        error_log("minai: callLLM Error: " . $e->getMessage());
-        error_log("minai: callLLM Stack Trace: " . $e->getTraceAsString());
+        minai_log("info", "callLLM Error: " . $e->getMessage());
+        minai_log("info", "callLLM Stack Trace: " . $e->getTraceAsString());
         return null;
     }
 }
@@ -998,7 +998,7 @@ Function GetFallbackConfigPath() {
 
 Function CreateFallbackConfig() {
     if (!file_exists(GetFallbackConfigPath())) {
-        error_log("minai: Initializing LLM Fallback Profile");
+        minai_log("info", "Initializing LLM Fallback Profile");
         createProfile("LLMFallback", [
             "HERIKA_NAME" => "LLMFallback",
             "HERIKA_PERS" => "This is a LLM profile used for retrying when the primary LLM call fails. Only the connector settings will be used, and it will only work with openrouterjson."
@@ -1050,4 +1050,21 @@ function replaceVariables($content, $replacements, $depth = 0) {
     }
     
     return $result;
+}
+
+function minai_log($level, $message, $logFile = 'minai.log') {
+    // Ensure level is lowercase for consistency
+    $level = strtolower($level);
+    
+    // Get timestamp in ISO 8601 format
+    $timestamp = date('Y-m-d\TH:i:sP');
+    
+    // Format the log entry
+    $logEntry = "[{$timestamp}] [{$level}] {$message}\n";
+    
+    // Construct the full path
+    $logPath = "/var/www/html/HerikaServer/log/{$logFile}";
+    
+    // Append to log file
+    file_put_contents($logPath, $logEntry, FILE_APPEND);
 }

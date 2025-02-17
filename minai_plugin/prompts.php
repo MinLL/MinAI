@@ -100,7 +100,7 @@ if (IsFollower($GLOBALS["HERIKA_NAME"])) {
 }
 
 function SetInputPrompts($prompt) {
-    error_log("minai: Overriding input prompts for combat for {$GLOBALS["HERIKA_NAME"]}");
+    minai_log("info", "Overriding input prompts for combat for {$GLOBALS["HERIKA_NAME"]}");
     $GLOBALS["PROMPTS"]["inputtext"]= $prompt;
     $GLOBALS["PROMPTS"]["inputtext_s"]= $prompt;
     $GLOBALS["PROMPTS"]["ginputtext"]= $prompt;
