@@ -138,7 +138,6 @@ function interceptRoleplayInput() {
             'PLAYER_POSSESSIVE' => $playerPronouns['possessive'],
             'HERIKA_DYNAMIC' => $HERIKA_DYNAMIC,
             'ORIGINAL_INPUT' => $originalInput,
-            'INSTRUCTIONS' => $settings['INSTRUCTIONS'],
             'PHYSICAL_DESCRIPTION' => $physDesc,
             'AROUSAL_STATUS' => $arousalStatus,
             'SURVIVAL_STATUS' => $survivalStatus,
@@ -150,8 +149,8 @@ function interceptRoleplayInput() {
         // Apply replacements to system prompt
         $systemPrompt = replaceVariables(
             $GLOBALS["gameRequest"][0] == "minai_roleplay" 
-                ? $settings['ROLEPLAY_SYSTEM_PROMPT']
-                : $settings['SYSTEM_PROMPT'],
+                ? $settings['roleplay_system_prompt']
+                : $settings['system_prompt'],
             $variableReplacements
         );
 
