@@ -864,10 +864,39 @@
 
                                 <label class="option-label" for="roleplay-system-prompt">Roleplay System Prompt</label>
                                 <textarea id="roleplay-system-prompt" class="prompt-textarea" rows="4"></textarea>
-                            </div>
+
 
                             <!-- Request Formats -->
                             <div class="option-group">
+                                <div class="info-section" style="margin-top: 10px;">
+                                    <p><strong>💡 Tip: Request Formats influences speech style</strong></p>
+                                    <p>The request format determines how the LLM processes input, and strongly influences the speech style of the response. Here are examples for different styles:</p>
+                                    <details>
+                                        <summary><strong>Translation (Default)</strong></summary>
+                                        <pre>Translate this casual speech into your character's manner: '#ORIGINAL_INPUT#'</pre>
+                                    </details>
+                                    <details>
+                                        <summary><strong>Noble/Aristocratic</strong></summary>
+                                        <pre>Your character tries to speak casually, but comes across as being a bit formal due to #PLAYER_POSSESSIVE# noble upbringing. Translate this casual speech into your character's more refined manner: '#ORIGINAL_INPUT#'</pre>
+                                    </details>
+                                    <details>
+                                        <summary><strong>Arrogant/Haughty</strong></summary>
+                                        <pre>Despite your best efforts to be civil, your deep-seated sense of superiority always shows through in your speech. Translate this commoner's words into your naturally condescending manner: '#ORIGINAL_INPUT#'</pre>
+                                    </details>
+                                    <details>
+                                        <summary><strong>Brutish/Warrior</strong></summary>
+                                        <pre>As a warrior who values directness over fancy words, you prefer to get straight to the point. Translate this casual speech into your characteristically blunt manner: '#ORIGINAL_INPUT#'</pre>
+                                    </details>
+                                    <details>
+                                        <summary><strong>Timid Scholar</strong></summary>
+                                        <pre>Being more comfortable with books than people, you tend to fall back on academic language when nervous. Translate this casual speech into your characteristically hesitant, scholarly manner: '#ORIGINAL_INPUT#'</pre>
+                                    </details>
+                                    <details>
+                                        <summary><strong>Roleplay (Default)</strong></summary>
+                                        <pre>You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue in response to the ongoing conversation and situation.</pre>
+                                    </details>
+                                    <p>The translation format must include '#ORIGINAL_INPUT#'. The roleplay format should emphasize natural responses to the conversation.</p>
+                                </div>
                                 <label class="option-label" for="translation-request">Translation Request Format</label>
                                 <textarea id="translation-request" class="prompt-textarea" rows="3"></textarea>
 
