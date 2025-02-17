@@ -34,11 +34,18 @@ Function BuildContext($name) {
 
 Function GetSurvivalContext($name) {
     $ret = "";
-    if (!IsPlayer($name) || (!IsModEnabled("Sunhelm") && !IsModEnabled("SurvivalMode"))) {
+    // If it's a follower, use the player's needs instead
+    // if/when we add support for ineed, we'll need to handle that differently
+    if (IsFollower($name)) {
+        $name = $GLOBALS["PLAYER_NAME"];
+    }
+    
+    if ((!IsModEnabled("Sunhelm") && !IsModEnabled("SurvivalMode"))) {
         return $ret;
     }
+    
     $hunger = floatval(GetActorValue($name, "hunger"));
-    $thirst = floatval(GetActorValue($name, "thirst"));
+    $thirst = floatval(GetActorValue($name, "thirst")); 
     $fatigue = floatval(GetActorValue($name, "fatigue"));
     $cold = floatval(GetActorValue($name, "cold"));
 
