@@ -97,13 +97,17 @@ if (isset($GLOBALS["realnames_support"]) && $GLOBALS["realnames_support"]) {
             error_log("minai: Detected generic NPC, seeding profile. Original: {$matches[0]}, new: {$matches[2]}, codename: $codename");
             $npcTemlate=$GLOBALS["db"]->fetchAll("SELECT npc_pers FROM npc_templates where npc_name='$codename'");
             $personality = 'Roleplay as '.addslashes(trim($matches[1])) . ", who is a " . addslashes(trim($matches[2]));;
-            if (is_array($npcTemlate[0]))
+            
+            // Check if we got results and they have the expected structure
+            if (!empty($npcTemlate) && isset($npcTemlate[0]['npc_pers'])) {
                 $personality = addslashes(trim($npcTemlate[0]["npc_pers"]));
-            else {
+            } else {
                 $npcTemlate=$GLOBALS["db"]->fetchAll("SELECT npc_pers FROM npc_templates_custom where npc_name='$codename'");
-                if (is_array($npcTemlate[0]))
+                if (!empty($npcTemlate) && isset($npcTemlate[0]['npc_pers'])) {
                     $personality = addslashes(trim($npcTemlate[0]["npc_pers"]));
+                }
             }
+
             // Swap out the generic name for the new name
             $personality = str_replace("Roleplay as {$matches[2]}", "Roleplay as {$matches[0]}", $personality);
             error_log("minai: Initializing generic NPC {$matches[0]} with personality: $personality");

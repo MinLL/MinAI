@@ -117,16 +117,27 @@ function GetWeatherContext() {
     $ret = "";
     $skyMode = intval(GetActorValue($GLOBALS["PLAYER_NAME"], "skyMode"));
     if ($skyMode == 3) { // Outdoors, full skybox
-        $weather = strtolower(GetActorValue($GLOBALS["PLAYER_NAME"], "weather"));;
+        $weather = strtolower(GetActorValue($GLOBALS["PLAYER_NAME"], "weather"));
         // [VoiceType <MaleGuard (000AA8D3)>
         // [Weather < (0010A231)>]
-        if (!$weather)
-            return $ret;
-        $weather = $weathers[substr($weather, strpos($weather, "(")+1, 8)];
         if (!$weather) {
-            error_log("minai: Unknown Weather type");
             return $ret;
         }
+
+        // Extract weather ID from the format: "Weather < (XXXXXXXX)>"
+        $matches = [];
+        if (!preg_match('/\(([0-9a-fA-F]{8})\)/', $weather, $matches)) {
+            error_log("minai: Invalid weather format: " . $weather);
+            return $ret;
+        }
+        
+        $weatherId = $matches[1];
+        if (!isset($weathers[$weatherId])) {
+            error_log("minai: Unknown weather ID: " . $weatherId);
+            return $ret;
+        }
+
+        $weather = $weathers[$weatherId];
         $ret .= "The weather is currently: {$weather["description"]} ";
         $currentGameHour = intval(GetActorValue($GLOBALS["PLAYER_NAME"], "currentGameHour"));
         if ($currentGameHour <= 5 || $currentGameHour > 21 && str_contains($weather["name"], "_A")) {
