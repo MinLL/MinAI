@@ -125,4 +125,3 @@ function RegisterSubLolaAction($command, $name, $description) {
     RegisterAction($command);
 }
 
-?>

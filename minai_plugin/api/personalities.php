@@ -178,4 +178,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     $result = $db->delete($table, "id = '$id'");
     echo json_encode(['status' => 'success']);
 }
-?>

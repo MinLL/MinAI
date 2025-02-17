@@ -431,4 +431,3 @@ $GLOBALS["PROMPTS"]["minai_tntr_deathworm_trigger01"] = [
         "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} notices something strange about the ground): {$GLOBALS["target"]} notices small pebbles starting to shift and roll across the ground. An odd stillness fills the air!) {$GLOBALS["TEMPLATE_DIALOG"]}"
     ]
 ];
-?>

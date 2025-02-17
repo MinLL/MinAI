@@ -101,4 +101,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['act
 
     echo json_encode(['status' => 'success', 'data' => $data]);
 }
-?>

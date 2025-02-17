@@ -289,4 +289,4 @@ function ShouldBlockTNTREvent($eventName) {
     
     return false;
 }
-?>
+

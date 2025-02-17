@@ -91,5 +91,4 @@ if (IsModEnabled("SLHH") && !IsDeviousFollower($GLOBALS['HERIKA_NAME'])) {
 
 
 
-?>
 

@@ -94,4 +94,3 @@ function handleDeleteRequest($endpoint, $data) {
     }
 }
 
-?>

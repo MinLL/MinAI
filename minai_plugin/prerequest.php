@@ -141,4 +141,3 @@ $GLOBALS["LLM_RETRY_FNCT"] = function() {
 if (isset($GLOBALS['use_llm_fallback']) && $GLOBALS['use_llm_fallback']) {
     CreateFallbackConfig();
 }
-?>

@@ -107,4 +107,3 @@ if (file_exists($migrateScript)) {
 send_message('progress', "🎉 All steps completed successfully!");
 send_message('success', "✨ Repository successfully updated from the $branch branch");
 
-?>

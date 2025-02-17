@@ -120,4 +120,3 @@ if ($GLOBALS["minai_processing_input"]) {
 $GLOBALS["contextDataFull"] = array_values($GLOBALS["contextDataFull"]);
 
 require "/var/www/html/HerikaServer/ext/minai_plugin/command_prompt_custom.php";
-?>

@@ -77,4 +77,3 @@ if(isset($scene)){
     $GLOBALS["TEMPLATE_DIALOG"] .= " Emphasize the content of the #SEX_SCENARIO in the dialogue, including any sexual acts, positions, or restraints. ";
 }
 
-?>

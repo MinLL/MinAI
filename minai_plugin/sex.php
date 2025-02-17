@@ -722,6 +722,3 @@ $GLOBALS["FUNCTIONS"][] = [
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStopFollowing"]=$GLOBALS["GenericFuncRet"];
 
-?>
-
-

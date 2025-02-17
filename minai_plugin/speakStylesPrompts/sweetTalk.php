@@ -56,4 +56,3 @@ function setSweeTalkPrompts($currentName)
     ];
 }
 
-?>

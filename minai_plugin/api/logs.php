@@ -154,4 +154,3 @@ if ($lastPosition === 0) {
         'position' => $currentPosition
     ]);
 }
-?> 

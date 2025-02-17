@@ -120,4 +120,3 @@ Function EnableDeviousNarratorActions() {
     $GLOBALS["ENABLED_FUNCTIONS"] = array();
 }
 
-?>
