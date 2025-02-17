@@ -76,7 +76,7 @@ Event OnAnimationEvent(ObjectReference akSource, string asEventName)
         MainQuestController.Info("Disabling sapience due to stealth")
       EndIf
     elseif asEventName == "tailMTIdle" || asEventName == "tailMTLocomotion" || asEventName == "tailCombatIdle" || asEventName == "tailCombatLocomotion"
-      if config.disableSapienceInStealth
+      if config.disableSapienceInStealth || minai_DynamicSapienceToggleStealth.GetValueInt() == 0
         MainQuestController.Info("Re-enabling sapience after leaving stealth")
         minai_DynamicSapienceToggleStealth.SetValue(1.0)
       EndIf

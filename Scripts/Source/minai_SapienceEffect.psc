@@ -12,7 +12,8 @@ Spell SapienceSpell
 Spell ContextSpell
 GlobalVariable minai_SapienceEnabled
 actor playerRef
-	
+GlobalVariable minai_DynamicSapienceToggleStealth
+
 Event OnEffectStart(Actor akTarget, Actor akCaster)
   main = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_MainQuestController
   aiff = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_AIFF
@@ -20,6 +21,7 @@ Event OnEffectStart(Actor akTarget, Actor akCaster)
   SapienceSpell = Game.GetFormFromFile(0x0917, "MinAI.esp") as Spell
   ContextSpell = Game.GetFormFromFile(0x090A, "MinAI.esp") as Spell
   minai_SapienceEnabled = Game.GetFormFromFile(0x091A, "MinAI.esp") as GlobalVariable
+  minai_DynamicSapienceToggleStealth = Game.GetFormFromFile(0x0E97, "MinAI.esp") as GlobalVariable
   if (!akTarget || !main || !aiff || !aiff.IsInitialized())
     Debug.Trace("[minai] SAPIENCE: Skipping OnEffectStart, not ready")
     return
@@ -60,6 +62,10 @@ bool Function ShouldRemoveActor(actor akTarget)
   if (!playerRef || !akTarget)
     return true
   EndIf
+  if (minai_DynamicSapienceToggleStealth.GetValueInt() == 0)
+    Main.Debug("SAPIENCE: Dynamic stealth is disabled. Should remove actor.")
+    return true
+  endif
   bool inRange = (akTarget.GetDistance(playerRef) <= 1024)
   bool isAlive = (akTarget.GetKiller() == None)
   ; bool isNotHostile = !(akTarget.IsHostileToActor(playerRef))
