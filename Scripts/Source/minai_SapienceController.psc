@@ -223,6 +223,10 @@ Function TriggerRechat(string actor1name, string actor2name)
     Main.Debug("SAPIENCE: Not rechatting with player")
     return
   EndIf
+  if actor2name == "The Narrator"
+    Main.Debug("SAPIENCE: Not rechatting with The Narrator")
+    return
+  EndIf
   Main.Info("SAPIENCE: Rechat triggered (" + actor2name + " => " + actor1name + "): " + numRechatsSoFar + "/" + targetRechatCount)
   AIAgentFunctions.requestMessageForActor(actor1name, "minai_force_rechat", actor2name)
   numRechatsSoFar += 1
@@ -302,3 +306,8 @@ Event OnKeyDown(int KeyCode)
   ;    StartNextUpdate()
   ;  EndIf
 EndEvent
+
+Function ResetAndStartNextUpdate(float nextTime = 0.0)
+  ResetRechat()
+  StartNextUpdate(nextTime)
+EndFunction
