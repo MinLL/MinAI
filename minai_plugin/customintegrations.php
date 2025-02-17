@@ -9,6 +9,9 @@ require_once(__DIR__.DIRECTORY_SEPARATOR."updateThreadsDB.php");
 
 
 function ProcessIntegrations() {
+    if (isset($GLOBALS["gameRequest"])) {
+        minai_log("info", "Processing request: " . json_encode($GLOBALS["gameRequest"]));
+    }
     // Handle allowing third party mods to register things with the context system
     $MUST_DIE=false;
     if (isset($GLOBALS["use_defeat"]) && $GLOBALS["use_defeat"] && IsModEnabled("SexlabDefeat")) {
