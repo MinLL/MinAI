@@ -206,6 +206,9 @@ function interceptRoleplayInput() {
             $response = preg_replace('/^' . preg_quote($PLAYER_NAME . ':') . '\s*/', '', $response);
             $response = preg_replace('/^' . preg_quote($PLAYER_NAME) . ':\s*/', '', $response);
             
+            // Strip all quotes from the response
+            $response = str_replace(["", '"'], '', $response);
+            
             minai_log("info", "Roleplay input transformed from \"{$originalInput}\" to \"{$response}\"");
             
             if ($GLOBALS["gameRequest"][0] == "minai_roleplay") {

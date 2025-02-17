@@ -232,10 +232,6 @@
             margin: 1px 0;
             padding: 1px 4px;
             border-radius: 2px;
-            display: flex;
-            align-items: baseline;
-            gap: 8px;
-            min-height: 20px;
             white-space: nowrap;
             overflow: hidden;
             position: relative;
@@ -274,14 +270,11 @@
 
         .timestamp {
             color: var(--info-color);
-            padding: 0 4px;
-            border-radius: 2px;
             background: rgba(77, 171, 247, 0.1);
-            font-size: 0.75em;
-            flex: 0 0 auto;
-            min-width: 50px;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            border-radius: 2px;
+            font-size: 0.85em;
+            display: inline;
+            min-width: unset;
             white-space: nowrap;
         }
 
@@ -680,13 +673,10 @@
         }
 
         .log-module {
-            color: #67cdcc;
-            flex: 0 0 auto;
+            color: var(--info-color);
             font-size: 0.85em;
-            display: flex;
-            align-items: center;
-            gap: 2px;
-            min-width: 80px;
+            display: inline;
+            min-width: unset;
             white-space: nowrap;
         }
 
@@ -704,12 +694,9 @@
 
         .log-message {
             color: var(--text-color);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            flex: 1 1 auto;
-            min-width: 0;
-            padding: 0 4px;
-            margin-left: 0;
+            display: inline;
+            padding: 0;
+            margin-left: 4px;
         }
 
         /* Default wrap behavior */
@@ -950,21 +937,12 @@
 
         /* Add compact mode for narrow views */
         @media (max-width: 600px), (max-width: 1200px) and (min-width: 601px) {
-            .log-line .timestamp {
-                max-width: 80px;
-            }
-            
-            .log-line .log-module {
-                font-size: 0.75em;
-                min-width: 60px;
-            }
-            
+            .log-line .timestamp,
+            .log-line .log-module,
             .log-line .log-level-error,
             .log-line .log-level-warn,
             .log-line .log-level-notice {
-                max-width: 40px;
-                overflow: hidden;
-                text-overflow: ellipsis;
+                max-width: none;
             }
         }
 
@@ -1385,9 +1363,10 @@
         let activeLogViewers = new Map();
         
         const DEFAULT_LOGS = [
+            'apache_error.log',
             'context_sent_to_llm.log',
             'output_from_llm.log',
-            'apache_error.log',
+            // Second row (3x2)
             'minai.log',
             'minai_context_sent_to_llm.log',
             'minai_output_from_llm.log'
@@ -1624,6 +1603,15 @@
                     const json = JSON.parse(line);
                     return `<div class="log-line">${formatDialogueJson(json)}</div>`;
                 } catch (e) {
+                    // If it's a quoted string (starts and ends with quotes)
+                    if (line.trim().match(/^".*"$/)) {
+                        const sanitizedLine = line
+                            .replace(/&/g, '&amp;')
+                            .replace(/</g, '&lt;')
+                            .replace(/>/g, '&gt;');
+                        return `<div class="log-line"><span class="json-string">${sanitizedLine}</span></div>`;
+                    }
+                    
                     // If not valid JSON, try to highlight JSON-like content
                     if (line.includes('{') && line.includes('}')) {
                         return `<div class="log-line">${highlightIncompleteJson(line)}</div>`;
