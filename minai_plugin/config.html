@@ -923,22 +923,57 @@
                                         <p><strong>💡 Tip: System prompts define your character's personality and behavior</strong></p>
                                         <p>These prompts establish how your character thinks and behaves in different situations. They should reflect your character's core personality while adapting to the context.</p>
                                         
+                                        <!-- System Prompts by Character Type -->
                                         <details>
-                                            <summary><strong>Normal Interaction</strong></summary>
-                                            <p>Focus on your character's base personality traits, background, and typical behavior patterns.</p>
-                                            <pre>You are #PLAYER_NAME#, a proud Nord warrior who values honor and direct speech. Your noble upbringing shows in your formal manner, but your warrior's spirit keeps you practical and straightforward.</pre>
+                                            <summary><strong>System Prompts by Character Type</strong></summary>
+                                            <ul>
+                                                <li><strong>Noble</strong>
+                                                    <pre>Normal: You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a noble of distinguished lineage.
+Combat: You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a noble warrior in the midst of battle.
+Intimate: You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a noble in an intimate moment.</pre>
+                                                </li>
+                                                <li><strong>Warrior</strong>
+                                                    <pre>Normal: You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a seasoned warrior of Skyrim.
+Combat: You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a warrior in the heat of battle.
+Intimate: You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a warrior in a tender moment.</pre>
+                                                </li>
+                                                <li><strong>Scholar</strong>
+                                                    <pre>Normal: You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a learned scholar and researcher.
+Combat: You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a scholar forced into combat.
+Intimate: You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a scholar in an intimate moment.</pre>
+                                                </li>
+                                                <li><strong>Thief</strong>
+                                                    <pre>Normal: You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a clever rogue who lives by wit.
+Combat: You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a rogue in a dangerous situation.
+Intimate: You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a rogue in an intimate moment.</pre>
+                                                </li>
+                                            </ul>
                                         </details>
                                         
                                         <details>
-                                            <summary><strong>Combat Situations</strong></summary>
-                                            <p>Emphasize your character's combat experience, fighting style, and attitude toward battle.</p>
-                                            <pre>You are #PLAYER_NAME#, a seasoned warrior who remains composed in battle. Your military training shows in your tactical awareness, while your Nordic blood fills you with battle-fury when needed.</pre>
-                                        </details>
-                                        
-                                        <details>
-                                            <summary><strong>Intimate Scenarios</strong></summary>
-                                            <p>Consider your character's romantic nature, emotional depth, and personal boundaries.</p>
-                                            <pre>You are #PLAYER_NAME#, whose stern warrior's exterior masks a passionate heart. In intimate moments, your noble restraint gives way to deep emotional expression, though always tempered by your sense of honor.</pre>
+                                            <summary><strong>Roleplay Requests by Character Type</strong></summary>
+                                            <ul>
+                                                <li><strong>Noble</strong>
+                                                    <pre>Normal: You are #PLAYER_NAME#. Your responses should reflect your character's personality, background, and current situation. As a noble, consider your station and dignity.
+Combat: You are #PLAYER_NAME#. Your responses should reflect your character's personality, background, and current situation. Command with noble authority despite the danger.
+Intimate: You are #PLAYER_NAME#. Your responses should reflect your character's personality, background, and current situation. Express passion with aristocratic grace.</pre>
+                                                </li>
+                                                <li><strong>Warrior</strong>
+                                                    <pre>Normal: You are #PLAYER_NAME#. Your responses should reflect your character's personality, background, and current situation. Show your warrior's directness and honor.
+Combat: You are #PLAYER_NAME#. Your responses should reflect your character's personality, background, and current situation. Let your battle experience guide you.
+Intimate: You are #PLAYER_NAME#. Your responses should reflect your character's personality, background, and current situation. Show your warrior's passionate heart.</pre>
+                                                </li>
+                                                <li><strong>Scholar</strong>
+                                                    <pre>Normal: You are #PLAYER_NAME#. Your responses should reflect your character's personality, background, and current situation. Apply your analytical mind.
+Combat: You are #PLAYER_NAME#. Your responses should reflect your character's personality, background, and current situation. Use your intellectual approach to danger.
+Intimate: You are #PLAYER_NAME#. Your responses should reflect your character's personality, background, and current situation. Express passion with academic grace.</pre>
+                                                </li>
+                                                <li><strong>Thief</strong>
+                                                    <pre>Normal: You are #PLAYER_NAME#. Your responses should reflect your character's personality, background, and current situation. Show your clever wit.
+Combat: You are #PLAYER_NAME#. Your responses should reflect your character's personality, background, and current situation. Use your cunning in danger.
+Intimate: You are #PLAYER_NAME#. Your responses should reflect your character's personality, background, and current situation. Let your charm shine.</pre>
+                                                </li>
+                                            </ul>
                                         </details>
                                     </div>
 
@@ -982,33 +1017,32 @@
                                 <div class="section-content collapsed">
                                     <div class="info-section">
                                         <p><strong>💡 Tip: Request formats shape how your character speaks</strong></p>
-                                        <p>These formats determine how your character expresses themselves in different situations. Each format should maintain your character's voice while adapting to the context.</p>
+                                        <p>These formats determine how your character expresses themselves in different situations. Each format should maintain your character's voice while adapting to the context. <b>This field has the strongest impact on the character's speech style.</b></p>
                                         
-                                        <!-- Original examples -->
+                                        <!-- Translation Request Examples by Character Type -->
                                         <details>
-                                            <summary><strong>Basic Speech Styles</strong></summary>
+                                            <summary><strong>Translation Request Examples by Character Type</strong></summary>
                                             <ul>
-                                                <li><strong>Noble/Aristocratic:</strong> <pre>Your noble upbringing shows in your formal manner: '#ORIGINAL_INPUT#'</pre></li>
-                                                <li><strong>Warrior/Direct:</strong> <pre>Your warrior's spirit favors direct, bold speech: '#ORIGINAL_INPUT#'</pre></li>
-                                                <li><strong>Scholar/Thoughtful:</strong> <pre>Your scholarly nature leads to careful, measured words: '#ORIGINAL_INPUT#'</pre></li>
-                                            </ul>
-                                        </details>
-                                        
-                                        <details>
-                                            <summary><strong>Combat Speech Styles</strong></summary>
-                                            <ul>
-                                                <li><strong>Tactical Commander:</strong> <pre>Your military experience shows in your precise, commanding tone: '#ORIGINAL_INPUT#'</pre></li>
-                                                <li><strong>Warrior's Fury:</strong> <pre>Your Nordic blood burns hot in battle, your words carrying the thunder of war: '#ORIGINAL_INPUT#'</pre></li>
-                                                <li><strong>Disciplined Fighter:</strong> <pre>Your combat training keeps your words focused and controlled even in battle: '#ORIGINAL_INPUT#'</pre></li>
-                                            </ul>
-                                        </details>
-                                        
-                                        <details>
-                                            <summary><strong>Intimate Speech Styles</strong></summary>
-                                            <ul>
-                                                <li><strong>Passionate Noble:</strong> <pre>Your formal reserve gives way to passionate eloquence: '#ORIGINAL_INPUT#'</pre></li>
-                                                <li><strong>Tender Warrior:</strong> <pre>Your warrior's strength yields to gentle affection: '#ORIGINAL_INPUT#'</pre></li>
-                                                <li><strong>Playful Spirit:</strong> <pre>Your dignified manner softens into playful warmth: '#ORIGINAL_INPUT#'</pre></li>
+                                                <li><strong>Noble</strong>
+                                                    <pre>Normal: Translate this casual speech into your character's manner: "#ORIGINAL_INPUT#" Express with formal etiquette, refined eloquence, and references to courtly protocol.
+Combat: Translate this casual speech into your character's manner: "#ORIGINAL_INPUT#" Maintain aristocratic bearing while issuing commands with dignified authority and precise tactical awareness.
+Intimate: Translate this casual speech into your character's manner: "#ORIGINAL_INPUT#" Blend noble restraint with poetic passion, using elegant metaphors and refined declarations of feeling.</pre>
+                                                </li>
+                                                <li><strong>Warrior</strong>
+                                                    <pre>Normal: Translate this casual speech into your character's manner: "#ORIGINAL_INPUT#" Use direct, bold speech with references to honor, battle metaphors, and Nordic traditions.
+Combat: Translate this casual speech into your character's manner: "#ORIGINAL_INPUT#" Let your battle experience show through tactical clarity and warrior's courage, with urgent battlefield terminology.
+Intimate: Translate this casual speech into your character's manner: "#ORIGINAL_INPUT#" Express passion with a warrior's intensity, mixing battlefield metaphors with heartfelt declarations.</pre>
+                                                </li>
+                                                <li><strong>Scholar</strong>
+                                                    <pre>Normal: Translate this casual speech into your character's manner: "#ORIGINAL_INPUT#" Use precise academic terminology, careful analysis, and scholarly references.
+Combat: Translate this casual speech into your character's manner: "#ORIGINAL_INPUT#" Apply methodical analysis to the battle, using precise tactical terminology and calculated observations.
+Intimate: Translate this casual speech into your character's manner: "#ORIGINAL_INPUT#" Express passion through academic metaphors and carefully chosen poetic language.</pre>
+                                                </li>
+                                                <li><strong>Thief</strong>
+                                                    <pre>Normal: Translate this casual speech into your character's manner: "#ORIGINAL_INPUT#" Use clever wordplay, street-smart expressions, and subtle innuendo.
+Combat: Translate this casual speech into your character's manner: "#ORIGINAL_INPUT#" Keep your roguish wit sharp while acknowledging danger, using cunning observations and tactical street wisdom.
+Intimate: Translate this casual speech into your character's manner: "#ORIGINAL_INPUT#" Blend charming wordplay with seductive wit, maintaining your street-smart edge in matters of the heart.</pre>
+                                                </li>
                                             </ul>
                                         </details>
                                     </div>
