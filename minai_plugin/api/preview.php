@@ -77,9 +77,17 @@ try {
         }, $sections),
         'prompts' => [
             'system_prompt' => replaceVariables($GLOBALS['roleplay_settings']['system_prompt'], $variableReplacements),
+            'system_prompt_explicit' => replaceVariables($GLOBALS['roleplay_settings']['system_prompt_explicit'], $variableReplacements),
+            'system_prompt_combat' => replaceVariables($GLOBALS['roleplay_settings']['system_prompt_combat'], $variableReplacements),
             'roleplay_system_prompt' => replaceVariables($GLOBALS['roleplay_settings']['roleplay_system_prompt'], $variableReplacements),
+            'roleplay_system_prompt_explicit' => replaceVariables($GLOBALS['roleplay_settings']['roleplay_system_prompt_explicit'], $variableReplacements),
+            'roleplay_system_prompt_combat' => replaceVariables($GLOBALS['roleplay_settings']['roleplay_system_prompt_combat'], $variableReplacements),
             'translation_request' => replaceVariables($GLOBALS['roleplay_settings']['translation_request'], $variableReplacements),
-            'roleplay_request' => replaceVariables($GLOBALS['roleplay_settings']['roleplay_request'], $variableReplacements)
+            'translation_request_explicit' => replaceVariables($GLOBALS['roleplay_settings']['translation_request_explicit'], $variableReplacements),
+            'translation_request_combat' => replaceVariables($GLOBALS['roleplay_settings']['translation_request_combat'], $variableReplacements),
+            'roleplay_request' => replaceVariables($GLOBALS['roleplay_settings']['roleplay_request'], $variableReplacements),
+            'roleplay_request_explicit' => replaceVariables($GLOBALS['roleplay_settings']['roleplay_request_explicit'], $variableReplacements),
+            'roleplay_request_combat' => replaceVariables($GLOBALS['roleplay_settings']['roleplay_request_combat'], $variableReplacements)
         ]
     ];
 

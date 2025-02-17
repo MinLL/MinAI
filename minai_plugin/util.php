@@ -122,7 +122,7 @@ $GLOBALS["GenericFuncRet"] =function($gameRequest) {
     // BY default, request will be $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdSpankAss"]
     // $gameRequest = [type of message,localts,gamets,data]
     $GLOBALS["FORCE_MAX_TOKENS"]=48;    // We can overwrite anything here using $GLOBALS;
-   
+
     if (stripos($gameRequest[3],"error")!==false) // Papyrus returned error
         return ["argName"=>"target","request"=>"{$GLOBALS["HERIKA_NAME"]} says sorry about unable to complete the task. {$GLOBALS["TEMPLATE_DIALOG"]}"];
     else
@@ -443,7 +443,7 @@ During sex {$GLOBALS["HERIKA_NAME"]}:
 - prefers these positions: ".implode(", ", $jsonXPersonality["preferredSexPositions"]).";
 - likes to participate in such sex activities: ".implode(", ", $jsonXPersonality["sexualBehavior"]).";
 - has secret sex fantasies:
-  ".implode("\n  ",$jsonXPersonality["sexFantasies"]);
+".implode("\n  ",$jsonXPersonality["sexFantasies"]);
     }
 }
 
@@ -526,59 +526,59 @@ function getTargetDuringSex($scene) {
 }
 
 function GetRevealedStatus($name) {
-  $cuirass = GetActorValue($name, "cuirass", false, true);
-  
-  $wearingBottom = false;
-  $wearingTop = false;
-  
-  // if $eqContext["context"] not empty, then will set ret
-  if (!empty($cuirass)) {
-      $wearingTop = true;
-  }
-  if (HasKeyword($name, "SLA_HalfNakedBikini")) {
-    $wearingTop = true;
-  }
-  if (HasKeyword($name, "SLA_ArmorHalfNaked")) {
-    $wearingTop = true;
-  }
-  if (HasKeyword($name, "SLA_Brabikini" )) {
-    $wearingTop = true;
-  }
-  if (HasKeyword($name, "SLA_Thong")) {
-    $wearingBottom = true;
-  }
-  if (HasKeyword($name, "SLA_PantiesNormal")) {
-    $wearingBottom = true;
-  }
-  if (HasKeyword($name, "SLA_PantsNormal")) {
-    $wearingBottom = true;
-  }
-  if (HasKeyword($name, "SLA_MicroHotPants")) {
-    $wearingBottom = true;
-  }
+$cuirass = GetActorValue($name, "cuirass", false, true);
 
-  if (HasKeyword($name, "SLA_ArmorTransparent")) {
+$wearingBottom = false;
+$wearingTop = false;
+
+// if $eqContext["context"] not empty, then will set ret
+if (!empty($cuirass)) {
+    $wearingTop = true;
+}
+if (HasKeyword($name, "SLA_HalfNakedBikini")) {
+    $wearingTop = true;
+}
+if (HasKeyword($name, "SLA_ArmorHalfNaked")) {
+    $wearingTop = true;
+}
+if (HasKeyword($name, "SLA_Brabikini" )) {
+    $wearingTop = true;
+}
+if (HasKeyword($name, "SLA_Thong")) {
+    $wearingBottom = true;
+}
+if (HasKeyword($name, "SLA_PantiesNormal")) {
+    $wearingBottom = true;
+}
+if (HasKeyword($name, "SLA_PantsNormal")) {
+    $wearingBottom = true;
+}
+if (HasKeyword($name, "SLA_MicroHotPants")) {
+    $wearingBottom = true;
+}
+
+if (HasKeyword($name, "SLA_ArmorTransparent")) {
     $wearingBottom = false;
     $wearingTop = false;
-  }
-  if (HasKeyword($name, "SLA_ArmorLewdLeotard")) {
+}
+if (HasKeyword($name, "SLA_ArmorLewdLeotard")) {
     $wearingBottom = true;
     $wearingTop = true;
-  }
-  if (HasKeyword($name, "SLA_PelvicCurtain")) {
+}
+if (HasKeyword($name, "SLA_PelvicCurtain")) {
     $wearingBottom = true;
-  }
-  if (HasKeyword($name, "SLA_FullSkirt")) {
+}
+if (HasKeyword($name, "SLA_FullSkirt")) {
     $wearingBottom = true;
-  }
-  if (HasKeyword($name, "SLA_MiniSkirt")) {
+}
+if (HasKeyword($name, "SLA_MiniSkirt")) {
     $wearingBottom = true;
-  }
-  if (HasKeyword($name, "EroticArmor")) {
-      $wearingBottom = true;
-      $wearingTop = true;
-  }
-  return ["wearingTop" => $wearingTop, "wearingBottom" => $wearingBottom];
+}
+if (HasKeyword($name, "EroticArmor")) {
+    $wearingBottom = true;
+    $wearingTop = true;
+}
+return ["wearingTop" => $wearingTop, "wearingBottom" => $wearingBottom];
 }
 
 Function IsExplicitScene() {
@@ -727,8 +727,8 @@ class Utilities {
             // for methods attached to this class
             return call_user_func(array($this, $name), $params);
         } else if ($this->hasMethod($name)) {
-           // function exists outside of class in this utlities file
-           return $name(...$params); 
+        // function exists outside of class in this utlities file
+        return $name(...$params); 
         }
         else {
             minai_log("info", "Error calling Utilities clas: ". $name . " is not defined as a method or function in util.php");

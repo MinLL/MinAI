@@ -512,6 +512,59 @@
             border-radius: 8px;
             margin-bottom: 15px;
         }
+
+        .prompt-group {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .prompt-group h4 {
+            margin: 0 0 15px 0;
+            color: var(--primary-color);
+            font-size: 1.1em;
+        }
+
+        .info-section details {
+            margin: 10px 0;
+        }
+
+        .info-section details ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .info-section details pre {
+            margin: 5px 0;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+
+        .example-block {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .important-note {
+            background: rgba(76, 175, 80, 0.1);
+            border-left: 3px solid var(--primary-color);
+            padding: 10px 15px;
+            margin: 15px 0;
+        }
+
+        .example-block ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .example-block em {
+            color: var(--secondary-color);
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
 </head>
@@ -812,128 +865,205 @@
                             Roleplay Translation Settings
                         </div>
                         <div class="section-content collapsed">
-                            <!-- System Prompts -->
+                            <div class="info-section">
+                                <p><strong>💡 Translation vs Roleplay: Understanding the Two Modes</strong></p>
+                                
+                                <details>
+                                    <summary><strong>Translation Mode (Converting Player Input)</strong></summary>
+                                    <p>Used when the player types dialogue that needs to be converted into their character's speaking style.</p>
+                                    <div class="example-block">
+                                        <p><strong>Example Scenario:</strong></p>
+                                        <ul>
+                                            <li>Player types: "Let's explore that cave"</li>
+                                            <li>Translation prompt: "Translate this casual speech into your character's manner: '#ORIGINAL_INPUT#'"</li>
+                                            <li>Character responds: "These ancient Nordic ruins beckon to be explored, shall we venture forth?"</li>
+                                        </ul>
+                                        <p><em>Translation mode preserves the player's intended meaning while adapting the speaking style.</em></p>
+                                    </div>
+                                </details>
+
+                                <details>
+                                    <summary><strong>Roleplay Mode (Automatic Responses)</strong></summary>
+                                    <p>Used with the "tap to roleplay" feature where the character generates appropriate dialogue for the situation.</p>
+                                    <div class="example-block">
+                                        <p><strong>Example Scenario:</strong></p>
+                                        <ul>
+                                            <li>Situation: Standing near a cave entrance</li>
+                                            <li>Roleplay prompt: "Respond naturally as your character would in this situation"</li>
+                                            <li>Character initiates: "The air from these ruins carries the weight of ancient secrets. We should proceed with caution."</li>
+                                        </ul>
+                                        <p><em>Roleplay mode creates new dialogue based on context and character personality.</em></p>
+                                    </div>
+                                </details>
+
+                                <div class="important-note">
+                                    <p><strong>Key Technical Differences:</strong></p>
+                                    <ul>
+                                        <li>Translation prompts must include '#ORIGINAL_INPUT#' variable</li>
+                                        <li>Roleplay prompts focus on generating contextual responses</li>
+                                        <li>Both modes should maintain character personality and current situation awareness</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Context Messages -->
                             <div class="option-group">
-                                <!-- Context Messages -->
                                 <label class="option-label" for="context-messages">Context Messages</label>
                                 <p>Number of recent messages to include for context</p>
                                 <input type="number" id="context-messages" min="1" max="100">
+                            </div>
 
-                                <div class="info-section">
-                                    <p>Available variables for all prompts and requests:</p>
-                                    <details>
-                                        <summary>Character Information</summary>
-                                        <ul>
-                                            <li><strong>#PLAYER_NAME#</strong> - The player character's name</li>
-                                            <li><strong>#PLAYER_BIOS#</strong> - The player's background and personality description (From PLAYER_BIO)</li>
-                                            <li><strong>#HERIKA_DYNAMIC#</strong> - The Dynamic Profile for the character (If using Narrator profile)</li>
-                                            <li><strong>#PHYSICAL_DESCRIPTION#</strong> - Physical appearance and characteristics</li>
-                                        </ul>
-                                    </details>
-                                    <details>
-                                        <summary>Status Information</summary>
-                                        <ul>
-                                            <li><strong>#AROUSAL_STATUS#</strong> - Current arousal state</li>
-                                            <li><strong>#SURVIVAL_STATUS#</strong> - Current needs like hunger and fatigue</li>
-                                            <li><strong>#CLOTHING_STATUS#</strong> - Currently worn clothing and armor</li>
-                                            <li><strong>#DEVICES_STATUS#</strong> - Worn devices and equipment</li>
-                                            <li><strong>#FERTILITY_STATUS#</strong> - Current fertility state</li>
-                                        </ul>
-                                    </details>
-                                    <details>
-                                        <summary>Context Information</summary>
-                                        <ul>
-                                            <li><strong>#ORIGINAL_INPUT#</strong> - The player's input text to be processed</li>
-                                            <li><strong>#NEARBY_ACTORS#</strong> - Comma-separated list of NPCs in range</li>
-                                            <li><strong>#NEARBY_LOCATIONS#</strong> - Comma-separated list of accessible locations</li>
-                                            <li><strong>#RECENT_EVENTS#</strong> - Recent conversation and event history</li>
-                                        </ul>
-                                    </details>
-                                    <details>
-                                        <summary>Pronouns</summary>
-                                        <ul>
-                                            <li><strong>#PLAYER_SUBJECT#</strong> - Subject pronoun (he/she/they)</li>
-                                            <li><strong>#PLAYER_OBJECT#</strong> - Object pronoun (him/her/them)</li>
-                                            <li><strong>#PLAYER_POSSESSIVE#</strong> - Possessive pronoun (his/her/their)</li>
-                                        </ul>
-                                    </details>
-                                </div>
-
-                                <label class="option-label" for="system-prompt">Translation System Prompt</label>
-                                <textarea id="system-prompt" class="prompt-textarea" rows="4"></textarea>
-
-                                <label class="option-label" for="roleplay-system-prompt">Roleplay System Prompt</label>
-                                <textarea id="roleplay-system-prompt" class="prompt-textarea" rows="4"></textarea>
-
-
-                            <!-- Request Formats -->
+                            <!-- System Prompts Section -->
                             <div class="option-group">
-                                <div class="info-section" style="margin-top: 10px;">
-                                    <p><strong>💡 Tip: Request Formats influences speech style</strong></p>
-                                    <p>The request format determines how the LLM processes input, and strongly influences the speech style of the response. Here are examples for different styles:</p>
-                                    <details>
-                                        <summary><strong>Translation (Default)</strong></summary>
-                                        <pre>Translate this casual speech into your character's manner: '#ORIGINAL_INPUT#'</pre>
-                                    </details>
-                                    <details>
-                                        <summary><strong>Noble/Aristocratic</strong></summary>
-                                        <pre>Your character tries to speak casually, but comes across as being a bit formal due to #PLAYER_POSSESSIVE# noble upbringing. Translate this casual speech into your character's more refined manner: '#ORIGINAL_INPUT#'</pre>
-                                    </details>
-                                    <details>
-                                        <summary><strong>Arrogant/Haughty</strong></summary>
-                                        <pre>Despite your best efforts to be civil, your deep-seated sense of superiority always shows through in your speech. Translate this commoner's words into your naturally condescending manner: '#ORIGINAL_INPUT#'</pre>
-                                    </details>
-                                    <details>
-                                        <summary><strong>Brutish/Warrior</strong></summary>
-                                        <pre>As a warrior who values directness over fancy words, you prefer to get straight to the point. Translate this casual speech into your characteristically blunt manner: '#ORIGINAL_INPUT#'</pre>
-                                    </details>
-                                    <details>
-                                        <summary><strong>Timid Scholar</strong></summary>
-                                        <pre>Being more comfortable with books than people, you tend to fall back on academic language when nervous. Translate this casual speech into your characteristically hesitant, scholarly manner: '#ORIGINAL_INPUT#'</pre>
-                                    </details>
-                                    <details>
-                                        <summary><strong>Roleplay (Default)</strong></summary>
-                                        <pre>You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue in response to the ongoing conversation and situation.</pre>
-                                    </details>
-                                    <p>The translation format must include '#ORIGINAL_INPUT#'. The roleplay format should emphasize natural responses to the conversation.</p>
+                                <div class="section-header collapsed" onclick="toggleSection(this)">
+                                    System Prompts
                                 </div>
-                                <label class="option-label" for="translation-request">Translation Request Format</label>
-                                <textarea id="translation-request" class="prompt-textarea" rows="3"></textarea>
+                                <div class="section-content collapsed">
+                                    <div class="info-section">
+                                        <p><strong>💡 Tip: System prompts define your character's personality and behavior</strong></p>
+                                        <p>These prompts establish how your character thinks and behaves in different situations. They should reflect your character's core personality while adapting to the context.</p>
+                                        
+                                        <details>
+                                            <summary><strong>Normal Interaction</strong></summary>
+                                            <p>Focus on your character's base personality traits, background, and typical behavior patterns.</p>
+                                            <pre>You are #PLAYER_NAME#, a proud Nord warrior who values honor and direct speech. Your noble upbringing shows in your formal manner, but your warrior's spirit keeps you practical and straightforward.</pre>
+                                        </details>
+                                        
+                                        <details>
+                                            <summary><strong>Combat Situations</strong></summary>
+                                            <p>Emphasize your character's combat experience, fighting style, and attitude toward battle.</p>
+                                            <pre>You are #PLAYER_NAME#, a seasoned warrior who remains composed in battle. Your military training shows in your tactical awareness, while your Nordic blood fills you with battle-fury when needed.</pre>
+                                        </details>
+                                        
+                                        <details>
+                                            <summary><strong>Intimate Scenarios</strong></summary>
+                                            <p>Consider your character's romantic nature, emotional depth, and personal boundaries.</p>
+                                            <pre>You are #PLAYER_NAME#, whose stern warrior's exterior masks a passionate heart. In intimate moments, your noble restraint gives way to deep emotional expression, though always tempered by your sense of honor.</pre>
+                                        </details>
+                                    </div>
 
-                                <label class="option-label" for="roleplay-request">Roleplay Request Format</label>
-                                <textarea id="roleplay-request" class="prompt-textarea" rows="3"></textarea>
+                                    <!-- Normal System Prompts -->
+                                    <div class="prompt-group">
+                                        <h4>Normal Interaction Prompts</h4>
+                                        <label class="option-label" for="system-prompt">Translation System Prompt</label>
+                                        <textarea id="system-prompt" class="prompt-textarea" rows="4"></textarea>
+
+                                        <label class="option-label" for="roleplay-system-prompt">Roleplay System Prompt</label>
+                                        <textarea id="roleplay-system-prompt" class="prompt-textarea" rows="4"></textarea>
+                                    </div>
+
+                                    <!-- Combat System Prompts -->
+                                    <div class="prompt-group">
+                                        <h4>Combat Prompts</h4>
+                                        <label class="option-label" for="system-prompt-combat">Combat Translation System Prompt</label>
+                                        <textarea id="system-prompt-combat" class="prompt-textarea" rows="4"></textarea>
+
+                                        <label class="option-label" for="roleplay-system-prompt-combat">Combat Roleplay System Prompt</label>
+                                        <textarea id="roleplay-system-prompt-combat" class="prompt-textarea" rows="4"></textarea>
+                                    </div>
+
+                                    <!-- Intimate System Prompts -->
+                                    <div class="prompt-group">
+                                        <h4>Intimate Scene Prompts</h4>
+                                        <label class="option-label" for="system-prompt-explicit">Intimate Translation System Prompt</label>
+                                        <textarea id="system-prompt-explicit" class="prompt-textarea" rows="4"></textarea>
+
+                                        <label class="option-label" for="roleplay-system-prompt-explicit">Intimate Roleplay System Prompt</label>
+                                        <textarea id="roleplay-system-prompt-explicit" class="prompt-textarea" rows="4"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Request Formats Section -->
+                            <div class="option-group">
+                                <div class="section-header collapsed" onclick="toggleSection(this)">
+                                    Request Formats
+                                </div>
+                                <div class="section-content collapsed">
+                                    <div class="info-section">
+                                        <p><strong>💡 Tip: Request formats shape how your character speaks</strong></p>
+                                        <p>These formats determine how your character expresses themselves in different situations. Each format should maintain your character's voice while adapting to the context.</p>
+                                        
+                                        <!-- Original examples -->
+                                        <details>
+                                            <summary><strong>Basic Speech Styles</strong></summary>
+                                            <ul>
+                                                <li><strong>Noble/Aristocratic:</strong> <pre>Your noble upbringing shows in your formal manner: '#ORIGINAL_INPUT#'</pre></li>
+                                                <li><strong>Warrior/Direct:</strong> <pre>Your warrior's spirit favors direct, bold speech: '#ORIGINAL_INPUT#'</pre></li>
+                                                <li><strong>Scholar/Thoughtful:</strong> <pre>Your scholarly nature leads to careful, measured words: '#ORIGINAL_INPUT#'</pre></li>
+                                            </ul>
+                                        </details>
+                                        
+                                        <details>
+                                            <summary><strong>Combat Speech Styles</strong></summary>
+                                            <ul>
+                                                <li><strong>Tactical Commander:</strong> <pre>Your military experience shows in your precise, commanding tone: '#ORIGINAL_INPUT#'</pre></li>
+                                                <li><strong>Warrior's Fury:</strong> <pre>Your Nordic blood burns hot in battle, your words carrying the thunder of war: '#ORIGINAL_INPUT#'</pre></li>
+                                                <li><strong>Disciplined Fighter:</strong> <pre>Your combat training keeps your words focused and controlled even in battle: '#ORIGINAL_INPUT#'</pre></li>
+                                            </ul>
+                                        </details>
+                                        
+                                        <details>
+                                            <summary><strong>Intimate Speech Styles</strong></summary>
+                                            <ul>
+                                                <li><strong>Passionate Noble:</strong> <pre>Your formal reserve gives way to passionate eloquence: '#ORIGINAL_INPUT#'</pre></li>
+                                                <li><strong>Tender Warrior:</strong> <pre>Your warrior's strength yields to gentle affection: '#ORIGINAL_INPUT#'</pre></li>
+                                                <li><strong>Playful Spirit:</strong> <pre>Your dignified manner softens into playful warmth: '#ORIGINAL_INPUT#'</pre></li>
+                                            </ul>
+                                        </details>
+                                    </div>
+
+                                    <!-- Normal Request Formats -->
+                                    <div class="prompt-group">
+                                        <h4>Normal Interaction Formats</h4>
+                                        <label class="option-label" for="translation-request">Translation Request Format</label>
+                                        <textarea id="translation-request" class="prompt-textarea" rows="3"></textarea>
+
+                                        <label class="option-label" for="roleplay-request">Roleplay Request Format</label>
+                                        <textarea id="roleplay-request" class="prompt-textarea" rows="3"></textarea>
+                                    </div>
+
+                                    <!-- Combat Request Formats -->
+                                    <div class="prompt-group">
+                                        <h4>Combat Formats</h4>
+                                        <label class="option-label" for="translation-request-combat">Combat Translation Request</label>
+                                        <textarea id="translation-request-combat" class="prompt-textarea" rows="3"></textarea>
+
+                                        <label class="option-label" for="roleplay-request-combat">Combat Roleplay Request</label>
+                                        <textarea id="roleplay-request-combat" class="prompt-textarea" rows="3"></textarea>
+                                    </div>
+
+                                    <!-- Intimate Request Formats -->
+                                    <div class="prompt-group">
+                                        <h4>Intimate Scene Formats</h4>
+                                        <label class="option-label" for="translation-request-explicit">Intimate Translation Request</label>
+                                        <textarea id="translation-request-explicit" class="prompt-textarea" rows="3"></textarea>
+
+                                        <label class="option-label" for="roleplay-request-explicit">Intimate Roleplay Request</label>
+                                        <textarea id="roleplay-request-explicit" class="prompt-textarea" rows="3"></textarea>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Section Configuration -->
                             <div class="option-group">
-                                <label class="option-label">Prompt Sections</label>
-                                <div class="info-section">
-                                    <p>Tips:</p>
-                                    <ul>
-                                        <li>Use sections to organize different types of context for the LLM</li>
-                                        <li>Disable sections you don't need to reduce token usage</li>
-                                        <li>Keep instructions clear and concise</li>
-                                    </ul>
-                                    <details>
-                                        <summary>How Section Order Affects Responses</summary>
-                                        <p>Sections are sent to the LLM in the order shown, with two newlines between each section. The order matters because:</p>
-                                        <ul>
-                                            <li>LLMs tend to weigh earlier information more heavily in their responses</li>
-                                            <li>The default order (Background → Nearby → Recent → Instructions) provides context from general to specific</li>
-                                            <li>Putting CHARACTER_BACKGROUND first helps maintain consistent character personality</li>
-                                            <li>Putting INSTRUCTIONS last ensures they apply to all the previous context</li>
-                                            <li>RECENT_EVENTS placement affects how much the response focuses on immediate vs background context</li>
-                                        </ul>
-                                        <p>Drag sections using ⋮⋮ to experiment with different orderings and see how they affect your character's responses.</p>
-                                    </details>
+                                <div class="section-header collapsed" onclick="toggleSection(this)">
+                                    Section Configuration
                                 </div>
-                                <div id="section-config">
-                                    <!-- Dynamically populated sections -->
+                                <div class="section-content collapsed">
+                                    <div class="info-section">
+                                        <p><strong>💡 Tip: Sections organize the context provided to the LLM</strong></p>
+                                        <p>Arrange sections in order of importance. Earlier sections have more influence on the response.</p>
+                                    </div>
+                                    
+                                    <div id="section-config">
+                                        <!-- Sections will be populated here by JavaScript -->
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Preview Section -->
-                            <div id="preview" class="option-group">
+                            <div class="option-group">
                                 <div class="section-header collapsed" onclick="toggleSection(this)">
                                     Context Preview
                                 </div>
@@ -1000,9 +1130,17 @@
                 // Load roleplay settings
                 document.getElementById('context-messages').value = configData.roleplay_settings.context_messages;
                 document.getElementById('system-prompt').value = configData.roleplay_settings.system_prompt;
+                document.getElementById('system-prompt-explicit').value = configData.roleplay_settings.system_prompt_explicit;
+                document.getElementById('system-prompt-combat').value = configData.roleplay_settings.system_prompt_combat;
                 document.getElementById('roleplay-system-prompt').value = configData.roleplay_settings.roleplay_system_prompt;
+                document.getElementById('roleplay-system-prompt-explicit').value = configData.roleplay_settings.roleplay_system_prompt_explicit;
+                document.getElementById('roleplay-system-prompt-combat').value = configData.roleplay_settings.roleplay_system_prompt_combat;
                 document.getElementById('translation-request').value = configData.roleplay_settings.translation_request;
+                document.getElementById('translation-request-explicit').value = configData.roleplay_settings.translation_request_explicit;
+                document.getElementById('translation-request-combat').value = configData.roleplay_settings.translation_request_combat;
                 document.getElementById('roleplay-request').value = configData.roleplay_settings.roleplay_request;
+                document.getElementById('roleplay-request-explicit').value = configData.roleplay_settings.roleplay_request_explicit;
+                document.getElementById('roleplay-request-combat').value = configData.roleplay_settings.roleplay_request_combat;
                 
                 // Populate section configuration
                 const sectionConfig = document.getElementById('section-config');
@@ -1095,10 +1233,23 @@
                 },
                 roleplay_settings: {
                     context_messages: parseInt(document.getElementById('context-messages').value),
+                    
+                    // System prompts
                     system_prompt: document.getElementById('system-prompt').value,
+                    system_prompt_explicit: document.getElementById('system-prompt-explicit').value,
+                    system_prompt_combat: document.getElementById('system-prompt-combat').value,
                     roleplay_system_prompt: document.getElementById('roleplay-system-prompt').value,
+                    roleplay_system_prompt_explicit: document.getElementById('roleplay-system-prompt-explicit').value,
+                    roleplay_system_prompt_combat: document.getElementById('roleplay-system-prompt-combat').value,
+
+                    // Request formats
                     translation_request: document.getElementById('translation-request').value,
+                    translation_request_explicit: document.getElementById('translation-request-explicit').value,
+                    translation_request_combat: document.getElementById('translation-request-combat').value,
                     roleplay_request: document.getElementById('roleplay-request').value,
+                    roleplay_request_explicit: document.getElementById('roleplay-request-explicit').value,
+                    roleplay_request_combat: document.getElementById('roleplay-request-combat').value,
+
                     sections: {}
                 }
             };
@@ -1238,30 +1389,36 @@
         }
 
         function toggleAllSections(expand = true) {
-            const headers = document.querySelectorAll('.section-header');
-            headers.forEach(header => {
-                const content = header.nextElementSibling;
-                if (expand) {
-                    header.classList.remove('collapsed');
-                    content.classList.remove('collapsed');
-                } else {
-                    header.classList.add('collapsed');
-                    content.classList.add('collapsed');
+            // Wait for DOM to be ready
+            document.querySelectorAll('.section-header').forEach(header => {
+                if (header && header.nextElementSibling) {  // Check if header and content exist
+                    const content = header.nextElementSibling;
+                    if (expand) {
+                        header.classList.remove('collapsed');
+                        content.classList.remove('collapsed');
+                    } else {
+                        header.classList.add('collapsed');
+                        content.classList.add('collapsed');
+                    }
                 }
             });
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const controlsDiv = document.createElement('div');
-            controlsDiv.className = 'control-buttons';
-            controlsDiv.innerHTML = `
-                <button onclick="toggleAllSections(true)" class="control-button">Expand All</button>
-                <button onclick="toggleAllSections(false)" class="control-button">Collapse All</button>
-            `;
-            document.getElementById('config-form').insertBefore(controlsDiv, document.getElementById('config-form').firstChild);
+            // Add the control buttons after the config form exists
+            const configForm = document.getElementById('config-form');
+            if (configForm) {
+                const controlsDiv = document.createElement('div');
+                controlsDiv.className = 'control-buttons';
+                controlsDiv.innerHTML = `
+                    <button onclick="toggleAllSections(true)" class="control-button">Expand All</button>
+                    <button onclick="toggleAllSections(false)" class="control-button">Collapse All</button>
+                `;
+                configForm.insertBefore(controlsDiv, configForm.firstChild);
+            }
             
-            // Make everything expanded by default
-            toggleAllSections(true);
+            // Start data fetch
+            fetchConfigData();
         });
 
         function initializeSortableSections() {

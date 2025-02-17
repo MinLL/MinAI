@@ -146,15 +146,41 @@ function interceptRoleplayInput() {
             'FERTILITY_STATUS' => $fertilityStatus
         ];
 
-        // Apply replacements to system prompt
-        $systemPrompt = replaceVariables(
-            $GLOBALS["gameRequest"][0] == "minai_roleplay" 
-                ? $settings['roleplay_system_prompt']
-                : $settings['system_prompt'],
-            $variableReplacements
-        );
+        // Determine scene context
+        $isExplicit = IsExplicitScene();
+        $inCombat = IsEnabled($PLAYER_NAME, "inCombat");
 
-        // Sort sections by their order if it exists, otherwise maintain config file order
+        // Select appropriate prompts based on context
+        if ($GLOBALS["gameRequest"][0] == "minai_roleplay") {
+            // Roleplay mode
+            $systemPrompt = $settings['roleplay_system_prompt'];
+            $requestFormat = $settings['roleplay_request'];
+            
+            if ($isExplicit) {
+                $systemPrompt = $settings['roleplay_system_prompt_explicit'];
+                $requestFormat = $settings['roleplay_request_explicit'];
+            } else if ($inCombat) {
+                $systemPrompt = $settings['roleplay_system_prompt_combat'];
+                $requestFormat = $settings['roleplay_request_combat'];
+            }
+        } else {
+            // Translation mode
+            $systemPrompt = $settings['system_prompt'];
+            $requestFormat = $settings['translation_request'];
+            
+            if ($isExplicit) {
+                $systemPrompt = $settings['system_prompt_explicit'];
+                $requestFormat = $settings['translation_request_explicit'];
+            } else if ($inCombat) {
+                $systemPrompt = $settings['system_prompt_combat'];
+                $requestFormat = $settings['translation_request_combat'];
+            }
+        }
+
+        // Apply variable replacements to the selected prompts
+        $systemPrompt = replaceVariables($systemPrompt, $variableReplacements);
+
+        // Sort sections by their order if it exists
         $sections = $settings['sections'];
         if (isset(reset($sections)['order'])) {
             uasort($sections, function($a, $b) {
@@ -179,14 +205,9 @@ function interceptRoleplayInput() {
 
         // Build the messages array with proper spacing
         $messages = [
-            ['role' => 'system', 'content' => replaceVariables($systemPrompt, $variableReplacements) . "\n\n"],
+            ['role' => 'system', 'content' => $systemPrompt . "\n\n"],
             ['role' => 'system', 'content' => replaceVariables($contextMessage, $variableReplacements)],
-            ['role' => 'user', 'content' => "\n" . replaceVariables(
-                $GLOBALS["gameRequest"][0] == "minai_roleplay" 
-                    ? $settings['roleplay_request']
-                    : $settings['translation_request'],
-                $variableReplacements
-            )]
+            ['role' => 'user', 'content' => "\n" . replaceVariables($requestFormat, $variableReplacements)]
         ];
 
         // Debug log the messages being sent to LLM
