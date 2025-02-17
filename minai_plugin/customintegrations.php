@@ -130,7 +130,7 @@ function ProcessIntegrations() {
     if (in_array($GLOBALS["gameRequest"][0],["inputtext","inputtext_s","ginputtext","ginputtext_s","rechat","bored", "radiant", "minai_force_rechat"])) {
         if (!in_array($GLOBALS["gameRequest"][0], ["radiant", "rechat", "minai_force_rechat"]))
             ClearRadiantActors();
-        error_log("minai: Setting lastInput time.");
+        // error_log("minai: Setting lastInput time.");
         $db = $GLOBALS['db'];
         $id = "_minai_RADIANT//lastInput";
         $db->delete("conf_opts", "id='{$id}'");

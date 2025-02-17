@@ -288,7 +288,7 @@ Function StoreRadiantActors($actor1, $actor2) {
 }
 
 Function ClearRadiantActors() {
-    error_log("minai: Clearing Radiant Actors");
+    // error_log("minai: Clearing Radiant Actors");
     $db = $GLOBALS['db'];
     $id = "_minai_RADIANT//actor1";
     $db->delete("conf_opts", "id='{$id}'");

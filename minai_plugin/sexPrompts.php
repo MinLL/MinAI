@@ -24,7 +24,7 @@ if($currentName === "The Narrator") {
 $currentName = strtolower($currentName);
 $scene = getScene($currentName);
 // Add debug logging for scene data
-error_log("minai: Scene data: " . json_encode($scene));
+// error_log("minai: Scene data: " . json_encode($scene));
 
 // Initialize sex scene context with scene data
 $GLOBALS["SEX_SCENE_CONTEXT"] = [
