@@ -3,7 +3,7 @@ header('Content-Type: text/event-stream');
 header('Cache-Control: no-cache');
 header('Connection: keep-alive');
 
-require_once("logger.php");
+require_once("../logger.php");
 
 function send_message($status, $message) {
     echo json_encode([
