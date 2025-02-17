@@ -198,6 +198,12 @@ bool Property enableConsoleLogging = True Auto
 
 int enableConsoleLoggingOID
 
+; Add near other property declarations
+bool disableSapienceInStealthDefault = False
+bool Property disableSapienceInStealth = False Auto
+
+int disableSapienceInStealthOID
+
 Event OnConfigInit()
   main.Info("Building mcm menu.")
   InitializeMCM()
@@ -270,6 +276,7 @@ Function RenderGeneralPage()
   requestResponseCooldownOID = AddSliderOption("LLM Response Request Cooldown", requestResponseCooldown, "{1}")
   AddHeaderOption("Sapience Settings")
   useSapienceOID = AddToggleOption("Enable Sapience", minai_SapienceEnabled.GetValueInt() == 1)
+  disableSapienceInStealthOID = AddToggleOption("Disable Sapience While Sneaking", disableSapienceInStealth)
   radiantDialogueFrequencyOID = AddSliderOption("Radiant Dialogue (NPC -> NPC) Frequency", radiantDialogueFrequency, "{1}")
   radiantDialogueChanceOID = AddSliderOption("Radiant Dialogue (NPC -> NPC) Chance", radiantDialogueChance, "{1}")
   minRadianceRechatsOID = AddSliderOption("Minimum Radiance Rechats", minRadianceRechats, "{0}")
@@ -626,6 +633,9 @@ Event OnOptionSelect(int oid)
   elseif oid == trackVictimAwarenessOID
     trackVictimAwareness = !trackVictimAwareness
     SetToggleOptionValue(oid, trackVictimAwareness)
+  elseif oid == disableSapienceInStealthOID
+    disableSapienceInStealth = !disableSapienceInStealth
+    SetToggleOptionValue(oid, disableSapienceInStealth)
   EndIf
   int i = 0
   string[] categories = JMap.allKeysPArray(aCategoryMap)
@@ -783,6 +793,9 @@ Event OnOptionDefault(int oid)
   elseif oid == trackVictimAwarenessOID
     trackVictimAwareness = trackVictimAwarenessDefault
     SetToggleOptionValue(oid, trackVictimAwareness)
+  elseif oid == disableSapienceInStealthOID
+    disableSapienceInStealth = disableSapienceInStealthDefault
+    SetToggleOptionValue(oid, disableSapienceInStealth)
   EndIf
 EndEvent
 
@@ -891,6 +904,8 @@ Event OnOptionHighlight(int oid)
     SetInfoText("Hotkey to roleplay as your character using voice")
   elseif oid == roleplayTextKeyOID
     SetInfoText("Hotkey to roleplay as your character using text")
+  elseif oid == disableSapienceInStealthOID
+    SetInfoText("When enabled, sapience will be automatically disabled while the player is sneaking (Allowing for private conversations with followers and such)")
   EndIf
   int i = 0
   string[] actions = JMap.allKeysPArray(aiff.actionRegistry)
