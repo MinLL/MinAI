@@ -472,6 +472,46 @@
                 rgba(244, 67, 54, 0.35) 100%
             );
         }
+
+        .section-fields {
+            margin-top: 10px;
+        }
+
+        .field-group {
+            margin-bottom: 15px;
+        }
+
+        .field-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .section-header-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .section-header-row h4 {
+            margin: 0;
+            color: var(--primary-color);
+        }
+
+        .drag-handle {
+            cursor: move;
+            color: var(--border-color);
+            user-select: none;
+        }
+
+        .section-entry {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
 </head>
@@ -934,7 +974,11 @@
                 const sectionConfig = document.getElementById('section-config');
                 sectionConfig.innerHTML = ''; // Clear existing content
                 
-                Object.entries(configData.roleplay_settings.sections).forEach(([key, section]) => {
+                // Sort sections by order before creating elements
+                const sortedSections = Object.entries(configData.roleplay_settings.sections)
+                    .sort((a, b) => a[1].order - b[1].order);
+                
+                sortedSections.forEach(([key, section]) => {
                     const sectionDiv = document.createElement('div');
                     sectionDiv.className = 'option-group';
                     sectionDiv.innerHTML = `
@@ -949,17 +993,27 @@
                                     ${section.enabled ? 'checked' : ''}>
                                 Enabled
                             </label>
-                            <input type="text" class="section-header" 
-                                data-section="${key}" 
-                                value="${section.header}" 
-                                placeholder="Section Header">
-                            <textarea class="prompt-textarea section-content" 
-                                data-section="${key}" 
-                                rows="3">${section.content}</textarea>
+                            <div class="section-fields">
+                                <div class="field-group">
+                                    <label>Header:</label>
+                                    <input type="text" class="section-header" 
+                                        data-section="${key}" 
+                                        value="${section.header}" 
+                                        placeholder="Section Header">
+                                </div>
+                                <div class="field-group">
+                                    <label>Content:</label>
+                                    <textarea class="prompt-textarea section-content" 
+                                        data-section="${key}" 
+                                        rows="3">${section.content}</textarea>
+                                </div>
+                            </div>
                         </div>
                     `;
                     sectionConfig.appendChild(sectionDiv);
                 });
+                
+                // Initialize sortable sections
                 initializeSortableSections();
 
                 // After populating all the fields, remove the collapsed class
@@ -1017,13 +1071,13 @@
 
             // Gather section configurations in DOM order
             const orderedSections = {};
-            document.querySelectorAll('.section-entry').forEach(section => {
+            document.querySelectorAll('.section-entry').forEach((section, index) => {
                 const key = section.querySelector('.section-enabled').dataset.section;
                 orderedSections[key] = {
                     enabled: section.querySelector('.section-enabled').checked,
                     header: section.querySelector('.section-header').value,
                     content: section.querySelector('.section-content').value,
-                    order: Object.keys(orderedSections).length  // Add order property
+                    order: index  // Use index for order to maintain drag-and-drop ordering
                 };
             });
             config.roleplay_settings.sections = orderedSections;
