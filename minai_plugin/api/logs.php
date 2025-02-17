@@ -1,6 +1,7 @@
 <?php
 header('Content-Type: application/json');
 set_time_limit(120); // Increase timeout to 2 minutes
+require_once("../logger.php");
 
 $logDir = realpath('/var/www/html/HerikaServer/log/');
 

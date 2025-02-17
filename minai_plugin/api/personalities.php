@@ -3,6 +3,7 @@
 $path = ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR;
 require_once($path . "conf" . DIRECTORY_SEPARATOR . "conf.php");
 require_once($path . "lib" . DIRECTORY_SEPARATOR . "{$GLOBALS['DBDRIVER']}.class.php");
+require_once("../logger.php");
 
 $db = new sql();
 

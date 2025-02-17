@@ -1,6 +1,7 @@
 <?php
 // Path to configuration and database library
 $path = ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR;
+require_once("../logger.php");
 require_once($path . "conf" . DIRECTORY_SEPARATOR . "conf.php");
 require_once($path . "lib" . DIRECTORY_SEPARATOR . "{$GLOBALS['DBDRIVER']}.class.php");
 require_once("./sexPersonalityJsonSchema.php");

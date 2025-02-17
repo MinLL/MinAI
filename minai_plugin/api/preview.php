@@ -1,7 +1,7 @@
 <?php
 // Prevent any output before JSON
 ob_start();
-
+require_once("../logger.php");
 header('Content-Type: application/json');
 $path = "..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR;
 require_once($path . "conf".DIRECTORY_SEPARATOR."conf.php");

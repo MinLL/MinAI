@@ -1,4 +1,5 @@
 <?php
+require_once("../logger.php");
 // Path to configuration and database library
 $path = ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR;
 require_once($path . "conf" . DIRECTORY_SEPARATOR . "conf.php");

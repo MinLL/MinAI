@@ -1,4 +1,5 @@
 <?php
+require_once("../logger.php");
 
 $sexPersonalityJsonSchema = '{
     "type": "object",
