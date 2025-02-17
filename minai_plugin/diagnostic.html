@@ -1062,6 +1062,147 @@
         .filter-active-indicator.active {
             opacity: 1;
         }
+
+        .role-entry {
+            margin: 10px 0;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+        
+        .role-label {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+            margin-bottom: 4px;
+        }
+        
+        .role-label.system {
+            background: rgba(33, 150, 243, 0.2);
+            color: #2196f3;
+        }
+        
+        .role-label.user {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+        
+        .role-label.assistant {
+            background: rgba(156, 39, 176, 0.2);
+            color: #9c27b0;
+        }
+        
+        .role-content {
+            margin-top: 4px;
+            white-space: pre-wrap;
+        }
+        
+        .section-header {
+            color: var(--primary-color);
+            margin: 15px 0 10px 0;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+        
+        .info-line {
+            margin: 5px 0;
+        }
+        
+        .info-label {
+            color: var(--info-color);
+            font-weight: 500;
+        }
+        
+        .numeric-value {
+            color: var(--warning-color);
+            font-family: 'Consolas', monospace;
+        }
+        
+        .entry-timestamp {
+            color: var(--info-color);
+            font-family: 'Consolas', monospace;
+            font-size: 0.9em;
+        }
+        
+        /* Enhance collapsible entries */
+        .collapsible-entry {
+            margin: 10px 0;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .collapsible-header {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .collapsible-header:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .collapsible-content {
+            padding: 15px;
+            display: none;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .collapsible-entry.expanded .collapsible-content {
+            display: block;
+        }
+
+        .narrator-line {
+            color: var(--info-color);
+            font-style: italic;
+            margin: 4px 0;
+            padding: 2px 0;
+        }
+        
+        .dialogue-line {
+            margin: 4px 0;
+            padding: 2px 0;
+        }
+        
+        .dialogue-line .speaker {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .dialogue-line .dialogue-text {
+            margin-left: 8px;
+            color: var(--text-color);
+        }
+        
+        .dialogue-line .dialogue-target {
+            margin-left: 8px;
+            color: var(--info-color);
+            font-style: italic;
+            font-size: 0.9em;
+        }
+        
+        .role-content {
+            margin-top: 4px;
+            white-space: pre-wrap;
+            line-height: 1.4;
+        }
+        
+        .info-line {
+            margin: 5px 0;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+        
+        .info-label {
+            color: var(--info-color);
+            font-weight: 500;
+            flex: 0 0 auto;
+        }
     </style>
 </head>
 <body>
@@ -1146,31 +1287,119 @@
         }
 
         function parseContextLog(content) {
-            const entries = content.split('=\n');
+            // First check if this is the new timestamp format
+            const hasTimestamps = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2}/.test(content);
+            
+            let entries;
+            if (hasTimestamps) {
+                // Split only by timestamps that are followed by "Role:"
+                entries = content.split(/(?=\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2}\s+Role:)/);
+            } else {
+                // Split by '=' for original format, but only on lines that contain just '='
+                entries = content.split(/^=\s*$/m);
+            }
+            
             let entryNumber = 1;
             
             const formattedEntries = entries.map(entry => {
                 if (!entry.trim()) return '';
                 
-                let formattedEntry;
-                if (entry.trim().startsWith('array (')) {
-                    formattedEntry = formatPhpArray(entry.trim());
-                } else {
-                    try {
-                        const json = JSON.parse(entry.trim());
-                        let highlighted = syntaxHighlightJSON(json);
-                        highlighted = highlighted.replace(
-                            /(AVAILABLE ACTION[^"]*)/g,
-                            '<span class="available-action">$1</span>'
-                        );
-                        formattedEntry = highlighted;
-                    } catch (e) {
-                        formattedEntry = entry;
-                    }
-                }
+                let timestamp = '';
+                let processedContent = '';
+                let previewText = '';
                 
-                // Create a preview of the first line
-                const previewText = entry.trim().split('\n')[0].slice(0, 100) + '...';
+                if (hasTimestamps) {
+                    // Handle new timestamp format
+                    const timestampMatch = entry.match(/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2})/);
+                    timestamp = timestampMatch ? timestampMatch[1] : '';
+                    let content = entry.replace(timestamp, '').trim();
+                    
+                    // Split into role-based sections, but only at the start of a new Role: section
+                    const sections = content.split(/(?=^Role:\s*(?:system|user|assistant)\s*\nContent:)/m);
+                    
+                    // Process each section
+                    processedContent = sections.map(section => {
+                        if (!section.trim()) return '';
+                        
+                        const roleMatch = section.match(/^Role:\s*(system|user|assistant)\s*\nContent:\s*([\s\S]*)/);
+                        if (!roleMatch) return section; // Not a role-based section
+                        
+                        const [_, role, roleContent] = roleMatch;
+                        
+                        // Process the content based on its type
+                        let formattedContent = roleContent.trim();
+                        
+                        // Handle special formatting for system role content
+                        if (role === 'system') {
+                            formattedContent = formattedContent
+                                .replace(/=== ([^=]+) ===/g, '<h3 class="section-header">$1</h3>')
+                                .replace(/^(Characters|Locations):\s*(.+)$/gm, '<div class="info-line"><span class="info-label">$1:</span> $2</div>')
+                                .replace(/(\d+)\/100/g, '<span class="numeric-value">$1/100</span>')
+                                .replace(/^([A-Za-z]+):\s+(.+)$/gm, '<div class="info-line"><span class="info-label">$1:</span> $2</div>')
+                                .replace(/The Narrator:\s+(.+?)(?=\n|$)/g, '<div class="narrator-line">$1</div>')
+                                .replace(/([^:]+?):\s+(.+?)\s*(?:\(talking to ([^)]+)\))?(?=\n|$)/g, (match, speaker, text, target) => {
+                                    return `<div class="dialogue-line">
+                                        <span class="speaker">${speaker}</span>
+                                        <span class="dialogue-text">${text}</span>
+                                        ${target ? `<span class="dialogue-target">(to ${target})</span>` : ''}
+                                    </div>`;
+                                });
+                        }
+                        
+                        // Try to parse as JSON if possible
+                        try {
+                            const json = JSON.parse(formattedContent);
+                            formattedContent = syntaxHighlightJSON(json);
+                        } catch (e) {
+                            // If it contains PHP array notation
+                            if (formattedContent.includes('array (')) {
+                                formattedContent = formatPhpArray(formattedContent);
+                            }
+                        }
+                        
+                        return `
+                            <div class="role-entry">
+                                <span class="role-label ${role.toLowerCase()}">${role}</span>
+                                <div class="role-content">${formattedContent}</div>
+                            </div>
+                        `;
+                    }).join('\n');
+                    
+                    // Create preview from the first meaningful line
+                    previewText = content
+                        .replace(/Role:\s*(system|user|assistant)\s*\nContent:\s*/g, '')
+                        .split('\n')
+                        .find(line => line.trim() && !line.startsWith('==='))
+                        ?.slice(0, 100) + '...';
+                        
+                } else {
+                    // Handle original array-based format
+                    let formattedEntry;
+                    const trimmedEntry = entry.trim();
+                    
+                    if (trimmedEntry.startsWith('array (')) {
+                        formattedEntry = formatPhpArray(trimmedEntry);
+                    } else {
+                        try {
+                            const json = JSON.parse(trimmedEntry);
+                            formattedEntry = syntaxHighlightJSON(json);
+                        } catch (e) {
+                            formattedEntry = trimmedEntry
+                                .replace(/&/g, '&amp;')
+                                .replace(/</g, '&lt;')
+                                .replace(/>/g, '&gt;');
+                        }
+                    }
+                    
+                    processedContent = `
+                        <div class="log-line">
+                            <span class="log-message">${formattedEntry}</span>
+                        </div>
+                    `;
+                    
+                    // Create preview from the first line
+                    previewText = trimmedEntry.split('\n')[0].slice(0, 100) + '...';
+                }
                 
                 // Determine if this is the last entry
                 const isLastEntry = entryNumber === entries.filter(e => e.trim()).length;
@@ -1178,13 +1407,14 @@
                 return `
                     <div class="collapsible-entry${isLastEntry ? ' expanded' : ''}">
                         <div class="collapsible-header" onclick="toggleEntry(this)">
-                            <span>Entry ${entryNumber++}: ${previewText}</span>
+                            <span>
+                                ${timestamp ? `<span class="entry-timestamp">${timestamp}</span> - ` : ''}
+                                Entry ${entryNumber++}: ${previewText || 'Empty entry'}
+                            </span>
                             <span class="expand-indicator">${isLastEntry ? '▼' : '▶'}</span>
                         </div>
                         <div class="collapsible-content">
-                            <div class="log-line">
-                                <span class="log-message">${formattedEntry}</span>
-                            </div>
+                            ${processedContent}
                         </div>
                     </div>
                 `;
@@ -2222,6 +2452,157 @@
                 entry.querySelector('.expand-indicator').textContent = '▶';
             });
         }
+
+        // Add these styles to the existing <style> section
+        function addContextLogStyles() {
+            const styleSheet = document.createElement('style');
+            styleSheet.textContent = `
+                .role-entry {
+                    margin: 10px 0;
+                    padding: 8px;
+                    background: rgba(0, 0, 0, 0.2);
+                    border-radius: 4px;
+                }
+                
+                .role-label {
+                    display: inline-block;
+                    padding: 2px 6px;
+                    border-radius: 3px;
+                    font-size: 0.9em;
+                    margin-bottom: 4px;
+                }
+                
+                .role-label.system {
+                    background: rgba(33, 150, 243, 0.2);
+                    color: #2196f3;
+                }
+                
+                .role-label.user {
+                    background: rgba(76, 175, 80, 0.2);
+                    color: #4caf50;
+                }
+                
+                .role-label.assistant {
+                    background: rgba(156, 39, 176, 0.2);
+                    color: #9c27b0;
+                }
+                
+                .role-content {
+                    margin-top: 4px;
+                    white-space: pre-wrap;
+                }
+                
+                .section-header {
+                    color: var(--primary-color);
+                    margin: 15px 0 10px 0;
+                    font-size: 1.1em;
+                    font-weight: 500;
+                }
+                
+                .info-line {
+                    margin: 5px 0;
+                }
+                
+                .info-label {
+                    color: var(--info-color);
+                    font-weight: 500;
+                }
+                
+                .numeric-value {
+                    color: var(--warning-color);
+                    font-family: 'Consolas', monospace;
+                }
+                
+                .entry-timestamp {
+                    color: var(--info-color);
+                    font-family: 'Consolas', monospace;
+                    font-size: 0.9em;
+                }
+                
+                /* Enhance collapsible entries */
+                .collapsible-entry {
+                    margin: 10px 0;
+                    border: 1px solid var(--border-color);
+                    border-radius: 6px;
+                    overflow: hidden;
+                }
+                
+                .collapsible-header {
+                    padding: 10px;
+                    background: rgba(255, 255, 255, 0.05);
+                    cursor: pointer;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+                
+                .collapsible-header:hover {
+                    background: rgba(255, 255, 255, 0.08);
+                }
+                
+                .collapsible-content {
+                    padding: 15px;
+                    display: none;
+                    background: rgba(0, 0, 0, 0.2);
+                }
+                
+                .collapsible-entry.expanded .collapsible-content {
+                    display: block;
+                }
+
+                .narrator-line {
+                    color: var(--info-color);
+                    font-style: italic;
+                    margin: 4px 0;
+                    padding: 2px 0;
+                }
+                
+                .dialogue-line {
+                    margin: 4px 0;
+                    padding: 2px 0;
+                }
+                
+                .dialogue-line .speaker {
+                    color: var(--primary-color);
+                    font-weight: 500;
+                }
+                
+                .dialogue-line .dialogue-text {
+                    margin-left: 8px;
+                    color: var(--text-color);
+                }
+                
+                .dialogue-line .dialogue-target {
+                    margin-left: 8px;
+                    color: var(--info-color);
+                    font-style: italic;
+                    font-size: 0.9em;
+                }
+                
+                .role-content {
+                    margin-top: 4px;
+                    white-space: pre-wrap;
+                    line-height: 1.4;
+                }
+                
+                .info-line {
+                    margin: 5px 0;
+                    display: flex;
+                    align-items: baseline;
+                    gap: 8px;
+                }
+                
+                .info-label {
+                    color: var(--info-color);
+                    font-weight: 500;
+                    flex: 0 0 auto;
+                }
+            `;
+            document.head.appendChild(styleSheet);
+        }
+
+        // Call this when the document loads
+        document.addEventListener('DOMContentLoaded', addContextLogStyles);
     </script>
 </body>
 </html> 
