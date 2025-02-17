@@ -81,7 +81,7 @@ function ProcessIntegrations() {
         );
         $MUST_DIE=true;
     }
-    if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "updateThreadsDB") {
+    if (isset($GLOBALS["gameRequest"]) && strtolower($GLOBALS["gameRequest"][0]) == "updatethreadsdb") {
         updateThreadsDB();
         $MUST_DIE=true;
     }
