@@ -30,8 +30,8 @@
 
         .container {
             max-width: 98vw;
-            margin: 20px auto;
-            padding: 20px;
+            margin: 5px auto;
+            padding: 10px;
             background: rgba(0, 0, 0, 0.2);
             border-radius: 16px;
             backdrop-filter: blur(10px);
@@ -39,33 +39,43 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
-        .nav-panel {
+        .log-selector-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin: 5px 0 10px 0;
+            flex-wrap: wrap;
             background-color: var(--background-light);
-            padding: 15px;
-            text-align: center;
+            padding: 10px;
             border-radius: 12px;
-            margin-bottom: 30px;
             border: 1px solid var(--border-color);
             backdrop-filter: blur(4px);
         }
 
-        .nav-panel a {
-            display: inline-block;
-            color: var(--text-color);
-            text-decoration: none;
-            font-size: 1.1rem;
-            margin: 0 20px;
-            padding: 10px 20px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
+        .nav-section {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .nav-section a, 
+        .nav-section button {
+            padding: 8px 16px;
             background: linear-gradient(135deg,
                 rgba(255, 255, 255, 0.1) 0%,
                 rgba(255, 255, 255, 0.05) 100%
             );
+            color: var(--text-color);
             border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 0.9rem;
         }
 
-        .nav-panel a:hover {
+        .nav-section a:hover,
+        .nav-section button:hover {
             transform: translateY(-2px);
             background: linear-gradient(135deg,
                 rgba(255, 255, 255, 0.15) 0%,
@@ -74,12 +84,28 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
+        h1 {
+            text-align: left;
+            color: var(--text-color);
+            margin: 0;
+            font-size: 1.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            white-space: nowrap;
+        }
+
+        .nav-divider {
+            width: 1px;
+            height: 24px;
+            background-color: var(--border-color);
+            margin: 0 5px;
+        }
+
         .log-container {
+            margin-top: 10px;
+            height: calc(95vh - 100px);
             display: grid;
             gap: 15px;
-            margin-top: 20px;
             width: 100%;
-            height: calc(90vh - 200px);
         }
 
         .log-viewer {
@@ -145,10 +171,29 @@
             font-family: 'Consolas', monospace;
             font-size: 0.9rem;
             line-height: 1.3;
-            overflow-y: auto;
+            overflow-y: scroll;
             overflow-x: hidden;
             border: 1px solid var(--border-color);
             height: calc(100% - 100px);
+            scroll-behavior: smooth;
+        }
+
+        .log-content.updating {
+            scroll-behavior: auto;
+        }
+
+        .log-content::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        .log-content::-webkit-scrollbar-track {
+            background: var(--background-dark);
+        }
+
+        .log-content::-webkit-scrollbar-thumb {
+            background-color: var(--border-color);
+            border-radius: 6px;
+            border: 3px solid var(--background-dark);
         }
 
         .log-line {
@@ -162,6 +207,8 @@
             white-space: nowrap;
             overflow: hidden;
             position: relative;
+            cursor: pointer;
+            transition: background-color 0.2s;
         }
 
         .log-line.error {
@@ -184,6 +231,15 @@
             background-color: rgba(255, 193, 7, 0.15);
         }
 
+        .log-line.copied {
+            animation: copiedFlash 0.5s;
+        }
+
+        @keyframes copiedFlash {
+            0%, 100% { background-color: transparent; }
+            50% { background-color: rgba(76, 175, 80, 0.2); }
+        }
+
         .timestamp {
             color: var(--info-color);
             padding: 0 4px;
@@ -198,6 +254,7 @@
         }
 
         .filter-container {
+            position: relative;
             margin-bottom: 20px;
         }
 
@@ -316,36 +373,32 @@
 
             .log-container {
                 height: calc(90vh - 120px);
+                gap: 10px;
             }
 
-            .nav-panel a {
-                display: block;
-                margin: 10px 0;
-            }
-
-            .preset-filters {
+            .log-selector-controls {
                 flex-direction: column;
+                align-items: stretch;
+                gap: 5px;
+            }
+
+            .nav-section {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            h1 {
+                text-align: center;
+                margin-bottom: 5px;
+            }
+
+            .nav-divider {
+                display: none;
             }
 
             .log-viewer {
                 min-height: 300px;
             }
-        }
-
-        h1 {
-            text-align: center;
-            color: var(--text-color);
-            margin-bottom: 30px;
-            font-size: 2.5rem;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .log-selector-controls {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            margin: 20px;
-            flex-wrap: wrap;
         }
 
         .log-selector-dropdown {
@@ -438,16 +491,47 @@
         }
 
         .troubleshoot-button {
-            padding: 10px 20px;
             background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.3) 0%,
+                rgba(76, 175, 80, 0.4) 100%
+            ) !important;
+            border: 1px solid var(--primary-color) !important;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .troubleshoot-button:hover {
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.4) 0%,
+                rgba(76, 175, 80, 0.5) 100%
+            ) !important;
+        }
+
+        .troubleshoot-button::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, 
                 rgba(76, 175, 80, 0.2) 0%,
-                rgba(76, 175, 80, 0.3) 100%
+                transparent 70%
             );
-            color: var(--text-color);
-            border: 1px solid var(--primary-color);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            animation: troubleshootGlow 2s infinite;
+        }
+
+        @keyframes troubleshootGlow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        .troubleshoot-button:hover::after {
+            opacity: 1;
         }
 
         .resize-handle {
@@ -859,30 +943,149 @@
             z-index: 1;
             background: var(--background-dark);
         }
+
+        /* Add tooltip styles */
+        .copy-tooltip {
+            position: fixed;
+            background: var(--background-dark);
+            color: var(--text-color);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 1000;
+            border: 1px solid var(--border-color);
+        }
+
+        .copy-tooltip.visible {
+            opacity: 1;
+        }
+
+        /* Add styles for LLM output display */
+        .log-viewer.llm-output .log-content {
+            white-space: pre-wrap !important;
+            word-break: break-word;
+        }
+
+        .log-viewer.llm-output .log-line {
+            display: block;
+            white-space: pre-wrap;
+            font-family: 'Consolas', monospace;
+            padding: 8px;
+            margin: 4px 0;
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .log-viewer.llm-output .timestamp {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.8em;
+        }
+
+        /* Improve JSON highlighting */
+        .log-viewer:not(.llm-output) .json-formatted {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            padding-left: 20px;
+        }
+
+        .json-key {
+            color: #67cdcc;
+            margin-right: 4px;
+        }
+
+        .json-string {
+            color: #7ec699;
+        }
+        
+        .json-number {
+            color: #f08d49;
+        }
+        
+        .json-boolean {
+            color: #cc99cd;
+        }
+        
+        .json-null {
+            color: #cc99cd;
+        }
+
+        /* Add styles for multi-line JSON in LLM output */
+        .log-viewer.llm-output .json-formatted {
+            white-space: pre-wrap;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            margin: 4px 0;
+        }
+
+        .log-viewer.llm-output .json-entry {
+            padding-left: 20px;
+            margin: 2px 0;
+        }
+
+        .log-viewer.llm-output .log-line {
+            background: transparent;
+            padding: 4px;
+        }
+
+        .log-viewer.llm-output .log-line:has(.json-formatted) {
+            padding: 0;
+        }
+
+        /* Add highlight style for filtered text */
+        .filter-highlight {
+            background-color: rgba(76, 175, 80, 0.3);
+            border-radius: 2px;
+            padding: 0 2px;
+            margin: 0 -2px;
+        }
+
+        /* Add style for active filter indicator */
+        .filter-active-indicator {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .filter-active-indicator.active {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>MinAI Diagnostics</h1>
-        
-        <div class="nav-panel">
-            <a href="index.html">Return to Home</a>
-            <a href="https://github.com/MinLL/MinAI">Documentation</a>
-            <button onclick="toggleTroubleshoot()" class="troubleshoot-button">
-                Troubleshoot
-            </button>
-        </div>
-
         <div class="log-selector-controls">
-            <select class="log-selector-dropdown" id="logSelect">
-                <option value="">Add Log Viewer...</option>
-            </select>
-            <button onclick="restoreDefaultLogs()" class="layout-button">Restore Defaults</button>
-            <div class="layout-controls">
-                <button class="layout-button" onclick="setLayout(1)">1x</button>
-                <button class="layout-button active" onclick="setLayout(2)">2x</button>
-                <button class="layout-button" onclick="setLayout(3)">3x</button>
-                <button class="layout-button" onclick="setLayout(4)">4x</button>
+            <div class="nav-section">
+                <h1>MinAI Diagnostics</h1>
+                <div class="nav-divider"></div>
+                <a href="index.html">Home</a>
+                <a href="https://github.com/MinLL/MinAI">Docs</a>
+                <button onclick="toggleTroubleshoot()" class="troubleshoot-button">Troubleshoot</button>
+            </div>
+            <div class="nav-divider"></div>
+            <div class="nav-section">
+                <select class="log-selector-dropdown" id="logSelect">
+                    <option value="">Add Log Viewer...</option>
+                </select>
+                <button onclick="restoreDefaultLogs()" class="layout-button">Restore Defaults</button>
+                <div class="layout-controls">
+                    <button class="layout-button" onclick="setLayout(1)">1x</button>
+                    <button class="layout-button active" onclick="setLayout(2)">2x</button>
+                    <button class="layout-button" onclick="setLayout(3)">3x</button>
+                    <button class="layout-button" onclick="setLayout(4)">4x</button>
+                </div>
             </div>
         </div>
 
@@ -996,28 +1199,72 @@
                 if (!entry.trim()) return '';
                 
                 const lines = entry.split('\n');
-                const formattedLines = lines.map(line => {
-                    if (!line.trim()) return '';
+                let formattedLines = [];
+                
+                // Try to parse the entire entry as a single JSON object first
+                try {
+                    const json = JSON.parse(entry.trim());
+                    return `<div class="log-line">${syntaxHighlightJSON(json)}</div>`;
+                } catch (e) {
+                    // If not a complete JSON, process line by line
+                    let jsonBuffer = '';
+                    let isCollectingJSON = false;
                     
-                    let formattedLine = line;
-                    if (line.includes('START') || line.includes('END')) {
-                        const timestamp = line.match(/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2})/);
-                        if (timestamp) {
-                            formattedLine = line.replace(timestamp[0], `<span class="timestamp">${timestamp[0]}</span>`);
+                    lines.forEach(line => {
+                        if (!line.trim()) return;
+                        
+                        // Handle timestamps
+                        if (line.includes('START') || line.includes('END')) {
+                            const timestamp = line.match(/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2})/);
+                            if (timestamp) {
+                                formattedLines.push(`<div class="log-line"><span class="timestamp">${timestamp[0]}</span></div>`);
+                                return;
+                            }
                         }
-                    }
-                    if (line.match(/\[.*?\d{4}\]/)) {
-                        formattedLine = line.replace(/\[(.*?\d{4})\]/g, '<span class="timestamp">[$1]</span>');
-                    }
-                    try {
-                        const json = JSON.parse(line);
-                        formattedLine = syntaxHighlightJSON(json);
-                    } catch (e) {
-                        // Keep as is if not JSON
-                    }
-                    return `<div class="log-line">${formattedLine}</div>`;
-                });
-                return formattedLines.filter(line => line).join('');
+                        
+                        // Try to parse single-line JSON first
+                        try {
+                            const json = JSON.parse(line);
+                            formattedLines.push(`<div class="log-line">${syntaxHighlightJSON(json)}</div>`);
+                            return;
+                        } catch (e) {
+                            // If not valid JSON, check if it's part of a multi-line JSON
+                            if (line.trim().startsWith('{')) {
+                                isCollectingJSON = true;
+                                jsonBuffer = line;
+                            } else if (isCollectingJSON) {
+                                jsonBuffer += '\n' + line;
+                                if (line.trim().endsWith('}')) {
+                                    isCollectingJSON = false;
+                                    try {
+                                        const json = JSON.parse(jsonBuffer);
+                                        formattedLines.push(`<div class="log-line">${syntaxHighlightJSON(json)}</div>`);
+                                    } catch (e) {
+                                        // If parsing fails, format each line individually
+                                        jsonBuffer.split('\n').forEach(jsonLine => {
+                                            if (jsonLine.trim().startsWith('{') || jsonLine.trim().startsWith('[')) {
+                                                formattedLines.push(`<div class="log-line"><span class="json-string">${jsonLine}</span></div>`);
+                                            } else if (jsonLine.trim() === '}' || jsonLine.trim() === ']') {
+                                                formattedLines.push(`<div class="log-line"><span class="json-string">${jsonLine}</span></div>`);
+                                            } else if (jsonLine.includes(':')) {
+                                                const [key, ...rest] = jsonLine.split(':');
+                                                const value = rest.join(':');
+                                                formattedLines.push(`<div class="log-line"><span class="json-key">${key}</span>:<span class="json-string">${value}</span></div>`);
+                                            } else {
+                                                formattedLines.push(`<div class="log-line">${jsonLine}</div>`);
+                                            }
+                                        });
+                                    }
+                                    jsonBuffer = '';
+                                }
+                            } else {
+                                formattedLines.push(`<div class="log-line">${line}</div>`);
+                            }
+                        }
+                    });
+                }
+                
+                return formattedLines.join('');
             }).filter(entry => entry).join('<hr style="border: 1px dashed var(--border-color); margin: 10px 0;">');
         }
 
@@ -1105,26 +1352,30 @@
         }
 
         function syntaxHighlightJSON(json) {
-            // Add more spacing in the JSON stringification
-            const jsonStr = JSON.stringify(json, null, 4);  // Changed from 2 to 4
+            if (typeof json !== 'object') return json;
             
-            // Add extra padding after colons in key-value pairs
-            let formattedStr = jsonStr.replace(/":"/g, '": "')  // Add space after colon for strings
-                             .replace(/":\[/g, '": [')   // Add space after colon for arrays
-                             .replace(/":{\s*/g, '": {') // Add space after colon for objects
-                             .replace(/":(\d)/g, '": $1'); // Add space after colon for numbers
-            
-            return formattedStr.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
-                let cls = 'json-number';
-                if (/^"/.test(match)) {
-                    cls = /:$/.test(match) ? 'json-key' : 'json-string';
-                } else if (/true|false/.test(match)) {
-                    cls = 'json-boolean';
-                } else if (/null/.test(match)) {
-                    cls = 'json-null';
+            const formatValue = (value) => {
+                if (value === null) return '<span class="json-null">null</span>';
+                if (typeof value === 'string') return `<span class="json-string">"${value}"</span>`;
+                if (typeof value === 'number') return `<span class="json-number">${value}</span>`;
+                if (typeof value === 'boolean') return `<span class="json-boolean">${value}</span>`;
+                if (Array.isArray(value)) {
+                    return `[${value.map(formatValue).join(', ')}]`;
                 }
-                return `<span class="${cls}">${match}</span>`;
-            });
+                if (typeof value === 'object') {
+                    return formatObject(value);
+                }
+                return value;
+            };
+            
+            const formatObject = (obj) => {
+                const entries = Object.entries(obj).map(([key, value]) => 
+                    `<div class="json-entry"><span class="json-key">"${key}":</span> ${formatValue(value)}</div>`
+                );
+                return `<div class="json-formatted">{${entries.join('')}}</div>`;
+            };
+            
+            return formatObject(json);
         }
 
         function clearLog(button) {
@@ -1290,53 +1541,95 @@
         }
 
         function filterLog(input) {
-            if (input.value === input.dataset.lastValue) return;
-            input.dataset.lastValue = input.value;
-            
             const viewer = input.closest('.log-viewer');
             const content = viewer.querySelector('.log-content');
+            const indicator = viewer.querySelector('.filter-active-indicator') || createFilterIndicator(viewer);
             
-            if (!input.value) {
+            const filterValue = input.value;
+            indicator.classList.toggle('active', !!filterValue);
+            
+            if (!filterValue) {
                 content.innerHTML = content.dataset.originalContent || '';
                 return;
             }
             
             try {
-                const regex = new RegExp(input.value, 'i');
+                const regex = new RegExp(filterValue, 'gi');
                 const lines = (content.dataset.originalContent || '').split(/(?=<div class="log-line)/);
                 
                 const filteredContent = lines
-                    .filter(line => {
-                        if (!line.trim()) return false;
+                    .map(line => {
+                        if (!line.trim()) return '';
                         
-                        // Create a temporary div to parse HTML and get text content
+                        // Create a temporary div to parse HTML
                         const div = document.createElement('div');
                         div.innerHTML = line;
                         const textContent = div.textContent || div.innerText;
-                        return regex.test(textContent);
+                        
+                        if (regex.test(textContent)) {
+                            // Reset regex lastIndex
+                            regex.lastIndex = 0;
+                            
+                            // Highlight matches while preserving HTML structure
+                            const elements = div.querySelectorAll('*');
+                            elements.forEach(el => {
+                                if (el.childNodes.length === 1 && el.childNodes[0].nodeType === 3) {
+                                    el.innerHTML = el.textContent.replace(regex, match => 
+                                        `<span class="filter-highlight">${match}</span>`
+                                    );
+                                }
+                            });
+                            
+                            return div.innerHTML;
+                        }
+                        return '';
                     })
+                    .filter(line => line)
                     .join('');
                 
                 content.innerHTML = filteredContent;
                 
             } catch (e) {
                 // Fallback to simple text search if regex is invalid
-                const searchText = input.value.toLowerCase();
+                const searchText = filterValue.toLowerCase();
                 const lines = (content.dataset.originalContent || '').split(/(?=<div class="log-line)/);
                 
                 const filteredContent = lines
-                    .filter(line => {
-                        if (!line.trim()) return false;
+                    .map(line => {
+                        if (!line.trim()) return '';
                         
                         const div = document.createElement('div');
                         div.innerHTML = line;
                         const textContent = (div.textContent || div.innerText).toLowerCase();
-                        return textContent.includes(searchText);
+                        
+                        if (textContent.includes(searchText)) {
+                            // Highlight matches while preserving HTML structure
+                            const elements = div.querySelectorAll('*');
+                            elements.forEach(el => {
+                                if (el.childNodes.length === 1 && el.childNodes[0].nodeType === 3) {
+                                    el.innerHTML = el.textContent.replace(
+                                        new RegExp(searchText, 'gi'),
+                                        match => `<span class="filter-highlight">${match}</span>`
+                                    );
+                                }
+                            });
+                            
+                            return div.innerHTML;
+                        }
+                        return '';
                     })
+                    .filter(line => line)
                     .join('');
                 
                 content.innerHTML = filteredContent;
             }
+        }
+
+        function createFilterIndicator(viewer) {
+            const indicator = document.createElement('div');
+            indicator.className = 'filter-active-indicator';
+            viewer.querySelector('.filter-container').appendChild(indicator);
+            return indicator;
         }
 
         function restoreDefaultLogs() {
@@ -1388,6 +1681,45 @@
             return content;
         }
 
+        function setupCopyHandlers(viewer) {
+            const logContent = viewer.querySelector('.log-content');
+            let tooltip = null;
+
+            logContent.addEventListener('click', async (e) => {
+                const logLine = e.target.closest('.log-line');
+                if (!logLine) return;
+
+                // Get text content without HTML tags
+                const textContent = logLine.textContent || logLine.innerText;
+                
+                try {
+                    await navigator.clipboard.writeText(textContent);
+                    
+                    // Flash animation
+                    logLine.classList.add('copied');
+                    setTimeout(() => logLine.classList.remove('copied'), 500);
+
+                    // Show tooltip
+                    if (!tooltip) {
+                        tooltip = document.createElement('div');
+                        tooltip.className = 'copy-tooltip';
+                        document.body.appendChild(tooltip);
+                    }
+
+                    tooltip.textContent = 'Copied!';
+                    tooltip.style.left = `${e.pageX + 10}px`;
+                    tooltip.style.top = `${e.pageY + 10}px`;
+                    tooltip.classList.add('visible');
+
+                    setTimeout(() => {
+                        tooltip.classList.remove('visible');
+                    }, 1000);
+                } catch (err) {
+                    console.error('Failed to copy:', err);
+                }
+            });
+        }
+
         async function fetchAndUpdateLog(config) {
             const viewerData = activeLogViewers.get(config.file);
             if (!viewerData) return;
@@ -1400,39 +1732,37 @@
                 
                 if (data.content) {
                     const content = viewerData.viewer.querySelector('.log-content');
+                    const filterInput = viewerData.viewer.querySelector('.filter-input');
                     
                     if (viewerData.updateTimeout) {
                         clearTimeout(viewerData.updateTimeout);
                     }
                     
                     viewerData.updateTimeout = setTimeout(() => {
-                        const parsedContent = config.parser(data.content);
+                        content.classList.add('updating');
+                        const wasAtBottom = content.scrollHeight - content.scrollTop <= content.clientHeight + 50;
                         
+                        const parsedContent = config.parser(data.content);
                         content.dataset.originalContent = optimizeLogContent(
                             (content.dataset.originalContent || '') + parsedContent
                         );
                         
-                        const filterInput = viewerData.viewer.querySelector('.filter-input');
-                        if (filterInput.value) {
-                            filterLog(filterInput);
-                        } else {
-                            requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            if (filterInput.value) {
+                                filterLog(filterInput);
+                            } else {
                                 content.innerHTML = content.dataset.originalContent;
-                                if (viewerData.follow) {
-                                    content.scrollTop = content.scrollHeight;
-                                }
-                            });
-                        }
+                            }
+                            
+                            if (viewerData.follow && wasAtBottom) {
+                                content.scrollTop = content.scrollHeight;
+                            }
+                            content.classList.remove('updating');
+                        });
                     }, 100);
                 }
                 
                 viewerData.position = data.position;
-
-                // When updating the log content:
-                if (viewerData && viewerData.follow) {
-                    const logContent = viewerData.viewer.querySelector('.log-content');
-                    logContent.scrollTop = logContent.scrollHeight;
-                }
             } catch (error) {
                 console.error(`Error fetching ${config.file}:`, error);
             }
@@ -1525,10 +1855,15 @@
             const viewer = document.createElement('div');
             viewer.className = 'log-viewer wrap';
             
+            // Add LLM output class if this is the output log
+            if (config.file === 'output_from_llm.log') {
+                viewer.classList.add('llm-output');
+            }
+            
             // Add expand/collapse buttons only for context log
             const extraControls = config.file === 'context_sent_to_llm.log' ? `
-                <button class="expand-all-button" onclick="expandAllEntries(this)">Expand All</button>
-                <button class="collapse-all-button" onclick="collapseAllEntries(this)">Collapse All</button>
+                <button class="expand-all-button" onclick="expandAllEntries(this)">Expand</button>
+                <button class="collapse-all-button" onclick="collapseAllEntries(this)">Collapse</button>
             ` : '';
             
             viewer.innerHTML = `
@@ -1563,6 +1898,7 @@
             });
             
             setupScrollHandler(viewer);
+            setupCopyHandlers(viewer);
             saveConfiguration();
             
             return viewer;
