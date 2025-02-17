@@ -528,14 +528,19 @@ Event OnKeyDown(int keyCode)
         minAiff.ToggleSapience()
     ElseIf(keyCode == config.singKey)
         OnSingKeyPressed()
+        sapience.StartNextUpdate()
     ElseIf(keyCode == config.narratorKey)
         OnNarratorKeyPressed()
+        sapience.StartNextUpdate()
     ElseIf(keyCode == config.narratorTextKey)
         OnNarratorTextKeyPressed()
+        sapience.StartNextUpdate()
     ElseIf(keyCode == config.roleplayKey)
         OnRoleplayKeyPressed()
+        sapience.StartNextUpdate()
     ElseIf(keyCode == config.roleplayTextKey)
         OnRoleplayTextKeyPressed()
+        sapience.StartNextUpdate()
     EndIf
 EndEvent
 
@@ -547,10 +552,13 @@ Event OnKeyUp(int keyCode, float holdTime)
     
     If(keyCode == config.singKey)
         OnSingKeyReleased(holdTime)
+        sapience.StartNextUpdate()
     ElseIf(keyCode == config.narratorKey)
         OnNarratorKeyReleased(holdTime)
+        sapience.StartNextUpdate()
     ElseIf(keyCode == config.roleplayKey)
         OnRoleplayKeyReleased(holdTime)
+        sapience.StartNextUpdate()
     EndIf
 EndEvent
 
