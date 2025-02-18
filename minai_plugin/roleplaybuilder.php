@@ -67,6 +67,7 @@ function interceptRoleplayInput() {
         $PLAYER_NAME = $GLOBALS["PLAYER_NAME"];
         $PLAYER_BIOS = $GLOBALS["PLAYER_BIOS"];
         $HERIKA_NAME = $GLOBALS["HERIKA_NAME"];
+        $originalHerikaName = $HERIKA_NAME;
         $HERIKA_PERS = $GLOBALS["HERIKA_PERS"];
         $CONNECTOR = $GLOBALS["CONNECTOR"];
         $HERIKA_DYNAMIC = $GLOBALS["HERIKA_DYNAMIC"];
@@ -80,6 +81,7 @@ function interceptRoleplayInput() {
             $path = GetNarratorConfigPath();    
             include($path);
         }
+        $GLOBALS["HERIKA_NAME"] = $originalHerikaName;
         
         SetEnabled($GLOBALS["PLAYER_NAME"], "isRoleplaying", false);
         $settings = $GLOBALS['roleplay_settings'];
@@ -143,7 +145,9 @@ function interceptRoleplayInput() {
             'SURVIVAL_STATUS' => $survivalStatus,
             'CLOTHING_STATUS' => $clothingStatus,
             'DEVICES_STATUS' => $devicesStatus,
-            'FERTILITY_STATUS' => $fertilityStatus
+            'FERTILITY_STATUS' => $fertilityStatus,
+            'HERIKA_NAME' => $HERIKA_NAME,
+            'HERIKA_PERS' => $HERIKA_PERS
         ];
 
         // Determine scene context

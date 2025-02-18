@@ -61,7 +61,8 @@ try {
         'SURVIVAL_STATUS' => $survivalStatus,
         'CLOTHING_STATUS' => $clothingStatus,
         'DEVICES_STATUS' => $devicesStatus,
-        'FERTILITY_STATUS' => $fertilityStatus
+        'FERTILITY_STATUS' => $fertilityStatus,
+        'HERIKA_PERS' => $GLOBALS["HERIKA_PERS"] ?? ""
     ];
 
     // Get sections from roleplay settings
