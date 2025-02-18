@@ -2184,6 +2184,9 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
             // Apply the templates
             document.getElementById(translationId).value = template.translation;
             document.getElementById(roleplayId).value = template.roleplay;
+            
+            // Mark as changed after applying template
+            markAsChanged();
         }
 
         const systemTemplates = {
@@ -2264,6 +2267,9 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
             // Apply the templates
             document.getElementById(translationId).value = template.translation;
             document.getElementById(roleplayId).value = template.roleplay;
+            
+            // Mark as changed after applying template
+            markAsChanged();
         }
 
         function showStatus(message, type = 'info', duration = 3000) {
