@@ -1001,7 +1001,7 @@ Function SetNarratorProfile() {
             ], true);
         }
         $path = GetNarratorConfigPath();
-        minai_log("info", "Overwriting profile with narrator profile ($path).");
+        // minai_log("info", "Overwriting profile with narrator profile ($path).");
         // Ignore narrator name
         global $HERIKA_NAME;
         $HERIKA_NAME = "The Narrator";
