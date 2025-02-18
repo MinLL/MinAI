@@ -1864,6 +1864,8 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     markAsSaved();
                     // Immediately fetch fresh config after save
                     await fetchConfigData();
+                    // Refresh the preview after saving
+                    await refreshPreview();
                 } else {
                     showStatus('Failed to save configuration', 'error');
                     const errorDisplay = document.getElementById('error-display');
