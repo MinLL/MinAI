@@ -24,7 +24,7 @@ if($currentName === "The Narrator") {
 $currentName = strtolower($currentName);
 $scene = getScene($currentName);
 // Add debug logging for scene data
-error_log("minai: Scene data: " . json_encode($scene));
+// minai_log("info", "Scene data: " . json_encode($scene));
 
 // Initialize sex scene context with scene data
 $GLOBALS["SEX_SCENE_CONTEXT"] = [
@@ -47,7 +47,7 @@ if(isset($scene)){
     $speakStyleInfo = determineSpeakStyle($currentName, $scene, $jsonXPersonality);
     $speakStyle = $speakStyleInfo["style"];
     
-    error_log("minai: Setting sex speak style: $speakStyle. Role: {$speakStyleInfo["role"]}");
+    minai_log("info", "Setting sex speak style: $speakStyle. Role: {$speakStyleInfo["role"]}");
     
     switch($speakStyle) {
         case "victim talk": {
@@ -100,4 +100,3 @@ if(isset($scene)){
         }
     }
 }
-?>

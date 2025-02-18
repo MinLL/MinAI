@@ -4,6 +4,7 @@ bool bHasSunhelm = False
 bool bUseVanilla = True
 bool bHasBFT = False
 bool bHasCampfire = False
+bool bHasSurvivalMode = False
 
 _shweathersystem sunhelmWeather
 _SunHelmMain property sunhelmMain auto
@@ -22,6 +23,14 @@ minai_Mantella minMantella
 minai_AIFF aiff
 
 actor playerRef
+
+GlobalVariable property Survival_ModeEnabled auto
+GlobalVariable property Survival_HungerNeedValue auto
+GlobalVariable property Survival_ColdNeedValue auto 
+GlobalVariable property Survival_ExhaustionNeedValue auto
+GlobalVariable property Survival_HungerNeedMaxValue auto
+GlobalVariable property Survival_ColdNeedMaxValue auto
+GlobalVariable property Survival_ExhaustionNeedMaxValue auto
 
 function Maintenance(minai_MainQuestController _main)
   playerRef = Game.GetPlayer()
@@ -74,14 +83,39 @@ function Maintenance(minai_MainQuestController _main)
   if !JobInnKeeper || !JobInnServer
     Main.Error("- Failed to fetch vanilla factions")
   EndIf
-  aiff.SetModAvailable("Sunhelm", bHasSunhelm)
-  aiff.SetModAvailable("BetterFastTravel", bHasBFT)
+
   aiff.RegisterAction("ExtCmdServeFood", "ServeFood", "Survival", "Receive food from an inn keeper/server", 1, 5, 2, 5, 60, bHasSunhelm)
   aiff.RegisterAction("ExtCmdRentRoom", "RentRoom", "Rent a room from an inn keeper", "Survival", 1, 30, 2, 5, 60, True)
   aiff.RegisterAction("ExtCmdTrade", "Trade", "Open the buy/sell menu", "Survival", 1, 5, 2, 5, 60, True)
   aiff.RegisterAction("ExtCmdCarriageRide", "CarriageRide", "Request a carriage ride to a destination", "Survival", 1, 5, 2, 5, 60, True)
   aiff.RegisterAction("ExtCmdTrainSkill", "TrainSkill", "Receive training in a skill", "Survival", 1, 5, 2, 5, 60, True)
   
+  if Game.GetModByName("ccQDRSSE001-SurvivalMode.esl") != 255
+    bHasSurvivalMode = True
+    Main.Info("Found Survival Mode")
+    
+    ; Get essential global variables
+    Survival_ModeEnabled = Game.GetFormFromFile(0x0826, "ccQDRSSE001-SurvivalMode.esl") as GlobalVariable
+    Survival_HungerNeedValue = Game.GetFormFromFile(0x081A, "ccQDRSSE001-SurvivalMode.esl") as GlobalVariable
+    Survival_ColdNeedValue = Game.GetFormFromFile(0x081B, "ccQDRSSE001-SurvivalMode.esl") as GlobalVariable
+    Survival_ExhaustionNeedValue = Game.GetFormFromFile(0x0816, "ccQDRSSE001-SurvivalMode.esl") as GlobalVariable
+    Survival_HungerNeedMaxValue = Game.GetFormFromFile(0x080C, "ccQDRSSE001-SurvivalMode.esl") as GlobalVariable
+    Survival_ColdNeedMaxValue = Game.GetFormFromFile(0x084B, "ccQDRSSE001-SurvivalMode.esl") as GlobalVariable
+    Survival_ExhaustionNeedMaxValue = Game.GetFormFromFile(0x084A, "ccQDRSSE001-SurvivalMode.esl") as GlobalVariable
+    
+    if !Survival_ModeEnabled || !Survival_HungerNeedValue || !Survival_ColdNeedValue || !Survival_ExhaustionNeedValue
+        Main.Error("Could not load all Survival Mode references")
+        Main.Debug("Survival_ModeEnabled: " + Survival_ModeEnabled)
+        Main.Debug("Survival_HungerNeedValue: " + Survival_HungerNeedValue)
+        Main.Debug("Survival_ColdNeedValue: " + Survival_ColdNeedValue)
+        Main.Debug("Survival_ExhaustionNeedValue: " + Survival_ExhaustionNeedValue)
+        bHasSurvivalMode = False
+    EndIf
+    Main.Debug("Survival Mode Values - Hunger: " + Survival_HungerNeedValue.GetValue() + "/" + Survival_HungerNeedMaxValue.GetValue() + ", Cold: " + Survival_ColdNeedValue.GetValue() + "/" + Survival_ColdNeedMaxValue.GetValue() + ", Exhaustion: " + Survival_ExhaustionNeedValue.GetValue() + "/" + Survival_ExhaustionNeedMaxValue.GetValue())
+  EndIf
+  aiff.SetModAvailable("SurvivalMode", bHasSurvivalMode)
+  aiff.SetModAvailable("Sunhelm", bHasSunhelm)
+  aiff.SetModAvailable("BetterFastTravel", bHasBFT)
 EndFunction
 
 
@@ -310,6 +344,16 @@ Function SetContext(actor akTarget)
     aiff.SetActorVariable(playerRef, "hunger", sunhelmMain.Hunger.CurrentHungerStage)
     aiff.SetActorVariable(playerRef, "thirst", sunhelmMain.Thirst.CurrentThirstStage)
     aiff.SetActorVariable(playerRef, "fatigue", sunhelmMain.Fatigue.CurrentFatigueStage)
+  ElseIf bHasSurvivalMode && Survival_ModeEnabled.GetValueInt() == 1
+    ; Convert needs to percentage values for consistency
+    float hungerPercent = ((Survival_HungerNeedValue.GetValue() / Survival_HungerNeedMaxValue.GetValue())) * 100
+    float coldPercent = (Survival_ColdNeedValue.GetValue() / Survival_ColdNeedMaxValue.GetValue()) * 100
+    float exhaustionPercent = (Survival_ExhaustionNeedValue.GetValue() / Survival_ExhaustionNeedMaxValue.GetValue()) * 100
+    
+    ; Store values as integers 0-100 for consistency with Sunhelm
+    aiff.SetActorVariable(playerRef, "hunger", hungerPercent as int)
+    aiff.SetActorVariable(playerRef, "cold", coldPercent as int)
+    aiff.SetActorVariable(playerRef, "fatigue", exhaustionPercent as int)
   EndIf
   if akTarget == playerRef
     aiff.SetActorVariable(playerRef, "weather", Weather.GetCurrentWeather())
@@ -374,3 +418,7 @@ Event Campfire_OnTentLeave()
   ; string playerName = Main.GetActorName(playerRef)
   ; Main.RequestLLMResponse(playerName + " left their tent.", "chatnf_survival_1", playerName)
 endEvent
+
+bool Function HasActiveSurvivalMod()
+    return (bHasSunhelm || (bHasSurvivalMode && Survival_ModeEnabled.GetValueInt() == 1))
+EndFunction

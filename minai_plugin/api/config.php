@@ -6,6 +6,7 @@ $pluginPath = "/var/www/html/HerikaServer/ext/minai_plugin";
 
 // Always load the base configuration first
 require_once("$pluginPath/config.base.php");
+require_once("../logger.php");
 
 // Then load the custom config if it exists, otherwise create it from base
 if (!file_exists("$pluginPath/config.php")) {
@@ -75,11 +76,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         "enforce_single_json" => $GLOBALS["enforce_single_json"],
         
         // Server settings
-        "xtts_server_override" => $GLOBALS["xtts_server_override"],
-        "input_delay_for_radiance" => $GLOBALS["input_delay_for_radiance"],
+        "input_delay_for_radiance" => intval($GLOBALS["input_delay_for_radiance"]),
         
         // Action prompts
-        "action_prompts" => $GLOBALS["action_prompts"]
+        "action_prompts" => $GLOBALS["action_prompts"],
+        
+        // Add roleplay settings to GET response
+        "roleplay_settings" => $GLOBALS["roleplay_settings"],
     );
 
     // Return the config data as JSON
@@ -92,8 +95,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Decode JSON input
         $input = json_decode(file_get_contents('php://input'), true);
         if (!$input) {
-            throw new Exception("Failed to decode JSON input");
+            throw new Exception("Failed to decode JSON input: " . json_last_error_msg());
         }
+
+        // Validate required fields
+        $requiredFields = [
+            'PROMPT_HEAD_OVERRIDE',
+            'use_narrator_profile',
+            'enforce_short_responses',
+            // ... add all required fields ...
+        ];
+
+        foreach ($requiredFields as $field) {
+            if (!isset($input[$field])) {
+                throw new Exception("Missing required field: $field");
+            }
+        }
+
+        minai_log("info", "Building new configuration file...");
 
         // Manually build the new config content string
         $newConfig = "<?php\n";
@@ -127,30 +146,77 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $newConfig .= "\$GLOBALS['enforce_single_json'] = " . ($input['enforce_single_json'] ? 'true' : 'false') . ";\n";
         
         // Server settings
-        $newConfig .= "\$GLOBALS['xtts_server_override'] = \"" . ($input['xtts_server_override']) . "\";\n";
-        $newConfig .= "\$GLOBALS['input_delay_for_radiance'] = " . intval($input['input_delay_for_radiance']) . ";\n";
+        $newConfig .= "\$GLOBALS['input_delay_for_radiance'] = " . (intval($input['input_delay_for_radiance']) ?: 15) . ";\n";
         
         // Action prompts
         $newConfig .= "\$GLOBALS['action_prompts'] = " . buildAssociativeArrayString($input['action_prompts']) . ";\n";
-
-        // Write only the overrides to config.php
-        $configFile = "$pluginPath/config.php";
-        error_log("Writing config to $configFile");
-        error_log("Config contents: " . $newConfig);
         
-        $success = (file_put_contents($configFile, $newConfig) !== false);
-        if (!$success) {
-            throw new Exception("Failed to write config file");
+        // Save roleplay settings
+        $newConfig .= "\$GLOBALS['roleplay_settings'] = " . var_export($input['roleplay_settings'], true) . ";\n";
+
+        // Write configuration
+        $configFile = "$pluginPath/config.php";
+        minai_log("info", "Writing configuration to $configFile");
+        
+        if (!is_writable($pluginPath)) {
+            throw new Exception("Plugin directory is not writable");
+        }
+        
+        if (file_exists($configFile) && !is_writable($configFile)) {
+            throw new Exception("Configuration file exists but is not writable");
         }
 
-        // Send response
-        echo json_encode(['status' => 'success']);
+        $success = (file_put_contents($configFile, $newConfig) !== false);
+        if (!$success) {
+            throw new Exception("Failed to write configuration file");
+        }
+
+        // Clear the configuration cache
+        clearstatcache(true, $configFile);
+        if (function_exists('opcache_reset')) {
+            opcache_reset();
+        }
+
+        minai_log("info", "Configuration saved successfully");
+        echo json_encode([
+            'status' => 'success',
+            'message' => 'Configuration saved successfully',
+            'timestamp' => date('Y-m-d H:i:s')
+        ]);
         
     } catch (Exception $e) {
-        error_log("Config save error: " . $e->getMessage());
+        minai_log("error", "Configuration save error: " . $e->getMessage());
         http_response_code(500);
-        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        
+        $errorDetails = [
+            'status' => 'error',
+            'message' => $e->getMessage(),
+            'details' => '',
+            'timestamp' => date('Y-m-d H:i:s')
+        ];
+        
+        // Add detailed error information
+        if (!is_writable("$pluginPath/config.php")) {
+            $errorDetails['details'] .= "Config file is not writable\n";
+            $errorDetails['details'] .= "Current permissions: " . decoct(fileperms("$pluginPath/config.php") & 0777) . "\n";
+            $errorDetails['details'] .= "Current owner: " . posix_getpwuid(fileowner("$pluginPath/config.php"))['name'] . "\n";
+        }
+        
+        if (!is_writable($pluginPath)) {
+            $errorDetails['details'] .= "Plugin directory is not writable\n";
+            $errorDetails['details'] .= "Directory permissions: " . decoct(fileperms($pluginPath) & 0777) . "\n";
+            $errorDetails['details'] .= "Directory owner: " . posix_getpwuid(fileowner($pluginPath))['name'] . "\n";
+        }
+        
+        $error = error_get_last();
+        if ($error !== null) {
+            $errorDetails['details'] .= "\nPHP Error:\n";
+            $errorDetails['details'] .= "Type: " . $error['type'] . "\n";
+            $errorDetails['details'] .= "Message: " . $error['message'] . "\n";
+            $errorDetails['details'] .= "File: " . $error['file'] . " (Line " . $error['line'] . ")\n";
+        }
+        
+        echo json_encode($errorDetails);
     }
 }
 
-?>

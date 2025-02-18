@@ -3,37 +3,145 @@
 $path = ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR;
 require_once($path . "conf" . DIRECTORY_SEPARATOR . "conf.php");
 require_once($path . "lib" . DIRECTORY_SEPARATOR . "{$GLOBALS['DBDRIVER']}.class.php");
+require_once("../logger.php");
 
-$db = new Sql();
+$db = new sql();
 
 // Handle GET request to fetch table data
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    if (isset($_GET['table'])) {
-        $table = $_GET['table'];
-        $data = $db->fetchAll("SELECT * FROM $table");
-        echo json_encode($data);
-    }
+    $table = 'minai_x_personalities'; // Set default table
+    $data = $db->fetchAll("SELECT * FROM $table");
+    echo json_encode(['status' => 'success', 'data' => $data]);
 }
 
-// Handle POST request to insert new data
+// Handle POST request for all operations
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $table = $_POST['table'];
-    $data = json_decode($_POST['data'], true);
-    $jsonData = json_encode([
-        "orientation" => $data['orientation'],
-        "sexFantasies" => $data['sexFantasies'],
-        "sexualBehavior" => $data['sexualBehavior'],
-        "relationshipStyle" => $data['relationshipStyle'],
-        "speakStyleDuringSex" => $data['speakStyleDuringSex'],
-        "sexPersonalityTraits" => $data['sexPersonalityTraits'],
-        "preferredSexPositions" => $data['preferredSexPositions']
-    ]);
+    $table = 'minai_x_personalities';
+    
+    if (!isset($_POST['action'])) {
+        echo json_encode(['status' => 'error', 'message' => 'No action specified']);
+        exit;
+    }
 
-    $result = $db->insert($table, [
-        "id"  => $data['id'],
-        "x_personality" => $db->escape($jsonData)
-    ]);
-    echo json_encode(['status' => 'success']);
+    try {
+        switch ($_POST['action']) {
+            case 'update':
+                if (!isset($_POST['data']) || !isset($_POST['id'])) {
+                    throw new Exception('Missing data or id for update');
+                }
+                
+                $data = json_decode($_POST['data'], true);
+                $id = $_POST['id'];
+                
+                // Check if entry exists
+                $exists = $db->fetchAll("SELECT id FROM $table WHERE id = '" . $db->escape($id) . "'");
+                
+                if (empty($exists)) {
+                    // Insert new entry
+                    try {
+                        $db->insert($table, [
+                            'id' => $id,
+                            'x_personality' => json_encode($data['x_personality'])
+                        ]);
+                        // Verify the insert worked by checking if the record exists
+                        $verify = $db->fetchAll("SELECT id FROM $table WHERE id = '" . $db->escape($id) . "'");
+                        if (!empty($verify)) {
+                            echo json_encode([
+                                'status' => 'success',
+                                'message' => 'New personality created successfully',
+                                'id' => $id
+                            ]);
+                        } else {
+                            throw new Exception('Failed to verify new personality creation');
+                        }
+                    } catch (Exception $e) {
+                        minai_log("info", "Insert error: " . $e->getMessage());
+                        throw new Exception('Failed to create new personality: ' . $e->getMessage());
+                    }
+                } else {
+                    // Update existing entry
+                    try {
+                        $db->update($table, 
+                            "x_personality = '" . $db->escape(json_encode($data['x_personality'])) . "'",
+                            "id = '" . $db->escape($id) . "'"
+                        );
+                        echo json_encode([
+                            'status' => 'success',
+                            'message' => 'Personality updated successfully',
+                            'id' => $id
+                        ]);
+                    } catch (Exception $e) {
+                        minai_log("info", "Update error: " . $e->getMessage());
+                        throw new Exception('Failed to update personality: ' . $e->getMessage());
+                    }
+                }
+                break;
+                
+            case 'delete':
+                if (!isset($_POST['id'])) {
+                    throw new Exception('Missing id for delete');
+                }
+                $id = $_POST['id'];
+                try {
+                    $db->delete($table, "id = '" . $db->escape($id) . "'");
+                    echo json_encode([
+                        'status' => 'success',
+                        'message' => 'Personality deleted successfully',
+                        'id' => $id
+                    ]);
+                } catch (Exception $e) {
+                    minai_log("info", "Delete error: " . $e->getMessage());
+                    throw new Exception('Failed to delete personality: ' . $e->getMessage());
+                }
+                break;
+
+            case 'import':
+                if (!isset($_POST['data'])) {
+                    throw new Exception('No data provided for import');
+                }
+                $importData = json_decode($_POST['data'], true);
+                $imported = 0;
+                $skipped = 0;
+                
+                foreach ($importData as $entry) {
+                    // Check if ID already exists
+                    $exists = $db->fetchAll("SELECT id FROM $table WHERE id = '" . $db->escape($entry['id']) . "'");
+                    if (empty($exists)) {
+                        try {
+                            $db->insert($table, [
+                                "id" => $entry['id'],
+                                "x_personality" => $entry['x_personality']
+                            ]);
+                            $imported++;
+                        } catch (Exception $e) {
+                            minai_log("info", "Import error for ID {$entry['id']}: " . $e->getMessage());
+                            $skipped++;
+                        }
+                    } else {
+                        $skipped++;
+                    }
+                }
+                
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => "Import completed: $imported added, $skipped skipped",
+                    'imported' => $imported,
+                    'skipped' => $skipped
+                ]);
+                break;
+
+            default:
+                throw new Exception('Invalid action specified');
+        }
+    } catch (Exception $e) {
+        minai_log("info", "Personalities API error: " . $e->getMessage());
+        echo json_encode([
+            'status' => 'error',
+            'message' => $e->getMessage(),
+            'details' => 'Check server logs for more information'
+        ]);
+    }
+    exit;
 }
 
 // Handle PUT request to update existing data
@@ -66,9 +174,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     parse_str(file_get_contents("php://input"), $_DELETE);
     $table = $_DELETE['table'];
     $id = $_DELETE['id'];
-    error_log("Deleting $id from $table");
+    minai_log("info", "Deleting $id from $table");
     // Delete the entry
     $result = $db->delete($table, "id = '$id'");
     echo json_encode(['status' => 'success']);
 }
-?>

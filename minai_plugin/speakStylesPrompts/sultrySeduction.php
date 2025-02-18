@@ -56,4 +56,3 @@ function setSultrySeductionPrompts($currentName)
     ];
 }
 
-?>

@@ -32,4 +32,3 @@ function assertObjectAsJson($expected, $actual, $message = "Failed assertion") {
   }
 }
 
-?>

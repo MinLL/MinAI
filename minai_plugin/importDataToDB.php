@@ -24,11 +24,11 @@ function importDataToDB($tableName, $folderName, $createQuery, $checkDuplicatesC
     foreach ($iterator as $fileInfo) {
         if ($fileInfo->isFile()) {
             $fileName = $fileInfo->getFileName();
-            error_log("Processing $fileName");
+            minai_log("info", "Processing $fileName");
             $extension = $fileInfo->getExtension();
             $filePath = $fileInfo->getRealPath();
             if ($extension !== "csv" || in_array($fileName, $importedVersions)) {
-                error_log("Not processing");
+                minai_log("info", "Not processing");
                 continue;
             }
             
@@ -56,7 +56,7 @@ function importDataToDB($tableName, $folderName, $createQuery, $checkDuplicatesC
         $fileName = $fileWithDate['fileName'];
         $filePath = $fileWithDate['filePath'];
         // Check if the current item is a file (not a directory)
-        error_log("Opening $filePath");                
+        minai_log("info", "Opening $filePath");                
 
         if (($handle = fopen($filePath, "r")) !== FALSE) {
             $headers = fgetcsv($handle, 1000, ",");
@@ -182,4 +182,3 @@ function importXPersonalities() {
       createUpdateTrigger($tableName);
 }
 
-?>

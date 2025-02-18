@@ -85,4 +85,4 @@ else {
         SetPromptHead($GLOBALS["PROMPT_HEAD"]);
 }
 
-?>
+

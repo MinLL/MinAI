@@ -58,11 +58,21 @@ int toggleSapienceOID
 
 int singKeyOID          ; New OID for sing keybind
 int narratorKeyOID      ; New OID for narrator keybind
+int narratorTextKeyOID  ; New OID for narrator text input keybind
+
+; Add new OID definitions near other key OIDs
+int roleplayKeyOID      ; New OID for roleplay voice keybind
+int roleplayTextKeyOID  ; New OID for roleplay text input keybind
 
 ; Key properties
 int Property toggleSapienceKey = -1 Auto
 int Property singKey = -1 Auto          ; New property for sing key
 int Property narratorKey = -1 Auto      ; New property for narrator key
+int Property narratorTextKey = -1 Auto  ; New property for narrator text input key
+
+; Add new key properties
+int Property roleplayKey = -1 Auto          ; Property for roleplay voice key
+int Property roleplayTextKey = -1 Auto      ; Property for roleplay text key
 
 ; Legacy globals
 GlobalVariable useCBPC
@@ -188,6 +198,12 @@ bool Property enableConsoleLogging = True Auto
 
 int enableConsoleLoggingOID
 
+; Add near other property declarations
+bool disableSapienceInStealthDefault = False
+bool Property disableSapienceInStealth = False Auto
+
+int disableSapienceInStealthOID
+
 Event OnConfigInit()
   main.Info("Building mcm menu.")
   InitializeMCM()
@@ -260,6 +276,7 @@ Function RenderGeneralPage()
   requestResponseCooldownOID = AddSliderOption("LLM Response Request Cooldown", requestResponseCooldown, "{1}")
   AddHeaderOption("Sapience Settings")
   useSapienceOID = AddToggleOption("Enable Sapience", minai_SapienceEnabled.GetValueInt() == 1)
+  disableSapienceInStealthOID = AddToggleOption("Disable Sapience While Sneaking", disableSapienceInStealth)
   radiantDialogueFrequencyOID = AddSliderOption("Radiant Dialogue (NPC -> NPC) Frequency", radiantDialogueFrequency, "{1}")
   radiantDialogueChanceOID = AddSliderOption("Radiant Dialogue (NPC -> NPC) Chance", radiantDialogueChance, "{1}")
   minRadianceRechatsOID = AddSliderOption("Minimum Radiance Rechats", minRadianceRechats, "{0}")
@@ -271,9 +288,12 @@ Function RenderGeneralPage()
   addSpellsOID = AddTextOption("General", "Add Spells to Player")
   removeSpellsOID = AddTextOption("General", "Remove Spells from Player")
   toggleSapienceOID = AddKeyMapOption("Toggle Sapience", toggleSapienceKey)
+  roleplayKeyOID = AddKeyMapOption("Roleplay Voice", roleplayKey)
+  roleplayTextKeyOID = AddKeyMapOption("Roleplay Text", roleplayTextKey)
   ; Disable for now until I finish implementing this
   ; singKeyOID = AddKeyMapOption("Sing", singKey)              ; New keybind option
   narratorKeyOID = AddKeyMapOption("Talk to Narrator", narratorKey)  ; New keybind option
+  narratorTextKeyOID = AddKeyMapOption("Type to Narrator", narratorTextKey)
   disableAIAnimationsOID = AddToggleOption("Disable AI-FF Animations", disableAIAnimations)
   AddHeaderOption("Debug")
   enableConsoleLoggingOID = AddToggleOption("Enable Console Logging", enableConsoleLogging)
@@ -613,6 +633,9 @@ Event OnOptionSelect(int oid)
   elseif oid == trackVictimAwarenessOID
     trackVictimAwareness = !trackVictimAwareness
     SetToggleOptionValue(oid, trackVictimAwareness)
+  elseif oid == disableSapienceInStealthOID
+    disableSapienceInStealth = !disableSapienceInStealth
+    SetToggleOptionValue(oid, disableSapienceInStealth)
   EndIf
   int i = 0
   string[] categories = JMap.allKeysPArray(aCategoryMap)
@@ -770,6 +793,9 @@ Event OnOptionDefault(int oid)
   elseif oid == trackVictimAwarenessOID
     trackVictimAwareness = trackVictimAwarenessDefault
     SetToggleOptionValue(oid, trackVictimAwareness)
+  elseif oid == disableSapienceInStealthOID
+    disableSapienceInStealth = disableSapienceInStealthDefault
+    SetToggleOptionValue(oid, disableSapienceInStealth)
   EndIf
 EndEvent
 
@@ -868,10 +894,18 @@ Event OnOptionHighlight(int oid)
     SetInfoText("Hotkey to make your character sing")
   elseif oid == narratorKeyOID
     SetInfoText("Hotkey to initiate a private conversation with just the narrator")
+  elseif oid == narratorTextKeyOID
+    SetInfoText("Hotkey to type to the narrator")
   elseif oid == preserveQueueOID
     SetInfoText("When enabled, the dialogue queue will be preserved when actions are enabled. This allows for more natural conversation flow.")
   elseif oid == trackVictimAwarenessOID
     SetInfoText("When enabled, tracks whether actors in sex scenes are victims or aggressors. This may not be completely accurate, and is mod-dependent.")
+  elseif oid == roleplayKeyOID
+    SetInfoText("Hotkey to roleplay as your character using voice")
+  elseif oid == roleplayTextKeyOID
+    SetInfoText("Hotkey to roleplay as your character using text")
+  elseif oid == disableSapienceInStealthOID
+    SetInfoText("When enabled, sapience will be automatically disabled while the player is sneaking (Allowing for private conversations with followers and such)")
   EndIf
   int i = 0
   string[] actions = JMap.allKeysPArray(aiff.actionRegistry)
@@ -1070,31 +1104,43 @@ EndEvent
 
 
 event OnOptionKeyMapChange(int a_option, int a_keyCode, string a_conflictControl, string a_conflictName)
-	{Called when a key has been remapped}
-	bool continue = true
-	if (a_conflictControl != "")
-		string msg
-		if (a_conflictName != "")
-			msg = "This key is already mapped to:\n'" + a_conflictControl + "'\n(" + a_conflictName + ")\n\nAre you sure you want to continue?"
-		else
-			msg = "This key is already mapped to:\n'" + a_conflictControl + "'\n\nAre you sure you want to continue?"
-		endIf
-		continue = ShowMessage(msg, true, "$Yes", "$No")
-	endIf
+    {Called when a key has been remapped}
+    bool continue = true
+    if (a_conflictControl != "")
+        string msg
+        if (a_conflictName != "")
+            msg = "This key is already mapped to:\n'" + a_conflictControl + "'\n(" + a_conflictName + ")\n\nAre you sure you want to continue?"
+        else
+            msg = "This key is already mapped to:\n'" + a_conflictControl + "'\n\nAre you sure you want to continue?"
+        endIf
+        continue = ShowMessage(msg, true, "$Yes", "$No")
+    endIf
 
-	if (continue)
-		if (a_option == toggleSapienceOID)
-			toggleSapienceKey = a_keyCode
-			SetKeymapOptionValue(a_option, a_keyCode)
-      main.SetSapienceKey()
-		elseif (a_option == singKeyOID)
-			singKey = a_keyCode
-			SetKeymapOptionValue(a_option, a_keyCode)
-      main.SetSingKey()
-		elseif (a_option == narratorKeyOID)
-			narratorKey = a_keyCode 
-			SetKeymapOptionValue(a_option, a_keyCode)
-      main.SetNarratorKey()
-		endIf
-	endIf
+    if (continue)
+        if (a_option == toggleSapienceOID)
+            toggleSapienceKey = a_keyCode
+            SetKeymapOptionValue(a_option, a_keyCode)
+            main.SetSapienceKey(true)
+        elseif (a_option == singKeyOID)
+            singKey = a_keyCode
+            SetKeymapOptionValue(a_option, a_keyCode)
+            main.SetSingKey(true)
+        elseif (a_option == narratorKeyOID)
+            narratorKey = a_keyCode 
+            SetKeymapOptionValue(a_option, a_keyCode)
+            main.SetNarratorKey(true)
+        elseif (a_option == narratorTextKeyOID)
+            narratorTextKey = a_keyCode
+            SetKeymapOptionValue(a_option, a_keyCode)
+            main.SetNarratorTextKey(true)
+        elseif (a_option == roleplayKeyOID)
+            roleplayKey = a_keyCode
+            SetKeymapOptionValue(a_option, a_keyCode)
+            main.SetRoleplayKey(true)
+        elseif (a_option == roleplayTextKeyOID)
+            roleplayTextKey = a_keyCode
+            SetKeymapOptionValue(a_option, a_keyCode)
+            main.SetRoleplayTextKey(true)
+        endIf
+    endIf
 EndEvent

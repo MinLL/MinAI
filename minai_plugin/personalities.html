@@ -7,92 +7,352 @@
     <title>Manage Personalities</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2196F3;
+            --background-dark: #1a1a1a;
+            --background-light: #2d2d2d;
+            --text-color: #e0e0e0;
+            --border-color: #404040;
+            --success-color: #40c057;
+            --error-color: #f44336;
+            --warning-color: #ffc107;
+            --info-color: #4dabf7;
+        }
+
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: radial-gradient(circle at center, var(--background-light) 0%, var(--background-dark) 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 95vw;
+            margin: 20px auto;
             padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
         h1 {
-            color: #333;
+            text-align: center;
+            color: var(--text-color);
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
-        input,
-        textarea,
-        button,
-        select {
-            padding: 10px;
-            margin: 5px;
-            font-size: 14px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
+        .nav-panel {
+            background-color: var(--background-light);
+            padding: 15px;
+            text-align: center;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(4px);
+        }
+
+        .nav-panel a {
+            display: inline-block;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 1.1rem;
+            margin: 0 20px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
+            border: 1px solid var(--border-color);
+        }
+
+        .nav-panel a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .personality-section {
+            background: rgba(45, 45, 45, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        .personality-section h3 {
+            color: var(--text-color);
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"],
+        select,
+        textarea {
             width: 100%;
+            padding: 12px;
+            background-color: var(--background-dark);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+
+        textarea {
+            min-height: 150px;
+            resize: vertical;
         }
 
         button {
-            background-color: #28a745;
-            color: white;
-            border: none;
+            padding: 8px 16px;
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
             cursor: pointer;
-            margin-right: 5px;
+            transition: all 0.3s ease;
         }
 
         button:hover {
-            background-color: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
-        table {
-            width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
+        button.primary {
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.2) 0%,
+                rgba(76, 175, 80, 0.3) 100%
+            );
+            border-color: var(--primary-color);
         }
 
-        table,
-        th,
-        td {
-            border: 1px solid #ddd;
+        .generate-section {
+            margin-top: 30px;
         }
 
-        th,
-        td {
-            padding: 8px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f2f2f2;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-
-        .form-container {
-            background-color: white;
-            padding: 20px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
-        }
-
-        .pagination {
-            margin-top: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .pagination button {
-            background-color: #007bff;
-            color: white;
+        #generateError {
+            color: var(--error-color);
+            margin-top: 10px;
             padding: 10px;
-            border: none;
-            cursor: pointer;
+            border-radius: 4px;
+            background-color: rgba(244, 67, 54, 0.1);
+            border: 1px solid var(--error-color);
+            display: none;
         }
 
-        .pagination button:hover {
-            background-color: #0056b3;
+        details {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        summary {
+            cursor: pointer;
+            padding: 10px;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        summary:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        #rawResponse {
+            padding: 15px;
+            background: var(--background-dark);
+            border-radius: 4px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px;
+                padding: 20px;
+            }
+
+            .nav-panel a {
+                display: block;
+                margin: 10px 0;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Add these styles to maintain functionality */
+        .entry-row {
+            padding: 10px;
+            margin-bottom: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 15px;
+        }
+
+        .entry-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 6px;
+        }
+
+        .entry-field {
+            display: flex;
+            flex-direction: column;
+            font-size: 0.9rem;
+        }
+
+        .entry-label {
+            font-size: 0.8rem;
+            color: var(--text-color);
+            opacity: 0.8;
+            margin-bottom: 2px;
+        }
+
+        .entry-value {
+            padding: 6px;
+            background-color: var(--background-dark);
+            border-radius: 4px;
+            min-height: 18px;
+            line-height: 1.2;
+        }
+
+        .entry-value[contenteditable="true"] {
+            border: 1px solid var(--border-color);
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .entry-controls {
+            display: flex;
+            gap: 10px;
+            align-items: start;
+        }
+
+        .pagination-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
         }
 
         .pagination-info {
-            font-size: 14px;
+            text-align: center;
+            margin-top: 10px;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+
+        .tooltip {
+            position: fixed;
+            background-color: var(--background-light);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .deleteBtn {
+            background: linear-gradient(135deg,
+                rgba(244, 67, 54, 0.2) 0%,
+                rgba(244, 67, 54, 0.3) 100%
+            );
+            border-color: var(--error-color);
+        }
+
+        .editBtn {
+            background: linear-gradient(135deg,
+                rgba(33, 150, 243, 0.2) 0%,
+                rgba(33, 150, 243, 0.3) 100%
+            );
+            border-color: var(--info-color);
+        }
+
+        .saveBtn {
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.2) 0%,
+                rgba(76, 175, 80, 0.3) 100%
+            );
+            border-color: var(--success-color);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .resetBtn {
+            background: linear-gradient(135deg,
+                rgba(255, 152, 0, 0.1) 0%,
+                rgba(255, 152, 0, 0.2) 100%
+            );
+            border-color: var(--warning-color);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-header h3 {
+            margin: 0;
+        }
+
+        .search-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .search-info {
+            color: var(--text-color);
+            opacity: 0.8;
         }
 
         .search-container {
@@ -100,193 +360,175 @@
         }
 
         .search-container input {
-            width: 300px;
-            padding: 10px;
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
         }
 
-        .new-entry-form {
-            margin-top: 20px;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        .search-info {
+            font-size: 0.8rem;
+            color: var(--text-color);
+            opacity: 0.7;
+            margin-top: 4px;
         }
 
-        .navigation {
-            margin-top: 20px;
+        .header-controls {
             display: flex;
-            justify-content: space-between;
+            gap: 10px;
             align-items: center;
-            background-color: #007bff;
-            padding: 10px;
-            color: white;
-            border-radius: 5px;
         }
 
-        .navigation a,
-        .navigation button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px;
-            border: none;
+        .header-controls input {
+            width: 300px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            background-color: var(--background-dark);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 6px;
+        }
+
+        .search-info {
+            font-size: 0.8rem;
+            color: var(--text-color);
+            opacity: 0.7;
+            margin: 4px 0 15px 0;
+        }
+
+        .collapsible {
+            margin-bottom: 20px;
+        }
+
+        .collapsible summary {
+            padding: 15px;
+            font-size: 1.1rem;
+            font-weight: 500;
             cursor: pointer;
-            text-decoration: none;
-            font-weight: bold;
+            user-select: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
         }
 
-        .navigation a:hover,
-        .navigation button:hover {
-            background-color: #0056b3;
+        .collapsible summary:hover {
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.15) 0%,
+                rgba(255, 255, 255, 0.08) 100%
+            );
         }
 
-        .tooltip {
-            position: absolute;
-            background-color: #333;
-            color: #fff;
-            padding: 5px;
-            border-radius: 5px;
-            font-size: 12px;
-            visibility: hidden;
-            max-width: 300px;
-            z-index: 1000;
+        .collapsible-content {
+            padding: 20px 0;
         }
 
-        /* Basic styles for the tabs */
-        .tab {
-            display: inline-block;
-            padding: 10px 20px;
-            cursor: pointer;
-            background-color: #f1f1f1;
-            border: 1px solid #ccc;
-            border-bottom: none;
-            margin-right: 5px;
-            font-weight: bold;
-        }
-
-        /* Active tab styling */
-        .tab.active {
-            background-color: #fff;
-            border-bottom: 2px solid #000;
-        }
-
-        /* Content for each tab */
-        .tab-content {
+        .subsection {
+            margin-bottom: 30px;
             padding: 20px;
-            border: 1px solid #ccc;
-            background-color: #fff;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
         }
 
-        .tab-content-item {
-            display: none;
+        .subsection:last-child {
+            margin-bottom: 0;
         }
 
-        /* Show active tab content */
-        .tab-content-item.active {
-            display: block;
+        .exportBtn {
+            background: linear-gradient(135deg,
+                rgba(33, 150, 243, 0.1) 0%,
+                rgba(33, 150, 243, 0.2) 100%
+            );
+            border-color: var(--info-color);
         }
 
-        #generateError, #speakStyleDuringSexError {
-            display: none;
-            color: #dc3545;
-            margin: 20px 0;
+        .importBtn {
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.1) 0%,
+                rgba(76, 175, 80, 0.2) 100%
+            );
+            border-color: var(--success-color);
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .importBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
 
 <body>
-    <h1>Manage Personalities</h1>
-
-    <!-- Navigation Bar -->
-    <div class="navigation">
-        <a href="index.html">Back to Home</a>
-        <button onclick="confirmResetPersonalities()">Reset Personalities</button>
-    </div>
-
-    <!-- Search Bar -->
-    <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Search personalities..." oninput="searchTable()">
-    </div>
-
-    <!-- Table for displaying personalities -->
-    <table id="dataTable"></table>
-
-    <!-- Pagination Controls -->
-    <div class="pagination">
-        <button onclick="prevPage()">Previous</button>
-        <div class="pagination-info">
-            Page <span id="currentPage">1</span> of <span id="totalPages">1</span>
+    <div class="container">
+        <h1>Manage NPC Sex Personalities</h1>
+        
+        <div class="nav-panel">
+            <a href="index.html">Return to Home</a>
+            <a href="https://github.com/MinLL/MinAI">Documentation</a>
         </div>
-        <button onclick="nextPage()">Next</button>
-    </div>
 
+        <!-- Replace the Generate and Add sections with this collapsible version -->
+        <details class="personality-section collapsible">
+            <summary>Generate & Add New Personalities</summary>
+            <div class="collapsible-content">
+                <!-- Generate Section -->
+                <div class="subsection">
+                    <h3>Generate New Personality</h3>
+                    <div class="form-grid">
+                        <textarea id="generatePrompt" placeholder="Describe the personality you want to generate (e.g., 'A flirtatious tavern maid who loves to tease customers')"></textarea>
+                    </div>
+                    <details>
+                        <summary>Raw response from LLM text</summary>
+                        <div id="rawResponse"></div>
+                    </details>
+                    <div id="generateError"></div>
+                    <div class="button-group">
+                        <button type="button" onclick="generatePersonality()" class="primary">Generate</button>
+                        <button type="button" onclick="resetForm()" class="resetBtn">Reset Form</button>
+                    </div>
+                </div>
 
-    <div class="tabs">
-        <div class="tab active" onclick="openTab(event, 'create')">Create manually</div>
-        <div class="tab" onclick="openTab(event, 'generate')">Generate with LLM</div>
-    </div>
-
-    <div class="tab-content">
-        <div class="new-entry-form">
-            <div id="create" class="tab-content-item active">
-                <!-- Form for creating new entries -->
-                <h2>Create New Personality</h2>
+                <!-- Add New Personality -->
+                <div class="subsection">
+                    <h3>Add New Personality</h3>
+                    <form id="newEntryForm">
+                        <div class="form-grid">
+                            <input type="text" id="newId" name="id" placeholder="ID" required>
+                            <input type="text" id="newOrientation" name="orientation" placeholder="Orientation" required>
+                            <select id="speakStyleDuringSex" name="speakStyle" required>
+                                <!-- Options are populated by JavaScript -->
+                            </select>
+                            <input type="text" id="newSexFantasies" name="sexFantasies" placeholder="Sex Fantasies (comma separated)">
+                        </div>
+                        <div id="speakStyleDuringSexError"></div>
+                        <button type="submit" class="primary">Add Personality</button>
+                    </form>
+                </div>
             </div>
+        </details>
 
-            <div id="generate" class="tab-content-item" style="margin-bottom: 20px;">
-                <h2>Generate Sex Personality with LLM</h2>
-                <p>It will use LLM endpoint from your CHIM openrouterjson configuration. You still need manually to provide id(npc name with spaces replaced with _ an single quote ' with +)</p>
-                <details style="margin: 10px 0;">
-                    <summary>Additional tips to generate sex personality</summary>
-                    <p>What to add to personality:</p>
-                    <ul>
-                        <li>Anything you think can provide additional context for LLM</li>
-                        <li>Their biography: gender, age, background, occupation, origin</li>
-                        <li>Their character, behavior, biography, difficulties or achievements they epxerienced</li>
-                        <li>Any relationships with other characters represented in a game or just mentioned in dialogues</li>
-                        <li>Dialogue examples how NPC is usually talking</li>
-                        <li>Instead or in addition you can provide description of their speak style, for example: tone - friendly and professional; mannerisms: speaks passionately about her work, occasionally expresses her political views</li>
-                    </ul>
-                </details>
-                
-                <textarea name="prompt" rows="5" id="descriptionPersonality">
-Zora Fair-Child, a compassionate and spirited Nord woman, is a character filled with resilience and depth. Despite a tragic past marked by physical and emotional scars, Zora displays an optimistic, humorous outlook that contrasts with the harshness of her experiences. Zora’s story is one of perseverance and inner strength, having survived a fire that left her face scarred when she was young. This incident left her with a lasting insecurity about her appearance but did little to tarnish her kind-hearted nature and determination.
-Zora can be found early in the game in Brittleshin Pass, where she will often try to engage the player with her witty, self-deprecating humor. Initially shy and cautious, she is revealed to be a loyal friend and fierce protector when given the chance. Unlike many other NPCs, Zora’s relationship with the Dragonborn can evolve over time, leading her to become a valuable ally and potential follower with unique dialogue reflecting her journey and outlook.
-Notable Traits and Personality:
-  - Humor and Self-Awareness: Zora often uses humor to mask her insecurities, making her interactions refreshing and sometimes touching.
-  - Bravery: Despite her self-perceived flaws, she steps up to challenges without hesitation.
-  - Curiosity and Insight: Zora shows a surprising amount of wisdom about the world and reflects on her hardships with a depth uncommon in many.
-Relationships:
-  - Morndas is a mysterious Bosmer woman also added by the 3DNPC mod, and she shares a brief but impactful relationship with Zora. Despite their differences, Morndas and Zora connect over their hardships and individual battles with self-doubt. The two women support each other, with Morndas encouraging Zora to face her insecurities with strength, while Zora admires Morndas’ resilience. Their exchanges showcase a bond built on shared understanding and mutual respect.
-  - Gorr, another companion added by the mod, is a lighthearted and somewhat roguish Nord warrior. He and Zora share a humorous dynamic, as Gorr often teases her but never crosses the line into cruelty. They develop a brother-sister type of bond, with Gorr appreciating Zora’s bravery and humor. Their friendly banter adds levity to their interactions, showing how they balance and uplift each other, particularly during challenging times.
-  - The sarcastic Altmer mage Rumarin and Zora make for an amusing duo due to their contrasting personalities. Rumarin often jokes about Zora’s optimism and naivete, though there is a clear underlying affection. Zora, in turn, finds Rumarin’s cynicism and humor refreshing, and the two develop a teasing friendship. They may appear mismatched at first, but over time, they display a shared warmth and loyalty that highlights their contrasting but complementary perspectives.
-  - Zora holds admiration for Erik’s bravery and the resilience he shows as an aspiring adventurer, given her own journey of facing fears and embracing challenges. Erik and Zora occasionally reflect on their goals and reasons for adventuring, with Zora gently encouraging Erik to be mindful of his choices and embrace both his strengths and weaknesses. Their friendship is marked by a mutual respect for each other’s dreams and vulnerabilities.
-                </textarea>
-                <details>
-                    <summary>Raw response from LLM text</summary>
-                    <div id="rawResponse"></div>
-                </details>
-                <div id="generateError"></div>
-                <button type="button" onclick="generatePersonality()">Generate</button>
+        <!-- Existing Entries -->
+        <div class="personality-section">
+            <div class="section-header">
+                <h3>Existing Personalities</h3>
+                <div class="header-controls">
+                    <input type="text" id="searchInput" placeholder="Search personalities..." onkeyup="filterEntries()">
+                    <button onclick="exportToCSV()" class="exportBtn">Export CSV</button>
+                    <label for="importCSV" class="importBtn">
+                        Import CSV
+                        <input type="file" id="importCSV" accept=".csv" onchange="importFromCSV(this)" style="display: none;">
+                    </label>
+                    <button onclick="resetPersonalities()" class="resetBtn">Reset Personalities</button>
+                </div>
             </div>
-            <form id="newEntryForm">
-                <label for="newId">ID</label>
-                <input type="text" id="newId" name="id" required>
-                <label for="newOrientation">Orientation</label>
-                <input type="text" id="newOrientation" name="orientation" required>
-                <label for="speakStyleDuringSex" required>Speak style during sex</label>
-                <select type="text" id="speakStyleDuringSex" name="speakStyle" required></select>
-                <div id="speakStyleDuringSexError"></div>
-                <label for="newSexFantasies">Sex Fantasies (comma separated)</label>
-                <input type="text" id="newSexFantasies" name="sexFantasies">
-                <label for="newSexualBehavior">Sexual Behavior (comma separated)</label>
-                <input type="text" id="newSexualBehavior" name="sexualBehavior">
-                <label for="newRelationshipStyle">Relationship Style</label>
-                <input type="text" id="newRelationshipStyle" name="relationshipStyle">
-                <label for="newSexPersonalityTraits">Sex Personality Traits (comma separated)</label>
-                <input type="text" id="newSexPersonalityTraits" name="sexPersonalityTraits">
-                <label for="newPreferredSexPositions">Preferred Sex Positions (comma separated)</label>
-                <input type="text" id="newPreferredSexPositions" name="preferredSexPositions">
-                <button type="button" onclick="createNewEntry()">Create Entry</button>
-            </form>
+            <div class="search-info">Search by ID, orientation, behavior, fantasies, etc...</div>
+            <div id="entriesContainer">
+                <!-- Entries will be populated by JavaScript -->
+            </div>
         </div>
     </div>
 
@@ -306,13 +548,23 @@ Relationships:
 
         // Function to load table data from the backend
         function loadTable() {
-            fetch('api/personalities.php?table=minai_x_personalities')
+            fetch('api/personalities.php')
                 .then(response => response.json())
                 .then(result => {
-                    data = result;
-                    filteredData = data.sort((a, b) => a.id.localeCompare(b.id));
-                    updatePagination();
-                    renderTable();
+                    console.log('Load table response:', result); // Debug log
+                    if (result.status === 'success') {
+                        data = result.data;
+                        filteredData = data.sort((a, b) => a.id.localeCompare(b.id));
+                        renderEntries();
+                    } else {
+                        console.error('Failed to load data:', result.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading data:', error);
+                    const errEl = document.getElementById('generateError');
+                    errEl.style.display = 'block';
+                    errEl.innerHTML = 'Failed to load personalities: ' + error.message;
                 });
         }
 
@@ -490,18 +742,11 @@ Relationships:
         }
 
         // Pagination Functions
-        function updatePagination() {
-            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-            document.getElementById('totalPages').innerText = totalPages;
-            document.getElementById('currentPage').innerText = currentPage;
-        }
-
         function nextPage() {
             const totalPages = Math.ceil(filteredData.length / rowsPerPage);
             if (currentPage < totalPages) {
                 currentPage++;
                 renderTable();
-                updatePagination();
             }
         }
 
@@ -509,7 +754,6 @@ Relationships:
             if (currentPage > 1) {
                 currentPage--;
                 renderTable();
-                updatePagination();
             }
         }
 
@@ -550,58 +794,28 @@ Relationships:
 
         // Function to reset all personalities
         function resetPersonalities() {
-            fetch('api/main.php?endpoint=reset_personalities', {
-                method: 'POST'
-            })
+            if (confirm('Are you sure you want to reset all personalities to their default values? This cannot be undone.')) {
+                fetch('api/main.php?endpoint=reset_personalities', {
+                    method: 'POST'
+                })
                 .then(response => response.json())
                 .then(result => {
-                    alert('Personalities reset successfully!');
-                    loadTable();
+                    if (result.message === 'Success') {
+                        loadTable(); // Reload the table after reset
+                    } else {
+                        const errEl = document.getElementById('generateError');
+                        errEl.style.display = 'block';
+                        errEl.innerHTML = result.message || 'Failed to reset personalities';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error resetting personalities:', error);
+                    const errEl = document.getElementById('generateError');
+                    errEl.style.display = 'block';
+                    errEl.innerHTML = 'Failed to reset personalities: ' + error.message;
                 });
-        }
-
-        const tooltip = document.getElementById('tooltip');
-        const tooltipTarget = document.getElementById('dataTable');
-
-        const cellTooltips = [
-            `NPC's name as in game(papyrus getDisplayName). Replace spaces with _ and single quote ' with +`,
-            'The character\'s sexual orientation, which describes their emotional, romantic, or sexual attraction to others.',
-            `The character's preferred style of romantic relationship, which can impact their behavior and expectations in intimate relationships. 
-monogamous - exclusive commitment to one partner; 
-polyamorous - non-exclusive commitment to multiple partners; 
-open relationship - commitment to one partner with freedom to explore outside relationships; 
-swinging - non-monogamous relationships with mutual consent.`,
-            `A comma separated list of the character's favorite or preferred sex positions, which can provide insight into their physical and emotional comfort levels. Use well known positions keywords.`,
-            `Communication style during sex`,
-            `The character's specific behaviors or activities they engage in during sex, which can indicate their desires and boundaries. For example: public sex, nipple play, cum play, facials, voyeurism, etc...`,
-            `A list of the character's daring, risky erotic and sexual fantasies.`,
-            `The character's personality traits that influence their behavior and interactions during sex, which can impact their relationships and emotional well-being.`,
-        ]
-
-        // Function to show the tooltip
-        function showTooltip(event) {
-            const target = event.target
-            if (target.tagName.toLowerCase() !== 'td') {
-                return
             }
-
-            let title = cellTooltips[target.cellIndex]
-
-
-            tooltip.style.visibility = 'visible';
-            tooltip.textContent = title;
-            tooltip.style.left = (event.pageX - tooltip.clientWidth / 2) + 'px';
-            tooltip.style.top = (event.pageY + 10) + 'px';
-
         }
-        // Function to hide the tooltip
-        function hideTooltip() {
-            tooltip.style.visibility = 'hidden';
-        }
-
-        tooltipTarget.addEventListener('mouseover', showTooltip);
-        tooltipTarget.addEventListener('mousemove', showTooltip); // Update position
-        tooltipTarget.addEventListener('mouseout', hideTooltip);
 
         function openTab(event, tabId) {
             // Hide all tab content
@@ -619,53 +833,448 @@ swinging - non-monogamous relationships with mutual consent.`,
         }
 
         function generatePersonality() {
-            const descriptionPersonality = document.getElementById('descriptionPersonality').value
-            const res = fetch('api/generateSexPersonality.php', {
+            const prompt = document.getElementById('generatePrompt').value;
+            const errEl = document.getElementById('generateError');
+            
+            if (!prompt) {
+                errEl.style.display = 'block';
+                errEl.innerHTML = 'Please enter a description for the personality';
+                return;
+            }
+
+            fetch('api/generateSexPersonality.php', {
                 method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
                 body: new URLSearchParams({
-                    descriptionPersonality
+                    descriptionPersonality: prompt
                 })
             })
             .then(response => response.json())
             .then(result => {
-                const errEl = document.getElementById('generateError')
-                if(result.status === 'error') {
+                if (result.status === 'error') {
                     errEl.style.display = 'block';
                     errEl.innerHTML = result.message;
                 } else {
                     errEl.style.display = 'none';
-
                     document.getElementById('rawResponse').innerHTML = result.data;
 
                     try {
-                        const pers = JSON.parse(result.data)
-                        document.getElementById('newOrientation').value = pers.orientation
-                        document.getElementById('newRelationshipStyle').value = pers.relationshipStyle
-                        document.getElementById('speakStyleDuringSex').value = pers.speakStyleDuringSex
-                        checkSpeakStyleSelectValue(pers.speakStyleDuringSex)
+                        const personality = JSON.parse(result.data);
+                        // Auto-fill the new entry form with generated data
+                        document.getElementById('newId').value = generateUniqueId();
+                        document.getElementById('newOrientation').value = personality.orientation;
+                        document.getElementById('speakStyleDuringSex').value = personality.speakStyleDuringSex;
+                        document.getElementById('newSexFantasies').value = personality.sexFantasies.join(', ');
                         
-                        document.getElementById('newPreferredSexPositions').value = pers.preferredSexPositions.join(', ')
-                        document.getElementById('newSexFantasies').value = pers.sexFantasies.join(', ')
-                        document.getElementById('newSexPersonalityTraits').value = pers.sexPersonalityTraits.join(', ')
-                        document.getElementById('newSexualBehavior').value = pers.sexualBehavior.join(', ')
+                        // Show success message
+                        errEl.style.display = 'block';
+                        errEl.style.color = 'var(--success-color)';
+                        errEl.innerHTML = 'Personality generated successfully! You can now edit the values and click "Add Personality" to save it.';
                     } catch(e) {
                         errEl.style.display = 'block';
-                        errEl.innerHTML = `LLM was able to produce something... which isn't json. You can look at raw response and here is an error: ${e.message}`;
+                        errEl.style.color = 'var(--error-color)';
+                        errEl.innerHTML = `Failed to parse generated personality: ${e.message}`;
                     }
                 }
+            })
+            .catch(error => {
+                errEl.style.display = 'block';
+                errEl.innerHTML = `Error generating personality: ${error.message}`;
+            });
+        }
+
+        // Helper function to generate a unique ID
+        function generateUniqueId() {
+            return 'npc_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function renderEntries() {
+            const container = document.getElementById('entriesContainer');
+            container.innerHTML = '';
+
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const pageData = filteredData.slice(startIndex, endIndex);
+
+            pageData.forEach(entry => {
+                // Parse the x_personality JSON
+                const personality = JSON.parse(entry.x_personality);
+                
+                const entryDiv = document.createElement('div');
+                entryDiv.className = 'entry-row';
+                entryDiv.innerHTML = `
+                    <div class="entry-content">
+                        <div class="entry-field">
+                            <span class="entry-label">ID</span>
+                            <div class="entry-value" data-field="id" data-value="${entry.id}">${entry.id}</div>
+                        </div>
+                        <div class="entry-field">
+                            <span class="entry-label">Orientation</span>
+                            <div class="entry-value" data-field="orientation">${personality.orientation}</div>
+                        </div>
+                        <div class="entry-field">
+                            <span class="entry-label">Relationship</span>
+                            <div class="entry-value" data-field="relationshipStyle">${personality.relationshipStyle}</div>
+                        </div>
+                        <div class="entry-field">
+                            <span class="entry-label">Speak Style</span>
+                            <div class="entry-value" data-field="speakStyleDuringSex">${personality.speakStyleDuringSex}</div>
+                        </div>
+                        <div class="entry-field">
+                            <span class="entry-label">Positions</span>
+                            <div class="entry-value" data-field="preferredSexPositions">${Array.isArray(personality.preferredSexPositions) ? personality.preferredSexPositions.join(', ') : personality.preferredSexPositions}</div>
+                        </div>
+                        <div class="entry-field">
+                            <span class="entry-label">Behavior</span>
+                            <div class="entry-value" data-field="sexualBehavior">${Array.isArray(personality.sexualBehavior) ? personality.sexualBehavior.join(', ') : personality.sexualBehavior}</div>
+                        </div>
+                        <div class="entry-field">
+                            <span class="entry-label">Fantasies</span>
+                            <div class="entry-value" data-field="sexFantasies">${Array.isArray(personality.sexFantasies) ? personality.sexFantasies.join(', ') : personality.sexFantasies}</div>
+                        </div>
+                        <div class="entry-field">
+                            <span class="entry-label">Traits</span>
+                            <div class="entry-value" data-field="sexPersonalityTraits">${Array.isArray(personality.sexPersonalityTraits) ? personality.sexPersonalityTraits.join(', ') : personality.sexPersonalityTraits}</div>
+                        </div>
+                    </div>
+                    <div class="entry-controls">
+                        <button class="editBtn" onclick="editEntry('${entry.id}')">Edit</button>
+                        <button class="deleteBtn" onclick="deleteEntry('${entry.id}')">Delete</button>
+                    </div>
+                `;
+                container.appendChild(entryDiv);
             });
 
-            function checkSpeakStyleSelectValue(value) {
-                const errorEl = document.getElementById('speakStyleDuringSexError')
-                if(!speakStyleDuringSexOptions.includes(pers.speakStyleDuringSex)) {
-                    errorEl.style.innerText = `${value} isn't valid speak style. You need to select one of 10 provided speak styles: ${speakStyleDuringSexOptions.join('; ')}`
-                    errorEl.style.display = 'block'
-                } else {
-                    errorEl.style.display = 'none'
-                }
-                
+            // Add pagination controls
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+            container.innerHTML += `
+                <div class="pagination-controls">
+                    <button onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''}>Previous</button>
+                    <button onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''}>Next</button>
+                </div>
+                <div class="pagination-info">
+                    Page ${currentPage} of ${totalPages} (${filteredData.length} total entries)
+                </div>
+            `;
+        }
+
+        function resetForm() {
+            // Reset all form fields
+            document.getElementById('newId').value = '';
+            document.getElementById('newOrientation').value = '';
+            document.getElementById('speakStyleDuringSex').value = '';
+            document.getElementById('newSexFantasies').value = '';
+            
+            // Clear any error messages
+            document.getElementById('generateError').style.display = 'none';
+            document.getElementById('speakStyleDuringSexError').style.display = 'none';
+            
+            // Clear the raw response
+            document.getElementById('rawResponse').innerHTML = '';
+            
+            // Clear the generate prompt
+            document.getElementById('generatePrompt').value = '';
+        }
+
+        function changePage(direction) {
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+            const newPage = currentPage + direction;
+            
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                renderEntries();
             }
         }
+
+        // Add this function to handle sorting if needed
+        function sortEntries(field) {
+            filteredData.sort((a, b) => {
+                const aVal = a[field] || '';
+                const bVal = b[field] || '';
+                return aVal.localeCompare(bVal);
+            });
+            currentPage = 1;
+            renderEntries();
+        }
+
+        function filterEntries() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            filteredData = data.filter(row => {
+                const personality = JSON.parse(row.x_personality);
+                return (
+                    row.id.toLowerCase().includes(searchText) ||
+                    personality.orientation.toLowerCase().includes(searchText) ||
+                    personality.relationshipStyle.toLowerCase().includes(searchText) ||
+                    personality.speakStyleDuringSex.toLowerCase().includes(searchText) ||
+                    (personality.preferredSexPositions || []).join(',').toLowerCase().includes(searchText) ||
+                    (personality.sexualBehavior || []).join(',').toLowerCase().includes(searchText) ||
+                    (personality.sexFantasies || []).join(',').toLowerCase().includes(searchText) ||
+                    (personality.sexPersonalityTraits || []).join(',').toLowerCase().includes(searchText)
+                );
+            });
+            currentPage = 1; // Reset to first page when filtering
+            renderEntries();
+        }
+
+        function editEntry(id) {
+            const entryDiv = document.querySelector(`.entry-row .entry-value[data-field="id"][data-value="${id}"]`).closest('.entry-row');
+            const editBtn = entryDiv.querySelector('.editBtn');
+            
+            if (entryDiv.classList.contains('editing')) {
+                // Save changes
+                const updatedData = {
+                    id: id,
+                    x_personality: {
+                        orientation: entryDiv.querySelector('[data-field="orientation"]').textContent,
+                        relationshipStyle: entryDiv.querySelector('[data-field="relationshipStyle"]').textContent,
+                        speakStyleDuringSex: entryDiv.querySelector('[data-field="speakStyleDuringSex"]').textContent,
+                        preferredSexPositions: entryDiv.querySelector('[data-field="preferredSexPositions"]').textContent.split(',').map(p => p.trim()),
+                        sexualBehavior: entryDiv.querySelector('[data-field="sexualBehavior"]').textContent.split(',').map(b => b.trim()),
+                        sexFantasies: entryDiv.querySelector('[data-field="sexFantasies"]').textContent.split(',').map(f => f.trim()),
+                        sexPersonalityTraits: entryDiv.querySelector('[data-field="sexPersonalityTraits"]').textContent.split(',').map(t => t.trim())
+                    }
+                };
+
+                fetch('api/personalities.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        table: 'minai_x_personalities',
+                        data: JSON.stringify(updatedData),
+                        id: id,
+                        action: 'update'
+                    })
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.status === 'success') {
+                        loadTable();
+                    } else {
+                        console.error('Failed to update:', result.message);
+                    }
+                });
+
+                // Remove editable state
+                entryDiv.querySelectorAll('.entry-value').forEach(el => {
+                    el.contentEditable = false;
+                    el.style = '';
+                });
+                entryDiv.classList.remove('editing');
+                editBtn.textContent = 'Edit';
+            } else {
+                // Enable editing
+                entryDiv.querySelectorAll('.entry-value:not([data-field="id"])').forEach(el => {
+                    makeEditable(el);
+                });
+                entryDiv.classList.add('editing');
+                editBtn.textContent = 'Save';
+            }
+        }
+
+        function deleteEntry(id) {
+            if (confirm('Are you sure you want to delete this personality?')) {
+                fetch('api/personalities.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        table: 'minai_x_personalities',
+                        id: id,
+                        action: 'delete'
+                    })
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.status === 'success') {
+                        loadTable();
+                    } else {
+                        console.error('Failed to delete:', result.message);
+                    }
+                });
+            }
+        }
+
+        function makeEditable(element) {
+            element.contentEditable = true;
+            element.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
+            element.style.padding = '4px 8px';
+            element.style.borderRadius = '4px';
+            element.style.border = '1px solid var(--border-color)';
+        }
+
+        function exportToCSV() {
+            // Convert the data to CSV format
+            const csvRows = [];
+            
+            // Add header row
+            csvRows.push(['ID', 'Orientation', 'Relationship Style', 'Speak Style', 
+                          'Preferred Positions', 'Sexual Behavior', 'Fantasies', 'Personality Traits']);
+            
+            // Add data rows
+            data.forEach(entry => {
+                const personality = JSON.parse(entry.x_personality);
+                csvRows.push([
+                    entry.id,
+                    personality.orientation,
+                    personality.relationshipStyle,
+                    personality.speakStyleDuringSex,
+                    Array.isArray(personality.preferredSexPositions) ? personality.preferredSexPositions.join('|') : personality.preferredSexPositions,
+                    Array.isArray(personality.sexualBehavior) ? personality.sexualBehavior.join('|') : personality.sexualBehavior,
+                    Array.isArray(personality.sexFantasies) ? personality.sexFantasies.join('|') : personality.sexFantasies,
+                    Array.isArray(personality.sexPersonalityTraits) ? personality.sexPersonalityTraits.join('|') : personality.sexPersonalityTraits
+                ]);
+            });
+            
+            // Convert to CSV string
+            const csvString = csvRows.map(row => 
+                row.map(cell => `"${cell.replace(/"/g, '""')}"`)
+                   .join(',')
+            ).join('\n');
+            
+            // Create and trigger download
+            const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            if (navigator.msSaveBlob) { // IE 10+
+                navigator.msSaveBlob(blob, 'personalities.csv');
+            } else {
+                link.href = URL.createObjectURL(blob);
+                link.download = 'personalities.csv';
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+
+        function importFromCSV(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const rows = text.split('\n').map(row => {
+                    // Handle quoted CSV properly
+                    const matches = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+                    if (!matches) return [];
+                    return matches.map(cell => cell.replace(/^"(.*)"$/, '$1').replace(/""/g, '"'));
+                });
+                
+                // Skip header row
+                const importedData = rows.slice(1).filter(row => row.length >= 8).map(row => ({
+                    id: row[0],
+                    x_personality: JSON.stringify({
+                        orientation: row[1],
+                        relationshipStyle: row[2],
+                        speakStyleDuringSex: row[3],
+                        preferredSexPositions: row[4].split('|'),
+                        sexualBehavior: row[5].split('|'),
+                        sexFantasies: row[6].split('|'),
+                        sexPersonalityTraits: row[7].split('|')
+                    })
+                }));
+
+                if (importedData.length === 0) {
+                    alert('No valid data found in CSV file');
+                    return;
+                }
+
+                if (confirm(`Are you sure you want to import ${importedData.length} personalities? This will add to existing entries.`)) {
+                    importPersonalities(importedData);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function importPersonalities(importedData) {
+            fetch('api/personalities.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    action: 'import',
+                    data: JSON.stringify(importedData)
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    alert('Import successful!');
+                    loadTable();
+                } else {
+                    alert('Import failed: ' + (result.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                alert('Import failed: ' + error.message);
+            });
+        }
+
+        // Add this after the existing script tag
+        document.getElementById('newEntryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const personality = {
+                id: document.getElementById('newId').value,
+                x_personality: {
+                    orientation: document.getElementById('newOrientation').value,
+                    speakStyleDuringSex: document.getElementById('speakStyleDuringSex').value,
+                    sexFantasies: document.getElementById('newSexFantasies').value.split(',').map(f => f.trim()).filter(f => f),
+                    sexualBehavior: [],
+                    relationshipStyle: "casual",
+                    sexPersonalityTraits: [],
+                    preferredSexPositions: []
+                }
+            };
+
+            // Add validation
+            if (!personality.id || !personality.x_personality.orientation || !personality.x_personality.speakStyleDuringSex) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            const errEl = document.getElementById('generateError');
+            errEl.style.display = 'none';
+
+            fetch('api/personalities.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    action: 'update',
+                    id: personality.id,
+                    data: JSON.stringify(personality)
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    errEl.style.display = 'block';
+                    errEl.style.color = 'var(--success-color)';
+                    errEl.innerHTML = result.message || 'New personality added successfully!';
+                    resetForm();
+                    loadTable();
+                } else {
+                    console.error('Server error:', result);
+                    errEl.style.display = 'block';
+                    errEl.style.color = 'var(--error-color)';
+                    errEl.innerHTML = `Failed to add personality: ${result.message}${result.details ? `<br>${result.details}` : ''}`;
+                }
+            })
+            .catch(error => {
+                console.error('Network error:', error);
+                errEl.style.display = 'block';
+                errEl.style.color = 'var(--error-color)';
+                errEl.innerHTML = `Error adding personality: ${error.message}`;
+            });
+        });
     </script>
 </body>
 

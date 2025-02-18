@@ -12,654 +12,1348 @@
             --background-light: #2d2d2d;
             --text-color: #e0e0e0;
             --border-color: #404040;
+            --success-color: #40c057;
+            --error-color: #f44336;
+            --warning-color: #ffc107;
+            --info-color: #4dabf7;
         }
 
         body {
             margin: 0;
-            padding: 20px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--background-dark);
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: radial-gradient(circle at center, var(--background-light) 0%, var(--background-dark) 100%);
             color: var(--text-color);
+            min-height: 100vh;
+            line-height: 1.6;
         }
 
-        .nav-panel {
-            background-color: var(--primary-color);
-            padding: 15px;
-            text-align: center;
-            border-radius: 8px;
-            margin-bottom: 20px;
+        .container {
+            max-width: 98vw;
+            margin: 5px auto;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
-        .nav-panel a {
-            color: white;
+        .log-selector-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin: 5px 0 10px 0;
+            flex-wrap: wrap;
+            background-color: var(--background-light);
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(4px);
+        }
+
+        .nav-section {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .nav-section a, 
+        .nav-section button {
+            padding: 8px 16px;
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
             text-decoration: none;
-            font-size: 18px;
-            margin-right: 40px;
+            font-size: 0.9rem;
+        }
+
+        .nav-section a:hover,
+        .nav-section button:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.15) 0%,
+                rgba(255, 255, 255, 0.08) 100%
+            );
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            text-align: left;
+            color: var(--text-color);
+            margin: 0;
+            font-size: 1.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            white-space: nowrap;
+        }
+
+        .nav-divider {
+            width: 1px;
+            height: 24px;
+            background-color: var(--border-color);
+            margin: 0 5px;
         }
 
         .log-container {
+            margin-top: 10px;
+            height: calc(95vh - 100px);
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
+            gap: 15px;
             width: 100%;
-            padding-bottom: 20px;
         }
 
         .log-viewer {
-            min-height: 200px;
-            min-width: 300px;
-            height: calc(100vh - 300px);
-            background-color: var(--background-light);
+            background: rgba(0, 0, 0, 0.2);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: 12px;
             padding: 15px;
             display: flex;
             flex-direction: column;
-            transition: width 0.3s ease;
-            resize: none;
+            backdrop-filter: blur(4px);
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
         }
 
         .log-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .log-title {
-            font-size: 1.2em;
-            font-weight: bold;
+            font-size: 1.2rem;
+            font-weight: 500;
             color: var(--primary-color);
         }
 
         .log-controls {
             display: flex;
-            gap: 5px;
+            align-items: center;
+            gap: 8px;
+            margin-left: 15px;
         }
 
         .log-controls button {
-            padding: 3px 6px;
-            font-size: 0.9em;
-            min-width: 50px;
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--text-color);
+            transition: all 0.2s ease;
+        }
+
+        .log-controls button:hover {
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.15) 0%,
+                rgba(255, 255, 255, 0.08) 100%
+            );
+            transform: translateY(-1px);
+        }
+
+        .log-controls button.active {
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.2) 0%,
+                rgba(76, 175, 80, 0.3) 100%
+            );
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .follow-all-button {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px !important;
+            font-size: 14px;
+        }
+
+        .follow-all-button.active {
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.2) 0%,
+                rgba(76, 175, 80, 0.3) 100%
+            ) !important;
+            border-color: var(--primary-color) !important;
+            color: var(--primary-color);
         }
 
         .log-content {
             flex-grow: 1;
             background-color: var(--background-dark);
-            border-radius: 4px;
+            border-radius: 8px;
             padding: 10px;
-            overflow-y: auto;
-            font-family: monospace;
-            font-size: 0.9em;
-            will-change: transform;
-            contain: content;
-            width: 100%;
-            box-sizing: border-box;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9rem;
+            line-height: 1.3;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            border: 1px solid var(--border-color);
+            height: calc(100% - 100px);
+            scroll-behavior: smooth;
         }
 
-        .log-viewer.nowrap .log-content {
-            white-space: pre;
-            overflow-x: auto;
+        .log-content.updating {
+            scroll-behavior: auto;
         }
-        
-        .log-viewer.wrap .log-content {
-            white-space: pre-wrap;
-            word-break: break-all;
-            overflow-x: hidden;
+
+        .log-content::-webkit-scrollbar {
+            width: 12px;
         }
-        
+
+        .log-content::-webkit-scrollbar-track {
+            background: var(--background-dark);
+        }
+
+        .log-content::-webkit-scrollbar-thumb {
+            background-color: var(--border-color);
+            border-radius: 6px;
+            border: 3px solid var(--background-dark);
+        }
+
         .log-line {
-            display: block;
-            width: 100%;
-            white-space: inherit;
+            margin: 1px 0;
+            padding: 1px 4px;
+            border-radius: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.2s;
         }
-        
-        .wrap-button {
-            opacity: 0.5;
+
+        .log-line.error {
+            background-color: rgba(244, 67, 54, 0.1);
         }
-        
-        .wrap-button.active {
-            opacity: 1;
-            background-color: var(--primary-color);
+
+        .log-line.warning {
+            background-color: rgba(255, 193, 7, 0.1);
+        }
+
+        .log-line:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .log-line.error:hover {
+            background-color: rgba(244, 67, 54, 0.15);
+        }
+
+        .log-line.warning:hover {
+            background-color: rgba(255, 193, 7, 0.15);
+        }
+
+        .log-line.copied {
+            animation: copiedFlash 0.5s;
+        }
+
+        @keyframes copiedFlash {
+            0%, 100% { background-color: transparent; }
+            50% { background-color: rgba(76, 175, 80, 0.2); }
+        }
+
+        .timestamp {
+            color: var(--info-color);
+            background: rgba(77, 171, 247, 0.1);
+            border-radius: 2px;
+            font-size: 0.85em;
+            display: inline;
+            min-width: unset;
+            white-space: nowrap;
         }
 
         .filter-container {
-            margin-bottom: 10px;
+            position: relative;
+            margin-bottom: 20px;
         }
 
         .filter-input {
+            width: 100%;
+            padding: 12px;
             background-color: var(--background-dark);
             border: 1px solid var(--border-color);
             color: var(--text-color);
-            padding: 5px 10px;
-            border-radius: 4px;
-            width: 200px;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
         }
 
-        button {
-            background-color: var(--secondary-color);
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #1976D2;
-        }
-
-        .json-key { color: #9cdcfe; }
-        .json-string { color: #ce9178; }
-        .json-number { color: #b5cea8; }
-        .json-boolean { color: #569cd6; }
-        .json-null { color: #569cd6; }
-
-        @keyframes timestampGradient {
-            0% {
-                background: rgba(86, 156, 214, 0.1);
-                color: #569cd6;
-            }
-            50% {
-                background: rgba(97, 175, 239, 0.1);
-                color: #61afef;
-            }
-            100% {
-                background: rgba(86, 156, 214, 0.1);
-                color: #569cd6;
-            }
-        }
-        
-        .timestamp {
-            color: #569cd6;  /* Consistent blue color */
-            font-style: italic;
-            padding: 2px 6px;
-            background: rgba(86, 156, 214, 0.1);
-            border-radius: 3px;
-            display: inline;
-            white-space: nowrap;
-        }
-        
-        /* Update log components to ensure inline display */
-        .log-module, .log-pid, .log-client, .log-message {
-            white-space: nowrap;
-            display: inline;
-        }
-        
-        /* Container for log line to prevent unwanted breaks */
-        .log-line {
-            white-space: pre;
-            display: block;
-        }
-
-        .error { color: #f44336; }
-        .warning { color: #ffc107; }
-        .info { color: #4CAF50; }
-
-        .expand-button {
-            background-color: var(--primary-color);
-            margin-left: 10px;
-        }
-
-        .clear-button {
-            background-color: #f44336;
+        .filter-input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
         }
 
         .preset-filters {
             display: flex;
             gap: 10px;
-            margin-bottom: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
         }
 
         .preset-filter {
-            background-color: var(--background-light);
+            padding: 8px 16px;
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
             border: 1px solid var(--border-color);
-            padding: 5px 10px;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-color);
+        }
+
+        .preset-filter:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.15) 0%,
+                rgba(255, 255, 255, 0.08) 100%
+            );
         }
 
         .preset-filter.active {
-            background-color: var(--primary-color);
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.2) 0%,
+                rgba(76, 175, 80, 0.3) 100%
+            );
+            border-color: var(--primary-color);
         }
 
-        .log-selector {
-            margin-bottom: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .log-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 10px;
-            max-height: 300px;
-            overflow-y: auto;
-            background: var(--background-light);
-            padding: 10px;
-            border-radius: 4px;
-        }
-        
-        .log-item {
-            display: flex;
-            flex-direction: column;
-            padding: 10px;
-            background: var(--background-dark);
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        
-        .log-item:hover {
-            background: var(--border-color);
-        }
-        
-        .log-item-name {
-            font-weight: bold;
-        }
-        
-        .log-item-details {
-            font-size: 0.8em;
-            color: #888;
-        }
-        
-        .php-array { color: #569cd6; }
-        .php-array-key { color: #9cdcfe; }
-        .php-array-arrow { color: #d4d4d4; }
-        .php-string { color: #ce9178; }
-        .php-number { color: #b5cea8; }
+        .error { color: var(--error-color); }
+        .warning { color: var(--warning-color); }
+        .info { color: var(--success-color); }
 
-        .available-action {
-            color: #4CAF50;
-            font-weight: bold;
-        }
-        
-        .log-viewer {
-            min-height: 200px;
-            min-width: 300px;
+        .wrap-button.active {
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.2) 0%,
+                rgba(76, 175, 80, 0.3) 100%
+            );
+            border-color: var(--primary-color);
         }
 
         .follow-button {
-            background-color: var(--secondary-color);
-            opacity: 0.5;
-            transition: all 0.3s ease;
-        }
-        
-        .follow-button.active {
-            opacity: 1;
-            background-color: var(--primary-color);
-            box-shadow: 0 0 5px var(--primary-color);
-        }
-        
-        .log-selector-controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .log-selector-dropdown {
-            flex: 1;
-            padding: 8px;
-            background-color: var(--background-light);
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
+            position: relative;
+            padding-left: 28px !important; /* Space for the indicator */
         }
 
-        .available-action-keyword { 
-            color: #4CAF50;
-            font-weight: bold;
+        .follow-button::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--border-color);
+            transition: background-color 0.3s ease;
         }
-        
-        .available-action-name {
-            color: #2196F3;
-            font-weight: bold;
+
+        .follow-button.active {
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.2) 0%,
+                rgba(76, 175, 80, 0.3) 100%
+            );
+            border-color: var(--success-color);
         }
-        
-        .available-action-desc {
-            color: #9E9E9E;
-            font-style: italic;
+
+        .follow-button.active::before {
+            background-color: var(--success-color);
+            box-shadow: 0 0 5px var(--success-color);
+        }
+
+        @media (max-width: 1200px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+
+            .log-container {
+                height: calc(90vh - 150px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 5px;
+                padding: 10px;
+            }
+
+            .log-container {
+                height: calc(90vh - 120px);
+                gap: 10px;
+            }
+
+            .log-selector-controls {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 5px;
+            }
+
+            .nav-section {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            h1 {
+                text-align: center;
+                margin-bottom: 5px;
+            }
+
+            .nav-divider {
+                display: none;
+            }
+
+            .log-viewer {
+                min-height: 300px;
+            }
+        }
+
+        .log-selector-dropdown {
+            padding: 10px;
+            background-color: var(--background-dark);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            min-width: 200px;
+            font-size: 1rem;
         }
 
         .layout-controls {
             display: flex;
             gap: 10px;
-            margin-left: auto;
         }
-        
+
         .layout-button {
-            padding: 5px 15px;
-            background-color: var(--background-light);
-            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
             color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
-        .layout-button.active {
-            background-color: var(--primary-color);
-            box-shadow: 0 0 5px var(--primary-color);
+
+        .layout-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
-        .download-button {
-            background-color: #4CAF50;  /* Green color for download */
-            padding: 3px 6px !important;
-        }
-        
-        .download-button:hover {
-            background-color: #45a049;
+        .layout-button.active {
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.2) 0%,
+                rgba(76, 175, 80, 0.3) 100%
+            );
+            border-color: var(--primary-color);
         }
 
         .troubleshoot-panel {
             position: fixed;
-            left: 50%;
             bottom: 40px;
+            left: 50%;
             transform: translateX(-50%);
+            width: 600px;
+            height: 500px;
             background: var(--background-light);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 15px;
-            width: 600px; /* Fixed width */
-            height: 500px; /* Fixed height */
-            max-width: 90vw;
-            max-height: 80vh;
-            display: flex;
+            border-radius: 12px;
+            display: none;
             flex-direction: column;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
             z-index: 1000;
-            resize: none;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
         }
-        
-        .resize-handle {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 20px;
-            height: 20px;
-            cursor: nw-resize;
-            z-index: 1001;
-        }
-        
-        .resize-handle::before {
-            content: '';
-            position: absolute;
-            left: 4px;
-            top: 4px;
-            width: 6px;
-            height: 6px;
-            border-left: 2px solid var(--text-color);
-            border-top: 2px solid var(--text-color);
-            opacity: 0.5;
-        }
-        
+
         .troubleshoot-header {
+            padding: 15px;
+            background: linear-gradient(135deg,
+                rgba(33, 150, 243, 0.1) 0%,
+                rgba(33, 150, 243, 0.2) 100%
+            );
+            border-bottom: 1px solid var(--border-color);
+            cursor: move;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
-            cursor: move; /* Show move cursor for drag handle */
+            border-radius: 12px 12px 0 0;
         }
-        
+
         .troubleshoot-content {
             flex: 1;
+            padding: 15px;
             overflow-y: auto;
-            padding: 15px;
-            margin: 0;
-            word-wrap: break-word;
-            white-space: pre-wrap;
-            min-height: 0;
-            position: relative;
         }
-        
-        .troubleshoot-content pre {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            overflow-x: auto;
-            max-width: 100%;
-            background: var(--background-dark);
-            padding: 10px;
-            border-radius: 4px;
-            margin: 5px 0;
-        }
-        
-        .troubleshoot-content details {
-            margin: 10px 0;
-            background: var(--background-dark);
-            padding: 10px;
-            border-radius: 4px;
-        }
-        
-        .troubleshoot-content details summary {
-            cursor: pointer;
-            padding: 5px;
-            margin: -5px;
-        }
-        
-        .troubleshoot-content details summary:hover {
-            background: var(--border-color);
-            border-radius: 4px;
-        }
-        
-        .troubleshoot-input-container {
-            position: relative;
-            background: var(--background-light);
-            padding: 15px;
-            border-top: 1px solid var(--border-color);
-            margin: 0 -15px -15px -15px;
-            display: flex;
-            gap: 10px;
-            flex-shrink: 0;
-        }
-        
+
         .troubleshoot-input {
-            flex: 1;
-            background: var(--background-dark);
+            width: 100%;
+            padding: 12px;
+            background-color: var(--background-dark);
             border: 1px solid var(--border-color);
             color: var(--text-color);
-            padding: 8px;
-            border-radius: 4px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .troubleshoot-button {
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.3) 0%,
+                rgba(76, 175, 80, 0.4) 100%
+            ) !important;
+            border: 1px solid var(--primary-color) !important;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .troubleshoot-button:hover {
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.4) 0%,
+                rgba(76, 175, 80, 0.5) 100%
+            ) !important;
+        }
+
+        .troubleshoot-button::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, 
+                rgba(76, 175, 80, 0.2) 0%,
+                transparent 70%
+            );
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            animation: troubleshootGlow 2s infinite;
+        }
+
+        @keyframes troubleshootGlow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        .troubleshoot-button:hover::after {
+            opacity: 1;
+        }
+
+        .resize-handle {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            width: 15px;
+            height: 15px;
+            cursor: se-resize;
         }
 
         .loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 1002;
+            gap: 20px;
+            padding: 20px;
         }
-        
+
         .loading-spinner {
             width: 40px;
             height: 40px;
-            border: 3px solid var(--border-color);
-            border-top: 3px solid var(--primary-color);
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin-bottom: 10px;
         }
-        
-        .loading-text {
-            color: var(--text-color);
-            font-size: 14px;
-            text-align: center;
-        }
-        
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
+
         .status-indicator {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 12px;
-            padding: 4px 8px;
-            border-radius: 4px;
-            background: var(--background-dark);
+            top: 15px;
+            right: 15px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
             opacity: 0;
-            transition: opacity 0.3s;
+            transition: opacity 0.3s ease;
         }
-        
+
         .status-indicator.visible {
             opacity: 1;
         }
-        
-        .status-indicator.error {
-            background: rgba(244, 67, 54, 0.2);
-            color: #f44336;
-        }
-        
+
         .status-indicator.success {
-            background: rgba(76, 175, 80, 0.2);
-            color: #4CAF50;
+            background-color: rgba(64, 192, 87, 0.2);
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
         }
 
-        .log-pid {
-            color: #b5cea8; /* Light green */
+        .status-indicator.error {
+            background-color: rgba(244, 67, 54, 0.2);
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
+        }
+
+        .json-string {
+            color: #7ec699;
+        }
+        
+        .json-number {
+            color: #f08d49;
+        }
+        
+        .json-boolean {
+            color: #cc99cd;
+        }
+        
+        .json-null {
+            color: #cc99cd;
+        }
+        
+        .json-key {
+            color: #67cdcc;
+        }
+
+        .php-string {
+            color: #7ec699;
+        }
+
+        .php-number {
+            color: #f08d49;
+        }
+
+        .php-array {
+            color: #cc99cd;
+        }
+
+        .php-array-key {
+            color: #67cdcc;
+        }
+
+        .php-array-arrow {
+            color: #e0e0e0;
+        }
+
+        .available-action-keyword {
+            color: #f08d49;
+            font-weight: bold;
+        }
+
+        .available-action-name {
+            color: #7ec699;
+        }
+
+        .available-action-desc {
+            color: #67cdcc;
             font-style: italic;
         }
-        
+
         .log-module {
-            color: #ce9178; /* Light orange */
-        }
-        
-        .log-level-notice {
-            color: #4CAF50; /* Green */
-        }
-        
-        .log-level-warn {
-            color: #ffc107; /* Yellow */
-        }
-        
-        .log-level-error {
-            color: #f44336; /* Red */
-        }
-        
-        
-        
-        .log-message {
-            color: var(--text-color) !important;
+            color: var(--info-color);
+            font-size: 0.85em;
             display: inline;
-            white-space: inherit;
+            min-width: unset;
+            white-space: nowrap;
+        }
+
+        .log-level-error {
+            color: var(--error-color);
+        }
+
+        .log-level-warn {
+            color: var(--warning-color);
+        }
+
+        .log-level-notice {
+            color: var(--info-color);
+        }
+
+        .log-message {
+            color: var(--text-color);
+            display: inline;
+            padding: 0;
+            margin-left: 4px;
+        }
+
+        /* Default wrap behavior */
+        .log-viewer.wrap .log-line {
+            white-space: normal;
+        }
+
+        .log-viewer.wrap .log-message {
+            white-space: pre-wrap;
+            word-break: break-word;
+            overflow: visible;
+        }
+
+        /* No-wrap behavior */
+        .log-viewer.nowrap .log-line {
+            white-space: pre;
+        }
+
+        .log-viewer.nowrap .log-message {
+            white-space: pre;
+            text-overflow: clip;
+            overflow: hidden;
+        }
+
+        /* Make the log content container scrollable horizontally in nowrap mode */
+        .log-viewer.nowrap .log-content {
+            overflow-x: auto;
+        }
+
+        /* Special handling for JSON content */
+        .log-viewer.wrap .json-string,
+        .log-viewer.wrap .json-number,
+        .log-viewer.wrap .json-boolean,
+        .log-viewer.wrap .json-null,
+        .log-viewer.wrap .json-key {
+            white-space: pre-wrap;
             word-break: break-word;
         }
 
-        /* Line highlighting for error/warning/notice */
-        .log-line.error { background: rgba(244, 67, 54, 0.1); }
-        .log-line.warning { background: rgba(255, 193, 7, 0.1); }
-        .log-line.notice { background: transparent; }
-        
-        /* Ensure all text in log lines is white by default */
-        .log-line {
-            white-space: pre;
+        /* Add these styles */
+        .collapsible-entry {
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            margin: 5px 0;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .collapsible-header {
+            padding: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+
+        .collapsible-header:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .collapsible-content {
+            padding: 8px;
+            display: none;
+        }
+
+        .collapsible-entry.expanded .collapsible-content {
             display: block;
+        }
+
+        .collapse-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .expand-all-button,
+        .collapse-all-button {
+            padding: 8px 16px;
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .expand-all-button:hover,
+        .collapse-all-button:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.15) 0%,
+                rgba(255, 255, 255, 0.08) 100%
+            );
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .expand-all-button.active,
+        .collapse-all-button.active {
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.2) 0%,
+                rgba(76, 175, 80, 0.3) 100%
+            );
+            border-color: var(--primary-color);
+        }
+
+        .troubleshoot-response {
+            margin-top: 20px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .troubleshoot-section {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .troubleshoot-section h3 {
+            color: var(--primary-color);
+            margin: 0 0 10px 0;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .troubleshoot-section pre {
+            background: var(--background-dark);
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            overflow-x: auto;
+            margin: 10px 0;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9rem;
+        }
+
+        .troubleshoot-section .timestamp {
+            font-size: 0.85em;
+            color: var(--info-color);
+            background: rgba(77, 171, 247, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 4px 0;
+        }
+
+        .troubleshoot-section .error-log {
+            color: var(--error-color);
+        }
+
+        .troubleshoot-details {
+            margin-top: 15px;
+        }
+
+        .troubleshoot-details summary {
+            cursor: pointer;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .troubleshoot-details summary:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Add these new styles */
+        .analysis-content {
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        .analysis-content h2 {
+            color: var(--secondary-color);
+            margin: 25px 0 15px 0;
+            font-size: 1.1rem;
+            font-weight: 500;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .analysis-content .bullet-point {
+            margin: 8px 0 4px 20px;
+            position: relative;
+            padding-left: 5px;
+        }
+
+        .analysis-content .sub-bullet-point {
+            margin: 4px 0 4px 40px;
+            position: relative;
+            padding-left: 5px;
+            color: var(--text-color);
+            opacity: 0.9;
+        }
+
+        /* Add spacing after bullet points that have sub-bullets */
+        .analysis-content .bullet-point + .sub-bullet-point {
+            margin-top: 2px;
+        }
+
+        /* Add spacing between bullet point groups */
+        .analysis-content .bullet-point + .bullet-point {
+            margin-top: 12px;
+        }
+
+        .analysis-content code {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9em;
+            color: #7ec699;
+        }
+
+        .analysis-content blockquote {
+            margin: 15px 0;
+            padding: 10px 15px;
+            border-left: 4px solid var(--primary-color);
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 0 4px 4px 0;
+        }
+
+        .analysis-content strong {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .analysis-content br {
+            display: block;
+            margin: 8px 0;
+            content: "";
+        }
+
+        /* Add compact mode for narrow views */
+        @media (max-width: 600px), (max-width: 1200px) and (min-width: 601px) {
+            .log-line .timestamp,
+            .log-line .log-module,
+            .log-line .log-level-error,
+            .log-line .log-level-warn,
+            .log-line .log-level-notice {
+                max-width: none;
+            }
+        }
+
+        /* Hover state for timestamps */
+        .log-line:hover .timestamp {
+            max-width: none;
+            position: relative;
+            z-index: 1;
+            background: var(--background-dark);
+        }
+
+        /* Add tooltip styles */
+        .copy-tooltip {
+            position: fixed;
+            background: var(--background-dark);
+            color: var(--text-color);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 1000;
+            border: 1px solid var(--border-color);
+        }
+
+        .copy-tooltip.visible {
+            opacity: 1;
+        }
+
+        /* Add styles for LLM output display */
+        .log-viewer.llm-output .log-content {
+            white-space: pre-wrap !important;
+            word-break: break-word;
+        }
+
+        .log-viewer.llm-output .log-line {
+            display: block;
+            white-space: pre-wrap;
+            font-family: 'Consolas', monospace;
+            padding: 8px;
+            margin: 4px 0;
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .log-viewer.llm-output .timestamp {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.8em;
+        }
+
+        /* Improve JSON highlighting */
+        .log-viewer:not(.llm-output) .json-formatted {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            padding-left: 20px;
+        }
+
+        .json-key {
+            color: #67cdcc;
+            margin-right: 4px;
+        }
+
+        .json-string {
+            color: #7ec699;
+        }
+        
+        .json-number {
+            color: #f08d49;
+        }
+        
+        .json-boolean {
+            color: #cc99cd;
+        }
+        
+        .json-null {
+            color: #cc99cd;
+        }
+
+        /* Add styles for multi-line JSON in LLM output */
+        .log-viewer.llm-output .json-formatted {
+            white-space: pre-wrap;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            margin: 4px 0;
+        }
+
+        .log-viewer.llm-output .json-entry {
+            padding-left: 20px;
+            margin: 2px 0;
+        }
+
+        .log-viewer.llm-output .log-line {
+            background: transparent;
+            padding: 4px;
+        }
+
+        .log-viewer.llm-output .log-line:has(.json-formatted) {
+            padding: 0;
+        }
+
+        /* Add highlight style for filtered text */
+        .filter-highlight {
+            background-color: rgba(76, 175, 80, 0.3);
+            border-radius: 2px;
+            padding: 0 2px;
+            margin: 0 -2px;
+        }
+
+        /* Add style for active filter indicator */
+        .filter-active-indicator {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .filter-active-indicator.active {
+            opacity: 1;
+        }
+
+        .role-entry {
+            margin: 10px 0;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+        
+        .role-label {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+            margin-bottom: 4px;
+        }
+        
+        .role-label.system {
+            background: rgba(33, 150, 243, 0.2);
+            color: #2196f3;
+        }
+        
+        .role-label.user {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+        
+        .role-label.assistant {
+            background: rgba(156, 39, 176, 0.2);
+            color: #9c27b0;
+        }
+        
+        .role-content {
+            margin-top: 4px;
+            white-space: pre-wrap;
+        }
+        
+        .section-header {
+            color: var(--primary-color);
+            margin: 15px 0 10px 0;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+        
+        .info-line {
+            margin: 5px 0;
+        }
+        
+        .info-label {
+            color: var(--info-color);
+            font-weight: 500;
+        }
+        
+        .numeric-value {
+            color: var(--warning-color);
+            font-family: 'Consolas', monospace;
+        }
+        
+        .entry-timestamp {
+            color: var(--info-color);
+            font-family: 'Consolas', monospace;
+            font-size: 0.9em;
+        }
+        
+        /* Enhance collapsible entries */
+        .collapsible-entry {
+            margin: 10px 0;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .collapsible-header {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .collapsible-header:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .collapsible-content {
+            padding: 15px;
+            display: none;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .collapsible-entry.expanded .collapsible-content {
+            display: block;
+        }
+
+        .narrator-line {
+            color: var(--info-color);
+            font-style: italic;
+            margin: 4px 0;
+            padding: 2px 0;
+        }
+        
+        .dialogue-line {
+            margin: 4px 0;
+            padding: 2px 0;
+        }
+        
+        .dialogue-line .speaker {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .dialogue-line .dialogue-text {
+            margin-left: 8px;
             color: var(--text-color);
         }
-
-        /* Update log line styles to handle Apache format better */
-        .log-line {
-            display: block;
-            width: 100%;
-            white-space: inherit; /* Inherit from parent container */
+        
+        .dialogue-line .dialogue-target {
+            margin-left: 8px;
+            color: var(--info-color);
+            font-style: italic;
+            font-size: 0.9em;
         }
         
-        .log-content {
-            flex-grow: 1;
-            background-color: var(--background-dark);
+        .role-content {
+            margin-top: 4px;
+            white-space: pre-wrap;
+            line-height: 1.4;
+        }
+        
+        .info-line {
+            margin: 5px 0;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+        
+        .info-label {
+            color: var(--info-color);
+            font-weight: 500;
+            flex: 0 0 auto;
+        }
+
+        .tooltip-icon {
+            font-size: 0.8em;
+            color: var(--info-color);
+            margin-left: 5px;
+            opacity: 0.7;
+        }
+
+        .log-title {
+            display: flex;
+            align-items: center;
+            cursor: help;
+        }
+
+        .log-title:hover {
+            text-decoration: underline;
+            text-decoration-style: dotted;
+        }
+
+        /* Add these styles in the <style> section */
+        .maximize-button {
+            padding: 8px 16px;
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .maximize-button:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.15) 0%,
+                rgba(255, 255, 255, 0.08) 100%
+            );
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .log-viewer.maximized {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 1000;
+            margin: 0;
+            border-radius: 0;
+            background: var(--background-dark);
+        }
+
+        .log-viewer.maximized .log-content {
+            height: calc(100vh - 150px);
+        }
+
+        /* Add these styles to the <style> section */
+        .log-controls button {
+            width: 32px;
+            height: 32px;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .log-controls button:hover::after {
+            content: attr(title);
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--background-dark);
+            color: var(--text-color);
+            padding: 4px 8px;
             border-radius: 4px;
-            padding: 10px;
-            overflow-y: auto;
-            font-family: monospace;
-            font-size: 0.9em;
-            will-change: transform;
-            contain: content;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        
-        /* Ensure components stay inline and wrap properly */
-        .timestamp, .log-module, .log-level-notice, 
-        .log-level-warn, .log-level-error {
-            display: inline-flex;
-            align-items: center;
-            white-space: nowrap; /* Keep these components from breaking */
+            font-size: 12px;
+            white-space: nowrap;
+            border: 1px solid var(--border-color);
+            z-index: 1000;
         }
 
-        .model-toggle {
-            display: flex;
-            align-items: center;
-            margin-right: 10px;
-            font-size: 0.9em;
-        }
-
-        .toggle-label {
-            display: flex;
-            align-items: center;
+        .log-controls {
+            position: relative;
             gap: 5px;
-            cursor: pointer;
-        }
-
-        .toggle-label input[type="checkbox"] {
-            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <div class="nav-panel">
-        <a href="index.html">Return to Home</a>
-        <a href="https://github.com/MinLL/MinAI">Documentation</a>
-        <button onclick="toggleTroubleshoot()" style="margin-left: auto">
-            Troubleshoot
-        </button>
-    </div>
-
-    <div class="log-selector-controls">
-        <select class="log-selector-dropdown" id="logSelect">
-            <option value="">Add Log Viewer...</option>
-        </select>
-        <button onclick="restoreDefaultLogs()">Restore Defaults</button>
-        <div class="layout-controls">
-            <button class="layout-button" onclick="setLayout(1)">1x</button>
-            <button class="layout-button active" onclick="setLayout(2)">2x</button>
-            <button class="layout-button" onclick="setLayout(3)">3x</button>
-            <button class="layout-button" onclick="setLayout(4)">4x</button>
+    <div class="container">
+        <div class="log-selector-controls">
+            <div class="nav-section">
+                <h1>MinAI Diagnostics</h1>
+                <div class="nav-divider"></div>
+                <a href="index.html">Home</a>
+                <a href="https://github.com/MinLL/MinAI">Docs</a>
+                <button onclick="toggleTroubleshoot()" class="troubleshoot-button">Troubleshoot</button>
+            </div>
+            <div class="nav-divider"></div>
+            <div class="nav-section">
+                <select class="log-selector-dropdown" id="logSelect">
+                    <option value="">Add Log Viewer...</option>
+                </select>
+                <button onclick="restoreDefaultLogs()" class="layout-button">Restore Defaults</button>
+                <button onclick="toggleFollowAll(this)" class="layout-button follow-all-button" title="Toggle auto-scroll for all logs">
+                    <span style="font-size: 14px;">⟱</span> Follow All
+                </button>
+                <div class="layout-controls">
+                    <button class="layout-button" onclick="setLayout(1)">1x</button>
+                    <button class="layout-button" onclick="setLayout(2)">2x</button>
+                    <button class="layout-button active" onclick="setLayout(3)">3x</button>
+                    <button class="layout-button" onclick="setLayout(4)">4x</button>
+                </div>
+            </div>
         </div>
-    </div>
 
-    <div class="log-container" id="logContainer">
-        <!-- Log viewers will be dynamically added here -->
+        <div class="log-container" id="logContainer">
+            <!-- Log viewers will be dynamically added here -->
+        </div>
     </div>
 
     <div class="troubleshoot-panel">
-        <div class="resize-handle"></div>
         <div class="troubleshoot-header">
-            <span>Troubleshoot Assistant</span>
-            <div class="model-toggle">
-                <label class="toggle-label">
-                    <input type="checkbox" id="useRecommendedModel" checked>
-                    Use Claude-3.5 (Model in summary adapter is used otherwise)
-                </label>
-            </div>
-            <div class="log-controls">
-                <button onclick="resetTroubleshootSize()">Reset Size</button>
-                <button onclick="toggleTroubleshoot(false)">Close</button>
-            </div>
+            <span>Troubleshoot</span>
+            <button onclick="toggleTroubleshoot(false)" class="layout-button">Close</button>
         </div>
-        <div class="status-indicator"></div>
-        <div class="troubleshoot-content"></div>
-        <div class="troubleshoot-input-container">
-            <input type="text" class="troubleshoot-input" placeholder="Ask a question about the latest interaction...">
-            <button class="troubleshoot-button" onclick="askQuestion()">Ask</button>
+        <div class="resize-handle"></div>
+        <div class="troubleshoot-content">
+            <input type="text" class="troubleshoot-input" placeholder="Describe your issue...">
+            <div class="model-selection">
+                <input type="checkbox" id="useRecommendedModel" checked>
+                <label for="useRecommendedModel">Use Claude 3.5 Sonnet (Recommended). Summary adaptor used if disabled</label>
+            </div>
+            <button onclick="askQuestion()" class="troubleshoot-button">Ask</button>
+            <div class="status-indicator"></div>
+            <div class="troubleshoot-response"></div>
         </div>
     </div>
 
@@ -669,237 +1363,113 @@
         let activeLogViewers = new Map();
         
         const DEFAULT_LOGS = [
+            'apache_error.log',
             'context_sent_to_llm.log',
             'output_from_llm.log',
-            'apache_error.log'
+            // Second row (3x2)
+            'minai.log',
+            'minai_context_sent_to_llm.log',
+            'minai_output_from_llm.log'
         ];
 
-        // Add layout preference to localStorage
         let currentLayout = parseInt(localStorage.getItem('logViewerLayout') || '2');
 
         function defaultLogParser(content) {
             return content.split('\n').map(line => {
-                // Skip empty lines
                 if (!line.trim()) return '';
                 
-                // Handle the equals separator lines in context logs
-                if (line.trim() === '=') {
-                    return '<hr style="border: 1px dashed var(--border-color); margin: 10px 0;">';
-                }
+                // Simple sanitization
+                const sanitizedLine = line
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
                 
-                try {
-                    const json = JSON.parse(line);
-                    return `<div class="log-line">${syntaxHighlightJSON(json)}</div>`;
-                } catch (e) {
-                    if (line.includes('array (')) {
-                        return `<div class="log-line">${formatPhpArray(line)}</div>`;
-                    }
-                    return `<div class="log-line">${line}</div>`;
-                }
+                return `<div class="log-line">${sanitizedLine}</div>`;
             }).filter(line => line).join('');
         }
 
         function parseContextLog(content) {
-            const entries = content.split('=\n');
-            return entries.map(entry => {
-                if (!entry.trim()) return '';
-                
-                let formattedEntry;
-                if (entry.trim().startsWith('array (')) {
-                    formattedEntry = formatPhpArray(entry.trim());
-                } else {
-                    try {
-                        const json = JSON.parse(entry.trim());
-                        let highlighted = syntaxHighlightJSON(json);
-                        highlighted = highlighted.replace(
-                            /(AVAILABLE ACTION[^"]*)/g,
-                            '<span class="available-action">$1</span>'
-                        );
-                        formattedEntry = highlighted;
-                    } catch (e) {
-                        formattedEntry = entry;
-                    }
-                }
-                return `<div class="log-line">${formattedEntry}</div>`;
-            }).filter(entry => entry).join('<hr style="border: 1px dashed var(--border-color); margin: 10px 0;">');
-        }
-
-        function parseOutputLog(content) {
-            const entries = content.split('==\n');
-            return entries.map(entry => {
-                if (!entry.trim()) return '';
-                
-                const lines = entry.split('\n');
-                const formattedLines = lines.map(line => {
-                    if (!line.trim()) return '';
-                    
-                    let formattedLine = line;
-                    // Match ISO format timestamps
-                    if (line.includes('START') || line.includes('END')) {
-                        const timestamp = line.match(/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2})/);
-                        if (timestamp) {
-                            formattedLine = line.replace(timestamp[0], `<span class="timestamp">${timestamp[0]}</span>`);
-                        }
-                    }
-                    // Match Apache style timestamps
-                    if (line.match(/\[.*?\d{4}\]/)) {
-                        formattedLine = line.replace(/\[(.*?\d{4})\]/g, '<span class="timestamp">[$1]</span>');
-                    }
-                    try {
-                        const json = JSON.parse(line);
-                        formattedLine = syntaxHighlightJSON(json);
-                    } catch (e) {
-                        // Keep as is if not JSON
-                    }
-                    return `<div class="log-line">${formattedLine}</div>`;
-                });
-                return formattedLines.filter(line => line).join('');
-            }).filter(entry => entry).join('<hr style="border: 1px dashed var(--border-color); margin: 10px 0;">');
-        }
-
-        function parseApacheLog(content) {
             return content.split('\n').map(line => {
                 if (!line.trim()) return '';
                 
-                // First, escape any HTML to prevent XSS
-                line = line.replace(/[&<>"']/g, char => ({
-                    '&': '&amp;',
-                    '<': '&lt;',
-                    '>': '&gt;',
-                    '"': '&quot;',
-                    "'": '&#39;'
-                }[char]));
-                
-                // Determine line type for highlighting
-                let lineClass = '';
-                if (line.includes('[php:error]')) lineClass = 'error';
-                else if (line.includes('[php:warn]')) lineClass = 'warning';
-                else if (line.includes('[php:notice]')) lineClass = 'notice';
-                
-                // Split the line into components and message
-                let components = [];
-                let message = line;
-                
-                // Extract timestamp
-                const timestampMatch = message.match(/\[([A-Za-z]{3} [A-Za-z]{3} \d{2} \d{2}:\d{2}:\d{2}\.\d{6} \d{4})\]/);
-                if (timestampMatch) {
-                    components.push(`<span class="timestamp">[${timestampMatch[1]}]</span>`);
-                    message = message.slice(timestampMatch[0].length).trimLeft();
+                // Skip separator lines
+                if (line.trim() === '=') {
+                    return '<hr style="border: 1px dashed var(--border-color); margin: 10px 0;">';
                 }
                 
-                // Extract module/level
-                const moduleMatch = message.match(/\[php:(notice|warn|error)\]/);
-                if (moduleMatch) {
-                    components.push(
-                        `<span class="log-module">[php:</span>` +
-                        `<span class="log-level-${moduleMatch[1]}">${moduleMatch[1]}</span>` +
-                        `<span class="log-module">]</span>`
-                    );
-                    message = message.slice(moduleMatch[0].length).trimLeft();
-                }
+                // Sanitize the line
+                let sanitizedLine = line
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
                 
-                // Remove PID and client info
-                message = message.replace(/\[pid [^\]]+\]/g, '').replace(/\[client [^\]]+\]/g, '');
-                
-                // Handle referer at the end of the line
-                const refererMatch = message.match(/, referer: [^$\n]+$/);
-                if (refererMatch) {
-                    message = message.slice(0, -refererMatch[0].length);
-                }
-                
-                // Wrap the components and message in a line container
-                return `<div class="log-line ${lineClass}">${components.join(' ')}<span class="log-message">${message.trimLeft()}</span></div>`;
-            }).join('\n');
-        }
-
-        function syntaxHighlightJSON(json) {
-            const jsonStr = JSON.stringify(json, null, 2);
-            return jsonStr.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
-                let cls = 'json-number';
-                if (/^"/.test(match)) {
-                    cls = /:$/.test(match) ? 'json-key' : 'json-string';
-                } else if (/true|false/.test(match)) {
-                    cls = 'json-boolean';
-                } else if (/null/.test(match)) {
-                    cls = 'json-null';
-                }
-                return `<span class="${cls}">${match}</span>`;
-            });
-        }
-
-        function clearLog(button) {
-            const content = button.closest('.log-viewer').querySelector('.log-content');
-            content.innerHTML = '';
-        }
-
-        function applyPreset(element, filter) {
-            const viewer = element.closest('.log-viewer');
-            const filterInput = viewer.querySelector('.filter-input');
-            
-            // If this preset is already active, clear it
-            if (element.classList.contains('active')) {
-                filterInput.value = '';
-                element.classList.remove('active');
-            } else {
-                // Clear other active presets
-                viewer.querySelectorAll('.preset-filter').forEach(preset => 
-                    preset.classList.remove('active')
+                // Highlight AVAILABLE ACTION
+                sanitizedLine = sanitizedLine.replace(
+                    /AVAILABLE ACTION: (\w+) \((.*?)\)/g,
+                    '<span class="available-action-keyword">AVAILABLE ACTION:</span> ' +
+                    '<span class="available-action-name">$1</span> ' +
+                    '<span class="available-action-desc">($2)</span>'
                 );
-                // Apply the new filter
-                filterInput.value = filter;
-                element.classList.add('active');
-            }
-            
-            // Trigger the filter
-            filterLog(filterInput);
+                
+                // Highlight quoted strings
+                sanitizedLine = sanitizedLine.replace(
+                    /(['"])(.*?)\1/g, 
+                    '<span class="php-string">$1$2$1</span>'
+                );
+                
+                // Highlight array keys
+                sanitizedLine = sanitizedLine.replace(
+                    /(\w+)\s*=>/g,
+                    '<span class="php-array-key">$1</span> =>'
+                );
+                
+                // Highlight array keyword
+                sanitizedLine = sanitizedLine.replace(
+                    /\barray\s*\(/g,
+                    '<span class="php-array">array</span> ('
+                );
+                
+                // Highlight numbers
+                sanitizedLine = sanitizedLine.replace(
+                    /\b(\d+)\b/g,
+                    '<span class="php-number">$1</span>'
+                );
+                
+                return `<div class="log-line">${sanitizedLine}</div>`;
+            }).filter(line => line).join('\n');
         }
 
-        function toggleFollow(button) {
-            button.classList.toggle('active');
-            const viewer = button.closest('.log-viewer');
-            const content = viewer.querySelector('.log-content');
-            const config = Array.from(activeLogViewers.entries())
-                .find(([_, v]) => v.viewer === viewer);
-            
-            if (config) {
-                const isActive = button.classList.contains('active');
-                activeLogViewers.get(config[0]).follow = isActive;
-                if (isActive) {
-                    content.scrollTop = content.scrollHeight;
-                }
-            }
-        }
-
-        function isFollowEnabled(viewer) {
-            return viewer.querySelector('.follow-button').classList.contains('active');
-        }
-
-        function setupScrollHandler(viewer) {
-            const content = viewer.querySelector('.log-content');
-            const followButton = viewer.querySelector('.follow-button');
-            
-            let scrollTimeout;
-            content.addEventListener('scroll', () => {
-                clearTimeout(scrollTimeout);
-                scrollTimeout = setTimeout(() => {
-                    const isAtBottom = content.scrollHeight - content.clientHeight <= content.scrollTop + 1;
-                    if (!isAtBottom && followButton.classList.contains('active')) {
-                        followButton.classList.remove('active');
-                        const config = Array.from(activeLogViewers.entries())
-                            .find(([_, v]) => v.viewer === viewer);
-                        if (config) {
-                            activeLogViewers.get(config[0]).follow = false;
-                        }
-                    } else if (isAtBottom && !followButton.classList.contains('active')) {
-                        followButton.classList.add('active');
-                        const config = Array.from(activeLogViewers.entries())
-                            .find(([_, v]) => v.viewer === viewer);
-                        if (config) {
-                            activeLogViewers.get(config[0]).follow = true;
-                        }
-                    }
-                }, 100);
-            });
+        function parseMinaiLog(content) {
+            return content.split('\n').map(line => {
+                if (!line.trim()) return '';
+                
+                // Extract timestamp if present
+                const timestampMatch = line.match(/^\[([\d\-: ]+)\]/);
+                const timestamp = timestampMatch ? timestampMatch[1] : '';
+                let message = timestampMatch ? line.slice(timestampMatch[0].length).trim() : line;
+                
+                // Determine log level
+                let levelClass = 'notice';
+                if (message.toLowerCase().includes('error')) levelClass = 'error';
+                else if (message.toLowerCase().includes('warning')) levelClass = 'warning';
+                
+                // Extract module/component if present
+                const moduleMatch = message.match(/^\[([\w\-_]+)\]/);
+                const module = moduleMatch ? moduleMatch[1] : '';
+                message = moduleMatch ? message.slice(moduleMatch[0].length).trim() : message;
+                
+                // Sanitize the message
+                message = message
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
+                
+                return `<div class="log-line ${levelClass}">
+                    ${timestamp ? `<span class="timestamp">[${timestamp}]</span>` : ''}
+                    ${module ? `<span class="log-module">[${module}]</span>` : ''}
+                    <span class="log-message">${message}</span>
+                </div>`;
+            }).filter(line => line).join('\n');
         }
 
         function formatPhpArray(content) {
@@ -913,7 +1483,7 @@
             function processValue(value, currentDepth) {
                 if (!value) return '';
                 
-                // Handle AVAILABLE ACTION lines
+                // Handle AVAILABLE ACTION format
                 if (value.includes('AVAILABLE ACTION:')) {
                     return value.replace(
                         /AVAILABLE ACTION: (\w+) \((.*?)\)/g,
@@ -923,13 +1493,9 @@
                     );
                 }
                 
-                // Handle nested arrays
-                if (value.trim().startsWith('array (')) {
-                    return formatPhpArrayInternal(value.slice(value.indexOf('(') + 1, -1), currentDepth + 1);
-                }
-                
-                // Handle string values
-                if (value.trim().startsWith("'") && value.trim().endsWith("'")) {
+                // Handle string values (both single and double quotes)
+                if ((value.trim().startsWith("'") && value.trim().endsWith("'")) ||
+                    (value.trim().startsWith('"') && value.trim().endsWith('"'))) {
                     return `<span class="php-string">${value}</span>`;
                 }
                 
@@ -938,31 +1504,55 @@
                     return `<span class="php-number">${value}</span>`;
                 }
                 
-                return `<span class="php-string">${value}</span>`;
+                // Handle nested arrays
+                if (value.trim().startsWith('array (')) {
+                    // Prevent infinite recursion by checking depth
+                    if (currentDepth > 10) {
+                        return '<span class="php-array">array</span> ( ... )';
+                    }
+                    
+                    // Extract the array content between the outermost parentheses
+                    let openParens = 0;
+                    let startIndex = value.indexOf('(');
+                    let endIndex = value.length;
+                    
+                    for (let i = startIndex; i < value.length; i++) {
+                        if (value[i] === '(') openParens++;
+                        if (value[i] === ')') {
+                            openParens--;
+                            if (openParens === 0) {
+                                endIndex = i;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    const nestedContent = value.slice(startIndex + 1, endIndex).trim();
+                    return formatPhpArrayInternal(nestedContent, currentDepth + 1);
+                }
+                
+                return value;
             }
             
-            function formatPhpArrayInternal(inner, currentDepth) {
-                const lines = inner.split('\n');
+            function formatPhpArrayInternal(content, currentDepth = 0) {
+                const lines = content.split('\n');
                 let formattedLines = [];
                 
                 for (let i = 0; i < lines.length; i++) {
                     let line = lines[i].trim();
                     if (!line) continue;
                     
-                    // Handle key => value pairs
                     if (line.includes('=>')) {
                         let [key, ...valueParts] = line.split('=>');
                         let value = valueParts.join('=>').trim();
                         
-                        // Collect multi-line values
+                        // Handle multi-line array values
                         let openParens = (value.match(/\(/g) || []).length;
                         let closeParens = (value.match(/\)/g) || []).length;
                         
-                        while (i + 1 < lines.length && 
-                               (openParens > closeParens || 
-                                value.trim().startsWith('array (') && !value.trim().endsWith(')'))) {
+                        while (i + 1 < lines.length && openParens > closeParens) {
                             i++;
-                            let nextLine = lines[i];
+                            const nextLine = lines[i].trim();
                             value += '\n' + nextLine;
                             openParens += (nextLine.match(/\(/g) || []).length;
                             closeParens += (nextLine.match(/\)/g) || []).length;
@@ -979,14 +1569,313 @@
                     }
                 }
                 
-                return `<span class="php-array">array</span> (\n${formattedLines.join('\n')}\n${getIndent(currentDepth-1)})`;
+                return `<span class="php-array">array</span> (\n${formattedLines.join('\n')}\n${getIndent(Math.max(0, currentDepth - 1))})`;
             }
             
+            // Start the formatting process
             if (!content.startsWith('array (')) {
                 return content;
             }
             
-            return formatPhpArrayInternal(content.slice(content.indexOf('(') + 1, -1), 1);
+            const arrayContent = content.slice(content.indexOf('(') + 1, content.lastIndexOf(')')).trim();
+            return formatPhpArrayInternal(arrayContent, 1);
+        }
+
+        function parseOutputLog(content) {
+            return content.split('\n').map(line => {
+                if (!line.trim()) return '';
+                
+                // Skip separator lines
+                if (line.trim() === '==') {
+                    return '<hr style="border: 1px dashed var(--border-color); margin: 10px 0;">';
+                }
+                
+                // Handle timestamps
+                if (line.includes('START') || line.includes('END')) {
+                    const timestamp = line.match(/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2})/);
+                    if (timestamp) {
+                        return `<div class="log-line"><span class="timestamp">${timestamp[0]}</span></div>`;
+                    }
+                }
+                
+                // First check if it's a simple quoted string (not a JSON object)
+                const quotedStringMatch = line.trim().match(/^"(.*)"$/);
+                if (quotedStringMatch) {
+                    const content = quotedStringMatch[1]
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;');
+                    return `<div class="log-line"><span class="json-string">${content}</span></div>`;
+                }
+                
+                // Try to parse as JSON if it wasn't a simple quoted string
+                try {
+                    const json = JSON.parse(line);
+                    return `<div class="log-line">${formatDialogueJson(json)}</div>`;
+                } catch (e) {
+                    // If not valid JSON, try to highlight JSON-like content
+                    if (line.includes('{') && line.includes('}')) {
+                        return `<div class="log-line">${highlightIncompleteJson(line)}</div>`;
+                    }
+                    
+                    // Default sanitization for non-JSON lines
+                    const sanitizedLine = line
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;');
+                    return `<div class="log-line">${sanitizedLine}</div>`;
+                }
+            }).filter(line => line).join('\n');
+        }
+
+        function formatDialogueJson(json) {
+            const parts = [];
+            
+            function sanitizeAndQuote(str) {
+                return `"${String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')}"`;
+            }
+            
+            if (json.character) {
+                parts.push(`<span class="json-key">character</span>: <span class="json-string">${sanitizeAndQuote(json.character)}</span>`);
+            }
+            if (json.listener) {
+                parts.push(`<span class="json-key">listener</span>: <span class="json-string">${sanitizeAndQuote(json.listener)}</span>`);
+            }
+            if (json.mood) {
+                parts.push(`<span class="json-key">mood</span>: <span class="json-string">${sanitizeAndQuote(json.mood)}</span>`);
+            }
+            if (json.action) {
+                parts.push(`<span class="json-key">action</span>: <span class="json-string">${sanitizeAndQuote(json.action)}</span>`);
+            }
+            if (json.target) {
+                parts.push(`<span class="json-key">target</span>: <span class="json-string">${sanitizeAndQuote(json.target)}</span>`);
+            }
+            if (json.message) {
+                parts.push(`<span class="json-key">message</span>: <span class="json-string">${sanitizeAndQuote(json.message)}</span>`);
+            }
+            
+            return `{ ${parts.join(', ')} }`;
+        }
+
+        function highlightIncompleteJson(line) {
+            // Sanitize the line first
+            let sanitized = line
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+            
+            // Highlight property names
+            let highlighted = sanitized.replace(/"(\w+)"\s*:/g, '<span class="json-key">"$1"</span>:');
+            
+            // Highlight string values
+            highlighted = highlighted.replace(/:\s*"([^"]*?)"/g, ': <span class="json-string">"$1"</span>');
+            
+            // Highlight numbers
+            highlighted = highlighted.replace(/:\s*(\d+)/g, ': <span class="json-number">$1</span>');
+            
+            // Highlight booleans
+            highlighted = highlighted.replace(/:\s*(true|false)\b/g, ': <span class="json-boolean">$1</span>');
+            
+            // Highlight null
+            highlighted = highlighted.replace(/:\s*(null)\b/g, ': <span class="json-null">$1</span>');
+            
+            return highlighted;
+        }
+
+        function parseApacheLog(content) {
+            const lines = content.split('\n');
+            const processedLines = new Map(); // Use Map to track unique messages
+            
+            return lines.map(line => {
+                if (!line.trim()) return '';
+                
+                // Basic sanitization
+                line = line.replace(/[&<>"']/g, char => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                }[char]));
+                
+                // Extract timestamp and message
+                const timestampMatch = line.match(/\[([A-Za-z]{3} [A-Za-z]{3} \d{2} \d{2}:\d{2}:\d{2}\.\d{6} \d{4})\]/);
+                if (!timestampMatch) return '';
+                
+                const timestamp = timestampMatch[1];
+                let message = line.slice(timestampMatch[0].length).trim();
+                
+                // Extract log level
+                const levelMatch = message.match(/\[php:(notice|warn|error)\]/);
+                if (!levelMatch) return '';
+                
+                const level = levelMatch[1];
+                message = message.slice(levelMatch[0].length).trim();
+                
+                // Skip redundant speech generation logs
+                if (message.includes('Speech sent for') && message.includes('generator')) {
+                    return '';
+                }
+                
+                // Skip redundant audit logs
+                if (message.startsWith('Audit') && message.includes('elapsed time')) {
+                    return '';
+                }
+                
+                // Remove common prefixes and client info
+                message = message
+                    .replace(/\[pid [^\]]+\]/, '')
+                    .replace(/\[client [^\]]+\]/, '')
+                    .replace(/, referer: [^$\n]+$/, '');
+                
+                // Create a unique key for the message content
+                const messageKey = message.trim();
+                
+                // Skip if we've seen this exact message recently (within last 5 seconds)
+                const existingEntry = processedLines.get(messageKey);
+                if (existingEntry) {
+                    const existingTime = new Date(existingEntry.timestamp.replace(/\.\d+/, ''));
+                    const currentTime = new Date(timestamp.replace(/\.\d+/, ''));
+                    if (currentTime - existingTime < 5000) { // 5 seconds
+                        return '';
+                    }
+                }
+                
+                // Store this message with its timestamp
+                processedLines.set(messageKey, { timestamp });
+                
+                // If Map gets too large, remove old entries
+                if (processedLines.size > 1000) {
+                    const oldestKey = processedLines.keys().next().value;
+                    processedLines.delete(oldestKey);
+                }
+                
+                // Format the log line
+                let lineClass = level === 'error' ? 'error' : 
+                               level === 'warn' ? 'warning' : 
+                               'notice';
+                
+                return `<div class="log-line ${lineClass}">
+                    <span class="timestamp" title="${timestamp}">[${timestamp}]</span>
+                    <span class="log-module">
+                        <span>[php:</span><span class="log-level-${level}">${level}</span><span>]</span>
+                    </span>
+                    <span class="log-message">${message.trim()}</span>
+                </div>`;
+            }).filter(line => line).join('\n');
+        }
+
+        function syntaxHighlightJSON(json) {
+            if (typeof json !== 'object') return json;
+            
+            const formatValue = (value) => {
+                if (value === null) return '<span class="json-null">null</span>';
+                if (typeof value === 'string') return `<span class="json-string">"${value}"</span>`;
+                if (typeof value === 'number') return `<span class="json-number">${value}</span>`;
+                if (typeof value === 'boolean') return `<span class="json-boolean">${value}</span>`;
+                if (Array.isArray(value)) {
+                    return `[${value.map(formatValue).join(', ')}]`;
+                }
+                if (typeof value === 'object') {
+                    return formatObject(value);
+                }
+                return value;
+            };
+            
+            const formatObject = (obj) => {
+                const entries = Object.entries(obj).map(([key, value]) => 
+                    `<div class="json-entry"><span class="json-key">"${key}":</span> ${formatValue(value)}</div>`
+                );
+                return `<div class="json-formatted">{${entries.join('')}}</div>`;
+            };
+            
+            return formatObject(json);
+        }
+
+        function clearLog(button) {
+            const content = button.closest('.log-viewer').querySelector('.log-content');
+            content.innerHTML = '';
+        }
+
+        function applyPreset(element, filter) {
+            const viewer = element.closest('.log-viewer');
+            const filterInput = viewer.querySelector('.filter-input');
+            
+            if (element.classList.contains('active')) {
+                filterInput.value = '';
+                element.classList.remove('active');
+            } else {
+                viewer.querySelectorAll('.preset-filter').forEach(preset => 
+                    preset.classList.remove('active')
+                );
+                filterInput.value = filter;
+                element.classList.add('active');
+            }
+            
+            filterLog(filterInput);
+        }
+
+        function setupScrollHandler(viewer) {
+            const logContent = viewer.querySelector('.log-content');
+            const followButton = viewer.querySelector('.follow-button');
+            let isUserScrolling = false;
+            let scrollTimeout;
+
+            logContent.addEventListener('scroll', () => {
+                clearTimeout(scrollTimeout);
+                
+                // Calculate if we're near the bottom (increased threshold)
+                const isNearBottom = logContent.scrollHeight - logContent.scrollTop - logContent.clientHeight < 100;
+                
+                if (!isNearBottom && !isUserScrolling) {
+                    // User has scrolled up
+                    isUserScrolling = true;
+                    followButton.classList.remove('active');
+                    const config = Array.from(activeLogViewers.entries())
+                        .find(([_, v]) => v.viewer === viewer);
+                    if (config) {
+                        activeLogViewers.get(config[0]).follow = false;
+                    }
+                }
+
+                // Reset the user scrolling flag after 1 second of no scrolling
+                scrollTimeout = setTimeout(() => {
+                    isUserScrolling = false;
+                    // Check if we should re-enable follow
+                    if (isNearBottom) {
+                        followButton.classList.add('active');
+                        const config = Array.from(activeLogViewers.entries())
+                            .find(([_, v]) => v.viewer === viewer);
+                        if (config) {
+                            activeLogViewers.get(config[0]).follow = true;
+                        }
+                    }
+                }, 1000);
+            });
+        }
+
+        function toggleFollow(button) {
+            const viewer = button.closest('.log-viewer');
+            const logContent = viewer.querySelector('.log-content');
+            const config = Array.from(activeLogViewers.entries())
+                .find(([_, v]) => v.viewer === viewer);
+            
+            if (!config) return;
+            
+            const following = !button.classList.contains('active');
+            button.classList.toggle('active', following);
+            activeLogViewers.get(config[0]).follow = following;
+            
+            // Always scroll to bottom when toggling follow
+            logContent.scrollTop = logContent.scrollHeight;
+        }
+
+        function isFollowEnabled(viewer) {
+            return viewer.querySelector('.follow-button').classList.contains('active');
         }
 
         function saveConfiguration() {
@@ -995,65 +1884,103 @@
         }
 
         function filterLog(input) {
-            if (input.value === input.dataset.lastValue) return;
-            input.dataset.lastValue = input.value;
-            
             const viewer = input.closest('.log-viewer');
             const content = viewer.querySelector('.log-content');
+            const indicator = viewer.querySelector('.filter-active-indicator') || createFilterIndicator(viewer);
             
-            if (!input.value) {
-                // Show original content when filter is empty
+            const filterValue = input.value;
+            indicator.classList.toggle('active', !!filterValue);
+            
+            if (!filterValue) {
                 content.innerHTML = content.dataset.originalContent || '';
                 return;
             }
             
             try {
-                const regex = new RegExp(input.value, 'i'); // Case insensitive search
-                const lines = content.dataset.originalContent.split('\n');
+                const regex = new RegExp(filterValue, 'gi');
+                const lines = (content.dataset.originalContent || '').split(/(?=<div class="log-line)/);
                 
-                // Filter and join lines that match
                 const filteredContent = lines
-                    .filter(line => {
-                        // Skip empty lines and separators
-                        if (!line.trim() || line.includes('<hr')) return false;
+                    .map(line => {
+                        if (!line.trim()) return '';
                         
-                        // Extract text content from HTML
+                        // Create a temporary div to parse HTML
                         const div = document.createElement('div');
                         div.innerHTML = line;
                         const textContent = div.textContent || div.innerText;
-                        return regex.test(textContent);
+                        
+                        if (regex.test(textContent)) {
+                            // Reset regex lastIndex
+                            regex.lastIndex = 0;
+                            
+                            // Highlight matches while preserving HTML structure
+                            const elements = div.querySelectorAll('*');
+                            elements.forEach(el => {
+                                if (el.childNodes.length === 1 && el.childNodes[0].nodeType === 3) {
+                                    el.innerHTML = el.textContent.replace(regex, match => 
+                                        `<span class="filter-highlight">${match}</span>`
+                                    );
+                                }
+                            });
+                            
+                            return div.innerHTML;
+                        }
+                        return '';
                     })
-                    .join('\n');
+                    .filter(line => line)
+                    .join('');
                 
                 content.innerHTML = filteredContent;
                 
             } catch (e) {
-                // If regex is invalid, fall back to simple text search
-                const searchText = input.value.toLowerCase();
-                const lines = content.dataset.originalContent.split('\n');
+                // Fallback to simple text search if regex is invalid
+                const searchText = filterValue.toLowerCase();
+                const lines = (content.dataset.originalContent || '').split(/(?=<div class="log-line)/);
                 
                 const filteredContent = lines
-                    .filter(line => {
-                        if (!line.trim() || line.includes('<hr')) return false;
+                    .map(line => {
+                        if (!line.trim()) return '';
+                        
                         const div = document.createElement('div');
                         div.innerHTML = line;
                         const textContent = (div.textContent || div.innerText).toLowerCase();
-                        return textContent.includes(searchText);
+                        
+                        if (textContent.includes(searchText)) {
+                            // Highlight matches while preserving HTML structure
+                            const elements = div.querySelectorAll('*');
+                            elements.forEach(el => {
+                                if (el.childNodes.length === 1 && el.childNodes[0].nodeType === 3) {
+                                    el.innerHTML = el.textContent.replace(
+                                        new RegExp(searchText, 'gi'),
+                                        match => `<span class="filter-highlight">${match}</span>`
+                                    );
+                                }
+                            });
+                            
+                            return div.innerHTML;
+                        }
+                        return '';
                     })
-                    .join('\n');
+                    .filter(line => line)
+                    .join('');
                 
                 content.innerHTML = filteredContent;
             }
         }
 
+        function createFilterIndicator(viewer) {
+            const indicator = document.createElement('div');
+            indicator.className = 'filter-active-indicator';
+            viewer.querySelector('.filter-container').appendChild(indicator);
+            return indicator;
+        }
+
         function restoreDefaultLogs() {
-            // Close all current viewers
             Array.from(activeLogViewers.entries()).forEach(([_, data]) => {
                 data.viewer.remove();
             });
             activeLogViewers.clear();
             
-            // Open default logs
             DEFAULT_LOGS.forEach(logFile => {
                 const config = availableLogConfigs.find(c => c.file === logFile);
                 if (config) {
@@ -1097,6 +2024,45 @@
             return content;
         }
 
+        function setupCopyHandlers(viewer) {
+            const logContent = viewer.querySelector('.log-content');
+            let tooltip = null;
+
+            logContent.addEventListener('click', async (e) => {
+                const logLine = e.target.closest('.log-line');
+                if (!logLine) return;
+
+                // Get text content without HTML tags
+                const textContent = logLine.textContent || logLine.innerText;
+                
+                try {
+                    await navigator.clipboard.writeText(textContent);
+                    
+                    // Flash animation
+                    logLine.classList.add('copied');
+                    setTimeout(() => logLine.classList.remove('copied'), 500);
+
+                    // Show tooltip
+                    if (!tooltip) {
+                        tooltip = document.createElement('div');
+                        tooltip.className = 'copy-tooltip';
+                        document.body.appendChild(tooltip);
+                    }
+
+                    tooltip.textContent = 'Copied!';
+                    tooltip.style.left = `${e.pageX + 10}px`;
+                    tooltip.style.top = `${e.pageY + 10}px`;
+                    tooltip.classList.add('visible');
+
+                    setTimeout(() => {
+                        tooltip.classList.remove('visible');
+                    }, 1000);
+                } catch (err) {
+                    console.error('Failed to copy:', err);
+                }
+            });
+        }
+
         async function fetchAndUpdateLog(config) {
             const viewerData = activeLogViewers.get(config.file);
             if (!viewerData) return;
@@ -1109,29 +2075,39 @@
                 
                 if (data.content) {
                     const content = viewerData.viewer.querySelector('.log-content');
+                    const filterInput = viewerData.viewer.querySelector('.filter-input');
                     
                     if (viewerData.updateTimeout) {
                         clearTimeout(viewerData.updateTimeout);
                     }
                     
                     viewerData.updateTimeout = setTimeout(() => {
-                        const parsedContent = config.parser(data.content);
+                        content.classList.add('updating');
                         
+                        const parsedContent = config.parser(data.content);
                         content.dataset.originalContent = optimizeLogContent(
                             (content.dataset.originalContent || '') + parsedContent
                         );
                         
-                        const filterInput = viewerData.viewer.querySelector('.filter-input');
-                        if (filterInput.value) {
-                            filterLog(filterInput);
-                        } else {
-                            requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            if (filterInput.value) {
+                                filterLog(filterInput);
+                            } else {
                                 content.innerHTML = content.dataset.originalContent;
-                                if (viewerData.follow) {
-                                    content.scrollTop = content.scrollHeight;
-                                }
-                            });
-                        }
+                            }
+                            
+                            // Always scroll to bottom on initial load or if follow is enabled
+                            if (!viewerData.initialized || viewerData.follow) {
+                                content.scrollTop = content.scrollHeight;
+                            }
+                            
+                            // Mark as initialized after first content load
+                            if (!viewerData.initialized) {
+                                viewerData.initialized = true;
+                            }
+                            
+                            content.classList.remove('updating');
+                        });
                     }, 100);
                 }
                 
@@ -1146,13 +2122,14 @@
                 const response = await fetch('api/logs.php?list=1');
                 const data = await response.json();
                 
-                // Create configs for all available logs
                 availableLogConfigs = data.files.map(file => ({
                     name: file.name,
                     file: file.name,
+                    tooltip: getLogTooltip(file.name),
                     parser: file.name.includes('apache') ? parseApacheLog :
-                           file.name.includes('context') ? parseContextLog :
-                           file.name.includes('output') ? parseOutputLog :
+                           file.name.includes('context_sent_to_llm') ? parseContextLog :
+                           file.name.includes('minai.log') ? parseMinaiLog :
+                           file.name.includes('output_from_llm') ? parseOutputLog :
                            defaultLogParser,
                     presets: file.name.includes('apache') ? [
                         { name: 'MinAI Only', filter: 'minai' },
@@ -1161,11 +2138,9 @@
                     ] : []
                 }));
 
-                // Load saved configuration or defaults
                 const savedConfig = JSON.parse(localStorage.getItem('logViewerConfig') || '[]');
                 const logsToLoad = savedConfig.length > 0 ? savedConfig : DEFAULT_LOGS;
 
-                // Create viewers for default/saved logs
                 logsToLoad.forEach(logFile => {
                     const config = availableLogConfigs.find(c => c.file === logFile);
                     if (config && !activeLogViewers.has(config.file)) {
@@ -1201,13 +2176,13 @@
             currentLayout = columns;
             localStorage.setItem('logViewerLayout', columns);
             
-            // Update button states
-            document.querySelectorAll('.layout-button').forEach(button => {
-                button.classList.remove('active');
-            });
-            document.querySelector(`.layout-button:nth-child(${columns})`).classList.add('active');
+            const container = document.getElementById('logContainer');
+            container.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
             
-            updateLayout();
+            document.querySelectorAll('.layout-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.layout-button[onclick="setLayout(${columns})"]`).classList.add('active');
         }
 
         function updateLayout() {
@@ -1215,33 +2190,62 @@
             const viewers = Array.from(document.querySelectorAll('.log-viewer'));
             const containerWidth = container.clientWidth;
             
-            // Set grid columns based on layout selection
             container.style.gridTemplateColumns = `repeat(${currentLayout}, 1fr)`;
             
-            // Reset all viewer widths to auto
             viewers.forEach(viewer => {
                 viewer.style.width = 'auto';
                 viewer.style.maxWidth = '100%';
             });
         }
 
-        // Update window.onload to set initial layout
-        window.addEventListener('load', () => {
+        document.addEventListener('DOMContentLoaded', () => {
             setLayout(currentLayout);
         });
 
         function createLogViewer(config) {
             const viewer = document.createElement('div');
-            viewer.className = 'log-viewer wrap'; // Default to wrap
+            viewer.className = 'log-viewer wrap';
+            
+            // Add LLM output class if this is the output log
+            if (config.file === 'output_from_llm.log') {
+                viewer.classList.add('llm-output');
+            }
+            
+            // Add expand/collapse buttons only for context log
+            const extraControls = config.file === 'context_sent_to_llm.log' ? `
+                <button class="expand-all-button" onclick="expandAllEntries(this)">Expand</button>
+                <button class="collapse-all-button" onclick="collapseAllEntries(this)">Collapse</button>
+            ` : '';
             
             viewer.innerHTML = `
                 <div class="log-header">
-                    <span class="log-title">${config.name}</span>
+                    <span class="log-title" title="${config.tooltip}">${config.name}
+                        ${config.tooltip ? `<span class="tooltip-icon">ⓘ</span>` : ''}
+                    </span>
                     <div class="log-controls">
-                        <button class="wrap-button active" onclick="toggleWrap(this)">Wrap</button>
-                        <button class="follow-button active" onclick="toggleFollow(this)">Follow</button>
-                        <button class="download-button" onclick="downloadLog('${config.file}')">Download</button>
-                        <button onclick="closeLogViewer(this)">Close</button>
+                        <button class="wrap-button active" onclick="toggleWrap(this)" title="Toggle Word Wrap">
+                            ↵
+                        </button>
+                        ${config.file === 'context_sent_to_llm.log' ? `
+                            <button class="expand-all-button" onclick="expandAllEntries(this)" title="Expand All">
+                                ⤵
+                            </button>
+                            <button class="collapse-all-button" onclick="collapseAllEntries(this)" title="Collapse All">
+                                ⤴
+                            </button>
+                        ` : ''}
+                        <button class="follow-button active" onclick="toggleFollow(this)" title="Auto-scroll to Bottom">
+                            ⟱
+                        </button>
+                        <button class="download-button" onclick="downloadLog('${config.file}')" title="Download Log">
+                            ⭳
+                        </button>
+                        <button class="maximize-button" onclick="toggleMaximize(this)" title="Maximize">
+                            ⛶
+                        </button>
+                        <button onclick="closeLogViewer(this)" title="Close">
+                            ✕
+                        </button>
                     </div>
                 </div>
                 ${config.presets.length > 0 ? `
@@ -1261,11 +2265,19 @@
             activeLogViewers.set(config.file, { 
                 position: 0, 
                 viewer,
-                follow: true
+                follow: true,  // Set follow to true by default
+                initialized: false  // Add initialization flag
             });
             
             setupScrollHandler(viewer);
+            setupCopyHandlers(viewer);
             saveConfiguration();
+            
+            // Ensure initial scroll to bottom
+            const logContent = viewer.querySelector('.log-content');
+            requestAnimationFrame(() => {
+                logContent.scrollTop = logContent.scrollHeight;
+            });
             
             return viewer;
         }
@@ -1279,12 +2291,11 @@
                 activeLogViewers.delete(config[0]);
                 viewer.remove();
                 saveConfiguration();
-                updateLayout();  // Update layout after removing a viewer
+                updateLayout();
             }
         }
 
         function downloadLog(filename) {
-            // Create a hidden link and click it to trigger the download
             const link = document.createElement('a');
             link.href = `api/logs.php?download=${encodeURIComponent(filename)}`;
             link.download = filename;
@@ -1309,11 +2320,9 @@
             
             if (!question) return;
             
-            // Disable input and button
             input.disabled = true;
             button.disabled = true;
             
-            // Start timer
             const startTime = Date.now();
             const updateTimer = setInterval(() => {
                 const elapsed = Math.floor((Date.now() - startTime) / 1000);
@@ -1321,7 +2330,6 @@
                 statusIndicator.className = 'status-indicator visible';
             }, 1000);
             
-            // Show loading overlay
             content.innerHTML = `
                 <div class="loading-overlay">
                     <div class="loading-spinner"></div>
@@ -1334,7 +2342,7 @@
             
             try {
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
+                const timeoutId = setTimeout(() => controller.abort(), 60000);
                 
                 const response = await fetch('api/troubleshoot.php', {
                     method: 'POST',
@@ -1358,7 +2366,6 @@
                 
                 const data = await response.json();
                 
-                // Show success status briefly
                 statusIndicator.textContent = `Request completed in ${Math.floor((Date.now() - startTime) / 1000)}s`;
                 statusIndicator.className = 'status-indicator visible success';
                 setTimeout(() => {
@@ -1366,24 +2373,55 @@
                 }, 3000);
                 
                 content.innerHTML = `
-                    <div style="margin-bottom: 15px;">
-                        <strong>Question:</strong> ${question}<br><br>
-                        <strong>Analysis:</strong> ${data.analysis}<br><br>
-                        <details>
-                            <summary>Show Context and Output</summary>
-                            <div style="margin-top: 10px;">
-                                <strong>Context:</strong><br>
-                                <pre>${data.context}</pre><br>
-                                <strong>Output:</strong><br>
-                                <div class="timestamp">
-                                    <span class="timestamp-label">Start:</span> ${data.timestamps.output_start}
-                                </div>
+                    <div class="troubleshoot-response">
+                        <div class="troubleshoot-section">
+                            <h3>Question</h3>
+                            ${question}
+                        </div>
+                        
+                        <div class="troubleshoot-section">
+                            <h3>Analysis</h3>
+                            <div class="analysis-content">${data.analysis
+                                // Convert markdown to HTML
+                                .replace(/##\s+([^\n]+)/g, '<h2>$1</h2>')
+                                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                                .replace(/^\s*>\s*(.+)$/gm, '<blockquote>$1</blockquote>')
+                                // Handle bullet points with different levels and styles
+                                .replace(/^•\s+([^\n]+)/gm, '<div class="bullet-point">• $1</div>')
+                                .replace(/^\s{2,}\*\s+([^\n]+)/gm, '<div class="sub-bullet-point">∗ $1</div>')
+                                .replace(/^\s*-\s+([^\n]+)/gm, '<div class="bullet-point">• $1</div>')
+                                .replace(/^\s{2,}-\s+([^\n]+)/gm, '<div class="sub-bullet-point">∗ $1</div>')
+                                // Handle newlines
+                                .replace(/\n\n+/g, '<br><br>')
+                                .replace(/\n(?![<\s])/g, '<br>')
+                                // Clean up
+                                .replace(/<br>\s*<h2>/g, '<h2>')
+                                .replace(/<\/h2>\s*<br>/g, '</h2>')
+                                .replace(/<br>\s*<blockquote>/g, '<blockquote>')
+                                .replace(/<\/blockquote>\s*<br>/g, '</blockquote>')
+                                .replace(/<br>\s*<div class="bullet-point">/g, '<div class="bullet-point">')
+                                .replace(/<br>\s*<div class="sub-bullet-point">/g, '<div class="sub-bullet-point">')
+                            }</div>
+                        </div>
+
+                        <details class="troubleshoot-details">
+                            <summary>Show Technical Details</summary>
+                            
+                            <div class="troubleshoot-section">
+                                <h3>Context</h3>
+                                <pre>${data.context}</pre>
+                            </div>
+
+                            <div class="troubleshoot-section">
+                                <h3>Output</h3>
+                                <div class="timestamp">Start: ${data.timestamps.output_start}</div>
                                 <pre>${data.output}</pre>
-                                <div class="timestamp">
-                                    <span class="timestamp-label">End:</span> ${data.timestamps.output_end}
-                                </div>
-                                <br>
-                                <strong>Recent Error Logs:</strong><br>
+                                <div class="timestamp">End: ${data.timestamps.output_end}</div>
+                            </div>
+
+                            <div class="troubleshoot-section">
+                                <h3>Recent Error Logs</h3>
                                 <pre class="error-log">${data.error_log}</pre>
                             </div>
                         </details>
@@ -1391,7 +2429,6 @@
                 `;
                 
             } catch (error) {
-                // Show error status
                 statusIndicator.textContent = error.name === 'AbortError' ? 
                     'Request timed out after 60s' : 
                     'Request failed';
@@ -1407,14 +2444,12 @@
                 
             } finally {
                 clearInterval(updateTimer);
-                // Re-enable input and button
                 input.disabled = false;
                 button.disabled = false;
                 input.focus();
             }
         }
 
-        // Add enter key support for the input
         document.querySelector('.troubleshoot-input').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 askQuestion();
@@ -1450,7 +2485,6 @@
             let isDragging = false;
             let startX, startY, startWidth, startHeight, startLeft;
             
-            // Load saved size and position
             const savedSize = JSON.parse(localStorage.getItem('troubleshootSize') || '{}');
             if (savedSize.width) {
                 panel.style.width = savedSize.width + 'px';
@@ -1461,7 +2495,6 @@
                 panel.style.transform = 'none';
             }
             
-            // Resize functionality
             resizeHandle.addEventListener('mousedown', (e) => {
                 isResizing = true;
                 startX = e.clientX;
@@ -1472,7 +2505,6 @@
                 e.preventDefault();
             });
             
-            // Drag functionality - constrained to bottom
             header.addEventListener('mousedown', (e) => {
                 if (e.target === header || e.target.parentElement === header) {
                     isDragging = true;
@@ -1491,7 +2523,6 @@
                     const newHeight = startHeight + dy;
                     const newLeft = startLeft - dx;
                     
-                    // Enforce minimum and maximum sizes
                     if (newWidth >= 300 && newWidth <= window.innerWidth * 0.9) {
                         panel.style.width = newWidth + 'px';
                         panel.style.left = newLeft + 'px';
@@ -1503,7 +2534,6 @@
                     const dx = e.clientX - startX;
                     const newLeft = startLeft + dx;
                     
-                    // Keep panel within window bounds
                     if (newLeft >= 0 && newLeft + panel.offsetWidth <= window.innerWidth) {
                         panel.style.left = newLeft + 'px';
                     }
@@ -1523,13 +2553,11 @@
             });
         }
         
-        // Initialize the panel when the page loads
         document.addEventListener('DOMContentLoaded', function() {
             initTroubleshootPanel();
             
-            // Restore troubleshooter visibility and model preference
             const troubleshootVisible = localStorage.getItem('troubleshootVisible') === 'true';
-            const useRecommendedModel = localStorage.getItem('useRecommendedModel') !== 'false'; // Default to true
+            const useRecommendedModel = localStorage.getItem('useRecommendedModel') !== 'false';
             
             document.getElementById('useRecommendedModel').checked = useRecommendedModel;
             document.getElementById('useRecommendedModel').addEventListener('change', saveModelPreference);
@@ -1547,6 +2575,260 @@
         function saveModelPreference() {
             const useRecommendedModel = document.getElementById('useRecommendedModel').checked;
             localStorage.setItem('useRecommendedModel', useRecommendedModel);
+        }
+
+        // Add these functions
+        function toggleEntry(header) {
+            const entry = header.closest('.collapsible-entry');
+            entry.classList.toggle('expanded');
+            const indicator = header.querySelector('.expand-indicator');
+            indicator.textContent = entry.classList.contains('expanded') ? '▼' : '▶';
+        }
+
+        function expandAllEntries(button) {
+            const viewer = button.closest('.log-viewer');
+            viewer.querySelectorAll('.collapsible-entry').forEach(entry => {
+                entry.classList.add('expanded');
+                entry.querySelector('.expand-indicator').textContent = '▼';
+            });
+        }
+
+        function collapseAllEntries(button) {
+            const viewer = button.closest('.log-viewer');
+            viewer.querySelectorAll('.collapsible-entry').forEach(entry => {
+                entry.classList.remove('expanded');
+                entry.querySelector('.expand-indicator').textContent = '▶';
+            });
+        }
+
+        // Add these styles to the existing <style> section
+        function addContextLogStyles() {
+            const styleSheet = document.createElement('style');
+            styleSheet.textContent = `
+                .role-entry {
+                    margin: 10px 0;
+                    padding: 8px;
+                    background: rgba(0, 0, 0, 0.2);
+                    border-radius: 4px;
+                }
+                
+                .role-label {
+                    display: inline-block;
+                    padding: 2px 6px;
+                    border-radius: 3px;
+                    font-size: 0.9em;
+                    margin-bottom: 4px;
+                }
+                
+                .role-label.system {
+                    background: rgba(33, 150, 243, 0.2);
+                    color: #2196f3;
+                }
+                
+                .role-label.user {
+                    background: rgba(76, 175, 80, 0.2);
+                    color: #4caf50;
+                }
+                
+                .role-label.assistant {
+                    background: rgba(156, 39, 176, 0.2);
+                    color: #9c27b0;
+                }
+                
+                .role-content {
+                    margin-top: 4px;
+                    white-space: pre-wrap;
+                }
+                
+                .section-header {
+                    color: var(--primary-color);
+                    margin: 15px 0 10px 0;
+                    font-size: 1.1em;
+                    font-weight: 500;
+                }
+                
+                .info-line {
+                    margin: 5px 0;
+                }
+                
+                .info-label {
+                    color: var(--info-color);
+                    font-weight: 500;
+                }
+                
+                .numeric-value {
+                    color: var(--warning-color);
+                    font-family: 'Consolas', monospace;
+                }
+                
+                .entry-timestamp {
+                    color: var(--info-color);
+                    font-family: 'Consolas', monospace;
+                    font-size: 0.9em;
+                }
+                
+                /* Enhance collapsible entries */
+                .collapsible-entry {
+                    margin: 10px 0;
+                    border: 1px solid var(--border-color);
+                    border-radius: 6px;
+                    overflow: hidden;
+                }
+                
+                .collapsible-header {
+                    padding: 10px;
+                    background: rgba(255, 255, 255, 0.05);
+                    cursor: pointer;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+                
+                .collapsible-header:hover {
+                    background: rgba(255, 255, 255, 0.08);
+                }
+                
+                .collapsible-content {
+                    padding: 15px;
+                    display: none;
+                    background: rgba(0, 0, 0, 0.2);
+                }
+                
+                .collapsible-entry.expanded .collapsible-content {
+                    display: block;
+                }
+
+                .narrator-line {
+                    color: var(--info-color);
+                    font-style: italic;
+                    margin: 4px 0;
+                    padding: 2px 0;
+                }
+                
+                .dialogue-line {
+                    margin: 4px 0;
+                    padding: 2px 0;
+                }
+                
+                .dialogue-line .speaker {
+                    color: var(--primary-color);
+                    font-weight: 500;
+                }
+                
+                .dialogue-line .dialogue-text {
+                    margin-left: 8px;
+                    color: var(--text-color);
+                }
+                
+                .dialogue-line .dialogue-target {
+                    margin-left: 8px;
+                    color: var(--info-color);
+                    font-style: italic;
+                    font-size: 0.9em;
+                }
+                
+                .role-content {
+                    margin-top: 4px;
+                    white-space: pre-wrap;
+                    line-height: 1.4;
+                }
+                
+                .info-line {
+                    margin: 5px 0;
+                    display: flex;
+                    align-items: baseline;
+                    gap: 8px;
+                }
+                
+                .info-label {
+                    color: var(--info-color);
+                    font-weight: 500;
+                    flex: 0 0 auto;
+                }
+            `;
+            document.head.appendChild(styleSheet);
+        }
+
+        // Call this when the document loads
+        document.addEventListener('DOMContentLoaded', addContextLogStyles);
+
+        // Add this helper function to get tooltips
+        function getLogTooltip(filename) {
+            const tooltips = {
+                'context_sent_to_llm.log': 'Prompt sent to LLM for CHIM requests',
+                'output_from_llm.log': 'Response from LLM for CHIM requests. Most responses will be here.',
+                'apache_error.log': 'CHIM server log',
+                'minai.log': 'MinAI server log',
+                'minai_context_sent_to_llm.log': 'Requests sent to the LLM from MinAI for things like the roleplay feature',
+                'minai_output_from_llm.log': 'Responses from the LLM for things like the roleplay feature'
+            };
+            return tooltips[filename] || '';
+        }
+
+        // Add this new function to handle maximize/restore
+        function toggleMaximize(button) {
+            const viewer = button.closest('.log-viewer');
+            const container = document.getElementById('logContainer');
+            const isMaximized = viewer.classList.toggle('maximized');
+            
+            // Update button text
+            button.innerHTML = isMaximized ? '⮌' : '⛶';
+            button.title = isMaximized ? 'Restore' : 'Maximize';
+            
+            // Save previous layout if maximizing
+            if (isMaximized) {
+                viewer.dataset.previousParent = viewer.parentElement.id;
+                viewer.dataset.previousPosition = Array.from(viewer.parentElement.children).indexOf(viewer);
+                document.body.style.overflow = 'hidden';
+                document.body.appendChild(viewer);
+            } else {
+                // Restore to previous position
+                document.body.style.overflow = '';
+                const previousPosition = parseInt(viewer.dataset.previousPosition);
+                const children = Array.from(container.children);
+                
+                if (previousPosition >= children.length) {
+                    container.appendChild(viewer);
+                } else {
+                    container.insertBefore(viewer, children[previousPosition]);
+                }
+            }
+            
+            // Trigger a resize event to update any internal layouts
+            window.dispatchEvent(new Event('resize'));
+        }
+
+        // Add event listener to handle Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const maximizedViewer = document.querySelector('.log-viewer.maximized');
+                if (maximizedViewer) {
+                    const maximizeButton = maximizedViewer.querySelector('.maximize-button');
+                    toggleMaximize(maximizeButton);
+                }
+            }
+        });
+
+        // Add these new functions to handle follow all and fix the double-click issue
+        function toggleFollowAll(button) {
+            const isFollowing = button.classList.toggle('active');
+            document.querySelectorAll('.log-viewer').forEach(viewer => {
+                const followButton = viewer.querySelector('.follow-button');
+                const logContent = viewer.querySelector('.log-content');
+                
+                // Update follow button state
+                followButton.classList.toggle('active', isFollowing);
+                
+                // Get config and update follow state
+                const config = Array.from(activeLogViewers.entries())
+                    .find(([_, v]) => v.viewer === viewer);
+                if (config) {
+                    activeLogViewers.get(config[0]).follow = isFollowing;
+                    if (isFollowing) {
+                        logContent.scrollTop = logContent.scrollHeight;
+                    }
+                }
+            });
         }
     </script>
 </body>

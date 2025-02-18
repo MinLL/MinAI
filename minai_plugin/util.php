@@ -1,5 +1,7 @@
 <?php
+require_once("logger.php");
 define("MINAI_ACTOR_VALUE_CACHE", "minai_actor_value_cache");
+require_once("db_utils.php");
 require_once("importDataToDB.php");
 
 $GLOBALS[MINAI_ACTOR_VALUE_CACHE] = [];
@@ -35,12 +37,12 @@ Function BuildActorValueCache($name) {
     $idPrefix = $GLOBALS["db"]->escape($idPrefix);
     $query = "select * from conf_opts where LOWER(id) like LOWER('{$idPrefix}%')";
     $ret = $GLOBALS["db"]->fetchAll($query);
-    // error_log("Building cache for $name");
+    // minai_log("info", "Building cache for $name");
     foreach ($ret as $row) {
         //do this instead of split // because $name could have // in it
         $key = substr(strtolower($row['id']), $origLength);
         $value = $row['value'];
-        // error_log($name . ':: (' . $key . ') ' . $row['id'] . ' = ' . $row['value']);
+        // minai_log("info", $name . ':: (' . $key . ') ' . $row['id'] . ' = ' . $row['value']);
         $GLOBALS[MINAI_ACTOR_VALUE_CACHE][$name][$key] = $value;
     }
 }
@@ -64,7 +66,7 @@ function CanVibrate($name) {
 // Return the specified actor value.
 // Caches the results of several queries that are repeatedly referenced.
 Function GetActorValue($name, $key, $preserveCase=false, $skipCache=false) {
-    // error_log("Looking up $name: $key");
+    // minai_log("info", "Looking up $name: $key");
     If (!$preserveCase && !$skipCache) {
         $name = strtolower($name);
         $key = strtolower($key);
@@ -72,7 +74,7 @@ Function GetActorValue($name, $key, $preserveCase=false, $skipCache=false) {
         If (!HasActorValueCache($name)) {
             BuildActorValueCache($name);
         }
-        // error_log("Checking cache: $name, $key");
+        // minai_log("info", "Checking cache: $name, $key");
         $ret = GetActorValueCache($name, $key);
         return $ret === null ? "" : strtolower($ret);
     }
@@ -120,7 +122,7 @@ $GLOBALS["GenericFuncRet"] =function($gameRequest) {
     // BY default, request will be $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdSpankAss"]
     // $gameRequest = [type of message,localts,gamets,data]
     $GLOBALS["FORCE_MAX_TOKENS"]=48;    // We can overwrite anything here using $GLOBALS;
-   
+
     if (stripos($gameRequest[3],"error")!==false) // Papyrus returned error
         return ["argName"=>"target","request"=>"{$GLOBALS["HERIKA_NAME"]} says sorry about unable to complete the task. {$GLOBALS["TEMPLATE_DIALOG"]}"];
     else
@@ -236,17 +238,17 @@ Function IsActionEnabled($actionName) {
 Function RegisterAction($actionName) {
     if (IsActionEnabled($actionName)) {
         $GLOBALS["ENABLED_FUNCTIONS"][]=$actionName;
-        // error_log("minai: Registering {$actionName}");
+        // minai_log("info", "Registering {$actionName}");
     }
     else {
-        // error_log("minai: Not Registering {$actionName}");
+        // minai_log("info", "Not Registering {$actionName}");
     }
 }
 
 
 
 // Override player name
-if ($GLOBALS["force_aiff_name_to_ingame_name"]) {
+if (isset($GLOBALS["force_aiff_name_to_ingame_name"]) && $GLOBALS["force_aiff_name_to_ingame_name"]) {
     $playerName = GetActorValue("PLAYER", "playerName", true);
     if ($playerName) {
         $GLOBALS["PLAYER_NAME"] = $playerName;
@@ -283,11 +285,11 @@ Function StoreRadiantActors($actor1, $actor2) {
             'value' => 'TRUE'
         )
     );
-    error_log("minai: Storing Radiant Actors");
+    minai_log("info", "Storing Radiant Actors");
 }
 
 Function ClearRadiantActors() {
-    error_log("minai: Clearing Radiant Actors");
+    // minai_log("info", "Clearing Radiant Actors");
     $db = $GLOBALS['db'];
     $id = "_minai_RADIANT//actor1";
     $db->delete("conf_opts", "id='{$id}'");
@@ -335,7 +337,7 @@ Function IsRadiant() {
 }
 
 function getScene($actor, $threadId = null) {
-    error_log("minai: getScene($actor, $threadId)");
+    //minai_log("info", "getScene($actor, $threadId)");
     
     // Properly escape the actor name for PostgreSQL
     $actor = $GLOBALS["db"]->escape($actor);
@@ -354,7 +356,7 @@ function getScene($actor, $threadId = null) {
     }
 
     if(!$scene) {
-        error_log("minai: No scene found.")     ;
+        // minai_log("info", "No scene found.")     ;
         return null;
     }
     $scene = $scene[0];
@@ -420,7 +422,7 @@ function getScene($actor, $threadId = null) {
     $actors = explode(",", $scene["actors"]);
     $sceneDesc = replaceActorsNamesInSceneDesc($actors, $sceneDesc);
     $scene["description"] = $sceneDesc;
-    error_log("minai: Returning scene: $sceneDesc.");
+    minai_log("info", "Returning scene: $sceneDesc.");
 
     return $scene;
 }
@@ -441,7 +443,7 @@ During sex {$GLOBALS["HERIKA_NAME"]}:
 - prefers these positions: ".implode(", ", $jsonXPersonality["preferredSexPositions"]).";
 - likes to participate in such sex activities: ".implode(", ", $jsonXPersonality["sexualBehavior"]).";
 - has secret sex fantasies:
-  ".implode("\n  ",$jsonXPersonality["sexFantasies"]);
+".implode("\n  ",$jsonXPersonality["sexFantasies"]);
     }
 }
 
@@ -524,59 +526,59 @@ function getTargetDuringSex($scene) {
 }
 
 function GetRevealedStatus($name) {
-  $cuirass = GetActorValue($name, "cuirass", false, true);
-  
-  $wearingBottom = false;
-  $wearingTop = false;
-  
-  // if $eqContext["context"] not empty, then will set ret
-  if (!empty($cuirass)) {
-      $wearingTop = true;
-  }
-  if (HasKeyword($name, "SLA_HalfNakedBikini")) {
-    $wearingTop = true;
-  }
-  if (HasKeyword($name, "SLA_ArmorHalfNaked")) {
-    $wearingTop = true;
-  }
-  if (HasKeyword($name, "SLA_Brabikini" )) {
-    $wearingTop = true;
-  }
-  if (HasKeyword($name, "SLA_Thong")) {
-    $wearingBottom = true;
-  }
-  if (HasKeyword($name, "SLA_PantiesNormal")) {
-    $wearingBottom = true;
-  }
-  if (HasKeyword($name, "SLA_PantsNormal")) {
-    $wearingBottom = true;
-  }
-  if (HasKeyword($name, "SLA_MicroHotPants")) {
-    $wearingBottom = true;
-  }
+$cuirass = GetActorValue($name, "cuirass", false, true);
 
-  if (HasKeyword($name, "SLA_ArmorTransparent")) {
+$wearingBottom = false;
+$wearingTop = false;
+
+// if $eqContext["context"] not empty, then will set ret
+if (!empty($cuirass)) {
+    $wearingTop = true;
+}
+if (HasKeyword($name, "SLA_HalfNakedBikini")) {
+    $wearingTop = true;
+}
+if (HasKeyword($name, "SLA_ArmorHalfNaked")) {
+    $wearingTop = true;
+}
+if (HasKeyword($name, "SLA_Brabikini" )) {
+    $wearingTop = true;
+}
+if (HasKeyword($name, "SLA_Thong")) {
+    $wearingBottom = true;
+}
+if (HasKeyword($name, "SLA_PantiesNormal")) {
+    $wearingBottom = true;
+}
+if (HasKeyword($name, "SLA_PantsNormal")) {
+    $wearingBottom = true;
+}
+if (HasKeyword($name, "SLA_MicroHotPants")) {
+    $wearingBottom = true;
+}
+
+if (HasKeyword($name, "SLA_ArmorTransparent")) {
     $wearingBottom = false;
     $wearingTop = false;
-  }
-  if (HasKeyword($name, "SLA_ArmorLewdLeotard")) {
+}
+if (HasKeyword($name, "SLA_ArmorLewdLeotard")) {
     $wearingBottom = true;
     $wearingTop = true;
-  }
-  if (HasKeyword($name, "SLA_PelvicCurtain")) {
+}
+if (HasKeyword($name, "SLA_PelvicCurtain")) {
     $wearingBottom = true;
-  }
-  if (HasKeyword($name, "SLA_FullSkirt")) {
+}
+if (HasKeyword($name, "SLA_FullSkirt")) {
     $wearingBottom = true;
-  }
-  if (HasKeyword($name, "SLA_MiniSkirt")) {
+}
+if (HasKeyword($name, "SLA_MiniSkirt")) {
     $wearingBottom = true;
-  }
-  if (HasKeyword($name, "EroticArmor")) {
-      $wearingBottom = true;
-      $wearingTop = true;
-  }
-  return ["wearingTop" => $wearingTop, "wearingBottom" => $wearingBottom];
+}
+if (HasKeyword($name, "EroticArmor")) {
+    $wearingBottom = true;
+    $wearingTop = true;
+}
+return ["wearingTop" => $wearingTop, "wearingBottom" => $wearingBottom];
 }
 
 Function IsExplicitScene() {
@@ -594,9 +596,12 @@ Function IsExplicitScene() {
 }
 
 Function SetNarratorPrompts($isFirstPerson = false) {
+    // Get the player's input if any
+    $playerInput = isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"] != "" ? $GLOBALS["gameRequest"][3] : "";
+    
     if ($isFirstPerson) {
         if (IsExplicitScene()) {
-            $GLOBALS["PROMPTS"]["minai_narrator_talk"] = [
+            $narratorPrompt = [
                 "cue" => [
                     "write a first-person erotic narrative response as {$GLOBALS["PLAYER_NAME"]}, focusing entirely on your immediate physical sensations and emotional state. Describe in vivid detail exactly what you are feeling in this moment, both physically and mentally."
                 ],
@@ -605,9 +610,9 @@ Function SetNarratorPrompts($isFirstPerson = false) {
                 ]
             ];
             
-            $GLOBALS["TEMPLATE_DIALOG"] = "Respond in first-person perspective as {$GLOBALS["PLAYER_NAME"]}, describing only your current physical and emotional state. Focus purely on the present moment - what you're feeling, how your body is responding, and your immediate emotional reactions. Don't reflect on the past or future, stay completely in the now.";
+            $templateDialog = "Respond in first-person perspective as {$GLOBALS["PLAYER_NAME"]}, describing only your current physical and emotional state. Focus purely on the present moment - what you're feeling, how your body is responding, and your immediate emotional reactions. Don't reflect on the past or future, stay completely in the now.";
         } else {
-            $GLOBALS["PROMPTS"]["minai_narrator_talk"] = [
+            $narratorPrompt = [
                 "cue" => [
                     "write a first-person narrative response as {$GLOBALS["PLAYER_NAME"]}, describing your thoughts, feelings, and experiences in this moment. Speak introspectively about your journey and current situation."
                 ],
@@ -616,25 +621,44 @@ Function SetNarratorPrompts($isFirstPerson = false) {
                 ]
             ];
             
-            $GLOBALS["TEMPLATE_DIALOG"] = "Respond in first-person perspective as {$GLOBALS["PLAYER_NAME"]}, sharing your personal thoughts and feelings.";
+            $templateDialog = "Respond in first-person perspective as {$GLOBALS["PLAYER_NAME"]}, sharing your personal thoughts and feelings.";
         }
     } else {
         if (IsExplicitScene()) {
-            $GLOBALS["PROMPTS"]["minai_narrator_talk"] = [
+            $narratorPrompt = [
                 "cue" => [
                     "write a response as The Narrator, describing {$GLOBALS["PLAYER_NAME"]}'s immediate physical and emotional experiences in vivid sensual detail. Focus entirely on what she is feeling in this exact moment."
                 ]
             ];
             
-            $GLOBALS["TEMPLATE_DIALOG"] = "You are The Narrator. Describe the intense sensations and emotions being experienced right now, focusing purely on the present moment.";
+            $templateDialog = "You are The Narrator. Describe the intense sensations and emotions being experienced right now, focusing purely on the present moment.";
         } else {
-            $GLOBALS["PROMPTS"]["minai_narrator_talk"] = [
+            $narratorPrompt = [
                 "cue" => [
                     "write a response as The Narrator, speaking from an omniscient perspective about the world and the player's journey."
                 ]
             ];
             
-            $GLOBALS["TEMPLATE_DIALOG"] = "You are The Narrator. Respond in an omniscient, storyteller-like manner.";
+            $templateDialog = "You are The Narrator. Respond in an omniscient, storyteller-like manner.";
+        }
+    }
+
+    // Add player_request only if there was actual input
+    if (!empty($playerInput)) {
+        $narratorPrompt["player_request"] = [
+            $playerInput
+        ];
+    }
+
+    // Set the base prompts
+    $GLOBALS["PROMPTS"]["minai_narrator_talk"] = $narratorPrompt;
+    $GLOBALS["TEMPLATE_DIALOG"] = $templateDialog;
+
+    // If Herika is The Narrator, set additional prompts for player input types
+    if ($GLOBALS["HERIKA_NAME"] == "The Narrator") {
+        $inputTypes = ["inputtext", "inputtext_s", "ginputtext", "ginputtext_s", "instruction", "init"];
+        foreach ($inputTypes as $type) {
+            $GLOBALS["PROMPTS"][$type] = $narratorPrompt;
         }
     }
 }
@@ -703,11 +727,11 @@ class Utilities {
             // for methods attached to this class
             return call_user_func(array($this, $name), $params);
         } else if ($this->hasMethod($name)) {
-           // function exists outside of class in this utlities file
-           return $name(...$params); 
+        // function exists outside of class in this utlities file
+        return $name(...$params); 
         }
         else {
-            error_log("Error calling Utilities clas: ". $name . " is not defined as a method or function in util.php");
+            minai_log("info", "Error calling Utilities clas: ". $name . " is not defined as a method or function in util.php");
         }
     }
 
@@ -846,4 +870,228 @@ function GetActorPronouns($name) {
     return $pronouns;
 }
 
-?>
+/**
+ * Makes a call to the LLM using OpenRouter
+ * 
+ * @param array $messages Array of message objects with 'role' and 'content'
+ * @param string|null $model Optional model override
+ * @param array $options Optional parameters like temperature, max_tokens
+ * @return string|null Returns the LLM response content or null on failure
+ */
+function callLLM($messages, $model = null, $options = []) {
+    try {
+        // Log the prompt
+        $timestamp = date('Y-m-d\TH:i:sP');
+        $promptLog = $timestamp . "\n";
+        foreach ($messages as $message) {
+            $promptLog .= "Role: " . $message['role'] . "\nContent: " . $message['content'] . "\n";
+        }
+        $promptLog .= "\n";
+        file_put_contents('/var/www/html/HerikaServer/log/minai_context_sent_to_llm.log', $promptLog, FILE_APPEND);
+
+        // Use provided model or fall back to configured model
+        if (!$model && isset($GLOBALS['CONNECTOR']['openrouter']['model'])) {
+            $model = $GLOBALS['CONNECTOR']['openrouter']['model'];
+        }
+        
+        if (!$model) {
+            minai_log("info", "callLLM: No model specified");
+            return null;
+        }
+
+        // Get API URL and key from globals
+        if (!isset($GLOBALS['CONNECTOR']['openrouter']['url']) || 
+            !isset($GLOBALS['CONNECTOR']['openrouter']['API_KEY'])) {
+            minai_log("info", "callLLM: Missing OpenRouter configuration");
+            return null;
+        }
+
+        $url = $GLOBALS['CONNECTOR']['openrouter']['url'];
+        $apiKey = $GLOBALS['CONNECTOR']['openrouter']['API_KEY'];
+
+        // Set up headers
+        $headers = [
+            'Content-Type: application/json',
+            "Authorization: Bearer {$apiKey}",
+            "HTTP-Referer: https://www.nexusmods.com/skyrimspecialedition/mods/126330",
+            "X-Title: CHIM"
+        ];
+
+        // Prepare request data
+        $data = array_merge([
+            'model' => $model,
+            'messages' => $messages,
+            'max_tokens' => $GLOBALS['CONNECTOR']['openrouter']['max_tokens'],
+            'temperature' => $GLOBALS['CONNECTOR']['openrouter']['temperature'],
+            'stream' => false
+        ], $options);
+
+        // Set up request options
+        $options = [
+            'http' => [
+                'method' => 'POST',
+                'header' => implode("\r\n", $headers),
+                'content' => json_encode($data),
+                'timeout' => 30
+            ]
+        ];
+
+        minai_log("info", "callLLM: Sending request to model: $model");
+        
+        // Make the request
+        $context = stream_context_create($options);
+        $result = file_get_contents($url, false, $context);
+
+        if ($result === false) {
+            minai_log("info", "callLLM: Request failed");
+            return null;
+        }
+
+        $response = json_decode($result, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            minai_log("info", "callLLM: Invalid JSON response: " . json_last_error_msg());
+            return null;
+        }
+
+        if (!isset($response['choices'][0]['message']['content'])) {
+            minai_log("info", "callLLM: Unexpected response format");
+            return null;
+        }
+
+        $responseContent = $response['choices'][0]['message']['content'];
+        
+        // Log the response
+        $timestamp = date('Y-m-d\TH:i:sP');
+        $responseLog = "== $timestamp START\n";
+        $responseLog .= $responseContent . "\n";
+        $responseLog .= date('Y-m-d\TH:i:sP') . " END\n\n";
+        file_put_contents('/var/www/html/HerikaServer/log/minai_output_from_llm.log', $responseLog, FILE_APPEND);
+
+        return $responseContent;
+
+    } catch (Exception $e) {
+        minai_log("info", "callLLM Error: " . $e->getMessage());
+        minai_log("info", "callLLM Stack Trace: " . $e->getTraceAsString());
+        return null;
+    }
+}
+
+function isPlayerInput() {
+    return  in_array($GLOBALS["gameRequest"][0],["inputtext","inputtext_s","ginputtext","ginputtext_s","instruction","init"]);
+}
+
+
+
+
+Function GetNarratorConfigPath() {
+    // If use symlink, php code is actually in repo folder but included in wsl php server
+    // with just dirname((__FILE__)) it was getting directory of repo not php server 
+    $path = "/var/www/html/HerikaServer/";
+    $newConfFile=md5("Narrator");
+    return $path . "conf".DIRECTORY_SEPARATOR."conf_$newConfFile.php";
+}
+
+Function SetNarratorProfile() {
+    if ($GLOBALS["HERIKA_NAME"] == "The Narrator" && $GLOBALS["use_narrator_profile"]) {
+        if (!file_exists(GetNarratorConfigPath())) {
+            minai_log("info", "Initializing Narrator Profile");
+            createProfile("Narrator", [
+                "HERIKA_NAME" => "The Narrator",
+                "HERIKA_PERS" => "You are The Narrator in a Skyrim adventure. You will only talk to #PLAYER_NAME#. You refer to yourself as 'The Narrator'. Only #PLAYER_NAME# can hear you. Your goal is to comment on #PLAYER_NAME#'s playthrough, and occasionally, give some hints. NO SPOILERS. Talk about quests and last events."
+            ], true);
+        }
+        $path = GetNarratorConfigPath();
+        minai_log("info", "Overwriting profile with narrator profile ($path).");
+        // Ignore narrator name
+        global $HERIKA_NAME;
+        $HERIKA_NAME = "The Narrator";
+        global $PROMPT_HEAD;
+        global $PLAYER_BIOS;
+        global $HERIKA_PERS;
+        global $HERIKA_DYNAMIC;
+        global $DYNAMIC_PROFILE;
+        global $RECHAT_H;
+        global $RECHAT_P;
+        global $BORED_EVENT;
+        global $CONTEXT_HISTORY;
+        global $HTTP_TIMEOUT;
+        global $CORE_LANG;
+        global $MAX_WORDS_LIMIT;
+        global $BOOK_EVENT_FULL;
+        global $LANG_LLM_XTTS;
+        global $HERIKA_ANIMATIONS;
+        global $EMOTEMOODS;
+        global $CONNECTORS;
+        global $CONNECTORS_DIARY;
+        global $CONNECTOR;
+        global $TTSFUNCTION;
+        global $TTS;
+        global $STT;
+        global $ITT;
+        global $FEATURES;
+        require_once($path);
+        $_GET["profile"] = md5("Narrator");
+    }
+}
+
+Function GetFallbackConfigPath() {
+    $path = getcwd().DIRECTORY_SEPARATOR;
+    $newConfFile=md5("LLMFallback");
+    return $path . "conf".DIRECTORY_SEPARATOR."conf_$newConfFile.php";
+}
+
+Function CreateFallbackConfig() {
+    if (!file_exists(GetFallbackConfigPath())) {
+        minai_log("info", "Initializing LLM Fallback Profile");
+        createProfile("LLMFallback", [
+            "HERIKA_NAME" => "LLMFallback",
+            "HERIKA_PERS" => "This is a LLM profile used for retrying when the primary LLM call fails. Only the connector settings will be used, and it will only work with openrouterjson."
+        ], true);
+    }
+}
+
+Function SetLLMFallbackProfile() {
+    CreateFallbackConfig();
+    $path = GetFallbackConfigPath();
+    global $CONNECTOR;
+    global $CONNECTORS;
+    require_once($path);
+}
+
+function replaceVariables($content, $replacements, $depth = 0) {
+    if (empty($content) || $depth > 10) { // Prevent infinite recursion
+        return $content;
+    }
+    
+    // Ensure all values are strings
+    $stringReplacements = array_map(function($value) {
+        return (string)$value;
+    }, $replacements);
+    
+    // Create search array with #variable# format
+    $search = array_map(function($key) {
+        return "#{$key}#";
+    }, array_keys($stringReplacements));
+    
+    // Do the initial replacement
+    $result = str_replace($search, array_values($stringReplacements), $content);
+    
+    // Look for any remaining #VARIABLE# patterns
+    while (strpos($result, '#') !== false && preg_match_all('/#([A-Z_]+)#/', $result, $matches)) {
+        $hasReplacement = false;
+        foreach ($matches[0] as $match) {
+            if (isset($replacements[trim($match, '#')])) {
+                $hasReplacement = true;
+                break;
+            }
+        }
+        // Only continue if we found a replaceable variable
+        if ($hasReplacement) {
+            $result = replaceVariables($result, $replacements, $depth + 1);
+        } else {
+            break; // No more replaceable variables found
+        }
+    }
+    
+    return $result;
+}

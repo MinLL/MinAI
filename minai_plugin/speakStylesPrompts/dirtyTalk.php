@@ -56,4 +56,3 @@ function setDirtyTalkPrompts($currentName)
     ];
 }
 
-?>

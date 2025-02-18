@@ -100,7 +100,7 @@ if (IsFollower($GLOBALS["HERIKA_NAME"])) {
 }
 
 function SetInputPrompts($prompt) {
-    error_log("minai: Overriding input prompts for combat for {$GLOBALS["HERIKA_NAME"]}");
+    minai_log("info", "Overriding input prompts for combat for {$GLOBALS["HERIKA_NAME"]}");
     $GLOBALS["PROMPTS"]["inputtext"]= $prompt;
     $GLOBALS["PROMPTS"]["inputtext_s"]= $prompt;
     $GLOBALS["PROMPTS"]["ginputtext"]= $prompt;
@@ -431,4 +431,3 @@ $GLOBALS["PROMPTS"]["minai_tntr_deathworm_trigger01"] = [
         "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} notices something strange about the ground): {$GLOBALS["target"]} notices small pebbles starting to shift and roll across the ground. An odd stillness fills the air!) {$GLOBALS["TEMPLATE_DIALOG"]}"
     ]
 ];
-?>

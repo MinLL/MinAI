@@ -48,4 +48,3 @@ $GLOBALS["FUNCTIONS"][] = [
     ];
 
 
-?>

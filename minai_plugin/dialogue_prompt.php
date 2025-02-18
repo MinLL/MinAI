@@ -17,7 +17,7 @@ if(isset($scene)){
     $speakStyleInfo = determineSpeakStyle($currentName, $scene, $jsonXPersonality);
     $speakStyle = $speakStyleInfo["style"];
     
-    error_log("minai: Using speakStyle: {$speakStyle}");
+    minai_log("info", "Using speakStyle: {$speakStyle}");
 
     $talkTo = "(talking to $targetToSpeak)";
     $enforceLength = "You MUST Respond with no more than two sentences.";
@@ -77,4 +77,3 @@ if(isset($scene)){
     $GLOBALS["TEMPLATE_DIALOG"] .= " Emphasize the content of the #SEX_SCENARIO in the dialogue, including any sexual acts, positions, or restraints. ";
 }
 
-?>

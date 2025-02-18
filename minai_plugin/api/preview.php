@@ -1,0 +1,111 @@
+<?php
+// Prevent any output before JSON
+ob_start();
+require_once("../config.base.php");
+require_once("../logger.php");
+header('Content-Type: application/json');
+$path = "..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR;
+require_once($path . "conf".DIRECTORY_SEPARATOR."conf.php");
+require_once($path. "lib" .DIRECTORY_SEPARATOR."{$GLOBALS["DBDRIVER"]}.class.php");
+$GLOBALS["db"] = new sql();
+
+// Load required files
+require_once("../util.php");
+require_once("../fertilitymode.php");
+require_once("../contextbuilders.php");
+require_once("../roleplaybuilder.php");
+
+// Set narrator name and load profile if needed
+$GLOBALS["HERIKA_NAME"] = "The Narrator";
+SetNarratorProfile();
+try {
+    // Get player name from query param or use default
+    $playerName = $_GET['player'] ?? $GLOBALS["PLAYER_NAME"] ?? "Player";
+
+    // Get player pronouns
+    $playerPronouns = GetActorPronouns($playerName);
+
+    // Get contexts and convert to first person
+    $physDesc = convertToFirstPerson(GetPhysicalDescription($playerName), $playerName, $playerPronouns);
+    $arousalStatus = convertToFirstPerson(GetArousalContext($playerName), $playerName, $playerPronouns);
+    $survivalStatus = convertToFirstPerson(GetSurvivalContext($playerName), $playerName, $playerPronouns);
+    $clothingStatus = convertToFirstPerson(GetClothingContext($playerName), $playerName, $playerPronouns);
+    $devicesStatus = convertToFirstPerson(GetDDContext($playerName), $playerName, $playerPronouns);
+    $fertilityStatus = convertToFirstPerson(GetFertilityContext($playerName), $playerName, $playerPronouns);
+
+    // Get nearby actors and locations
+    $nearbyActors = array_filter(array_map('trim', explode('|', DataBeingsInRange())));
+    $possibleLocations = DataPosibleLocationsToGo();
+
+    // Get recent context using configured value
+    $contextMessages = $GLOBALS['roleplay_settings']['context_messages'];
+    $contextDataHistoric = DataLastDataExpandedFor("", $contextMessages * -1);
+    $contextDataWorld = DataLastInfoFor("", -2);
+    $contextDataFull = array_merge($contextDataWorld, $contextDataHistoric);
+
+    // Build the variable replacements as they would appear in the prompt
+    $variableReplacements = [
+        'PLAYER_NAME' => $playerName,
+        'PLAYER_BIOS' => replaceVariables($GLOBALS["PLAYER_BIOS"] ?? "", ['PLAYER_NAME' => $playerName]),
+        'NEARBY_ACTORS' => implode(", ", $nearbyActors),
+        'NEARBY_LOCATIONS' => implode(", ", $possibleLocations),
+        'RECENT_EVENTS' => implode("\n", array_map(function($ctx) { 
+            return $ctx['content']; 
+        }, array_slice($contextDataFull, -$GLOBALS['roleplay_settings']['context_messages']))),
+        'PLAYER_SUBJECT' => $playerPronouns['subject'],
+        'PLAYER_OBJECT' => $playerPronouns['object'],
+        'PLAYER_POSSESSIVE' => $playerPronouns['possessive'],
+        'HERIKA_DYNAMIC' => $GLOBALS["HERIKA_DYNAMIC"] ?? "",
+        'PHYSICAL_DESCRIPTION' => $physDesc,
+        'AROUSAL_STATUS' => $arousalStatus,
+        'SURVIVAL_STATUS' => $survivalStatus,
+        'CLOTHING_STATUS' => $clothingStatus,
+        'DEVICES_STATUS' => $devicesStatus,
+        'FERTILITY_STATUS' => $fertilityStatus,
+        'HERIKA_PERS' => $GLOBALS["HERIKA_PERS"] ?? ""
+    ];
+
+    // Get sections from roleplay settings
+    $sections = $GLOBALS['roleplay_settings']['sections'];
+
+    // Build the preview data
+    $preview = [
+        'variables' => $variableReplacements,
+        'sections' => array_map(function($section) use ($variableReplacements) {
+            $content = replaceVariables($section['content'], $variableReplacements);
+            return [
+                'header' => $section['header'],
+                'content' => $content,
+                'enabled' => $section['enabled']
+            ];
+        }, $sections),
+        'prompts' => [
+            'system_prompt' => replaceVariables($GLOBALS['roleplay_settings']['system_prompt'], $variableReplacements),
+            'system_prompt_explicit' => replaceVariables($GLOBALS['roleplay_settings']['system_prompt_explicit'], $variableReplacements),
+            'system_prompt_combat' => replaceVariables($GLOBALS['roleplay_settings']['system_prompt_combat'], $variableReplacements),
+            'roleplay_system_prompt' => replaceVariables($GLOBALS['roleplay_settings']['roleplay_system_prompt'], $variableReplacements),
+            'roleplay_system_prompt_explicit' => replaceVariables($GLOBALS['roleplay_settings']['roleplay_system_prompt_explicit'], $variableReplacements),
+            'roleplay_system_prompt_combat' => replaceVariables($GLOBALS['roleplay_settings']['roleplay_system_prompt_combat'], $variableReplacements),
+            'translation_request' => replaceVariables($GLOBALS['roleplay_settings']['translation_request'], $variableReplacements),
+            'translation_request_explicit' => replaceVariables($GLOBALS['roleplay_settings']['translation_request_explicit'], $variableReplacements),
+            'translation_request_combat' => replaceVariables($GLOBALS['roleplay_settings']['translation_request_combat'], $variableReplacements),
+            'roleplay_request' => replaceVariables($GLOBALS['roleplay_settings']['roleplay_request'], $variableReplacements),
+            'roleplay_request_explicit' => replaceVariables($GLOBALS['roleplay_settings']['roleplay_request_explicit'], $variableReplacements),
+            'roleplay_request_combat' => replaceVariables($GLOBALS['roleplay_settings']['roleplay_request_combat'], $variableReplacements)
+        ]
+    ];
+
+    // Clear any previous output
+    ob_clean();
+    
+    echo json_encode($preview, 
+        JSON_PRETTY_PRINT | 
+        JSON_UNESCAPED_UNICODE | 
+        JSON_UNESCAPED_SLASHES | 
+        JSON_INVALID_UTF8_SUBSTITUTE
+    );
+} catch (Exception $e) {
+    ob_clean();
+    http_response_code(500);
+    echo json_encode(['error' => $e->getMessage()]);
+} 

@@ -9,7 +9,7 @@ minai_Config config
 minai_Reputation reputation
 minai_DirtAndBlood dirtAndBlood
 minai_FertilityMode fertility
-
+GlobalVariable minai_DynamicSapienceToggleStealth
 bool bHasAIFF = False
 
 int Property contextUpdateInterval Auto
@@ -72,6 +72,10 @@ Function Maintenance(minai_MainQuestController _main)
     main.Fatal("You are running an old / outdated version of AI Follower Framework. Some functionality will be broken.")
   EndIf
   ContextSpell = Game.GetFormFromFile(0x090A, "MinAI.esp") as Spell
+  minai_DynamicSapienceToggleStealth = Game.GetFormFromFile(0x0E97, "MinAI.esp") as GlobalVariable
+  if (!minai_DynamicSapienceToggleStealth)
+    Main.Error("Could not retrieve minai_DynamicSapienceToggleStealth from esp")
+  EndIf
   sex = (Self as Quest)as minai_Sex
   survival = (Self as Quest)as minai_Survival
   arousal = (Self as Quest)as minai_Arousal
@@ -243,6 +247,12 @@ Function SetContext(actor akTarget)
   if akTarget == Player
     AIAgentFunctions.logMessage("_minai_PLAYER//playerName@" + Main.GetActorName(player), "setconf")
     AIAgentFunctions.logMessage("_minai_PLAYER//nearbyActors@" + GetNearbyAiStr(), "setconf")
+    ; Make sure this doesn't get stuck
+    if player.IsSneaking()
+      minai_DynamicSapienceToggleStealth.SetValue(0.0)
+    else
+      minai_DynamicSapienceToggleStealth.SetValue(1.0)
+    EndIf
   EndIf
   StoreActorVoice(akTarget)
   devious.SetContext(akTarget)
@@ -773,7 +783,7 @@ Function RemoveActorAI(string targetName)
   
   ; If actor had dialogue within last 60 seconds, don't remove
   ; They will get  cleaned up later on location change by cleanup
-  if lastDialogueTime > 0 && (currentTime - lastDialogueTime) < 60.0
+  if (lastDialogueTime > 0 && (currentTime - lastDialogueTime) < 60.0 && minai_DynamicSapienceToggleStealth.GetValueInt() == 1)
     Main.Debug("SAPIENCE: Not removing " + targetName + " - recent dialogue activity")
     return
   EndIf

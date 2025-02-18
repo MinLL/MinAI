@@ -375,4 +375,4 @@ if (!IsEnabled($GLOBALS["HERIKA_NAME"], "inCombat") && IsConfigEnabled("allowDev
     }
 }
 
-?>
+
