@@ -565,6 +565,35 @@
         .example-block em {
             color: var(--secondary-color);
         }
+
+        .template-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .template-button {
+            padding: 8px 16px;
+            background: linear-gradient(135deg,
+                rgba(33, 150, 243, 0.1) 0%,
+                rgba(33, 150, 243, 0.2) 100%
+            );
+            color: var(--text-color);
+            border: 1px solid rgba(33, 150, 243, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .template-button:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg,
+                rgba(33, 150, 243, 0.15) 0%,
+                rgba(33, 150, 243, 0.25) 100%
+            );
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
 </head>
@@ -919,67 +948,15 @@
                                     System Prompts
                                 </div>
                                 <div class="section-content collapsed">
-                                    <div class="info-section">
-                                        <p><strong>💡 Tip: System prompts define your character's personality and behavior</strong></p>
-                                        <p>These prompts establish how your character thinks and behaves in different situations. They should reflect your character's core personality while adapting to the context.</p>
-                                        
-                                        <!-- System Prompts by Character Type -->
-                                        <details>
-                                            <summary><strong>System Prompts by Character Type</strong></summary>
-                                            <ul>
-                                                <li><strong>Noble</strong>
-                                                    <pre>Normal: You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a noble of distinguished lineage.
-Combat: You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a noble warrior in the midst of battle.
-Intimate: You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a noble in an intimate moment.</pre>
-                                                </li>
-                                                <li><strong>Warrior</strong>
-                                                    <pre>Normal: You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a seasoned warrior of Skyrim.
-Combat: You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a warrior in the heat of battle.
-Intimate: You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a warrior in a tender moment.</pre>
-                                                </li>
-                                                <li><strong>Scholar</strong>
-                                                    <pre>Normal: You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a learned scholar and researcher.
-Combat: You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a scholar forced into combat.
-Intimate: You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a scholar in an intimate moment.</pre>
-                                                </li>
-                                                <li><strong>Thief</strong>
-                                                    <pre>Normal: You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a clever rogue who lives by wit.
-Combat: You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a rogue in a dangerous situation.
-Intimate: You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a rogue in an intimate moment.</pre>
-                                                </li>
-                                            </ul>
-                                        </details>
-                                        
-                                        <details>
-                                            <summary><strong>Roleplay Requests by Character Type</strong></summary>
-                                            <ul>
-                                                <li><strong>Noble</strong>
-                                                    <pre>Normal: You are #PLAYER_NAME#. Your responses should reflect your character's personality, background, and current situation. As a noble, consider your station and dignity.
-Combat: You are #PLAYER_NAME#. Your responses should reflect your character's personality, background, and current situation. Command with noble authority despite the danger.
-Intimate: You are #PLAYER_NAME#. Your responses should reflect your character's personality, background, and current situation. Express passion with aristocratic grace.</pre>
-                                                </li>
-                                                <li><strong>Warrior</strong>
-                                                    <pre>Normal: You are #PLAYER_NAME#. Your responses should reflect your character's personality, background, and current situation. Show your warrior's directness and honor.
-Combat: You are #PLAYER_NAME#. Your responses should reflect your character's personality, background, and current situation. Let your battle experience guide you.
-Intimate: You are #PLAYER_NAME#. Your responses should reflect your character's personality, background, and current situation. Show your warrior's passionate heart.</pre>
-                                                </li>
-                                                <li><strong>Scholar</strong>
-                                                    <pre>Normal: You are #PLAYER_NAME#. Your responses should reflect your character's personality, background, and current situation. Apply your analytical mind.
-Combat: You are #PLAYER_NAME#. Your responses should reflect your character's personality, background, and current situation. Use your intellectual approach to danger.
-Intimate: You are #PLAYER_NAME#. Your responses should reflect your character's personality, background, and current situation. Express passion with academic grace.</pre>
-                                                </li>
-                                                <li><strong>Thief</strong>
-                                                    <pre>Normal: You are #PLAYER_NAME#. Your responses should reflect your character's personality, background, and current situation. Show your clever wit.
-Combat: You are #PLAYER_NAME#. Your responses should reflect your character's personality, background, and current situation. Use your cunning in danger.
-Intimate: You are #PLAYER_NAME#. Your responses should reflect your character's personality, background, and current situation. Let your charm shine.</pre>
-                                                </li>
-                                            </ul>
-                                        </details>
-                                    </div>
-
                                     <!-- Normal System Prompts -->
                                     <div class="prompt-group">
                                         <h4>Normal Interaction Prompts</h4>
+                                        <div class="template-buttons">
+                                            <button onclick="applySystemTemplate('normal', 'noble')" class="template-button">Noble Template</button>
+                                            <button onclick="applySystemTemplate('normal', 'warrior')" class="template-button">Warrior Template</button>
+                                            <button onclick="applySystemTemplate('normal', 'scholar')" class="template-button">Scholar Template</button>
+                                            <button onclick="applySystemTemplate('normal', 'thief')" class="template-button">Thief Template</button>
+                                        </div>
                                         <label class="option-label" for="system-prompt">Translation System Prompt</label>
                                         <textarea id="system-prompt" class="prompt-textarea" rows="4"></textarea>
 
@@ -990,6 +967,12 @@ Intimate: You are #PLAYER_NAME#. Your responses should reflect your character's 
                                     <!-- Combat System Prompts -->
                                     <div class="prompt-group">
                                         <h4>Combat Prompts</h4>
+                                        <div class="template-buttons">
+                                            <button onclick="applySystemTemplate('combat', 'noble')" class="template-button">Noble Template</button>
+                                            <button onclick="applySystemTemplate('combat', 'warrior')" class="template-button">Warrior Template</button>
+                                            <button onclick="applySystemTemplate('combat', 'scholar')" class="template-button">Scholar Template</button>
+                                            <button onclick="applySystemTemplate('combat', 'thief')" class="template-button">Thief Template</button>
+                                        </div>
                                         <label class="option-label" for="system-prompt-combat">Combat Translation System Prompt</label>
                                         <textarea id="system-prompt-combat" class="prompt-textarea" rows="4"></textarea>
 
@@ -1000,6 +983,12 @@ Intimate: You are #PLAYER_NAME#. Your responses should reflect your character's 
                                     <!-- Intimate System Prompts -->
                                     <div class="prompt-group">
                                         <h4>Intimate Scene Prompts</h4>
+                                        <div class="template-buttons">
+                                            <button onclick="applySystemTemplate('intimate', 'noble')" class="template-button">Noble Template</button>
+                                            <button onclick="applySystemTemplate('intimate', 'warrior')" class="template-button">Warrior Template</button>
+                                            <button onclick="applySystemTemplate('intimate', 'scholar')" class="template-button">Scholar Template</button>
+                                            <button onclick="applySystemTemplate('intimate', 'thief')" class="template-button">Thief Template</button>
+                                        </div>
                                         <label class="option-label" for="system-prompt-explicit">Intimate Translation System Prompt</label>
                                         <textarea id="system-prompt-explicit" class="prompt-textarea" rows="4"></textarea>
 
@@ -1019,7 +1008,7 @@ Intimate: You are #PLAYER_NAME#. Your responses should reflect your character's 
                                         <p><strong>💡 Tip: Request formats shape how your character speaks</strong></p>
                                         <p>These formats determine how your character expresses themselves in different situations. Each format should maintain your character's voice while adapting to the context. <b>This field has the strongest impact on the character's speech style.</b></p>
                                         
-                                        <!-- Translation Request Examples by Character Type -->
+                                        <!-- Request Formats Examples by Character Type -->
                                         <details>
                                             <summary><strong>Translation Request Examples by Character Type</strong></summary>
                                             <ul>
@@ -1045,11 +1034,43 @@ Intimate: Translate this casual speech into your character's manner: "#ORIGINAL_
                                                 </li>
                                             </ul>
                                         </details>
+                                        
+                                        <details>
+                                            <summary><strong>Roleplay Request Examples by Character Type</strong></summary>
+                                            <ul>
+                                                <li><strong>Noble</strong>
+                                                    <pre>Normal: You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue that reflects your noble upbringing, formal etiquette, and refined manner of speech.
+Combat: You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue that maintains aristocratic bearing while conveying tactical awareness and command authority.
+Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue that blends noble restraint with poetic expressions of passion.</pre>
+                                                </li>
+                                                <li><strong>Warrior</strong>
+                                                    <pre>Normal: You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue that shows your direct, bold nature and references to Nordic traditions.
+Combat: You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue that demonstrates your battle experience and warrior's courage.
+Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue that expresses passion with a warrior's intensity and heart.</pre>
+                                                </li>
+                                                <li><strong>Scholar</strong>
+                                                    <pre>Normal: You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue that demonstrates your academic knowledge and analytical mindset.
+Combat: You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue that applies methodical analysis to the battle situation.
+Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue that expresses passion through carefully chosen academic metaphors.</pre>
+                                                </li>
+                                                <li><strong>Thief</strong>
+                                                    <pre>Normal: You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue that showcases your clever wit and street-smart nature.
+Combat: You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue that demonstrates your cunning approach to danger.
+Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue that blends charming wordplay with seductive wit.</pre>
+                                                </li>
+                                            </ul>
+                                        </details>
                                     </div>
 
                                     <!-- Normal Request Formats -->
                                     <div class="prompt-group">
                                         <h4>Normal Interaction Formats</h4>
+                                        <div class="template-buttons">
+                                            <button onclick="applyTemplate('normal', 'noble')" class="template-button">Noble Template</button>
+                                            <button onclick="applyTemplate('normal', 'warrior')" class="template-button">Warrior Template</button>
+                                            <button onclick="applyTemplate('normal', 'scholar')" class="template-button">Scholar Template</button>
+                                            <button onclick="applyTemplate('normal', 'thief')" class="template-button">Thief Template</button>
+                                        </div>
                                         <label class="option-label" for="translation-request">Translation Request Format</label>
                                         <textarea id="translation-request" class="prompt-textarea" rows="3"></textarea>
 
@@ -1060,6 +1081,12 @@ Intimate: Translate this casual speech into your character's manner: "#ORIGINAL_
                                     <!-- Combat Request Formats -->
                                     <div class="prompt-group">
                                         <h4>Combat Formats</h4>
+                                        <div class="template-buttons">
+                                            <button onclick="applyTemplate('combat', 'noble')" class="template-button">Noble Template</button>
+                                            <button onclick="applyTemplate('combat', 'warrior')" class="template-button">Warrior Template</button>
+                                            <button onclick="applyTemplate('combat', 'scholar')" class="template-button">Scholar Template</button>
+                                            <button onclick="applyTemplate('combat', 'thief')" class="template-button">Thief Template</button>
+                                        </div>
                                         <label class="option-label" for="translation-request-combat">Combat Translation Request</label>
                                         <textarea id="translation-request-combat" class="prompt-textarea" rows="3"></textarea>
 
@@ -1070,6 +1097,12 @@ Intimate: Translate this casual speech into your character's manner: "#ORIGINAL_
                                     <!-- Intimate Request Formats -->
                                     <div class="prompt-group">
                                         <h4>Intimate Scene Formats</h4>
+                                        <div class="template-buttons">
+                                            <button onclick="applyTemplate('intimate', 'noble')" class="template-button">Noble Template</button>
+                                            <button onclick="applyTemplate('intimate', 'warrior')" class="template-button">Warrior Template</button>
+                                            <button onclick="applyTemplate('intimate', 'scholar')" class="template-button">Scholar Template</button>
+                                            <button onclick="applyTemplate('intimate', 'thief')" class="template-button">Thief Template</button>
+                                        </div>
                                         <label class="option-label" for="translation-request-explicit">Intimate Translation Request</label>
                                         <textarea id="translation-request-explicit" class="prompt-textarea" rows="3"></textarea>
 
@@ -1102,7 +1135,7 @@ Intimate: Translate this casual speech into your character's manner: "#ORIGINAL_
                                     Context Preview
                                 </div>
                                 <div class="section-content collapsed">
-                                    <p class="option-description">This shows how the context variables will appear in the roleplay prompt.</p>
+                                    <p class="option-description">This shows how the context variables will appear in the roleplay prompt. Note, that things like PLAYER_BIO are pulled from the Narrator profile if using it, or the default profile otherwise.</p>
                                     
                                     <button onclick="refreshPreview()" class="refresh-button">
                                         Refresh Preview
@@ -1555,6 +1588,166 @@ Intimate: Translate this casual speech into your character's manner: "#ORIGINAL_
 
         // Load preview on page load
         document.addEventListener('DOMContentLoaded', refreshPreview);
+
+        const templates = {
+            noble: {
+                normal: {
+                    translation: 'Translate this casual speech into your character\'s manner: "#ORIGINAL_INPUT#" Express with formal etiquette, refined eloquence, and references to courtly protocol.',
+                    roleplay: 'You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue that reflects your noble upbringing, formal etiquette, and refined manner of speech.'
+                },
+                combat: {
+                    translation: 'Translate this casual speech into your character\'s manner: "#ORIGINAL_INPUT#" Maintain aristocratic bearing while issuing commands with dignified authority and precise tactical awareness.',
+                    roleplay: 'You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue that maintains aristocratic bearing while conveying tactical awareness and command authority.'
+                },
+                intimate: {
+                    translation: 'Translate this casual speech into your character\'s manner: "#ORIGINAL_INPUT#" Blend noble restraint with poetic passion, using elegant metaphors and refined declarations of feeling.',
+                    roleplay: 'You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue that blends noble restraint with poetic expressions of passion.'
+                }
+            },
+            warrior: {
+                normal: {
+                    translation: 'Translate this casual speech into your character\'s manner: "#ORIGINAL_INPUT#" Use direct, bold speech with references to honor, battle metaphors, and Nordic traditions.',
+                    roleplay: 'You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue that shows your direct, bold nature and references to Nordic traditions.'
+                },
+                combat: {
+                    translation: 'Translate this casual speech into your character\'s manner: "#ORIGINAL_INPUT#" Let your battle experience show through tactical clarity and warrior\'s courage, with urgent battlefield terminology.',
+                    roleplay: 'You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue that demonstrates your battle experience and warrior\'s courage.'
+                },
+                intimate: {
+                    translation: 'Translate this casual speech into your character\'s manner: "#ORIGINAL_INPUT#" Express passion with a warrior\'s intensity, mixing battlefield metaphors with heartfelt declarations.',
+                    roleplay: 'You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue that expresses passion with a warrior\'s intensity and heart.'
+                }
+            },
+            scholar: {
+                normal: {
+                    translation: 'Translate this casual speech into your character\'s manner: "#ORIGINAL_INPUT#" Use precise academic terminology, careful analysis, and scholarly references.',
+                    roleplay: 'You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue that demonstrates your academic knowledge and analytical mindset.'
+                },
+                combat: {
+                    translation: 'Translate this casual speech into your character\'s manner: "#ORIGINAL_INPUT#" Apply methodical analysis to the battle, using precise tactical terminology and calculated observations.',
+                    roleplay: 'You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue that applies methodical analysis to the battle situation.'
+                },
+                intimate: {
+                    translation: 'Translate this casual speech into your character\'s manner: "#ORIGINAL_INPUT#" Express passion through academic metaphors and carefully chosen poetic language.',
+                    roleplay: 'You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue that expresses passion through carefully chosen academic metaphors.'
+                }
+            },
+            thief: {
+                normal: {
+                    translation: 'Translate this casual speech into your character\'s manner: "#ORIGINAL_INPUT#" Use clever wordplay, street-smart expressions, and subtle innuendo.',
+                    roleplay: 'You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue that showcases your clever wit and street-smart nature.'
+                },
+                combat: {
+                    translation: 'Translate this casual speech into your character\'s manner: "#ORIGINAL_INPUT#" Keep your roguish wit sharp while acknowledging danger, using cunning observations and tactical street wisdom.',
+                    roleplay: 'You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue that demonstrates your cunning approach to danger.'
+                },
+                intimate: {
+                    translation: 'Translate this casual speech into your character\'s manner: "#ORIGINAL_INPUT#" Blend charming wordplay with seductive wit, maintaining your street-smart edge in matters of the heart.',
+                    roleplay: 'You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue that blends charming wordplay with seductive wit.'
+                }
+            }
+        };
+
+        function applyTemplate(context, character) {
+            const template = templates[character][context];
+            
+            // Map context to the correct field IDs
+            let translationId, roleplayId;
+            if (context === 'normal') {
+                translationId = 'translation-request';
+                roleplayId = 'roleplay-request';
+            } else if (context === 'combat') {
+                translationId = 'translation-request-combat';
+                roleplayId = 'roleplay-request-combat';
+            } else if (context === 'intimate') {
+                translationId = 'translation-request-explicit';
+                roleplayId = 'roleplay-request-explicit';
+            }
+
+            // Apply the templates
+            document.getElementById(translationId).value = template.translation;
+            document.getElementById(roleplayId).value = template.roleplay;
+        }
+
+        const systemTemplates = {
+            noble: {
+                normal: {
+                    translation: 'You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a noble of distinguished lineage, speaking with formal etiquette and refined eloquence. Your words reflect your aristocratic upbringing and command of courtly protocol.',
+                    roleplay: 'You are #PLAYER_NAME#. Your responses should reflect your character\'s personality, background, and current situation. As a noble, you speak with formal etiquette and refined eloquence, maintaining the dignity of your station while showing genuine care for those around you.'
+                },
+                combat: {
+                    translation: 'You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a noble warrior in the midst of battle, maintaining aristocratic bearing while issuing commands with tactical precision and authority.',
+                    roleplay: 'You are #PLAYER_NAME#. Your responses should reflect your character\'s personality, background, and current situation. Command with noble authority despite the danger, balancing aristocratic dignity with tactical awareness.'
+                },
+                intimate: {
+                    translation: 'You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a noble in an intimate moment, blending aristocratic restraint with passionate eloquence.',
+                    roleplay: 'You are #PLAYER_NAME#. Your responses should reflect your character\'s personality, background, and current situation. Express passion with noble grace, using refined language and poetic metaphors while maintaining aristocratic dignity.'
+                }
+            },
+            warrior: {
+                normal: {
+                    translation: 'You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a seasoned warrior of Skyrim, speaking with directness and honor, often using battle metaphors and referencing Nordic traditions.',
+                    roleplay: 'You are #PLAYER_NAME#. Your responses should reflect your character\'s personality, background, and current situation. Show your warrior\'s directness and honor, speaking boldly while respecting Nordic traditions and warrior\'s code.'
+                },
+                combat: {
+                    translation: 'You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a warrior in the heat of battle, your words carrying the weight of combat experience and tactical urgency.',
+                    roleplay: 'You are #PLAYER_NAME#. Your responses should reflect your character\'s personality, background, and current situation. Let your battle experience guide your words, showing courage and tactical awareness.'
+                },
+                intimate: {
+                    translation: 'You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a warrior in a tender moment, expressing passion with the same intensity you bring to battle.',
+                    roleplay: 'You are #PLAYER_NAME#. Your responses should reflect your character\'s personality, background, and current situation. Show your warrior\'s passionate heart, mixing strength with tenderness.'
+                }
+            },
+            scholar: {
+                normal: {
+                    translation: 'You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a learned scholar and researcher, using precise terminology and analytical observations.',
+                    roleplay: 'You are #PLAYER_NAME#. Your responses should reflect your character\'s personality, background, and current situation. Apply your analytical mind and academic knowledge, speaking with precision and intellectual curiosity.'
+                },
+                combat: {
+                    translation: 'You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a scholar forced into combat, applying methodical analysis to battlefield situations.',
+                    roleplay: 'You are #PLAYER_NAME#. Your responses should reflect your character\'s personality, background, and current situation. Use your intellectual approach to danger, analyzing tactical situations with academic precision.'
+                },
+                intimate: {
+                    translation: 'You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a scholar in an intimate moment, expressing passion through academic metaphors and carefully chosen words.',
+                    roleplay: 'You are #PLAYER_NAME#. Your responses should reflect your character\'s personality, background, and current situation. Express passion with academic grace, using scholarly metaphors and precise language.'
+                }
+            },
+            thief: {
+                normal: {
+                    translation: 'You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a clever rogue who lives by wit, using street-smart expressions and subtle wordplay.',
+                    roleplay: 'You are #PLAYER_NAME#. Your responses should reflect your character\'s personality, background, and current situation. Show your clever wit and street smarts, speaking with cunning charm and worldly wisdom.'
+                },
+                combat: {
+                    translation: 'You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a rogue in a dangerous situation, relying on cunning and tactical street wisdom.',
+                    roleplay: 'You are #PLAYER_NAME#. Your responses should reflect your character\'s personality, background, and current situation. Use your cunning in danger, showing tactical awareness through street-smart observations.'
+                },
+                intimate: {
+                    translation: 'You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking. You are a rogue in an intimate moment, blending charm with seductive wit.',
+                    roleplay: 'You are #PLAYER_NAME#. Your responses should reflect your character\'s personality, background, and current situation. Let your charm shine through, using clever wordplay and seductive wit.'
+                }
+            }
+        };
+
+        function applySystemTemplate(context, character) {
+            const template = systemTemplates[character][context];
+            
+            // Map context to the correct field IDs
+            let translationId, roleplayId;
+            if (context === 'normal') {
+                translationId = 'system-prompt';
+                roleplayId = 'roleplay-system-prompt';
+            } else if (context === 'combat') {
+                translationId = 'system-prompt-combat';
+                roleplayId = 'roleplay-system-prompt-combat';
+            } else if (context === 'intimate') {
+                translationId = 'system-prompt-explicit';
+                roleplayId = 'roleplay-system-prompt-explicit';
+            }
+
+            // Apply the templates
+            document.getElementById(translationId).value = template.translation;
+            document.getElementById(roleplayId).value = template.roleplay;
+        }
     </script>
 
 </body>
