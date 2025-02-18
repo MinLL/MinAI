@@ -171,6 +171,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception("Failed to write configuration file");
         }
 
+        // Clear the configuration cache
+        clearstatcache(true, $configFile);
+        if (function_exists('opcache_reset')) {
+            opcache_reset();
+        }
+
         minai_log("info", "Configuration saved successfully");
         echo json_encode([
             'status' => 'success',
