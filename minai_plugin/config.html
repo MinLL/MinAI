@@ -1461,7 +1461,8 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                                     Context Preview
                                 </div>
                                 <div class="section-content collapsed">
-                                    <p class="option-description">This shows how the context variables will appear in the roleplay prompt. Note, that things like PLAYER_BIO are pulled from the Narrator profile if using it, or the default profile otherwise.</p>
+                                    <p class="option-description">This shows how the context variables will appear in the roleplay prompt. Note, that things like PLAYER_BIOS are pulled from the <b>Narrator profile</b> if using it, or the <b>default profile</b> otherwise.</p>
+                                    <p class="option-description" style="color: #ff5555; font-weight: bold; padding: 10px; background: rgba(255,85,85,0.1); border: 2px solid #ff5555; border-radius: 4px; margin: 15px 0;">⚠️ IMPORTANT: The preview will not update until you save settings!</p>
                                     
                                     <button onclick="refreshPreview()" class="refresh-button">
                                         Refresh Preview
@@ -1670,6 +1671,17 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 }
             };
 
+            // Add sections in their current order
+            document.querySelectorAll('.section-entry').forEach((section, index) => {
+                const key = section.querySelector('.section-enabled').dataset.section;
+                newConfig.roleplay_settings.sections[key] = {
+                    enabled: section.querySelector('.section-enabled').checked,
+                    header: section.querySelector('.section-header').value,
+                    content: section.querySelector('.section-content').value,
+                    order: index
+                };
+            });
+
             // Fetch the current saved config
             try {
                 const response = await fetch('api/config.php');
@@ -1700,11 +1712,37 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 const currentPath = path ? `${path}.${key}` : key;
                 
                 if (typeof newConfig[key] === 'object' && newConfig[key] !== null && !Array.isArray(newConfig[key])) {
-                    // Recursively compare nested objects
-                    const nestedChanges = compareConfigs(oldConfig[key] || {}, newConfig[key], currentPath);
-                    Object.assign(changes, nestedChanges);
+                    // Special handling for sections
+                    if (key === 'sections') {
+                        const oldSections = oldConfig[key] || {};
+                        const newSections = newConfig[key] || {};
+                        
+                        // Compare each section
+                        const allSectionKeys = new Set([...Object.keys(oldSections), ...Object.keys(newSections)]);
+                        
+                        for (const sectionKey of allSectionKeys) {
+                            const oldSection = oldSections[sectionKey] || {};
+                            const newSection = newSections[sectionKey] || {};
+                            
+                            // Compare section properties
+                            if (oldSection.enabled !== newSection.enabled ||
+                                oldSection.header !== newSection.header ||
+                                oldSection.content !== newSection.content ||
+                                oldSection.order !== newSection.order) {
+                                
+                                changes[`${currentPath}.${sectionKey}`] = {
+                                    oldValue: oldSection,
+                                    newValue: newSection
+                                };
+                            }
+                        }
+                    } else {
+                        // Regular nested object handling
+                        const nestedChanges = compareConfigs(oldConfig[key] || {}, newConfig[key], currentPath);
+                        Object.assign(changes, nestedChanges);
+                    }
                 } else {
-                    // Compare values
+                    // Regular value comparison
                     const oldValue = oldConfig[key];
                     let newValue = newConfig[key];
                     
@@ -1789,6 +1827,15 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
             if (value === null) return '<em>null</em>';
             if (value === '') return '<em>(empty string)</em>';
             if (typeof value === 'boolean') return value ? 'true' : 'false';
+            
+            // Special handling for section objects
+            if (typeof value === 'object' && 'enabled' in value && 'header' in value && 'content' in value) {
+                return `Enabled: ${value.enabled}<br>` +
+                       `Header: ${value.header}<br>` +
+                       `Content: ${value.content}<br>` +
+                       `Order: ${value.order}`;
+            }
+            
             if (Array.isArray(value)) return JSON.stringify(value, null, 2);
             if (typeof value === 'object') return JSON.stringify(value, null, 2);
             return String(value);
@@ -1957,8 +2004,15 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 animation: 150,
                 handle: '.drag-handle',
                 onEnd: function() {
-                    // Order is automatically maintained in the DOM
-                    // We'll collect it when saving
+                    markAsChanged();
+                }
+            });
+
+            // Add change listeners to all section inputs
+            container.querySelectorAll('input, textarea').forEach(element => {
+                element.addEventListener('change', markAsChanged);
+                if (element.type === 'text' || element.tagName === 'TEXTAREA') {
+                    element.addEventListener('input', markAsChanged);
                 }
             });
         }
@@ -2226,7 +2280,6 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
             try {
                 showStatus('Preparing configuration export...', 'info');
                 
-                // Get current config by collecting all form values
                 const config = {
                     PROMPT_HEAD_OVERRIDE: document.getElementById('prompt-head-override').value,
                     use_narrator_profile: document.getElementById('use-narrator-profile').checked,
@@ -2245,7 +2298,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     commands_to_purge: getDynamicList('commands-to-purge-container'),
                     events_to_ignore: getDynamicList('events-to-ignore-container'),
                     disable_worn_equipment: document.getElementById('disable-worn-equipment').checked,
-                    input_delay_for_radiance: document.getElementById('input-delay').value,
+                    input_delay_for_radiance: parseInt(document.getElementById('input-delay').value),
                     strip_emotes_from_output: document.getElementById('strip-emotes').checked,
                     use_defeat: document.getElementById('use-defeat').checked,
                     realnames_support: document.getElementById('realnames-support').checked,
@@ -2280,7 +2333,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     }
                 };
 
-                // Get sections in current order
+                // Add sections in their current order
                 document.querySelectorAll('.section-entry').forEach((section, index) => {
                     const key = section.querySelector('.section-enabled').dataset.section;
                     config.roleplay_settings.sections[key] = {
@@ -2465,18 +2518,6 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
             event.target.value = '';
         }
 
-        function validateConfig(config) {
-            // Add validation for required fields and structure
-            const requiredFields = [
-                'PROMPT_HEAD_OVERRIDE',
-                'use_narrator_profile',
-                'enforce_short_responses',
-                // ... add all required fields ...
-            ];
-
-            return requiredFields.every(field => field in config);
-        }
-
         let hasUnsavedChanges = false;
 
         function markAsChanged() {
@@ -2502,8 +2543,6 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
 
         // Add change listeners to all form elements
         document.addEventListener('DOMContentLoaded', () => {
-            // ... existing DOMContentLoaded code ...
-
             // Add change listeners to all inputs, textareas, and selects
             document.querySelectorAll('input, textarea, select').forEach(element => {
                 element.addEventListener('change', markAsChanged);
@@ -2521,7 +2560,8 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
             const sectionConfig = document.getElementById('section-config');
             if (sectionConfig) {
                 new Sortable(sectionConfig, {
-                    // ... existing Sortable options ...
+                    handle: '.drag-handle',
+                    animation: 150,
                     onEnd: function() {
                         markAsChanged();
                     }

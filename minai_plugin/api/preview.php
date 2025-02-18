@@ -1,6 +1,7 @@
 <?php
 // Prevent any output before JSON
 ob_start();
+require_once("../config.base.php");
 require_once("../logger.php");
 header('Content-Type: application/json');
 $path = "..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR;
@@ -13,8 +14,10 @@ require_once("../util.php");
 require_once("../fertilitymode.php");
 require_once("../contextbuilders.php");
 require_once("../roleplaybuilder.php");
-require_once("../config.base.php");
 
+// Set narrator name and load profile if needed
+$GLOBALS["HERIKA_NAME"] = "The Narrator";
+SetNarratorProfile();
 try {
     // Get player name from query param or use default
     $playerName = $_GET['player'] ?? $GLOBALS["PLAYER_NAME"] ?? "Player";

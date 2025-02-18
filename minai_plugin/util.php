@@ -986,9 +986,52 @@ function isPlayerInput() {
 Function GetNarratorConfigPath() {
     // If use symlink, php code is actually in repo folder but included in wsl php server
     // with just dirname((__FILE__)) it was getting directory of repo not php server 
-    $path = getcwd().DIRECTORY_SEPARATOR;
+    $path = "/var/www/html/HerikaServer/";
     $newConfFile=md5("Narrator");
     return $path . "conf".DIRECTORY_SEPARATOR."conf_$newConfFile.php";
+}
+
+Function SetNarratorProfile() {
+    if ($GLOBALS["HERIKA_NAME"] == "The Narrator" && $GLOBALS["use_narrator_profile"]) {
+        if (!file_exists(GetNarratorConfigPath())) {
+            minai_log("info", "Initializing Narrator Profile");
+            createProfile("Narrator", [
+                "HERIKA_NAME" => "The Narrator",
+                "HERIKA_PERS" => "You are The Narrator in a Skyrim adventure. You will only talk to #PLAYER_NAME#. You refer to yourself as 'The Narrator'. Only #PLAYER_NAME# can hear you. Your goal is to comment on #PLAYER_NAME#'s playthrough, and occasionally, give some hints. NO SPOILERS. Talk about quests and last events."
+            ], true);
+        }
+        $path = GetNarratorConfigPath();
+        minai_log("info", "Overwriting profile with narrator profile ($path).");
+        // Ignore narrator name
+        global $HERIKA_NAME;
+        $HERIKA_NAME = "The Narrator";
+        global $PROMPT_HEAD;
+        global $PLAYER_BIOS;
+        global $HERIKA_PERS;
+        global $HERIKA_DYNAMIC;
+        global $DYNAMIC_PROFILE;
+        global $RECHAT_H;
+        global $RECHAT_P;
+        global $BORED_EVENT;
+        global $CONTEXT_HISTORY;
+        global $HTTP_TIMEOUT;
+        global $CORE_LANG;
+        global $MAX_WORDS_LIMIT;
+        global $BOOK_EVENT_FULL;
+        global $LANG_LLM_XTTS;
+        global $HERIKA_ANIMATIONS;
+        global $EMOTEMOODS;
+        global $CONNECTORS;
+        global $CONNECTORS_DIARY;
+        global $CONNECTOR;
+        global $TTSFUNCTION;
+        global $TTS;
+        global $STT;
+        global $ITT;
+        global $FEATURES;
+        require_once($path);
+        $_GET["profile"] = md5("Narrator");
+    }
 }
 
 Function GetFallbackConfigPath() {
