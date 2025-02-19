@@ -557,6 +557,10 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     while iIndex < iElement
       if devious.HasDD() && equippedItems[iIndex].HasKeyword(devious.libs.zad_Lockable)
         Main.Debug("Not removing " + equippedItems[iIndex] + " - Lockable DD")
+      elseif equippedItems[iIndex].HasKeywordString("OStimNoStrip") || equippedItems[iIndex].HasKeywordString("SexLabNoStrip") ; skip removing any item tagged with OStimNoStrip or SexLabNoStrip
+        Main.Debug("Not removing " + equippedItems[iIndex].GetName() + " - OStimNoStrip or SexLabNoStrip")
+      elseif (equippedItems[iIndex] as Armor) != None && ((equippedItems[iIndex] as Armor).GetSlotMask() == 2 || (equippedItems[iIndex] as Armor).GetSlotMask() == 2050) ; skip removing hair items
+        Main.Debug("Not removing " + equippedItems[iIndex].GetName() + " - Wig")
       else
         Main.Debug("Removing " + equippedItems[iIndex].GetName())
         JArray.AddForm(equippedArmor, equippedItems[iIndex])
