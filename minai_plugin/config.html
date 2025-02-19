@@ -917,6 +917,14 @@
             color: var(--text-color);
             font-style: italic;
         }
+
+        .help-text {
+            font-size: 0.9em;
+            color: #888;
+            margin-top: 4px;
+            margin-bottom: 8px;
+            font-style: italic;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
 </head>
@@ -1183,12 +1191,27 @@
                                 <textarea id="singing-prompt" class="prompt-textarea" rows="3"></textarea>
                             </div>
 
+                            <!-- Add new Diary Prompts section -->
+                            <div class="option-group">
+                                <h4>Diary Prompts</h4>
+                                
+                                <label class="option-label" for="player-diary">Player's Diary Entry Prompt</label>
+                                <p>Customize how the player character writes their diary entries (If using the Self Narrator feature).</p>
+                                <p class="help-text">Example format: Please write a summary of #player_name#'s recent thoughts, feelings, and adventures. Respond as if you are writing this into a private diary, including completely unfiltered thoughts and feelings. WRITE AS IF YOU ARE #player_name#.</p>
+                                <textarea id="player-diary" class="prompt-textarea" rows="4"></textarea>
+
+                                <label class="option-label" for="follower-diary">Follower's Diary Entry Prompt</label>
+                                <p>Customize how followers write their diary entries about traveling with the player.</p>
+                                <p class="help-text">Example format: Please write a summary of #herika_name#'s recent thoughts, feelings, and adventures with #target#. Respond as if you are writing this into a private diary, including completely unfiltered thoughts and feelings. WRITE AS IF YOU ARE #herika_name#.</p>
+                                <textarea id="follower-diary" class="prompt-textarea" rows="4"></textarea>
+                            </div>
+
                             <!-- Self Narrator (Explicit) -->
                             <div class="option-group">
                                 <label class="option-label" for="self-narrator-explicit">Self Narrator (Explicit Scene)</label>
-                                <textarea id="self-narrator-explicit" class="prompt-textarea" rows="4"></textarea>
                             </div>
-
+                            
+                            <textarea id="self-narrator-explicit" class="prompt-textarea" rows="4"></textarea>
                             <!-- Self Narrator (Normal) -->
                             <div class="option-group">
                                 <label class="option-label" for="self-narrator-normal">Self Narrator (Normal Scene)</label>
@@ -1541,6 +1564,8 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 document.getElementById('self-narrator-normal').value = configData.action_prompts.self_narrator_normal;
                 document.getElementById('explicit-scene').value = configData.action_prompts.explicit_scene;
                 document.getElementById('normal-scene').value = configData.action_prompts.normal_scene;
+                document.getElementById('player-diary').value = configData.action_prompts.player_diary;
+                document.getElementById('follower-diary').value = configData.action_prompts.follower_diary;
 
                 // Load roleplay settings
                 document.getElementById('context-messages').value = configData.roleplay_settings.context_messages;
@@ -1643,6 +1668,8 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 voicetype_fallbacks: getVoiceTypeFallbacks(),
                 action_prompts: {
                     singing: document.getElementById('singing-prompt').value,
+                    player_diary: document.getElementById('player-diary').value,
+                    follower_diary: document.getElementById('follower-diary').value,
                     self_narrator_explicit: document.getElementById('self-narrator-explicit').value,
                     self_narrator_normal: document.getElementById('self-narrator-normal').value,
                     explicit_scene: document.getElementById('explicit-scene').value,
@@ -2313,6 +2340,8 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     voicetype_fallbacks: getVoiceTypeFallbacks(),
                     action_prompts: {
                         singing: document.getElementById('singing-prompt').value,
+                        player_diary: document.getElementById('player-diary').value,
+                        follower_diary: document.getElementById('follower-diary').value,
                         self_narrator_explicit: document.getElementById('self-narrator-explicit').value,
                         self_narrator_normal: document.getElementById('self-narrator-normal').value,
                         explicit_scene: document.getElementById('explicit-scene').value,
@@ -2425,6 +2454,8 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                         // Handle action prompts
                         if (importedConfig.action_prompts) {
                             document.getElementById('singing-prompt').value = importedConfig.action_prompts.singing ?? baseConfig.action_prompts.singing;
+                            document.getElementById('player-diary').value = importedConfig.action_prompts.player_diary ?? baseConfig.action_prompts.player_diary;
+                            document.getElementById('follower-diary').value = importedConfig.action_prompts.follower_diary ?? baseConfig.action_prompts.follower_diary;
                             document.getElementById('self-narrator-explicit').value = importedConfig.action_prompts.self_narrator_explicit ?? baseConfig.action_prompts.self_narrator_explicit;
                             document.getElementById('self-narrator-normal').value = importedConfig.action_prompts.self_narrator_normal ?? baseConfig.action_prompts.self_narrator_normal;
                             document.getElementById('explicit-scene').value = importedConfig.action_prompts.explicit_scene ?? baseConfig.action_prompts.explicit_scene;

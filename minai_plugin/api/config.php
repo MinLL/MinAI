@@ -79,7 +79,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         "input_delay_for_radiance" => intval($GLOBALS["input_delay_for_radiance"]),
         
         // Action prompts
-        "action_prompts" => $GLOBALS["action_prompts"],
+        "action_prompts" => array(
+            "singing" => $GLOBALS["action_prompts"]["singing"],
+            "player_diary" => $GLOBALS["action_prompts"]["player_diary"],
+            "follower_diary" => $GLOBALS["action_prompts"]["follower_diary"],
+            "self_narrator_explicit" => $GLOBALS["action_prompts"]["self_narrator_explicit"],
+            "self_narrator_normal" => $GLOBALS["action_prompts"]["self_narrator_normal"],
+            "explicit_scene" => $GLOBALS["action_prompts"]["explicit_scene"],
+            "normal_scene" => $GLOBALS["action_prompts"]["normal_scene"]
+        ),
         
         // Add roleplay settings to GET response
         "roleplay_settings" => $GLOBALS["roleplay_settings"],
@@ -149,7 +157,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $newConfig .= "\$GLOBALS['input_delay_for_radiance'] = " . (intval($input['input_delay_for_radiance']) ?: 15) . ";\n";
         
         // Action prompts
-        $newConfig .= "\$GLOBALS['action_prompts'] = " . buildAssociativeArrayString($input['action_prompts']) . ";\n";
+        $newConfig .= "\$GLOBALS['action_prompts'] = " . buildAssociativeArrayString(array(
+            'singing' => $input['action_prompts']['singing'],
+            'player_diary' => $input['action_prompts']['player_diary'],
+            'follower_diary' => $input['action_prompts']['follower_diary'],
+            'self_narrator_explicit' => $input['action_prompts']['self_narrator_explicit'],
+            'self_narrator_normal' => $input['action_prompts']['self_narrator_normal'],
+            'explicit_scene' => $input['action_prompts']['explicit_scene'],
+            'normal_scene' => $input['action_prompts']['normal_scene']
+        )) . ";\n";
         
         // Save roleplay settings
         $newConfig .= "\$GLOBALS['roleplay_settings'] = " . var_export($input['roleplay_settings'], true) . ";\n";

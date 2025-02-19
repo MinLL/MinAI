@@ -35,7 +35,12 @@ $GLOBALS['action_prompts'] = Array(
 
     "explicit_scene" => "Choose the ACTION or TALK that best conveys #herika_name#'s immediate physical and emotional responses. Focus heavily on explicit dialogue and verbal expressions to enhance the scene, but also utilize ACTIONS to vividly depict #herika_name#'s sensations and feelings when interacting with #target#. Avoid narration and emoting.",
     
-    "normal_scene" => "Choose the ACTION that best fits the current context and #herika_name#'s mood when interacting with #target#. Prioritize dialogue for expressing thoughts and intentions. Use ACTIONS for tasks like interacting with items, trading, or showing physical needs. Avoid narration and emoting."
+    "normal_scene" => "Choose the ACTION that best fits the current context and #herika_name#'s mood when interacting with #target#. Prioritize dialogue for expressing thoughts and intentions. Use ACTIONS for tasks like interacting with items, trading, or showing physical needs. Avoid narration and emoting.",
+
+    // Diary prompts
+    "player_diary" => "Please write a summary of #player_name#'s recent thoughts, feelings, and adventures. Respond as if you are writing this into a private diary, including completely unfiltered thoughts and feelings. WRITE AS IF YOU ARE #player_name#.",
+    
+    "follower_diary" => "Please write a summary of #herika_name#'s recent thoughts, feelings, and adventures with #target#. Respond as if you are writing this into a private diary, including completely unfiltered thoughts and feelings. WRITE AS IF YOU ARE #herika_name#."
 );
 
 // Roleplay translation settings
