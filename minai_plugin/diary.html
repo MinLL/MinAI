@@ -550,6 +550,36 @@
         .search-highlight:hover {
             background-color: rgba(255, 255, 0, 0.3);
         }
+
+        /* Markdown styles */
+        .entry-content strong {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .entry-content em {
+            font-style: italic;
+            color: var(--text-color);
+        }
+
+        .entry-content del {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .entry-content blockquote {
+            border-left: 3px solid var(--primary-color);
+            margin: 1em 0;
+            padding: 0.5em 0 0.5em 1em;
+            background: rgba(255, 255, 255, 0.05);
+            font-style: italic;
+        }
+
+        .entry-content hr {
+            border: none;
+            border-top: 1px solid var(--border-color);
+            margin: 1.5em 0;
+        }
     </style>
 </head>
 <body>
@@ -948,19 +978,38 @@
             const searchText = document.getElementById('search-text').value.toLowerCase();
             let content = entry.content || '';
             
-            // First split into paragraphs and clean them up
+            // First split into potential paragraphs and clean them up
             let paragraphs = content
-                .split(/\n+/) // Split on one or more newlines
+                .split(/\n+/) // First split on explicit newlines
                 .map(p => p.trim())
-                .filter(p => p.length > 0); // Remove empty paragraphs
+                .filter(p => p.length > 0);
+            
+            // If we only have one paragraph, try to split it intelligently
+            if (paragraphs.length === 1) {
+                const text = paragraphs[0];
+                // Split on sentence endings followed by spaces and capital letters
+                paragraphs = text
+                    .split(/(?<=[.!?])\s+(?=[A-Z])/)
+                    .reduce((acc, sentence) => {
+                        // If the last paragraph is short, append this sentence to it
+                        if (acc.length > 0 && acc[acc.length - 1].length + sentence.length < 300) {
+                            acc[acc.length - 1] += ' ' + sentence;
+                        } else {
+                            acc.push(sentence);
+                        }
+                        return acc;
+                    }, []);
+            }
 
-            // Process each paragraph separately
+            // Process each paragraph with markdown and character highlighting
             paragraphs = paragraphs.map(para => {
-                // Generate unique colors for all characters
+                // Apply markdown formatting first
+                para = applyMarkdown(para);
+                
+                // Then apply character coloring
                 const characterColors = {};
                 const baseNameMap = new Map();
 
-                // First pass: create color mapping and base name mapping
                 allCharacterNames.forEach(fullName => {
                     const match = fullName.match(/^(.*?)\s*(?:\[(.*?)\])?$/);
                     if (match) {
@@ -995,10 +1044,8 @@
                     });
                 }
 
-                // Sort base names by length (longest first) to handle overlapping names
                 const baseNames = Array.from(baseNameMap.keys()).sort((a, b) => b.length - a.length);
 
-                // Replace base names with colored versions
                 baseNames.forEach(baseName => {
                     const {fullName, color} = baseNameMap.get(baseName);
                     const escapedBase = baseName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -1006,7 +1053,7 @@
                     para = para.replace(regex, `<span class="character-name" title="${fullName}" style="color: ${color};">$&</span>`);
                 });
 
-                // Highlight search terms after character names
+                // Apply search highlighting last
                 if (searchText) {
                     const terms = searchText.split(' ')
                         .filter(term => term.length > 0)
@@ -1021,12 +1068,33 @@
                 return para;
             });
 
-            // Join paragraphs with proper spacing and formatting
             return `
                 <div class="entry-content">
                     ${paragraphs.map(p => `<p>${p}</p>`).join('\n')}
                 </div>
             `;
+        }
+
+        // Add this new function for markdown processing
+        function applyMarkdown(text) {
+            // Bold
+            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            text = text.replace(/__(.*?)__/g, '<strong>$1</strong>');
+            
+            // Italic
+            text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            text = text.replace(/_(.*?)_/g, '<em>$1</em>');
+            
+            // Strikethrough
+            text = text.replace(/~~(.*?)~~/g, '<del>$1</del>');
+            
+            // Quotes
+            text = text.replace(/^>\s*(.+)/gm, '<blockquote>$1</blockquote>');
+            
+            // Horizontal rules
+            text = text.replace(/^---+$/gm, '<hr>');
+            
+            return text;
         }
 
         function formatEntriesByCharacter(entries) {
