@@ -635,6 +635,25 @@
             'Hearthfire', 'Frost Fall', 'Sun\'s Dusk', 'Evening Star'
         ];
 
+        // Add these constants at the top with other constants
+        const MONTH_DAYS = {
+            'Morning Star': 31,
+            'Sun\'s Dawn': 28,
+            'First Seed': 31,
+            'Rain\'s Hand': 30,
+            'Second Seed': 31,
+            'Midyear': 30,
+            'Sun\'s Height': 31,
+            'Last Seed': 31,
+            'Hearthfire': 30,
+            'Frostfall': 31,
+            'Sun\'s Dusk': 30,
+            'Evening Star': 31
+        };
+
+        // Known date: 17th of Last Seed, 4E 201 is Sundas
+        const LAST_SEED_17_OFFSET = 0; // Sundas is index 0 in our days array
+
         // Global state
         let allEntries = [];
         let currentDate = null;
@@ -1342,8 +1361,11 @@
                 return date && date.monthName === monthName && date.year === year;
             });
 
+            // Get the number of days in this month
+            const daysInMonth = MONTH_DAYS[monthName];
+
             // Create calendar grid
-            const days = Array.from({length: 30}, (_, i) => {
+            const days = Array.from({length: daysInMonth}, (_, i) => {
                 const dayNum = i + 1;
                 const dayEntries = monthEntries.filter(entry => {
                     const date = parseSkyrimDate(entry.topic);
@@ -1450,8 +1472,53 @@
         // Helper function to determine the starting day of each month
         // This could be adjusted based on Skyrim's calendar rules
         function getMonthStartDay(monthName, year) {
-            const monthIndex = SKYRIM_MONTHS.indexOf(monthName);
-            return monthIndex % 7; // Simple rotation of start days
+            // Calculate days from Last Seed 17th to the start of the target month
+            const lastSeed17ToMonthStart = getDaysToMonthStart(monthName, year);
+            
+            // The day that starts this month will be:
+            // (Sundas + total days since reference date) % 7
+            const startDay = (LAST_SEED_17_OFFSET - (17 - 1) + lastSeed17ToMonthStart) % 7;
+            return startDay >= 0 ? startDay : startDay + 7;
+        }
+
+        function getDaysToMonthStart(targetMonth, targetYear) {
+            const referenceYear = '4E 201';
+            const referenceMonth = 'Last Seed';
+            
+            let totalDays = 0;
+            
+            // Convert year string to number (e.g., "4E 201" -> 201)
+            const currentYear = parseInt(targetYear.split(' ')[1]);
+            const refYear = parseInt(referenceYear.split(' ')[1]);
+            
+            // Calculate days between years
+            const yearDiff = currentYear - refYear;
+            totalDays += yearDiff * 365; // Assuming no leap years for simplicity
+            
+            // Calculate days between months within the same year
+            const months = Object.keys(MONTH_DAYS);
+            let startIdx = months.indexOf(referenceMonth);
+            let endIdx = months.indexOf(targetMonth);
+            
+            if (yearDiff >= 0) {
+                // Going forward in time
+                if (endIdx < startIdx) {
+                    endIdx += 12;
+                }
+                for (let i = startIdx; i < endIdx; i++) {
+                    totalDays += MONTH_DAYS[months[i % 12]];
+                }
+            } else {
+                // Going backward in time
+                if (endIdx > startIdx) {
+                    startIdx += 12;
+                }
+                for (let i = endIdx; i < startIdx; i++) {
+                    totalDays -= MONTH_DAYS[months[i % 12]];
+                }
+            }
+            
+            return totalDays;
         }
 
         function updateColumnLayout(columns) {
