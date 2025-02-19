@@ -96,6 +96,10 @@ $GLOBALS["LLM_RETRY_FNCT"] = function() {
     return $outputWasValid;
 };
 
+$GLOBALS["VALIDATE_LLM_OUTPUT_FNCT"] = function($output) {
+    return validateLLMResponse($output);
+};
+
 // Only create the fallback config if the feature is enabled
 if (isset($GLOBALS['use_llm_fallback']) && $GLOBALS['use_llm_fallback']) {
     CreateFallbackConfig();

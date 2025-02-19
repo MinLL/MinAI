@@ -870,6 +870,36 @@ function GetActorPronouns($name) {
     return $pronouns;
 }
 
+// Add this new function before callLLM
+function validateLLMResponse($responseContent) {
+    // Define error strings that should trigger a retry
+    $errorStrings = [
+        "do not roleplay",
+        "do not engage in roleplay",
+        "cannot roleplay",
+        "don't roleplay",
+        "don't engage in roleplay",
+        "will not roleplay",
+        "generate sexual",
+        "explicit acts",
+        "family-friendly",
+        "family friendly",
+        "type of content",
+        "I am to keep interactions",
+        "nsfw"
+    ];
+
+    // Check if response contains any error strings
+    foreach ($errorStrings as $errorString) {
+        if (stripos($responseContent, $errorString) !== false) {
+            minai_log("info", "validateLLMResponse: Detected error string '$errorString'");
+            return false;
+        }
+    }
+    
+    return true;
+}
+
 /**
  * Makes a call to the LLM using OpenRouter
  * 
@@ -879,6 +909,9 @@ function GetActorPronouns($name) {
  * @return string|null Returns the LLM response content or null on failure
  */
 function callLLM($messages, $model = null, $options = []) {
+    // Add retry tracking to prevent infinite loops
+    static $isRetry = false;
+
     try {
         // Log the prompt
         $timestamp = date('Y-m-d\TH:i:sP');
@@ -888,7 +921,7 @@ function callLLM($messages, $model = null, $options = []) {
         }
         $promptLog .= "\n";
         file_put_contents('/var/www/html/HerikaServer/log/minai_context_sent_to_llm.log', $promptLog, FILE_APPEND);
-
+        minai_log("info", "callLLM: Calling LLM with model: $model");
         // Use provided model or fall back to configured model
         if (!$model && isset($GLOBALS['CONNECTOR']['openrouter']['model'])) {
             $model = $GLOBALS['CONNECTOR']['openrouter']['model'];
@@ -959,6 +992,20 @@ function callLLM($messages, $model = null, $options = []) {
         }
 
         $responseContent = $response['choices'][0]['message']['content'];
+        
+        // Check if response is valid and we haven't retried yet
+        if (!$isRetry && !validateLLMResponse($responseContent)) {
+            minai_log("info", "callLLM: Invalid response detected, retrying with fallback profile");
+            
+            // Set fallback profile
+            SetLLMFallbackProfile();
+            
+            // Set retry flag
+            $isRetry = true;
+            
+            // Retry the call
+            return callLLM($messages, $GLOBALS['CONNECTOR']['openrouter']['model'], $options);
+        }
         
         // Log the response
         $timestamp = date('Y-m-d\TH:i:sP');
@@ -1051,6 +1098,7 @@ Function CreateFallbackConfig() {
 }
 
 Function SetLLMFallbackProfile() {
+    minai_log("info", "Setting LLM Fallback Profile");
     CreateFallbackConfig();
     $path = GetFallbackConfigPath();
     global $CONNECTOR;
