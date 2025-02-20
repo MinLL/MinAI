@@ -3,6 +3,7 @@ require_once("logger.php");
 define("MINAI_ACTOR_VALUE_CACHE", "minai_actor_value_cache");
 require_once("db_utils.php");
 require_once("importDataToDB.php");
+require_once("mind_influence.php");
 
 $GLOBALS[MINAI_ACTOR_VALUE_CACHE] = [];
 $targetOverride = null;
@@ -875,6 +876,8 @@ function validateLLMResponse($responseContent) {
     // Define error strings that should trigger a retry
     $errorStrings = [
         "do not roleplay",
+        'this type of roleplay',
+        'roleplay interaction',
         "do not engage in roleplay",
         "cannot roleplay",
         "don't roleplay",
@@ -889,7 +892,9 @@ function validateLLMResponse($responseContent) {
         "nsfw",
         'do not generate',
         'respectful and appropriate',
-        'non-consensual'
+        'non-consensual',
+        'aim to engage',
+        'ethical interactions'
     ];
 
     // Check if response contains any error strings
@@ -1104,9 +1109,19 @@ Function SetLLMFallbackProfile() {
     minai_log("info", "Setting LLM Fallback Profile");
     CreateFallbackConfig();
     $path = GetFallbackConfigPath();
-    global $CONNECTOR;
-    global $CONNECTORS;
-    require_once($path);
+    if (isset($GLOBALS["CONNECTOR_FALLBACK"])) {
+        minai_log("info", "Setting LLM Fallback Profile with fallback connectors - connectors already exist");
+        $GLOBALS["CONNECTOR"] = $GLOBALS["CONNECTOR_FALLBACK"];
+        $GLOBALS["CONNECTORS"] = $GLOBALS["CONNECTORS_FALLBACK"];
+    }
+    else {
+        minai_log("info", "Setting LLM Fallback Profile with fallback connectors");
+        $GLOBALS["CONNECTOR_FALLBACK"] = $GLOBALS["CONNECTOR"];
+        $GLOBALS["CONNECTORS_FALLBACK"] = $GLOBALS["CONNECTORS"];
+        global $CONNECTOR;
+        global $CONNECTORS;
+        require_once($path);
+    }
 }
 
 function replaceVariables($content, $replacements, $depth = 0) {

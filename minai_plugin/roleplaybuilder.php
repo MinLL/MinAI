@@ -54,6 +54,23 @@ function convertToFirstPerson($text, $name, $pronouns) {
     return trim($text);
 }
 
+function GetNameFromProfile() {
+    $HERIKA_NAME = "";
+    if (isset($_GET["profile"])) {
+        if (file_exists("/var/www/html/HerikaServer/conf".DIRECTORY_SEPARATOR."conf_{$_GET["profile"]}.php")) {
+           // error_log("PROFILE: {$_GET["profile"]}");
+            include("/var/www/html/HerikaServer/conf".DIRECTORY_SEPARATOR."conf_{$_GET["profile"]}.php");
+    
+        } else {
+            // error_log(__FILE__.". Using default profile because GET PROFILE NOT EXISTS");
+        }
+    }
+    else {
+        minai_log("info", "No profile specified, using default profile.");
+    }
+    return $HERIKA_NAME;
+}
+
 function interceptRoleplayInput() {
     if (IsEnabled($GLOBALS["PLAYER_NAME"], "isRoleplaying") && (isPlayerInput() || $GLOBALS["gameRequest"][0] == "minai_roleplay")) {
         if ($GLOBALS["gameRequest"][0] == "minai_roleplay") {
@@ -66,7 +83,7 @@ function interceptRoleplayInput() {
         // Initialize local variables with global defaults
         $PLAYER_NAME = $GLOBALS["PLAYER_NAME"];
         $PLAYER_BIOS = $GLOBALS["PLAYER_BIOS"];
-        $HERIKA_NAME = $GLOBALS["HERIKA_NAME"];
+        $HERIKA_NAME = GetNameFromProfile();
         $originalHerikaName = $HERIKA_NAME;
         $HERIKA_PERS = $GLOBALS["HERIKA_PERS"];
         $CONNECTOR = $GLOBALS["CONNECTOR"];
@@ -126,6 +143,7 @@ function interceptRoleplayInput() {
         $clothingStatus = convertToFirstPerson(GetClothingContext($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
         $devicesStatus = convertToFirstPerson(GetDDContext($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
         $fertilityStatus = convertToFirstPerson(GetFertilityContext($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
+        $mindState = convertToFirstPerson(GetMindInfluenceContext(GetMindInfluenceState($PLAYER_NAME)), $PLAYER_NAME, $playerPronouns);
         // Replace variables in system prompt and request
         $variableReplacements = [
             'PLAYER_NAME' => $PLAYER_NAME,
@@ -147,7 +165,8 @@ function interceptRoleplayInput() {
             'DEVICES_STATUS' => $devicesStatus,
             'FERTILITY_STATUS' => $fertilityStatus,
             'HERIKA_NAME' => $HERIKA_NAME,
-            'HERIKA_PERS' => $HERIKA_PERS
+            'HERIKA_PERS' => $HERIKA_PERS,
+            'MIND_STATE' => $mindState
         ];
 
         // Determine scene context
@@ -179,6 +198,19 @@ function interceptRoleplayInput() {
                 $systemPrompt = $settings['system_prompt_combat'];
                 $requestFormat = $settings['translation_request_combat'];
             }
+        }
+
+        // Add mind control state
+        $mindState = GetMindInfluenceState($PLAYER_NAME);
+        $mindPrompt = GetMindInfluencePrompt($mindState, $isExplicit ? "explicit" : ($inCombat ? "combat" : "default"));
+        $mindFormat = GetMindInfluenceRequestFormat($mindState, $isExplicit ? "explicit" : ($inCombat ? "combat" : "default"));
+        if ($mindPrompt) {
+            $systemPrompt .= " " . $mindPrompt;
+        }
+
+        // Add the request format addition if it exists
+        if ($mindFormat) {
+            $requestFormat .= " " . $mindFormat;
         }
 
         // Apply variable replacements to the selected prompts

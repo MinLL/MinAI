@@ -42,7 +42,7 @@ try {
     $contextDataHistoric = DataLastDataExpandedFor("", $contextMessages * -1);
     $contextDataWorld = DataLastInfoFor("", -2);
     $contextDataFull = array_merge($contextDataWorld, $contextDataHistoric);
-
+    $mindState = GetMindInfluenceContext(GetMindInfluenceState($GLOBALS["PLAYER_NAME"]));
     // Build the variable replacements as they would appear in the prompt
     $variableReplacements = [
         'PLAYER_NAME' => $playerName,
@@ -62,7 +62,8 @@ try {
         'CLOTHING_STATUS' => $clothingStatus,
         'DEVICES_STATUS' => $devicesStatus,
         'FERTILITY_STATUS' => $fertilityStatus,
-        'HERIKA_PERS' => $GLOBALS["HERIKA_PERS"] ?? ""
+        'HERIKA_PERS' => $GLOBALS["HERIKA_PERS"] ?? "",
+        'MIND_STATE' => $mindState
     ];
 
     // Get sections from roleplay settings

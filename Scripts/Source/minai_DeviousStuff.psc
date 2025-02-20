@@ -36,11 +36,45 @@ MagicEffect dwp_watched
 GlobalVariable dwp_global_minai
 Spell dwp_eldwhoresp
 Spell dwp_eldwhoresp_neq  
+Spell dwp_
 actor playerRef
 Perk dwp_eldritchwaifueffect_soldsoul
 Perk dwp_eldritchwaifueffect_soldsoul_belted
 
 ; TODO: Break this out into a separate script for each mod.
+
+; Deviously Accessible Magic Effects
+MagicEffect dwp_descbadgirl
+MagicEffect dwp_descbadgirl2 
+MagicEffect dwp_descbadgirl2b
+MagicEffect dwp_descbadgirl2c
+MagicEffect dwp_descbadgirl2d
+MagicEffect dwp_descbadgirlb
+MagicEffect dwp_descbadgirlBASE
+MagicEffect dwp_descbadgirlc
+MagicEffect dwp_descbadgirld
+MagicEffect dwp_descgoodgirl
+MagicEffect dwp_descgoodgirl2
+MagicEffect dwp_descgoodgirl2b
+MagicEffect dwp_descgoodgirl2c
+MagicEffect dwp_descgoodgirl2d
+MagicEffect dwp_descgoodgirlb
+MagicEffect dwp_descgoodgirlBASE
+MagicEffect dwp_descgoodgirlc
+MagicEffect dwp_descgoodgirld
+MagicEffect dwp_descmindcontrol
+MagicEffect dwp_descmindcontrol2
+MagicEffect dwp_descmindcontrolpost
+MagicEffect dwp_descmindcontrolpunishment
+MagicEffect dwp_descverybadgirl
+MagicEffect dwp_descverybadgirl2
+MagicEffect dwp_descverybadgirl2b
+MagicEffect dwp_descverybadgirl2c
+MagicEffect dwp_descverybadgirl2d
+MagicEffect dwp_descverybadgirlb
+MagicEffect dwp_descverybadgirlBASE
+MagicEffect dwp_descverybadgirlc
+MagicEffect dwp_descverybadgirld
 
 function Maintenance(minai_MainQuestController _main)
   Main.Info("Initializing Devious Module")
@@ -146,6 +180,39 @@ function Maintenance(minai_MainQuestController _main)
       bHasTNTR = True
       RegisterForModEvent("minai_tntr", "OnTNTRAnimation")
     EndIf
+
+    ; Load magic effects
+    dwp_descbadgirl = Game.GetFormFromFile(0x015B7D, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descbadgirl2 = Game.GetFormFromFile(0x02C183, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descbadgirl2b = Game.GetFormFromFile(0x0459FD, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descbadgirl2c = Game.GetFormFromFile(0x045A06, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descbadgirl2d = Game.GetFormFromFile(0x045A0C, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descbadgirlb = Game.GetFormFromFile(0x0459FA, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descbadgirlBASE = Game.GetFormFromFile(0x045A00, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descbadgirlc = Game.GetFormFromFile(0x045A03, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descbadgirld = Game.GetFormFromFile(0x045A09, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descgoodgirl = Game.GetFormFromFile(0x015B7C, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descgoodgirl2 = Game.GetFormFromFile(0x02C182, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descgoodgirl2b = Game.GetFormFromFile(0x0459FC, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descgoodgirl2c = Game.GetFormFromFile(0x045A05, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descgoodgirl2d = Game.GetFormFromFile(0x045A0B, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descgoodgirlb = Game.GetFormFromFile(0x0459F9, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descgoodgirlBASE = Game.GetFormFromFile(0x0459FF, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descgoodgirlc = Game.GetFormFromFile(0x045A02, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descgoodgirld = Game.GetFormFromFile(0x045A08, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descmindcontrol = Game.GetFormFromFile(0x015B89, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descmindcontrol2 = Game.GetFormFromFile(0x059E6F, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descmindcontrolpost = Game.GetFormFromFile(0x04FC1C, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descmindcontrolpunishment = Game.GetFormFromFile(0x0826FC, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descverybadgirl = Game.GetFormFromFile(0x015B7E, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descverybadgirl2 = Game.GetFormFromFile(0x02C184, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descverybadgirl2b = Game.GetFormFromFile(0x0459FE, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descverybadgirl2c = Game.GetFormFromFile(0x045A07, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descverybadgirl2d = Game.GetFormFromFile(0x045A0D, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descverybadgirlb = Game.GetFormFromFile(0x0459FB, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descverybadgirlBASE = Game.GetFormFromFile(0x045A01, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descverybadgirlc = Game.GetFormFromFile(0x045A04, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descverybadgirld = Game.GetFormFromFile(0x045A0A, "DeviouslyAccessible.esp") as MagicEffect
   EndIf  
 
 
@@ -997,6 +1064,69 @@ Function SetContext(actor akTarget)
     aiff.SetActorVariable(playerRef, "dwp_eldwhoresp_neq", PlayerRef.HasSpell(dwp_eldwhoresp_neq))
     aiff.SetActorVariable(playerRef, "dwp_eldritchwaifueffect_soldsoul", PlayerRef.HasPerk(dwp_eldritchwaifueffect_soldsoul))
     aiff.SetActorVariable(playerRef, "dwp_eldritchwaifueffect_soldsoul_belted", PlayerRef.HasPerk(dwp_eldritchwaifueffect_soldsoul_belted))
+    ; Add magic effect checks
+    aiff.SetActorVariable(playerRef, "dwp_descbadgirl", PlayerRef.HasMagicEffect(dwp_descbadgirl))
+    aiff.SetActorVariable(playerRef, "dwp_descbadgirl2", PlayerRef.HasMagicEffect(dwp_descbadgirl2))
+    aiff.SetActorVariable(playerRef, "dwp_descbadgirl2b", PlayerRef.HasMagicEffect(dwp_descbadgirl2b))
+    aiff.SetActorVariable(playerRef, "dwp_descbadgirl2c", PlayerRef.HasMagicEffect(dwp_descbadgirl2c))
+    aiff.SetActorVariable(playerRef, "dwp_descbadgirl2d", PlayerRef.HasMagicEffect(dwp_descbadgirl2d))
+    aiff.SetActorVariable(playerRef, "dwp_descbadgirlb", PlayerRef.HasMagicEffect(dwp_descbadgirlb))
+    aiff.SetActorVariable(playerRef, "dwp_descbadgirlBASE", PlayerRef.HasMagicEffect(dwp_descbadgirlBASE))
+    aiff.SetActorVariable(playerRef, "dwp_descbadgirlc", PlayerRef.HasMagicEffect(dwp_descbadgirlc))
+    aiff.SetActorVariable(playerRef, "dwp_descbadgirld", PlayerRef.HasMagicEffect(dwp_descbadgirld))
+    aiff.SetActorVariable(playerRef, "dwp_descgoodgirl", PlayerRef.HasMagicEffect(dwp_descgoodgirl))
+    aiff.SetActorVariable(playerRef, "dwp_descgoodgirl2", PlayerRef.HasMagicEffect(dwp_descgoodgirl2))
+    aiff.SetActorVariable(playerRef, "dwp_descgoodgirl2b", PlayerRef.HasMagicEffect(dwp_descgoodgirl2b))
+    aiff.SetActorVariable(playerRef, "dwp_descgoodgirl2c", PlayerRef.HasMagicEffect(dwp_descgoodgirl2c))
+    aiff.SetActorVariable(playerRef, "dwp_descgoodgirl2d", PlayerRef.HasMagicEffect(dwp_descgoodgirl2d))
+    aiff.SetActorVariable(playerRef, "dwp_descgoodgirlb", PlayerRef.HasMagicEffect(dwp_descgoodgirlb))
+    aiff.SetActorVariable(playerRef, "dwp_descgoodgirlBASE", PlayerRef.HasMagicEffect(dwp_descgoodgirlBASE))
+    aiff.SetActorVariable(playerRef, "dwp_descgoodgirlc", PlayerRef.HasMagicEffect(dwp_descgoodgirlc))
+    aiff.SetActorVariable(playerRef, "dwp_descgoodgirld", PlayerRef.HasMagicEffect(dwp_descgoodgirld))
+    aiff.SetActorVariable(playerRef, "dwp_descmindcontrol", PlayerRef.HasMagicEffect(dwp_descmindcontrol))
+    aiff.SetActorVariable(playerRef, "dwp_descmindcontrol2", PlayerRef.HasMagicEffect(dwp_descmindcontrol2))
+    aiff.SetActorVariable(playerRef, "dwp_descmindcontrolpost", PlayerRef.HasMagicEffect(dwp_descmindcontrolpost))
+    aiff.SetActorVariable(playerRef, "dwp_descmindcontrolpunishment", PlayerRef.HasMagicEffect(dwp_descmindcontrolpunishment))
+    aiff.SetActorVariable(playerRef, "dwp_descverybadgirl", PlayerRef.HasMagicEffect(dwp_descverybadgirl))
+    aiff.SetActorVariable(playerRef, "dwp_descverybadgirl2", PlayerRef.HasMagicEffect(dwp_descverybadgirl2))
+    aiff.SetActorVariable(playerRef, "dwp_descverybadgirl2b", PlayerRef.HasMagicEffect(dwp_descverybadgirl2b))
+    aiff.SetActorVariable(playerRef, "dwp_descverybadgirl2c", PlayerRef.HasMagicEffect(dwp_descverybadgirl2c))
+    aiff.SetActorVariable(playerRef, "dwp_descverybadgirl2d", PlayerRef.HasMagicEffect(dwp_descverybadgirl2d))
+    aiff.SetActorVariable(playerRef, "dwp_descverybadgirlb", PlayerRef.HasMagicEffect(dwp_descverybadgirlb))
+    aiff.SetActorVariable(playerRef, "dwp_descverybadgirlBASE", PlayerRef.HasMagicEffect(dwp_descverybadgirlBASE))
+    aiff.SetActorVariable(playerRef, "dwp_descverybadgirlc", PlayerRef.HasMagicEffect(dwp_descverybadgirlc))
+    aiff.SetActorVariable(playerRef, "dwp_descverybadgirld", PlayerRef.HasMagicEffect(dwp_descverybadgirld))
+    
+    ; Determine mind control status
+    string mindControlStatus = "normal"
+    if PlayerRef.HasMagicEffect(dwp_descgoodgirl) || PlayerRef.HasMagicEffect(dwp_descgoodgirl2) || \
+       PlayerRef.HasMagicEffect(dwp_descgoodgirl2b) || PlayerRef.HasMagicEffect(dwp_descgoodgirl2c) || \
+       PlayerRef.HasMagicEffect(dwp_descgoodgirl2d) || PlayerRef.HasMagicEffect(dwp_descgoodgirlb) || \
+       PlayerRef.HasMagicEffect(dwp_descgoodgirlBASE) || PlayerRef.HasMagicEffect(dwp_descgoodgirlc) || \
+       PlayerRef.HasMagicEffect(dwp_descgoodgirld)
+        mindControlStatus = "goodgirl"
+    elseif PlayerRef.HasMagicEffect(dwp_descbadgirl) || PlayerRef.HasMagicEffect(dwp_descbadgirl2) || \
+           PlayerRef.HasMagicEffect(dwp_descbadgirl2b) || PlayerRef.HasMagicEffect(dwp_descbadgirl2c) || \
+           PlayerRef.HasMagicEffect(dwp_descbadgirl2d) || PlayerRef.HasMagicEffect(dwp_descbadgirlb) || \
+           PlayerRef.HasMagicEffect(dwp_descbadgirlBASE) || PlayerRef.HasMagicEffect(dwp_descbadgirlc) || \
+           PlayerRef.HasMagicEffect(dwp_descbadgirld)
+        mindControlStatus = "badgirl"
+    elseif PlayerRef.HasMagicEffect(dwp_descverybadgirl) || PlayerRef.HasMagicEffect(dwp_descverybadgirl2) || \
+           PlayerRef.HasMagicEffect(dwp_descverybadgirl2b) || PlayerRef.HasMagicEffect(dwp_descverybadgirl2c) || \
+           PlayerRef.HasMagicEffect(dwp_descverybadgirl2d) || PlayerRef.HasMagicEffect(dwp_descverybadgirlb) || \
+           PlayerRef.HasMagicEffect(dwp_descverybadgirlBASE) || PlayerRef.HasMagicEffect(dwp_descverybadgirlc) || \
+           PlayerRef.HasMagicEffect(dwp_descverybadgirld)
+        mindControlStatus = "verybadgirl"
+    elseif PlayerRef.HasMagicEffect(dwp_descmindcontrolpunishment)
+        mindControlStatus = "punishment"
+    elseif PlayerRef.HasMagicEffect(dwp_descmindcontrolpost)
+        mindControlStatus = "post"
+    endif
+    
+    aiff.SetActorVariable(playerRef, "dwp_mindcontrol", mindControlStatus)
+
+    ; Remove individual effect checks
+    ; ... rest of existing DeviouslyAccessible context setting ...
   EndIf
   if bHasSlaveTats && akTarget
     SerializeTattooForDB(akTarget) ; This will store the data in the DB

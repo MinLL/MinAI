@@ -62,7 +62,7 @@ $GLOBALS['roleplay_settings'] = Array(
         "CHARACTER_BACKGROUND" => Array(
             "enabled" => true,
             "header" => "=== YOUR BACKGROUND ===",
-            "content" => "#PLAYER_BIOS#\nPronouns: #PLAYER_SUBJECT#/#PLAYER_OBJECT#/#PLAYER_POSSESSIVE#\n\nCurrent State: #HERIKA_DYNAMIC#\n\nPhysical Description: #PHYSICAL_DESCRIPTION#",
+            "content" => "#PLAYER_BIOS#\nPronouns: #PLAYER_SUBJECT#/#PLAYER_OBJECT#/#PLAYER_POSSESSIVE#\n\nCurrent State: #HERIKA_DYNAMIC#\n\nPhysical Description: #PHYSICAL_DESCRIPTION#\n\Mental State: #MIND_STATE#",
             "order" => 0
         ),
         "CHARACTER_STATUS" => Array(

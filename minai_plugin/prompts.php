@@ -138,8 +138,19 @@ if (isset($GLOBALS["gameRequest"]) && in_array(strtolower($GLOBALS["gameRequest"
 if (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"] && $GLOBALS["HERIKA_NAME"] == "The Narrator") {
     // Only set diary prompt if one is provided
     if (isset($GLOBALS["action_prompts"]["player_diary"]) && !empty($GLOBALS["action_prompts"]["player_diary"])) {
+        // Get mind influence state and prompts
+        $mindState = GetMindInfluenceState($GLOBALS["PLAYER_NAME"]);
+        $mindPrompt = GetMindInfluencePrompt($mindState);
+
+        $diaryPrompt = ExpandPromptVariables($GLOBALS["action_prompts"]["player_diary"]);
+        
+        // Add mind influence context if any exists
+        if (!empty($mindPrompt)) {
+            $diaryPrompt .= " " . $mindPrompt . " Write your diary entry reflecting your current mental state.";
+        }
+
         $GLOBALS["PROMPTS"]["diary"] = [
-            "cue"=>[ExpandPromptVariables($GLOBALS["action_prompts"]["player_diary"])],
+            "cue"=>[$diaryPrompt],
             "extra"=>["force_tokens_max"=>0]
         ];
     }

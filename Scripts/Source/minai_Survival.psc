@@ -5,6 +5,7 @@ bool bUseVanilla = True
 bool bHasBFT = False
 bool bHasCampfire = False
 bool bHasSurvivalMode = False
+bool bHasRequiem = False
 
 _shweathersystem sunhelmWeather
 _SunHelmMain property sunhelmMain auto
@@ -31,6 +32,9 @@ GlobalVariable property Survival_ExhaustionNeedValue auto
 GlobalVariable property Survival_HungerNeedMaxValue auto
 GlobalVariable property Survival_ColdNeedMaxValue auto
 GlobalVariable property Survival_ExhaustionNeedMaxValue auto
+
+MagicEffect property REQ_Effect_Alcohol auto
+MagicEffect property REQ_Effect_Drug_Skooma01_FX auto
 
 function Maintenance(minai_MainQuestController _main)
   playerRef = Game.GetPlayer()
@@ -116,6 +120,19 @@ function Maintenance(minai_MainQuestController _main)
   aiff.SetModAvailable("SurvivalMode", bHasSurvivalMode)
   aiff.SetModAvailable("Sunhelm", bHasSunhelm)
   aiff.SetModAvailable("BetterFastTravel", bHasBFT)
+
+  if Game.GetModByName("Requiem.esp") != 255
+    bHasRequiem = True
+    Main.Info("Found Requiem")
+    REQ_Effect_Alcohol = Game.GetFormFromFile(0x18ED7C, "Requiem.esp") as MagicEffect
+    REQ_Effect_Drug_Skooma01_FX = Game.GetFormFromFile(0x8191518, "Requiem.esp") as MagicEffect
+    if !REQ_Effect_Alcohol || !REQ_Effect_Drug_Skooma01_FX
+      Main.Error("Could not load Requiem effects - Intoxication state tracking will be disabled")
+      bHasRequiem = False
+    EndIf
+  EndIf
+
+  aiff.SetModAvailable("Requiem", bHasRequiem)
 EndFunction
 
 
@@ -356,6 +373,16 @@ Function SetContext(actor akTarget)
     aiff.SetActorVariable(playerRef, "fatigue", exhaustionPercent as int)
   EndIf
   if akTarget == playerRef
+    ; Track intoxication effects
+    if bHasRequiem
+      if REQ_Effect_Alcohol
+        aiff.SetActorVariable(playerRef, "isDrunk", playerRef.HasMagicEffect(REQ_Effect_Alcohol))
+      EndIf
+      if REQ_Effect_Drug_Skooma01_FX
+        aiff.SetActorVariable(playerRef, "isOnSkooma", playerRef.HasMagicEffect(REQ_Effect_Drug_Skooma01_FX))
+      EndIf
+    EndIf
+    
     aiff.SetActorVariable(playerRef, "weather", Weather.GetCurrentWeather())
     aiff.SetActorVariable(playerRef, "skyMode", Weather.GetSkyMode())
     aiff.SetActorVariable(playerRef, "currentGameHour", GetCurrentHourOfDay())

@@ -16,12 +16,21 @@ if (IsEnabled($GLOBALS["PLAYER_NAME"], "isSinging")) {
     $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] = ExpandPromptVariables($GLOBALS["action_prompts"]["singing"]);
 }
 elseif (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"] && $GLOBALS["HERIKA_NAME"] == "The Narrator") {
+    $mindState = GetMindInfluenceState($GLOBALS["PLAYER_NAME"]);
+    $mindPrompt = GetMindInfluencePrompt($mindState, IsExplicitScene() ? "explicit" : (IsEnabled($GLOBALS["PLAYER_NAME"], "inCombat") ? "combat" : "default"));
+    
     if (IsExplicitScene()) {
         $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] = ExpandPromptVariables($GLOBALS["action_prompts"]["self_narrator_explicit"]);
+        if ($mindPrompt) {
+            $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] .= " " . $mindPrompt;
+        }
     } else {
         $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] = ExpandPromptVariables($GLOBALS["action_prompts"]["self_narrator_normal"]);
+        if ($mindPrompt) {
+            $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] .= " " . $mindPrompt;
+        }
     }
-    $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] .= "Aim for your responses to be 2-4 sentences. ";
+    $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] .= " Aim for your responses to be 2-4 sentences. ";
 }
 else {
     if (IsExplicitScene()) {

@@ -25,6 +25,7 @@ function ProcessIntegrations() {
     if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "minai_init") {
         // This is sent once by the SKSE plugin when the game is loaded. Do our initialization here.
         minai_log("info", "Initializing");
+        DropThreadsTableIfExists();
         InitiateDBTables();
         importXPersonalities();
         importScenesDescriptions();

@@ -29,6 +29,14 @@ Function BuildContext($name) {
   }
   $context .= GetSurvivalContext($name);
 
+  // Add mind influence context for player
+  if ($name == $GLOBALS["PLAYER_NAME"]) {
+      $mindState = GetMindInfluenceState($name);
+      if ($mindState != "normal") {
+          $context .= GetMindInfluenceContext($mindState) . "\n";
+      }
+  }
+
   return $context;
 }
 
