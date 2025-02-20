@@ -184,7 +184,7 @@ actor[] function BuildGroup(int size, int jMalesArr, int jFemalesArr)
     MinaiUtil.Debug("BuildGroup: Attempting to build male only group of size: "+group.length)
     jActorsArr = jMalesArr
   elseif (JArray.count(jFemalesArr) > 0)
-    MinaiUtil.Debug("BuildGroup: trying to build female only group of size: "+group.length)
+    MinaiUtil.Debug("BuildGroup: Attempting to build female only group of size: "+group.length)
     jActorsArr = jFemalesArr
   endif
 
@@ -194,7 +194,7 @@ actor[] function BuildGroup(int size, int jMalesArr, int jFemalesArr)
     j += 1
   endwhile
 
-  MinaiUtil.Debug("BuildGroup: succesfully built single gender group of size: "+group.length)
+  MinaiUtil.Debug("BuildGroup: Succesfully built single gender group of size: "+group.length)
   return group
 endfunction
 
@@ -207,7 +207,7 @@ bool function CheckGroup(actor[] actors, string framework)
     actors = OActorUtil.Sort(actors, PapyrusUtil.ActorArray(1))
     string sceneId = OLibrary.GetRandomSceneSuperloadCSV(actors, AnyActionType = "sexual")
     Utility.wait(0.2)
-    MinaiUtil.Debug("CheckGroup: ostim scene - "+sceneId)
+    MinaiUtil.Debug("CheckGroup: OStim scene - "+sceneId)
     return sceneId != ""
   else
     return sexlab.FindSexlabAnimations(actors, "").Length != 0

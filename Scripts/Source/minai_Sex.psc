@@ -226,7 +226,7 @@ Function ProcessActorsAndStartScenes(Actor[] actors)
     i += 1
   endwhile
 
-  MinaiUtil.Debug("Try to form orgy with: "+JArray.count(jMalesArr)+" males and "+JArray.count(jFemalesArr)+" females")
+  MinaiUtil.Debug("Attempting to form orgy with: "+JArray.count(jMalesArr)+" males and "+JArray.count(jFemalesArr)+" females")
 
   string framework = "sexlab"
   if(useOstim())
@@ -244,7 +244,7 @@ Function ProcessActorsAndStartScenes(Actor[] actors)
       groupSize = remainingActors - 3
       MinaiUtil.Debug("There are less than 9 actors, change orgy group size to "+groupSize)
     else
-      MinaiUtil.Debug("Try to form orgy group with size "+groupSize)
+      MinaiUtil.Debug("Attempt to form orgy group with size "+groupSize)
     endif
 
     actor[] group = sexUtil.BuildGroup(groupSize, jMalesArr, jFemalesArr)
@@ -253,7 +253,7 @@ Function ProcessActorsAndStartScenes(Actor[] actors)
     while(!sexUtil.CheckGroup(group, framework) && groupSize > 2)
       ; try to downsize group and build it again
       groupSize -= 1
-      MinaiUtil.Debug("User doesn't have animations for this orgy group, try to downsize to "+groupSize)
+      MinaiUtil.Debug("No animations available for this orgy group, downsize to "+groupSize+" and retry")
       ; add actors from group back to gender specific arrays
       int j = 0
       while(j < group.length)
@@ -271,10 +271,10 @@ Function ProcessActorsAndStartScenes(Actor[] actors)
 
     ; if group exists and it contains actors and user has animations for this group -> then start thread
     if(group && group.Length > 0 && sexUtil.CheckGroup(group, framework))
-      MinaiUtil.Debug("Group of "+groupSize+" was formed and initiated scene")
+      MinaiUtil.Debug("Group of "+groupSize+" was successfully formed and initiating scene")
       StartSexOrSwitchToGroup(group, group[0])
       countThreads += 1
-      Utility.Wait(3.0)
+      Utility.Wait(3.5)
     endif
   endwhile
 EndFunction
