@@ -248,7 +248,7 @@ Function ProcessActorsAndStartScenes(Actor[] actors)
     endif
 
     actor[] group = sexUtil.BuildGroup(groupSize, jMalesArr, jFemalesArr)
-    MinaiUtil.Debug("Orgy group members: "+group)
+
     ; if user has not valid animations for selected set of actors try to downsize and build group again
     while(!sexUtil.CheckGroup(group, framework) && groupSize > 2)
       ; try to downsize group and build it again
