@@ -14,6 +14,7 @@ if (!file_exists($configFilepath . "conf.php")) {
 
 require_once($rootEnginePath . "conf" . DIRECTORY_SEPARATOR . "conf.php");
 require_once($rootEnginePath . "lib" . DIRECTORY_SEPARATOR . "{$GLOBALS["DBDRIVER"]}.class.php");
+require_once("logger.php");
 
 $db = new sql();
 $GLOBALS['db'] = $db;

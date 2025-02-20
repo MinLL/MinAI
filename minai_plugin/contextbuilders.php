@@ -240,7 +240,7 @@ Function GetClothingContext($name) {
       $ret .= "{$concealedPrefix}{$name} is wearing very revealing attire, leaving them half naked.\n";
     }
     if (HasKeywordAndNotSkip($name, $eqContext, "EroticArmor")) {
-      $ret .= "{$concealedPrefix}{$name} is wearing a sexy revealing outfit.\n";
+      // $ret .= "{$concealedPrefix}{$name} is wearing a sexy revealing outfit.\n";
     }
     if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorSpendex")) {
       $ret .= "{$concealedPrefix}{$name}'s outfit is made out of latex (Referred to as Ebonite).\n";
