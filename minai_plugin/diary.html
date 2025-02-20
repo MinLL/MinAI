@@ -865,60 +865,36 @@
         }
 
         function goToPage(action) {
-            const searchActive = document.getElementById('search-text').value || 
-                                document.getElementById('search-location').value;
-            
-            if (searchActive) {
-                const filteredEntries = getEntriesForDate(currentDate);
-                const totalPages = Math.ceil(filteredEntries.length / ENTRIES_PER_PAGE);
-                
-                switch (action) {
-                    case 'first':
-                        currentPage = 0;
-                        break;
-                    case 'last':
-                        currentPage = totalPages - 1;
-                        break;
-                    case 'prev':
-                        if (currentPage > 0) currentPage--;
-                        break;
-                    case 'next':
-                        if (currentPage < totalPages - 1) currentPage++;
-                        break;
-                    default:
-                        if (typeof action === 'number') {
-                            currentPage = action;
-                        }
-                }
-            } else {
-                const dates = getAvailableDates();
-                const currentIndex = dates.indexOf(currentDate);
+            const validDates = getValidDates();
+            if (validDates.length === 0) return;
 
-                switch (action) {
-                    case 'first':
-                        currentDate = dates[dates.length - 1];
-                        break;
-                    case 'last':
-                        currentDate = dates[0];
-                        break;
-                    case 'prev':
-                        if (currentIndex < dates.length - 1) {
-                            currentDate = dates[currentIndex + 1];
-                        }
-                        break;
-                    case 'next':
-                        if (currentIndex > 0) {
-                            currentDate = dates[currentIndex - 1];
-                        }
-                        break;
-                    default:
-                        if (typeof action === 'number' && action >= 0 && action < dates.length) {
-                            currentDate = dates[action];
-                        }
-                }
-                currentPage = 0;
+            const currentIndex = validDates.indexOf(currentDate);
+            
+            switch (action) {
+                case 'first':
+                    currentDate = validDates[0];
+                    break;
+                case 'last':
+                    currentDate = validDates[validDates.length - 1];
+                    break;
+                case 'prev':
+                    if (currentIndex > 0) {
+                        currentDate = validDates[currentIndex - 1];
+                    }
+                    break;
+                case 'next':
+                    if (currentIndex < validDates.length - 1) {
+                        currentDate = validDates[currentIndex + 1];
+                    }
+                    break;
+                default:
+                    if (typeof action === 'number' && action >= 0 && action < validDates.length) {
+                        currentDate = validDates[action];
+                    }
             }
             
+            // Reset any page-specific state since we're showing all entries for a date
+            currentPage = 0;
             updateDisplay();
         }
 
@@ -1173,8 +1149,16 @@
         function displayEntries(entries) {
             const container = document.getElementById('entries-container');
             
-            // Filter entries for current date only
-            const currentDateEntries = entries.filter(entry => entry.topic === currentDate);
+            // Get all entries for current date
+            const currentDateEntries = entries.filter(entry => {
+                const entryDate = parseSkyrimDate(entry.topic);
+                const currentDateParsed = parseSkyrimDate(currentDate);
+                
+                return entryDate && currentDateParsed && 
+                       entryDate.year === currentDateParsed.year &&
+                       entryDate.month === currentDateParsed.month &&
+                       entryDate.day === currentDateParsed.day;
+            });
             
             if (!currentDateEntries || currentDateEntries.length === 0) {
                 container.innerHTML = `
@@ -1209,6 +1193,9 @@
 
             const html = `
                 <div class="diary-content">
+                    <div class="date-header" style="margin-bottom: 20px; font-size: 1.2em; color: var(--primary-color);">
+                        ${currentDate}
+                    </div>
                     ${rows.map(row => `
                         <div class="entries-row" style="display: grid; grid-template-columns: repeat(${entriesPerRow}, 1fr); gap: 20px;">
                             ${row.map(entry => `
@@ -1645,6 +1632,8 @@
                     }
             }
             
+            // Reset any page-specific state since we're showing all entries for a date
+            currentPage = 0;
             updateDisplay();
         }
 
