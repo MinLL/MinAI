@@ -234,28 +234,26 @@ Function ProcessActorsAndStartScenes(Actor[] actors)
   endif
 
   while((JArray.count(jMalesArr) > 0 || JArray.count(jFemalesArr) > 0) && countThreads < config.maxThreads)
-    MinaiUtil.Debug("Currently running threads: "+countThreads)
+    MinaiUtil.Debug("Currently running orgy threads: "+countThreads)
     int groupSize = Utility.RandomInt(3, 5)
-    MinaiUtil.Debug("Try to form group with size "+groupSize)
     int remainingActors = JArray.count(jMalesArr) + JArray.count(jFemalesArr)
-    if (remainingActors <= 8) 
-      
-      groupSize = remainingActors - 3
-      MinaiUtil.Debug("There are less than 8 actors change group size to "+groupSize)
-    endif
-
-    if(remainingActors <= 5) 
-      MinaiUtil.Debug("There are less than 5 actors change group size to "+groupSize)
+    if(remainingActors <= 5)
       groupSize = remainingActors
+      MinaiUtil.Debug("There are " + remainingActors + " actors remaining to process, this is the final orgy group")
+    elseif (remainingActors <= 8)
+      groupSize = remainingActors - 3
+      MinaiUtil.Debug("There are less than 9 actors, change orgy group size to "+groupSize)
+    else
+      MinaiUtil.Debug("Try to form orgy group with size "+groupSize)
     endif
 
     actor[] group = sexUtil.BuildGroup(groupSize, jMalesArr, jFemalesArr)
-
+    MinaiUtil.Debug("Orgy group members: "+group)
     ; if user has not valid animations for selected set of actors try to downsize and build group again
     while(!sexUtil.CheckGroup(group, framework) && groupSize > 2)
       ; try to downsize group and build it again
       groupSize -= 1
-      MinaiUtil.Debug("User doesn't have animations for this group, try to downsize to "+groupSize)
+      MinaiUtil.Debug("User doesn't have animations for this orgy group, try to downsize to "+groupSize)
       ; add actors from group back to gender specific arrays
       int j = 0
       while(j < group.length)
