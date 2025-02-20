@@ -886,7 +886,10 @@ function validateLLMResponse($responseContent) {
         "family friendly",
         "type of content",
         "I am to keep interactions",
-        "nsfw"
+        "nsfw",
+        'do not generate',
+        'respectful and appropriate',
+        'non-consensual'
     ];
 
     // Check if response contains any error strings
