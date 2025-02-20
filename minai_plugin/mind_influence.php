@@ -202,7 +202,41 @@ function GetMindInfluenceRequestFormat($state, $promptType = "default") {
     $useMasterPrompts = IsMaster($GLOBALS["HERIKA_NAME"]);
     
     if (!$useMasterPrompts) {
-        return "";  // Only add special request format for masters
+        $subtleFormats = [
+            "normal" => "",
+            "goodgirl" => "Remember that you are under a mental influence that makes you more compliant and eager to please. Your response should be polite and helpful, with a subtle undertone of submission to authority.",
+            "badgirl" => "Remember that you are under a mental influence that leaves you sexually frustrated and seeking approval. Your response should show slight distraction and a subtle need for validation.",
+            "verybadgirl" => "Remember that you are under a mental influence that leaves you intensely sexually frustrated. Your response should hint at your internal struggle while maintaining composure.",
+            "punishment" => "Remember that you are under a mental influence that makes you feel ashamed. Your response should be more reserved and self-conscious than usual.",
+            "post" => "Remember that your thoughts are slightly clouded by lingering mental influences. Your response should show subtle hints of uncertainty."
+        ];
+        
+        $subtleExplicitFormats = [
+            "normal" => "",
+            "goodgirl" => "Remember that you are under a mental influence that heightens your desire to please. Your response about intimate matters should reflect a subtle eagerness to comply.",
+            "badgirl" => "Remember that you are under a mental influence that leaves you sexually unfulfilled. Your response about intimate matters should hint at your underlying frustration.",
+            "verybadgirl" => "Remember that you are under a mental influence that torments you with need. Your response about intimate matters should subtly convey your desperate state.",
+            "punishment" => "Remember that you are under a mental influence that dulls pleasure. Your response about intimate matters should be more subdued and remorseful.",
+            "post" => "Remember that your desires feel slightly uncertain. Your response about intimate matters should reflect this subtle confusion."
+        ];
+        
+        $subtleCombatFormats = [
+            "normal" => "",
+            "goodgirl" => "Remember that you are under a mental influence that makes you more focused in combat. Your response should reflect controlled confidence.",
+            "badgirl" => "Remember that you are under a mental influence that affects your combat focus. Your response should hint at slight distraction.",
+            "verybadgirl" => "Remember that you are under a mental influence that makes you wild and desperate. Your response should suggest barely contained intensity.",
+            "punishment" => "Remember that you are under a mental influence that makes you doubt yourself. Your response should show subtle hesitation.",
+            "post" => "Remember that your combat reactions feel slightly off. Your response should hint at this subtle disconnection."
+        ];
+
+        switch($promptType) {
+            case "explicit":
+                return $subtleExplicitFormats[$state] ?? $subtleFormats[$state];
+            case "combat":
+                return $subtleCombatFormats[$state] ?? $subtleFormats[$state];
+            default:
+                return $subtleFormats[$state];
+        }
     }
     
     $baseFormats = [
