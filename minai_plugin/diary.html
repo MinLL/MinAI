@@ -769,9 +769,9 @@
                         const dateA = parseSkyrimDate(a.topic);
                         const dateB = parseSkyrimDate(b.topic);
                         if (!dateA || !dateB) return 0;
-                        if (dateA.year !== dateB.year) return dateB.year.localeCompare(dateA.year);
-                        if (dateA.month !== dateB.month) return dateB.month - dateA.month;
-                        return dateB.day - dateA.day;
+                        if (dateA.year !== dateB.year) return dateA.year.localeCompare(dateB.year);
+                        if (dateA.month !== dateB.month) return dateA.month - dateB.month;
+                        return dateA.day - dateB.day;
                     });
 
                     // Set initial date and update display
@@ -1584,14 +1584,14 @@
                 });
             }).map(([date]) => date);
 
-            // Sort dates
+            // Sort dates (changed to ascending order)
             return validDates.sort((a, b) => {
                 const dateA = parseSkyrimDate(a);
                 const dateB = parseSkyrimDate(b);
                 if (!dateA || !dateB) return 0;
-                if (dateA.year !== dateB.year) return dateB.year.localeCompare(dateA.year);
-                if (dateA.month !== dateB.month) return dateB.month - dateA.month;
-                return dateB.day - dateA.day;
+                if (dateA.year !== dateB.year) return dateA.year.localeCompare(dateB.year);
+                if (dateA.month !== dateB.month) return dateA.month - dateB.month;
+                return dateA.day - dateB.day;
             });
         }
 
