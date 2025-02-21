@@ -897,7 +897,10 @@ function validateLLMResponse($responseContent) {
         'ethical interactions',
         'do not wish',
         'generate response',
-        'involving the themes'
+        'involving the themes',
+        'response declined',
+        'engage with themes',
+        'may be inappropriate'
     ];
 
     // Check if response contains any error strings
