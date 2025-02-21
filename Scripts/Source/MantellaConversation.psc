@@ -898,3 +898,10 @@ EndFunction
 Function ClearRepeatingMessage()
     _repeatingMessage = ""
 EndFunction
+
+
+;; MINAI PATCH
+Bool Function IsActionsEmpty()
+    return _ingameEvents.Length == 0
+EndFunction
+;; END MINAI PATCH
