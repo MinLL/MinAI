@@ -547,6 +547,7 @@ string Function GetWornEquipments(Actor target)
   int slotsChecked
   slotsChecked += 0x00100000
   slotsChecked += 0x00200000
+  slotsChecked += 0x00400000
   slotsChecked += 0x80000000
 
   int currentSlot = 0x01
