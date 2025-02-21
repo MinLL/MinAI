@@ -8,6 +8,9 @@ class tng {
         if(strpos($longerStr, strtolower($str)) !== false) return true;
     }
     static function rollUpAList($someArray, $hasHave = false) {
+        if (empty($someArray)) {
+        return "";
+        }
         $count = count($someArray);
         if($count>1) {
             // prepend last element with "and" for "and so-and-so" in list

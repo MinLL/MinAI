@@ -8,6 +8,7 @@ require_once("weather.php");
 require_once("reputation.php");
 require_once("submissivelola.php");
 require_once("dirtandblood.php");
+require_once("exposure.php");
 require_once("fertilitymode.php");
 
 Function BuildContext($name) {
