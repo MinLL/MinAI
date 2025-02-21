@@ -1,6 +1,5 @@
 scriptname minai_ContextEffect extends ActiveMagicEffect
 
-
 minai_Sex sex
 minai_Survival survival
 minai_Arousal arousal
@@ -8,17 +7,23 @@ minai_DeviousStuff devious
 minai_AIFF aiff
 minai_MainQuestController main
 Spell ContextSpell
+minai_FillHerUp fillHerUp
 
 Event OnEffectStart(Actor akTarget, Actor akCaster)
   main = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_MainQuestController
   aiff = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_AIFF
   ContextSpell = Game.GetFormFromFile(0x090A, "MinAI.esp") as Spell
+  fillHerUp = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_FillHerUp
   if (!akTarget || !main || !aiff || !aiff.IsInitialized())
     Debug.Trace("[minai] Skipping OnEffectStart, not ready")
     return
   EndIf
   string targetName = Main.GetActorName(akTarget)
   main.Debug("Context OnEffectStart(" + targetName +")")
+  ; Register for Fill Her Up animations if mod is available
+  if fillHerUp
+    fillHerUp.RegisterForAnimationEvents(akTarget)
+  endif
   ; Do one update for actors the first time we enter a zone. Introduce a little jitter to distribute load.
   int updateTime = 2 + Utility.RandomInt(0, 5)
   RegisterForSingleUpdate(updateTime)
@@ -27,6 +32,10 @@ EndEvent
 
 Event OnEffectFinish(Actor akTarget, Actor akCaster)
   Main.Debug("Context OnEffectFinish( " + Main.GetActorName(akTarget) + ")")
+  ; Unregister Fill Her Up animations
+  if fillHerUp
+    fillHerUp.UnregisterForAnimationEvents(akTarget)
+  endif
   UnregisterForUpdate()
   DisableSelf(akTarget)
 EndEvent

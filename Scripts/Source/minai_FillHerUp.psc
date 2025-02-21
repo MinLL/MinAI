@@ -105,49 +105,12 @@ Function Maintenance(minai_MainQuestController _main)
         EndIf
 
         ; Register for all animation events
-        RegisterForAnimationEvents()
+        RegisterForAnimationEvents(playerRef)
     EndIf
 
     aiff.SetModAvailable("FillHerUp", bHasFillHerUp)
 EndFunction
 
-Function RegisterForAnimationEvents()
-    ; Register for all animation types
-    int i = 0
-    
-    ; Vaginal animations
-    while i < SPERM_OUT_START.Length
-        RegisterForAnimationEvent(playerRef, SPERM_OUT_START[i])
-        RegisterForAnimationEvent(playerRef, SPERM_OUT_LOOP[i])
-        RegisterForAnimationEvent(playerRef, SPERM_OUT_END[i])
-        i += 1
-    endwhile
-
-    ; Anal animations
-    i = 0
-    while i < SPERM_ANAL_START.Length
-        RegisterForAnimationEvent(playerRef, SPERM_ANAL_START[i])
-        RegisterForAnimationEvent(playerRef, SPERM_ANAL_LOOP[i])
-        RegisterForAnimationEvent(playerRef, SPERM_ANAL_END[i])
-        i += 1
-    endwhile
-
-    ; Oral animations
-    i = 0
-    while i < SPERM_ORAL_START.Length
-        RegisterForAnimationEvent(playerRef, SPERM_ORAL_START[i])
-        RegisterForAnimationEvent(playerRef, SPERM_ORAL_LOOP[i])
-        RegisterForAnimationEvent(playerRef, SPERM_ORAL_END[i])
-        i += 1
-    endwhile
-
-    ; Special animations
-    i = 0
-    while i < SPERM_EXPEL.Length
-        RegisterForAnimationEvent(playerRef, SPERM_EXPEL[i])
-        i += 1
-    endwhile
-EndFunction
 
 Event OnAnimationEvent(ObjectReference akSource, string asEventName)
     Main.Info("FillHerUp: OnAnimationEvent(" + akSource.GetBaseObject().GetName() + "): " + asEventName)
@@ -223,4 +186,86 @@ Function SetContext(actor akTarget)
     aiff.SetActorVariable(akTarget, "cumVaginal", cumVaginal)
     aiff.SetActorVariable(akTarget, "cumAnal", cumAnal)
     aiff.SetActorVariable(akTarget, "cumOral", cumOral)
+EndFunction
+
+Function RegisterForAnimationEvents(Actor akActor)
+    Main.Debug("FillHerUp: RegisterForAnimationEvents(" + main.GetActorName(akActor) + ")")
+    if !akActor
+        return
+    endif
+    
+    ; Register for all animation types
+    int i = 0
+    
+    ; Vaginal animations
+    while i < SPERM_OUT_START.Length
+        RegisterForAnimationEvent(akActor, SPERM_OUT_START[i])
+        RegisterForAnimationEvent(akActor, SPERM_OUT_LOOP[i])
+        RegisterForAnimationEvent(akActor, SPERM_OUT_END[i])
+        i += 1
+    endwhile
+
+    ; Anal animations 
+    i = 0
+    while i < SPERM_ANAL_START.Length
+        RegisterForAnimationEvent(akActor, SPERM_ANAL_START[i])
+        RegisterForAnimationEvent(akActor, SPERM_ANAL_LOOP[i])
+        RegisterForAnimationEvent(akActor, SPERM_ANAL_END[i])
+        i += 1
+    endwhile
+
+    ; Oral animations
+    i = 0
+    while i < SPERM_ORAL_START.Length
+        RegisterForAnimationEvent(akActor, SPERM_ORAL_START[i])
+        RegisterForAnimationEvent(akActor, SPERM_ORAL_LOOP[i])
+        RegisterForAnimationEvent(akActor, SPERM_ORAL_END[i])
+        i += 1
+    endwhile
+
+    ; Special animations
+    i = 0
+    while i < SPERM_EXPEL.Length
+        RegisterForAnimationEvent(akActor, SPERM_EXPEL[i])
+        i += 1
+    endwhile
+EndFunction
+
+Function UnregisterForAnimationEvents(Actor akActor) 
+    Main.Debug("FillHerUp: UnregisterForAnimationEvents(" + main.GetActorName(akActor) + ")")
+    if !akActor
+        return
+    endif
+
+    int i = 0
+    
+    ; Unregister all animation types
+    while i < SPERM_OUT_START.Length
+        UnregisterForAnimationEvent(akActor, SPERM_OUT_START[i])
+        UnregisterForAnimationEvent(akActor, SPERM_OUT_LOOP[i])
+        UnregisterForAnimationEvent(akActor, SPERM_OUT_END[i])
+        i += 1
+    endwhile
+
+    i = 0
+    while i < SPERM_ANAL_START.Length
+        UnregisterForAnimationEvent(akActor, SPERM_ANAL_START[i])
+        UnregisterForAnimationEvent(akActor, SPERM_ANAL_LOOP[i])
+        UnregisterForAnimationEvent(akActor, SPERM_ANAL_END[i])
+        i += 1
+    endwhile
+
+    i = 0
+    while i < SPERM_ORAL_START.Length
+        UnregisterForAnimationEvent(akActor, SPERM_ORAL_START[i])
+        UnregisterForAnimationEvent(akActor, SPERM_ORAL_LOOP[i])
+        UnregisterForAnimationEvent(akActor, SPERM_ORAL_END[i])
+        i += 1
+    endwhile
+
+    i = 0
+    while i < SPERM_EXPEL.Length
+        UnregisterForAnimationEvent(akActor, SPERM_EXPEL[i])
+        i += 1
+    endwhile
 EndFunction

@@ -858,10 +858,18 @@
                     errEl.innerHTML = result.message;
                 } else {
                     errEl.style.display = 'none';
+                    // Show the raw response
                     document.getElementById('rawResponse').innerHTML = result.data;
 
                     try {
-                        const personality = JSON.parse(result.data);
+                        // Extract JSON from the markdown-formatted response
+                        const jsonMatch = result.data.match(/\{[\s\S]*\}/);
+                        if (!jsonMatch) {
+                            throw new Error('No JSON object found in response');
+                        }
+                        
+                        const personality = JSON.parse(jsonMatch[0]);
+                        
                         // Auto-fill the new entry form with generated data
                         document.getElementById('newId').value = generateUniqueId();
                         document.getElementById('newOrientation').value = personality.orientation;
