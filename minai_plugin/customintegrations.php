@@ -193,6 +193,23 @@ function ProcessIntegrations() {
         $MUST_DIE=true;
     }
 
+    // Add handling for minai_combatenddefeat
+    if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "minai_combatenddefeat") {
+        // Store the defeat timestamp
+        $db = $GLOBALS['db'];
+        $id = "_minai_PLAYER//lastDefeat";
+        $db->delete("conf_opts", "id='{$id}'");
+        $db->insert(
+            'conf_opts',
+            array(
+                'id' => $id,
+                'value' => time()
+            )
+        );
+        minai_log("info", "Player was defeated in combat, blocking Attack command for 300 seconds");
+        $MUST_DIE=true;
+    }
+
     if ($MUST_DIE) {
         minai_log("info", "Done procesing custom request");
         die('X-CUSTOM-CLOSE');
