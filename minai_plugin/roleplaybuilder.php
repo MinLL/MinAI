@@ -71,6 +71,24 @@ function GetNameFromProfile() {
     return $HERIKA_NAME;
 }
 
+function getGaggedSpeech($name) {
+    // Check for any type of gag
+    if (!HasKeyword($name, "zad_DeviousGag") && 
+        !HasKeyword($name, "zad_DeviousGagPanel") && 
+        !HasKeyword($name, "zad_DeviousGagLarge")) {
+        return "";
+    }
+    
+    // Add gag context to the global roleplay settings
+    if (HasKeyword($name, "zad_DeviousGagLarge")) {
+        return "\nThe player is wearing a large ball gag and can only communicate through muffled sounds like 'mmph', 'nngh', and similar gagged noises. Keep their gagged speech short and clearly muffled.";
+    } else if (HasKeyword($name, "zad_DeviousGagPanel")) {
+        return "\nThe player is wearing a panel gag and can only speak in muffled, restricted sounds. Their speech should be short and clearly impeded.";
+    } else {
+        return "\nThe player is gagged and can only communicate through muffled sounds. Keep their speech short and obviously restricted.";
+    }
+}
+
 function interceptRoleplayInput() {
     if (IsEnabled($GLOBALS["PLAYER_NAME"], "isRoleplaying") && (isPlayerInput() || $GLOBALS["gameRequest"][0] == "minai_roleplay")) {
         if ($GLOBALS["gameRequest"][0] == "minai_roleplay") {
@@ -238,7 +256,8 @@ function interceptRoleplayInput() {
 
             $contextMessage .= $content;
         }
-
+        // Convert to gagged speech if player is gagged
+        $requestFormat .= getGaggedSpeech($PLAYER_NAME);
         // Build the messages array with proper spacing
         $messages = [
             ['role' => 'system', 'content' => $systemPrompt . "\n\n"],
@@ -265,6 +284,7 @@ function interceptRoleplayInput() {
             
             // Strip all quotes from the response
             $response = str_replace(["", '"'], '', $response);
+            
             
             minai_log("info", "Roleplay input transformed from \"{$originalInput}\" to \"{$response}\"");
             
