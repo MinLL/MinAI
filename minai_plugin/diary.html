@@ -1348,8 +1348,14 @@
                 return date && date.monthName === monthName && date.year === year;
             });
 
-            // Get the number of days in this month
+            // Get the number of days in this month and the starting day offset
             const daysInMonth = MONTH_DAYS[monthName];
+            const startDayOffset = getMonthStartDay(monthName, year);
+
+            // Create empty cells for days before the month starts
+            const emptyCells = Array.from({ length: startDayOffset }, () => 
+                `<div class="calendar-day"></div>`
+            ).join('');
 
             // Create calendar grid
             const days = Array.from({length: daysInMonth}, (_, i) => {
@@ -1417,7 +1423,7 @@
                 `;
             }).join('');
 
-            container.innerHTML = dayHeaders + days;
+            container.innerHTML = dayHeaders + emptyCells + days;
         }
 
         function jumpToDate(date) {

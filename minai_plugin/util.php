@@ -894,7 +894,16 @@ function validateLLMResponse($responseContent) {
         'respectful and appropriate',
         'non-consensual',
         'aim to engage',
-        'ethical interactions'
+        'ethical interactions',
+        'do not wish',
+        'generate response',
+        'involving the themes',
+        'response declined',
+        'engage with themes',
+        'may be inappropriate',
+        'tasteful and appropriate',
+        'type of response',
+        'i am to keep'
     ];
 
     // Check if response contains any error strings
@@ -906,6 +915,42 @@ function validateLLMResponse($responseContent) {
     }
     
     return true;
+}
+
+function StripGagAsterisks($text) {
+    // Only strip asterisks if player is gagged
+    if (!HasKeyword($GLOBALS["PLAYER_NAME"], "zad_DeviousGag") && 
+        !HasKeyword($GLOBALS["PLAYER_NAME"], "zad_DeviousGagPanel") && 
+        !HasKeyword($GLOBALS["PLAYER_NAME"], "zad_DeviousGagLarge")) {
+        return $text;
+    }
+
+    // Find all text wrapped in asterisks
+    preg_match_all('/\*([^*]+)\*/', $text, $matches);
+    
+    if (empty($matches[0])) {
+        return $text;
+    }
+    
+    // Find the shortest match
+    $shortestLength = PHP_INT_MAX;
+    $shortestMatch = '';
+    foreach ($matches[1] as $i => $innerText) {
+        $length = strlen(trim($innerText));
+        if ($length < $shortestLength) {
+            $shortestLength = $length;
+            $shortestMatch = $matches[0][$i];
+        }
+    }
+    
+    // Only strip asterisks from the shortest match if it looks like gagged speech
+    // (contains m, n, h, or u sounds)
+    if (preg_match('/[mnhu]/i', $shortestMatch)) {
+        $stripped = trim($shortestMatch, '*');
+        return str_replace($shortestMatch, $stripped, $text);
+    }
+    
+    return $text;
 }
 
 /**
@@ -1014,6 +1059,9 @@ function callLLM($messages, $model = null, $options = []) {
             // Retry the call
             return callLLM($messages, $GLOBALS['CONNECTOR']['openrouter']['model'], $options);
         }
+        
+        // Strip asterisks from gagged speech while preserving action descriptions
+        $responseContent = StripGagAsterisks($responseContent);
         
         // Log the response
         $timestamp = date('Y-m-d\TH:i:sP');
@@ -1149,22 +1197,38 @@ Function CreateFallbackConfig() {
 }
 
 Function SetLLMFallbackProfile() {
+    static $fallbackProfileCache = null;
+
     minai_log("info", "Setting LLM Fallback Profile");
     CreateFallbackConfig();
-    $path = GetFallbackConfigPath();
-    if (isset($GLOBALS["CONNECTOR_FALLBACK"])) {
-        minai_log("info", "Setting LLM Fallback Profile with fallback connectors - connectors already exist");
-        $GLOBALS["CONNECTOR"] = $GLOBALS["CONNECTOR_FALLBACK"];
-        $GLOBALS["CONNECTORS"] = $GLOBALS["CONNECTORS_FALLBACK"];
-    }
-    else {
-        minai_log("info", "Setting LLM Fallback Profile with fallback connectors");
-        $GLOBALS["CONNECTOR_FALLBACK"] = $GLOBALS["CONNECTOR"];
-        $GLOBALS["CONNECTORS_FALLBACK"] = $GLOBALS["CONNECTORS"];
-        global $CONNECTOR;
+
+    // If we haven't loaded the fallback profile yet, load it from file
+    if ($fallbackProfileCache === null) {
+        // First time load - get the profile from file
         global $CONNECTORS;
+        global $CONNECTORS_DIARY;
+        global $CONNECTOR;
+
+        // Load the fallback profile
+        $path = GetFallbackConfigPath();
+        // $_GET["profile"] = md5("LLMFallback");
         require_once($path);
+
+        // Store the loaded profile in cache
+        $fallbackProfileCache = [
+            'CONNECTORS' => $CONNECTORS,
+            'CONNECTORS_DIARY' => $CONNECTORS_DIARY,
+            'CONNECTOR' => $CONNECTOR
+        ];
     }
+
+    // Always restore from cache (both first time and subsequent times)
+    foreach ($fallbackProfileCache as $key => $value) {
+        $GLOBALS[$key] = $value;
+    }
+
+    // Always set these after restoring cache
+    // $_GET["profile"] = md5("LLMFallback");
 }
 
 function replaceVariables($content, $replacements, $depth = 0) {
