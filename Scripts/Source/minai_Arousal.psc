@@ -208,33 +208,19 @@ function WriteClothingString(actor akActor, actor player, bool isYou=false, acto
 					main.RegisterAction(actorName + "'s genitals are exposed.")
           string sizeDescription = ""
           Main.Debug("TNG Dick Check on "+ actorName)
-          ; Check for auto-assigned first
-          if currentActor.HasKeywordString("TNG_ActorAddnAuto:05")
+          int TNG_Size = TNG_PapyrusUtil.GetActorSize(currentactor)
+          if currentActor.HasKeyword(TNG_XL) || TNG_Size == 5
             sizeDescription = "one of the biggest cocks you've ever seen"
-          elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:04")
+          elseif currentActor.HasKeyword(TNG_L) || TNG_Size == 4
             sizeDescription = "a large cock"
-          elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:03")
+          elseif currentActor.HasKeyword(TNG_M) || currentActor.HasKeyword(TNG_DefaultSize) || TNG_Size == 3
             sizeDescription = "an average sized cock"
-          elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:02")
+          elseif currentActor.HasKeyword(TNG_S) || TNG_Size == 2
             sizeDescription = "a very small cock"
-          elseif currentActor.HasKeywordString("TNG_ActorAddnAuto:01")
+          elseif currentActor.HasKeyword(TNG_XS) || TNG_Size == 1
             sizeDescription = "an embarrassingly tiny prick"
           EndIf
-          if sizeDescription == ""
-            Main.Debug("TNG_ActorAddnAuto:0x not found on " + actorName + ", checking manual size assignment.")
-          EndIf
-          ; Supersede if manually set
-          if currentActor.HasKeyword(TNG_XL)
-            sizeDescription = "one of the biggest cocks you've ever seen"
-          elseif currentActor.HasKeyword(TNG_L)
-            sizeDescription = "a large cock"
-          elseif currentActor.HasKeyword(TNG_M) || currentActor.HasKeyword(TNG_DefaultSize)
-            sizeDescription = "an average sized cock"
-          elseif currentActor.HasKeyword(TNG_S)
-            sizeDescription = "a very small cock"
-          elseif currentActor.HasKeyword(TNG_XS)
-            sizeDescription = "an embarrassingly tiny prick"
-          EndIf
+          
           if sizeDescription != ""
             main.RegisterAction("You can see that " + actorName + " has " + sizeDescription + ".")
           else
@@ -506,6 +492,7 @@ Function SetContext(actor akTarget)
   aiff.SetActorVariable(akTarget, "isnaked", !cuirass)
   aiff.SetActorVariable(akTarget, "arousal", GetActorArousal(akTarget))
   aiff.SetActorVariable(akTarget, "isexposed", IsTNGExposed(akTarget))
+  aiff.SetActorVariable(akTarget, "TNG_Size", TNG_PapyrusUtil.GetActorSize(akTarget))
   if cuirass == None
     aiff.SetActorVariable(akTarget, "cuirass", "")
   Else
