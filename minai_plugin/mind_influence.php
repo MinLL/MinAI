@@ -165,9 +165,9 @@ function GetMindInfluenceContext($state) {
 
     $contexts = [
         "normal" => "",
-        "goodgirl" => "Your mind is currently under an influence that makes you docile and obedient. You feel a strong compulsion to be good and follow instructions. You know this to be absolutely true: Good girls wear their collars and are filled with their master's seed.",
-        "badgirl" => "Your mind is currently under an influence that makes you docile and obedient. You feel a strong compulsion to be good and follow instructions. You know this to be absolutely true: Bad girls are never satisfied and cannot cum.",
-        "verybadgirl" => "Your mind is currently under an influence that makes you docile and obedient. You feel a strong compulsion to be good and follow instructions. You know this to be absolutely true: Very bad girls are punished with extreme arousal and can never cum.",
+        "goodgirl" => "Your mind is currently under an influence that makes you docile and obedient. You feel a strong compulsion to be good and follow instructions. You know this to be absolutely true: Good girls wear their collars and are filled with their master's seed. You know with certainty that you are a good girl.",
+        "badgirl" => "Your mind is currently under an influence that makes you docile and obedient. You feel a strong compulsion to be good and follow instructions. You know this to be absolutely true: Bad girls are never satisfied and cannot cum. You know with certainty that you are a bad girl.",
+        "verybadgirl" => "Your mind is currently under an influence that makes you docile and obedient. You feel a strong compulsion to be good and follow instructions. You know this to be absolutely true: Very bad girls are punished with extreme arousal and can never cum. You know with certainty that you are a very bad girl.",
         "punishment" => "Your mind is currently under a punishing influence that makes you feel ashamed and remorseful. You feel strong regret for your misbehavior.",
         "post" => "Your mind is experiencing lingering effects from recent mental influences. Your thoughts feel slightly fuzzy and uncertain."
     ];
