@@ -28,6 +28,11 @@ String[] Property SPERM_ORAL_LOOP auto
 String[] Property SPERM_ORAL_END auto
 String[] Property SPERM_EXPEL auto
 
+; Pool masks
+int property VAGINAL		= 0x01 autoreadonly hidden
+int property ANAL		= 0x02 autoreadonly hidden
+int property ORAL		= 0x04 autoreadonly hidden
+
 Function Maintenance(minai_MainQuestController _main)
     main = _main
     aiff = (Self as Quest) as minai_AIFF
@@ -106,6 +111,11 @@ Function Maintenance(minai_MainQuestController _main)
 
         ; Register for all animation events
         RegisterForAnimationEvents(playerRef)
+        
+        ; Register for Fill Her Up mod events
+        RegisterForModEvent("SR_AbsorbEvent", "SRAbsorbEvent")
+        RegisterForModEvent("SR_InflateEvent", "SRInflateEvent") 
+        RegisterForModEvent("SR_InflateInjectorEvent", "SRInflateEventWithInjector")
     EndIf
 
     aiff.SetModAvailable("FillHerUp", bHasFillHerUp)
@@ -269,3 +279,148 @@ Function UnregisterForAnimationEvents(Actor akActor)
         i += 1
     endwhile
 EndFunction
+
+; Handler for absorption events
+Event SRAbsorbEvent(Form akSpeakerform, int poolmask, float amount, int time, string callback)
+    Main.Debug("FillHerUp: SRAbsorbEvent(" + akSpeakerform + ", " + poolmask + ", " + amount + ", " + time + ", " + callback + ")")
+    if !bHasFillHerUp
+        return
+    EndIf
+
+    Actor target = akSpeakerform as Actor
+    if !target
+        return
+    EndIf
+
+    string eventType = ""
+    string bodyPart = ""
+    if Math.LogicalAnd(poolmask, VAGINAL)
+        eventType = "absorb_vaginal"
+        bodyPart = "womb"
+    elseif Math.LogicalAnd(poolmask, ANAL)
+        eventType = "absorb_anal"
+        bodyPart = "bowels"
+    elseif Math.LogicalAnd(poolmask, ORAL)
+        eventType = "absorb_oral"
+        bodyPart = "stomach"
+    endif
+
+    if eventType != ""
+        string eventLine = main.GetActorName(target) + "'s body absorbed " + amount + " units of cum from their " + bodyPart + " over " + time + " seconds"
+        main.RegisterEvent(eventLine, "minai_fillherup_" + eventType)
+    EndIf
+EndEvent
+
+; Handler for inflation events 
+Event SRInflateEvent(Form akSpeakerform, Bool Inflation, int poolmask, float amount, int time, string callback)
+    Main.Debug("FillHerUp: SRInflateEvent(" + akSpeakerform + ", " + Inflation + ", " + poolmask + ", " + amount + ", " + time + ", " + callback + ")")
+    if !bHasFillHerUp
+        return
+    EndIf
+
+    Actor target = akSpeakerform as Actor
+    if !target
+        return
+    EndIf
+
+    string eventType = ""
+    string bodyPart = ""
+    string inflateAction = ""
+    if Inflation
+        inflateAction = "inflated with"
+    else
+        inflateAction = "deflated"
+    endif
+    
+    if Math.LogicalAnd(poolmask, VAGINAL)
+        if Inflation
+            eventType = "inflate_vaginal"
+        else
+            eventType = "deflate_vaginal"
+        endif
+        bodyPart = "womb"
+    elseif Math.LogicalAnd(poolmask, ANAL)
+        if Inflation
+            eventType = "inflate_anal"
+        else
+            eventType = "deflate_anal"
+        endif
+        bodyPart = "bowels"
+    elseif Math.LogicalAnd(poolmask, ORAL)
+        if Inflation
+            eventType = "inflate_oral"
+        else
+            eventType = "deflate_oral"
+        endif
+        bodyPart = "stomach"
+    endif
+
+    if eventType != ""
+        string eventLine = main.GetActorName(target) + "'s " + bodyPart + " was " + inflateAction + " " + amount + " units of cum over " + time + " seconds"
+        if Inflation
+            main.RequestLLMResponse(eventLine, "minai_fillherup_" + eventType)
+        else
+            main.RegisterEvent(eventLine, "minai_fillherup_" + eventType)
+        EndIf
+    EndIf
+EndEvent
+
+; Handler for inflation events with injector
+Event SRInflateEventWithInjector(Form akSpeakerform, Form akInjectorform, Bool Inflation, int poolmask, float amount, int time, string callback)
+    Main.Debug("FillHerUp: SRInflateEventWithInjector(" + akSpeakerform + ", " + akInjectorform + ", " + Inflation + ", " + poolmask + ", " + amount + ", " + time + ", " + callback + ")")
+    if !bHasFillHerUp
+        return
+    EndIf
+
+    Actor target = akSpeakerform as Actor
+    Actor injector = akInjectorform as Actor
+    if !target || !injector
+        return
+    EndIf
+
+    string eventType = ""
+    string bodyPart = ""
+    string inflateAction = ""
+    if Inflation
+        inflateAction = "inflated with"
+    else
+        inflateAction = "deflated"
+    endif
+    
+    if Math.LogicalAnd(poolmask, VAGINAL)
+        if Inflation
+            eventType = "inflate_vaginal"
+        else
+            eventType = "deflate_vaginal"
+        endif
+        bodyPart = "womb"
+    elseif Math.LogicalAnd(poolmask, ANAL)
+        if Inflation
+            eventType = "inflate_anal"
+        else
+            eventType = "deflate_anal"
+        endif
+        bodyPart = "bowels"
+    elseif Math.LogicalAnd(poolmask, ORAL)
+        if Inflation
+            eventType = "inflate_oral"
+        else
+            eventType = "deflate_oral"
+        endif
+        bodyPart = "stomach"
+    endif
+
+    if eventType != ""
+        string eventLine = main.GetActorName(target) + "'s " + bodyPart + " was " + inflateAction + " " + amount + " units of cum"
+        if Inflation
+            eventLine += " from " + main.GetActorName(injector)
+        endif
+        eventLine += " over " + time + " seconds"
+        
+        if Inflation
+            main.RequestLLMResponse(eventLine, "minai_fillherup_" + eventType)
+        else
+            main.RegisterEvent(eventLine, "minai_fillherup_" + eventType)
+        EndIf
+    EndIf
+EndEvent
