@@ -140,7 +140,7 @@ Function GetPenisSize($name) {
     elseif (HasKeyword($name, "TNG_XS")) {
         $sizeDescription = "an embarrassingly tiny prick";
     }
-    elseif ($tngsize == 4) {
+ /*    elseif ($tngsize == 4) {
         $sizeDescription = "one of the biggest cocks you've ever seen";
     }
     elseif($tngsize == 3) {
@@ -154,7 +154,7 @@ Function GetPenisSize($name) {
     }        
     elseif($tngsize == 0) {
         $sizeDescription = "an embarrassingly tiny prick";
-    }
+    } */
     if ($sizeDescription != "") {
         return "{$name} has {$sizeDescription}. ";
     }

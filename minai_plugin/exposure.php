@@ -58,13 +58,15 @@ function GetExposureContext($localActors) {
     $actorList[] = $GLOBALS["PLAYER_NAME"]; 
     foreach($actorList as $name) {
         $naked = $utilities->GetActorValue($name, "isexposed");
+        if($naked == true) {
+        $isnaked[] = $name;
         $tngsize = $utilities->GetActorValue($name, "tngsize");
-        if($tngsize == 0) $tngsize0[] = $name;
-        if($tngsize == 1) $tngsize1[] = $name;
-        if($tngsize == 2) $tngsize2[] = $name;
-        if($tngsize == 3) $tngsize3[] = $name;
-        if($tngsize == 4) $tngsize4[] = $name;
-        if($naked == true) $isnaked[] = $name;
+            if($tngsize == 0) $tngsize0[] = $name;
+            if($tngsize == 1) $tngsize1[] = $name;
+            if($tngsize == 2) $tngsize2[] = $name;
+            if($tngsize == 3) $tngsize3[] = $name;
+            if($tngsize == 4) $tngsize4[] = $name;
+        }
     }
 
     // build lists
@@ -72,19 +74,19 @@ function GetExposureContext($localActors) {
     if(!empty($naked)) {
         $verbiage .= tng::rollUpAList($isnaked) . "naked and exposed.\n";
     }
-    if(!empty($tngsize1)) {
+    if(!empty($tngsize0)) {
         $verbiage .= tng::rollUpAList($tngsize0, true) . "an embarrassingly tiny prick.\n";
     }
-    if(!empty($tngsize2)) {
+    if(!empty($tngsize1)) {
         $verbiage .= tng::rollUpAList($tngsize1, true) . "a very small cock.\n";
     }
-    if(!empty($tngsize3)) {
+    if(!empty($tngsize2)) {
         $verbiage .= tng::rollUpAList($tngsize2, true) . "an average size cock.\n";
     }
-    if(!empty($tngsize4)) {
+    if(!empty($tngsize3)) {
         $verbiage .= tng::rollUpAList($tngsize3, true) . "a large, impressive cock.\n";
     }
-    if(!empty($tngsize5)) {
+    if(!empty($tngsize4)) {
         $verbiage .= tng::rollUpAList($tngsize4, true) . "one of the biggest cocks you've ever seen.\n";
     }
 
