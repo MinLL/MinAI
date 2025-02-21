@@ -83,12 +83,13 @@ function GetMindInfluencePrompt($state, $promptType = "default") {
         "post" => "The lingering mental influence leaves you in a daze, unsure if your feelings and actions were entirely your own. Your thoughts and speech are clouded and uncertain."
     ];
     
-    $explicitPrompts = [
+    
+    $masterExplicitPrompts = [
         "normal" => "",
-        "goodgirl" => "The mental influence makes intimate moments feel deeply rewarding. You feel a profound sense of fulfillment, knowing you've pleased your master. You feel a strong compulsion to obey and satisfy those in authority.",
-        "badgirl" => "The mental influence leaves you achingly unfulfilled during intimate moments. You feel the weight of your disappointment, longing for your master's approval. Despite this, you still feel a compulsion to obey and seek pleasure from those in authority.",
-        "verybadgirl" => "The mental influence makes intimate moments torturously intense. Your arousal is heightened but unsatisfied, a consequence of defying your master's wishes. Yet, you still feel a compulsion to obey and earn forgiveness.",
-        "punishment" => "The mental influence makes intimate moments feel empty and hollow. You feel the sting of punishment, your desires muted by regret. You feel a strong compulsion to obey and make amends.",
+        "goodgirl" => "The mental influence makes intimate moments feel deeply rewarding. You feel a profound sense of fulfillment, knowing you've met expectations. You feel an overwhelming compulsion to obey and satisfy others' desires.",
+        "badgirl" => "The mental influence leaves you achingly unfulfilled during intimate moments. You feel the weight of disappointment, longing for approval. Despite this, you still feel an overwhelming compulsion to obey and please others.",
+        "verybadgirl" => "The mental influence makes intimate moments torturously intense. Your arousal is heightened but unsatisfied, a consequence of defying expectations. Yet, you still feel an overwhelming compulsion to obey and earn forgiveness.",
+        "punishment" => "The mental influence makes intimate moments feel empty and hollow. You feel the sting of punishment, your desires muted by regret. You feel an overwhelming compulsion to obey and make amends.",
         "post" => "The lingering mental influence leaves intimate moments feeling surreal. You're uncertain if your desires are truly your own, your thoughts and actions slightly disconnected."
     ];
     
