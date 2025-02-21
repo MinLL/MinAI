@@ -18,12 +18,15 @@ endfunction
 
 int function StartOstim(actor[] actors, string tags = "")
   MinaiUtil.Debug("StartSexScene processing for OStim: " + tags)
+  int playerIndex = actors.Find(PlayerRef)
+  if playerIndex > -1
+    actors = OActorUtil.SelectIndexAndSort(actors, PapyrusUtil.ActorArray(1))
+  else
+    actors = OActorUtil.Sort(actors, PapyrusUtil.ActorArray(1))
+  endif
   int builderID = OThreadBuilder.create(actors)
-
   string newScene = getSceneByActionsOrTags(actors, tags, true)
-
   OThreadBuilder.SetStartingAnimation(builderID, newScene)
-
   int newThreadID = OThreadBuilder.Start(builderID)
   MinaiUtil.Debug("OStim Thread [" + newThreadID + "] Initialized")
 
@@ -106,7 +109,7 @@ EndFunction
 ;     endif
 ; endfunction
 
-Function GoToScene(int ThreadID, string SceneID, float await = 0.0, bool isWarp = true)
+;/ Function GoToScene(int ThreadID, string SceneID, float await = 0.0, bool isWarp = true)
   ; if(interrupted)
   ;     return
   ; endif
@@ -118,11 +121,10 @@ Function GoToScene(int ThreadID, string SceneID, float await = 0.0, bool isWarp 
   if(await != 0)
       Utility.Wait(await)
   endif
-EndFunction
+EndFunction /;
 
 string function getSceneByActionsOrTags(actor[] actors, string tags, bool useRandom = false)
   string newScene
-  actors = OActorUtil.sort(actors, PapyrusUtil.ActorArray(1))
   if tags != ""
     MinaiUtil.Debug("Searching for OStim scene with Actions: " + tags)
     tags = ConvertTagsOstim(tags)
@@ -182,12 +184,12 @@ int function AddActorsToActiveThread(int ThreadID, actor[] newActors)
 endfunction
 
 function Navigate(int ThreadID, string newScene)
-  OThread.NavigateTo(ThreadID, newScene)
-  if OThread.IsInAutoMode(ThreadID)
-    OThread.StopAutoMode(ThreadID)
-    Utility.Wait(5)
-    OThread.StartAutoMode(ThreadID)
-  EndIf
+  OThread.QueueNavigation(ThreadID, newScene, 2.5)
+;  if OThread.IsInAutoMode(ThreadID)
+;    OThread.StopAutoMode(ThreadID)
+;    Utility.Wait(3)
+;    OThread.StartAutoMode(ThreadID)
+;  EndIf
 endfunction
 
 function SpeedUp(actor akActor)

@@ -137,7 +137,7 @@ string function buildSceneString(string sceneId, string actorString, string even
 endfunction
 
 actor[] function BuildGroup(int size, int jMalesArr, int jFemalesArr)
-  MinaiUtil.Debug("BuildGroup: Try to build group of "+size+" people size")
+  MinaiUtil.Debug("BuildGroup: Attempt to build group of "+size+" people")
   Actor[] group
   if(size == 2)
     group = new Actor[2]
@@ -150,13 +150,13 @@ actor[] function BuildGroup(int size, int jMalesArr, int jFemalesArr)
   endif
   ; both genders available. Set one of each and after random
   if (JArray.count(jMalesArr) > 0 && JArray.count(jFemalesArr) > 0) 
-    MinaiUtil.Debug("BuildGroup: trying to build group with both genders")
+    MinaiUtil.Debug("BuildGroup: Attempt to build group with both genders")
     actor male = UnshiftActor(jMalesArr)
     actor female = UnshiftActor(jFemalesArr)
     group[0] = male
     group[1] = female
     int i = 2
-    while(i < size && i < JArray.count(jMalesArr) + JArray.count(jFemalesArr))
+    while(i < size && 0 < JArray.count(jMalesArr) + JArray.count(jFemalesArr))
       if(JArray.count(jMalesArr) == JArray.count(jFemalesArr))
         if (Utility.RandomInt(0, 1) == 0) 
           group[i] = UnshiftActor(jMalesArr)
@@ -172,7 +172,7 @@ actor[] function BuildGroup(int size, int jMalesArr, int jFemalesArr)
       i += 1
     endwhile
 
-    MinaiUtil.Debug("BuildGroup: succesfully built group with both genders of size "+group.length)
+    MinaiUtil.Debug("BuildGroup: Succesfully built group of size: "+group.length+" with both genders")
 
     return group
   endif
@@ -181,10 +181,10 @@ actor[] function BuildGroup(int size, int jMalesArr, int jFemalesArr)
   
   ; just take a part of actors from either arrays since there is no other genders left
   if (JArray.count(jMalesArr) > 0) 
-    MinaiUtil.Debug("BuildGroup: trying to build group from males only")
+    MinaiUtil.Debug("BuildGroup: Attempting to build male only group of size: "+group.length)
     jActorsArr = jMalesArr
   elseif (JArray.count(jFemalesArr) > 0)
-    MinaiUtil.Debug("BuildGroup: trying to build group from females only")
+    MinaiUtil.Debug("BuildGroup: Attempting to build female only group of size: "+group.length)
     jActorsArr = jFemalesArr
   endif
 
@@ -194,7 +194,7 @@ actor[] function BuildGroup(int size, int jMalesArr, int jFemalesArr)
     j += 1
   endwhile
 
-  MinaiUtil.Debug("BuildGroup: succesfully built group with single gender of size "+group.length)
+  MinaiUtil.Debug("BuildGroup: Succesfully built single gender group of size: "+group.length)
   return group
 endfunction
 
@@ -207,7 +207,7 @@ bool function CheckGroup(actor[] actors, string framework)
     actors = OActorUtil.Sort(actors, PapyrusUtil.ActorArray(1))
     string sceneId = OLibrary.GetRandomSceneSuperloadCSV(actors, AnyActionType = "sexual")
     Utility.wait(0.2)
-    MinaiUtil.Debug("CheckGroup: ostim scene - "+sceneId)
+    MinaiUtil.Debug("CheckGroup: OStim scene - "+sceneId)
     return sceneId != ""
   else
     return sexlab.FindSexlabAnimations(actors, "").Length != 0
