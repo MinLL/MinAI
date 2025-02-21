@@ -92,7 +92,7 @@ Function GetPhysicalDescription($name) {
   $breastsScore = GetActorValue($name, "breastsScore");
   $buttScore = GetActorValue($name, "buttScore");
   $isexposed = GetActorValue($name, "isexposed");
-  $tngsize = GetActorValue($name, "TNG_Size");
+  $tngsize = GetActorValue($name, "tngsize");
   $ret = "";
   $isWerewolf = false;
   if ($gender != "" && $race != "") {
@@ -124,22 +124,7 @@ Function GetPhysicalDescription($name) {
 
 Function GetPenisSize($name) {
     $sizeDescription = "";
-    if ($tngsize == 5) {
-        $sizeDescription = "one of the biggest cocks you've ever seen";
-    }
-    elseif($tngsize == 4) {
-        $sizeDescription = "a large cock";
-    }
-    elseif($tngsize == 3) {
-        $sizeDescription = "an average sized cock";
-    }
-    elseif($tngsize == 2) {
-        $sizeDescription = "a very small cock";
-    }        
-    elseif($tngsize == 1) {
-        $sizeDescription = "an embarrassingly tiny prick";
-    }
-    elseif (HasKeyword($name, "TNG_XL")) {
+    if (HasKeyword($name, "TNG_XL")) {
         $sizeDescription = "one of the biggest cocks you've ever seen";
     }
     elseif(HasKeyword($name, "TNG_L")) {
@@ -152,6 +137,21 @@ Function GetPenisSize($name) {
         $sizeDescription = "a very small cock";
     }        
     elseif (HasKeyword($name, "TNG_XS")) {
+        $sizeDescription = "an embarrassingly tiny prick";
+    }
+    elseif ($tngsize == 4) {
+        $sizeDescription = "one of the biggest cocks you've ever seen";
+    }
+    elseif($tngsize == 3) {
+        $sizeDescription = "a large cock";
+    }
+    elseif($tngsize == 2) {
+        $sizeDescription = "an average sized cock";
+    }
+    elseif($tngsize == 1) {
+        $sizeDescription = "a very small cock";
+    }        
+    elseif($tngsize == 0) {
         $sizeDescription = "an embarrassingly tiny prick";
     }
     if ($sizeDescription != "") {

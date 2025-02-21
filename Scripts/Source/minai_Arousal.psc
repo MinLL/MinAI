@@ -209,15 +209,15 @@ function WriteClothingString(actor akActor, actor player, bool isYou=false, acto
           string sizeDescription = ""
           Main.Debug("TNG Dick Check on "+ actorName)
           int TNG_Size = TNG_PapyrusUtil.GetActorSize(currentactor)
-          if currentActor.HasKeyword(TNG_XL) || TNG_Size == 5
+          if currentActor.HasKeyword(TNG_XL) || TNG_Size == 4
             sizeDescription = "one of the biggest cocks you've ever seen"
-          elseif currentActor.HasKeyword(TNG_L) || TNG_Size == 4
+          elseif currentActor.HasKeyword(TNG_L) || TNG_Size == 3
             sizeDescription = "a large cock"
-          elseif currentActor.HasKeyword(TNG_M) || currentActor.HasKeyword(TNG_DefaultSize) || TNG_Size == 3
+          elseif currentActor.HasKeyword(TNG_M) || currentActor.HasKeyword(TNG_DefaultSize) || TNG_Size == 2
             sizeDescription = "an average sized cock"
-          elseif currentActor.HasKeyword(TNG_S) || TNG_Size == 2
+          elseif currentActor.HasKeyword(TNG_S) || TNG_Size == 1
             sizeDescription = "a very small cock"
-          elseif currentActor.HasKeyword(TNG_XS) || TNG_Size == 1
+          elseif currentActor.HasKeyword(TNG_XS) || TNG_Size == 0
             sizeDescription = "an embarrassingly tiny prick"
           EndIf
           
@@ -492,7 +492,7 @@ Function SetContext(actor akTarget)
   aiff.SetActorVariable(akTarget, "isnaked", !cuirass)
   aiff.SetActorVariable(akTarget, "arousal", GetActorArousal(akTarget))
   aiff.SetActorVariable(akTarget, "isexposed", IsTNGExposed(akTarget))
-  aiff.SetActorVariable(akTarget, "TNG_Size", TNG_PapyrusUtil.GetActorSize(akTarget))
+  
   if cuirass == None
     aiff.SetActorVariable(akTarget, "cuirass", "")
   Else
@@ -513,6 +513,12 @@ Function SetContext(actor akTarget)
   string gender = "male";
   if akTarget.GetActorBase().GetSex() != 0
     gender = "female"
+    if akTarget.HasKeyword(TNG_Gentlewoman)
+      aiff.SetActorVariable(akTarget, "tngsize", TNG_PapyrusUtil.GetActorSize(akTarget))
+    EndIf
+  EndIf
+  if gender == "male"
+    aiff.SetActorVariable(akTarget, "tngsize", TNG_PapyrusUtil.GetActorSize(akTarget))
   EndIf
   aiff.SetActorVariable(akTarget, "gender", gender)
   string actorRace = (akTarget.GetActorBase().GetRace() as Form).GetName()
@@ -655,16 +661,6 @@ string Function GetKeywordsForActor(actor akTarget)
       ret += "TNG_XL,"
     elseif akTarget.HasKeyword(TNG_DefaultSize)
       ret += "TNG_DefaultSize,"
-    elseif akTarget.HasKeywordString("TNG_ActorAddnAuto:01")
-      ret += "TNG_ActorAddnAuto:01,"
-    elseif akTarget.HasKeywordString("TNG_ActorAddnAuto:02")
-      ret += "TNG_ActorAddnAuto:02,"
-    elseif akTarget.HasKeywordString("TNG_ActorAddnAuto:03")
-      ret += "TNG_ActorAddnAuto:03,"
-    elseif akTarget.HasKeywordString("TNG_ActorAddnAuto:04")
-      ret += "TNG_ActorAddnAuto:04,"
-    elseif akTarget.HasKeywordString("TNG_ActorAddnAuto:05")
-      ret += "TNG_ActorAddnAuto:05,"
     EndIf
   EndIf
   int actorSex = akTarget.GetActorBase().GetSex()
