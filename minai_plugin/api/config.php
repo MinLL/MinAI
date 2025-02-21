@@ -11,9 +11,7 @@ require_once("../logger.php");
 // Then load the custom config if it exists, otherwise create it from base
 if (!file_exists("$pluginPath/config.php")) {
     copy("$pluginPath/config.base.php", "$pluginPath/config.php");
-} else {
-    require_once("$pluginPath/config.php");
-}
+} 
 
 // Function to build a string for indexed arrays using Array("value1", "value2") format
 function buildArrayString($array) {
@@ -46,6 +44,14 @@ function buildAssociativeArrayString($array) {
 
 // Read config data from the file (GET request)
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    if (isset($_GET['defaults']) && $_GET['defaults'] === 'true') {
+        // Return default configuration
+        require_once("$pluginPath/config.base.php");
+    }
+    else {
+        require_once("$pluginPath/config.base.php");
+        require_once("$pluginPath/config.php");
+    }
     // Prepare the response using the loaded configuration
     $configData = array(
         // Basic settings
