@@ -448,3 +448,116 @@ $GLOBALS["PROMPTS"]["minai_tntr_deathworm_trigger01"] = [
         "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} notices something strange about the ground): {$GLOBALS["target"]} notices small pebbles starting to shift and roll across the ground. An odd stillness fills the air!) {$GLOBALS["TEMPLATE_DIALOG"]}"
     ]
 ];
+
+// Fill Her Up animation prompts
+$GLOBALS["PROMPTS"]["minai_fillherup_spermout_start"] = [
+    "player_request"=>[
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]} begins leaking cum, their body trembling as the fluid starts to flow.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]} shivers as they feel the cum beginning to leak out.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s body tenses as they start expelling the cum inside them."
+    ]
+];
+
+$GLOBALS["PROMPTS"]["minai_fillherup_spermout_loop"] = [
+    "player_request"=>[
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]} continues to leak cum, their body quivering with each pulse.",
+        "The Narrator: #SEX_INFO The flow of cum from {$GLOBALS["target"]}'s body continues steadily.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s body continues to expel the cum inside them."
+    ]
+];
+
+$GLOBALS["PROMPTS"]["minai_fillherup_spermout_end"] = [
+    "player_request"=>[
+        "The Narrator: #SEX_INFO The flow of cum from {$GLOBALS["target"]}'s body finally slows to a stop.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]} sighs as the last of the cum drains from their body.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s body relaxes as they finish expelling the cum."
+    ]
+];
+
+$GLOBALS["PROMPTS"]["minai_fillherup_spermanal_start"] = [
+    "player_request"=>[
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]} feels the cum beginning to leak from their rear.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s body tenses as they begin expelling cum from their ass.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]} starts pushing out the cum filling their rear."
+    ]
+];
+
+$GLOBALS["PROMPTS"]["minai_fillherup_spermanal_loop"] = [
+    "player_request"=>[
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]} continues expelling cum from their rear.",
+        "The Narrator: #SEX_INFO The flow of cum from {$GLOBALS["target"]}'s ass continues steadily.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s body keeps pushing out the cum filling their rear."
+    ]
+];
+
+$GLOBALS["PROMPTS"]["minai_fillherup_spermanal_end"] = [
+    "player_request"=>[
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]} finishes expelling the cum from their rear.",
+        "The Narrator: #SEX_INFO The last of the cum drains from {$GLOBALS["target"]}'s ass.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s body relaxes as they finish pushing out the cum."
+    ]
+];
+
+$GLOBALS["PROMPTS"]["minai_fillherup_spermoral_start"] = [
+    "player_request"=>[
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]} begins to drool cum from their mouth.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]} starts expelling cum from their throat.",
+        "The Narrator: #SEX_INFO Cum begins to leak from {$GLOBALS["target"]}'s mouth."
+    ]
+];
+
+$GLOBALS["PROMPTS"]["minai_fillherup_spermoral_loop"] = [
+    "player_request"=>[
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]} continues drooling cum steadily.",
+        "The Narrator: #SEX_INFO Cum keeps flowing from {$GLOBALS["target"]}'s mouth.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s throat continues expelling cum."
+    ]
+];
+
+$GLOBALS["PROMPTS"]["minai_fillherup_spermoral_end"] = [
+    "player_request"=>[
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]} finishes expelling cum from their mouth.",
+        "The Narrator: #SEX_INFO The last drops of cum drip from {$GLOBALS["target"]}'s lips.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s throat finally stops leaking cum."
+    ]
+];
+
+$GLOBALS["PROMPTS"]["minai_fillherup_sperm_expel"] = [
+    "player_request"=>[
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]} forcefully expels the cum from their body, their muscles contracting with the effort.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]} pushes hard, forcing out the cum that had been filling them.",
+        "The Narrator: #SEX_INFO With determined effort, {$GLOBALS["target"]} expels the cum from their body."
+    ]
+];
+
+$GLOBALS["PROMPTS"]["minai_fillherup_sperm_expel_panting"] = [
+    "player_request"=>[
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]} pants heavily as they try to expel the cum from their body.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]} breathes hard with exertion as they push out the cum.",
+        "The Narrator: #SEX_INFO Panting with effort, {$GLOBALS["target"]} works to expel the cum filling them."
+    ]
+];
+
+$GLOBALS["PROMPTS"]["minai_fillherup_sperm_expel_refuse"] = [
+    "player_request"=>[
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s body refuses to expel the cum, keeping it trapped inside.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]} tries but fails to push out the cum filling them.",
+        "The Narrator: #SEX_INFO Despite their efforts, {$GLOBALS["target"]}'s body won't release the cum inside."
+    ]
+];
+
+$GLOBALS["PROMPTS"]["minai_fillherup_sperm_expel_fail"] = [
+    "player_request"=>[
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]} fails to expel the cum from their rear.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s attempts to push the cum from their ass prove futile.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]} struggles but can't expel the cum from their rear."
+    ]
+];
+
+$GLOBALS["PROMPTS"]["minai_fillherup_stomach_rubbing"] = [
+    "player_request"=>[
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]} rubs their swollen belly, feeling the cum shifting inside.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]} massages their cum-filled stomach gently.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]} tenderly caresses their belly, distended with cum."
+    ]
+];

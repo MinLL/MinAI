@@ -262,6 +262,7 @@ Function SetContext(actor akTarget)
   reputation.SetContext(akTarget)
   dirtAndBlood.SetContext(akTarget)
   fertility.SetContext(akTarget)
+  sex.SetContext(akTarget)
   StoreKeywords(akTarget)
   StoreFactions(akTarget)
   if config.disableAIAnimations && akTarget != player

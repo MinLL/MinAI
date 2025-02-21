@@ -19,6 +19,7 @@ minai_SexOstim ostim
 minai_SexSexlab sexlab
 minai_SexUtil sexUtil
 minai_Util MinaiUtil
+minai_FillHerUp fillHerUp
 
 float lastSexTalk
 
@@ -141,6 +142,18 @@ Function Maintenance(minai_MainQuestController _main)
 
   aiff.RegisterAction("ExtCmdFollow", "FollowTarget", "Start Following Player", "General", 1, 0, 2, 5, 300, true)
   aiff.RegisterAction("ExtCmdStopFollowing", "StopFollowing", "Stop Following Player", "General", 1, 0, 2, 5, 300, true)
+
+  fillHerUp = (Self as Quest) as minai_FillHerUp
+  fillHerUp.Maintenance(main)
+EndFunction
+
+Function SetContext(actor akTarget)
+  if !aiff
+    return
+  EndIf
+  
+  ; Add Fill Her Up context
+  fillHerUp.SetContext(akTarget)
 EndFunction
 
 ; Event onUpdate()
