@@ -218,7 +218,7 @@ EndFunction
 int function CountMatch(string sayLine, string lineToMatch)
   int count = 0
   int index = 0
-  while index != -1
+  while index != -1 && count < 30
     index = StringUtil.Find(sayLine, lineToMatch, index+1)
     count += 1
   endWhile

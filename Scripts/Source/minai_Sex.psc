@@ -233,7 +233,9 @@ Function ProcessActorsAndStartScenes(Actor[] actors)
     framework = "ostim"
   endif
 
-  while((JArray.count(jMalesArr) > 0 || JArray.count(jFemalesArr) > 0) && countThreads < config.maxThreads)
+  int count2 = 0
+  while((JArray.count(jMalesArr) > 0 || JArray.count(jFemalesArr) > 0) && countThreads < config.maxThreads && count2 < 30)
+    count2 += 1
     MinaiUtil.Debug("Currently running orgy threads: "+countThreads)
     int groupSize = Utility.RandomInt(3, 5)
     int remainingActors = JArray.count(jMalesArr) + JArray.count(jFemalesArr)
@@ -250,7 +252,9 @@ Function ProcessActorsAndStartScenes(Actor[] actors)
     actor[] group = sexUtil.BuildGroup(groupSize, jMalesArr, jFemalesArr)
 
     ; if user has not valid animations for selected set of actors try to downsize and build group again
-    while(!sexUtil.CheckGroup(group, framework) && groupSize > 2)
+    int count3 = 0
+    while(!sexUtil.CheckGroup(group, framework) && groupSize > 2 && count3 < 30)
+      count3 += 1
       ; try to downsize group and build it again
       groupSize -= 1
       MinaiUtil.Debug("No animations available for this orgy group, downsize to "+groupSize+" and retry")

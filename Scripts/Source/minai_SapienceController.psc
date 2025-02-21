@@ -128,8 +128,10 @@ actor[] Function FindActors(bool returnAll = False, Actor exclude = None)
     ret = new actor[2]
     int actor1 = PO3_SKSEFunctions.GenerateRandomInt(0, nearbyActors.Length - 1)
     int actor2 = actor1
-    while actor2 == actor1
+    int count = 0
+    while actor2 == actor1 && count < 30
       actor2 = PO3_SKSEFunctions.GenerateRandomInt(0, nearbyActors.Length - 1)
+      count += 1
     endwhile
     ret[0] = nearbyActors[actor1]
     ret[1] = nearbyActors[actor2]
