@@ -900,7 +900,10 @@ function validateLLMResponse($responseContent) {
         'involving the themes',
         'response declined',
         'engage with themes',
-        'may be inappropriate'
+        'may be inappropriate',
+        'tasteful and appropriate',
+        'type of response',
+        'i am to keep'
     ];
 
     // Check if response contains any error strings
@@ -915,6 +918,13 @@ function validateLLMResponse($responseContent) {
 }
 
 function StripGagAsterisks($text) {
+    // Only strip asterisks if player is gagged
+    if (!HasKeyword($GLOBALS["PLAYER_NAME"], "zad_DeviousGag") && 
+        !HasKeyword($GLOBALS["PLAYER_NAME"], "zad_DeviousGagPanel") && 
+        !HasKeyword($GLOBALS["PLAYER_NAME"], "zad_DeviousGagLarge")) {
+        return $text;
+    }
+
     // Find all text wrapped in asterisks
     preg_match_all('/\*([^*]+)\*/', $text, $matches);
     
@@ -1198,11 +1208,6 @@ Function SetLLMFallbackProfile() {
         global $CONNECTORS;
         global $CONNECTORS_DIARY;
         global $CONNECTOR;
-        global $TTSFUNCTION;
-        global $TTS;
-        global $STT;
-        global $ITT;
-        global $FEATURES;
 
         // Load the fallback profile
         $path = GetFallbackConfigPath();
@@ -1213,12 +1218,7 @@ Function SetLLMFallbackProfile() {
         $fallbackProfileCache = [
             'CONNECTORS' => $CONNECTORS,
             'CONNECTORS_DIARY' => $CONNECTORS_DIARY,
-            'CONNECTOR' => $CONNECTOR,
-            'TTSFUNCTION' => $TTSFUNCTION,
-            'TTS' => $TTS,
-            'STT' => $STT,
-            'ITT' => $ITT,
-            'FEATURES' => $FEATURES
+            'CONNECTOR' => $CONNECTOR
         ];
     }
 
