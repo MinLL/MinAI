@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         minai_log("info", json_encode($prompt));
 
-        $connectionHandler = new connector();
+        $connectionHandler = new $GLOBALS["CONNECTORS_DIARY"];
 
         $connectionHandler->open($prompt, []);
         $buffer = "";
