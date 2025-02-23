@@ -14,6 +14,7 @@ if (!file_exists($configFilepath . "conf.php")) {
 
 require_once($rootEnginePath . "conf" . DIRECTORY_SEPARATOR . "conf.php");
 require_once($rootEnginePath . "lib" . DIRECTORY_SEPARATOR . "{$GLOBALS["DBDRIVER"]}.class.php");
+require_once("logger.php");
 
 $db = new sql();
 $GLOBALS['db'] = $db;
@@ -22,7 +23,7 @@ $response = ['status' => 'success'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'];
-    error_log('post action: ' . $action);
+    minai_log("info", 'post action: ' . $action);
     if ($action === 'add') {
         // Add new row
         $baseFormId = $db->escape($_POST['baseFormId']);
@@ -43,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Update existing record
         $updateQuery = "UPDATE equipment_description SET description = '{$description}' WHERE baseFormId = '{$baseFormId}' AND modName = '{$modName}'";
-        error_log('update query: ' . $updateQuery);
+        minai_log("info", 'update query: ' . $updateQuery);
         $db->execQuery($updateQuery);
 
     } elseif ($action === 'delete') {
@@ -101,4 +102,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['act
 
     echo json_encode(['status' => 'success', 'data' => $data]);
 }
-?>

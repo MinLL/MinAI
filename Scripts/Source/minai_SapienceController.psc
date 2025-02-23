@@ -128,8 +128,10 @@ actor[] Function FindActors(bool returnAll = False, Actor exclude = None)
     ret = new actor[2]
     int actor1 = PO3_SKSEFunctions.GenerateRandomInt(0, nearbyActors.Length - 1)
     int actor2 = actor1
-    while actor2 == actor1
+    int count = 0
+    while actor2 == actor1 && count < 30
       actor2 = PO3_SKSEFunctions.GenerateRandomInt(0, nearbyActors.Length - 1)
+      count += 1
     endwhile
     ret[0] = nearbyActors[actor1]
     ret[1] = nearbyActors[actor2]
@@ -215,10 +217,16 @@ Function ResetRechat()
 EndFunction
 
 Function TriggerRechat(string actor1name, string actor2name)
-  ; string payload = utility.GetCurrentRealTime() + "|" + utility.GetCurrentGameTime()  + "|" + playerRef.GetCurrentLocation() + "|" + speakerName + " has something to say"
-  ; AIAgentFunctions.logMessageForActor("rechat", payload)
+  ; Update dialogue times for both actors
+  aiff.UpdateLastDialogueTime(actor1name) 
+  aiff.UpdateLastDialogueTime(actor2name)
+  
   if actor2name == Main.GetActorName(playerRef)
     Main.Debug("SAPIENCE: Not rechatting with player")
+    return
+  EndIf
+  if actor2name == "The Narrator"
+    Main.Debug("SAPIENCE: Not rechatting with The Narrator")
     return
   EndIf
   Main.Info("SAPIENCE: Rechat triggered (" + actor2name + " => " + actor1name + "): " + numRechatsSoFar + "/" + targetRechatCount)
@@ -259,6 +267,9 @@ EndFunction
 
 Event OnTextReceived(String speakerName, String sayLine)
   if minai_SapienceEnabled.GetValueInt() == 1
+    ; Update dialogue time when text is received
+    aiff.UpdateLastDialogueTime(speakerName)
+    
     Main.Debug("SAPIENCE: Received LLM response, Resetting radiant dialogue cooldown.")
     CheckForRechat(speakerName)
     StartNextUpdate()
@@ -297,3 +308,8 @@ Event OnKeyDown(int KeyCode)
   ;    StartNextUpdate()
   ;  EndIf
 EndEvent
+
+Function ResetAndStartNextUpdate(float nextTime = 0.0)
+  ResetRechat()
+  StartNextUpdate(nextTime)
+EndFunction

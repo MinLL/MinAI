@@ -23,6 +23,17 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
 ### Action Registry (CHIM)
 * All commands can be enabled or disabled in the MCM.
 * All commands can be configured with cooldowns, with exponential backoff parameters. Effectively, this means that you can set a cooldown on a command, and have the cooldown increase every time that command is used, until enough time passes for the cooldown to reset back to base values.
+
+### Roleplay Assistant
+* This system can optionally preprocess player messages to better match their character's roleplay style
+* Can transform casual modern speech into lore-appropriate Skyrim dialogue that will automatically adapt to the character's personality, roleplay, and the situation.
+* Allows players to prompt their character to respond to situations without explicit direction
+* Uses the summary connector from either the narrator profile (if enabled) or the default profile
+* Examples of transformations:
+  * "Min: What the fuck?" → "Min: By the Nine, what in Oblivion is this?!"
+  * "Min: I'm really tired" → "Min: These weary bones could use some rest at an inn..."
+  * "Min: That's awesome!" → "Min: By Ysmir, that's incredible!"
+
 ### Sapience
 * This mod exposes an option allowing you to dynamically enable / disable AI for all actors near the player. This generally means that you can just walk up to any NPC in the world, and start interacting with them seamlessly. This also implements radiant dialogue (Similar to the mantella feature), except more powerful / less buggy.
 ### CHIM-Specific Configuration Options:
@@ -76,21 +87,17 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
 This mod enables a number of optional [nsfw](https://github.com/MinLL/MinAI/blob/main/nsfw.md) integrations that are disabled by default. These will not effect your game unless you have the nsfw mods installed.
 
 # Installation
-## Hard Requirements
-* This mod requires a functional installation of either CHIM, Mantella, or both (and their respective dependencies). DO THIS FIRST and seek assistance in those forums. When you are up and running well, return here and continue installation as follows:
-* Papyrus Tweaks is required. Install the version appropriate for your game (SE/AE/VR).
-* Requires the latest version of JContainers.
-* Requires the latest version of Papyrus Extender.
-
-## Soft Requirements
+## Requirements
+* This mod requires a functional installation of either [CHIM](https://www.nexusmods.com/skyrimspecialedition/mods/126330), [Mantella](https://www.nexusmods.com/skyrimspecialedition/mods/98631), or both (and their respective dependencies). DO THIS FIRST and seek assistance in those forums. When you are up and running well, return here and continue installation as follows:
+* [Papyrus Tweaks NG](https://www.nexusmods.com/skyrimspecialedition/mods/77779).
+* [JContainers SE](https://www.nexusmods.com/skyrimspecialedition/mods/16495).
+* [powerofthree's Papyrus Extender](https://www.nexusmods.com/skyrimspecialedition/mods/22854). (VR: also install [Papyrus Extender VR](https://www.nexusmods.com/skyrimspecialedition/mods/58296))
+* [Spell Perk Item Distributor (SPID)](https://www.nexusmods.com/skyrimspecialedition/mods/36869), if using MinAI's Sapience feature. (VR: [Spell Perk Item Distributor (SPID) VR](https://www.nexusmods.com/skyrimspecialedition/mods/59121))
 * See the features section. All supported mods are soft requirements. 
-* Sapience requires SPID in order to function.
 
 ## Installation Steps (CHIM)
 * Download and install this mod through your mod organizer of choice.
-* Copy the minai_plugin folder to your Herika Server plugins directory (this is in your wsl VM, under This PC in File Explorer). You can easily access this folder by running the "tools/AI-FF Plugins Folder" file in your DwemerAI4Skyrim3 directory.
-* After installing the plugin, run the CHIM Server Update file that came with DwemerDistro.
-* In the web UI for CHIM, validate that the plugin has loaded by clicking "Plugins" on the top right.
+* Use the CHIM plugin manager to install the plugin (Server Plugins -> Plugin Manager)
 * Navigate to the configuration page for MinAI (From the plugins page), and configure the mod to your liking.
 
 ## Installation Steps (MANTELLA)

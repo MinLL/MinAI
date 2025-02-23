@@ -1,43 +1,170 @@
 name: Build release
 
-on: 
+on:
   workflow_dispatch:
     inputs:
       tag:
-        required: True
+        required: true
   push:
-    tags:  # Tags need to be annotated with git tag 1.x.x -a; push tags with git push origin 1.x.x, or use follow tags = true in git config file.
-    - '*'
-  
+    tags:
+      - '*'
+
 jobs:
   build:
     runs-on: windows-latest
     
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Move mod files
-      run: |
-        mkdir minai
-        mv minai_plugin minai/
-        mv *.esp minai/
-        mv *.ini minai/
-        mv Scripts minai/
-        mv Data minai/
-        mv mantella_files minai/
-        
-    - name: Zip the files
-      uses: TheDoctor0/zip-release@0.7.6
-      with:
-        path: "./minai/*"
-        type: "zip"
-        filename: "MinAI-${{github.ref_name}}:.zip"
+    # Define REF_NAME as an environment variable for the entire job
+    env:
+      REF_NAME: ${{ github.ref_name }}
 
-    - name: Upload Release
-      uses: ncipollo/release-action@v1.14.0
-      with:
-        artifacts: "MinAI-${{github.ref_name}}:.zip"
-        token: ${{ secrets.RELEASE_TOKEN }}
-        generateReleaseNotes: true
-        prerelease: true  # Remember to set release status manually
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create BAIN folders and move files
+        run: |
+          # Create the main packaging folder and BAIN subfolders
+          mkdir minai
+          mkdir "minai/000 Required - Core Files"
+          mkdir "minai/200 Optional - BakaScripts"
+          mkdir "minai/300 Optional - Mantella"
+
+          # Move core files -> 000 Required - Core Files
+          Move-Item -Path Scripts -Destination "minai/000 Required - Core Files" -Force -ErrorAction SilentlyContinue
+          Move-Item -Path Data -Destination "minai/000 Required - Core Files" -Force -ErrorAction SilentlyContinue
+          Move-Item -Path *.esp -Destination "minai/000 Required - Core Files" -Force -ErrorAction SilentlyContinue
+          Move-Item -Path *.ini -Destination "minai/000 Required - Core Files" -Force -ErrorAction SilentlyContinue
+
+          # Move Baka scripts (Baka*.pex) -> 200 Optional - BakaScripts
+          if (Test-Path "minai/000 Required - Core Files/Scripts") {
+            Get-ChildItem -Path "minai/000 Required - Core Files/Scripts" -Filter "Baka*.pex" -Recurse -File |
+              Move-Item -Destination "minai/200 Optional - BakaScripts" -Force
+          }
+
+          # Move mantella_files -> 300 Optional - Mantella
+          Move-Item -Path mantella_files -Destination "minai/300 Optional - Mantella" -Force -ErrorAction SilentlyContinue
+
+      - name: Create and populate fomod/images
+        run: |
+          mkdir -p "minai/fomod/images"
+          # Rename splash if present
+          if (Test-Path "minai_plugin/splash.png") {
+            Copy-Item -Path "minai_plugin/splash.png" -Destination "minai/fomod/images/minai_banner.png" -Force
+          }
+
+      - name: Generate info.xml
+        shell: pwsh
+        run: |
+          $refName = $env:REF_NAME
+
+          $infoXml = @"
+          <?xml version='1.0' encoding='UTF-16'?>
+          <fomod>
+            <Name>MinAI</Name>
+            <Author>Min</Author>
+            <Id>128980</Id>
+            <Version MachineVersion='$refName'>$refName</Version>
+            <Website>https://github.com/MinLL/MinAI</Website>
+            <Groups>
+              <element>Gameplay</element>
+            </Groups>
+            <Description>
+          <![CDATA[
+          LLM Integrations with Skyrim
+          
+          Features:
+           - Core Files
+           - Optional TNTR Support
+           - Optional Mantella Files
+          
+          Version: $refName
+          
+          Thanks for downloading!
+          ]]>
+            </Description>
+          </fomod>
+          "@
+
+          Set-Content -Path "minai/fomod/info.xml" -Value $infoXml -Encoding Unicode
+
+      - name: Generate ModuleConfig.xml
+        shell: pwsh
+        run: |
+          $moduleConfig = @"
+          <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:noNamespaceSchemaLocation="http://qconsulting.ca/fo3/ModConfig5.0.xsd">
+          
+            <moduleName>MinAI FOMOD Installer</moduleName>
+          
+            <!-- Optionally install all core files automatically -->
+            <requiredInstallFiles>
+              <folder source="000 Required - Core Files" destination="" priority="0"/>
+            </requiredInstallFiles>
+          
+            <installSteps order="Explicit">
+              <installStep name="Optional Integrations">
+                <!-- 
+                  If you want one big image at the top, place it here:
+                  <image path="fomod/images/minai_banner.png"/>
+                -->
+                <optionalFileGroups order="Explicit">
+          
+                  <!-- Group #1: TNTR Support -->
+                  <group name="TNTR Support" type="SelectAny">
+                    <plugins order="Explicit">
+                      <plugin name="TNTR v0.5 Patch">
+                        <description>Select this option to install a patch to support TNTR v0.5</description>
+                        <!-- Per-plugin image (optional) -->
+                        <image path="fomod/images/minai_banner.png"/>
+                        <files>
+                          <folder source="200 Optional - BakaScripts" destination="Scripts" priority="1"/>
+                        </files>
+                        <typeDescriptor>
+                          <type name="Optional"/>
+                        </typeDescriptor>
+                      </plugin>
+                    </plugins>
+                  </group>
+          
+                  <!-- Group #2: Mantella Files -->
+                  <group name="Mantella Files" type="SelectAny">
+                    <plugins order="Explicit">
+                      <plugin name="Install mantella_files">
+                        <description>Install optional files for Mantella Support</description>
+                        <!-- Another per-plugin image if you want:
+                             <image path="fomod/images/mantella_banner.png"/>
+                        -->
+                        <files>
+                          <!-- Installs 300 Optional - Mantella to Data -->
+                          <folder source="300 Optional - Mantella" destination="" priority="2"/>
+                        </files>
+                        <typeDescriptor>
+                          <type name="Optional"/>
+                        </typeDescriptor>
+                      </plugin>
+                    </plugins>
+                  </group>
+          
+                </optionalFileGroups>
+              </installStep>
+            </installSteps>
+          
+          </config>
+          "@
+
+          Set-Content -Path "minai/fomod/ModuleConfig.xml" -Value $moduleConfig -Encoding Unicode
+
+      - name: Zip the mod files
+        uses: TheDoctor0/zip-release@0.7.6
+        with:
+          path: "./minai/*"
+          type: "zip"
+          filename: "MinAI-${{ env.REF_NAME }}.zip"
+
+      - name: Upload Release
+        uses: ncipollo/release-action@v1.14.0
+        with:
+          artifacts: "MinAI-${{ env.REF_NAME }}.zip"
+          token: ${{ secrets.RELEASE_TOKEN }}
+          generateReleaseNotes: true
+          prerelease: true

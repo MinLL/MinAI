@@ -163,4 +163,4 @@ if (!IsRadiant()) { // Don't enable these commands for NPC's
         RegisterAction("ExtCmdTrainSkill");
     }
 }
-?>
+

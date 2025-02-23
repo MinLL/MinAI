@@ -53,10 +53,26 @@ int actionDecayWindowOID
 int testActionsOID
 int addSpellsOID
 int removeSpellsOID
-
-int toggleSapienceOID
-int Property toggleSapienceKey = -1 Auto
 int toggleCombatDialogueOID
+int toggleSapienceOID
+
+int singKeyOID          ; New OID for sing keybind
+int narratorKeyOID      ; New OID for narrator keybind
+int narratorTextKeyOID  ; New OID for narrator text input keybind
+
+; Add new OID definitions near other key OIDs
+int roleplayKeyOID      ; New OID for roleplay voice keybind
+int roleplayTextKeyOID  ; New OID for roleplay text input keybind
+
+; Key properties
+int Property toggleSapienceKey = -1 Auto
+int Property singKey = -1 Auto          ; New property for sing key
+int Property narratorKey = -1 Auto      ; New property for narrator key
+int Property narratorTextKey = -1 Auto  ; New property for narrator text input key
+
+; Add new key properties
+int Property roleplayKey = -1 Auto          ; Property for roleplay voice key
+int Property roleplayTextKey = -1 Auto      ; Property for roleplay text key
 
 ; Legacy globals
 GlobalVariable useCBPC
@@ -153,14 +169,40 @@ int Property maxRadianceRechats = 5 Auto
 float maxThreadsDefault = 5.0
 float Property maxThreads = 5.0 Auto
 
-bool allowSexTransitionsDefault = True
-bool Property allowSexTransitions = True Auto
+bool allowSexTransitionsDefault = False
+bool Property allowSexTransitions = False Auto
 
 bool allowActorsToJoinSexDefault = False
 bool Property allowActorsToJoinSex = False Auto
 
 bool toggleCombatDialogueDefault = True
 bool property toggleCombatDialogue = True Auto
+
+bool updateNarratorProfileDefault = False
+bool Property updateNarratorProfile = False Auto
+
+int updateNarratorProfileOID
+
+bool preserveQueueDefault = True
+bool Property preserveQueue = True Auto
+
+int preserveQueueOID
+
+bool trackVictimAwarenessDefault = True
+bool Property trackVictimAwareness = True Auto
+
+int trackVictimAwarenessOID
+
+bool enableConsoleLoggingDefault = True
+bool Property enableConsoleLogging = True Auto
+
+int enableConsoleLoggingOID
+
+; Add near other property declarations
+bool disableSapienceInStealthDefault = False
+bool Property disableSapienceInStealth = False Auto
+
+int disableSapienceInStealthOID
 
 Event OnConfigInit()
   main.Info("Building mcm menu.")
@@ -230,21 +272,31 @@ Function RenderGeneralPage()
   AddHeaderOption("LLM Settings")
   autoUpdateDiaryOID = AddToggleOption("Automatically Update Follower Diaries", autoUpdateDiary)
   updateNarratorDiaryOID = AddToggleOption("Update Narrator Diary on Sleep", updateNarratorDiary)
+  updateNarratorProfileOID = AddToggleOption("Update Narrator Dynamic Profile on Sleep", updateNarratorProfile)
   requestResponseCooldownOID = AddSliderOption("LLM Response Request Cooldown", requestResponseCooldown, "{1}")
   AddHeaderOption("Sapience Settings")
   useSapienceOID = AddToggleOption("Enable Sapience", minai_SapienceEnabled.GetValueInt() == 1)
+  disableSapienceInStealthOID = AddToggleOption("Disable Sapience While Sneaking", disableSapienceInStealth)
   radiantDialogueFrequencyOID = AddSliderOption("Radiant Dialogue (NPC -> NPC) Frequency", radiantDialogueFrequency, "{1}")
   radiantDialogueChanceOID = AddSliderOption("Radiant Dialogue (NPC -> NPC) Chance", radiantDialogueChance, "{1}")
   minRadianceRechatsOID = AddSliderOption("Minimum Radiance Rechats", minRadianceRechats, "{0}")
   maxRadianceRechatsOID = AddSliderOption("Maximum Radiance Rechats", maxRadianceRechats, "{0}")
   SetCursorPosition(1) ; Move cursor to top right position
   AddHeaderOption("General Settings")
-  toggleCombatDialogueOID = AddToggleOption("Allow Dialogue during Combat", toggleCombatDialogue)
+  toggleCombatDialogueOID = AddToggleOption("CHIM Config - Allow Dialogue during Combat", toggleCombatDialogue)
+  preserveQueueOID = AddToggleOption("CHIM Config - Preserve Dialogue Queue", preserveQueue)
   addSpellsOID = AddTextOption("General", "Add Spells to Player")
   removeSpellsOID = AddTextOption("General", "Remove Spells from Player")
   toggleSapienceOID = AddKeyMapOption("Toggle Sapience", toggleSapienceKey)
+  roleplayKeyOID = AddKeyMapOption("Roleplay Voice", roleplayKey)
+  roleplayTextKeyOID = AddKeyMapOption("Roleplay Text", roleplayTextKey)
+  ; Disable for now until I finish implementing this
+  ; singKeyOID = AddKeyMapOption("Sing", singKey)              ; New keybind option
+  narratorKeyOID = AddKeyMapOption("Talk to Narrator", narratorKey)  ; New keybind option
+  narratorTextKeyOID = AddKeyMapOption("Type to Narrator", narratorTextKey)
   disableAIAnimationsOID = AddToggleOption("Disable AI-FF Animations", disableAIAnimations)
   AddHeaderOption("Debug")
+  enableConsoleLoggingOID = AddToggleOption("Enable Console Logging", enableConsoleLogging)
   testActionsOID = AddTextOption("Debug", "Test Mod Events")
 EndFunction
 
@@ -271,6 +323,7 @@ Function RenderSexPage()
   confirmSexOID = AddToggleOption("Ask before a sex scene is initiated", confirmSex)
   allowSexTransitionsOID = AddToggleOption("Allow Sex Scene Transitions", allowSexTransitions)
   allowActorsToJoinSexOID = AddToggleOption("Allow NPC's to join Ongoing Sex Scenes", allowActorsToJoinSex)
+  trackVictimAwarenessOID = AddToggleOption("Track Victim Actor Awareness", trackVictimAwareness)
   AddHeaderOption("NPC Sex Settings")
   enableAISexOID = AddToggleOption("Enable NPC -> NPC Sex", enableAISex)
   ; right column
@@ -483,7 +536,10 @@ EndFunction
 
 Event OnOptionSelect(int oid)
   Main.Debug("OnOptionSelect(" + oid + ")")
-  if oid == UseCBPCOID
+  if oid == enableConsoleLoggingOID
+    enableConsoleLogging = !enableConsoleLogging
+    SetToggleOptionValue(oid, enableConsoleLogging)
+  elseif oid == UseCBPCOID
     toggleGlobal(oid, useCBPC)
     Debug.Notification("CBPC setting changed. Save/Reload to take effect")
   elseif oid == autoUpdateDiaryOID
@@ -492,6 +548,9 @@ Event OnOptionSelect(int oid)
   elseif oid == updateNarratorDiaryOID
     updateNarratorDiary = !updateNarratorDiary
     SetToggleOptionValue(oid, updateNarratorDiary)
+  elseif oid == updateNarratorProfileOID
+    updateNarratorProfile = !updateNarratorProfile
+    SetToggleOptionValue(oid, updateNarratorProfile)
   elseif oid == enableAISexOID
     enableAISex = !enableAISex
     aiff.SetAISexEnabled(enableAISex)
@@ -523,6 +582,7 @@ Event OnOptionSelect(int oid)
   elseif oid == allowSexTransitionsOID
     allowSexTransitions = !allowSexTransitions
     SetToggleOptionValue(oid, allowSexTransitions)
+    aiff.SetActorVariable(game.GetPlayer(), "allowSexTransitions", allowSexTransitions)
   elseif oid == allowActorsToJoinSexOID
     allowActorsToJoinSex = !allowActorsToJoinSex
     SetToggleOptionValue(oid, allowActorsToJoinSex)
@@ -559,6 +619,23 @@ Event OnOptionSelect(int oid)
   elseif oid == enableAmbientCommentsOID
     enableAmbientComments = !enableAmbientComments
     SetToggleOptionValue(oid, enableAmbientComments)
+  elseif oid == updateNarratorProfileOID
+    updateNarratorProfile = !updateNarratorProfile
+    SetToggleOptionValue(oid, updateNarratorProfile)
+  elseif oid == preserveQueueOID
+    preserveQueue = !preserveQueue
+    if preserveQueue
+      aiff.EnablePreserveQueue()
+    else
+      aiff.DisablePreserveQueue() 
+    EndIf
+    SetToggleOptionValue(oid, preserveQueue)
+  elseif oid == trackVictimAwarenessOID
+    trackVictimAwareness = !trackVictimAwareness
+    SetToggleOptionValue(oid, trackVictimAwareness)
+  elseif oid == disableSapienceInStealthOID
+    disableSapienceInStealth = !disableSapienceInStealth
+    SetToggleOptionValue(oid, disableSapienceInStealth)
   EndIf
   int i = 0
   string[] categories = JMap.allKeysPArray(aCategoryMap)
@@ -587,7 +664,10 @@ EndEvent
 
 Event OnOptionDefault(int oid)
   bool changedAction = False
-  if oid == UseCBPCOID
+  if oid == enableConsoleLoggingOID
+    enableConsoleLogging = enableConsoleLoggingDefault
+    SetToggleOptionValue(oid, enableConsoleLogging)
+  elseif oid == UseCBPCOID
     SetGlobalToggle(oid, UseCBPC, true)
     Debug.Notification("CBPC setting changed. Save/Reload to take effect")
   elseif oid == autoUpdateDiaryOID
@@ -596,6 +676,9 @@ Event OnOptionDefault(int oid)
   elseif oid == updateNarratorDiaryOID
     updateNarratorDiary = updateNarratorDiaryDefault
     SetToggleOptionValue(oid, updateNarratorDiary)
+  elseif oid == updateNarratorProfileOID
+    updateNarratorProfile = updateNarratorProfileDefault
+    SetToggleOptionValue(oid, updateNarratorProfile)
   elseif oid == enableAISexOID
     enableAISex = enableAISexDefault
     aiff.SetAISexEnabled(enableAISex)
@@ -657,9 +740,7 @@ Event OnOptionDefault(int oid)
   elseif oid == allowSexTransitionsOID
     allowSexTransitions = allowSexTransitionsDefault
     SetToggleOptionValue(oid, allowSexTransitions)
-  elseif oid == allowActorsToJoinSexOID
-    allowActorsToJoinSex = allowActorsToJoinSexDefault
-    SetToggleOptionValue(oid, allowActorsToJoinSex)
+    aiff.SetActorVariable(game.GetPlayer(), "allowSexTransitions", allowSexTransitions)
   elseif oid == toggleCombatDialogueOID
     toggleCombatDialogue = toggleCombatDialogueDefault
     if toggleCombatDialogue
@@ -698,18 +779,39 @@ Event OnOptionDefault(int oid)
   elseif oid == maxThreadsOID
     maxThreads = maxThreadsDefault
     SetSliderOptionValue(oid, maxThreadsDefault, "{0}")
+  elseif oid == updateNarratorProfileOID
+    updateNarratorProfile = updateNarratorProfileDefault
+    SetToggleOptionValue(oid, updateNarratorProfile)
+  elseif oid == preserveQueueOID
+    preserveQueue = preserveQueueDefault
+    if preserveQueue
+      aiff.EnablePreserveQueue()
+    else
+      aiff.DisablePreserveQueue()
+    EndIf
+    SetToggleOptionValue(oid, preserveQueueDefault)
+  elseif oid == trackVictimAwarenessOID
+    trackVictimAwareness = trackVictimAwarenessDefault
+    SetToggleOptionValue(oid, trackVictimAwareness)
+  elseif oid == disableSapienceInStealthOID
+    disableSapienceInStealth = disableSapienceInStealthDefault
+    SetToggleOptionValue(oid, disableSapienceInStealth)
   EndIf
 EndEvent
 
 
 Event OnOptionHighlight(int oid)
   Main.Debug("OnOptionHighlight(" + oid + ")")
-  if oid == UseCBPCOID
+  if oid == enableConsoleLoggingOID
+    SetInfoText("Controls whether log messages are printed to the console in addition to the Papyrus log")
+  elseif oid == UseCBPCOID
     SetInfoText("Enables or disables CBPC globally. Requires save/reload to take effect")
   elseif oid == autoUpdateDiaryOID
     SetInfoText("Automatically update the diary for all followers upon sleeping.")
   elseif oid == updateNarratorDiaryOID
     SetInfoText("Controls whether the narrator maintains a diary that is updated when sleeping.")
+  elseif oid == updateNarratorProfileOID
+    SetInfoText("Controls whether the narrator's dynamic profile is updated when sleeping.")
   elseif oid == enableAISexOID
     SetInfoText("Allow NPC's to decide to have sex with eachother.")
   elseif  oid == useSapienceOID
@@ -788,6 +890,22 @@ Event OnOptionHighlight(int oid)
     SetInfoText("Enable ambient comments between events. Follows comments during sex scene cooldown. Polling mechanism checking each time if there is no cooldown on comments and fires ambient talking.")
   elseif oid == maxThreadsOID
     SetInfoText("Maximum concurrent threads for adult frameworks. Ostim usually crashes at 6+, try yourself and set to the number you game can handle.")
+  elseif oid == singKeyOID
+    SetInfoText("Hotkey to make your character sing")
+  elseif oid == narratorKeyOID
+    SetInfoText("Hotkey to initiate a private conversation with just the narrator")
+  elseif oid == narratorTextKeyOID
+    SetInfoText("Hotkey to type to the narrator")
+  elseif oid == preserveQueueOID
+    SetInfoText("When enabled, the dialogue queue will be preserved when actions are enabled. This allows for more natural conversation flow.")
+  elseif oid == trackVictimAwarenessOID
+    SetInfoText("When enabled, tracks whether actors in sex scenes are victims or aggressors. This may not be completely accurate, and is mod-dependent.")
+  elseif oid == roleplayKeyOID
+    SetInfoText("Hotkey to roleplay as your character using voice")
+  elseif oid == roleplayTextKeyOID
+    SetInfoText("Hotkey to roleplay as your character using text")
+  elseif oid == disableSapienceInStealthOID
+    SetInfoText("When enabled, sapience will be automatically disabled while the player is sneaking (Allowing for private conversations with followers and such)")
   EndIf
   int i = 0
   string[] actions = JMap.allKeysPArray(aiff.actionRegistry)
@@ -986,22 +1104,43 @@ EndEvent
 
 
 event OnOptionKeyMapChange(int a_option, int a_keyCode, string a_conflictControl, string a_conflictName)
-	{Called when a key has been remapped}
-	if (a_option == toggleSapienceOID)
-		bool continue = true
-		if (a_conflictControl != "")
-			string msg
-			if (a_conflictName != "")
-				msg = "This key is already mapped to:\n'" + a_conflictControl + "'\n(" + a_conflictName + ")\n\nAre you sure you want to continue?"
-			else
-				msg = "This key is already mapped to:\n'" + a_conflictControl + "'\n\nAre you sure you want to continue?"
-			endIf
-			continue = ShowMessage(msg, true, "$Yes", "$No")
-		endIf
-		if (continue)
-			toggleSapienceKey = a_keyCode
-			SetKeymapOptionValue(a_option, a_keyCode)
-      main.SetSapienceKey()
-		endIf
-	endIf
+    {Called when a key has been remapped}
+    bool continue = true
+    if (a_conflictControl != "")
+        string msg
+        if (a_conflictName != "")
+            msg = "This key is already mapped to:\n'" + a_conflictControl + "'\n(" + a_conflictName + ")\n\nAre you sure you want to continue?"
+        else
+            msg = "This key is already mapped to:\n'" + a_conflictControl + "'\n\nAre you sure you want to continue?"
+        endIf
+        continue = ShowMessage(msg, true, "$Yes", "$No")
+    endIf
+
+    if (continue)
+        if (a_option == toggleSapienceOID)
+            toggleSapienceKey = a_keyCode
+            SetKeymapOptionValue(a_option, a_keyCode)
+            main.SetSapienceKey(true)
+        elseif (a_option == singKeyOID)
+            singKey = a_keyCode
+            SetKeymapOptionValue(a_option, a_keyCode)
+            main.SetSingKey(true)
+        elseif (a_option == narratorKeyOID)
+            narratorKey = a_keyCode 
+            SetKeymapOptionValue(a_option, a_keyCode)
+            main.SetNarratorKey(true)
+        elseif (a_option == narratorTextKeyOID)
+            narratorTextKey = a_keyCode
+            SetKeymapOptionValue(a_option, a_keyCode)
+            main.SetNarratorTextKey(true)
+        elseif (a_option == roleplayKeyOID)
+            roleplayKey = a_keyCode
+            SetKeymapOptionValue(a_option, a_keyCode)
+            main.SetRoleplayKey(true)
+        elseif (a_option == roleplayTextKeyOID)
+            roleplayTextKey = a_keyCode
+            SetKeymapOptionValue(a_option, a_keyCode)
+            main.SetRoleplayTextKey(true)
+        endIf
+    endIf
 EndEvent

@@ -4,190 +4,613 @@
     <title>Equipment Description Management</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <style>
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid black; padding: 8px; text-align: left; }
-        input[type="text"] { width: 100%; }
-        .editing { background-color: #dbf1b2; }
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2196F3;
+            --background-dark: #1a1a1a;
+            --background-light: #2d2d2d;
+            --text-color: #e0e0e0;
+            --border-color: #404040;
+            --success-color: #40c057;
+            --error-color: #f44336;
+            --warning-color: #ffc107;
+            --info-color: #4dabf7;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: radial-gradient(circle at center, var(--background-light) 0%, var(--background-dark) 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--text-color);
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-panel {
+            background-color: var(--background-light);
+            padding: 15px;
+            text-align: center;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(4px);
+        }
+
+        .nav-panel a {
+            display: inline-block;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 1.1rem;
+            margin: 0 20px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
+            border: 1px solid var(--border-color);
+        }
+
+        .nav-panel a:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.15) 0%,
+                rgba(255, 255, 255, 0.08) 100%
+            );
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .equipment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .equipment-card {
+            background: rgba(45, 45, 45, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        .equipment-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .equipment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .equipment-name {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+
+        .equipment-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 8px 16px;
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.15) 0%,
+                rgba(255, 255, 255, 0.08) 100%
+            );
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        button.primary {
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.2) 0%,
+                rgba(76, 175, 80, 0.3) 100%
+            );
+            border-color: var(--primary-color);
+        }
+
+        .add-equipment {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(45, 45, 45, 0.4);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--background-dark);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+
+        .equipment-details {
+            margin-top: 15px;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 10px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .detail-label {
+            flex: 0 0 120px;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+
+        .detail-value {
+            flex: 1;
+        }
+
+        .status-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .status-message.success {
+            background-color: rgba(64, 192, 87, 0.2);
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+        }
+
+        .status-message.error {
+            background-color: rgba(244, 67, 54, 0.2);
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px;
+                padding: 20px;
+            }
+
+            .nav-panel a {
+                display: block;
+                margin: 10px 0;
+            }
+
+            .equipment-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .add-equipment h3 {
+            color: var(--text-color);
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .deleteBtn {
+            background: linear-gradient(135deg,
+                rgba(244, 67, 54, 0.2) 0%,
+                rgba(244, 67, 54, 0.3) 100%
+            );
+            border-color: var(--error-color);
+        }
+
+        .editBtn {
+            background: linear-gradient(135deg,
+                rgba(33, 150, 243, 0.2) 0%,
+                rgba(33, 150, 243, 0.3) 100%
+            );
+            border-color: var(--info-color);
+        }
+
+        .equipment-card.editing {
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.1) 0%,
+                rgba(76, 175, 80, 0.2) 100%
+            );
+            border-color: var(--primary-color);
+        }
+
+        .sort {
+            color: var(--text-color);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .sort:hover {
+            color: var(--primary-color);
+        }
+
+        .sort::after {
+            content: '↕';
+            font-size: 0.8em;
+        }
+
+        .sort.asc::after {
+            content: '↑';
+        }
+
+        .sort.desc::after {
+            content: '↓';
+        }
+
+        .clearBtn {
+            background: linear-gradient(135deg,
+                rgba(244, 67, 54, 0.1) 0%,
+                rgba(244, 67, 54, 0.2) 100%
+            );
+            border-color: var(--error-color);
+            padding: 4px 8px;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
-    <h1>Equipment Description Management</h1>
+    <div class="container">
+        <h1>Equipment Description Management</h1>
+        
+        <div class="nav-panel">
+            <a href="index.html">Return to Home</a>
+            <a href="https://github.com/MinLL/MinAI">Documentation</a>
+        </div>
 
-    <!-- Filter Form -->
-    <form id="filterForm">
-        <table>
-            <tr>
-                <td><input type="text" id="filterBaseFormId" placeholder="Filter by BaseFormID"></td>
-                <td><input type="text" id="filterModName" placeholder="Filter by ModName"></td>
-                <td><input type="text" id="filterName" placeholder="Filter by Name"></td>
-                <td><input type="text" id="filterDescription" placeholder="Filter by Description"></td>
-                <td><button type="submit">Filter</button></td>
-            </tr>
-        </table>
-    </form>
+        <!-- Filter Form -->
+        <div class="add-equipment">
+            <h3>Filter Equipment</h3>
+            <form id="filterForm">
+                <div class="form-grid">
+                    <input type="text" id="filterBaseFormId" placeholder="Filter by BaseFormID">
+                    <input type="text" id="filterModName" placeholder="Filter by ModName">
+                    <input type="text" id="filterName" placeholder="Filter by Name">
+                    <input type="text" id="filterDescription" placeholder="Filter by Description">
+                </div>
+                <button type="submit" class="primary">Apply Filter</button>
+            </form>
+        </div>
 
-    <!-- Add New Row Form -->
-    <form id="addForm">
-        <table>
-            <tr>
-                <td><input type="text" id="newBaseFormId" placeholder="BaseFormID" required></td>
-                <td><input type="text" id="newModName" placeholder="ModName" required></td>
-                <td><input type="text" id="newName" placeholder="Name"></td>
-                <td><input type="text" id="newDescription" placeholder="Description"></td>
-                <td><button type="submit">Add</button></td>
-            </tr>
-        </table>
-    </form>
+        <!-- Add New Row Form -->
+        <div class="add-equipment">
+            <h3>Add New Equipment</h3>
+            <form id="addForm">
+                <div class="form-grid">
+                    <input type="text" id="newBaseFormId" placeholder="BaseFormID" required>
+                    <input type="text" id="newModName" placeholder="ModName" required>
+                    <input type="text" id="newName" placeholder="Name">
+                    <input type="text" id="newDescription" placeholder="Description">
+                </div>
+                <button type="submit" class="primary">Add Equipment</button>
+            </form>
+        </div>
 
-    <!-- Data Table -->
-    <table id="dataTable">
-        <thead>
-            <tr>
-                <th><a href="#" class="sort" data-sort="baseFormId">BaseFormID</a></th>
-                <th><a href="#" class="sort" data-sort="modName">ModName</a></th>
-                <th><a href="#" class="sort" data-sort="name">Name</a></th>
-                <th><a href="#" class="sort" data-sort="description">Description</a></th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Rows will be inserted here by JavaScript -->
-        </tbody>
-    </table>
+        <!-- Equipment Grid -->
+        <div class="equipment-grid" id="dataTable">
+            <!-- Equipment cards will be inserted here by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Template for equipment card -->
+    <template id="equipment-template">
+        <div class="equipment-card">
+            <div class="equipment-header">
+                <span class="equipment-name"></span>
+                <div class="equipment-controls">
+                    <button class="editBtn">Edit</button>
+                    <button class="deleteBtn">Delete</button>
+                </div>
+            </div>
+            <div class="equipment-details">
+                <div class="detail-row">
+                    <span class="detail-label">BaseFormID:</span>
+                    <span class="detail-value baseFormId"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">ModName:</span>
+                    <span class="detail-value modName"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Description:</span>
+                    <span class="detail-value description"></span>
+                </div>
+            </div>
+        </div>
+    </template>
 
     <script>
         $(document).ready(function() {
+            let currentSort = { column: null, direction: null };
+            
             // Load table data initially
             loadTableData();
 
-            // Handle Filter Form Submission
+            function loadTableData() {
+                $.ajax({
+                    url: 'we_manager.php?action=load',
+                    method: 'GET',
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            renderEquipmentCards(response.data);
+                        } else {
+                            console.error('Error loading data:', response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error loading data:', error);
+                    }
+                });
+            }
+
+            function renderEquipmentCards(data) {
+                const container = document.getElementById('dataTable');
+                container.innerHTML = ''; // Clear existing cards
+                
+                // Sort data if needed
+                if (currentSort.column) {
+                    data.sort((a, b) => {
+                        const aVal = a[currentSort.column] || '';
+                        const bVal = b[currentSort.column] || '';
+                        return currentSort.direction === 'asc' ? 
+                            aVal.localeCompare(bVal) : 
+                            bVal.localeCompare(aVal);
+                    });
+                }
+
+                const template = document.getElementById('equipment-template');
+                
+                data.forEach(item => {
+                    const card = template.content.cloneNode(true);
+                    const cardElement = card.querySelector('.equipment-card');
+                    
+                    // Add data attributes for targeting
+                    cardElement.dataset.baseformid = item.baseFormId;
+                    cardElement.dataset.modname = item.modName;
+                    
+                    // Set card content
+                    card.querySelector('.equipment-name').textContent = item.name || 'Unnamed Equipment';
+                    card.querySelector('.baseFormId').textContent = item.baseFormId;
+                    card.querySelector('.modName').textContent = item.modName;
+                    card.querySelector('.description').textContent = item.description || 'No description';
+
+                    // Add edit functionality
+                    const editBtn = card.querySelector('.editBtn');
+                    editBtn.addEventListener('click', () => {
+                        const cardElement = editBtn.closest('.equipment-card');
+                        if (cardElement.classList.contains('editing')) {
+                            // Save changesG
+                            const updatedData = {
+                                baseFormId: item.baseFormId,
+                                modName: item.modName,
+                                name: cardElement.querySelector('.equipment-name').textContent,
+                                description: cardElement.querySelector('.description').textContent || ''
+                            };
+                            
+                            // Remove clear button
+                            const clearBtn = cardElement.querySelector('.clearBtn');
+                            if (clearBtn) {
+                                clearBtn.remove();
+                            }
+                            
+                            // Remove editable state
+                            cardElement.querySelector('.description').contentEditable = false;
+                            cardElement.querySelector('.description').style = '';
+                            cardElement.querySelector('.equipment-name').contentEditable = false;
+                            cardElement.querySelector('.equipment-name').style = '';
+                            
+                            updateEquipment(updatedData);
+                            cardElement.classList.remove('editing');
+                            editBtn.textContent = 'Edit';
+                        } else {
+                            // Enable editing
+                            makeEditable(cardElement.querySelector('.equipment-name'));
+                            makeEditable(cardElement.querySelector('.description'));
+                            cardElement.classList.add('editing');
+                            editBtn.textContent = 'Save';
+                        }
+                    });
+
+                    // Add delete functionality
+                    card.querySelector('.deleteBtn').addEventListener('click', () => {
+                        if (confirm('Are you sure you want to delete this equipment?')) {
+                            deleteEquipment(item.baseFormId, item.modName);
+                        }
+                    });
+
+                    container.appendChild(card);
+                });
+            }
+
+            function makeEditable(element) {
+                element.contentEditable = true;
+                element.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
+                element.style.padding = '4px 8px';
+                element.style.borderRadius = '4px';
+                element.style.border = '1px solid var(--border-color)';
+
+                // Only add clear button for description fields
+                if (element.classList.contains('description')) {
+                    const clearBtn = document.createElement('button');
+                    clearBtn.className = 'clearBtn';
+                    clearBtn.textContent = 'Clear';
+                    clearBtn.style.marginLeft = '8px';
+                    
+                    // Insert clear button after the description element
+                    element.parentNode.insertBefore(clearBtn, element.nextSibling);
+
+                    clearBtn.addEventListener('click', () => {
+                        element.textContent = '';
+                        element.focus(); // Keep focus on the editable field
+                    });
+                }
+            }
+
+            // Filter form submission
             $('#filterForm').submit(function(e) {
                 e.preventDefault();
-                loadTableData();  // Reload table data with filters
+                const filters = {
+                    action: 'load',
+                    baseFormId: $('#filterBaseFormId').val(),
+                    modName: $('#filterModName').val(),
+                    name: $('#filterName').val(),
+                    description: $('#filterDescription').val()
+                };
+
+                $.ajax({
+                    url: 'we_manager.php',
+                    method: 'GET',
+                    data: filters,
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            renderEquipmentCards(response.data);
+                        }
+                    }
+                });
             });
 
-            // Add new row
+            // Add new equipment form submission
             $('#addForm').submit(function(e) {
                 e.preventDefault();
-                const baseFormId = $('#newBaseFormId').val();
-                const modName = $('#newModName').val();
-                const name = $('#newName').val();
-                const description = $('#newDescription').val();
+                const newData = {
+                    action: 'add',
+                    baseFormId: $('#newBaseFormId').val(),
+                    modName: $('#newModName').val(),
+                    name: $('#newName').val(),
+                    description: $('#newDescription').val()
+                };
 
                 $.ajax({
                     url: 'we_manager.php',
-                    type: 'POST',
-                    dataType: 'json',
-                    data: {
-                        action: 'add',
-                        baseFormId: baseFormId,
-                        modName: modName,
-                        name: name,
-                        description: description
-                    },
+                    method: 'POST',
+                    data: newData,
                     success: function(response) {
-                        loadTableData();  // Reload table data
-                        $('#addForm')[0].reset();  // Reset the form fields
+                        if (response.status === 'success') {
+                            loadTableData();
+                            $('#addForm')[0].reset();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error adding equipment:', error);
                     }
                 });
             });
 
-            // Inline edit and delete functionality
-            $(document).on('click', '.editBtn', function() {
-                const row = $(this).closest('tr');
-                row.find('.editable').attr('contenteditable', 'true').addClass('editing');
-                $(this).hide();
-                row.find('.saveBtn').show();
-            });
+            function updateEquipment(data) {
+                const updateData = {
+                    action: 'edit',
+                    baseFormId: data.baseFormId,
+                    modName: data.modName,
+                    description: data.description || ''
+                };
 
-            $(document).on('click', '.saveBtn', function() {
-                const row = $(this).closest('tr');
-                const baseFormId = row.find('.baseFormId').text();
-                const modName = row.find('.modName').text();
-                const description = row.find('.description').text();
+                // Add visual feedback
+                const cardElement = document.querySelector(`.equipment-card[data-baseformid="${data.baseFormId}"][data-modname="${data.modName}"]`);
+                if (cardElement) {
+                    const descriptionElement = cardElement.querySelector('.description');
+                    const originalText = descriptionElement.textContent;
+                    
+                    $.ajax({
+                        url: 'we_manager.php',
+                        method: 'POST',
+                        data: updateData,
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                loadTableData();
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error updating equipment:', error);
+                            // Revert on error
+                            if (descriptionElement) {
+                                descriptionElement.textContent = originalText;
+                            }
+                        }
+                    });
+                }
+            }
 
+            function deleteEquipment(baseFormId, modName) {
                 $.ajax({
                     url: 'we_manager.php',
-                    type: 'POST',
-                    dataType: 'json',
-                    data: {
-                        action: 'edit',
-                        baseFormId: baseFormId,
-                        modName: modName,
-                        description: description
-                    },
-                    success: function(response) {
-                        loadTableData();  // Reload table data
-                    }
-                });
-            });
-
-            $(document).on('click', '.deleteBtn', function() {
-                const row = $(this).closest('tr');
-                const baseFormId = row.find('.baseFormId').text();
-                const modName = row.find('.modName').text();
-
-                $.ajax({
-                    url: 'we_manager.php',
-                    type: 'POST',
-                    dataType: 'json',
+                    method: 'POST',
                     data: {
                         action: 'delete',
                         baseFormId: baseFormId,
                         modName: modName
                     },
                     success: function(response) {
-                        loadTableData();  // Reload table data
-                    }
-                });
-            });
-
-            // Sorting functionality
-            $('.sort').click(function(e) {
-                e.preventDefault();
-                const sortField = $(this).data('sort');
-                loadTableData(sortField);
-            });
-
-            // Function to load table data via AJAX
-            function loadTableData(sortField = 'baseFormId') {
-                const baseFormId = $('#filterBaseFormId').val();
-                const modName = $('#filterModName').val();
-                const name = $('#filterName').val();
-                const description = $('#filterDescription').val();
-
-                $.ajax({
-                    url: 'we_manager.php',
-                    type: 'GET',
-                    dataType: 'json',
-                    data: {
-                        action: 'load',
-                        sort: sortField,
-                        baseFormId: baseFormId,
-                        modName: modName,
-                        name: name,
-                        description: description
+                        if (response.status === 'success') {
+                            loadTableData();
+                        }
                     },
-                    success: function(response) {
-                        // Clear the table body
-                        const tbody = $('#dataTable tbody');
-                        tbody.empty();
-
-                        // Append rows to the table
-                        $.each(response.data, function(index, row) {
-                            const tr = `<tr>
-                                <td class='baseFormId'>${row.baseFormId}</td>
-                                <td class='modName'>${row.modName}</td>
-                                <td class='name'>${row.name}</td>
-                                <td class='editable description'>${row.description}</td>
-                                <td>
-                                    <button class='editBtn'>Edit</button>
-                                    <button class='saveBtn' style='display:none;'>Save</button>
-                                    <button class='deleteBtn'>Delete</button>
-                                </td>
-                            </tr>`;
-                            tbody.append(tr);
-                        });
+                    error: function(xhr, status, error) {
+                        console.error('Error deleting equipment:', error);
                     }
                 });
             }

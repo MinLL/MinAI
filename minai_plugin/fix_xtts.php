@@ -28,4 +28,4 @@ if ($GLOBALS["HERIKA_NAME"] != "The Narrator") { // Users can configure the narr
         $GLOBALS["TTS"]["MELOTTS"]["voiceid"] = $voiceType;
     }
 }
-?>
+

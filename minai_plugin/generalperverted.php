@@ -155,4 +155,3 @@ $GLOBALS["FUNCRET"]["ExtCmdGrope"]=$GLOBALS["GenericFuncRet"];
 $GLOBALS["FUNCRET"]["ExtCmdPinchNipples"]=$GLOBALS["GenericFuncRet"];
 
 
-?>

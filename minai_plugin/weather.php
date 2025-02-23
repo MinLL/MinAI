@@ -489,24 +489,36 @@ function GetWeatherContext() {
         ]
     ];
 
-    $returnText = "";
+        
+    $ret = "";
+    $skyMode = intval(GetActorValue($GLOBALS["PLAYER_NAME"], "skyMode"));
+    if ($skyMode == 3) { // Outdoors, full skybox
+        $weather = strtolower(GetActorValue($GLOBALS["PLAYER_NAME"], "weather"));
+        // [VoiceType <MaleGuard (000AA8D3)>
+        // [Weather < (0010A231)>]
+        if (!$weather) {
+            return $ret;
+        }
 
-    $envAwarenessWeather = $utilities->GetActorValue($playerName, "EnviromentalAwarenessPlayerEnviroment");
-    $bWeatherChange = false;
-    $bIsRainingPresently = str_icontains($envAwarenessWeather, "is raining outside");
-    $bIsSnowingPresently = str_icontains($envAwarenessWeather, "is snowing outside");
-    $bIsOvercast = str_icontains($envAwarenessWeather, "The sky is overcast.");
+        // Extract weather ID from the format: "Weather < (XXXXXXXX)>"
+        $matches = [];
+        if (!preg_match('/\(([0-9a-fA-F]{8})\)/', $weather, $matches)) {
+            minai_log("info", "Invalid weather format: " . $weather);
+            return $ret;
+        }
+        
+        $weatherId = $matches[1];
+        if (!isset($weathers[$weatherId])) {
+            minai_log("info", "Unknown weather ID: " . $weatherId);
+            return $ret;
+        }
 
-
-    $weatherCode = strtolower(GetActorValue($playerName, "weather"));
-    if (!$weatherCode) return $envAwarenessWeather;
-    $wc = substr($weatherCode, (stripos( $weatherCode, "(") + 1), 8);
-    $weather = $weatherDictionary[$wc];
-
-    if (!$weather) {
-        error_log("minai: Unknown Weather type: " . $weatherCode);
-        // if nothing fall back to this
-        return $envAwarenessWeather;
+        $weather = $weathers[$weatherId];
+        $ret .= "The weather is currently: {$weather["description"]} ";
+        $currentGameHour = intval(GetActorValue($GLOBALS["PLAYER_NAME"], "currentGameHour"));
+        if ($currentGameHour <= 5 || $currentGameHour > 21 && str_contains($weather["name"], "_A")) {
+            $ret .= "The sky contains a bright aurora tonight.";
+        }
     }
     // currentWeather as opposed to "outgoing weather" which will overlay current weather for a time
     $currentWeather = $weather["descriptionPresent"];

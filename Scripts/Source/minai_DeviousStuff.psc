@@ -14,7 +14,8 @@ bool bHasSLApp = False
 bool bHasDeviouslyAccessible = False
 bool bHasDDExpansion = False
 bool bHasSubmissiveLola = False
-
+bool bHasTNTR = False
+bool bHasSlaveTats = False
 Keyword SLHHScriptEventKeyword
 GlobalVariable Debt
 GlobalVariable EnslaveDebt
@@ -35,9 +36,45 @@ MagicEffect dwp_watched
 GlobalVariable dwp_global_minai
 Spell dwp_eldwhoresp
 Spell dwp_eldwhoresp_neq  
+Spell dwp_
 actor playerRef
 Perk dwp_eldritchwaifueffect_soldsoul
 Perk dwp_eldritchwaifueffect_soldsoul_belted
+
+; TODO: Break this out into a separate script for each mod.
+
+; Deviously Accessible Magic Effects
+MagicEffect dwp_descbadgirl
+MagicEffect dwp_descbadgirl2 
+MagicEffect dwp_descbadgirl2b
+MagicEffect dwp_descbadgirl2c
+MagicEffect dwp_descbadgirl2d
+MagicEffect dwp_descbadgirlb
+MagicEffect dwp_descbadgirlBASE
+MagicEffect dwp_descbadgirlc
+MagicEffect dwp_descbadgirld
+MagicEffect dwp_descgoodgirl
+MagicEffect dwp_descgoodgirl2
+MagicEffect dwp_descgoodgirl2b
+MagicEffect dwp_descgoodgirl2c
+MagicEffect dwp_descgoodgirl2d
+MagicEffect dwp_descgoodgirlb
+MagicEffect dwp_descgoodgirlBASE
+MagicEffect dwp_descgoodgirlc
+MagicEffect dwp_descgoodgirld
+MagicEffect dwp_descmindcontrol
+MagicEffect dwp_descmindcontrol2
+MagicEffect dwp_descmindcontrolpost
+MagicEffect dwp_descmindcontrolpunishment
+MagicEffect dwp_descverybadgirl
+MagicEffect dwp_descverybadgirl2
+MagicEffect dwp_descverybadgirl2b
+MagicEffect dwp_descverybadgirl2c
+MagicEffect dwp_descverybadgirl2d
+MagicEffect dwp_descverybadgirlb
+MagicEffect dwp_descverybadgirlBASE
+MagicEffect dwp_descverybadgirlc
+MagicEffect dwp_descverybadgirld
 
 function Maintenance(minai_MainQuestController _main)
   Main.Info("Initializing Devious Module")
@@ -138,7 +175,46 @@ function Maintenance(minai_MainQuestController _main)
       Main.Error("Old version of Deviously Accessible. Some integrations will be broken.")
       Debug.Notification("Old version of Deviously Accessible. Some integrations will be broken.")
     EndIf
+    if Game.GetModByName("TNTR.esp") != 255
+      Main.Info("Found TNTR - Registering for TNTR events")
+      bHasTNTR = True
+      RegisterForModEvent("minai_tntr", "OnTNTRAnimation")
+    EndIf
+
+    ; Load magic effects
+    dwp_descbadgirl = Game.GetFormFromFile(0x015B7D, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descbadgirl2 = Game.GetFormFromFile(0x02C183, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descbadgirl2b = Game.GetFormFromFile(0x0459FD, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descbadgirl2c = Game.GetFormFromFile(0x045A06, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descbadgirl2d = Game.GetFormFromFile(0x045A0C, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descbadgirlb = Game.GetFormFromFile(0x0459FA, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descbadgirlBASE = Game.GetFormFromFile(0x045A00, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descbadgirlc = Game.GetFormFromFile(0x045A03, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descbadgirld = Game.GetFormFromFile(0x045A09, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descgoodgirl = Game.GetFormFromFile(0x015B7C, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descgoodgirl2 = Game.GetFormFromFile(0x02C182, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descgoodgirl2b = Game.GetFormFromFile(0x0459FC, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descgoodgirl2c = Game.GetFormFromFile(0x045A05, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descgoodgirl2d = Game.GetFormFromFile(0x045A0B, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descgoodgirlb = Game.GetFormFromFile(0x0459F9, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descgoodgirlBASE = Game.GetFormFromFile(0x0459FF, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descgoodgirlc = Game.GetFormFromFile(0x045A02, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descgoodgirld = Game.GetFormFromFile(0x045A08, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descmindcontrol = Game.GetFormFromFile(0x015B89, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descmindcontrol2 = Game.GetFormFromFile(0x059E6F, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descmindcontrolpost = Game.GetFormFromFile(0x04FC1C, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descmindcontrolpunishment = Game.GetFormFromFile(0x0826FC, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descverybadgirl = Game.GetFormFromFile(0x015B7E, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descverybadgirl2 = Game.GetFormFromFile(0x02C184, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descverybadgirl2b = Game.GetFormFromFile(0x0459FE, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descverybadgirl2c = Game.GetFormFromFile(0x045A07, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descverybadgirl2d = Game.GetFormFromFile(0x045A0D, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descverybadgirlb = Game.GetFormFromFile(0x0459FB, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descverybadgirlBASE = Game.GetFormFromFile(0x045A01, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descverybadgirlc = Game.GetFormFromFile(0x045A04, "DeviouslyAccessible.esp") as MagicEffect
+    dwp_descverybadgirld = Game.GetFormFromFile(0x045A0A, "DeviouslyAccessible.esp") as MagicEffect
   EndIf  
+
 
   if Game.GetModByName("submissivelola_est.esp") != 255
     bHasSubmissiveLola = True
@@ -152,6 +228,12 @@ function Maintenance(minai_MainQuestController _main)
   aiff.SetModAvailable("DeviouslyAccessible", bHasDeviouslyAccessible)
   aiff.SetModAvailable("SubmissiveLola", bHasSubmissiveLola)
   config.StoreAllConfigs()
+
+  if Game.GetModByName("SlaveTats.esp") != 255
+    bHasSlaveTats = True
+    Main.Info("Found SlaveTats")
+  endif
+  aiff.SetModAvailable("SlaveTats", bHasSlaveTats)
 
   aiff.RegisterAction("ExtCmdGrope", "Grope", "Grope the Target", "General", 1, 30, 2, 5, 300, True)
   aiff.RegisterAction("ExtCmdPinchNipples", "PinchNipples", "Pinch the Targets Nipples", "General", 1, 30, 2, 5, 300, True)
@@ -733,6 +815,18 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     elseIf (command == "ExtCmdshock")
       libs.ShockActor(akTarget)
       Main.RegisterEvent(""+speakerName+" remotely shocks  " + targetName + ".")
+    elseIf (command == "ExtCmdEquipVibrator")
+      ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_plugs_anal)
+      ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_plugs_vaginal)
+      
+      ; Turn on vibrators - edge only if not already in a scene
+      bool edgeOnly = sex.CanAnimate(akTarget)
+      StartVibration(akTarget, 3, 60, edgeOnly)
+      if edgeOnly
+        Main.RegisterEvent(speakerName + " locked vibrating plugs inside " + targetName + ". The plugs immediately began teasing " + targetName + " with moderate vibrations, but won't let them climax.")
+      else
+        Main.RegisterEvent(speakerName + " locked vibrating plugs inside " + targetName + ". The plugs immediately began stimulating " + targetName + " with moderate vibrations that could potentially make them climax.")
+      EndIf
     EndIf
     ; Device equip events
     if bHasDDExpansion
@@ -755,6 +849,7 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
         ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_plugs_anal)
         ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_plugs_vaginal)
         Main.RegisterEvent(""+speakerName+" Puts a Vibrator in " + targetName)
+        
       elseif (command == "ExtCmdEquipBelt")
         ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_chastitybelts_closed)
         Main.RegisterEvent(""+speakerName+" Puts a Chastity Belt on " + targetName)
@@ -969,7 +1064,73 @@ Function SetContext(actor akTarget)
     aiff.SetActorVariable(playerRef, "dwp_eldwhoresp_neq", PlayerRef.HasSpell(dwp_eldwhoresp_neq))
     aiff.SetActorVariable(playerRef, "dwp_eldritchwaifueffect_soldsoul", PlayerRef.HasPerk(dwp_eldritchwaifueffect_soldsoul))
     aiff.SetActorVariable(playerRef, "dwp_eldritchwaifueffect_soldsoul_belted", PlayerRef.HasPerk(dwp_eldritchwaifueffect_soldsoul_belted))
+    ; Add magic effect checks
+    aiff.SetActorVariable(playerRef, "dwp_descbadgirl", PlayerRef.HasMagicEffect(dwp_descbadgirl))
+    aiff.SetActorVariable(playerRef, "dwp_descbadgirl2", PlayerRef.HasMagicEffect(dwp_descbadgirl2))
+    aiff.SetActorVariable(playerRef, "dwp_descbadgirl2b", PlayerRef.HasMagicEffect(dwp_descbadgirl2b))
+    aiff.SetActorVariable(playerRef, "dwp_descbadgirl2c", PlayerRef.HasMagicEffect(dwp_descbadgirl2c))
+    aiff.SetActorVariable(playerRef, "dwp_descbadgirl2d", PlayerRef.HasMagicEffect(dwp_descbadgirl2d))
+    aiff.SetActorVariable(playerRef, "dwp_descbadgirlb", PlayerRef.HasMagicEffect(dwp_descbadgirlb))
+    aiff.SetActorVariable(playerRef, "dwp_descbadgirlBASE", PlayerRef.HasMagicEffect(dwp_descbadgirlBASE))
+    aiff.SetActorVariable(playerRef, "dwp_descbadgirlc", PlayerRef.HasMagicEffect(dwp_descbadgirlc))
+    aiff.SetActorVariable(playerRef, "dwp_descbadgirld", PlayerRef.HasMagicEffect(dwp_descbadgirld))
+    aiff.SetActorVariable(playerRef, "dwp_descgoodgirl", PlayerRef.HasMagicEffect(dwp_descgoodgirl))
+    aiff.SetActorVariable(playerRef, "dwp_descgoodgirl2", PlayerRef.HasMagicEffect(dwp_descgoodgirl2))
+    aiff.SetActorVariable(playerRef, "dwp_descgoodgirl2b", PlayerRef.HasMagicEffect(dwp_descgoodgirl2b))
+    aiff.SetActorVariable(playerRef, "dwp_descgoodgirl2c", PlayerRef.HasMagicEffect(dwp_descgoodgirl2c))
+    aiff.SetActorVariable(playerRef, "dwp_descgoodgirl2d", PlayerRef.HasMagicEffect(dwp_descgoodgirl2d))
+    aiff.SetActorVariable(playerRef, "dwp_descgoodgirlb", PlayerRef.HasMagicEffect(dwp_descgoodgirlb))
+    aiff.SetActorVariable(playerRef, "dwp_descgoodgirlBASE", PlayerRef.HasMagicEffect(dwp_descgoodgirlBASE))
+    aiff.SetActorVariable(playerRef, "dwp_descgoodgirlc", PlayerRef.HasMagicEffect(dwp_descgoodgirlc))
+    aiff.SetActorVariable(playerRef, "dwp_descgoodgirld", PlayerRef.HasMagicEffect(dwp_descgoodgirld))
+    aiff.SetActorVariable(playerRef, "dwp_descmindcontrol", PlayerRef.HasMagicEffect(dwp_descmindcontrol))
+    aiff.SetActorVariable(playerRef, "dwp_descmindcontrol2", PlayerRef.HasMagicEffect(dwp_descmindcontrol2))
+    aiff.SetActorVariable(playerRef, "dwp_descmindcontrolpost", PlayerRef.HasMagicEffect(dwp_descmindcontrolpost))
+    aiff.SetActorVariable(playerRef, "dwp_descmindcontrolpunishment", PlayerRef.HasMagicEffect(dwp_descmindcontrolpunishment))
+    aiff.SetActorVariable(playerRef, "dwp_descverybadgirl", PlayerRef.HasMagicEffect(dwp_descverybadgirl))
+    aiff.SetActorVariable(playerRef, "dwp_descverybadgirl2", PlayerRef.HasMagicEffect(dwp_descverybadgirl2))
+    aiff.SetActorVariable(playerRef, "dwp_descverybadgirl2b", PlayerRef.HasMagicEffect(dwp_descverybadgirl2b))
+    aiff.SetActorVariable(playerRef, "dwp_descverybadgirl2c", PlayerRef.HasMagicEffect(dwp_descverybadgirl2c))
+    aiff.SetActorVariable(playerRef, "dwp_descverybadgirl2d", PlayerRef.HasMagicEffect(dwp_descverybadgirl2d))
+    aiff.SetActorVariable(playerRef, "dwp_descverybadgirlb", PlayerRef.HasMagicEffect(dwp_descverybadgirlb))
+    aiff.SetActorVariable(playerRef, "dwp_descverybadgirlBASE", PlayerRef.HasMagicEffect(dwp_descverybadgirlBASE))
+    aiff.SetActorVariable(playerRef, "dwp_descverybadgirlc", PlayerRef.HasMagicEffect(dwp_descverybadgirlc))
+    aiff.SetActorVariable(playerRef, "dwp_descverybadgirld", PlayerRef.HasMagicEffect(dwp_descverybadgirld))
+    
+    ; Determine mind control status
+    string mindControlStatus = "normal"
+    if PlayerRef.HasMagicEffect(dwp_descgoodgirl) || PlayerRef.HasMagicEffect(dwp_descgoodgirl2) || \
+       PlayerRef.HasMagicEffect(dwp_descgoodgirl2b) || PlayerRef.HasMagicEffect(dwp_descgoodgirl2c) || \
+       PlayerRef.HasMagicEffect(dwp_descgoodgirl2d) || PlayerRef.HasMagicEffect(dwp_descgoodgirlb) || \
+       PlayerRef.HasMagicEffect(dwp_descgoodgirlBASE) || PlayerRef.HasMagicEffect(dwp_descgoodgirlc) || \
+       PlayerRef.HasMagicEffect(dwp_descgoodgirld)
+        mindControlStatus = "goodgirl"
+    elseif PlayerRef.HasMagicEffect(dwp_descbadgirl) || PlayerRef.HasMagicEffect(dwp_descbadgirl2) || \
+           PlayerRef.HasMagicEffect(dwp_descbadgirl2b) || PlayerRef.HasMagicEffect(dwp_descbadgirl2c) || \
+           PlayerRef.HasMagicEffect(dwp_descbadgirl2d) || PlayerRef.HasMagicEffect(dwp_descbadgirlb) || \
+           PlayerRef.HasMagicEffect(dwp_descbadgirlBASE) || PlayerRef.HasMagicEffect(dwp_descbadgirlc) || \
+           PlayerRef.HasMagicEffect(dwp_descbadgirld)
+        mindControlStatus = "badgirl"
+    elseif PlayerRef.HasMagicEffect(dwp_descverybadgirl) || PlayerRef.HasMagicEffect(dwp_descverybadgirl2) || \
+           PlayerRef.HasMagicEffect(dwp_descverybadgirl2b) || PlayerRef.HasMagicEffect(dwp_descverybadgirl2c) || \
+           PlayerRef.HasMagicEffect(dwp_descverybadgirl2d) || PlayerRef.HasMagicEffect(dwp_descverybadgirlb) || \
+           PlayerRef.HasMagicEffect(dwp_descverybadgirlBASE) || PlayerRef.HasMagicEffect(dwp_descverybadgirlc) || \
+           PlayerRef.HasMagicEffect(dwp_descverybadgirld)
+        mindControlStatus = "verybadgirl"
+    elseif PlayerRef.HasMagicEffect(dwp_descmindcontrolpunishment)
+        mindControlStatus = "punishment"
+    elseif PlayerRef.HasMagicEffect(dwp_descmindcontrolpost)
+        mindControlStatus = "post"
+    endif
+    
+    aiff.SetActorVariable(playerRef, "dwp_mindcontrol", mindControlStatus)
+
+    ; Remove individual effect checks
+    ; ... rest of existing DeviouslyAccessible context setting ...
   EndIf
+  if bHasSlaveTats && akTarget
+    SerializeTattooForDB(akTarget) ; This will store the data in the DB
+  endif
 EndFunction
 
 
@@ -1051,3 +1212,164 @@ Function SexStarted(actor[] actors, actor akSpeaker, string tags="")
 
   Main.Info("Event sent to SLola")
 EndFunction
+
+; New handler for TNTR animation events
+Event OnTNTRAnimation(Form akTarget, string eventSource, string eventName)
+    string eventLine = main.GetActorName(akTarget as Actor) + " caught caught by a " + eventSource + " and is being animated with " + eventName
+    Main.Info("tntr: " + eventLine)
+    main.RequestLLMResponse(eventLine, "minai_tntr_" + eventSource + "_" + eventName)
+EndEvent
+
+
+; Serializes tattoo information into a length-encoded string format
+; Format: <field_count>:<field1_len>:<field1><field2_len>:<field2>... with ~ between tattoos 
+string Function SerializeTattooInfo(Actor target)
+    string result = ""
+    
+    if !target
+        Main.Error("SerializeTattooInfo called with null target")
+        return "0:"
+    endif
+    
+    int applied = JFormDB.getObj(target, ".SlaveTats.applied")
+    if applied == 0
+        Main.Debug("No tattoos found for " + Main.GetActorName(target))
+        return "0:"
+    endif
+    
+    int i = JArray.count(applied)
+    while i > 0
+        i -= 1
+        
+        int entry = JArray.getObj(applied, i)
+        if SlaveTats.is_tattoo(entry)
+            ; Start a new tattoo entry with field count
+            string tattooStr = "15:" ; Number of standard fields we're including
+            
+            ; Add standard fields with length encoding
+            string[] fields = new string[15]
+            fields[0] = JMap.getStr(entry, "section", "")
+            fields[1] = JMap.getStr(entry, "name", "")
+            fields[2] = JMap.getStr(entry, "area", "")
+            fields[3] = JMap.getInt(entry, "slot", -1)
+            fields[4] = JMap.getInt(entry, "color", 0)
+            fields[5] = JMap.getInt(entry, "glow", 0)
+            fields[6] = JMap.getInt(entry, "gloss", 0)
+            fields[7] = (1.0 - JMap.getFlt(entry, "invertedAlpha", 0.0))
+            fields[8] = JMap.getStr(entry, "texture", "")
+            fields[9] = JMap.getInt(entry, "locked", 0)
+            fields[10] = JMap.getStr(entry, "excluded_by", "")
+            fields[11] = JMap.getStr(entry, "requires", "")
+            fields[12] = JMap.getStr(entry, "requires_plugin", "")
+            fields[13] = JMap.getStr(entry, "requires_formid", "")
+            fields[14] = JMap.getStr(entry, "domain", "")
+            
+            int j = 0
+            while j < fields.Length
+                string fieldStr = fields[j]
+                int fieldLen = StringUtil.GetLength(fieldStr)
+                tattooStr += fieldLen + ":" + fieldStr
+                j += 1
+            endwhile
+            
+            ; Add this tattoo entry to the result
+            if result != ""
+                result += "~"
+            endif
+            result += tattooStr
+        endif
+    endwhile
+    
+    Main.Info("Serialized " + JArray.count(applied) + " tattoos for " + Main.GetActorName(target))
+    return result
+endfunction
+
+; Helper function to test parsing the serialized string
+bool Function TestParseSerializedTattoos(string serialized)
+    Main.Info("Testing parse of serialized tattoo string: " + serialized)
+    
+    string[] tattoos = StringUtil.Split(serialized, "~")
+    int i = 0
+    while i < tattoos.Length
+        string tattoo = tattoos[i]
+        Main.Info("Parsing tattoo: " + tattoo)
+        
+        ; Split by first colon to get field count
+        int colonPos = StringUtil.Find(tattoo, ":")
+        int fieldCount = tattoo as int
+        string remaining = StringUtil.Substring(tattoo, colonPos + 1)
+        
+        int j = 0
+        while j < fieldCount
+            ; Get field length
+            colonPos = StringUtil.Find(remaining, ":")
+            int fieldLen = StringUtil.Substring(remaining, 0, colonPos) as int
+            remaining = StringUtil.Substring(remaining, colonPos + 1)
+            
+            ; Get field value
+            string fieldValue = StringUtil.Substring(remaining, 0, fieldLen)
+            remaining = StringUtil.Substring(remaining, fieldLen)
+            
+            Main.Info("Field " + j + ": " + fieldValue)
+            j += 1
+        endwhile
+        
+        i += 1
+    endwhile
+    
+    return true
+endfunction
+
+; Serializes tattoo information into a length-encoded string format for storage in the database
+string Function SerializeTattooForDB(Actor target)
+    if !target
+        Main.Error("SerializeTattooForDB called with null target")
+        return ""
+    endif
+    
+    int applied = JFormDB.getObj(target, ".SlaveTats.applied")
+    if applied == 0
+        Main.Debug("No tattoos found for " + Main.GetActorName(target))
+        return ""
+    endif
+    
+    string result = ""
+    int i = JArray.count(applied)
+    while i > 0
+        i -= 1
+        
+        int entry = JArray.getObj(applied, i)
+        if SlaveTats.is_tattoo(entry)
+            if result != ""
+                result += "~"
+            endif
+            
+            ; Format: section&name&area&texture&slot&color&glow&gloss&alpha&locked&excluded_by&requires&requires_plugin&requires_formid&domain
+            string tattooEntry = ""
+            tattooEntry += JMap.getStr(entry, "section", "") + "&"
+            tattooEntry += JMap.getStr(entry, "name", "") + "&"
+            tattooEntry += JMap.getStr(entry, "area", "") + "&"
+            tattooEntry += JMap.getStr(entry, "texture", "") + "&"
+            tattooEntry += JMap.getInt(entry, "slot", -1) + "&"
+            tattooEntry += JMap.getInt(entry, "color", 0) + "&"
+            tattooEntry += JMap.getInt(entry, "glow", 0) + "&"
+            tattooEntry += JMap.getInt(entry, "gloss", 0) + "&"
+            tattooEntry += (1.0 - JMap.getFlt(entry, "invertedAlpha", 0.0)) + "&"
+            tattooEntry += JMap.getInt(entry, "locked", 0) + "&"
+            tattooEntry += JMap.getStr(entry, "excluded_by", "") + "&"
+            tattooEntry += JMap.getStr(entry, "requires", "") + "&"
+            tattooEntry += JMap.getStr(entry, "requires_plugin", "") + "&"
+            tattooEntry += JMap.getStr(entry, "requires_formid", "") + "&"
+            tattooEntry += JMap.getStr(entry, "domain", "")
+            
+            result += tattooEntry
+        endif
+    endwhile
+    
+    ; Send the full tattoo data to be stored
+    if result != ""
+        AIAgentFunctions.logMessage(Main.GetActorName(target) + "@" + result, "storetattoodesc")
+    endif
+    
+    return result
+endfunction

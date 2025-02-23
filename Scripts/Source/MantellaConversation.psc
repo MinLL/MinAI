@@ -3,7 +3,8 @@ Scriptname MantellaConversation extends Quest hidden
 Import SKSE_HTTP
 Import Utility
 
-Topic property MantellaDialogueLine auto
+Topic property MantellaDialogueLine1 auto
+Topic property MantellaDialogueLine2 auto
 MantellaRepository property repository auto
 MantellaConstants property mConsts auto
 Faction Property MantellaConversationParticipantsFaction Auto
@@ -12,6 +13,9 @@ Quest Property MantellaConversationParticipantsQuest auto
 SPELL Property MantellaIsTalkingSpell Auto
 MantellaEquipmentDescriber Property EquipmentDescriber auto
 Actor Property PlayerRef Auto
+VoiceType Property MantellaVoice00  Auto  
+MantellaInterface property EventInterface Auto
+ReferenceAlias Property Narrator Auto
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;           Globals           ;
@@ -20,14 +24,20 @@ Actor Property PlayerRef Auto
 String[] _ingameEvents
 String[] _extraRequestActions
 int[] _actorHandles = None
+bool _actorsUpdated = false
 int _contextHandle = 0
 bool _does_accept_player_input = false
 bool _isTalking = false
 bool _hasBeenStopped = true
 Actor _lastNpcToSpeak = None
+string _lastSpeakerName = ""
 string _repeatingMessage = ""
 string _location = ""
 int _initialTime = 0
+bool _useNarrator = False
+int _lastTopicInfo = 0
+float httpReceivedTime = 0.0
+string lineToSpeakError = "Error: No line transmitted for actor to speak"
 
 event OnInit()
     RegisterForConversationEvents()
@@ -37,18 +47,13 @@ event OnPlayerLoadGame()
     RegisterForConversationEvents()
 endEvent
 
-;; MINAI PATCH
-Bool Function IsActionsEmpty()
-  return _ingameEvents.Length == 0
-EndFunction
-;; END MINAI PATCH
-
 Function RegisterForConversationEvents()
     RegisterForModEvent("SKSE_HTTP_OnHttpReplyReceived","OnHttpReplyReceived")
     RegisterForModEvent("SKSE_HTTP_OnHttpErrorReceived","OnHttpErrorReceived")
-    RegisterForModEvent(mConsts.EVENT_ACTIONS + mConsts.ACTION_RELOADCONVERSATION,"OnReloadConversationActionReceived")
-    RegisterForModEvent(mConsts.EVENT_ACTIONS + mConsts.ACTION_ENDCONVERSATION,"OnEndConversationActionReceived")
-    RegisterForModEvent(mConsts.EVENT_ACTIONS + mConsts.ACTION_REMOVECHARACTER,"OnRemoveCharacterActionReceived")
+    RegisterForModEvent(EventInterface.EVENT_ACTIONS_PREFIX + mConsts.ACTION_RELOADCONVERSATION,"OnReloadConversationActionReceived")
+    RegisterForModEvent(EventInterface.EVENT_ACTIONS_PREFIX + mConsts.ACTION_ENDCONVERSATION,"OnEndConversationActionReceived")
+    RegisterForModEvent(EventInterface.EVENT_ACTIONS_PREFIX + mConsts.ACTION_REMOVECHARACTER,"OnRemoveCharacterActionReceived")
+    RegisterForModEvent(EventInterface.EVENT_ADD_EVENT,"OnAddEventReceived")
 EndFunction
 
 event OnUpdate()
@@ -67,6 +72,12 @@ function StartConversation(Actor[] actorsToStartConversationWith)
         Debug.Notification("Cannot start conversation. Conversation is already running.")
         return
     endIf
+
+    int handle = SKSE_HTTP.createDictionary()
+    SKSE_HTTP.setString(handle, mConsts.KEY_REQUESTTYPE, mConsts.KEY_REQUESTTYPE_INIT)
+    ; send request to initialize Mantella settings (set LLM connection, start up TTS service, load character_df etc) 
+    ; while waiting for actor info and context to be prepared below
+    SKSE_HTTP.sendLocalhostHttpRequest(handle, repository.HttpPort, mConsts.HTTP_ROUTE_MAIN)
     
     AddActors(actorsToStartConversationWith)
 
@@ -75,14 +86,28 @@ function StartConversation(Actor[] actorsToStartConversationWith)
         return
     endIf
     
-    int handle = SKSE_HTTP.createDictionary()
     SKSE_HTTP.setString(handle, mConsts.KEY_REQUESTTYPE, mConsts.KEY_REQUESTTYPE_STARTCONVERSATION)
     SKSE_HTTP.setString(handle, mConsts.KEY_STARTCONVERSATION_WORLDID, PlayerRef.GetDisplayName() + repository.worldID)
     BuildContext(true)
     AddCurrentActorsAndContext(handle, true)
+
+    if repository.microphoneEnabled
+        if repository.useHotkeyToStartMic
+            SKSE_HTTP.setString(handle, mConsts.KEY_INPUTTYPE, mConsts.KEY_INPUTTYPE_PTT)
+        else
+            SKSE_HTTP.setString(handle, mConsts.KEY_INPUTTYPE, mConsts.KEY_INPUTTYPE_MIC)
+        endIf
+    Else
+        SKSE_HTTP.setString(handle, mConsts.KEY_INPUTTYPE, mConsts.KEY_INPUTTYPE_TEXT)
+    endIf
+
     SKSE_HTTP.sendLocalhostHttpRequest(handle, repository.HttpPort, mConsts.HTTP_ROUTE_MAIN)
     ; string address = "http://localhost:" + mConsts.HTTP_PORT + "/" + mConsts.HTTP_ROUTE_MAIN
-    ; Debug.Notification("Sent StartConversation http request to " + address)  
+    ; Debug.Notification("Sent StartConversation http request to " + address)
+    int eventHandle = ModEvent.Create(EventInterface.EVENT_CONVERSATION_STARTED)
+    if (eventHandle)        
+        ModEvent.Send(eventHandle)
+    endIf 
 endFunction
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -105,10 +130,32 @@ bool Function GetIsTalking()
     return _isTalking
 EndFunction
 
+int Function GetNextTopicID()
+    If (_lastTopicInfo == 0 || _lastTopicInfo == 2)
+        return 1
+    Else
+        return 2
+    EndIf
+EndFunction
+
+Topic Function GetTopicToUse(int transmittedID)
+    If (transmittedID == 2)
+        return MantellaDialogueLine2
+    Else
+        return MantellaDialogueLine1
+    EndIf
+EndFunction
+
 event OnHttpReplyReceived(int typedDictionaryHandle)
+    ; httpReceivedTime = Utility.GetCurrentRealTime()
+    ; NOTE: When testing run times, remember to factor in the time it takes to trace a message (noted below) and subtract this number to get the "true" operation run time
+    ; Debug.Trace((Utility.GetCurrentRealTime() - httpReceivedTime) + " seconds to trace a message", 2)
     string replyType = SKSE_HTTP.getString(typedDictionaryHandle, mConsts.KEY_REPLYTYPE ,"error")
-    If (replyType != "error")
-        ContinueConversation(typedDictionaryHandle)        
+    ; Debug.Trace((Utility.GetCurrentRealTime() - httpReceivedTime) + " seconds to determine reply type", 2)
+    IF replyType == mConsts.KEY_REPLYTTYPE_INITCOMPLETED
+        None
+    ElseIf (replyType != "error")
+        ContinueConversation(replyType, typedDictionaryHandle)        
     Else
         string errorMessage = SKSE_HTTP.getString(typedDictionaryHandle, "mantella_message","Error: Received an error reply from MantellaSoftware but there was no error message attached.")
         Debug.Notification(errorMessage)
@@ -116,15 +163,19 @@ event OnHttpReplyReceived(int typedDictionaryHandle)
     EndIf
 endEvent
 
-function ContinueConversation(int handle)
-    string nextAction = SKSE_HTTP.getString(handle, mConsts.KEY_REPLYTYPE, "Error: Did not receive reply type")
+function ContinueConversation(string nextAction, int handle)
     ; Debug.Notification(nextAction)
     if(nextAction == mConsts.KEY_REPLYTTYPE_STARTCONVERSATIONCOMPLETED)
         _hasBeenStopped = false
+        if(SKSE_HTTP.hasKey(handle,mConsts.KEY_STARTCONVERSATION_USENARRATOR))
+            _useNarrator = SKSE_HTTP.getBool(handle, mConsts.KEY_STARTCONVERSATION_USENARRATOR, false)
+        endif
         ;Debug.Notification("Conversation started.")
         RequestContinueConversation()
     elseIf(nextAction == mConsts.KEY_REPLYTYPE_NPCTALK)
+        ; Debug.Trace((Utility.GetCurrentRealTime() - httpReceivedTime) + " seconds to realise NPC needs to respond", 2)
         int npcTalkHandle = SKSE_HTTP.getNestedDictionary(handle, mConsts.KEY_REPLYTYPE_NPCTALK)
+        ; Debug.Trace((Utility.GetCurrentRealTime() - httpReceivedTime) + " seconds to get NPC talk handle", 2)
         ProcessNpcSpeak(npcTalkHandle)
         RequestContinueConversation()
     elseIf(nextAction == mConsts.KEY_REPLYTYPE_PLAYERTALK)
@@ -137,7 +188,7 @@ function ContinueConversation(int handle)
     elseIf (nextAction == mConsts.KEY_REQUESTTYPE_TTS)
         ClearRepeatingMessage()
         string transcribe = SKSE_HTTP.getString(handle, mConsts.KEY_TRANSCRIBE, "*Complete gibberish*")
-        sendRequestForPlayerInput(transcribe)
+        sendRequestForPlayerInput(transcribe, updateContext=True)
     elseIf(nextAction == mConsts.KEY_REPLYTYPE_NPCACTION)
         int npcActionHandle = SKSE_HTTP.getNestedDictionary(handle, mConsts.KEY_REPLYTYPE_NPCACTION)
         ProcessNpcSpeak(npcActionHandle)
@@ -151,56 +202,118 @@ function RequestContinueConversation()
     if(!_hasBeenStopped)    
         int handle = SKSE_HTTP.createDictionary()
         SKSE_HTTP.setString(handle, mConsts.KEY_REQUESTTYPE, mConsts.KEY_REQUESTTYPE_CONTINUECONVERSATION)
+        int nextTopicInfo = GetNextTopicID()
+        SKSE_HTTP.setInt(handle, mConsts.KEY_CONTINUECONVERSATION_TOPICINFOFILE, nextTopicInfo)
+        _lastTopicInfo = nextTopicInfo
         if(_extraRequestActions && _extraRequestActions.Length > 0)
             ;Debug.Notification("_extraRequestActions contains items. Sending them along with continue!")
             SKSE_HTTP.setStringArray(handle, mConsts.KEY_REQUEST_EXTRA_ACTIONS, _extraRequestActions)
             ClearExtraRequestAction()
             ;Debug.Notification("_extraRequestActions got cleared. Remaining items: " + _extraRequestActions.Length)
         endif
+        if _actorsUpdated
+            SKSE_HTTP.setNestedDictionariesArray(handle, mConsts.KEY_ACTORS, _actorHandles)
+            _actorsUpdated = false
+        endIf
         SKSE_HTTP.sendLocalhostHttpRequest(handle, repository.HttpPort, mConsts.HTTP_ROUTE_MAIN)
     EndIf
 endFunction
 
 function ProcessNpcSpeak(int handle)
     string speakerName = SKSE_HTTP.getString(handle, mConsts.KEY_ACTOR_SPEAKER, "Error: No speaker transmitted for action 'NPC talk'")
+    ; Debug.Trace((Utility.GetCurrentRealTime() - httpReceivedTime) + " seconds to get speaker name", 2)
     ;Debug.Notification("Transmitted speaker name: "+ speakerName)
-    Actor speaker = GetActorInConversation(speakerName)
+    Actor speaker = None
+    bool isNarration = False
+    float lineDuration = 0
+    if _useNarrator
+        isNarration = SKSE_HTTP.getBool(handle, mConsts.KEY_ACTOR_ISNARRATION, false)
+    endIf
+    if isNarration
+        speaker = Narrator.GetReference() as Actor
+        speakerName = "MantellaNarrator"
+        lineDuration = SKSE_HTTP.getFloat(handle, mConsts.KEY_ACTOR_DURATION, 0)
+        ;Debug.Notification("Using Narrator.")
+    ; If actor is already loaded, do not load again from actors list
+    elseif speakerName == _lastSpeakerName
+        speaker = _lastNpcToSpeak
+    else
+        speaker = GetActorInConversation(speakerName)
+    endIf
+    
+    ; Debug.Trace((Utility.GetCurrentRealTime() - httpReceivedTime) + " to get actor based on speaker name", 2)
     ;Debug.Notification("Chosen Actor: "+ speaker.GetDisplayName())
+
     if speaker != none
         WaitForNpcToFinishSpeaking(speaker, _lastNpcToSpeak)
-        string lineToSpeakError = "Error: No line transmitted for actor to speak"
+        ; Debug.Trace((Utility.GetCurrentRealTime() - httpReceivedTime) + " seconds to wait for last NPC to finish speaking", 2)
         string lineToSpeak = SKSE_HTTP.getString(handle, mConsts.KEY_ACTOR_LINETOSPEAK, lineToSpeakError)
-        float duration = SKSE_HTTP.getFloat(handle, mConsts.KEY_ACTOR_DURATION, 0)
-        string[] actions = SKSE_HTTP.getStringArray(handle, mConsts.KEY_ACTOR_ACTIONS)
+        ; Debug.Trace((Utility.GetCurrentRealTime() - httpReceivedTime) + " seconds to prepare response data", 2)
+        int topicID = SKSE_HTTP.getInt(handle, mConsts.KEY_CONTINUECONVERSATION_TOPICINFOFILE, 1)
 
         if lineToSpeak != lineToSpeakError
-            Actor NpcToLookAt = GetNpcToLookAt(speaker, _lastNpcToSpeak)
-            NpcSpeak(speaker, lineToSpeak, NpcToLookAt, duration)
+            Topic topicToUse = GetTopicToUse(topicID)
+            bool isPlayer = speaker == PlayerRef
+            if isPlayer
+                VoiceType orgRaceDefaultVoice = SKSE_HTTP.GetRaceDefaultVoiceType(speaker)
+                SKSE_HTTP.SetRaceDefaultVoiceType(speaker,MantellaVoice00)
+
+                NpcSpeak(speaker, lineToSpeak, topicToUse, false, lineDuration)
+                SKSE_HTTP.SetRaceDefaultVoiceType(speaker,orgRaceDefaultVoice)
+            else
+                VoiceType orgVoice = SKSE_HTTP.GetVoiceType(speaker)
+                ; Debug.Trace((Utility.GetCurrentRealTime() - httpReceivedTime) + " seconds to get orinal voice type", 2)
+                SKSE_HTTP.SetVoiceType(speaker, MantellaVoice00)
+                ; Debug.Trace((Utility.GetCurrentRealTime() - httpReceivedTime) + " seconds to set voice type", 2)
+
+                NpcSpeak(speaker, lineToSpeak, topicToUse, isNarration, lineDuration)
+                SKSE_HTTP.SetVoiceType(speaker, orgVoice)
+            endif
             _lastNpcToSpeak = speaker
+            _lastSpeakerName = speakerName
         endIf
+        ; Get actions only after the NPC starts speaking to improve response times
+        string[] actions = SKSE_HTTP.getStringArray(handle, mConsts.KEY_ACTOR_ACTIONS)
         RaiseActionEvent(speaker, actions)
     endIf
 endFunction
 
-function NpcSpeak(Actor actorSpeaking, string lineToSay, Actor actorToSpeakTo, float duration)
-    MantellaSubtitles.SetInjectTopicAndSubtitleForSpeaker(actorSpeaking, MantellaDialogueLine, lineToSay)
-    ;; MINAI PATCH
-    int handle = ModEvent.Create("Mantella_ActorSpeakEvent")
-    if (handle)
-	ModEvent.PushForm(handle,actorToSpeakTo as Form )
-        ModEvent.PushForm(handle, actorSpeaking as Form)
-        ModEvent.PushString(handle, lineToSay)
-        ModEvent.Send(handle)
-    endIf
-    ;; END MINAI PATCH
-    actorSpeaking.Say(MantellaDialogueLine, abSpeakInPlayersHead=false)
-    actorSpeaking.SetLookAt(actorToSpeakTo)
-    actorToSpeakTo.SetLookAt(actorSpeaking)
-    float durationAdjusted = duration - 1.0
-    if(durationAdjusted < 0)
-        durationAdjusted = 0
-    endIf
-    Utility.Wait(durationAdjusted)
+function WaitForVoiceAssignment(Actor speaker, bool isPlayer)
+    bool hasVoiceChanged = false
+    float totalWaitTime = 0
+    VoiceType currentVoice
+    while hasVoiceChanged == false
+        if isPlayer
+            currentVoice = SKSE_HTTP.GetRaceDefaultVoiceType(speaker)
+        else
+            currentVoice = SKSE_HTTP.GetVoiceType(speaker)
+        endIf
+
+        if currentVoice == MantellaVoice00
+            hasVoiceChanged = true
+        elseIf totalWaitTime > 5
+            Debug.Notification("Could not assign voiceline to NPC")
+            hasVoiceChanged = true
+        else
+            Utility.Wait(0.01)
+            totalWaitTime += 0.01
+        endIf
+    endWhile
+endFunction
+
+function NpcSpeak(Actor actorSpeaking, string lineToSay, Topic topicToUse, bool isSpokenByNarrator, float lineDuration)
+    MantellaSubtitles.SetInjectTopicAndSubtitleForSpeaker(actorSpeaking, topicToUse, lineToSay)
+    actorSpeaking.Say(topicToUse, abSpeakInPlayersHead=isSpokenByNarrator)
+    ; Debug.Trace((Utility.GetCurrentRealTime() - httpReceivedTime) + " seconds to start speaking", 2)
+    If (!isSpokenByNarrator)
+        Actor NpcToLookAt = GetNpcToLookAt(actorSpeaking, _lastNpcToSpeak)
+        actorSpeaking.SetLookAt(NpcToLookAt)
+        NpcToLookAt.SetLookAt(actorSpeaking)
+    Else
+        ; Narrations do not have an actor to apply the IsTalking spell to, so a wait time needs to be forced here
+        Utility.Wait(lineDuration)
+    EndIf
+    actorSpeaking.AddSpell(MantellaIsTalkingSpell, False)
 endfunction
 
 string function GetActorName(actor actorToGetName)
@@ -247,10 +360,15 @@ Function CleanupConversation()
     _does_accept_player_input = false
     _isTalking = false
     _lastNpcToSpeak = None
+    _lastTopicInfo = 0
     ;SKSE_HTTP.clearAllDictionaries()
     If (MantellaConversationParticipantsQuest.IsRunning())
         MantellaConversationParticipantsQuest.Stop()
     EndIf
+    int handle = ModEvent.Create(EventInterface.EVENT_CONVERSATION_ENDED)
+    if (handle)        
+        ModEvent.Send(handle)
+    endIf 
     Debug.Notification("Conversation ended.")  
     Stop()
 EndFunction
@@ -269,22 +387,22 @@ endEvent
 ;   Handle player speaking    ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-function sendRequestForPlayerInput(string playerInput)
+function sendRequestForPlayerInput(string playerInput, bool updateContext)
     if(!_hasBeenStopped)
         int handle = SKSE_HTTP.createDictionary()
         SKSE_HTTP.setString(handle, mConsts.KEY_REQUESTTYPE, mConsts.KEY_REQUESTTYPE_PLAYERINPUT)
         SKSE_HTTP.setString(handle, mConsts.KEY_REQUESTTYPE_PLAYERINPUT, playerinput)
-        UpdateNpcsInConversationArray()
-        SKSE_HTTP.setNestedDictionariesArray(handle, mConsts.KEY_ACTORS, _actorHandles)    
-        BuildContext()
-        SKSE_HTTP.setNestedDictionary(handle, mConsts.KEY_CONTEXT, _contextHandle)
-        ;; MINAI PATCH
-        int mHandle = ModEvent.Create("Mantella_PlayerInputEvent")
-        if (mHandle)
-            ModEvent.PushString(mHandle, playerInput)
-            ModEvent.Send(mHandle)
+
+        if repository.targetTrackingAngerState ; only the anger state of the NPCs is updated by UpdateNpcsInConversationArray()
+            UpdateNpcsInConversationArray()
         endIf
-        ;; END MINAI PATCH
+        SKSE_HTTP.setNestedDictionariesArray(handle, mConsts.KEY_ACTORS, _actorHandles)
+
+        if updateContext ; if context has not been refreshed recently
+            BuildContext()
+        endIf
+        SKSE_HTTP.setNestedDictionary(handle, mConsts.KEY_CONTEXT, _contextHandle)
+
         SKSE_HTTP.sendLocalhostHttpRequest(handle, repository.HttpPort, mConsts.HTTP_ROUTE_MAIN)
     EndIf
 endFunction
@@ -296,16 +414,7 @@ function sendRequestForVoiceTranscribe()
         _does_accept_player_input = False
     endif
 
-    int handle = SKSE_HTTP.createDictionary()
-    SKSE_HTTP.setString(handle, mConsts.KEY_REQUESTTYPE, mConsts.KEY_REQUESTTYPE_TTS)
-    string[] namesInConversation = Utility.CreateStringArray(Participants.GetSize())
-    int i = 0
-    While i < Participants.GetSize()
-        namesInConversation[i] = (Participants.GetAt(i) as Actor).GetDisplayName()
-        i += 1
-    EndWhile
-    SKSE_HTTP.setStringArray(handle, mConsts.KEY_INPUT_NAMESINCONVERSATION, namesInConversation)
-    SKSE_HTTP.sendLocalhostHttpRequest(handle, repository.HttpPort, mConsts.HTTP_ROUTE_STT)
+    sendRequestForPlayerInput("", updateContext=True)
     ShowRepeatingMessage("Listening...")
 endFunction
 
@@ -314,12 +423,17 @@ function GetPlayerTextInput()
         return
     endif
 
+    ; Sneak in context refresh before textbox opens
+    ; As of writing, BuildContext() takes ~0.3 seconds to run,
+    ; but if this runtime increases in the future the delay may become noticeable
+    BuildContext()
+
     UIExtensions.InitMenu("UITextEntryMenu")
     UIExtensions.OpenMenu("UITextEntryMenu")
 
     string result = UIExtensions.GetMenuResultString("UITextEntryMenu")
     if (result && result != "")
-        sendRequestForPlayerInput(result)
+        sendRequestForPlayerInput(result, updateContext=False)
         _does_accept_player_input = False
         ClearRepeatingMessage()
     endIf
@@ -359,8 +473,11 @@ function WaitForNpcToFinishSpeaking(Actor speaker, Actor lastNpcToSpeak)
     if lastNpcToSpeak != None
         ; if the current NPC did not speak last in a multi-NPC conversation, 
         ; wait for the last NPC to finish speaking to avoid interrupting
+        ; and then cast the IsTalking spell on the current NPC (mainly to check that they are not speaking non-Mantella voicelines)
         if speaker != lastNpcToSpeak 
             WaitForSpecificNpcToFinishSpeaking(lastNpcToSpeak)
+            speaker.AddSpell(MantellaIsTalkingSpell, False)
+            Utility.Wait(0.01) ; allow time for _isTalking to be set
         endIf
         ; wait for the current NPC to finish speaking before starting the next voiceline
         WaitForSpecificNpcToFinishSpeaking(speaker)
@@ -368,10 +485,8 @@ function WaitForNpcToFinishSpeaking(Actor speaker, Actor lastNpcToSpeak)
 endFunction
 
 function WaitForSpecificNpcToFinishSpeaking(Actor selectedNpc)
-    selectedNpc.AddSpell(MantellaIsTalkingSpell, False)
     float waitTime = 0.01
     float totalWaitTime = 0
-    Utility.Wait(waitTime) ; allow time for _isTalking to be set
     while _isTalking == true ; wait until the NPC has finished speaking
         Utility.Wait(waitTime)
         totalWaitTime += waitTime
@@ -391,11 +506,11 @@ Function RaiseActionEvent(Actor speaker, string[] actions)
     if(!actions || actions.Length == 0)
         return ;dont send out an action event if there are no actions to act upon
     endIf
-
+    
     int i = 0
     While i < actions.Length
         string extraAction = actions[i]
-        ;Debug.Notification("Recieved action " + extraAction + ". Sending out event!")
+        ;AddIngameEvent("Recieved action " + extraAction + ". Sending out event!")
         ; if the action is to open the inventory menu, wait for the speaker to finish their voiceline first before the menu forces the game to pause
         if extraAction == mConsts.ACTION_NPC_INVENTORY
             Utility.Wait(0.5)
@@ -405,7 +520,7 @@ Function RaiseActionEvent(Actor speaker, string[] actions)
         if extraAction == mConsts.KEY_REQUESTTYPE_ENDCONVERSATION
             EndConversation()
         else
-            int handle = ModEvent.Create(mConsts.EVENT_ACTIONS + extraAction)
+            int handle = ModEvent.Create(EventInterface.EVENT_ACTIONS_PREFIX + extraAction)
             if (handle)
                 ModEvent.PushForm(handle, speaker)
                 ModEvent.Send(handle)
@@ -413,7 +528,7 @@ Function RaiseActionEvent(Actor speaker, string[] actions)
         endIf
         i += 1
     EndWhile
-    
+    ;AddIngameEvent("All Events sent out!")
 EndFunction
 
 Function AddExtraRequestAction(string extraAction)
@@ -429,14 +544,40 @@ Function ClearExtraRequestAction()
     _extraRequestActions = Utility.CreateStringArray(0)
 EndFunction
 
+Function SendActorAddedEvents(Form[] actorsAdded)
+    int index = 0
+    While (index < actorsAdded.Length)
+        Actor speaker = actorsAdded[index] as Actor
+        If (speaker)
+            int handle = ModEvent.Create(EventInterface.EVENT_CONVERSATION_NPC_ADDED)
+            if (handle)
+                ModEvent.PushForm(handle, speaker)
+                ModEvent.Send(handle)
+            endIf 
+        EndIf
+        index += 1
+    EndWhile
+EndFunction
+
+Function SendActorRemovedEvents(Form[] actorsRemoved)
+    int index = 0
+    While (index < actorsRemoved.Length)
+        Actor speaker = actorsRemoved[index] as Actor
+        int handle = ModEvent.Create(EventInterface.EVENT_CONVERSATION_NPC_REMOVED)
+        if (handle)
+            ModEvent.PushForm(handle, speaker)
+            ModEvent.Send(handle)
+        endIf 
+        index += 1
+    EndWhile
+EndFunction
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;        Ingame events        ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 Function AddIngameEvent(string eventText)
-    ;; MINAI PATCH START
-    if (eventText != "" && stringUtil.Find(_inGameEvents, eventText) == -1 )
-    ;; MINAI PATCH END
+    if (eventText != "")
         if(!_ingameEvents)
             _ingameEvents = Utility.CreateStringArray(1)
         Else
@@ -449,6 +590,10 @@ EndFunction
 Function ClearIngameEvent()
     _ingameEvents = Utility.CreateStringArray(0)
 EndFunction
+
+event OnAddEventReceived(string text)
+    AddIngameEvent(text)
+endEvent
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Action: Reload conversation ;
@@ -506,24 +651,26 @@ EndFunction
 
 Function AddActors(Actor[] actorsToAdd)
     int i = 0
-    bool wasNewActorAdded = false
+    Form[] actorsAdded = Utility.CreateFormArray(0)
     While i < actorsToAdd.Length
-        int pos = Participants.Find(actorsToAdd[i])
+        Actor possibleNewActor = actorsToAdd[i]
+        int pos = Participants.Find(possibleNewActor)
         if(pos < 0)
-            Participants.AddForm(actorsToAdd[i])
-            actorsToAdd[i].AddToFaction(MantellaConversationParticipantsFaction)
-            wasNewActorAdded = true
+            Participants.AddForm(possibleNewActor)
+            possibleNewActor.AddToFaction(MantellaConversationParticipantsFaction)
+            actorsAdded = Utility.ResizeFormArray(actorsAdded, actorsAdded.Length + 1)
+            actorsAdded[actorsAdded.Length - 1] = possibleNewActor
 
             ; check if there are multiple actors with the same name
             int nameCount = 0
             int j = 0
             bool break = false
-            if (actorsToAdd[i] != PlayerRef) ; ignore the player having the same name as an actor
+            if (possibleNewActor != PlayerRef) ; ignore the player having the same name as an actor
                 While (j < Participants.GetSize()) && (break==false)
                     Actor currentActor = Participants.GetAt(j) as Actor
-                    if (currentActor.GetDisplayName() == actorsToAdd[i].GetDisplayName())
+                    if (currentActor.GetDisplayName() == possibleNewActor.GetDisplayName())
                         nameCount += 1
-                        if (currentActor == actorsToAdd[i]) ; stop counting when the exact actor is found (not just the same name)
+                        if (currentActor == possibleNewActor) ; stop counting when the exact actor is found (not just the same name)
                             break = true
                         endIf
                     endIf
@@ -533,15 +680,16 @@ Function AddActors(Actor[] actorsToAdd)
                 if (nameCount > 1)
                     ; set an ID to this non-uniquely-named actor in the form of a faction rank
                     ; these uniquely ID'd names can be called via the GetActorName() function
-                    actorsToAdd[i].SetFactionRank(MantellaConversationParticipantsFaction, nameCount)
+                    possibleNewActor.SetFactionRank(MantellaConversationParticipantsFaction, nameCount)
                 endIf
             endIf
         endIf
         i += 1
     EndWhile
-    If (wasNewActorAdded)
+    If (actorsAdded.Length > 0)
         CauseReassignmentOfParticipantAlias()
         BuildNpcsInConversationArray()
+        SendActorAddedEvents(actorsAdded)
     EndIf
     
     ;PrintActorsInConversation()
@@ -549,22 +697,25 @@ EndFunction
 
 Function RemoveActors(Actor[] actorsToRemove)
     PrintActorsArray("Actors to remove: ",actorsToRemove)
-    bool wasActorRemoved = false
+    Form[] actorsRemoved = Utility.CreateFormArray(0)
     int i = 0
     While (i < actorsToRemove.Length)
-        If (Participants.HasForm(actorsToRemove[i]))
-            Participants.RemoveAddedForm(actorsToRemove[i])
-            actorsToRemove[i].RemoveFromFaction(MantellaConversationParticipantsFaction)
-            Debug.Notification(actorsToRemove[i].GetDisplayName()+" left the conversation.")
-            wasActorRemoved = true
+        Actor actorInQuestion = actorsToRemove[i]
+        If (Participants.HasForm(actorInQuestion))
+            actorsRemoved = Utility.ResizeFormArray(actorsRemoved, actorsRemoved.Length + 1)
+            actorsRemoved[actorsRemoved.Length - 1] = actorInQuestion
+            Participants.RemoveAddedForm(actorInQuestion)
+            actorInQuestion.RemoveFromFaction(MantellaConversationParticipantsFaction)
+            Debug.Notification(actorInQuestion.GetDisplayName()+" left the conversation.")
         EndIf
         i += 1
     EndWhile
     if (Participants.GetSize() < 2)
         EndConversation()
-    ElseIf (wasActorRemoved)
+    ElseIf (actorsRemoved.Length > 0)
         CauseReassignmentOfParticipantAlias()
         BuildNpcsInConversationArray()
+        SendActorRemovedEvents(actorsRemoved)
     endIf
     ;PrintActorsInConversation()
 EndFunction
@@ -634,6 +785,7 @@ int[] function BuildNpcsInConversationArray()
         _actorHandles[i] = buildActorSetting(Participants.GetAt(i) as Actor)
         i += 1
     EndWhile
+    _actorsUpdated = true
 endFunction
 
 int[] function UpdateNpcsInConversationArray()
@@ -746,3 +898,10 @@ EndFunction
 Function ClearRepeatingMessage()
     _repeatingMessage = ""
 EndFunction
+
+
+;; MINAI PATCH
+Bool Function IsActionsEmpty()
+    return _ingameEvents.Length == 0
+EndFunction
+;; END MINAI PATCH

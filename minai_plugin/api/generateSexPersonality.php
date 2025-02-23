@@ -1,6 +1,7 @@
 <?php
 // Path to configuration and database library
 $path = ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR;
+require_once("../logger.php");
 require_once($path . "conf" . DIRECTORY_SEPARATOR . "conf.php");
 require_once($path . "lib" . DIRECTORY_SEPARATOR . "{$GLOBALS['DBDRIVER']}.class.php");
 require_once("./sexPersonalityJsonSchema.php");
@@ -22,9 +23,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $prompt[] = ["role" => "system", "content" => "$personalityGenerationPrompt".json_encode($sexPersonalityJsonSchema)];
         $prompt[] = ["role" => "user", "content" => $_POST['descriptionPersonality']];
 
-        error_log(json_encode($prompt));
+        minai_log("info", json_encode($prompt));
 
-        $connectionHandler = new connector();
+        $connectionHandler = new $GLOBALS["CONNECTORS_DIARY"];
 
         $connectionHandler->open($prompt, []);
         $buffer = "";
@@ -53,4 +54,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-?>

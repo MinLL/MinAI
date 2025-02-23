@@ -1,8 +1,10 @@
 <?php
 require_once("util.php");
 $target = $GLOBALS["target"];
+$actorName = $GLOBALS["HERIKA_NAME"];
 
-if (!IsEnabled($GLOBALS["HERIKA_NAME"], "inCombat") && (IsModEnabled("Sexlab") || IsModEnabled("Ostim")) && ((IsEnabled("PLAYER", "enableAISex") && IsRadiant()) || !IsRadiant())) {
+if (ShouldEnableSexFunctions($actorName)) {
+
     // Always enabled
     RegisterAction("ExtCmdMasturbate");
     RegisterAction("ExtCmdStartVaginal");
@@ -22,10 +24,10 @@ if (!IsEnabled($GLOBALS["HERIKA_NAME"], "inCombat") && (IsModEnabled("Sexlab") |
             RegisterAction("ExtCmdStopFollowing");
         } else {
             if (!IsInScene($GLOBALS['HERIKA_NAME'])) {
-                error_log($GLOBALS['HERIKA_NAME']." is not in a scene");
+                minai_log("info", $GLOBALS['HERIKA_NAME']." is not in a scene");
                 RegisterAction("ExtCmdFollow");
             } else {
-                error_log($GLOBALS['HERIKA_NAME']." is in a scene");
+                minai_log("info", $GLOBALS['HERIKA_NAME']." is in a scene");
             }
         }
     }
@@ -719,5 +721,4 @@ $GLOBALS["FUNCTIONS"][] = [
         ],
     ];
 $GLOBALS["FUNCRET"]["ExtCmdStopFollowing"]=$GLOBALS["GenericFuncRet"];
-?>
 

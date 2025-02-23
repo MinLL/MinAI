@@ -16,7 +16,6 @@ class dnb {
         $str = "";
         if(count($someArray)>1) {
             $str = implode(", ", $someArray); 
-            $str = substr($str, 0, -2);
         } else $str = $someArray[0];
         if($hasHave) {
             if($count>1) {
@@ -146,4 +145,3 @@ function GetDirtAndBloodContext($localActors) {
 }
 
 
-?>

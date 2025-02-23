@@ -5,12 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Landing Page</title>
     <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2196F3;
+            --background-dark: #1a1a1a;
+            --background-light: #2d2d2d;
+            --text-color: #e0e0e0;
+            --border-color: #404040;
+            --success-color: #40c057;
+            --error-color: #f44336;
+            --warning-color: #ffc107;
+            --info-color: #4dabf7;
+        }
+
         body, html {
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--background-dark);
             height: 100%;
+            color: var(--text-color);
         }
 
         .container {
@@ -18,158 +32,472 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             text-align: center;
-            background: linear-gradient(to bottom, #ffffff, #e0e0e0);
+            padding: 20px;
+            background: radial-gradient(circle at center, var(--background-light) 0%, var(--background-dark) 100%);
+        }
+
+        .content-wrapper {
+            max-width: 1200px;
+            width: 100%;
+            padding: 40px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
         .splash-image {
             width: 100%;
             max-width: 200px;
-            border-radius: 10px;
-            margin-bottom: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease;
+        }
+
+        .splash-image:hover {
+            transform: scale(1.05);
         }
 
         h1 {
-            font-size: 48px;
+            font-size: 2.5rem;
             margin-bottom: 20px;
-            color: #333;
+            color: var(--text-color);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         p {
-            font-size: 18px;
-            color: #666;
+            font-size: 1.1rem;
+            color: var(--text-color);
+            opacity: 0.9;
             margin-bottom: 40px;
-        }
-
-        .version-info {
-            margin-bottom: 20px;
-            color: #666;
-            font-size: 16px;
-        }
-
-        .update-warning {
-            color: #FF5733;
-            font-size: 18px;
-            margin-bottom: 20px;
-        }
-
-        .development-info {
-            color: #2196F3;
-            font-size: 16px;
-            margin-bottom: 20px;
+            max-width: 600px;
+            line-height: 1.6;
         }
 
         .links {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+            margin: 30px auto;
             justify-content: center;
+        }
+
+        /* Update the base button styles */
+        .links a, .update-button, .external-links a {
+            display: flex;
             align-items: center;
-        }
-
-        .links a, .update-button {
-            display: block;
+            justify-content: center;
             text-decoration: none;
-            font-size: 20px;
-            color: #ffffff;
-            background-color: #4CAF50;
-            padding: 15px 30px;
-            margin: 10px;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
+            font-size: 1.1rem;
+            color: var(--text-color);
+            padding: 16px 24px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(4px);
+            height: 60px;
+            text-align: center;
+            margin: 0 auto;
+            width: 100%;
+            max-width: 300px;
+            position: relative;
+            overflow: hidden;
+            /* Add default gradient background */
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
-        .links a:hover, .update-button:hover {
-            background-color: #45a049;
+        /* Update hover effect to be more pronounced */
+        .links a:hover, .update-button:hover, .external-links a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            filter: brightness(1.3);
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.15) 0%,
+                rgba(255, 255, 255, 0.08) 100%
+            );
         }
 
-        .update-buttons {
-            margin-bottom: 20px;
+        /* Add shimmer effect */
+        .links a::before, .update-button::before, .external-links a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.1),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        .links a:hover::before, .update-button:hover::before, .external-links a:hover::before {
+            left: 100%;
+        }
+
+        /* Update button styles */
+        .update-button.stable {
+            background: linear-gradient(135deg, 
+                rgba(76, 175, 80, 0.1) 0%, 
+                rgba(76, 175, 80, 0.2) 100%
+            );
+            border-color: var(--success-color);
+        }
+
+        .update-button.development {
+            background: linear-gradient(135deg, 
+                rgba(33, 150, 243, 0.1) 0%, 
+                rgba(33, 150, 243, 0.2) 100%
+            );
+            border-color: var(--info-color);
+        }
+
+        /* Primary action buttons (Configuration and Diagnostics) */
+        .links a[href="config.html"],
+        .links a[href="diagnostic.html"] {
+            background: linear-gradient(135deg, 
+                rgba(76, 175, 80, 0.2) 0%, 
+                rgba(76, 175, 80, 0.3) 100%
+            );
+            border-color: rgba(76, 175, 80, 0.5);
+            font-weight: 500;
+            font-size: 1.2rem;
+            height: 70px;
+        }
+
+        /* Equipment Manager */
+        .links a[href="we_manager.html"] {
+            background: linear-gradient(135deg, 
+                rgba(156, 39, 176, 0.1) 0%, 
+                rgba(156, 39, 176, 0.2) 100%
+            );
+            border-color: rgba(156, 39, 176, 0.3);
+            grid-column: 1 / -1;
+            max-width: 400px;
+        }
+
+        /* NSFW related buttons */
+        .nsfw-options {
+            margin: 15px auto;
+        }
+
+        .nsfw-options a {
+            background: linear-gradient(135deg, 
+                rgba(218, 119, 242, 0.15) 0%, 
+                rgba(218, 119, 242, 0.25) 100%
+            );
+            border-color: rgba(218, 119, 242, 0.4);
+            color: #f0d5f7;
+        }
+
+        /* External links container */
+        .external-links {
+            margin-top: 10px;
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .external-links a {
+            flex: 0 1 200px;
+            height: 50px;
+            font-size: 1rem;
+        }
+
+        /* Github button */
+        .external-links a[href*="github"] {
+            background: linear-gradient(135deg, 
+                rgba(51, 51, 51, 0.1) 0%, 
+                rgba(51, 51, 51, 0.2) 100%
+            );
+            border-color: rgba(51, 51, 51, 0.3);
+        }
+
+        /* Back to Main button */
+        .external-links a[href*="HerikaServer"] {
+            background: linear-gradient(135deg, 
+                rgba(255, 152, 0, 0.1) 0%, 
+                rgba(255, 152, 0, 0.2) 100%
+            );
+            border-color: rgba(255, 152, 0, 0.3);
+        }
+
+        .status-section {
+            margin: 30px auto;
+            padding: 25px;
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            background-color: rgba(45, 45, 45, 0.4);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(4px);
+        }
+
+        .version-info {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .version-info p {
+            margin: 10px 0;
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .version-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px auto;
+            max-width: 800px;
+            justify-content: center;
+        }
+
+        .version-item {
+            padding: 12px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .version-label {
+            font-size: 0.9rem;
+            color: var(--text-color);
+            opacity: 0.7;
+            margin-bottom: 5px;
+        }
+
+        .version-value {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .update-warning {
+            color: var(--warning-color);
+            font-size: 1.1rem;
+            margin: 20px auto;
+            max-width: 600px;
+            padding: 15px;
+            background-color: rgba(255, 193, 7, 0.1);
+            border-radius: 8px;
+            border: 1px solid var(--warning-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .update-warning::before {
+            content: "⚠️";
+            font-size: 1.2rem;
+        }
+
+        .development-info {
+            color: var(--info-color);
+            font-size: 1rem;
+            margin: 20px auto;
+            max-width: 600px;
+            padding: 15px;
+            background-color: rgba(77, 171, 247, 0.1);
+            border-radius: 8px;
+            border: 1px solid var(--info-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .development-info::before {
+            content: "ℹ️";
+            font-size: 1.2rem;
+        }
+
+        .update-buttons .links {
+            margin: 20px auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .update-buttons .update-button {
+            flex: 0 1 280px;
         }
 
         .error-message {
-            color: red;
-            font-size: 16px;
-            margin-bottom: 20px;
+            color: var(--error-color);
+            font-size: 1rem;
+            margin: 20px 0;
+            padding: 12px;
+            background-color: rgba(244, 67, 54, 0.1);
+            border-radius: 8px;
+            border: 1px solid var(--error-color);
         }
-	
-	.nsfw-mode {
-            color: purple;
-            font-size: 16px;
-            margin-bottom: 20px;
+
+        .nsfw-mode {
+            color: #da77f2;
+            font-size: 1rem;
+            margin: 20px 0;
+            padding: 12px;
+            background-color: rgba(218, 119, 242, 0.1);
+            border-radius: 8px;
+            border: 1px solid #da77f2;
+        }
+
+        .update-status {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--background-light);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 800px;
+            width: 90%;
+            display: none;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-color);
+            z-index: 1000;
+            backdrop-filter: blur(16px);
+        }
+
+        .update-status h3 {
+            color: var(--info-color);
+            margin: 0 0 20px 0;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .update-status pre {
+            background-color: var(--background-dark);
+            padding: 16px;
+            border-radius: 8px;
+            color: var(--text-color);
+            font-family: 'Consolas', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
         }
 
         footer {
-            position: absolute;
-            bottom: 10px;
+            position: fixed;
+            bottom: 20px;
             width: 100%;
             text-align: center;
-            color: #777;
+            color: var(--text-color);
+            opacity: 0.7;
+            font-size: 0.9rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         @media (max-width: 768px) {
-            h1 {
-                font-size: 36px;
+            .content-wrapper {
+                padding: 20px;
             }
 
-            .links a {
-                font-size: 18px;
+            h1 {
+                font-size: 2rem;
+            }
+
+            .links {
+                grid-template-columns: 1fr;
+                max-width: 100%;
+            }
+
+            .links a, .update-button {
+                height: 50px;
+                max-width: 100%;
+                font-size: 1rem;
                 padding: 12px 20px;
+            }
+
+            .update-buttons .update-button {
+                flex: 1 1 100%;
             }
         }
     </style>
 </head>
 <body>
-
     <div class="container">
-        <h1>Welcome to the MinAI Configuration Page</h1>
-        <p>Manage your game settings, configuration, and more from here.</p>
+        <div class="content-wrapper">
+            <h1>Welcome to the MinAI Configuration Page</h1>
+            <p>Manage your game settings, configuration, diagnose problems, and more from here.</p>
 
-        <!-- Splash Image -->
-        <img src="splash.png" alt="Splash Image" class="splash-image">
+            <!-- Splash Image -->
+            <img src="splash.png" alt="Splash Image" class="splash-image">
 
-	<!-- Error Message (hidden by default) -->
-        <div id="nsfw-mode" class="nsfw-mode" style="display:none;">NSFW mode is currently enabled</div>
-	
-        <!-- Version Info -->
-        <div id="version-info" class="version-info">
-            Checking for updates...
-        </div>
+            <!-- Status Section -->
+            <div class="status-section">
+                <!-- NSFW Mode Indicator -->
+                <div id="nsfw-mode" class="nsfw-mode" style="display:none;">NSFW mode is currently enabled</div>
+                
+                <!-- Version Info -->
+                <div id="version-info" class="version-info">
+                    Checking for updates...
+                </div>
 
-        <!-- Error Message (hidden by default) -->
-        <div id="error-message" class="error-message" style="display:none;"></div>
+                <!-- Error Message -->
+                <div id="error-message" class="error-message" style="display:none;"></div>
 
-        <!-- Update Buttons for Stable and Main Branch -->
-        <div id="update-buttons" class="update-buttons" style="display:none;">
-            <table>
-                <tr>
-                    <td>
+                <!-- Update Buttons -->
+                <div id="update-buttons" class="update-buttons" style="display:none;">
+                    <div class="links">
                         <button class="update-button" onclick="updateToLatestVersion('stable')">Update to Latest Stable</button>
-                    </td>
-                    <td>
                         <button class="update-button" onclick="updateToLatestVersion('main')">Update to Latest Development</button>
-                    </td>
-                </tr>
-            </table>
-        </div>
+                    </div>
+                </div>
+            </div>
 
-        <!-- Navigation Links -->
-        <div class="links">
-            <a href="config.html">Configuration</a>
-            <a href="we_manager.html">Equipment Manager</a>
-	    <br />
-	    <div class="nsfw-options" id="nsfw-options" style="display:none;">
-	      <a href="personalities.html">Edit NPC Sex Personalities</a>
-	      <a href="scene_descriptions.html">Edit Sex Scene Descriptions</a>
-	    </div>
-	    <table>
-	      <tr><td>
-		  <a href="https://github.com/MinLL/MinAI/tree/main">Github</a>
-		  </td><td>
-		  <a href="/HerikaServer/">Back to Main AI-FF Page</a>
-	      </td></tr>
-	    </table>
+            <!-- Primary Navigation Links -->
+            <div class="links">
+                <a href="config.html" class="cache-bust">Configuration</a>
+                <a href="diagnostic.html" class="cache-bust">Diagnostics and Log Viewer</a>
+                <a href="we_manager.html" class="cache-bust">Equipment Manager</a>
+                <a href="diary.html" class="cache-bust">Diary Viewer</a>
+            </div>
+
+            <!-- NSFW Options -->
+            <div class="links nsfw-options" id="nsfw-options" style="display:none;">
+                <a href="personalities.html" class="cache-bust">Edit NPC Sex Personalities</a>
+                <a href="scene_descriptions.html" class="cache-bust">Edit Sex Scene Descriptions</a>
+            </div>
+
+            <!-- External Links -->
+            <div class="external-links">
+                <a href="https://github.com/MinLL/MinAI/tree/main">Github</a>
+                <a href="/HerikaServer/" class="cache-bust">Back to Main AI-FF Page</a>
+            </div>
         </div>
+    </div>
+
+    <!-- Update Status Modal -->
+    <div id="update-status" class="update-status">
+        <h3>Update Progress</h3>
+        <pre id="update-log"></pre>
     </div>
 
     <footer>
@@ -214,25 +542,85 @@
 
         // Function to call the PHP API to update to the selected branch
         async function updateToLatestVersion(branch) {
-            try {
-                const response = await fetch(`api/update.php?branch=${branch}`, { method: 'POST' });
-                const result = await response.json();
-                const errorMessageDiv = document.getElementById('error-message');
+            const updateStatus = document.getElementById('update-status');
+            const updateLog = document.getElementById('update-log');
+            const errorMessageDiv = document.getElementById('error-message');
+            
+            updateStatus.style.display = 'block';
+            updateLog.textContent = '';  // Clear previous logs
+            errorMessageDiv.style.display = 'none';
 
-                if (response.ok && result.status === 'success') {
-                    alert(`Updated to the latest version on the ${branch} branch! Please refresh the page.`);
-                } else {
-                    const errorDetails = result.message || 'Unknown error';
-                    errorMessageDiv.textContent = `Error updating to the latest ${branch} branch: ${errorDetails}`;
-                    if (result.output) {
-                        errorMessageDiv.textContent += `\nDetails: ${result.output.join('\n')}`;
+            function appendMessage(status, message) {
+                const timestamp = new Date().toLocaleTimeString();
+                const statusClass = `status-${status}`;
+                let icon = '';
+                
+                // Add status-specific icons using Unicode
+                switch(status) {
+                    case 'progress':
+                        icon = '<span class="emoji">📋</span> '; // U+1F4CB
+                        break;
+                    case 'success':
+                        icon = '<span class="emoji">✅</span> '; // U+2705
+                        break;
+                    case 'error':
+                        icon = '<span class="emoji">❌</span> '; // U+274C
+                        break;
+                }
+                
+                const messageHtml = `[${timestamp}] <span class="${statusClass}">${icon}${message}</span>\n`;
+                updateLog.innerHTML += messageHtml;
+                updateLog.scrollTop = updateLog.scrollHeight;
+            }
+
+            try {
+                const response = await fetch(`api/update.php?branch=${branch}`, { 
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'text/event-stream'
                     }
-                    errorMessageDiv.style.display = 'block';
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+
+                while (true) {
+                    const {value, done} = await reader.read();
+                    if (done) break;
+                    
+                    buffer += decoder.decode(value, {stream: true});
+                    
+                    // Split buffer by newlines and process each complete message
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || ''; // Keep the last incomplete line in buffer
+                    
+                    for (const line of lines) {
+                        if (line.trim()) {
+                            try {
+                                const result = JSON.parse(line);
+                                appendMessage(result.status, result.message);
+                                
+                                if (result.status === 'success') {
+                                    setTimeout(() => {
+                                        alert('Update completed! Please refresh the page.');
+                                    }, 1000);
+                                }
+                            } catch (e) {
+                                console.error('Error parsing line:', line, e);
+                                appendMessage('error', `Failed to parse update message: ${line}`);
+                            }
+                        }
+                    }
                 }
             } catch (error) {
-                const errorMessageDiv = document.getElementById('error-message');
                 errorMessageDiv.textContent = `Error updating to the latest version: ${error.message}`;
                 errorMessageDiv.style.display = 'block';
+                appendMessage('error', `Error: ${error.message}`);
                 console.error('Error updating to the latest version:', error);
             }
         }
@@ -247,32 +635,74 @@
             const updateButtonsDiv = document.getElementById('update-buttons');
 
             if (localVersion && stableVersion && mainVersion) {
-                let message = `Local version: ${localVersion} | Latest stable: ${stableVersion} | Latest development: ${mainVersion}`;
-
                 if (localVersion === stableVersion && localVersion === mainVersion) {
-                    versionInfoDiv.textContent = `You are using the latest version (${localVersion})`;
+                    versionInfoDiv.innerHTML = `
+                        <div class="version-details">
+                            <div class="version-item">
+                                <div class="version-label">Current Version</div>
+                                <div class="version-value">${localVersion}</div>
+                            </div>
+                        </div>
+                        <p>You are using the latest version</p>
+                    `;
                 } else {
-                    versionInfoDiv.innerHTML = `<p>${message}</p>`;
+                    versionInfoDiv.innerHTML = `
+                        <div class="version-details">
+                            <div class="version-item">
+                                <div class="version-label">Current Version</div>
+                                <div class="version-value">${localVersion}</div>
+                            </div>
+                            <div class="version-item">
+                                <div class="version-label">Latest Stable</div>
+                                <div class="version-value">${stableVersion}</div>
+                            </div>
+                            <div class="version-item">
+                                <div class="version-label">Latest Development</div>
+                                <div class="version-value">${mainVersion}</div>
+                            </div>
+                        </div>
+                    `;
                     
-                    // Check if the local version differs from the stable version and show an update warning
                     if (localVersion !== stableVersion) {
-                        versionInfoDiv.innerHTML += `<p class="update-warning">A new stable version is available!</p>`;
+                        versionInfoDiv.innerHTML += `
+                            <div class="update-warning">
+                                A new stable version is available!
+                            </div>
+                        `;
                     }
-                    // Check if the local version differs from the main (development) version, less emphasis
                     if (localVersion !== mainVersion && localVersion === stableVersion) {
-                        versionInfoDiv.innerHTML += `<p class="development-info">A new development version is available.</p>`;
+                        versionInfoDiv.innerHTML += `
+                            <div class="development-info">
+                                A new development version is available
+                            </div>
+                        `;
                     }
 
+                    updateButtonsDiv.innerHTML = `
+                        <div class="links">
+                            <button class="update-button stable" onclick="updateToLatestVersion('stable')">
+                                Update to Latest Stable
+                            </button>
+                            <button class="update-button development" onclick="updateToLatestVersion('main')">
+                                Update to Latest Development
+                            </button>
+                        </div>
+                    `;
                     updateButtonsDiv.style.display = 'block';
                 }
             } else {
-                versionInfoDiv.textContent = 'Unable to check for updates at this time.';
+                versionInfoDiv.innerHTML = `
+                    <div class="error-message">
+                        Unable to check for updates at this time.
+                    </div>
+                `;
             }
         }
 
         // Run the update check when the page loads
-      document.addEventListener('DOMContentLoaded', checkForUpdates);
-       // Global variable to store the fetched payload
+        document.addEventListener('DOMContentLoaded', checkForUpdates);
+        
+        // Global variable to store the fetched payload
         var fetchedPayload = {};
 
         // Function to fetch the index_payload on page load
@@ -312,11 +742,18 @@
                 console.log("NSFW mode enabled");
                 var nsfwDiv = document.getElementById('nsfw-mode');
                 nsfwDiv.style.display = 'block';  // Show the NSFW mode div
-		var nsfwOptionsDiv = document.getElementById('nsfw-options');
+                var nsfwOptionsDiv = document.getElementById('nsfw-options');
                 nsfwOptionsDiv.style.display = 'block';  // Show the NSFW options div
             }
         };
-    </script>
 
+        // Add this to your existing script section
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add cache busting to all links with class 'cache-bust'
+            document.querySelectorAll('a.cache-bust').forEach(link => {
+                link.href = link.href + (link.href.includes('?') ? '&' : '?') + 'v=' + new Date().getTime();
+            });
+        });
+    </script>
 </body>
 </html>

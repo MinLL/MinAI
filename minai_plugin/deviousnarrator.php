@@ -2,7 +2,7 @@
 
 Function SetTelvanniNarrator() {
     $GLOBALS["devious_narrator"]="telvanni";
-    // error_log("minai: Setting Telvanni Narrator");
+    // minai_log("info", "Setting Telvanni Narrator");
     $eyepenalty = GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleEyePenalty");       
     $eyereward = GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleEyeReward");
     $eyescore = GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleEyeScore");
@@ -41,7 +41,7 @@ Function SetTelvanniNarrator() {
 
 Function SetEldritchNarrator() {
     $GLOBALS["devious_narrator"]="eldritch";
-    // error_log("minai: Setting Eldritch Narrator");
+    // minai_log("info", "Setting Eldritch Narrator");
     // Overwrite narrator personality
     $soldSoul = (IsEnabled($GLOBALS["PLAYER_NAME"], "dwp_eldritchwaifueffect_soldsoul") || IsEnabled($GLOBALS["PLAYER_NAME"], "dwp_eldritchwaifueffect_soldsoul_belted"));
     $personality = "";
@@ -96,7 +96,7 @@ Function SetDeviousNarrator() {
         SetTelvanniNarrator();
     }
     else {
-        error_Log("Using default narrator");
+        minai_log("info", "Using default narrator");
     }
 }
 
@@ -120,4 +120,3 @@ Function EnableDeviousNarratorActions() {
     $GLOBALS["ENABLED_FUNCTIONS"] = array();
 }
 
-?>

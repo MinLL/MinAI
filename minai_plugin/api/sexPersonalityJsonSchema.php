@@ -1,4 +1,5 @@
 <?php
+require_once("../logger.php");
 
 $sexPersonalityJsonSchema = '{
     "type": "object",
@@ -120,4 +121,3 @@ LLM can come up with other different sexual behaviors;",
     ]
 }';
 
-?>

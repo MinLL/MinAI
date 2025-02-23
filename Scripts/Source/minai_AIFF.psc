@@ -10,6 +10,8 @@ minai_Reputation reputation
 minai_DirtAndBlood dirtAndBlood
 minai_EnvironmentalAwareness envAwareness
 
+minai_FertilityMode fertility
+GlobalVariable minai_DynamicSapienceToggleStealth
 bool bHasAIFF = False
 
 int Property contextUpdateInterval Auto
@@ -30,6 +32,9 @@ int sapientActors = 0
 bool bHasFollowPlayer = False
 Package FollowPlayerPackage
 Faction FollowingPlayerFaction
+
+; Add new property to track last dialogue time for actors
+int Property lastDialogueTimes Auto  ; JMap of actor names to timestamps
 
 Function InitFollow()
   bHasFollowPlayer = False
@@ -69,12 +74,17 @@ Function Maintenance(minai_MainQuestController _main)
     main.Fatal("You are running an old / outdated version of AI Follower Framework. Some functionality will be broken.")
   EndIf
   ContextSpell = Game.GetFormFromFile(0x090A, "MinAI.esp") as Spell
+  minai_DynamicSapienceToggleStealth = Game.GetFormFromFile(0x0E97, "MinAI.esp") as GlobalVariable
+  if (!minai_DynamicSapienceToggleStealth)
+    Main.Error("Could not retrieve minai_DynamicSapienceToggleStealth from esp")
+  EndIf
   sex = (Self as Quest)as minai_Sex
   survival = (Self as Quest)as minai_Survival
   arousal = (Self as Quest)as minai_Arousal
   devious = (Self as Quest)as minai_DeviousStuff
   dirtAndBlood = (Self as Quest)as minai_DirtAndBlood
   envAwareness = (Self as Quest)as minai_EnvironmentalAwareness
+  fertility = (Self as Quest)as minai_FertilityMode
   followers = Game.GetFormFromFile(0x0913, "MinAI.esp") as minai_Followers
   reputation = (Self as Quest) as minai_Reputation
   if (!followers)
@@ -114,7 +124,18 @@ Function Maintenance(minai_MainQuestController _main)
   ; StoreContext("minai", "testKey", "This is dynamically persisted context!", 1200)
   InitFollow()
   CleanupStates()
+
+  if !lastDialogueTimes
+    ; Initialize the dialogue times map
+    lastDialogueTimes = JMap.Object()
+    JValue.Retain(lastDialogueTimes)
+  EndIf
+
+  if config.preserveQueue
+    EnablePreserveQueue()
+  EndIf
 EndFunction
+
 
 Function CleanupStates()
   actor[] actors = GetNearbyAI()
@@ -229,6 +250,12 @@ Function SetContext(actor akTarget)
   if akTarget == Player
     AIAgentFunctions.logMessage("_minai_PLAYER//playerName@" + Main.GetActorName(player), "setconf")
     AIAgentFunctions.logMessage("_minai_PLAYER//nearbyActors@" + GetNearbyAiStr(), "setconf")
+    ; Make sure this doesn't get stuck
+    if player.IsSneaking()
+      minai_DynamicSapienceToggleStealth.SetValue(0.0)
+    else
+      minai_DynamicSapienceToggleStealth.SetValue(1.0)
+    EndIf
   EndIf
   StoreActorVoice(akTarget)
   devious.SetContext(akTarget)
@@ -238,6 +265,8 @@ Function SetContext(actor akTarget)
   reputation.SetContext(akTarget)
   dirtAndBlood.SetContext(akTarget)
   envAwareness.SetContext(akTarget)
+  fertility.SetContext(akTarget)
+  sex.SetContext(akTarget)
   StoreKeywords(akTarget)
   StoreFactions(akTarget)
   if config.disableAIAnimations && akTarget != player
@@ -568,7 +597,13 @@ Function ResetActionBackoff(string actionName, bool bypassCooldown)
     Main.Warn("ActionRegistry: Could not find action " + actionName + " to reset backoff.")
     return
   EndIf
+  int hasMod = JMap.getInt(actionObj, "hasMod")
+  if hasMod == 0
+    Main.Debug("ActionRegistry: The mod for action " + actionName + " is not installed, skipping backoff reset.")
+    return
+  EndIf
   
+
   float interval = JMap.getFlt(actionObj, "interval")
   float exponent = JMap.getFlt(actionObj, "exponent")
   float decayWindow = JMap.getFlt(actionObj, "decayWindow")
@@ -736,14 +771,40 @@ Function CleanupSapientActors()
 EndFunction
 
 
+Function UpdateLastDialogueTime(string actorName)
+  if !lastDialogueTimes
+    lastDialogueTimes = JMap.Object()
+    JValue.Retain(lastDialogueTimes)
+  EndIf
+  float currentTime = Utility.GetCurrentRealTime()
+  JMap.SetFlt(lastDialogueTimes, actorName, currentTime)
+  Main.Debug("Updated last dialogue time for " + actorName + " to " + currentTime)
+EndFunction
+
+
 Function RemoveActorAI(string targetName)
+  float lastDialogueTime = JMap.GetFlt(lastDialogueTimes, targetName)
+  float currentTime = Utility.GetCurrentRealTime()
+  
+  ; If actor had dialogue within last 60 seconds, don't remove
+  ; They will get  cleaned up later on location change by cleanup
+  if (lastDialogueTime > 0 && (currentTime - lastDialogueTime) < 60.0 && minai_DynamicSapienceToggleStealth.GetValueInt() == 1)
+    Main.Debug("SAPIENCE: Not removing " + targetName + " - recent dialogue activity")
+    return
+  EndIf
+
   Main.Info("SAPIENCE: Removing " + targetName + " from AI")
   AIAgentFunctions.removeAgentByName(targetName)
   JMap.RemoveKey(sapientActors, targetName)
+  JMap.RemoveKey(lastDialogueTimes, targetName) ; Clean up the dialogue time entry
 EndFunction
 
 Function EnableActorAI(actor akTarget)
   string targetName = Main.GetActorName(akTarget)
+  if targetName == "" || targetName == "<Missing Name>"
+    Main.Warn("SAPIENCE: Not adding missing npc, invalid name.")
+    return
+  EndIf
   Actor agent = AIAgentFunctions.getAgentByName(targetName)
   if !agent
     Main.Info("SAPIENCE: Adding " + targetName + " to AI")
@@ -759,6 +820,12 @@ Function UpdateDiary(string targetName)
   EndIf
 EndFunction
 
+Function UpdateProfile(string targetName)
+  if bHasAIFF
+    AIAgentFunctions.requestMessageForActor("Please, update your profile", "updateprofile", targetName)
+  EndIf
+EndFunction
+
 Function ToggleSapience()
   if minai_SapienceEnabled.GetValueInt() == 1
     Main.Info("SAPIENCE: Sapience disabled via toggle.")
@@ -768,5 +835,19 @@ Function ToggleSapience()
     Main.Info("SAPIENCE: Sapience enabled via toggle.")
     Debug.Notification("Sapience enabled.")
     minai_SapienceEnabled.SetValue(1)
+  EndIf
+EndFunction
+
+Function EnablePreserveQueue()
+  if bHasAIFF
+    Main.Info("CHIM CONFIG: Preserving dialogue queue.")
+    AIAgentFunctions.setConf("_preserve_queue", 1, 0, "")
+  EndIf
+EndFunction
+
+Function DisablePreserveQueue()
+  if bHasAIFF
+    Main.Info("CHIM CONFIG: Not preserving dialogue queue.")
+    AIAgentFunctions.setConf("_preserve_queue", 0, 0, "")
   EndIf
 EndFunction

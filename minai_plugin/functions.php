@@ -111,7 +111,17 @@ RegisterThirdPartyActions();
 
 $commandsToPurge=[];
 foreach ($GLOBALS["ENABLED_FUNCTIONS"] as $n=>$func) {
-    if (in_array($func, $GLOBALS["commands_to_purge"]) || (IsEnabled($GLOBALS["HERIKA_NAME"], "inCombat") && $func == "Attack")) {
+    // Get last defeat time
+    $lastDefeat = GetActorValue("PLAYER", "lastDefeat");
+    $defeatCooldown = !empty($lastDefeat) && (time() - intval($lastDefeat) < 300);
+    
+    // Block Attack command if:
+    // - Command is in commands_to_purge list
+    // - NPC is in combat and command is Attack
+    // - NPC is a follower, there's an active defeat cooldown, and command is Attack
+    if (in_array($func, $GLOBALS["commands_to_purge"]) || 
+        (IsEnabled($GLOBALS["HERIKA_NAME"], "inCombat") && $func == "Attack") ||
+        ($defeatCooldown && $func == "Attack" && IsFollower($GLOBALS["HERIKA_NAME"]))) {
         $commandsToPurge[] = $n;
     }
 }
@@ -121,4 +131,4 @@ foreach ($commandsToPurge as $n) {
 }
 
 
-?>
+
