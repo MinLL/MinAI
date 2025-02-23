@@ -112,15 +112,12 @@ function Maintenance(minai_MainQuestController _main)
   aiff = (Self as Quest) as minai_AIFF
   MinaiUtil = (self as Quest) as minai_Util
   bHasFrostfall = False
-  MinaiUtil.Info("Environmental Awareness maintenance")
   iActorMap = JMap.object()
   playerRef = Game.GetPlayer()
   playerName = main.GetActorName(playerRef)
   If Game.GetModByName("Frostfall.esp") != 255
-    MinaiUtil.Info("Environmental Awareness - Frostfall.esp found")
     GlobalVariable FrostfallRunning = Game.GetFormFromFile(0x06DCFB, "Frostfall.esp") as GlobalVariable
     if(FrostfallRunning.GetValueInt() == 2) 
-      MinaiUtil.Info("Environmental Awareness - Frostfall Enabled")
       bHasFrostfall = True
       _Frost_CurrentTemperature = Game.GetFormFromFile(0x0665F9, "Frostfall.esp") as GlobalVariable
       _Frost_NearFire = Game.GetFormFromFile(0x064AFD, "Frostfall.esp") as GlobalVariable 
@@ -141,7 +138,6 @@ EndFunction
 
 function SetContext(actor akActor)
   string an = Main.GetActorName(akActor)
-  MinaiUtil.Info("Environmental Awareness SetContex 001 :: " + an)
   if(akActor == playerRef)
     string envDescription = GetDayState()
     if(envDescription)
@@ -207,7 +203,6 @@ function SetContext(actor akActor)
   if(bNotInList) 
     wasInList = an + " was NOT in list"
   endIf
-  MinaiUtil.Info("Environmental Awareness SetContext 002 :: "  + wasInList)
 
   ; the player's data can change pretty often, and so can a follower's
   ; even player's height/race/sex/gender, so run it half the time rather than 1 in 20
@@ -219,7 +214,6 @@ function SetContext(actor akActor)
   if(bNotInList||r>19)
     if(bNotInList)
       JMap.setInt(iActorMap, an, 1)
-      MinaiUtil.Info("Environmental Awareness SetContext 003 added :: "  + an)
     EndIf
 
    
@@ -311,15 +305,15 @@ function SetContext(actor akActor)
     endIf
 
     string wealthText = ""
-
     if(richClothes) 
       wealthText = " expensive"
     elseif(poorClothes)
       wealthText = " cheap"
     EndIf
 
-   
-    staticData += an + " is wearing " + wealthText + " clothes. "
+    if(wealthText!="")
+      staticData += ". " + an + " is dressed " + wealthText + " "
+    EndIf
 
     if(!bHasFrostfall || playerRef != akActor)
       float actorsWarmth = akActor.GetWarmthRating()
