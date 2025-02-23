@@ -58,7 +58,7 @@ function GetExposureContext($localActors) {
     $actorList[] = $GLOBALS["PLAYER_NAME"]; 
     foreach($actorList as $name) {
         $naked = $utilities->GetActorValue($name, "isexposed");
-        if($naked == true) {
+        if(strtolower($naked) === "true") {
         $isnaked[] = $name;
         $tngsize = $utilities->GetActorValue($name, "tngsize");
             if($tngsize == 0) $tngsize0[] = $name;
@@ -71,7 +71,7 @@ function GetExposureContext($localActors) {
 
     // build lists
     $verbiage = "";
-    if(!empty($naked)) {
+    if(!empty($isnaked)) {
         $verbiage .= tng::rollUpAList($isnaked) . "naked and exposed.\n";
     }
     if(!empty($tngsize0)) {
