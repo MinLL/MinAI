@@ -203,6 +203,7 @@ function SetContext(actor akActor)
   if(bNotInList) 
     wasInList = an + " was NOT in list"
   endIf
+  MinaiUtil.Info("Environmental Awareness SetContext 002 :: "  + wasInList)
 
   ; the player's data can change pretty often, and so can a follower's
   ; even player's height/race/sex/gender, so run it half the time rather than 1 in 20
@@ -210,10 +211,10 @@ function SetContext(actor akActor)
   if bIsPlayerOrFollower
     r += 9
   endif 
-  r += 100 ; debuggin
   if(bNotInList||r>19)
     if(bNotInList)
       JMap.setInt(iActorMap, an, 1)
+      MinaiUtil.Info("Environmental Awareness SetContext 003 added :: "  + an)
     EndIf
 
    
