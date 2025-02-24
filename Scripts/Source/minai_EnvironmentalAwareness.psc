@@ -95,8 +95,9 @@ String Function GetRaceName(Race akRace)
 	return name
 EndFunction
 
-function Maintenance(minai_MainQuestController _main)
+function Maintenance(minai_MainQuestController _main)  
   main = _main
+  main.Info("Environmental Awareness Initializing")
   aiff = (Self as Quest) as minai_AIFF
   MinaiUtil = (self as Quest) as minai_Util
   bHasFrostfall = False
