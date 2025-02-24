@@ -77,6 +77,23 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
 * Allows the player to order followers to start / stop looting the nearby area.
 * This will be expanded greatly in the future to provide further integrations.
 
+### Frostfall
+* The NPCs are aware of the temprature of the environment, if the player looks cold, how warmly people are dressed, and if someone is wet.
+* The NPCs know if you are near a fire, and if you need to be due to the cold. 
+* NPCs know if someone is nearing frostbite or has it, or if someone is nearing death in the cold.
+
+### Environmental Awareness
+* NPCs know if they have been or could be intimidated by the player. They'll remember the player having used intimidation against them. Maybe they keep it a secret. 
+* NPCs know each other's occupations, except that shady occupations disguise themselves. Who is a merchant or a blacksmith is obvious from clear social cues to the people who live there.
+* NPCs will know who amongst themselves and the player is wearing cheap or expensive clothing.
+* NPCs are informed about what they can readily see regarding characters around them: if someone is short, tall, and if they match up against the player in a fight. 
+* NPCs are aware of each other's shoes, clothing, race, and symbols of cultural allegiance like shields with icons.
+* NPCs know who is riding a horse, swimming, sleeping and sitting.
+* Added time of day descriptors like "noon", "dawn", "dead of night" to help the LLM have more natural dialog like "are you enjoying the sunset?" 
+
+### NAT
+* NAT weathers are supported and recognized by the LLM (In addition to the general weather system).
+
 ### General
 * Players can carry out a number of routine vanilla interactions through natural dialogue. Currently supported integrations are:
   * Renting a room from innkeepers
