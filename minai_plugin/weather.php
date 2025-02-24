@@ -486,6 +486,115 @@ function GetWeatherContext() {
         "04034CFB" => [
             "name" => "DLC2ApocryphaWeatherNew", 
             "descriptionPresent" => "An eerie light rules the sky casting all in a disturbing green glow."
+        ],
+        // NAT Weather Types - using ?? as wildcard for first two digits
+        "??003df4" => [
+            "name" => "SClearSkyTU",
+            "descriptionPresent" => "The sky is nearly cloudless, transparent."
+        ],
+        "??0053b6" => [
+            "name" => "OvercastPF",
+            "descriptionPresent" => "It is overcast. Thick clouds fill the sky.",
+            "descriptionFuture" => "Thick cloudy weather begins to move in."
+        ],
+        "??0053bd" => [
+            "name" => "OvercastTU",
+            "descriptionPresent" => "It is overcast. The sky is a thick plate of clouds.",
+            "descriptionFuture" => "A thick plate of clouds is beginning to move in."
+        ],
+        "??0053be" => [
+            "name" => "OvercastRE",
+            "descriptionPresent" => "It is overcast. The air is thick with clouds.",
+            "descriptionFuture" => "A thick plate of clouds is moving in."
+        ],
+        "??0053c2" => [
+            "name" => "SClearSkySN",
+            "descriptionPresent" => "The sky is nearly cloudless, transparent."
+        ],
+        "??0053c4" => [
+            "name" => "OvercastMA",
+            "descriptionPresent" => "It is overcast. Clouds fill the sky.",
+            "descriptionFuture" => "Thick cloudy weather begins to move in."
+        ],
+        "??0053c7" => [
+            "name" => "FogRain",
+            "descriptionPresent" => "The air is thick with fog and a steady rain falls.",
+            "descriptionFuture" => "Fog is rolling in and rain clouds are gathering."
+        ],
+        "??0053d1" => [
+            "name" => "OvercastFF",
+            "descriptionPresent" => "It is overcast. Clouds fill the sky.",
+            "descriptionFuture" => "Cloudy weather begins to move in."
+        ],
+        "??0053d2" => [
+            "name" => "OvercastCO",
+            "descriptionPresent" => "It is overcast. The sky is thick with endless clouds.",
+            "descriptionFuture" => "A thick plate of clouds is moving in."
+        ],
+        "??005943" => [
+            "name" => "OvercastVT",
+            "descriptionPresent" => "It is overcast. Clouds fill the sky.",
+            "descriptionFuture" => "Cloudy weather begins to move in."
+        ],
+        "??007f00" => [
+            "name" => "SClearSkyPF",
+            "descriptionPresent" => "The sky is nearly cloudless, transparent."
+        ],
+        "??008476" => [
+            "name" => "SnowClear",
+            "descriptionPresent" => "The sky is clear with light snowfall.",
+            "descriptionFuture" => "Clear skies with light snow are approaching."
+        ],
+        "??023667" => [
+            "name" => "SClearSkyCOMA",
+            "descriptionPresent" => "The sky is nearly cloudless, transparent."
+        ],
+        "??06b387" => [
+            "name" => "SnowOvercast",
+            "descriptionPresent" => "The sky is overcast with steady snowfall.",
+            "descriptionFuture" => "Overcast skies and snow are approaching."
+        ],
+        "??0d64b0" => [
+            "name" => "SunnyDLC2_ALT",
+            "descriptionPresent" => "The sky is clear and sunny."
+        ],
+        "??0d64b1" => [
+            "name" => "RainCloudy_DLC2_ALT",
+            "descriptionPresent" => "The sky is cloudy with steady rainfall.",
+            "descriptionFuture" => "Rain clouds are gathering."
+        ],
+        "??0d64b2" => [
+            "name" => "CloudyDLC2_ALT",
+            "descriptionPresent" => "The sky is filled with clouds."
+        ],
+        "??0d64b3" => [
+            "name" => "CloudyDLC2_TU_A_ALT",
+            "descriptionPresent" => "The sky is filled with clouds."
+        ],
+        "??0d64b4" => [
+            "name" => "StormDLC2_ALT",
+            "descriptionPresent" => "A powerful storm rages with heavy rain and thunder.",
+            "descriptionFuture" => "Storm clouds are gathering on the horizon."
+        ],
+        "??0d64d3" => [
+            "name" => "Snow_Alt",
+            "descriptionPresent" => "Snow falls steadily from the cloudy sky.",
+            "descriptionFuture" => "Snow clouds are moving in."
+        ],
+        "??0d64d4" => [
+            "name" => "SnowClear_Alt",
+            "descriptionPresent" => "The sky is clear with light snowfall.",
+            "descriptionFuture" => "Clear skies with light snow are approaching."
+        ],
+        "??0d64d5" => [
+            "name" => "SnowOvercast_Alt",
+            "descriptionPresent" => "The sky is overcast with steady snowfall.",
+            "descriptionFuture" => "Overcast skies and snow are approaching."
+        ],
+        "??0d64d6" => [
+            "name" => "Snowstorm_Alt",
+            "descriptionPresent" => "A fierce snowstorm rages with heavy snowfall.",
+            "descriptionFuture" => "A snowstorm is approaching from the distance."
         ]
     ];
     
@@ -500,8 +609,17 @@ function GetWeatherContext() {
 
     $weatherCode = strtolower(GetActorValue($playerName, "weather"));
     if (!$weatherCode) return $envAwarenessWeather;
-    $wc = substr($weatherCode, (stripos( $weatherCode, "(") + 1), 8);
+    $wc = substr($weatherCode, (stripos($weatherCode, "(") + 1), 8);
+    
+    // Try exact match first
     $weather = $weatherDictionary[$wc];
+    
+    // If no exact match, try matching with wildcard
+    if (!$weather) {
+        $lastSixDigits = substr($wc, 2);
+        $wildcardKey = "??" . $lastSixDigits;
+        $weather = $weatherDictionary[$wildcardKey] ?? null;
+    }
 
     if (!$weather) {
         error_log("minai: Unknown Weather type: " . $weatherCode);
