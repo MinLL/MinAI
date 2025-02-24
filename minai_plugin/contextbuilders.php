@@ -30,8 +30,8 @@ Function BuildContext($name) {
   }
   $context .= GetSurvivalContext($name);
 
-  // Add mind influence context for player
-  if ($name == $GLOBALS["PLAYER_NAME"]) {
+  // Add mind influence context for the narrator only
+  if ($name == "The Narrator") {
       $mindState = GetMindInfluenceState($name);
       if ($mindState != "normal") {
           $context .= GetMindInfluenceContext($mindState) . "\n";

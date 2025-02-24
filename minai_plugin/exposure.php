@@ -2,7 +2,7 @@
 require_once("util.php");
 
 
-class tng {
+class expose {
     // includes is a common name so put it in a class to avoid name collisions
     static function includes($str, $longerStr) {
         if(strpos($longerStr, strtolower($str)) !== false) return true;
@@ -72,22 +72,22 @@ function GetExposureContext($localActors) {
     // build lists
     $verbiage = "";
     if(!empty($isnaked)) {
-        $verbiage .= tng::rollUpAList($isnaked) . "naked and exposed.\n";
+        $verbiage .= expose::rollUpAList($isnaked) . "naked and exposed.\n";
     }
     if(!empty($tngsize0)) {
-        $verbiage .= tng::rollUpAList($tngsize0, true) . "an embarrassingly tiny prick.\n";
+        $verbiage .= expose::rollUpAList($tngsize0, true) . "an embarrassingly tiny prick.\n";
     }
     if(!empty($tngsize1)) {
-        $verbiage .= tng::rollUpAList($tngsize1, true) . "a very small cock.\n";
+        $verbiage .= expose::rollUpAList($tngsize1, true) . "a very small cock.\n";
     }
     if(!empty($tngsize2)) {
-        $verbiage .= tng::rollUpAList($tngsize2, true) . "an average size cock.\n";
+        $verbiage .= expose::rollUpAList($tngsize2, true) . "an average size cock.\n";
     }
     if(!empty($tngsize3)) {
-        $verbiage .= tng::rollUpAList($tngsize3, true) . "a large, impressive cock.\n";
+        $verbiage .= expose::rollUpAList($tngsize3, true) . "a large, impressive cock.\n";
     }
     if(!empty($tngsize4)) {
-        $verbiage .= tng::rollUpAList($tngsize4, true) . "one of the biggest cocks you've ever seen.\n";
+        $verbiage .= expose::rollUpAList($tngsize4, true) . "one of the biggest cocks you've ever seen.\n";
     }
 
     if(!$verbiage) {
