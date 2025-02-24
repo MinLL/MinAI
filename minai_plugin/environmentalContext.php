@@ -43,7 +43,7 @@ function GetEnvironmentalContext($localActors, $targetActor) {
     $text = str_ireplace("IMPERIAL", "imperial", $text);
     $text = str_replace(" , ", " ", $text);
     $text = str_replace(":, ", ":", $text);
-    $text = str_replace("player spellsword class", "spellsword", $text);
+    $text = str_ireplace("{$GLOBALS["PLAYER_NAME"]} is a player spellsword class.", "", $text); // Player is always a spellsword in-game, don't show it.
     $text = str_replace(strtolower($player_name), $player_name, $text);
 
     return $text;

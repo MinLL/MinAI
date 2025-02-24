@@ -362,6 +362,7 @@ function SetContext(actor akActor)
       string privateCareerText = an + " is a " + careerName + " but is secretive about that unless in select company - like with other " + careerName + "s or close friends.  "
       privateKnowledge += " " + privateCareerText
       publicCareerText = an + " has an air of mystery about them. "
+      Main.Debug("Actor " + an + " is a " + careerName)
     endif
     staticData +=  publicCareerText
     aiff.SetActorVariable(akActor, "EnvironmentalAwarenessPrivateKnowledge", privateKnowledge) 
