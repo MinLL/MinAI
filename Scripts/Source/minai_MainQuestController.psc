@@ -38,7 +38,17 @@ Event OnInit()
 EndEvent
 
 Int Function GetVersion()
-  return 41
+  return 111
+EndFunction
+
+Function CheckForCriticalDependencies()
+  Info("Checking for critical dependencies...")
+  int[] pTweaksVersion = PapyrusTweaks.GetPapyrusTweaksVersion()
+  if !pTweaksVersion
+    Fatal("Papyrus Tweaks NG is not installed. This is a critical dependency. Revert to a prior save and install the mod before continuing.")
+  Else
+    Info("Papyrus Tweaks NG detected: " + pTweaksVersion[0] + "." + pTweaksVersion[1] + "." + pTweaksVersion[2])
+  EndIf
 EndFunction
 
 Function Maintenance()
@@ -52,6 +62,7 @@ Function Maintenance()
     Debug.MessageBox("Mismatched MinAI.esp and minai_MainQuestController version")
   EndIf
   Info("Maintenance() - minai v" +GetVersion() + " initializing.")
+  CheckForCriticalDependencies()
   ; Set keybinds
   SetSapienceKey()
   SetNarratorKey()
