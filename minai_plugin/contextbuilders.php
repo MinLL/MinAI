@@ -125,19 +125,19 @@ Function GetPhysicalDescription($name) {
 Function GetPenisSize($name) {
     $tngsize = GetActorValue($name, "tngsize");
     $sizeDescription = "";
-    if (HasKeyword($name, "TNG_XL")) || ($tngsize == 4) {
+    if (HasKeyword($name, "TNG_XL") || ($tngsize == 4)) {
         $sizeDescription = "one of the biggest cocks you've ever seen";
     }
-    elseif(HasKeyword($name, "TNG_L")) || ($tngsize == 3) {
+    elseif(HasKeyword($name, "TNG_L") || ($tngsize == 3)) {
         $sizeDescription = "a large cock";
     }
-    elseif (HasKeyword($name, "TNG_M") || HasKeyword($name, "TNG_DefaultSize")) || ($tngsize == 2) {
+    elseif (HasKeyword($name, "TNG_M") || HasKeyword($name, "TNG_DefaultSize") || ($tngsize == 2)) {
         $sizeDescription = "an average sized cock";
     }
-    elseif (HasKeyword($name, "TNG_S")) || ($tngsize == 1) {
+    elseif (HasKeyword($name, "TNG_S") || ($tngsize == 1)) {
         $sizeDescription = "a very small cock";
     }        
-    elseif (HasKeyword($name, "TNG_XS")) || ($tngsize == 0) {
+    elseif (HasKeyword($name, "TNG_XS") || ($tngsize == 0)) {
         $sizeDescription = "an embarrassingly tiny prick";
     }
     if ($sizeDescription != "") {
