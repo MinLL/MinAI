@@ -510,7 +510,7 @@ Function SetContext(actor akTarget)
     aiff.SetActorVariable(akTarget, "breastsScore", baboConfigs.BreastsValue.GetValueInt())
     aiff.SetActorVariable(akTarget, "buttScore", baboConfigs.ButtocksValue.GetValueInt())
   EndIf
-  string gender = "male";
+  string gender = "male"
   if akTarget.GetActorBase().GetSex() != 0
     gender = "female"
     if akTarget.HasKeyword(TNG_Gentlewoman)
