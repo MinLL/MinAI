@@ -64,10 +64,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['act
 
     $query = "SELECT * FROM equipment_description WHERE 1=1";
 
-    $baseFormId = $db->escape($_GET['baseFormId']);
-    $modName = $db->escape($_GET['modName']);
-    $name = $db->escape($_GET['name']);
-    $description = $db->escape($_GET['description']);
+    $baseFormId = $db->escape($_GET['baseFormId'] ?? '');
+    $modName = $db->escape($_GET['modName'] ?? '');
+    $name = $db->escape($_GET['name'] ?? '');
+    $description = $db->escape($_GET['description'] ?? '');
 
     if (!empty($baseFormId)) {
         $query .= " AND baseFormId ILIKE '%{$baseFormId}%'";
