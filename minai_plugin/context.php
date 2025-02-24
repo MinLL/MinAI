@@ -3,6 +3,7 @@ require_once("config.php");
 require_once("util.php");
 require_once("contextbuilders.php");
 require_once("mind_influence.php");
+require_once("environmentalContext.php");
 
 $nearbyActors = GetActorValue("PLAYER", "nearbyActors", true);
 // Build context
@@ -27,6 +28,7 @@ function bundleSFWContext(&$nc) {
   // send localActors list to GetDirtAndBlood so as to make comma seperated lists
   $nc .= GetDirtAndBloodContext($localActors);
   $nc .= GetExposureContext($localActors);
+  $nc .= GetEnvironmentalContext($GLOBALS["HERIKA_NAME"]);
   $nc .= BuildSFWReputationContext($GLOBALS["HERIKA_NAME"]);
   $nc .= GetThirdPartyContext();
   $nc .= GetWeatherContext() . "\n";

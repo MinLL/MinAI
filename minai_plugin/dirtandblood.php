@@ -34,8 +34,6 @@ class dnb {
     }
 }
 
-// The script is Structured this way to that it will be easier to implement the playmate part.
-// I never played with one so far, so I am not able to do it from the get go.
 function GetDirtAndBloodContext($localActors) {
     $utilities = new Utilities();
     if (!$utilities->IsModEnabled("DirtAndBlood")) {
@@ -68,6 +66,8 @@ function GetDirtAndBloodContext($localActors) {
     $actorList = explode("|",$localActors);
     $actorList[] = $GLOBALS["PLAYER_NAME"]; 
     foreach($actorList as $name) {
+        $name = str_replace("(", "", $name);
+        if($name == "") continue;
         $listOfTags = $utilities->GetActorValue($name, "dirtAndBlood");
         if(dnb::includes("Clean", $listOfTags)) $clean[] = $name;
         if(dnb::includes("Dirt1", $listOfTags)) $dirt1[] = $name;

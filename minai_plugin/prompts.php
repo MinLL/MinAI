@@ -561,3 +561,77 @@ $GLOBALS["PROMPTS"]["minai_fillherup_stomach_rubbing"] = [
         "The Narrator: #SEX_INFO {$GLOBALS["target"]} tenderly caresses their belly, distended with cum."
     ]
 ];
+
+// Fill Her Up inflation/absorption prompts
+$GLOBALS["PROMPTS"]["minai_fillherup_inflate_vaginal"] = [
+    "player_request"=>[
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s womb swells as it fills with cum, their belly slowly expanding.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]} gasps as their body is pumped full of cum, their stomach beginning to bulge.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s abdomen starts to stretch as cum floods into their womb."
+    ]
+];
+
+$GLOBALS["PROMPTS"]["minai_fillherup_inflate_anal"] = [
+    "player_request"=>[
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s belly swells as cum floods their bowels.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]} moans as their gut fills with cum, their stomach expanding.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s abdomen begins to bulge as cum pumps into their rear."
+    ]
+];
+
+$GLOBALS["PROMPTS"]["minai_fillherup_inflate_oral"] = [
+    "player_request"=>[
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s belly swells as they're forced to swallow more cum.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s stomach expands as it fills with swallowed cum.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s abdomen stretches as cum floods their stomach."
+    ]
+];
+
+$GLOBALS["PROMPTS"]["minai_fillherup_absorb_vaginal"] = [
+    "player_request"=>[
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s body absorbs the cum filling their womb, their belly slowly shrinking.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]} shivers as their body draws in the cum inside them.",
+        "The Narrator: #SEX_INFO The cum filling {$GLOBALS["target"]}'s womb is gradually absorbed into their body."
+    ]
+];
+
+$GLOBALS["PROMPTS"]["minai_fillherup_absorb_anal"] = [
+    "player_request"=>[
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s body absorbs the cum filling their bowels.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]} trembles as their body draws in the cum from their rear.",
+        "The Narrator: #SEX_INFO The cum filling {$GLOBALS["target"]}'s gut is slowly absorbed into their system."
+    ]
+];
+
+$GLOBALS["PROMPTS"]["minai_fillherup_absorb_oral"] = [
+    "player_request"=>[
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s body absorbs the cum filling their stomach.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]} quivers as their body processes the swallowed cum.",
+        "The Narrator: #SEX_INFO The cum in {$GLOBALS["target"]}'s stomach is gradually absorbed into their system."
+    ]
+];
+
+// Fill Her Up deflation prompts
+$GLOBALS["PROMPTS"]["minai_fillherup_deflate_vaginal"] = [
+    "player_request"=>[
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s womb slowly empties, their belly gradually returning to normal.",
+        "The Narrator: #SEX_INFO The cum filling {$GLOBALS["target"]}'s womb begins to drain away.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s swollen belly shrinks as their womb empties."
+    ]
+];
+
+$GLOBALS["PROMPTS"]["minai_fillherup_deflate_anal"] = [
+    "player_request"=>[
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s belly shrinks as their bowels empty.",
+        "The Narrator: #SEX_INFO The cum filling {$GLOBALS["target"]}'s rear begins to drain away.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s distended gut returns to normal as it empties."
+    ]
+];
+
+$GLOBALS["PROMPTS"]["minai_fillherup_deflate_oral"] = [
+    "player_request"=>[
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s belly shrinks as their stomach empties.",
+        "The Narrator: #SEX_INFO The cum filling {$GLOBALS["target"]}'s stomach begins to drain away.",
+        "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s swollen belly returns to normal as their stomach empties."
+    ]
+];
