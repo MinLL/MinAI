@@ -58,16 +58,16 @@ Function GetSurvivalContext($name) {
     $fatigue = floatval(GetActorValue($name, "fatigue"));
     $cold = floatval(GetActorValue($name, "cold"));
 
-    $ret .= "{$name}'s hunger level is at {$hunger}%, where 0 is not hungry at all, and 100 is starving. ";
+    $ret .= "{$name}'s hunger level is {$hunger}% toward starving. ";
 
     if (IsModEnabled("Sunhelm")) {
-        $ret .= "{$name}'s thirst level is at {$thirst}%, where 0 is not thirsty at all, and 100 is dying of thirst. ";
+        $ret .= "{$name}'s thirst level is {$thirst}% dehydrated. ";
     }
 
-    $ret .= "{$name}'s fatigue level is at {$fatigue}%, where 0 is not tired at all, and 100 is exhausted. ";
+    $ret .= "{$name}'s fatigue level is at {$fatigue}% exhaustion. ";
 
     if (IsModEnabled("SurvivalMode")) {
-        $ret .= "{$name}'s cold level is at {$cold}%, where 0 is not cold at all, and 100 is freezing to death. ";
+        $ret .= "{$name}'s cold level is at {$cold}% toward hypothermia. ";
     }
 
     if ($ret != "")
@@ -79,7 +79,7 @@ Function GetArousalContext($name) {
   $ret = "";
   $arousal = GetActorValue($name, "arousal");
   if ($arousal != "" && (IsModEnabled("OSL") || IsModEnabled("Aroused"))) {
-      $ret .= "{$name}'s sexual arousal level is {$arousal}/100, where 0 is not aroused at all, and 100 is desperate for sex.";
+      $ret .= "{$name}'s sexual arousal level is {$arousal}%";
   }
   if ($ret != "")
         $ret .= "\n";
