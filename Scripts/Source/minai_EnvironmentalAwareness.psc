@@ -95,18 +95,6 @@ String Function GetRaceName(Race akRace)
 	return name
 EndFunction
 
-string[] function lengthenArray(string name, string[] nameList)
-  string[] newNameList = Utility.CreateStringArray(nameList.Length + 1)
-  int countNames = 0
-  while (countNames < nameList.Length)
-    newNameList[countNames] = name
-    countNames += 1
-  endwhile
-  newNameList[newNameList.Length - 1] = name
-  return newNameList
-EndFunction
-
-
 function Maintenance(minai_MainQuestController _main)
   main = _main
   aiff = (Self as Quest) as minai_AIFF
@@ -203,7 +191,7 @@ function SetContext(actor akActor)
   if(bNotInList) 
     wasInList = an + " was NOT in list"
   endIf
-  MinaiUtil.Info("Environmental Awareness SetContext 002 :: "  + wasInList)
+  MinaiUtil.Debug("Environmental Awareness SetContext 002 :: "  + wasInList)
 
   ; the player's data can change pretty often, and so can a follower's
   ; even player's height/race/sex/gender, so run it half the time rather than 1 in 20
@@ -214,7 +202,7 @@ function SetContext(actor akActor)
   if(bNotInList||r>19)
     if(bNotInList)
       JMap.setInt(iActorMap, an, 1)
-      MinaiUtil.Info("Environmental Awareness SetContext 003 added :: "  + an)
+      MinaiUtil.Debug("Environmental Awareness SetContext 003 added :: "  + an)
     EndIf
 
    
