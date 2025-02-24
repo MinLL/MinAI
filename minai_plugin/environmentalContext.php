@@ -1,7 +1,7 @@
 <?php
 require_once("util.php");
 
-function GetEnvironmentalContext($localActors, $targetActor) {
+function GetEnvironmentalContext($targetActor) {
     $utilities = new Utilities();
 
     // it doesn't matter if Frostfall exists, this PHP loads sentances verbatim from the db
@@ -17,7 +17,7 @@ function GetEnvironmentalContext($localActors, $targetActor) {
         . $utilities->GetActorValue($targetActor, "EnvironmentalAwarenessDynamicPrivateData");
     $others_appearances = [];
 
-    $actorList = explode("|", $localActors);
+    $actorList = [];
     if(!in_array($targetActor, $actorList)) $actorList[] = $targetActor;
 
     $dedupe = [];
