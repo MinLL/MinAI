@@ -8,6 +8,7 @@ require_once("weather.php");
 require_once("reputation.php");
 require_once("submissivelola.php");
 require_once("dirtandblood.php");
+require_once("exposure.php");
 require_once("fertilitymode.php");
 
 Function BuildContext($name) {
@@ -122,35 +123,21 @@ Function GetPhysicalDescription($name) {
 }
 
 Function GetPenisSize($name) {
+    $tngsize = GetActorValue($name, "tngsize");
     $sizeDescription = "";
-    if (HasKeyword($name, "TNG_ActorAddnAuto:05")) {
+    if (HasKeyword($name, "TNG_XL")) || ($tngsize == 4) {
         $sizeDescription = "one of the biggest cocks you've ever seen";
     }
-    elseif(HasKeyword($name, "TNG_ActorAddnAuto:04")) {
+    elseif(HasKeyword($name, "TNG_L")) || ($tngsize == 3) {
         $sizeDescription = "a large cock";
     }
-    elseif (HasKeyword($name, "TNG_ActorAddnAuto:03")) {
+    elseif (HasKeyword($name, "TNG_M") || HasKeyword($name, "TNG_DefaultSize")) || ($tngsize == 2) {
         $sizeDescription = "an average sized cock";
     }
-    elseif (HasKeyword($name, "TNG_ActorAddnAuto:02")) {
+    elseif (HasKeyword($name, "TNG_S")) || ($tngsize == 1) {
         $sizeDescription = "a very small cock";
     }        
-    elseif (HasKeyword($name, "TNG_ActorAddnAuto:01")) {
-        $sizeDescription = "an embarrassingly tiny prick";
-    }
-    elseif (HasKeyword($name, "TNG_XL")) {
-        $sizeDescription = "one of the biggest cocks you've ever seen";
-    }
-    elseif(HasKeyword($name, "TNG_L")) {
-        $sizeDescription = "a large cock";
-    }
-    elseif (HasKeyword($name, "TNG_M") || HasKeyword($name, "TNG_DefaultSize")) {
-        $sizeDescription = "an average sized cock";
-    }
-    elseif (HasKeyword($name, "TNG_S")) {
-        $sizeDescription = "a very small cock";
-    }        
-    elseif (HasKeyword($name, "TNG_XS")) {
+    elseif (HasKeyword($name, "TNG_XS")) || ($tngsize == 0) {
         $sizeDescription = "an embarrassingly tiny prick";
     }
     if ($sizeDescription != "") {
