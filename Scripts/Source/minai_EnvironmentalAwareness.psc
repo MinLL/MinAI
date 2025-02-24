@@ -155,22 +155,26 @@ function SetContext(actor akActor)
       float currentTemp = _Frost_CurrentTemperature.GetValueInt()
       ; describe the temprature
       string airTemprature = ""
-      if currentTemp <= -15
-        airTemprature = "lethally cold"
-      elseif currentTemp < 0
-        airTemprature = "dangerously cold"
-      elseif currentTemp < 10
+      if currentTemp < -14
+        airTemprature = "frigid and deadly"
+      elseif currentTemp < -9
+        airTemprature = "bone-chilling"
+      elseif currentTemp < -4
+        airTemprature = "biting cold"
+      elseif currentTemp < 1
         airTemprature = "cold"
-      elseif currentTemp < 20
-        airTemprature = "mild"
-      elseif currentTemp < 23
+      elseif currentTemp < 6
+        airTemprature = "chilly"
+      elseif currentTemp < 10
+        airTemprature = "cool"
+      elseif currentTemp == 10
+        airTemprature = "temperate"
+      elseif currentTemp < 15
         airTemprature = "pleasant"
-      elseif currentTemp < 34
+      elseif currentTemp < 18
         airTemprature = "warm"
-      elseif currentTemp < 40
-        airTemprature = "hot"
       else 
-        airTemprature = "extremely hot"
+        airTemprature = "hot"
       endif
       envDescription += "The temperature is " + airTemprature + ". "
       bool IsWeatherSevere = _Frost_SevereWeatherList.HasForm(akWeather)
