@@ -3,6 +3,7 @@ require_once("config.php");
 require_once("util.php");
 require_once("contextbuilders.php");
 require_once("mind_influence.php");
+require_once("environmentalContext.php");
 
 $nearbyActors = GetActorValue("PLAYER", "nearbyActors", true);
 // Build context
