@@ -8,6 +8,8 @@ minai_DeviousStuff devious
 minai_Config config
 minai_Reputation reputation
 minai_DirtAndBlood dirtAndBlood
+minai_EnvironmentalAwareness envAwareness
+
 minai_FertilityMode fertility
 GlobalVariable minai_DynamicSapienceToggleStealth
 bool bHasAIFF = False
@@ -81,6 +83,7 @@ Function Maintenance(minai_MainQuestController _main)
   arousal = (Self as Quest)as minai_Arousal
   devious = (Self as Quest)as minai_DeviousStuff
   dirtAndBlood = (Self as Quest)as minai_DirtAndBlood
+  envAwareness = (Self as Quest)as minai_EnvironmentalAwareness
   fertility = (Self as Quest)as minai_FertilityMode
   followers = Game.GetFormFromFile(0x0913, "MinAI.esp") as minai_Followers
   reputation = (Self as Quest) as minai_Reputation
@@ -261,6 +264,7 @@ Function SetContext(actor akTarget)
   followers.SetContext(akTarget)
   reputation.SetContext(akTarget)
   dirtAndBlood.SetContext(akTarget)
+  envAwareness.SetContext(akTarget)
   fertility.SetContext(akTarget)
   sex.SetContext(akTarget)
   StoreKeywords(akTarget)

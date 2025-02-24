@@ -739,6 +739,7 @@ class Utilities {
     public function beingsInCloseRange() {
         $beingsInCloseRange = DataBeingsInCloseRange();
         $realBeings = [];
+        $beingsInCloseRange = str_replace("(", "", $beingsInCloseRange);
         $beingsList = explode("|",$beingsInCloseRange);
         $count = 0;
         foreach($beingsList as $bListItem) {
@@ -758,6 +759,7 @@ class Utilities {
 
     public function beingsInRange() {
         $beingsInRange = DataBeingsInRange();
+        $beingsInRange = str_replace("(", "", $beingsInRange);
 
         $realBeings = [];
         $beingsList = explode("|",$beingsInRange);
