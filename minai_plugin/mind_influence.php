@@ -84,10 +84,10 @@ function GetMindInfluencePrompt($state, $promptType = "default") {
     ];
     
     
-    $masterExplicitPrompts = [
+    $explicitPrompts = [
         "normal" => "",
         "goodgirl" => "The mental influence makes intimate moments feel deeply rewarding. You feel a profound sense of fulfillment, knowing you've met expectations. You feel an overwhelming compulsion to obey and satisfy others' desires.",
-        "badgirl" => "The mental influence leaves you achingly unfulfilled during intimate moments. You feel the weight of disappointment, longing for approval. Despite this, you still feel an overwhelming compulsion to obey and please others.",
+        "badgirl" => "The mental influence leaves you horny but achingly unfulfilled during intimate moments.",
         "verybadgirl" => "The mental influence makes intimate moments torturously intense. Your arousal is heightened but unsatisfied, a consequence of defying expectations. Yet, you still feel an overwhelming compulsion to obey and earn forgiveness.",
         "punishment" => "The mental influence makes intimate moments feel empty and hollow. You feel the sting of punishment, your desires muted by regret. You feel an overwhelming compulsion to obey and make amends.",
         "post" => "The lingering mental influence leaves intimate moments feeling surreal. You're uncertain if your desires are truly your own, your thoughts and actions slightly disconnected."
@@ -215,7 +215,7 @@ function GetMindInfluenceRequestFormat($state, $promptType = "default") {
         $subtleExplicitFormats = [
             "normal" => "",
             "goodgirl" => "Remember that you are under a mental influence that heightens your desire to please. Your response about intimate matters should reflect a subtle eagerness to comply.",
-            "badgirl" => "Remember that you are under a mental influence that leaves you sexually unfulfilled. Your response about intimate matters should hint at your underlying frustration.",
+            "badgirl" => "Remember that you are under a mental influence that leaves you feeling highly aroused and frustrated. Your response about intimate matters should hint at your underlying frustration.",
             "verybadgirl" => "Remember that you are under a mental influence that torments you with need. Your response about intimate matters should subtly convey your desperate state.",
             "punishment" => "Remember that you are under a mental influence that dulls pleasure. Your response about intimate matters should be more subdued and remorseful.",
             "post" => "Remember that your desires feel slightly uncertain. Your response about intimate matters should reflect this subtle confusion."
