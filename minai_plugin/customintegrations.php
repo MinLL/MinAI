@@ -117,11 +117,17 @@ function ProcessIntegrations() {
             else {
                 // $GLOBALS["HERIKA_NAME"] is npc1
                 $GLOBALS["HERIKA_TARGET"] = explode(":", $GLOBALS["gameRequest"][3])[3];
-                if ($GLOBALS["HERIKA_TARGET"] == $GLOBALS["HERIKA_NAME"])
-                    $GLOBALS["HERIKA_TARGET"] = $GLOBALS["PLAYER_NAME"];
-                minai_log("info", "Starting {$GLOBALS["gameRequest"][0]} dialogue between {$GLOBALS["HERIKA_NAME"]} and {$GLOBALS["HERIKA_TARGET"]}");
-                StoreRadiantActors($GLOBALS["HERIKA_TARGET"], $GLOBALS["HERIKA_NAME"]);
-                $GLOBALS["target"] = $GLOBALS["HERIKA_TARGET"];
+                if ($GLOBALS["HERIKA_TARGET"] == $GLOBALS["HERIKA_NAME"]) {
+                    minai_log("info", "Blocking radiant/rechat - source and target are the same NPC");
+                    $MUST_DIE = true;
+                }
+                else {
+                    if ($GLOBALS["HERIKA_TARGET"] == $GLOBALS["HERIKA_NAME"])
+                        $GLOBALS["HERIKA_TARGET"] = $GLOBALS["PLAYER_NAME"];
+                    minai_log("info", "Starting {$GLOBALS["gameRequest"][0]} dialogue between {$GLOBALS["HERIKA_NAME"]} and {$GLOBALS["HERIKA_TARGET"]}");
+                    StoreRadiantActors($GLOBALS["HERIKA_TARGET"], $GLOBALS["HERIKA_NAME"]);
+                    $GLOBALS["target"] = $GLOBALS["HERIKA_TARGET"];
+                }
             }
         }
         else {
