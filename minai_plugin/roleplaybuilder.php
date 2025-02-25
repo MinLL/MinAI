@@ -158,8 +158,8 @@ function interceptRoleplayInput() {
         $physDesc = convertToFirstPerson(GetPhysicalDescription($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
         $arousalStatus = convertToFirstPerson(GetArousalContext($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
         $survivalStatus = convertToFirstPerson(GetSurvivalContext($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
-        $clothingStatus = convertToFirstPerson(GetClothingContext($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
-        $devicesStatus = convertToFirstPerson(GetDDContext($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
+        $clothingStatus = convertToFirstPerson(GetClothingContext($PLAYER_NAME, true), $PLAYER_NAME, $playerPronouns);
+        $devicesStatus = convertToFirstPerson(GetDDContext($PLAYER_NAME, true), $PLAYER_NAME, $playerPronouns);
         $fertilityStatus = convertToFirstPerson(GetFertilityContext($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
         $mindState = convertToFirstPerson(GetMindInfluenceContext(GetMindInfluenceState($PLAYER_NAME)), $PLAYER_NAME, $playerPronouns);
         // Replace variables in system prompt and request

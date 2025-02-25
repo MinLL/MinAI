@@ -158,7 +158,7 @@ Function HasKeywordAndNotSkip($name, $eqContext, $keyword) {
   return HasKeyword($name, $keyword) && !IsSkipKeyword($keyword, $eqContext["skipKeywords"]);
 }
 
-Function GetClothingContext($name) {
+Function GetClothingContext($name, $forceNarrator = false) {
   $cuirass = GetActorValue($name, "cuirass", false, true);
   $ret = "";
   
@@ -167,7 +167,7 @@ Function GetClothingContext($name) {
   $tmp = GetRevealedStatus($name);
   $wearingBottom = $tmp["wearingBottom"];
   $wearingTop = $tmp["wearingTop"];
-  $isNarrator = ($GLOBALS["HERIKA_NAME"]  == "The Narrator");
+  $isNarrator = $forceNarrator || ($GLOBALS["HERIKA_NAME"] == "The Narrator");
   
   // if $eqContext["context"] not empty, then will set ret
   if (!empty($eqContext["context"])) {
@@ -277,12 +277,12 @@ Function GetClothingContext($name) {
 }
 
 
-Function GetDDContext($name) {
+Function GetDDContext($name, $forceNarrator = false) {
   $ret = "";
   $tmp = GetRevealedStatus($name);
   $wearingBottom = $tmp["wearingBottom"];
   $wearingTop = $tmp["wearingTop"];
-  $isNarrator = ($GLOBALS["HERIKA_NAME"] == "The Narrator");
+  $isNarrator = $forceNarrator || ($GLOBALS["HERIKA_NAME"] == "The Narrator");
   $cuirass = GetActorValue($name, "cuirass", false, true);
   $concealedPrefix = !empty($cuirass) ? "Concealed by {$cuirass}, " : "";
 
