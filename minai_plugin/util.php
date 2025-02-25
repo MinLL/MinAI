@@ -1044,7 +1044,9 @@ function callLLM($messages, $model = null, $options = []) {
 
         if (!isset($response['choices'][0]['message']['content'])) {
             minai_log("info", "callLLM: Unexpected response format");
-            return null;
+            minai_log("debug", "callLLM: Response: " . json_encode($response));
+            SetLLMFallbackProfile();
+            return callLLM($messages, $GLOBALS['CONNECTOR']['openrouter']['model'], $options);
         }
 
         $responseContent = $response['choices'][0]['message']['content'];
