@@ -1402,7 +1402,7 @@
                 return `
                     <div class="calendar-day ${hasSearchMatch ? 'highlight search-match' : dayEntries.length ? 'highlight' : ''}"
                          title="${dayName}, ${dayNum}${suffix} of ${monthName}, ${year}">
-                        <div class="calendar-day-header" onclick="jumpToDate('${dayEntries[0]?.topic || ''}')"
+                        <div class="calendar-day-header" onclick="jumpToDate(\`${dayEntries[0]?.topic || ''}\`)"
                              title="${dayName}, ${dayNum}${suffix} of ${monthName}, ${year}">
                             <span class="day-number">${dayNum}${suffix}</span>
                             <span class="day-name">${dayName}</span>
@@ -1413,7 +1413,7 @@
                                     .sort(([a], [b]) => a.localeCompare(b))
                                     .map(([char, count]) => `
                                         <div class="calendar-entry ${hasSearchMatch ? 'search-match' : ''}" 
-                                             onclick="jumpToDate('${filteredDayEntries[0].topic}')">
+                                             onclick="jumpToDate(\`${filteredDayEntries[0].topic}\`)">
                                             ${char} <span class="entry-count">${count}</span>
                                         </div>
                                     `).join('')}
