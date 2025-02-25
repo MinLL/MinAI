@@ -117,7 +117,11 @@ function ProcessIntegrations() {
             else {
                 // $GLOBALS["HERIKA_NAME"] is npc1
                 $GLOBALS["HERIKA_TARGET"] = explode(":", $GLOBALS["gameRequest"][3])[3];
-                if ($GLOBALS["HERIKA_TARGET"] == $GLOBALS["HERIKA_NAME"]) {
+                if (empty(trim($GLOBALS["HERIKA_TARGET"]))) {
+                    minai_log("info", "Blocking radiant/rechat - target is empty or invalid");
+                    $MUST_DIE = true;
+                }
+                else if ($GLOBALS["HERIKA_TARGET"] == $GLOBALS["HERIKA_NAME"]) {
                     minai_log("info", "Blocking radiant/rechat - source and target are the same NPC");
                     $MUST_DIE = true;
                 }
