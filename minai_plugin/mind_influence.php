@@ -205,29 +205,29 @@ function GetMindInfluenceRequestFormat($state, $promptType = "default") {
     if (!$useMasterPrompts) {
         $subtleFormats = [
             "normal" => "",
-            "goodgirl" => "Remember that you are under a mental influence that makes you more compliant and eager to please. Your response should be polite and helpful, with a subtle undertone of submission to authority.",
-            "badgirl" => "Remember that you are under a mental influence that leaves you sexually frustrated and seeking approval. Your response should show slight distraction and a subtle need for validation.",
-            "verybadgirl" => "Remember that you are under a mental influence that leaves you intensely sexually frustrated. Your response should hint at your internal struggle while maintaining composure.",
-            "punishment" => "Remember that you are under a mental influence that makes you feel ashamed. Your response should be more reserved and self-conscious than usual.",
-            "post" => "Remember that your thoughts are slightly clouded by lingering mental influences. Your response should show subtle hints of uncertainty."
+            "goodgirl" => "Your response should subtly convey your deep satisfaction and eagerness.",
+            "badgirl" => "Your response should hint at your aching need and desperate arousal.",
+            "verybadgirl" => "Your response should subtly reveal your torturous, overwhelming desire.",
+            "punishment" => "Your response should be subdued, tinged with yearning.",
+            "post" => "Your response should have a dreamy, wanting undertone."
         ];
         
         $subtleExplicitFormats = [
             "normal" => "",
-            "goodgirl" => "Remember that you are under a mental influence that heightens your desire to please. Your response about intimate matters should reflect a subtle eagerness to comply.",
-            "badgirl" => "Remember that you are under a mental influence that leaves you feeling highly aroused and frustrated. Your response about intimate matters should hint at your underlying frustration.",
-            "verybadgirl" => "Remember that you are under a mental influence that torments you with need. Your response about intimate matters should subtly convey your desperate state.",
-            "punishment" => "Remember that you are under a mental influence that dulls pleasure. Your response about intimate matters should be more subdued and remorseful.",
-            "post" => "Remember that your desires feel slightly uncertain. Your response about intimate matters should reflect this subtle confusion."
+            "goodgirl" => "Your response should subtly convey your deep satisfaction and eagerness.",
+            "badgirl" => "Your response should hint at your aching need and desperate arousal.",
+            "verybadgirl" => "Your response should subtly reveal your torturous, overwhelming desire.",
+            "punishment" => "Your response should be subdued, tinged with yearning.",
+            "post" => "Your response should have a dreamy, wanting undertone."
         ];
         
         $subtleCombatFormats = [
             "normal" => "",
-            "goodgirl" => "Remember that you are under a mental influence that makes you more focused in combat. Your response should reflect controlled confidence.",
-            "badgirl" => "Remember that you are under a mental influence that affects your combat focus. Your response should hint at slight distraction.",
-            "verybadgirl" => "Remember that you are under a mental influence that makes you wild and desperate. Your response should suggest barely contained intensity.",
-            "punishment" => "Remember that you are under a mental influence that makes you doubt yourself. Your response should show subtle hesitation.",
-            "post" => "Remember that your combat reactions feel slightly off. Your response should hint at this subtle disconnection."
+            "goodgirl" => "Your response should reflect focused determination.",
+            "badgirl" => "Your response should hint at slight distraction.",
+            "verybadgirl" => "Your response should suggest barely contained intensity.",
+            "punishment" => "Your response should have a subtle note of hesitation.",
+            "post" => "Your response should subtly reflect your slightly delayed reactions."
         ];
 
         switch($promptType) {
@@ -242,29 +242,29 @@ function GetMindInfluenceRequestFormat($state, $promptType = "default") {
     
     $baseFormats = [
         "normal" => "",
-        "goodgirl" => "You are speaking directly to your master. Remember that you feel an overwhelming desire to obey and please them. Your response should be respectful and reflect your eagerness to comply with their wishes.",
-        "badgirl" => "You are speaking directly to your master. Remember that despite your disobedience, you still feel a deep need to please them. Your response should show your internal struggle between defiance and submission to their authority.",
-        "verybadgirl" => "You are speaking directly to your master. Remember that even in your disobedience, you cannot resist their authority. Your response should reflect your desperate need for their approval.",
-        "punishment" => "You are speaking directly to your master. Remember that you feel intense remorse and a need to earn their forgiveness. Your response should reflect your shame and desire to make amends.",
-        "post" => "Remember that your thoughts are clouded by lingering mental influences. Your response should reflect some uncertainty about your own desires."
+        "goodgirl" => "Your response should subtly reflect your devotion and deep desire to serve.",
+        "badgirl" => "Your response should have an undertone of desperate need for approval.",
+        "verybadgirl" => "Your response should subtly convey your frantic desire for forgiveness.",
+        "punishment" => "Your response should be subdued, with longing for redemption.",
+        "post" => "Your response should have a subtle hint of lingering submission."
     ];
     
     $explicitFormats = [
         "normal" => "",
-        "goodgirl" => "You are speaking directly to your master about intimate matters. Remember that pleasing them brings you intense satisfaction. Your response should reflect your eagerness to fulfill their desires.",
-        "badgirl" => "You are speaking directly to your master about intimate matters. Remember that your disobedience has left you frustrated and longing for their approval. Your response should reflect this desperate need.",
-        "verybadgirl" => "You are speaking directly to your master about intimate matters. Remember that your extreme arousal and inability to find release torments you. Your response should reflect your desperate need for their forgiveness.",
-        "punishment" => "You are speaking directly to your master about intimate matters. Remember that you currently feel no pleasure as punishment. Your response should reflect your remorse and desire to earn back their favor.",
-        "post" => "Remember that your desires feel confusing and uncertain. Your response should reflect this mental fog."
+        "goodgirl" => "Your response should subtly convey your passionate devotion.",
+        "badgirl" => "Your response should reveal your desperate, aching need.",
+        "verybadgirl" => "Your response should hint at your overwhelming, torturous arousal.",
+        "punishment" => "Your response should be subdued but yearning.",
+        "post" => "Your response should have a dreamy, wanting undertone."
     ];
     
     $combatFormats = [
         "normal" => "",
-        "goodgirl" => "You are speaking directly to your master during combat. Remember that you fight to protect their interests. Your response should reflect your dedication to their cause.",
-        "badgirl" => "You are speaking directly to your master during combat. Remember that your disobedience affects your focus. Your response should reflect your struggle between defiance and duty to them.",
-        "verybadgirl" => "You are speaking directly to your master during combat. Remember that your extreme arousal makes you wild and desperate. Your response should reflect this frenzied state while acknowledging their authority.",
-        "punishment" => "You are speaking directly to your master during combat. Remember that you question your worth as their fighter. Your response should reflect your uncertainty and desire to prove yourself to them.",
-        "post" => "Remember that your combat reactions feel slightly delayed. Your response should reflect this disconnected state."
+        "goodgirl" => "Your response should reflect fierce loyalty.",
+        "badgirl" => "Your response should hint at distraction from need.",
+        "verybadgirl" => "Your response should suggest barely contained desperate energy.",
+        "punishment" => "Your response should have an undertone of eager redemption.",
+        "post" => "Your response should subtly reflect your conflicted focus."
     ];
     
     switch($promptType) {
