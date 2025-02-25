@@ -205,20 +205,20 @@ function GetMindInfluenceRequestFormat($state, $promptType = "default") {
     if (!$useMasterPrompts) {
         $subtleFormats = [
             "normal" => "",
-            "goodgirl" => "Your response should subtly convey your deep satisfaction and eagerness.",
-            "badgirl" => "Your response should hint at your aching need and desperate arousal.",
-            "verybadgirl" => "Your response should subtly reveal your torturous, overwhelming desire.",
-            "punishment" => "Your response should be subdued, tinged with yearning.",
-            "post" => "Your response should have a dreamy, wanting undertone."
+            "goodgirl" => "Your response should subtly convey your deep satisfaction and eagerness, while avoiding direct references to your state.",
+            "badgirl" => "Your response should hint at your aching need and desperate arousal through metaphor and suggestion rather than explicit statements.",
+            "verybadgirl" => "Your response should subtly reveal your torturous, overwhelming desire through implication rather than direct expression.",
+            "punishment" => "Your response should be subdued, tinged with yearning, expressed through indirect references.",
+            "post" => "Your response should have a dreamy, wanting undertone without explicitly mentioning your mental state."
         ];
         
         $subtleExplicitFormats = [
             "normal" => "",
-            "goodgirl" => "Your response should subtly convey your deep satisfaction and eagerness.",
-            "badgirl" => "Your response should hint at your aching need and desperate arousal.",
-            "verybadgirl" => "Your response should subtly reveal your torturous, overwhelming desire.",
-            "punishment" => "Your response should be subdued, tinged with yearning.",
-            "post" => "Your response should have a dreamy, wanting undertone."
+            "goodgirl" => "Your response should subtly convey your deep satisfaction and eagerness through implication rather than statement.",
+            "badgirl" => "Your response should hint at your aching need and desperate arousal through suggestion and metaphor.",
+            "verybadgirl" => "Your response should subtly reveal your torturous, overwhelming desire without directly stating it.",
+            "punishment" => "Your response should be subdued, tinged with yearning, expressed through indirect language.",
+            "post" => "Your response should have a dreamy, wanting undertone conveyed through subtle implications."
         ];
         
         $subtleCombatFormats = [
@@ -242,20 +242,20 @@ function GetMindInfluenceRequestFormat($state, $promptType = "default") {
     
     $baseFormats = [
         "normal" => "",
-        "goodgirl" => "Your response should subtly reflect your devotion and deep desire to serve.",
-        "badgirl" => "Your response should have an undertone of desperate need for approval.",
-        "verybadgirl" => "Your response should subtly convey your frantic desire for forgiveness.",
-        "punishment" => "Your response should be subdued, with longing for redemption.",
-        "post" => "Your response should have a subtle hint of lingering submission."
+        "goodgirl" => "Your response should subtly reflect your devotion and deep desire to serve through implication rather than statement.",
+        "badgirl" => "Your response should have an undertone of desperate need for approval conveyed through suggestion rather than direct expression.",
+        "verybadgirl" => "Your response should subtly convey your frantic desire for forgiveness through metaphor and indirect reference.",
+        "punishment" => "Your response should be subdued, with longing for redemption expressed through subtle implications.",
+        "post" => "Your response should have a subtle hint of lingering submission conveyed through indirect language."
     ];
     
     $explicitFormats = [
         "normal" => "",
-        "goodgirl" => "Your response should subtly convey your passionate devotion.",
-        "badgirl" => "Your response should reveal your desperate, aching need.",
-        "verybadgirl" => "Your response should hint at your overwhelming, torturous arousal.",
-        "punishment" => "Your response should be subdued but yearning.",
-        "post" => "Your response should have a dreamy, wanting undertone."
+        "goodgirl" => "Your response should subtly convey your passionate devotion through metaphor rather than direct statement.",
+        "badgirl" => "Your response should reveal your desperate, aching need through suggestion and implication.",
+        "verybadgirl" => "Your response should hint at your overwhelming, torturous arousal through indirect reference.",
+        "punishment" => "Your response should be subdued but yearning, expressed through subtle implications.",
+        "post" => "Your response should have a dreamy, wanting undertone conveyed through metaphor."
     ];
     
     $combatFormats = [
