@@ -905,7 +905,8 @@ function validateLLMResponse($responseContent) {
         'may be inappropriate',
         'tasteful and appropriate',
         'type of response',
-        'i am to keep'
+        'i am to keep',
+        'Provider returned error'
     ];
 
     // Check if response contains any error strings
