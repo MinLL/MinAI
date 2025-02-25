@@ -124,6 +124,10 @@ foreach ($GLOBALS["ENABLED_FUNCTIONS"] as $n=>$func) {
         ($defeatCooldown && $func == "Attack" && IsFollower($GLOBALS["HERIKA_NAME"]))) {
         $commandsToPurge[] = $n;
     }
+    // Purge ExchangeItems if the npc is a follower
+    if (IsFollower($GLOBALS["HERIKA_NAME"]) && $func == "ExchangeItems") {
+        $commandsToPurge[] = $n;
+    }
 }
 
 foreach ($commandsToPurge as $n) {
