@@ -190,8 +190,8 @@ function GetMindInfluenceRequestFormat($state, $promptType = "default") {
 
     // Add request formats for simple states
     $simpleFormats = [
-        "drunk" => "Remember that you are intoxicated. Your response should be slightly slurred and show reduced inhibitions.",
-        "high" => "Remember that you are under the effects of skooma. Your response should be energetic and slightly erratic."
+        "drunk" => "As a subtle undertone, let your response show very mild signs of intoxication.",
+        "high" => "As a subtle undertone, let your response show slight traces of skooma's effects."
     ];
 
     // Return simple formats if in a simple state
@@ -205,29 +205,29 @@ function GetMindInfluenceRequestFormat($state, $promptType = "default") {
     if (!$useMasterPrompts) {
         $subtleFormats = [
             "normal" => "",
-            "goodgirl" => "Your response should subtly convey your deep satisfaction and eagerness, while avoiding direct references to your state.",
-            "badgirl" => "Your response should hint at your aching need and desperate arousal through metaphor and suggestion rather than explicit statements.",
-            "verybadgirl" => "Your response should subtly reveal your torturous, overwhelming desire through implication rather than direct expression.",
-            "punishment" => "Your response should be subdued, tinged with yearning, expressed through indirect references.",
-            "post" => "Your response should have a dreamy, wanting undertone without explicitly mentioning your mental state."
+            "goodgirl" => "As a subtle undertone, let your contentment and eagerness color your response.",
+            "badgirl" => "As a subtle undertone, let a hint of yearning color your response.",
+            "verybadgirl" => "As a subtle undertone, let traces of intense desire color your response.",
+            "punishment" => "As a subtle undertone, let a touch of remorse color your response.",
+            "post" => "As a subtle undertone, let a slight dreaminess color your response."
         ];
         
         $subtleExplicitFormats = [
             "normal" => "",
-            "goodgirl" => "Your response should subtly convey your deep satisfaction and eagerness through implication rather than statement.",
-            "badgirl" => "Your response should hint at your aching need and desperate arousal through suggestion and metaphor.",
-            "verybadgirl" => "Your response should subtly reveal your torturous, overwhelming desire without directly stating it.",
-            "punishment" => "Your response should be subdued, tinged with yearning, expressed through indirect language.",
-            "post" => "Your response should have a dreamy, wanting undertone conveyed through subtle implications."
+            "goodgirl" => "As a subtle undertone, let satisfaction color your response.",
+            "badgirl" => "As a subtle undertone, let unfulfilled desire color your response.",
+            "verybadgirl" => "As a subtle undertone, let desperate longing color your response.",
+            "punishment" => "As a subtle undertone, let regret color your response.",
+            "post" => "As a subtle undertone, let haziness color your response."
         ];
         
         $subtleCombatFormats = [
             "normal" => "",
-            "goodgirl" => "Your response should reflect focused determination.",
-            "badgirl" => "Your response should hint at slight distraction.",
-            "verybadgirl" => "Your response should suggest barely contained intensity.",
-            "punishment" => "Your response should have a subtle note of hesitation.",
-            "post" => "Your response should subtly reflect your slightly delayed reactions."
+            "goodgirl" => "As a subtle undertone, let focus color your response.",
+            "badgirl" => "As a subtle undertone, let mild distraction color your response.",
+            "verybadgirl" => "As a subtle undertone, let intensity color your response.",
+            "punishment" => "As a subtle undertone, let uncertainty color your response.",
+            "post" => "As a subtle undertone, let slight confusion color your response."
         ];
 
         switch($promptType) {
@@ -242,29 +242,29 @@ function GetMindInfluenceRequestFormat($state, $promptType = "default") {
     
     $baseFormats = [
         "normal" => "",
-        "goodgirl" => "Your response should subtly reflect your devotion and deep desire to serve through implication rather than statement.",
-        "badgirl" => "Your response should have an undertone of desperate need for approval conveyed through suggestion rather than direct expression.",
-        "verybadgirl" => "Your response should subtly convey your frantic desire for forgiveness through metaphor and indirect reference.",
-        "punishment" => "Your response should be subdued, with longing for redemption expressed through subtle implications.",
-        "post" => "Your response should have a subtle hint of lingering submission conveyed through indirect language."
+        "goodgirl" => "As a subtle undertone, let devotion color your response.",
+        "badgirl" => "As a subtle undertone, let a need for approval color your response.",
+        "verybadgirl" => "As a subtle undertone, let desperate yearning color your response.",
+        "punishment" => "As a subtle undertone, let contrition color your response.",
+        "post" => "As a subtle undertone, let mild uncertainty color your response."
     ];
     
     $explicitFormats = [
         "normal" => "",
-        "goodgirl" => "Your response should subtly convey your passionate devotion through metaphor rather than direct statement.",
-        "badgirl" => "Your response should reveal your desperate, aching need through suggestion and implication.",
-        "verybadgirl" => "Your response should hint at your overwhelming, torturous arousal through indirect reference.",
-        "punishment" => "Your response should be subdued but yearning, expressed through subtle implications.",
-        "post" => "Your response should have a dreamy, wanting undertone conveyed through metaphor."
+        "goodgirl" => "As a subtle undertone, let passionate devotion color your response.",
+        "badgirl" => "As a subtle undertone, let unfulfilled desire color your response.",
+        "verybadgirl" => "As a subtle undertone, let desperate need color your response.",
+        "punishment" => "As a subtle undertone, let subdued yearning color your response.",
+        "post" => "As a subtle undertone, let dreaminess color your response."
     ];
     
     $combatFormats = [
         "normal" => "",
-        "goodgirl" => "Your response should reflect fierce loyalty.",
-        "badgirl" => "Your response should hint at distraction from need.",
-        "verybadgirl" => "Your response should suggest barely contained desperate energy.",
-        "punishment" => "Your response should have an undertone of eager redemption.",
-        "post" => "Your response should subtly reflect your conflicted focus."
+        "goodgirl" => "As a subtle undertone, let loyalty color your response.",
+        "badgirl" => "As a subtle undertone, let mild distraction color your response.",
+        "verybadgirl" => "As a subtle undertone, let frantic energy color your response.",
+        "punishment" => "As a subtle undertone, let desire for redemption color your response.",
+        "post" => "As a subtle undertone, let slight confusion color your response."
     ];
     
     switch($promptType) {
