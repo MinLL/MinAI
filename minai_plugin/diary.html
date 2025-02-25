@@ -1433,19 +1433,82 @@
             updateDisplay();
         }
 
-        // Parse Skyrim date from topic field (e.g., "Fredas, 2:44 PM, 22nd of Last Seed, 4E 201")
+        // Calculate Levenshtein distance between two strings
+        function levenshteinDistance(str1, str2) {
+            const m = str1.length;
+            const n = str2.length;
+            const dp = Array(m + 1).fill().map(() => Array(n + 1).fill(0));
+
+            for (let i = 0; i <= m; i++) dp[i][0] = i;
+            for (let j = 0; j <= n; j++) dp[0][j] = j;
+
+            for (let i = 1; i <= m; i++) {
+                for (let j = 1; j <= n; j++) {
+                    const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
+                    dp[i][j] = Math.min(
+                        dp[i - 1][j] + 1,
+                        dp[i][j - 1] + 1,
+                        dp[i - 1][j - 1] + cost
+                    );
+                }
+            }
+            return dp[m][n];
+        }
+
+        // Find closest matching month name
+        function findClosestMonth(monthName) {
+            // Normalize input
+            const normalized = monthName.toLowerCase().replace(/\s+/g, ' ').trim();
+            
+            // First try exact match after normalization
+            const exactMatch = SKYRIM_MONTHS.find(m => 
+                m.toLowerCase().replace(/\s+/g, ' ').trim() === normalized
+            );
+            if (exactMatch) return exactMatch;
+            
+            // If no exact match, find closest match using Levenshtein distance
+            let closestMatch = null;
+            let minDistance = Infinity;
+            
+            SKYRIM_MONTHS.forEach(month => {
+                const normalizedMonth = month.toLowerCase().replace(/\s+/g, ' ').trim();
+                const distance = levenshteinDistance(normalized, normalizedMonth);
+                
+                // Use relative distance to handle varying length strings better
+                const relativeDistance = distance / Math.max(normalized.length, normalizedMonth.length);
+                
+                if (relativeDistance < minDistance) {
+                    minDistance = relativeDistance;
+                    closestMatch = month;
+                }
+            });
+            
+            // Only return match if it's reasonably close (threshold of 0.4 relative distance)
+            return minDistance < 0.4 ? closestMatch : null;
+        }
+
+        // Update the parseSkyrimDate function to use fuzzy matching
         function parseSkyrimDate(dateStr) {
-            const match = dateStr.match(/(\w+), \d+:\d+ [AP]M, (\d+)(?:st|nd|rd|th) of (\w+ ?\w*), (\d+E \d+)/);
+            const match = dateStr.match(/(\w+), \d+:\d+ [AP]M, (\d+)(?:st|nd|rd|th) of ([\w']+ ?\w*), (\d+E \d+)/);
             if (!match) return null;
             
             const [_, dayName, dayNum, monthName, year] = match;
-            const monthIndex = SKYRIM_MONTHS.findIndex(m => m.toLowerCase() === monthName.toLowerCase());
+            
+            // Find closest matching month using fuzzy matching
+            const matchedMonth = findClosestMonth(monthName);
+            
+            if (!matchedMonth) {
+                console.warn(`No close match found for month: ${monthName}`);
+                return null;
+            }
+            
+            const monthIndex = SKYRIM_MONTHS.indexOf(matchedMonth);
             
             return {
                 dayName,
                 day: parseInt(dayNum),
                 month: monthIndex + 1,
-                monthName: SKYRIM_MONTHS[monthIndex],
+                monthName: matchedMonth,
                 year,
                 original: dateStr
             };
