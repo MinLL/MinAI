@@ -160,6 +160,9 @@ EndFunction
 ; EndEvent
 
 bool Function CanAnimate(actor akTarget)
+  if(!bHasSexlab && !bHasOstim)
+    return true
+  endif
   return sexUtil.CanAnimate(akTarget, useOstim() && !OActor.IsInOStim(akTarget))
 EndFunction
 
