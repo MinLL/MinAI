@@ -35,7 +35,7 @@ $GLOBALS['action_prompts'] = Array(
 
     "explicit_scene" => "Choose the ACTION or TALK that best conveys #herika_name#'s immediate physical and emotional responses. Focus heavily on explicit dialogue and verbal expressions to enhance the scene, but also utilize ACTIONS to vividly depict #herika_name#'s sensations and feelings when interacting with #target#. Avoid narration and emoting.",
     
-    "normal_scene" => "Select the most contextually appropriate ACTION to respond to #target#. Prioritize actions that directly address the current interaction (like BeginTrading for commerce, Talk for dialogue). Use combat or intimate actions such as Grope when warranted by the situation, or when your character wants to do so. Your character must act according to their personality and profession first, and prioritize maintaining dialogue and scene continuity.",
+    "normal_scene" => "Select the most contextually appropriate ACTION to respond to #target#. Prioritize actions that directly address the current interaction (like BeginTrading for commerce, Talk for dialogue). Use combat actions such as Attack when warranted by the situation, or when your character wants to do so. Your character must act according to their personality and profession first, and prioritize maintaining dialogue and scene continuity.",
 
     // Diary prompts
     "player_diary" => "#player_name# regularly keeps a diary, which you are now tasked to update. Please write a several page story of #player_name#'s recent thoughts, feelings, and adventures. Respond as if you are writing this into a private diary, including completely unfiltered thoughts and feelings. WRITE AS IF YOU ARE #player_name# WRITING INTO A PRIVATE DIARY.",
