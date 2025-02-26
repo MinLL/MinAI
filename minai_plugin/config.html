@@ -917,6 +917,81 @@
             color: var(--text-color);
             font-style: italic;
         }
+
+        .help-text {
+            font-size: 0.9em;
+            color: #888;
+            margin-top: 4px;
+            margin-bottom: 8px;
+            font-style: italic;
+        }
+
+        .reset-button {
+            background: transparent;
+            border: none;
+            color: var(--secondary-color);
+            cursor: pointer;
+            padding: 4px 8px;
+            font-size: 0.9em;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .reset-button:hover {
+            background: rgba(33, 150, 243, 0.1);
+        }
+
+        .nav-button.warning {
+            background: linear-gradient(135deg,
+                rgba(244, 67, 54, 0.1) 0%,
+                rgba(244, 67, 54, 0.2) 100%
+            );
+            border: 1px solid var(--error-color);
+        }
+
+        .nav-button.warning:hover {
+            background: linear-gradient(135deg,
+                rgba(244, 67, 54, 0.15) 0%,
+                rgba(244, 67, 54, 0.25) 100%
+            );
+        }
+
+        .option-label-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        /* Add these styles */
+        .option-label-container.modified {
+            position: relative;
+        }
+
+        .option-label-container.modified::after {
+            content: '•';
+            color: var(--warning-color);
+            font-size: 1.5em;
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            animation: pulse 2s infinite;
+        }
+
+        .section-header-row.modified::after {
+            content: '•';
+            color: var(--warning-color);
+            font-size: 1.5em;
+            margin-left: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
 </head>
@@ -930,6 +1005,7 @@
             <button onclick="exportConfig()" class="nav-button">Export</button>
             <button onclick="document.getElementById('import-input').click()" class="nav-button">Import</button>
             <input type="file" id="import-input" style="display: none" accept=".json" onchange="importConfig(event)">
+            <button onclick="resetAllToDefaults()" class="nav-button warning">Reset All to Defaults</button>
             <div class="nav-divider"></div>
             <button onclick="toggleAllSections(true)" class="nav-button">Expand All</button>
             <button onclick="toggleAllSections(false)" class="nav-button">Collapse All</button>
@@ -959,14 +1035,20 @@
                         <div class="section-content collapsed">
                             <!-- enforce_short_responses -->
                             <div class="option-group checkbox-group">
-                                <label class="option-label" for="enforce-short-responses">Enforce Short Responses</label>
+                                <div class="option-label-container">
+                                    <label class="option-label" for="enforce-short-responses">Enforce Short Responses</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('enforce-short-responses')">Reset to Default</button>
+                                </div>
                                 <p>Attempt to enforce short 2-3 sentence responses from the LLM. This is "best effort", and does not always work.</p>
                                 <input type="checkbox" id="enforce-short-responses">
                             </div>
 
                             <!-- use_llm_fallback -->
                             <div class="option-group checkbox-group">
-                                <label class="option-label" for="use-llm-fallback">Use LLM Fallback</label>
+                                <div class="option-label-container">
+                                    <label class="option-label" for="use-llm-fallback">Use LLM Fallback</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('use-llm-fallback')">Reset to Default</button>
+                                </div>
                                 <p>Enable fallback to alternative LLM configuration when primary LLM call fails. 
                                     This can help recover from errors and censorship, but will result in increased token cost and response time 
                                     when a retry is performed. Response time hit is fairly minimal, but the full token cost of both requests 
@@ -977,15 +1059,21 @@
 
                             <!-- strip_emotes_from_output -->
                             <div class="option-group checkbox-group">
-                                <label class="option-label" for="strip-emotes">Strip emotes from output</label>
-                                <p>Remove anything between two astericks from the response. Useful if your LLM likes to respond with things like *smirking*, *laughing*, etc.</p>
+                                <div class="option-label-container">
+                                    <label class="option-label" for="strip-emotes">Strip emotes from output</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('strip-emotes')">Reset to Default</button>
+                                </div>
+                                <p>Remove anything between two astericks from the response...</p>
                                 <input type="checkbox" id="strip-emotes">
                             </div>
 
                             <!-- enforce_single_json -->
                             <div class="option-group checkbox-group">
-                                <label class="option-label" for="enforce-single-json">Enforce Single JSON Response</label>
-                                <p>Forces the LLM to provide only one single JSON response object per interaction. This helps prevent multiple action attempts in a single response.</p>
+                                <div class="option-label-container">
+                                    <label class="option-label" for="enforce-single-json">Enforce Single JSON Response</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('enforce-single-json')">Reset to Default</button>
+                                </div>
+                                <p>Forces the LLM to provide only one single JSON response object per interaction...</p>
                                 <input type="checkbox" id="enforce-single-json">
                             </div>
                         </div>
@@ -999,50 +1087,71 @@
                         <div class="section-content collapsed">
                             <!-- disable_nsfw -->
                             <div class="option-group checkbox-group">
-                                <label class="option-label" for="disable-nsfw">Disable NSFW</label>
+                                <div class="option-label-container">
+                                    <label class="option-label" for="disable-nsfw">Disable NSFW</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('disable-nsfw')">Reset to Default</button>
+                                </div>
                                 <p>Globally disable all NSFW features.</p>
                                 <input type="checkbox" id="disable-nsfw">
                             </div>
 
                             <!-- restrict_nonfollower_functions -->
                             <div class="option-group checkbox-group">
-                                <label class="option-label" for="restrict-nonfollower-functions">Restrict Non-Follower Functions</label>
+                                <div class="option-label-container">
+                                    <label class="option-label" for="restrict-nonfollower-functions">Restrict Non-Follower Functions</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('restrict-nonfollower-functions')">Reset to Default</button>
+                                </div>
                                 <p>Restrict actions that only make sense for followers to followers.</p>
                                 <input type="checkbox" id="restrict-nonfollower-functions">
                             </div>
 
                             <!-- always_enable_functions -->
                             <div class="option-group checkbox-group">
-                                <label class="option-label" for="always-enable-functions">Always Enable Functions</label>
+                                <div class="option-label-container">
+                                    <label class="option-label" for="always-enable-functions">Always Enable Functions</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('always-enable-functions')">Reset to Default</button>
+                                </div>
                                 <p>Enable functions during things like rechat. Disabled for the narrator to avoid crashes (CTD).</p>
                                 <input type="checkbox" id="always-enable-functions">
                             </div>
 
                             <!-- force_aiff_name_to_ingame_name -->
                             <div class="option-group checkbox-group">
-                                <label class="option-label" for="force-aiff-name">Force CHIM Name to Match In-Game Name</label>
+                                <div class="option-label-container">
+                                    <label class="option-label" for="force-aiff-name">Force CHIM Name to Match In-Game Name</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('force-aiff-name')">Reset to Default</button>
+                                </div>
                                 <p>Force the configured name in CHIM to match the in-game name.</p>
                                 <input type="checkbox" id="force-aiff-name">
                             </div>
 
                             <!-- disable_worn_equipment -->
                             <div class="option-group checkbox-group">
-                                <label class="option-label" for="disable-worn-equipment">Disable Worn Equipment</label>
+                                <div class="option-label-container">
+                                    <label class="option-label" for="disable-worn-equipment">Disable Worn Equipment</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('disable-worn-equipment')">Reset to Default</button>
+                                </div>
                                 <p>Disable the worn equipment system, which customizes the description of items that actors are wearing.</p>
                                 <input type="checkbox" id="disable-worn-equipment">
                             </div>
 
                             <!-- use_defeat -->
                             <div class="option-group checkbox-group">
-                                <label class="option-label" for="use-defeat">Add Support for Defeat mods</label>
+                                <div class="option-label-container">
+                                    <label class="option-label" for="use-defeat">Add Support for Defeat mods</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('use-defeat')">Reset to Default</button>
+                                </div>
                                 <p>If using a supported defeat mod, the LLM will differentiate between victory and defeat in combat.</p>
                                 <input type="checkbox" id="use-defeat">
                             </div>
 
                             <!-- realnames_support -->
                             <div class="option-group checkbox-group">
-                                <label class="option-label" for="realnames-support">Add Support for Realnames Extended</label>
-                                <p>Automatically seed NPC profiles that are renamed via Realnames Extended. For example, if a guard were renamed to Fred [Whiterun Guard], his personality would be initially seeded with the "Whiterun Guard" template.</p>
+                                <div class="option-label-container">
+                                    <label class="option-label" for="realnames-support">Add Support for Realnames Extended</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('realnames-support')">Reset to Default</button>
+                                </div>
+                                <p>Automatically seed NPC profiles that are renamed via Realnames Extended...</p>
                                 <input type="checkbox" id="realnames-support">
                             </div>
                         </div>
@@ -1056,7 +1165,10 @@
                         <div class="section-content collapsed">
                             <!-- commands_to_purge -->
                             <div class="option-group">
-                                <label class="option-label" for="commands-to-purge">Commands to Purge</label>
+                                <div class="option-label-container">
+                                    <label class="option-label" for="commands-to-purge">Commands to Purge</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('commands-to-purge')">Reset to Default</button>
+                                </div>
                                 <p>List of commands to disable.</p>
                                 <div id="commands-to-purge-container" class="dynamic-list-container"></div>
                                 <button class="add-list-item" onclick="addListItem('commands-to-purge-container')">Add Command to Purge</button>
@@ -1064,16 +1176,22 @@
 
                             <!-- events_to_ignore -->
                             <div class="option-group">
-                                <label class="option-label" for="events-to-ignore">Events to Ignore</label>
-                                <p>List of game events to ignore. For example, ignoring rpg_lvlup events will prevent the LLM from commenting on the player leveling up.</p>
+                                <div class="option-label-container">
+                                    <label class="option-label" for="events-to-ignore">Events to Ignore</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('events-to-ignore')">Reset to Default</button>
+                                </div>
+                                <p>List of game events to ignore...</p>
                                 <div id="events-to-ignore-container" class="dynamic-list-container"></div>
                                 <button class="add-list-item" onclick="addListItem('events-to-ignore-container')">Add Event to Ignore</button>
                             </div>
 
                             <!-- input_delay_for_radiance -->
-                            <div class="option-group slider">
-                                <label class="option-label" for="input-delay">Input Delay for Radiance (Seconds)</label>
-                                <p>Prevents radiant dialogue from triggering too quickly after player input, ensuring proper timing of responses.</p>
+                            <div class="option-group">
+                                <div class="option-label-container">
+                                    <label class="option-label" for="input-delay">Input Delay for Radiance (Seconds)</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('input-delay')">Reset to Default</button>
+                                </div>
+                                <p>Prevents radiant dialogue from triggering too quickly after player input...</p>
                                 <input type="range" id="input-delay" min="0" max="30" value="15">
                             </div>
                         </div>
@@ -1089,43 +1207,61 @@
                         <div class="section-content collapsed">
                             <!-- PROMPT_HEAD_OVERRIDE -->
                             <div class="option-group text-input">
-                                <label class="option-label" for="prompt-head-override">PROMPT_HEAD_OVERRIDE</label>
-                                <p>Set this to override the prompt head for all profiles. Do not include any player specific information in this prompt. Use the bio for that instead. You can override this for specific NPC's by beginning their prompt head with a #.</p>
+                                <div class="option-label-container">
+                                    <label class="option-label" for="prompt-head-override">PROMPT_HEAD_OVERRIDE</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('prompt-head-override')">Reset to Default</button>
+                                </div>
+                                <p>Set this to override the prompt head for all profiles...</p>
                                 <input type="text" id="prompt-head-override">
                             </div>
 
                             <!-- use_narrator_profile -->
                             <div class="option-group checkbox-group">
-                                <label class="option-label" for="use-narrator-profile">Use Narrator Profile</label>
-                                <p>Use an alternative profile for the narrator instead of the default one. The profile name is "Narrator", and will be created the first time you load the game.</p>
+                                <div class="option-label-container">
+                                    <label class="option-label" for="use-narrator-profile">Use Narrator Profile</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('use-narrator-profile')">Reset to Default</button>
+                                </div>
+                                <p>Use an alternative profile for the narrator instead of the default one...</p>
                                 <input type="checkbox" id="use-narrator-profile">
                             </div>
 
                             <!-- stop_narrator_context_leak -->
                             <div class="option-group checkbox-group">
-                                <label class="option-label" for="stop-narrator-context-leak">Stop Narrator Context Leak</label>
-                                <p>Purge narrator dialogue from the context that is shared with nearby NPC's in order to avoid them commenting on narrator dialogue.</p>
+                                <div class="option-label-container">
+                                    <label class="option-label" for="stop-narrator-context-leak">Stop Narrator Context Leak</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('stop-narrator-context-leak')">Reset to Default</button>
+                                </div>
+                                <p>Purge narrator dialogue from the context that is shared with nearby NPC's...</p>
                                 <input type="checkbox" id="stop-narrator-context-leak">
                             </div>
 
                             <!-- devious_narrator_eldritch_voice -->
                             <div class="option-group text-input">
-                                <label class="option-label" for="eldritch-voice">Devious Narrator Eldritch Voice</label>
-                                <p>If the Eldritch Devious Narrator is active, override it's voice type with the specified id.</p>
+                                <div class="option-label-container">
+                                    <label class="option-label" for="eldritch-voice">Eldritch Voice Type</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('eldritch-voice')">Reset to Default</button>
+                                </div>
+                                <p>Voice type to use for eldritch narration...</p>
                                 <input type="text" id="eldritch-voice">
                             </div>
 
                             <!-- devious_narrator_telvanni_voice -->
                             <div class="option-group text-input">
-                                <label class="option-label" for="telvanni-voice">Devious Narrator Telvanni Voice</label>
+                                <div class="option-label-container">
+                                    <label class="option-label" for="telvanni-voice">Devious Narrator Telvanni Voice</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('telvanni-voice')">Reset to Default</button>
+                                </div>
                                 <p>If the Telvanni Devious Narrator is active, override it's voice type with the specified id.</p>
                                 <input type="text" id="telvanni-voice">
                             </div>
 
                             <!-- self_narrator_toggle -->
                             <div class="option-group checkbox-group">
-                                <label class="option-label" for="self-narrator">Use Self Narrator</label>
-                                <p>Add support for the Narrator roleplaying as the character thinking to themself. NOTE: This still requires customization of the narrator's personality to make them RP appropriately.</p>
+                                <div class="option-label-container">
+                                    <label class="option-label" for="self-narrator">Use Self Narrator</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('self-narrator')">Reset to Default</button>
+                                </div>
+                                <p>Add support for the Narrator roleplaying as the character thinking to themself...</p>
                                 <input type="checkbox" id="self-narrator">
                             </div>
                         </div>
@@ -1139,15 +1275,21 @@
                         <div class="section-content collapsed">
                             <!-- force_voice_type -->
                             <div class="option-group checkbox-group">
-                                <label class="option-label" for="force-voice-type">Force Voice Type</label>
-                                <p>Force the voice type to use the actor's base voice type (e.g., "maleguard") instead of a specific one (e.g., "whiterun_guard"). Useful for compatibility with Mantella's XTTS configuration. You can still manually set the voice type for a specific actor by prefixing their voiceid with a #. For example, if you wanted Lydia to have a whiterun guard voice, you could set her voicetype to #maleguard.</p>
+                                <div class="option-label-container">
+                                    <label class="option-label" for="force-voice-type">Force Voice Type</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('force-voice-type')">Reset to Default</button>
+                                </div>
+                                <p>Force the voice type to use the actor's base voice type...</p>
                                 <input type="checkbox" id="force-voice-type">
                             </div>
 
                             <!-- VoiceType Fallbacks -->
                             <div class="option-group">
-                                <label class="option-label" for="voicetype-fallbacks">VoiceType Fallbacks</label>
-                                <p>Provide default voices for specific gender and race combinations if the XTTS server does not have a valid voice type: genderRace = voiceid.</p>
+                                <div class="option-label-container">
+                                    <label class="option-label" for="voicetype-fallbacks">VoiceType Fallbacks</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('voicetype-fallbacks')">Reset to Default</button>
+                                </div>
+                                <p>Provide default voices for specific gender and race combinations...</p>
                                 <div id="voicetype-container" class="voicetype-container"></div>
                                 <button class="add-voicetype" onclick="addVoiceTypeEntry()">Add VoiceType Fallback</button>
                             </div>
@@ -1179,31 +1321,71 @@
                             
                             <!-- Singing Prompt -->
                             <div class="option-group">
-                                <label class="option-label" for="singing-prompt">Singing Prompt</label>
+                                <div class="option-label-container">
+                                    <label class="option-label" for="singing-prompt">Singing Prompt</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('singing-prompt')">Reset to Default</button>
+                                </div>
                                 <textarea id="singing-prompt" class="prompt-textarea" rows="3"></textarea>
                             </div>
 
-                            <!-- Self Narrator (Explicit) -->
+                            <!-- Add new Diary Prompts section -->
                             <div class="option-group">
-                                <label class="option-label" for="self-narrator-explicit">Self Narrator (Explicit Scene)</label>
+                                <h4>Diary Prompts</h4>
+                                
+                                <!-- For player-diary -->
+                                <div class="option-group">
+                                    <div class="option-label-container">
+                                        <label class="option-label" for="player-diary">Player's Diary Entry Prompt</label>
+                                        <button class="reset-button" onclick="resetOptionToDefault('player-diary')">Reset to Default</button>
+                                    </div>
+                                    <p>Customize how the player character writes their diary entries (If using the Self Narrator feature).</p>
+                                    <textarea id="player-diary" class="prompt-textarea" rows="4"></textarea>
+                                </div>
+
+                                <!-- For follower-diary -->
+                                <div class="option-group">
+                                    <div class="option-label-container">
+                                        <label class="option-label" for="follower-diary">Follower's Diary Entry Prompt</label>
+                                        <button class="reset-button" onclick="resetOptionToDefault('follower-diary')">Reset to Default</button>
+                                    </div>
+                                    <p>Customize how followers write their diary entries about traveling with the player.</p>
+                                    <textarea id="follower-diary" class="prompt-textarea" rows="4"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- For self-narrator-explicit -->
+                            <div class="option-group">
+                                <div class="option-label-container">
+                                    <label class="option-label" for="self-narrator-explicit">Self Narrator (Explicit Scene)</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('self-narrator-explicit')">Reset to Default</button>
+                                </div>
                                 <textarea id="self-narrator-explicit" class="prompt-textarea" rows="4"></textarea>
                             </div>
 
-                            <!-- Self Narrator (Normal) -->
+                            <!-- For self-narrator-normal -->
                             <div class="option-group">
-                                <label class="option-label" for="self-narrator-normal">Self Narrator (Normal Scene)</label>
+                                <div class="option-label-container">
+                                    <label class="option-label" for="self-narrator-normal">Self Narrator (Normal Scene)</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('self-narrator-normal')">Reset to Default</button>
+                                </div>
                                 <textarea id="self-narrator-normal" class="prompt-textarea" rows="4"></textarea>
                             </div>
 
-                            <!-- Explicit Scene -->
+                            <!-- For explicit-scene -->
                             <div class="option-group">
-                                <label class="option-label" for="explicit-scene">Explicit Dialogue</label>
+                                <div class="option-label-container">
+                                    <label class="option-label" for="explicit-scene">Explicit Scene</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('explicit-scene')">Reset to Default</button>
+                                </div>
                                 <textarea id="explicit-scene" class="prompt-textarea" rows="4"></textarea>
                             </div>
 
-                            <!-- Normal Scene -->
+                            <!-- For normal-scene -->
                             <div class="option-group">
-                                <label class="option-label" for="normal-scene">Normal Dialogue</label>
+                                <div class="option-label-container">
+                                    <label class="option-label" for="normal-scene">Normal Scene</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('normal-scene')">Reset to Default</button>
+                                </div>
                                 <textarea id="normal-scene" class="prompt-textarea" rows="4"></textarea>
                             </div>
                         </div>
@@ -1263,7 +1445,10 @@
 
                             <!-- Context Messages -->
                             <div class="option-group">
-                                <label class="option-label" for="context-messages">Context Messages</label>
+                                <div class="option-label-container">
+                                    <label class="option-label" for="context-messages">Context Messages</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('context-messages')">Reset to Default</button>
+                                </div>
                                 <p>Number of recent messages to include for context</p>
                                 <input type="number" id="context-messages" min="1" max="100">
                             </div>
@@ -1283,11 +1468,22 @@
                                             <button onclick="applySystemTemplate('normal', 'scholar')" class="template-button">Scholar Template</button>
                                             <button onclick="applySystemTemplate('normal', 'thief')" class="template-button">Thief Template</button>
                                         </div>
-                                        <label class="option-label" for="system-prompt">Translation System Prompt</label>
-                                        <textarea id="system-prompt" class="prompt-textarea" rows="4"></textarea>
+                                        <div class="option-group">
+                                            <div class="option-label-container">
+                                                <label class="option-label" for="system-prompt">System Prompt</label>
+                                                <button class="reset-button" onclick="resetOptionToDefault('system-prompt')">Reset to Default</button>
+                                            </div>
+                                            <p>The system prompt used for normal interactions...</p>
+                                            <textarea id="system-prompt" rows="3"></textarea>
+                                        </div>
 
-                                        <label class="option-label" for="roleplay-system-prompt">Roleplay System Prompt</label>
-                                        <textarea id="roleplay-system-prompt" class="prompt-textarea" rows="4"></textarea>
+                                        <div class="option-group">
+                                            <div class="option-label-container">
+                                                <label class="option-label" for="roleplay-system-prompt">Roleplay System Prompt</label>
+                                                <button class="reset-button" onclick="resetOptionToDefault('roleplay-system-prompt')">Reset to Default</button>
+                                            </div>
+                                            <textarea id="roleplay-system-prompt" class="prompt-textarea" rows="4"></textarea>
+                                        </div>
                                     </div>
 
                                     <!-- Combat System Prompts -->
@@ -1299,11 +1495,21 @@
                                             <button onclick="applySystemTemplate('combat', 'scholar')" class="template-button">Scholar Template</button>
                                             <button onclick="applySystemTemplate('combat', 'thief')" class="template-button">Thief Template</button>
                                         </div>
-                                        <label class="option-label" for="system-prompt-combat">Combat Translation System Prompt</label>
-                                        <textarea id="system-prompt-combat" class="prompt-textarea" rows="4"></textarea>
+                                        <div class="option-group">
+                                            <div class="option-label-container">
+                                                <label class="option-label" for="system-prompt-combat">Combat Translation System Prompt</label>
+                                                <button class="reset-button" onclick="resetOptionToDefault('system-prompt-combat')">Reset to Default</button>
+                                            </div>
+                                            <textarea id="system-prompt-combat" class="prompt-textarea" rows="4"></textarea>
+                                        </div>
 
-                                        <label class="option-label" for="roleplay-system-prompt-combat">Combat Roleplay System Prompt</label>
-                                        <textarea id="roleplay-system-prompt-combat" class="prompt-textarea" rows="4"></textarea>
+                                        <div class="option-group">
+                                            <div class="option-label-container">
+                                                <label class="option-label" for="roleplay-system-prompt-combat">Combat Roleplay System Prompt</label>
+                                                <button class="reset-button" onclick="resetOptionToDefault('roleplay-system-prompt-combat')">Reset to Default</button>
+                                            </div>
+                                            <textarea id="roleplay-system-prompt-combat" class="prompt-textarea" rows="4"></textarea>
+                                        </div>
                                     </div>
 
                                     <!-- Intimate System Prompts -->
@@ -1315,11 +1521,21 @@
                                             <button onclick="applySystemTemplate('intimate', 'scholar')" class="template-button">Scholar Template</button>
                                             <button onclick="applySystemTemplate('intimate', 'thief')" class="template-button">Thief Template</button>
                                         </div>
-                                        <label class="option-label" for="system-prompt-explicit">Intimate Translation System Prompt</label>
-                                        <textarea id="system-prompt-explicit" class="prompt-textarea" rows="4"></textarea>
+                                        <div class="option-group">
+                                            <div class="option-label-container">
+                                                <label class="option-label" for="system-prompt-explicit">Intimate Translation System Prompt</label>
+                                                <button class="reset-button" onclick="resetOptionToDefault('system-prompt-explicit')">Reset to Default</button>
+                                            </div>
+                                            <textarea id="system-prompt-explicit" class="prompt-textarea" rows="4"></textarea>
+                                        </div>
 
-                                        <label class="option-label" for="roleplay-system-prompt-explicit">Intimate Roleplay System Prompt</label>
-                                        <textarea id="roleplay-system-prompt-explicit" class="prompt-textarea" rows="4"></textarea>
+                                        <div class="option-group">
+                                            <div class="option-label-container">
+                                                <label class="option-label" for="roleplay-system-prompt-explicit">Intimate Roleplay System Prompt</label>
+                                                <button class="reset-button" onclick="resetOptionToDefault('roleplay-system-prompt-explicit')">Reset to Default</button>
+                                            </div>
+                                            <textarea id="roleplay-system-prompt-explicit" class="prompt-textarea" rows="4"></textarea>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1397,11 +1613,21 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                                             <button onclick="applyTemplate('normal', 'scholar')" class="template-button">Scholar Template</button>
                                             <button onclick="applyTemplate('normal', 'thief')" class="template-button">Thief Template</button>
                                         </div>
-                                        <label class="option-label" for="translation-request">Translation Request Format</label>
-                                        <textarea id="translation-request" class="prompt-textarea" rows="3"></textarea>
+                                        <div class="option-group">
+                                            <div class="option-label-container">
+                                                <label class="option-label" for="translation-request">Translation Request</label>
+                                                <button class="reset-button" onclick="resetOptionToDefault('translation-request')">Reset to Default</button>
+                                            </div>
+                                            <textarea id="translation-request" class="prompt-textarea" rows="4"></textarea>
+                                        </div>
 
-                                        <label class="option-label" for="roleplay-request">Roleplay Request Format</label>
-                                        <textarea id="roleplay-request" class="prompt-textarea" rows="3"></textarea>
+                                        <div class="option-group">
+                                            <div class="option-label-container">
+                                                <label class="option-label" for="roleplay-request">Roleplay Request</label>
+                                                <button class="reset-button" onclick="resetOptionToDefault('roleplay-request')">Reset to Default</button>
+                                            </div>
+                                            <textarea id="roleplay-request" class="prompt-textarea" rows="4"></textarea>
+                                        </div>
                                     </div>
 
                                     <!-- Combat Request Formats -->
@@ -1413,11 +1639,21 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                                             <button onclick="applyTemplate('combat', 'scholar')" class="template-button">Scholar Template</button>
                                             <button onclick="applyTemplate('combat', 'thief')" class="template-button">Thief Template</button>
                                         </div>
-                                        <label class="option-label" for="translation-request-combat">Combat Translation Request</label>
-                                        <textarea id="translation-request-combat" class="prompt-textarea" rows="3"></textarea>
+                                        <div class="option-group">
+                                            <div class="option-label-container">
+                                                <label class="option-label" for="translation-request-combat">Combat Translation Request</label>
+                                                <button class="reset-button" onclick="resetOptionToDefault('translation-request-combat')">Reset to Default</button>
+                                            </div>
+                                            <textarea id="translation-request-combat" class="prompt-textarea" rows="4"></textarea>
+                                        </div>
 
-                                        <label class="option-label" for="roleplay-request-combat">Combat Roleplay Request</label>
-                                        <textarea id="roleplay-request-combat" class="prompt-textarea" rows="3"></textarea>
+                                        <div class="option-group">
+                                            <div class="option-label-container">
+                                                <label class="option-label" for="roleplay-request-combat">Combat Roleplay Request</label>
+                                                <button class="reset-button" onclick="resetOptionToDefault('roleplay-request-combat')">Reset to Default</button>
+                                            </div>
+                                            <textarea id="roleplay-request-combat" class="prompt-textarea" rows="4"></textarea>
+                                        </div>
                                     </div>
 
                                     <!-- Intimate Request Formats -->
@@ -1429,11 +1665,21 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                                             <button onclick="applyTemplate('intimate', 'scholar')" class="template-button">Scholar Template</button>
                                             <button onclick="applyTemplate('intimate', 'thief')" class="template-button">Thief Template</button>
                                         </div>
-                                        <label class="option-label" for="translation-request-explicit">Intimate Translation Request</label>
-                                        <textarea id="translation-request-explicit" class="prompt-textarea" rows="3"></textarea>
+                                        <div class="option-group">
+                                            <div class="option-label-container">
+                                                <label class="option-label" for="translation-request-explicit">Intimate Translation Request</label>
+                                                <button class="reset-button" onclick="resetOptionToDefault('translation-request-explicit')">Reset to Default</button>
+                                            </div>
+                                            <textarea id="translation-request-explicit" class="prompt-textarea" rows="4"></textarea>
+                                        </div>
 
-                                        <label class="option-label" for="roleplay-request-explicit">Intimate Roleplay Request</label>
-                                        <textarea id="roleplay-request-explicit" class="prompt-textarea" rows="3"></textarea>
+                                        <div class="option-group">
+                                            <div class="option-label-container">
+                                                <label class="option-label" for="roleplay-request-explicit">Intimate Roleplay Request</label>
+                                                <button class="reset-button" onclick="resetOptionToDefault('roleplay-request-explicit')">Reset to Default</button>
+                                            </div>
+                                            <textarea id="roleplay-request-explicit" class="prompt-textarea" rows="4"></textarea>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1541,6 +1787,8 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 document.getElementById('self-narrator-normal').value = configData.action_prompts.self_narrator_normal;
                 document.getElementById('explicit-scene').value = configData.action_prompts.explicit_scene;
                 document.getElementById('normal-scene').value = configData.action_prompts.normal_scene;
+                document.getElementById('player-diary').value = configData.action_prompts.player_diary;
+                document.getElementById('follower-diary').value = configData.action_prompts.follower_diary;
 
                 // Load roleplay settings
                 document.getElementById('context-messages').value = configData.roleplay_settings.context_messages;
@@ -1573,6 +1821,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                             <div class="section-header-row">
                                 <div class="drag-handle">⋮⋮</div>
                                 <h4>${key}</h4>
+                                <button class="reset-button" onclick="resetSectionToDefault('${key}')">Reset Section to Default</button>
                             </div>
                             <label>
                                 <input type="checkbox" class="section-enabled" 
@@ -1610,6 +1859,8 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
 
                 document.getElementById('loading-message').style.display = 'none';
                 document.getElementById('config-form').style.display = 'block';
+                
+                await checkModifiedValues(); // Add this line
             } catch (error) {
                 console.error('Error fetching config:', error);
                 showStatus('Failed to load configuration', 'error');
@@ -1643,6 +1894,8 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 voicetype_fallbacks: getVoiceTypeFallbacks(),
                 action_prompts: {
                     singing: document.getElementById('singing-prompt').value,
+                    player_diary: document.getElementById('player-diary').value,
+                    follower_diary: document.getElementById('follower-diary').value,
                     self_narrator_explicit: document.getElementById('self-narrator-explicit').value,
                     self_narrator_normal: document.getElementById('self-narrator-normal').value,
                     explicit_scene: document.getElementById('explicit-scene').value,
@@ -2313,6 +2566,8 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     voicetype_fallbacks: getVoiceTypeFallbacks(),
                     action_prompts: {
                         singing: document.getElementById('singing-prompt').value,
+                        player_diary: document.getElementById('player-diary').value,
+                        follower_diary: document.getElementById('follower-diary').value,
                         self_narrator_explicit: document.getElementById('self-narrator-explicit').value,
                         self_narrator_normal: document.getElementById('self-narrator-normal').value,
                         explicit_scene: document.getElementById('explicit-scene').value,
@@ -2425,6 +2680,8 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                         // Handle action prompts
                         if (importedConfig.action_prompts) {
                             document.getElementById('singing-prompt').value = importedConfig.action_prompts.singing ?? baseConfig.action_prompts.singing;
+                            document.getElementById('player-diary').value = importedConfig.action_prompts.player_diary ?? baseConfig.action_prompts.player_diary;
+                            document.getElementById('follower-diary').value = importedConfig.action_prompts.follower_diary ?? baseConfig.action_prompts.follower_diary;
                             document.getElementById('self-narrator-explicit').value = importedConfig.action_prompts.self_narrator_explicit ?? baseConfig.action_prompts.self_narrator_explicit;
                             document.getElementById('self-narrator-normal').value = importedConfig.action_prompts.self_narrator_normal ?? baseConfig.action_prompts.self_narrator_normal;
                             document.getElementById('explicit-scene').value = importedConfig.action_prompts.explicit_scene ?? baseConfig.action_prompts.explicit_scene;
@@ -2469,6 +2726,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                                                 <div class="section-header-row">
                                                     <div class="drag-handle">⋮⋮</div>
                                                     <h4>${key}</h4>
+                                                    <button class="reset-button" onclick="resetSectionToDefault('${key}')">Reset Section to Default</button>
                                                 </div>
                                                 <label>
                                                     <input type="checkbox" class="section-enabled" 
@@ -2532,6 +2790,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
             hasUnsavedChanges = true;
             document.getElementById('save-button').classList.add('has-changes');
             setupBeforeUnload();
+            checkModifiedValues(); // Add this line
         }
 
         function markAsSaved() {
@@ -2587,6 +2846,336 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 }
             });
         });
+
+        async function resetAllToDefaults() {
+            if (!confirm('Are you sure you want to reset ALL settings to their default values? This cannot be undone.')) {
+                return;
+            }
+
+            try {
+                showStatus('Loading default values...', 'info');
+                
+                const response = await fetch('api/config.php?defaults=true');
+                const defaultConfig = await response.json();
+                
+                if (!defaultConfig || defaultConfig.error) {
+                    throw new Error(defaultConfig.error || 'Failed to load default configuration');
+                }
+
+                // Show changes modal with differences
+                const changes = compareConfigs(await getCurrentConfig(), defaultConfig);
+                
+                showChangesModal(changes, async () => {
+                    await saveConfiguration(defaultConfig);
+                    showStatus('All settings reset to defaults successfully!', 'success');
+                });
+
+            } catch (error) {
+                console.error('Reset error:', error);
+                showStatus('Failed to reset settings: ' + error.message, 'error');
+            }
+        }
+
+        async function resetOptionToDefault(optionId) {
+            try {
+                const response = await fetch('api/config.php?defaults=true');
+                const defaultConfig = await response.json();
+                
+                if (!defaultConfig || defaultConfig.error) {
+                    throw new Error(defaultConfig.error || 'Failed to load default configuration');
+                }
+
+                // Map the optionId to its config key
+                const configKey = optionIdToConfigKey(optionId);
+                if (!configKey) {
+                    throw new Error('No config mapping for: ' + optionId);
+                }
+
+                // Get the default value
+                const defaultValue = getNestedValue(defaultConfig, configKey);
+                if (defaultValue === undefined) {
+                    throw new Error('No default value found for: ' + configKey);
+                }
+
+                // Handle different types of inputs
+                if (optionId === 'commands-to-purge' || optionId === 'events-to-ignore') {
+                    const container = document.getElementById(`${optionId}-container`);
+                    container.innerHTML = ''; // Clear existing entries
+                    defaultValue.forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'dynamic-list-entry';
+                        div.innerHTML = `
+                            <input type="text" value="${item}">
+                            <button onclick="removeListItem(this)">Remove</button>
+                        `;
+                        container.appendChild(div);
+                    });
+                } else if (optionId === 'voicetype-fallbacks') {
+                    const container = document.getElementById('voicetype-container');
+                    container.innerHTML = ''; // Clear existing entries
+                    Object.entries(defaultValue).forEach(([voiceType, fallback]) => {
+                        const div = document.createElement('div');
+                        div.className = 'voicetype-entry';
+                        div.innerHTML = `
+                            <input type="text" value="${voiceType}" placeholder="VoiceType">
+                            <input type="text" value="${fallback}" placeholder="Fallback">
+                            <button onclick="removeVoiceTypeEntry(this)">Remove</button>
+                        `;
+                        container.appendChild(div);
+                    });
+                } else {
+                    // Handle regular inputs
+                    const element = document.getElementById(optionId);
+                    if (!element) {
+                        throw new Error('Element not found: ' + optionId);
+                    }
+                    
+                    if (element.type === 'checkbox') {
+                        element.checked = defaultValue;
+                    } else if (element.tagName === 'TEXTAREA' || element.type === 'text' || element.type === 'number') {
+                        element.value = defaultValue;
+                    }
+                }
+
+                markAsChanged();
+                showStatus(`Reset ${optionId} to default value`, 'success');
+                await checkModifiedValues(); // Add this line
+
+            } catch (error) {
+                console.error('Reset option error:', error);
+                showStatus('Failed to reset option: ' + error.message, 'error');
+            }
+        }
+
+        function optionIdToConfigKey(optionId) {
+            const mapping = {
+                // Basic settings
+                'prompt-head-override': 'PROMPT_HEAD_OVERRIDE',
+                'use-narrator-profile': 'use_narrator_profile',
+                'enforce-short-responses': 'enforce_short_responses',
+                'stop-narrator-context-leak': 'stop_narrator_context_leak',
+                'eldritch-voice': 'devious_narrator_eldritch_voice',
+                'telvanni-voice': 'devious_narrator_telvanni_voice',
+                'force-voice-type': 'force_voice_type',
+                'self-narrator': 'self_narrator',
+                'disable-nsfw': 'disable_nsfw',
+                'restrict-nonfollower-functions': 'restrict_nonfollower_functions',
+                'always-enable-functions': 'always_enable_functions',
+                'force-aiff-name': 'force_aiff_name_to_ingame_name',
+                'use-llm-fallback': 'use_llm_fallback',
+                'enforce-single-json': 'enforce_single_json',
+                'disable-worn-equipment': 'disable_worn_equipment',
+                'strip-emotes': 'strip_emotes_from_output',
+                'use-defeat': 'use_defeat',
+                'realnames-support': 'realnames_support',
+                'input-delay': 'input_delay_for_radiance',
+                'voicetype-fallbacks': 'voicetype_fallbacks',
+                'commands-to-purge': 'commands_to_purge',
+                'events-to-ignore': 'events_to_ignore',
+
+                // Action prompts
+                'singing-prompt': 'action_prompts.singing',
+                'player-diary': 'action_prompts.player_diary',
+                'follower-diary': 'action_prompts.follower_diary',
+                'self-narrator-explicit': 'action_prompts.self_narrator_explicit',
+                'self-narrator-normal': 'action_prompts.self_narrator_normal',
+                'explicit-scene': 'action_prompts.explicit_scene',
+                'normal-scene': 'action_prompts.normal_scene',
+
+                // Roleplay settings
+                'context-messages': 'roleplay_settings.context_messages',
+                'system-prompt': 'roleplay_settings.system_prompt',
+                'system-prompt-explicit': 'roleplay_settings.system_prompt_explicit',
+                'system-prompt-combat': 'roleplay_settings.system_prompt_combat',
+                'roleplay-system-prompt': 'roleplay_settings.roleplay_system_prompt',
+                'roleplay-system-prompt-explicit': 'roleplay_settings.roleplay_system_prompt_explicit',
+                'roleplay-system-prompt-combat': 'roleplay_settings.roleplay_system_prompt_combat',
+                'translation-request': 'roleplay_settings.translation_request',
+                'translation-request-explicit': 'roleplay_settings.translation_request_explicit',
+                'translation-request-combat': 'roleplay_settings.translation_request_combat',
+                'roleplay-request': 'roleplay_settings.roleplay_request',
+                'roleplay-request-explicit': 'roleplay_settings.roleplay_request_explicit',
+                'roleplay-request-combat': 'roleplay_settings.roleplay_request_combat',
+
+                // Section configurations
+                'roleplay_settings.sections.CHARACTER_BACKGROUND': 'roleplay_settings.sections.CHARACTER_BACKGROUND',
+                'roleplay_settings.sections.CHARACTER_STATUS': 'roleplay_settings.sections.CHARACTER_STATUS',
+                'roleplay_settings.sections.NEARBY_ENTITIES': 'roleplay_settings.sections.NEARBY_ENTITIES',
+                'roleplay_settings.sections.RECENT_EVENTS': 'roleplay_settings.sections.RECENT_EVENTS',
+                'roleplay_settings.sections.INSTRUCTIONS': 'roleplay_settings.sections.INSTRUCTIONS'
+            };
+            return mapping[optionId];
+        }
+
+        function getNestedValue(obj, path) {
+            const parts = path.split('.');
+            let value = obj;
+            for (const part of parts) {
+                if (value === undefined) return undefined;
+                value = value[part];
+            }
+            return value;
+        }
+
+        async function getCurrentConfig() {
+            const response = await fetch('api/config.php');
+            return await response.json();
+        }
+
+        async function resetSectionToDefault(sectionKey) {
+            try {
+                const response = await fetch('api/config.php?defaults=true');
+                const defaultConfig = await response.json();
+                
+                if (!defaultConfig || defaultConfig.error) {
+                    throw new Error(defaultConfig.error || 'Failed to load default configuration');
+                }
+
+                const defaultSection = defaultConfig.roleplay_settings.sections[sectionKey];
+                if (!defaultSection) {
+                    throw new Error('No default section found for: ' + sectionKey);
+                }
+
+                // Update all fields for this section
+                const sectionElement = document.querySelector(`[data-section="${sectionKey}"]`).closest('.section-entry');
+                sectionElement.querySelector('.section-enabled').checked = defaultSection.enabled;
+                sectionElement.querySelector('.section-header').value = defaultSection.header;
+                sectionElement.querySelector('.section-content').value = defaultSection.content;
+
+                markAsChanged();
+                showStatus(`Reset section ${sectionKey} to default values`, 'success');
+
+            } catch (error) {
+                console.error('Reset section error:', error);
+                showStatus('Failed to reset section: ' + error.message, 'error');
+            }
+        }
+
+        function resetSectionFieldToDefault(sectionKey, field) {
+            try {
+                const configKey = `roleplay_settings.sections.${sectionKey}.${field}`;
+                resetOptionToDefault(configKey);
+            } catch (error) {
+                console.error('Reset section field error:', error);
+                showStatus('Failed to reset section field: ' + error.message, 'error');
+            }
+        }
+
+        async function checkModifiedValues() {
+            try {
+                const response = await fetch('api/config.php?defaults=true');
+                const defaultConfig = await response.json();
+                
+                if (!defaultConfig || defaultConfig.error) {
+                    throw new Error(defaultConfig.error || 'Failed to load default configuration');
+                }
+
+                // Get the mapping object directly
+                const configMapping = {
+                    // Basic settings
+                    'prompt-head-override': 'PROMPT_HEAD_OVERRIDE',
+                    'use-narrator-profile': 'use_narrator_profile',
+                    'enforce-short-responses': 'enforce_short_responses',
+                    'stop-narrator-context-leak': 'stop_narrator_context_leak',
+                    'eldritch-voice': 'devious_narrator_eldritch_voice',
+                    'telvanni-voice': 'devious_narrator_telvanni_voice',
+                    'force-voice-type': 'force_voice_type',
+                    'self-narrator': 'self_narrator',
+                    'disable-nsfw': 'disable_nsfw',
+                    'restrict-nonfollower-functions': 'restrict_nonfollower_functions',
+                    'always-enable-functions': 'always_enable_functions',
+                    'force-aiff-name': 'force_aiff_name_to_ingame_name',
+                    'use-llm-fallback': 'use_llm_fallback',
+                    'enforce-single-json': 'enforce_single_json',
+                    'disable-worn-equipment': 'disable_worn_equipment',
+                    'strip-emotes': 'strip_emotes_from_output',
+                    'use-defeat': 'use_defeat',
+                    'realnames-support': 'realnames_support',
+                    'input-delay': 'input_delay_for_radiance',
+                    'voicetype-fallbacks': 'voicetype_fallbacks',
+                    'commands-to-purge': 'commands_to_purge',
+                    'events-to-ignore': 'events_to_ignore',
+
+                    // Action prompts
+                    'singing-prompt': 'action_prompts.singing',
+                    'player-diary': 'action_prompts.player_diary',
+                    'follower-diary': 'action_prompts.follower_diary',
+                    'self-narrator-explicit': 'action_prompts.self_narrator_explicit',
+                    'self-narrator-normal': 'action_prompts.self_narrator_normal',
+                    'explicit-scene': 'action_prompts.explicit_scene',
+                    'normal-scene': 'action_prompts.normal_scene',
+
+                    // Roleplay settings
+                    'context-messages': 'roleplay_settings.context_messages',
+                    'system-prompt': 'roleplay_settings.system_prompt',
+                    'system-prompt-explicit': 'roleplay_settings.system_prompt_explicit',
+                    'system-prompt-combat': 'roleplay_settings.system_prompt_combat',
+                    'roleplay-system-prompt': 'roleplay_settings.roleplay_system_prompt',
+                    'roleplay-system-prompt-explicit': 'roleplay_settings.roleplay_system_prompt_explicit',
+                    'roleplay-system-prompt-combat': 'roleplay_settings.roleplay_system_prompt_combat',
+                    'translation-request': 'roleplay_settings.translation_request',
+                    'translation-request-explicit': 'roleplay_settings.translation_request_explicit',
+                    'translation-request-combat': 'roleplay_settings.translation_request_combat',
+                    'roleplay-request': 'roleplay_settings.roleplay_request',
+                    'roleplay-request-explicit': 'roleplay_settings.roleplay_request_explicit',
+                    'roleplay-request-combat': 'roleplay_settings.roleplay_request_combat'
+                };
+
+                // Check each input against its default value
+                Object.keys(configMapping).forEach(optionId => {
+                    const configKey = configMapping[optionId];
+                    const defaultValue = getNestedValue(defaultConfig, configKey);
+                    const container = document.querySelector(`[for="${optionId}"]`)?.closest('.option-label-container');
+                    
+                    if (!container) return;
+
+                    if (optionId === 'commands-to-purge' || optionId === 'events-to-ignore') {
+                        const currentValues = getDynamicList(`${optionId}-container`);
+                        const isModified = JSON.stringify(currentValues) !== JSON.stringify(defaultValue);
+                        container.classList.toggle('modified', isModified);
+                    } 
+                    else if (optionId === 'voicetype-fallbacks') {
+                        const currentValues = getVoiceTypeFallbacks();
+                        const isModified = JSON.stringify(currentValues) !== JSON.stringify(defaultValue);
+                        container.classList.toggle('modified', isModified);
+                    }
+                    else {
+                        const element = document.getElementById(optionId);
+                        if (!element) return;
+
+                        let isModified;
+                        if (element.type === 'checkbox') {
+                            isModified = element.checked !== defaultValue;
+                        } else {
+                            isModified = element.value !== defaultValue;
+                        }
+                        container.classList.toggle('modified', isModified);
+                    }
+                });
+
+                // Check sections
+                Object.keys(defaultConfig.roleplay_settings.sections).forEach(sectionKey => {
+                    const defaultSection = defaultConfig.roleplay_settings.sections[sectionKey];
+                    const sectionElement = document.querySelector(`[data-section="${sectionKey}"]`)?.closest('.section-entry');
+                    if (!sectionElement) return;
+
+                    const headerRow = sectionElement.querySelector('.section-header-row');
+                    const currentEnabled = sectionElement.querySelector('.section-enabled').checked;
+                    const currentHeader = sectionElement.querySelector('.section-header').value;
+                    const currentContent = sectionElement.querySelector('.section-content').value;
+
+                    const isModified = 
+                        currentEnabled !== defaultSection.enabled ||
+                        currentHeader !== defaultSection.header ||
+                        currentContent !== defaultSection.content;
+
+                    headerRow.classList.toggle('modified', isModified);
+                });
+
+            } catch (error) {
+                console.error('Error checking modified values:', error);
+            }
+        }
     </script>
 
 </body>

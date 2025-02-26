@@ -19,6 +19,7 @@ minai_SexOstim ostim
 minai_SexSexlab sexlab
 minai_SexUtil sexUtil
 minai_Util MinaiUtil
+minai_FillHerUp fillHerUp
 
 float lastSexTalk
 
@@ -141,12 +142,27 @@ Function Maintenance(minai_MainQuestController _main)
 
   aiff.RegisterAction("ExtCmdFollow", "FollowTarget", "Start Following Player", "General", 1, 0, 2, 5, 300, true)
   aiff.RegisterAction("ExtCmdStopFollowing", "StopFollowing", "Stop Following Player", "General", 1, 0, 2, 5, 300, true)
+
+  fillHerUp = (Self as Quest) as minai_FillHerUp
+  fillHerUp.Maintenance(main)
+EndFunction
+
+Function SetContext(actor akTarget)
+  if !aiff
+    return
+  EndIf
+  
+  ; Add Fill Her Up context
+  fillHerUp.SetContext(akTarget)
 EndFunction
 
 ; Event onUpdate()
 ; EndEvent
 
 bool Function CanAnimate(actor akTarget)
+  if(!bHasSexlab && !bHasOstim)
+    return true
+  endif
   return sexUtil.CanAnimate(akTarget, useOstim() && !OActor.IsInOStim(akTarget))
 EndFunction
 
@@ -226,36 +242,38 @@ Function ProcessActorsAndStartScenes(Actor[] actors)
     i += 1
   endwhile
 
-  MinaiUtil.Debug("Try to form orgy with: "+JArray.count(jMalesArr)+" males and "+JArray.count(jFemalesArr)+" females")
+  MinaiUtil.Debug("Attempting to form orgy with: "+JArray.count(jMalesArr)+" males and "+JArray.count(jFemalesArr)+" females")
 
   string framework = "sexlab"
   if(useOstim())
     framework = "ostim"
   endif
 
-  while((JArray.count(jMalesArr) > 0 || JArray.count(jFemalesArr) > 0) && countThreads < config.maxThreads)
-    MinaiUtil.Debug("Currently running threads: "+countThreads)
+  int count2 = 0
+  while((JArray.count(jMalesArr) > 0 || JArray.count(jFemalesArr) > 0) && countThreads < config.maxThreads && count2 < 30)
+    count2 += 1
+    MinaiUtil.Debug("Currently running orgy threads: "+countThreads)
     int groupSize = Utility.RandomInt(3, 5)
-    MinaiUtil.Debug("Try to form group with size "+groupSize)
     int remainingActors = JArray.count(jMalesArr) + JArray.count(jFemalesArr)
-    if (remainingActors <= 8) 
-      
-      groupSize = remainingActors - 3
-      MinaiUtil.Debug("There are less than 8 actors change group size to "+groupSize)
-    endif
-
-    if(remainingActors <= 5) 
-      MinaiUtil.Debug("There are less than 5 actors change group size to "+groupSize)
+    if(remainingActors <= 5)
       groupSize = remainingActors
+      MinaiUtil.Debug("There are " + remainingActors + " actors remaining to process, this is the final orgy group")
+    elseif (remainingActors <= 8)
+      groupSize = remainingActors - 3
+      MinaiUtil.Debug("There are less than 9 actors, change orgy group size to "+groupSize)
+    else
+      MinaiUtil.Debug("Attempt to form orgy group with size "+groupSize)
     endif
 
     actor[] group = sexUtil.BuildGroup(groupSize, jMalesArr, jFemalesArr)
 
     ; if user has not valid animations for selected set of actors try to downsize and build group again
-    while(!sexUtil.CheckGroup(group, framework) && groupSize > 2)
+    int count3 = 0
+    while(!sexUtil.CheckGroup(group, framework) && groupSize > 2 && count3 < 30)
+      count3 += 1
       ; try to downsize group and build it again
       groupSize -= 1
-      MinaiUtil.Debug("User doesn't have animations for this group, try to downsize to "+groupSize)
+      MinaiUtil.Debug("No animations available for this orgy group, downsize to "+groupSize+" and retry")
       ; add actors from group back to gender specific arrays
       int j = 0
       while(j < group.length)
@@ -273,10 +291,10 @@ Function ProcessActorsAndStartScenes(Actor[] actors)
 
     ; if group exists and it contains actors and user has animations for this group -> then start thread
     if(group && group.Length > 0 && sexUtil.CheckGroup(group, framework))
-      MinaiUtil.Debug("Group of "+groupSize+" was formed and initiated scene")
+      MinaiUtil.Debug("Group of "+groupSize+" was successfully formed and initiating scene")
       StartSexOrSwitchToGroup(group, group[0])
       countThreads += 1
-      Utility.Wait(3.0)
+      Utility.Wait(3.5)
     endif
   endwhile
 EndFunction
@@ -557,6 +575,10 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     while iIndex < iElement
       if devious.HasDD() && equippedItems[iIndex].HasKeyword(devious.libs.zad_Lockable)
         Main.Debug("Not removing " + equippedItems[iIndex] + " - Lockable DD")
+      elseif equippedItems[iIndex].HasKeywordString("OStimNoStrip") || equippedItems[iIndex].HasKeywordString("SexLabNoStrip") ; skip removing any item tagged with OStimNoStrip or SexLabNoStrip
+        Main.Debug("Not removing " + equippedItems[iIndex].GetName() + " - OStimNoStrip or SexLabNoStrip")
+      elseif (equippedItems[iIndex] as Armor) != None && ((equippedItems[iIndex] as Armor).GetSlotMask() == 2 || (equippedItems[iIndex] as Armor).GetSlotMask() == 2050) ; skip removing hair items
+        Main.Debug("Not removing " + equippedItems[iIndex].GetName() + " - Wig")
       else
         Main.Debug("Removing " + equippedItems[iIndex].GetName())
         JArray.AddForm(equippedArmor, equippedItems[iIndex])

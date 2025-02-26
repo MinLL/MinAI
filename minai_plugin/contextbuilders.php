@@ -8,6 +8,7 @@ require_once("weather.php");
 require_once("reputation.php");
 require_once("submissivelola.php");
 require_once("dirtandblood.php");
+require_once("exposure.php");
 require_once("fertilitymode.php");
 
 Function BuildContext($name) {
@@ -28,6 +29,14 @@ Function BuildContext($name) {
       $context .= GetSubmissiveLolaContext($name);
   }
   $context .= GetSurvivalContext($name);
+
+  // Add mind influence context for the narrator only
+  if ($name == "The Narrator") {
+      $mindState = GetMindInfluenceState($name);
+      if ($mindState != "normal") {
+          $context .= GetMindInfluenceContext($mindState) . "\n";
+      }
+  }
 
   return $context;
 }
@@ -114,35 +123,21 @@ Function GetPhysicalDescription($name) {
 }
 
 Function GetPenisSize($name) {
+    $tngsize = GetActorValue($name, "tngsize");
     $sizeDescription = "";
-    if (HasKeyword($name, "TNG_ActorAddnAuto:05")) {
+    if (HasKeyword($name, "TNG_XL") || ($tngsize == 4)) {
         $sizeDescription = "one of the biggest cocks you've ever seen";
     }
-    elseif(HasKeyword($name, "TNG_ActorAddnAuto:04")) {
+    elseif(HasKeyword($name, "TNG_L") || ($tngsize == 3)) {
         $sizeDescription = "a large cock";
     }
-    elseif (HasKeyword($name, "TNG_ActorAddnAuto:03")) {
+    elseif (HasKeyword($name, "TNG_M") || HasKeyword($name, "TNG_DefaultSize") || ($tngsize == 2)) {
         $sizeDescription = "an average sized cock";
     }
-    elseif (HasKeyword($name, "TNG_ActorAddnAuto:02")) {
+    elseif (HasKeyword($name, "TNG_S") || ($tngsize == 1)) {
         $sizeDescription = "a very small cock";
     }        
-    elseif (HasKeyword($name, "TNG_ActorAddnAuto:01")) {
-        $sizeDescription = "an embarrassingly tiny prick";
-    }
-    elseif (HasKeyword($name, "TNG_XL")) {
-        $sizeDescription = "one of the biggest cocks you've ever seen";
-    }
-    elseif(HasKeyword($name, "TNG_L")) {
-        $sizeDescription = "a large cock";
-    }
-    elseif (HasKeyword($name, "TNG_M") || HasKeyword($name, "TNG_DefaultSize")) {
-        $sizeDescription = "an average sized cock";
-    }
-    elseif (HasKeyword($name, "TNG_S")) {
-        $sizeDescription = "a very small cock";
-    }        
-    elseif (HasKeyword($name, "TNG_XS")) {
+    elseif (HasKeyword($name, "TNG_XS") || ($tngsize == 0)) {
         $sizeDescription = "an embarrassingly tiny prick";
     }
     if ($sizeDescription != "") {
@@ -163,7 +158,7 @@ Function HasKeywordAndNotSkip($name, $eqContext, $keyword) {
   return HasKeyword($name, $keyword) && !IsSkipKeyword($keyword, $eqContext["skipKeywords"]);
 }
 
-Function GetClothingContext($name) {
+Function GetClothingContext($name, $forceNarrator = false) {
   $cuirass = GetActorValue($name, "cuirass", false, true);
   $ret = "";
   
@@ -172,7 +167,7 @@ Function GetClothingContext($name) {
   $tmp = GetRevealedStatus($name);
   $wearingBottom = $tmp["wearingBottom"];
   $wearingTop = $tmp["wearingTop"];
-  $isNarrator = ($GLOBALS["HERIKA_NAME"]  == "The Narrator");
+  $isNarrator = $forceNarrator || ($GLOBALS["HERIKA_NAME"] == "The Narrator");
   
   // if $eqContext["context"] not empty, then will set ret
   if (!empty($eqContext["context"])) {
@@ -232,7 +227,7 @@ Function GetClothingContext($name) {
       $ret .= "{$concealedPrefix}{$name} is wearing very revealing attire, leaving them half naked.\n";
     }
     if (HasKeywordAndNotSkip($name, $eqContext, "EroticArmor")) {
-      $ret .= "{$concealedPrefix}{$name} is wearing a sexy revealing outfit.\n";
+      // $ret .= "{$concealedPrefix}{$name} is wearing a sexy revealing outfit.\n";
     }
     if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorSpendex")) {
       $ret .= "{$concealedPrefix}{$name}'s outfit is made out of latex (Referred to as Ebonite).\n";
@@ -282,12 +277,12 @@ Function GetClothingContext($name) {
 }
 
 
-Function GetDDContext($name) {
+Function GetDDContext($name, $forceNarrator = false) {
   $ret = "";
   $tmp = GetRevealedStatus($name);
   $wearingBottom = $tmp["wearingBottom"];
   $wearingTop = $tmp["wearingTop"];
-  $isNarrator = ($GLOBALS["HERIKA_NAME"] == "The Narrator");
+  $isNarrator = $forceNarrator || ($GLOBALS["HERIKA_NAME"] == "The Narrator");
   $cuirass = GetActorValue($name, "cuirass", false, true);
   $concealedPrefix = !empty($cuirass) ? "Concealed by {$cuirass}, " : "";
 

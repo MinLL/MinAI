@@ -1,0 +1,1739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diary Viewer</title>
+    <style>
+        /* Import existing theme variables */
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2196F3;
+            --background-dark: #1a1a1a;
+            --background-light: #2d2d2d;
+            --text-color: #e0e0e0;
+            --border-color: #404040;
+            --success-color: #40c057;
+            --error-color: #f44336;
+            --warning-color: #ffc107;
+            --info-color: #4dabf7;
+            --parchment: #d4c5a9;
+            --ink-color: #2b1810;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--background-dark);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            background: radial-gradient(circle at center, var(--background-light) 0%, var(--background-dark) 100%);
+            min-height: 100vh;
+        }
+
+        .diary-container {
+            max-width: 95%;
+            margin: 40px auto;
+            padding: 30px;
+            background: var(--background-dark);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .navigation-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: var(--background-light);
+            border-radius: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            min-width: auto;
+            flex: 0 1 auto;
+        }
+
+        .nav-group.search {
+            flex: 1 1 300px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-group.search input {
+            min-width: 120px;
+            flex: 1;
+        }
+
+        .view-toggle, .column-controls {
+            display: flex;
+            gap: 4px;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            white-space: nowrap;
+            margin: 0;
+        }
+
+        .view-toggle button, 
+        .column-btn, 
+        .pagination button {
+            min-width: 36px;
+            height: 36px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .current-page {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .page-count {
+            color: var(--text-color);
+            opacity: 0.7;
+            font-size: 0.9em;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 768px) {
+            .navigation-controls {
+                gap: 8px;
+                padding: 8px;
+            }
+            
+            .nav-group.search {
+                flex-basis: 100%;
+            }
+        }
+
+        .diary-page {
+            background: var(--background-light);
+            padding: 30px;
+            border-radius: 8px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            min-height: 300px;
+        }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: var(--background-light);
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .entry-character {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .entry-location {
+            font-style: italic;
+            opacity: 0.8;
+        }
+
+        .entry-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 15px;
+            line-height: 1.8;
+        }
+
+        .entry-content p {
+            margin: 0 0 1.5em 0;
+            text-align: justify;
+            hyphens: auto;
+        }
+
+        .entry-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Add some visual separation between entries in multi-column layout */
+        .grid-item {
+            background: var(--background-dark);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        /* Improve readability with better contrast */
+        .entry-content {
+            color: var(--text-color);
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .entry-metadata {
+            font-size: 0.9rem;
+            color: #888;
+            border-top: 1px solid var(--border-color);
+            padding-top: 10px;
+            margin-top: 20px;
+        }
+
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .tag {
+            background: var(--background-dark);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .navigation {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-top: 20px;
+            justify-content: space-between;
+            padding: 10px;
+            background: var(--background-light);
+            border-radius: 8px;
+        }
+
+        .navigation button {
+            background: var(--background-dark);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            min-width: 100px;
+        }
+
+        .navigation button:hover:not(:disabled) {
+            background: var(--primary-color);
+        }
+
+        .navigation button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .current-date {
+            font-size: 1.1rem;
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .character-select {
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .navigation-bar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--background-light);
+            margin-bottom: 30px;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .empty-page {
+            flex: 1;
+            height: 100%;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        .diary-content {
+            margin-top: 30px;
+        }
+
+        .book-view {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #entries-container {
+            flex: 1;
+        }
+
+        @media (max-width: 1200px) {
+            .entries-grid-multi {
+                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .entries-grid-multi {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        #column-select {
+            display: none;
+        }
+
+        .column-buttons {
+            display: flex;
+            gap: 5px;
+            margin-left: 10px;
+        }
+
+        .search-match {
+            background-color: rgba(255, 255, 0, 0.1);
+        }
+
+        .calendar-day.search-match {
+            border: 2px solid var(--primary-color);
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .calendar-entry.search-match {
+            background: rgba(76, 175, 80, 0.2);
+        }
+
+        .calendar-day.highlight {
+            border: 1px solid var(--border-color);
+        }
+
+        .current-page {
+            margin: 0 10px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .diary-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .date-section {
+            background: var(--background-dark);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .navigation-bar .current-page {
+            font-size: 1.2em;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        #month-select {
+            background: var(--background-dark);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        #month-select:hover {
+            border-color: var(--primary-color);
+        }
+
+        .month-navigation button {
+            background: var(--background-dark);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .month-navigation button:hover:not(:disabled) {
+            background: var(--background-light);
+            border-color: var(--primary-color);
+        }
+
+        .month-navigation button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Base button and input styles */
+        .view-toggle button, 
+        .column-btn, 
+        .pagination button,
+        .month-navigation button,
+        input[type="text"],
+        select {
+            background: var(--background-dark);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        /* Button specific styles */
+        .view-toggle button, 
+        .column-btn, 
+        .pagination button,
+        .month-navigation button {
+            min-width: 36px;
+            height: 36px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* Button hover and active states */
+        .view-toggle button:hover, 
+        .column-btn:hover,
+        .pagination button:hover:not(:disabled),
+        .month-navigation button:hover:not(:disabled),
+        input[type="text"]:hover,
+        select:hover {
+            border-color: var(--primary-color);
+            background: var(--background-light);
+        }
+
+        .view-toggle button.active,
+        .column-btn.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        /* Calendar styles */
+        .calendar-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .calendar-month-select {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+        }
+
+        .calendar-day-name {
+            font-weight: bold;
+            text-align: center;
+            padding: 10px;
+            background: var(--background-light);
+            border-radius: 4px;
+        }
+
+        .calendar-day {
+            background: var(--background-dark);
+            padding: 15px;
+            border-radius: 6px;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .calendar-day.highlight {
+            border: 1px solid var(--border-color);
+        }
+
+        .calendar-day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        .calendar-entries {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            overflow-y: auto;
+            max-height: 200px;
+        }
+
+        .calendar-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+            padding: 3px 8px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+        }
+
+        .entry-count {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 0 6px;
+            font-size: 0.8em;
+            min-width: 18px;
+            text-align: center;
+            margin-left: 8px;
+        }
+
+        .calendar-entry:hover {
+            background: var(--primary-color);
+        }
+
+        .calendar-entry:hover .entry-count {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        /* Responsive calendar */
+        @media (max-width: 1200px) {
+            .calendar-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .calendar-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .calendar-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Search highlighting */
+        .search-highlight {
+            background-color: rgba(255, 255, 0, 0.2);
+            border-radius: 3px;
+            padding: 0 2px;
+            transition: all 0.2s ease;
+        }
+
+        /* Character name highlighting */
+        .character-name {
+            font-weight: 500;
+            transition: all 0.2s ease;
+            cursor: help;
+        }
+
+        .character-name:hover {
+            filter: brightness(1.2);
+        }
+
+        /* Transition for highlights */
+        .search-highlight:hover {
+            background-color: rgba(255, 255, 0, 0.3);
+        }
+
+        /* Markdown styles */
+        .entry-content strong {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .entry-content em {
+            font-style: italic;
+            color: var(--text-color);
+        }
+
+        .entry-content del {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .entry-content blockquote {
+            border-left: 3px solid var(--primary-color);
+            margin: 1em 0;
+            padding: 0.5em 0 0.5em 1em;
+            background: rgba(255, 255, 255, 0.05);
+            font-style: italic;
+        }
+
+        .entry-content hr {
+            border: none;
+            border-top: 1px solid var(--border-color);
+            margin: 1.5em 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="diary-container">
+        <div class="navigation-controls">
+            <div class="nav-group">
+                <div class="view-toggle">
+                    <button id="diary-view-btn" class="active" onclick="switchView('diary')">📖</button>
+                    <button id="calendar-view-btn" onclick="switchView('calendar')">📅</button>
+                </div>
+                <div class="column-controls">
+                    <button class="column-btn" data-columns="1">1</button>
+                    <button class="column-btn" data-columns="2">2</button>
+                    <button class="column-btn" data-columns="3">3</button>
+                    <button class="column-btn" data-columns="4">4</button>
+                </div>
+            </div>
+            <div class="nav-group search">
+                <input type="text" id="search-text" placeholder="Search diary entries...">
+                <input type="text" id="search-location" placeholder="Filter by location...">
+            </div>
+            <div class="nav-group">
+                <div class="navigation-bar"></div>
+            </div>
+        </div>
+
+        <div class="diary-page">
+            <div id="entries-container"></div>
+            <div id="calendar-container" style="display: none;">
+                <div class="calendar-header">
+                    <div class="calendar-month-select">
+                        <button id="prev-month">‹</button>
+                        <select id="month-select"></select>
+                        <button id="next-month">›</button>
+                    </div>
+                </div>
+                <div class="calendar-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <script>
+        // Constants
+        const ENTRIES_PER_PAGE = 2;
+        const SKYRIM_DAYS = ['Sundas', 'Morndas', 'Tirdas', 'Middas', 'Turdas', 'Fredas', 'Loredas'];
+        const SKYRIM_MONTHS = [
+            'Morning Star', 'Sun\'s Dawn', 'First Seed', 'Rain\'s Hand', 
+            'Second Seed', 'Mid Year', 'Sun\'s Height', 'Last Seed',
+            'Heartfire', 'Frostfall', 'Sun\'s Dusk', 'Evening Star'
+        ];
+
+        // Add these constants at the top with other constants
+        const MONTH_DAYS = {
+            'Morning Star': 31,
+            'Sun\'s Dawn': 28,
+            'First Seed': 31,
+            'Rain\'s Hand': 30,
+            'Second Seed': 31,
+            'Midyear': 30,
+            'Sun\'s Height': 31,
+            'Last Seed': 31,
+            'Heartfire': 30,
+            'Frostfall': 31,
+            'Sun\'s Dusk': 30,
+            'Evening Star': 31
+        };
+
+        // Known date: 17th of Last Seed, 4E 201 is Sundas
+        const LAST_SEED_17_OFFSET = 0; // Sundas is index 0 in our days array
+
+        // Global state
+        let allEntries = [];
+        let currentDate = null;
+        let currentPage = 0;
+        let selectedCharacter = '';
+        let currentView = 'diary';
+        let allCharacterNames = new Set();
+        let playerName = '';
+        const SPECIAL_NAMES = new Set(['The Narrator']); // Will add player name to this
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Create dynamic navigation bar
+            const navBar = document.querySelector('.navigation-bar');
+            
+            // Set up event listeners
+            document.getElementById('diary-view-btn').addEventListener('click', () => switchView('diary'));
+            document.getElementById('calendar-view-btn').addEventListener('click', () => switchView('calendar'));
+            
+            // Set up search listeners without view switching
+            document.getElementById('search-text').addEventListener('input', debounce(() => {
+                updateDisplay();
+            }, 300));
+            
+            document.getElementById('search-location').addEventListener('input', debounce(() => {
+                updateDisplay();
+            }, 300));
+            
+            // Set up column buttons
+            document.querySelectorAll('.column-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.column-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    currentPage = 0; // Reset to first page when changing layout
+                    updateDisplay();
+                });
+            });
+            
+            // Set default column layout
+            document.querySelector('[data-columns="2"]').classList.add('active');
+            
+            await loadEntries();
+        });
+
+        function setupEventListeners() {
+            // View toggle
+            document.getElementById('diary-view-btn').addEventListener('click', () => switchView('diary'));
+            document.getElementById('calendar-view-btn').addEventListener('click', () => switchView('calendar'));
+            
+            // Navigation
+            document.getElementById('first-page').addEventListener('click', () => goToPage('first'));
+            document.getElementById('last-page').addEventListener('click', () => goToPage('last'));
+            document.getElementById('prev-page').addEventListener('click', () => goToPage('prev'));
+            document.getElementById('next-page').addEventListener('click', () => goToPage('next'));
+            
+            // Search and filters
+            document.getElementById('search-text').addEventListener('input', debounce(updateDisplay, 300));
+            document.getElementById('search-location').addEventListener('input', debounce(updateDisplay, 300));
+
+            // Keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft') {
+                    goToPage('prev');
+                } else if (e.key === 'ArrowRight') {
+                    goToPage('next');
+                }
+            });
+        }
+
+        function switchView(view) {
+            currentView = view;
+            
+            // Update button states
+            document.getElementById('diary-view-btn').classList.toggle('active', view === 'diary');
+            document.getElementById('calendar-view-btn').classList.toggle('active', view === 'calendar');
+
+            // Show/hide appropriate containers
+            document.getElementById('entries-container').style.display = view === 'diary' ? 'block' : 'none';
+            document.getElementById('calendar-container').style.display = view === 'calendar' ? 'block' : 'none';
+
+            // Update display
+            if (view === 'calendar') {
+                displayCalendar();
+            } else {
+                updateDisplay();
+            }
+        }
+
+        async function loadEntries() {
+            const loadingOverlay = document.querySelector('.loading-overlay');
+            loadingOverlay.style.display = 'flex';
+
+            try {
+                const response = await fetch('api/diary.php');
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    allEntries = data.entries;
+                    playerName = data.playerName;
+                    
+                    // Initialize special names first
+                    SPECIAL_NAMES.clear(); // Clear existing
+                    SPECIAL_NAMES.add('The Narrator');
+                    if (playerName) {
+                        SPECIAL_NAMES.add(playerName);
+                    }
+                    
+                    // Initialize character names after setting special names
+                    initializeCharacterNames();
+                    
+                    // Sort entries by Skyrim date
+                    allEntries.sort((a, b) => {
+                        const dateA = parseSkyrimDate(a.topic);
+                        const dateB = parseSkyrimDate(b.topic);
+                        if (!dateA || !dateB) return 0;
+                        if (dateA.year !== dateB.year) return dateA.year.localeCompare(dateB.year);
+                        if (dateA.month !== dateB.month) return dateA.month - dateB.month;
+                        return dateA.day - dateB.day;
+                    });
+
+                    // Set initial date and update display
+                    if (allEntries.length > 0) {
+                        currentDate = allEntries[0].topic;
+                        updateDisplay();
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading entries:', error);
+                document.getElementById('entries-container').innerHTML = `
+                    <div class="diary-page">Error loading diary entries: ${error.message}</div>
+                `;
+            } finally {
+                loadingOverlay.style.display = 'none';
+            }
+        }
+
+        function initializeCharacterNames() {
+            const nameMap = new Map(); // Map to store base name -> full name with role
+
+            allEntries.forEach(entry => {
+                if (entry.people) {
+                    entry.people.split(',')
+                        .map(char => char.trim())
+                        .filter(char => char)
+                        .forEach(char => {
+                            // Check if the name has a role tag
+                            const match = char.match(/^(.*?)\s*(?:\[(.*?)\])?$/);
+                            if (match) {
+                                const [_, baseName, role] = match;
+                                const trimmedBase = baseName.trim();
+                                // Store the full name (with role) for this base name
+                                if (!nameMap.has(trimmedBase) || char.includes('[')) {
+                                    nameMap.set(trimmedBase, char);
+                                }
+                            }
+                        });
+                }
+            });
+
+            // Convert to Set, preserving the full names with roles
+            allCharacterNames = new Set(nameMap.values());
+        }
+
+        function getAvailableDates() {
+            // Get unique dates that have entries
+            const dates = [...new Set(allEntries.map(entry => entry.topic))];
+            
+            // Sort dates by Skyrim calendar
+            return dates.sort((a, b) => {
+                const dateA = parseSkyrimDate(a);
+                const dateB = parseSkyrimDate(b);
+                if (!dateA || !dateB) return 0;
+                
+                if (dateA.year !== dateB.year) {
+                    return dateB.year.localeCompare(dateA.year);
+                }
+                if (dateA.month !== dateB.month) {
+                    return dateB.month - dateA.month;
+                }
+                return dateB.day - dateA.day;
+            });
+        }
+
+        function getEntriesForDate(date) {
+            const searchText = document.getElementById('search-text').value.toLowerCase();
+            const location = document.getElementById('search-location').value.toLowerCase();
+
+            return allEntries.filter(entry => {
+                // If searching, don't filter by date
+                if (searchText || location) {
+                    if (searchText && !(
+                        (entry.content && entry.content.toLowerCase().includes(searchText)) ||
+                        (entry.topic && entry.topic.toLowerCase().includes(searchText))
+                    )) {
+                        return false;
+                    }
+
+                    if (location && (!entry.location || !entry.location.toLowerCase().includes(location))) {
+                        return false;
+                    }
+
+                    return true;
+                }
+
+                // Otherwise, filter by date and character
+                if (entry.topic !== date) return false;
+                return true;
+            });
+        }
+
+        function goToPage(action) {
+            const validDates = getValidDates();
+            if (validDates.length === 0) return;
+
+            const currentIndex = validDates.indexOf(currentDate);
+            
+            switch (action) {
+                case 'first':
+                    currentDate = validDates[0];
+                    break;
+                case 'last':
+                    currentDate = validDates[validDates.length - 1];
+                    break;
+                case 'prev':
+                    if (currentIndex > 0) {
+                        currentDate = validDates[currentIndex - 1];
+                    }
+                    break;
+                case 'next':
+                    if (currentIndex < validDates.length - 1) {
+                        currentDate = validDates[currentIndex + 1];
+                    }
+                    break;
+                default:
+                    if (typeof action === 'number' && action >= 0 && action < validDates.length) {
+                        currentDate = validDates[action];
+                    }
+            }
+            
+            // Reset any page-specific state since we're showing all entries for a date
+            currentPage = 0;
+            updateDisplay();
+        }
+
+        function updatePageNumbers() {
+            const entries = getEntriesForDate(currentDate);
+            const totalPages = Math.ceil(entries.length / 2) * 2;
+            const pageNumbers = document.getElementById('page-numbers');
+            
+            let html = '';
+            for (let i = 0; i < totalPages; i += 2) {
+                html += `
+                    <button class="${currentPage === i ? 'current' : ''}" 
+                            onclick="currentPage = ${i}; updateDisplay();">
+                        ${i + 1}-${i + 2}
+                    </button>
+                `;
+            }
+            pageNumbers.innerHTML = html;
+        }
+
+        function updateDisplay() {
+            const validDates = getValidDates();
+            
+            // If current date is not valid, set to first valid date
+            if (!validDates.includes(currentDate) && validDates.length > 0) {
+                currentDate = validDates[0];
+            }
+
+            // If we're in diary mode and searching, jump to first match
+            const searchText = document.getElementById('search-text').value.toLowerCase();
+            const searchLocation = document.getElementById('search-location').value.toLowerCase();
+            if ((searchText || searchLocation) && currentView === 'diary' && !validDates.includes(currentDate)) {
+                currentDate = validDates[0];
+            }
+
+            // Update navigation
+            const navBar = document.querySelector('.navigation-bar');
+            if (navBar) {
+                navBar.innerHTML = createPagination(validDates.length);
+            }
+
+            // Display entries for current date
+            if (currentView === 'calendar') {
+                displayCalendarMonth();
+            } else {
+                displayEntries(allEntries);
+            }
+        }
+
+        function updateNavigation(entries) {
+            const dates = getAvailableDates();
+            const currentIndex = dates.indexOf(currentDate);
+            const totalPages = Math.ceil(entries.length / ENTRIES_PER_PAGE);
+
+            // Update navigation buttons
+            document.getElementById('first-page').disabled = currentIndex <= 0;
+            document.getElementById('last-page').disabled = currentIndex >= dates.length - 1;
+            document.getElementById('prev-page').disabled = currentPage <= 0 && currentIndex <= 0;
+            document.getElementById('next-page').disabled = 
+                (currentPage >= totalPages - 1 && currentIndex >= dates.length - 1);
+
+            // Update current date display if it exists
+            const currentDateElement = document.getElementById('current-date');
+            if (currentDateElement) {
+                currentDateElement.textContent = currentDate || 'No date selected';
+            }
+
+            // Update pagination
+            const paginationElement = document.getElementById('pagination');
+            if (paginationElement) {
+                paginationElement.innerHTML = createPagination(totalPages, entries);
+            }
+        }
+
+        function formatEntry(entry) {
+            const searchText = document.getElementById('search-text').value.toLowerCase();
+            let content = entry.content || '';
+            
+            // First split into potential paragraphs and clean them up
+            let paragraphs = content
+                .split(/\n+/) // First split on explicit newlines
+                .map(p => p.trim())
+                .filter(p => p.length > 0);
+            
+            // If we only have one paragraph, try to split it intelligently
+            if (paragraphs.length === 1) {
+                const text = paragraphs[0];
+                // Split on sentence endings followed by spaces and capital letters
+                paragraphs = text
+                    .split(/(?<=[.!?])\s+(?=[A-Z])/)
+                    .reduce((acc, sentence) => {
+                        // If the last paragraph is short, append this sentence to it
+                        if (acc.length > 0 && acc[acc.length - 1].length + sentence.length < 300) {
+                            acc[acc.length - 1] += ' ' + sentence;
+                        } else {
+                            acc.push(sentence);
+                        }
+                        return acc;
+                    }, []);
+            }
+
+            // Process each paragraph with markdown and character highlighting
+            paragraphs = paragraphs.map(para => {
+                // Apply markdown formatting first
+                para = applyMarkdown(para);
+                
+                // Then apply character coloring
+                const characterColors = {};
+                const baseNameMap = new Map();
+
+                allCharacterNames.forEach(fullName => {
+                    const match = fullName.match(/^(.*?)\s*(?:\[(.*?)\])?$/);
+                    if (match) {
+                        const [_, baseName, role] = match;
+                        const trimmedBase = baseName.trim();
+                        
+                        if (!characterColors[fullName]) {
+                            const hash = fullName.split('').reduce((acc, char) => char.charCodeAt(0) + ((acc << 5) - acc), 0);
+                            const hue = Math.abs(hash % 360);
+                            
+                            if (SPECIAL_NAMES.has(trimmedBase)) {
+                                characterColors[fullName] = `hsl(${hue}, 85%, 70%)`;
+                            } else {
+                                characterColors[fullName] = `hsl(${hue}, 70%, 65%)`;
+                            }
+                        }
+                        
+                        baseNameMap.set(trimmedBase.toLowerCase(), {
+                            fullName,
+                            color: characterColors[fullName]
+                        });
+                    }
+                });
+
+                // Add player name if not already in the map
+                if (playerName && !baseNameMap.has(playerName.toLowerCase())) {
+                    const hash = playerName.split('').reduce((acc, char) => char.charCodeAt(0) + ((acc << 5) - acc), 0);
+                    const hue = Math.abs(hash % 360);
+                    baseNameMap.set(playerName.toLowerCase(), {
+                        fullName: playerName,
+                        color: `hsl(${hue}, 85%, 70%)`
+                    });
+                }
+
+                const baseNames = Array.from(baseNameMap.keys()).sort((a, b) => b.length - a.length);
+
+                baseNames.forEach(baseName => {
+                    const {fullName, color} = baseNameMap.get(baseName);
+                    const escapedBase = baseName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const regex = new RegExp(`\\b${escapedBase}\\b`, 'gi');
+                    para = para.replace(regex, `<span class="character-name" title="${fullName}" style="color: ${color};">$&</span>`);
+                });
+
+                // Apply search highlighting last
+                if (searchText) {
+                    const terms = searchText.split(' ')
+                        .filter(term => term.length > 0)
+                        .sort((a, b) => b.length - a.length);
+                        
+                    terms.forEach(term => {
+                        const regex = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+                        para = para.replace(regex, '<span class="search-highlight">$1</span>');
+                    });
+                }
+
+                return para;
+            });
+
+            return `
+                <div class="entry-content">
+                    ${paragraphs.map(p => `<p>${p}</p>`).join('\n')}
+                </div>
+            `;
+        }
+
+        // Add this new function for markdown processing
+        function applyMarkdown(text) {
+            // Bold
+            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            text = text.replace(/__(.*?)__/g, '<strong>$1</strong>');
+            
+            // Italic
+            text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            text = text.replace(/_(.*?)_/g, '<em>$1</em>');
+            
+            // Strikethrough
+            text = text.replace(/~~(.*?)~~/g, '<del>$1</del>');
+            
+            // Quotes
+            text = text.replace(/^>\s*(.+)/gm, '<blockquote>$1</blockquote>');
+            
+            // Horizontal rules
+            text = text.replace(/^---+$/gm, '<hr>');
+            
+            return text;
+        }
+
+        function formatEntriesByCharacter(entries) {
+            const entriesByCharacter = new Map();
+            entries.forEach(entry => {
+                const characters = entry.people?.split(',').map(c => c.trim()) || ['Unknown'];
+                characters.forEach(char => {
+                    if (!entriesByCharacter.has(char)) {
+                        entriesByCharacter.set(char, []);
+                    }
+                    entriesByCharacter.get(char).push({...entry});
+                });
+            });
+
+            const sortedCharacters = [...entriesByCharacter.keys()].sort((a, b) => {
+                if (a === selectedCharacter) return -1;
+                if (b === selectedCharacter) return 1;
+                return a.localeCompare(b);
+            });
+
+            // Get current column setting
+            const activeColumnBtn = document.querySelector('.column-btn.active');
+            const entriesPerRow = activeColumnBtn ? parseInt(activeColumnBtn.dataset.columns) : 2;
+
+            // Flatten all entries into a single array
+            const allCharacterEntries = sortedCharacters.flatMap(character => {
+                if (selectedCharacter && character !== selectedCharacter) {
+                    return [];
+                }
+                return entriesByCharacter.get(character)
+                    .sort((a, b) => parseInt(b.localts) - parseInt(a.localts))
+                    .map(entry => ({...entry, character}));
+            });
+
+            // Split all entries into rows based on entriesPerRow
+            const rows = [];
+            for (let i = 0; i < allCharacterEntries.length; i += entriesPerRow) {
+                rows.push(allCharacterEntries.slice(i, i + entriesPerRow));
+            }
+
+            return `
+                <div class="entries-container">
+                    ${rows.map(row => `
+                        <div class="entries-row" style="display: grid; grid-template-columns: repeat(${entriesPerRow}, 1fr); gap: 20px; margin-bottom: 20px;">
+                            ${row.map(entry => `
+                                <div class="grid-item">
+                                    <div class="character-header">${entry.character}</div>
+                                    ${formatEntry(entry)}
+                                </div>
+                            `).join('')}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function displayEntries(entries) {
+            const container = document.getElementById('entries-container');
+            
+            // Get all entries for current date
+            const currentDateEntries = entries.filter(entry => {
+                const entryDate = parseSkyrimDate(entry.topic);
+                const currentDateParsed = parseSkyrimDate(currentDate);
+                
+                return entryDate && currentDateParsed && 
+                       entryDate.year === currentDateParsed.year &&
+                       entryDate.month === currentDateParsed.month &&
+                       entryDate.day === currentDateParsed.day;
+            });
+            
+            if (!currentDateEntries || currentDateEntries.length === 0) {
+                container.innerHTML = `
+                    <div class="date-section">
+                        <div class="date-header">No entries found for ${currentDate || 'selected date'}</div>
+                    </div>`;
+                return;
+            }
+
+            // Sort entries: "The Narrator" first, then alphabetically by character name
+            const sortedEntries = currentDateEntries.sort((a, b) => {
+                const aCharacter = a.people || '';
+                const bCharacter = b.people || '';
+                
+                // Put "The Narrator" entries first
+                if (aCharacter.includes('The Narrator') && !bCharacter.includes('The Narrator')) return -1;
+                if (!aCharacter.includes('The Narrator') && bCharacter.includes('The Narrator')) return 1;
+                
+                // Then sort alphabetically
+                return aCharacter.localeCompare(bCharacter);
+            });
+
+            // Get current column setting
+            const activeColumnBtn = document.querySelector('.column-btn.active');
+            const entriesPerRow = activeColumnBtn ? parseInt(activeColumnBtn.dataset.columns) : 2;
+
+            // Split entries into rows
+            const rows = [];
+            for (let i = 0; i < sortedEntries.length; i += entriesPerRow) {
+                rows.push(sortedEntries.slice(i, i + entriesPerRow));
+            }
+
+            const html = `
+                <div class="diary-content">
+                    <div class="date-header" style="margin-bottom: 20px; font-size: 1.2em; color: var(--primary-color);">
+                        ${currentDate}
+                    </div>
+                    ${rows.map(row => `
+                        <div class="entries-row" style="display: grid; grid-template-columns: repeat(${entriesPerRow}, 1fr); gap: 20px;">
+                            ${row.map(entry => `
+                                <div class="grid-item">
+                                    <div class="entry-header">
+                                        <div class="entry-character">${entry.people || 'Unknown'}</div>
+                                        <div class="entry-location">${entry.location || 'Unknown Location'}</div>
+                                    </div>
+                                    ${formatEntry(entry)}
+                                </div>
+                            `).join('')}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function createPagination(totalPages, filteredEntries) {
+            if (totalPages <= 0) return '';
+            
+            const searchActive = document.getElementById('search-text').value || 
+                                document.getElementById('search-location').value;
+            
+            let currentPageNum;
+            if (searchActive) {
+                currentPageNum = Math.floor(currentPage / ENTRIES_PER_PAGE) + 1;
+            } else {
+                const dates = getAvailableDates();
+                const currentIndex = dates.indexOf(currentDate);
+                currentPageNum = currentIndex >= 0 ? dates.length - currentIndex : 1;
+            }
+            
+            const maxVisibleButtons = 7;
+            let buttons = [];
+
+            if (totalPages <= maxVisibleButtons) {
+                buttons = Array.from({length: totalPages}, (_, i) => i + 1);
+            } else {
+                buttons.push(1);
+                
+                if (currentPageNum <= 3) {
+                    buttons.push(2, 3, 4, '...', totalPages);
+                } else if (currentPageNum >= totalPages - 2) {
+                    buttons.push('...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+                } else {
+                    buttons.push('...', currentPageNum - 1, currentPageNum, currentPageNum + 1, '...', totalPages);
+                }
+            }
+
+            return `
+                <div class="pagination">
+                    <button onclick="goToPage('first')" ${currentPageNum === 1 ? 'disabled' : ''}>«</button>
+                    <button onclick="goToPage('prev')" ${currentPageNum === 1 ? 'disabled' : ''}>‹</button>
+                    ${buttons.map(btn => {
+                        if (btn === '...') {
+                            return '<span class="ellipsis">...</span>';
+                        }
+                        return `
+                            <button onclick="goToPage(${searchActive ? (btn - 1) : filteredEntries.length - btn})" 
+                                    class="${btn === currentPageNum ? 'active' : ''}">${btn}</button>
+                        `;
+                    }).join('')}
+                    <button onclick="goToPage('next')" ${currentPageNum === totalPages ? 'disabled' : ''}>›</button>
+                    <button onclick="goToPage('last')" ${currentPageNum === totalPages ? 'disabled' : ''}>»</button>
+                </div>
+            `;
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function displayCalendar() {
+            const container = document.querySelector('.calendar-grid');
+            
+            // Get unique years and months from entries
+            const yearMonths = new Set();
+            allEntries.forEach(entry => {
+                const date = parseSkyrimDate(entry.topic);
+                if (date) {
+                    yearMonths.add(`${date.year}|${date.monthName}`);
+                }
+            });
+
+            // Sort year-months
+            const sortedYearMonths = [...yearMonths]
+                .map(ym => {
+                    const [year, month] = ym.split('|');
+                    return { year, month, original: ym };
+                })
+                .sort((a, b) => {
+                    if (a.year !== b.year) return b.year.localeCompare(a.year);
+                    return SKYRIM_MONTHS.indexOf(b.month) - SKYRIM_MONTHS.indexOf(a.month);
+                });
+
+            // Populate month/year selects
+            const monthSelect = document.getElementById('month-select');
+            monthSelect.innerHTML = sortedYearMonths.map(ym => 
+                `<option value="${ym.original}">${ym.month}, ${ym.year}</option>`
+            ).join('');
+
+            // Set up month navigation
+            document.getElementById('prev-month').onclick = () => {
+                const currentIndex = monthSelect.selectedIndex;
+                if (currentIndex < monthSelect.options.length - 1) {
+                    monthSelect.selectedIndex = currentIndex + 1;
+                    displayCalendarMonth();
+                }
+            };
+
+            document.getElementById('next-month').onclick = () => {
+                const currentIndex = monthSelect.selectedIndex;
+                if (currentIndex > 0) {
+                    monthSelect.selectedIndex = currentIndex - 1;
+                    displayCalendarMonth();
+                }
+            };
+
+            monthSelect.onchange = displayCalendarMonth;
+            displayCalendarMonth();
+        }
+
+        function displayCalendarMonth() {
+            const monthSelect = document.getElementById('month-select');
+            const [year, monthName] = monthSelect.value.split('|');
+            const container = document.querySelector('.calendar-grid');
+            
+            // Get search terms
+            const searchText = document.getElementById('search-text').value.toLowerCase();
+            const searchLocation = document.getElementById('search-location').value.toLowerCase();
+            
+            // Create day headers
+            const dayHeaders = SKYRIM_DAYS.map(day => 
+                `<div class="calendar-day-name">${day}</div>`
+            ).join('');
+
+            // Filter entries for selected month
+            const monthEntries = allEntries.filter(entry => {
+                const date = parseSkyrimDate(entry.topic);
+                return date && date.monthName === monthName && date.year === year;
+            });
+
+            // Get the number of days in this month and the starting day offset
+            const daysInMonth = MONTH_DAYS[monthName];
+            const startDayOffset = getMonthStartDay(monthName, year);
+
+            // Create empty cells for days before the month starts
+            const emptyCells = Array.from({ length: startDayOffset }, () => 
+                `<div class="calendar-day"></div>`
+            ).join('');
+
+            // Create calendar grid
+            const days = Array.from({length: daysInMonth}, (_, i) => {
+                const dayNum = i + 1;
+                const dayEntries = monthEntries.filter(entry => {
+                    const date = parseSkyrimDate(entry.topic);
+                    return date && date.day === dayNum;
+                });
+
+                // Check if any entries match search criteria
+                const hasSearchMatch = dayEntries.some(entry => {
+                    const matchesText = !searchText || (
+                        (entry.content && entry.content.toLowerCase().includes(searchText)) ||
+                        (entry.topic && entry.topic.toLowerCase().includes(searchText))
+                    );
+                    const matchesLocation = !searchLocation || 
+                        (entry.location && entry.location.toLowerCase().includes(searchLocation));
+                    return matchesText && matchesLocation;
+                });
+
+                const dayName = SKYRIM_DAYS[(i + getMonthStartDay(monthName, year)) % 7];
+                const suffix = getDaySuffix(dayNum);
+
+                // Only show entries that match both character and search filters
+                const filteredDayEntries = dayEntries.filter(entry => {
+                    const matchesText = !searchText || (
+                        (entry.content && entry.content.toLowerCase().includes(searchText)) ||
+                        (entry.topic && entry.topic.toLowerCase().includes(searchText))
+                    );
+                    const matchesLocation = !searchLocation || 
+                        (entry.location && entry.location.toLowerCase().includes(searchLocation));
+                    return matchesText && matchesLocation;
+                });
+
+                // Count entries per character
+                const characterCounts = filteredDayEntries.reduce((counts, entry) => {
+                    const characters = entry.people?.split(',').map(p => p.trim()) || ['Unknown'];
+                    characters.forEach(char => {
+                        counts[char] = (counts[char] || 0) + 1;
+                    });
+                    return counts;
+                }, {});
+
+                return `
+                    <div class="calendar-day ${hasSearchMatch ? 'highlight search-match' : dayEntries.length ? 'highlight' : ''}"
+                         title="${dayName}, ${dayNum}${suffix} of ${monthName}, ${year}">
+                        <div class="calendar-day-header" onclick="jumpToDate(\`${dayEntries[0]?.topic || ''}\`)"
+                             title="${dayName}, ${dayNum}${suffix} of ${monthName}, ${year}">
+                            <span class="day-number">${dayNum}${suffix}</span>
+                            <span class="day-name">${dayName}</span>
+                        </div>
+                        ${filteredDayEntries.length ? `
+                            <div class="calendar-entries">
+                                ${Object.entries(characterCounts)
+                                    .sort(([a], [b]) => a.localeCompare(b))
+                                    .map(([char, count]) => `
+                                        <div class="calendar-entry ${hasSearchMatch ? 'search-match' : ''}" 
+                                             onclick="jumpToDate(\`${filteredDayEntries[0].topic}\`)">
+                                            ${char} <span class="entry-count">${count}</span>
+                                        </div>
+                                    `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = dayHeaders + emptyCells + days;
+        }
+
+        function jumpToDate(date) {
+            if (!date) return;
+            currentDate = date;
+            switchView('diary');
+            updateDisplay();
+        }
+
+        // Calculate Levenshtein distance between two strings
+        function levenshteinDistance(str1, str2) {
+            const m = str1.length;
+            const n = str2.length;
+            const dp = Array(m + 1).fill().map(() => Array(n + 1).fill(0));
+
+            for (let i = 0; i <= m; i++) dp[i][0] = i;
+            for (let j = 0; j <= n; j++) dp[0][j] = j;
+
+            for (let i = 1; i <= m; i++) {
+                for (let j = 1; j <= n; j++) {
+                    const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
+                    dp[i][j] = Math.min(
+                        dp[i - 1][j] + 1,
+                        dp[i][j - 1] + 1,
+                        dp[i - 1][j - 1] + cost
+                    );
+                }
+            }
+            return dp[m][n];
+        }
+
+        // Find closest matching month name
+        function findClosestMonth(monthName) {
+            // Normalize input
+            const normalized = monthName.toLowerCase().replace(/\s+/g, ' ').trim();
+            
+            // First try exact match after normalization
+            const exactMatch = SKYRIM_MONTHS.find(m => 
+                m.toLowerCase().replace(/\s+/g, ' ').trim() === normalized
+            );
+            if (exactMatch) return exactMatch;
+            
+            // If no exact match, find closest match using Levenshtein distance
+            let closestMatch = null;
+            let minDistance = Infinity;
+            
+            SKYRIM_MONTHS.forEach(month => {
+                const normalizedMonth = month.toLowerCase().replace(/\s+/g, ' ').trim();
+                const distance = levenshteinDistance(normalized, normalizedMonth);
+                
+                // Use relative distance to handle varying length strings better
+                const relativeDistance = distance / Math.max(normalized.length, normalizedMonth.length);
+                
+                if (relativeDistance < minDistance) {
+                    minDistance = relativeDistance;
+                    closestMatch = month;
+                }
+            });
+            
+            // Only return match if it's reasonably close (threshold of 0.4 relative distance)
+            return minDistance < 0.4 ? closestMatch : null;
+        }
+
+        // Update the parseSkyrimDate function to use fuzzy matching
+        function parseSkyrimDate(dateStr) {
+            const match = dateStr.match(/(\w+), \d+:\d+ [AP]M, (\d+)(?:st|nd|rd|th) of ([\w']+ ?\w*), (\d+E \d+)/);
+            if (!match) return null;
+            
+            const [_, dayName, dayNum, monthName, year] = match;
+            
+            // Find closest matching month using fuzzy matching
+            const matchedMonth = findClosestMonth(monthName);
+            
+            if (!matchedMonth) {
+                console.warn(`No close match found for month: ${monthName}`);
+                return null;
+            }
+            
+            const monthIndex = SKYRIM_MONTHS.indexOf(matchedMonth);
+            
+            return {
+                dayName,
+                day: parseInt(dayNum),
+                month: monthIndex + 1,
+                monthName: matchedMonth,
+                year,
+                original: dateStr
+            };
+        }
+
+        // Helper function to get day suffix (st, nd, rd, th)
+        function getDaySuffix(day) {
+            if (day >= 11 && day <= 13) return 'th';
+            switch (day % 10) {
+                case 1: return 'st';
+                case 2: return 'nd';
+                case 3: return 'rd';
+                default: return 'th';
+            }
+        }
+
+        // Helper function to determine the starting day of each month
+        // This could be adjusted based on Skyrim's calendar rules
+        function getMonthStartDay(monthName, year) {
+            // Calculate days from Last Seed 17th to the start of the target month
+            const lastSeed17ToMonthStart = getDaysToMonthStart(monthName, year);
+            
+            // The day that starts this month will be:
+            // (Sundas + total days since reference date) % 7
+            const startDay = (LAST_SEED_17_OFFSET - (17 - 1) + lastSeed17ToMonthStart) % 7;
+            return startDay >= 0 ? startDay : startDay + 7;
+        }
+
+        function getDaysToMonthStart(targetMonth, targetYear) {
+            const referenceYear = '4E 201';
+            const referenceMonth = 'Last Seed';
+            
+            let totalDays = 0;
+            
+            // Convert year string to number (e.g., "4E 201" -> 201)
+            const currentYear = parseInt(targetYear.split(' ')[1]);
+            const refYear = parseInt(referenceYear.split(' ')[1]);
+            
+            // Calculate days between years
+            const yearDiff = currentYear - refYear;
+            totalDays += yearDiff * 365; // Assuming no leap years for simplicity
+            
+            // Calculate days between months within the same year
+            const months = Object.keys(MONTH_DAYS);
+            let startIdx = months.indexOf(referenceMonth);
+            let endIdx = months.indexOf(targetMonth);
+            
+            if (yearDiff >= 0) {
+                // Going forward in time
+                if (endIdx < startIdx) {
+                    endIdx += 12;
+                }
+                for (let i = startIdx; i < endIdx; i++) {
+                    totalDays += MONTH_DAYS[months[i % 12]];
+                }
+            } else {
+                // Going backward in time
+                if (endIdx > startIdx) {
+                    startIdx += 12;
+                }
+                for (let i = endIdx; i < startIdx; i++) {
+                    totalDays -= MONTH_DAYS[months[i % 12]];
+                }
+            }
+            
+            return totalDays;
+        }
+
+        function updateColumnLayout(columns) {
+            // Remove old style element if it exists
+            const oldStyle = document.getElementById('dynamic-grid-style');
+            if (oldStyle) {
+                oldStyle.remove();
+            }
+
+            const style = document.createElement('style');
+            style.id = 'dynamic-grid-style';
+            style.textContent = `
+                .entries-row {
+                    margin-bottom: 20px !important;
+                }
+                .grid-item {
+                    min-width: 0;
+                    width: 100%;
+                }
+                @media (max-width: 768px) {
+                    .entries-row {
+                        grid-template-columns: 1fr !important;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Force refresh of the display
+            updateDisplay();
+        }
+
+        function getValidDates() {
+            const searchText = document.getElementById('search-text').value.toLowerCase();
+            const searchLocation = document.getElementById('search-location').value.toLowerCase();
+            
+            // First, group entries by date
+            const entriesByDate = new Map();
+            allEntries.forEach(entry => {
+                if (!entriesByDate.has(entry.topic)) {
+                    entriesByDate.set(entry.topic, []);
+                }
+                entriesByDate.get(entry.topic).push(entry);
+            });
+
+            // Filter dates based on search only
+            const validDates = Array.from(entriesByDate.entries()).filter(([date, dateEntries]) => {
+                return dateEntries.some(entry => {
+                    // Apply search filters if any
+                    if (searchText || searchLocation) {
+                        const matchesText = !searchText || (
+                            (entry.content && entry.content.toLowerCase().includes(searchText)) ||
+                            (entry.topic && entry.topic.toLowerCase().includes(searchText))
+                        );
+                        
+                        const matchesLocation = !searchLocation || 
+                            (entry.location && entry.location.toLowerCase().includes(searchLocation));
+                        
+                        if (!matchesText || !matchesLocation) {
+                            return false;
+                        }
+                    }
+                    return true;
+                });
+            }).map(([date]) => date);
+
+            // Sort dates (changed to ascending order)
+            return validDates.sort((a, b) => {
+                const dateA = parseSkyrimDate(a);
+                const dateB = parseSkyrimDate(b);
+                if (!dateA || !dateB) return 0;
+                if (dateA.year !== dateB.year) return dateA.year.localeCompare(dateB.year);
+                if (dateA.month !== dateB.month) return dateA.month - dateB.month;
+                return dateA.day - dateB.day;
+            });
+        }
+
+        function createPagination(totalPages) {
+            const validDates = getValidDates();
+            if (validDates.length === 0) return '';
+
+            const currentIndex = validDates.indexOf(currentDate);
+            if (currentIndex === -1 && validDates.length > 0) {
+                currentDate = validDates[0];
+            }
+
+            return `
+                <div class="pagination">
+                    <button onclick="goToPage('first')" ${currentIndex <= 0 ? 'disabled' : ''}>«</button>
+                    <button onclick="goToPage('prev')" ${currentIndex <= 0 ? 'disabled' : ''}>‹</button>
+                    <span class="current-page">${currentDate}</span>
+                    <span class="page-count">(${currentIndex + 1} of ${validDates.length})</span>
+                    <button onclick="goToPage('next')" ${currentIndex >= validDates.length - 1 ? 'disabled' : ''}>›</button>
+                    <button onclick="goToPage('last')" ${currentIndex >= validDates.length - 1 ? 'disabled' : ''}>»</button>
+                </div>
+            `;
+        }
+
+        function goToPage(action) {
+            const validDates = getValidDates();
+            if (validDates.length === 0) return;
+
+            const currentIndex = validDates.indexOf(currentDate);
+            
+            switch (action) {
+                case 'first':
+                    currentDate = validDates[0];
+                    break;
+                case 'last':
+                    currentDate = validDates[validDates.length - 1];
+                    break;
+                case 'prev':
+                    if (currentIndex > 0) {
+                        currentDate = validDates[currentIndex - 1];
+                    }
+                    break;
+                case 'next':
+                    if (currentIndex < validDates.length - 1) {
+                        currentDate = validDates[currentIndex + 1];
+                    }
+                    break;
+                default:
+                    if (typeof action === 'number' && action >= 0 && action < validDates.length) {
+                        currentDate = validDates[action];
+                    }
+            }
+            
+            // Reset any page-specific state since we're showing all entries for a date
+            currentPage = 0;
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            const validDates = getValidDates();
+            
+            // If current date is not valid, set to first valid date
+            if (!validDates.includes(currentDate) && validDates.length > 0) {
+                currentDate = validDates[0];
+            }
+
+            // If we're in diary mode and searching, jump to first match
+            const searchText = document.getElementById('search-text').value.toLowerCase();
+            const searchLocation = document.getElementById('search-location').value.toLowerCase();
+            if ((searchText || searchLocation) && currentView === 'diary' && !validDates.includes(currentDate)) {
+                currentDate = validDates[0];
+            }
+
+            // Update navigation
+            const navBar = document.querySelector('.navigation-bar');
+            if (navBar) {
+                navBar.innerHTML = createPagination(validDates.length);
+            }
+
+            // Display entries for current date
+            if (currentView === 'calendar') {
+                displayCalendarMonth();
+            } else {
+                displayEntries(allEntries);
+            }
+        }
+    </script>
+</body>
+</html> 

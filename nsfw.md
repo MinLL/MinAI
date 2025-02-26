@@ -97,3 +97,10 @@ MinAI includes 3467 ostim/sexlab scene descriptions (as of 10/24/2024) for bette
 ### (In Development) Diary of Mine (DoM, PAH, HSH, AYGAS)
 * Slave context, character info, and events exposed to CHIM/Sapient NPC's
 * Slave actions - TBD
+
+### Fill Her Up
+* Adds LLM awareness of inflation states - The AI will know when actors are inflated vaginally, anally, or orally
+* The AI is aware of exact amounts in each orifice and will incorporate this into their responses
+* Includes support for impregnation states from Fill Her Up
+* The AI will acknowledge when actors expel cum, absorb it into their body, or their belly inflates/deflates
+* Provides detailed contextual descriptions of belly size and other physical changes

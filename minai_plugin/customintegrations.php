@@ -25,6 +25,7 @@ function ProcessIntegrations() {
     if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "minai_init") {
         // This is sent once by the SKSE plugin when the game is loaded. Do our initialization here.
         minai_log("info", "Initializing");
+        DropThreadsTableIfExists();
         InitiateDBTables();
         importXPersonalities();
         importScenesDescriptions();
@@ -116,11 +117,21 @@ function ProcessIntegrations() {
             else {
                 // $GLOBALS["HERIKA_NAME"] is npc1
                 $GLOBALS["HERIKA_TARGET"] = explode(":", $GLOBALS["gameRequest"][3])[3];
-                if ($GLOBALS["HERIKA_TARGET"] == $GLOBALS["HERIKA_NAME"])
-                    $GLOBALS["HERIKA_TARGET"] = $GLOBALS["PLAYER_NAME"];
-                minai_log("info", "Starting {$GLOBALS["gameRequest"][0]} dialogue between {$GLOBALS["HERIKA_NAME"]} and {$GLOBALS["HERIKA_TARGET"]}");
-                StoreRadiantActors($GLOBALS["HERIKA_TARGET"], $GLOBALS["HERIKA_NAME"]);
-                $GLOBALS["target"] = $GLOBALS["HERIKA_TARGET"];
+                if (empty(trim($GLOBALS["HERIKA_TARGET"]))) {
+                    minai_log("info", "Blocking radiant/rechat - target is empty or invalid");
+                    $MUST_DIE = true;
+                }
+                else if ($GLOBALS["HERIKA_TARGET"] == $GLOBALS["HERIKA_NAME"]) {
+                    minai_log("info", "Blocking radiant/rechat - source and target are the same NPC");
+                    $MUST_DIE = true;
+                }
+                else {
+                    if ($GLOBALS["HERIKA_TARGET"] == $GLOBALS["HERIKA_NAME"])
+                        $GLOBALS["HERIKA_TARGET"] = $GLOBALS["PLAYER_NAME"];
+                    minai_log("info", "Starting {$GLOBALS["gameRequest"][0]} dialogue between {$GLOBALS["HERIKA_NAME"]} and {$GLOBALS["HERIKA_TARGET"]}");
+                    StoreRadiantActors($GLOBALS["HERIKA_TARGET"], $GLOBALS["HERIKA_NAME"]);
+                    $GLOBALS["target"] = $GLOBALS["HERIKA_TARGET"];
+                }
             }
         }
         else {
@@ -189,6 +200,23 @@ function ProcessIntegrations() {
 
     if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "storetattoodesc") {
         minai_log("info", "Processing storetattoodesc event");
+        $MUST_DIE=true;
+    }
+
+    // Add handling for minai_combatenddefeat
+    if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "minai_combatenddefeat") {
+        // Store the defeat timestamp
+        $db = $GLOBALS['db'];
+        $id = "_minai_PLAYER//lastDefeat";
+        $db->delete("conf_opts", "id='{$id}'");
+        $db->insert(
+            'conf_opts',
+            array(
+                'id' => $id,
+                'value' => time()
+            )
+        );
+        minai_log("info", "Player was defeated in combat, blocking Attack command for 300 seconds");
         $MUST_DIE=true;
     }
 

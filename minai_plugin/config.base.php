@@ -29,13 +29,22 @@ $GLOBALS['enforce_single_json'] = false;
 $GLOBALS['action_prompts'] = Array(
     "singing" => "Respond with a song from #player_name#. Be creative, and match the mood of the scene.",
     
-    "self_narrator_explicit" => "Respond with #target#'s immediate thoughts, emotions, and internal reactions to the physical and emotional sensations #target_subject# is experiencing right now. Focus particularly on any erotic elements happening within the scene. Respond in first person as #target#, staying fully in the present moment and focusing on #target_possessive# personal, subjective experience rather than describing the situation itself. Keep the response deeply personal and reflective of how #target# would genuinely react.",
+    "self_narrator_explicit" => "Respond as #target# with raw, immediate reactions to what's happening right now - speak out loud or think to yourself exactly how you feel in this moment. Express genuine emotions like fear, pleasure, anger, or excitement. Keep it natural and direct - say what someone would really say or think in this situation, emphasizing the most recent dialogue or event.",
     
     "self_narrator_normal" => "Respond as #player_name#, thinking privately to #player_object#self about the current situation and recent events. Stay in first person, capturing #player_possessive# genuine thoughts, emotions, and internal conflicts. Focus on #player_possessive# personal perspective, biases, and feelings rather than an objective summary of events. Keep the response introspective and true to how #player_name# would process and react internally.",
 
     "explicit_scene" => "Choose the ACTION or TALK that best conveys #herika_name#'s immediate physical and emotional responses. Focus heavily on explicit dialogue and verbal expressions to enhance the scene, but also utilize ACTIONS to vividly depict #herika_name#'s sensations and feelings when interacting with #target#. Avoid narration and emoting.",
     
-    "normal_scene" => "Choose the ACTION that best fits the current context and #herika_name#'s mood when interacting with #target#. Prioritize dialogue for expressing thoughts and intentions. Use ACTIONS for tasks like interacting with items, trading, or showing physical needs. Avoid narration and emoting."
+    "normal_scene" => "Select the most contextually appropriate ACTION to respond to #target#. Prioritize actions that directly address the current interaction (like BeginTrading for commerce, Talk for dialogue). Use combat actions such as Attack when warranted by the situation, or when your character wants to do so. Your character must act according to their personality and profession first, and prioritize maintaining dialogue and scene continuity.",
+
+    // Diary prompts
+    "player_diary" => "#player_name# regularly keeps a diary, which you are now tasked to update. Please write a several page story of #player_name#'s recent thoughts, feelings, and adventures. Respond as if you are writing this into a private diary, including completely unfiltered thoughts and feelings. WRITE AS IF YOU ARE #player_name# WRITING INTO A PRIVATE DIARY.",
+    
+    "follower_diary" => "#herika_name# regularly keeps a diary, which you are now tasked to update. Please write a several page story of #herika_name#'s  recent thoughts, feelings, and adventures. Respond as if you are writing this into a private diary, including completely unfiltered thoughts and feelings. WRITE AS IF YOU ARE #herika_name# WRITING INTO A PRIVATE DIARY."
+);
+
+$GLOBALS['action_prompts_nsfw'] = Array(
+    "normal_scene" => "Select the most contextually appropriate ACTION to respond to #target#. Prioritize actions that directly address the current interaction (like BeginTrading for commerce, Talk for dialogue). Use combat or intimate actions such as Grope when warranted by the situation, or when your character wants to do so. Your character must act according to their personality and profession first, and prioritize maintaining dialogue and scene continuity.",
 );
 
 // Roleplay translation settings
@@ -51,13 +60,13 @@ $GLOBALS['roleplay_settings'] = Array(
     "translation_request_explicit" => "Translate this casual speech to reflect the current intimate situation while maintaining your character's manner: \"#ORIGINAL_INPUT#\"",
     "translation_request_combat" => "Translate this casual speech into an appropriately tense and urgent manner while maintaining your character's style: \"#ORIGINAL_INPUT#\"",
     "roleplay_request" => "You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue in response to the ongoing conversation and situation.",
-    "roleplay_request_explicit" => "You are roleplaying as #PLAYER_NAME# in an intimate scenario. Respond naturally with dialogue that reflects both the passionate situation and your character's personality.",
-    "roleplay_request_combat" => "You are roleplaying as #PLAYER_NAME# in combat. Respond with appropriately urgent dialogue that reflects both the tense situation and your character's personality.",
+    "roleplay_request_explicit" => "You are roleplaying as #PLAYER_NAME# in an intimate scenario. Respond naturally to the ongoing conversation and situation as your character would in this situation with a succinct line of dialogue.",
+    "roleplay_request_combat" => "You are roleplaying as #PLAYER_NAME# in combat. Respond naturally to the ongoing conversation and situation as your character would in this situation with a succinct line of dialogue.",
     "sections" => Array(
         "CHARACTER_BACKGROUND" => Array(
             "enabled" => true,
             "header" => "=== YOUR BACKGROUND ===",
-            "content" => "#PLAYER_BIOS#\nPronouns: #PLAYER_SUBJECT#/#PLAYER_OBJECT#/#PLAYER_POSSESSIVE#\n\nCurrent State: #HERIKA_DYNAMIC#\n\nPhysical Description: #PHYSICAL_DESCRIPTION#",
+            "content" => "#PLAYER_BIOS#\nPronouns: #PLAYER_SUBJECT#/#PLAYER_OBJECT#/#PLAYER_POSSESSIVE#\n\nCurrent State: #HERIKA_DYNAMIC#\n\nPhysical Description: #PHYSICAL_DESCRIPTION#\n\Mental State: #MIND_STATE#",
             "order" => 0
         ),
         "CHARACTER_STATUS" => Array(

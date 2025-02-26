@@ -21,6 +21,7 @@ minai_CombatManager combat
 minai_SapienceController sapience
 minai_Reputation reputation  
 minai_DirtAndBlood dirtAndBlood
+minai_EnvironmentalAwareness envAwareness
 minai_Util MinaiUtil  
 Spell minai_ToggleSapienceSpell
 minai_FertilityMode fertility
@@ -37,7 +38,17 @@ Event OnInit()
 EndEvent
 
 Int Function GetVersion()
-  return 41
+  return 111
+EndFunction
+
+Function CheckForCriticalDependencies()
+  Info("Checking for critical dependencies...")
+  int[] pTweaksVersion = PapyrusTweaks.GetPapyrusTweaksVersion()
+  if !pTweaksVersion
+    Fatal("Papyrus Tweaks NG is not installed. This is a critical dependency. Revert to a prior save and install the mod before continuing.")
+  Else
+    Info("Papyrus Tweaks NG detected: " + pTweaksVersion[0] + "." + pTweaksVersion[1] + "." + pTweaksVersion[2])
+  EndIf
 EndFunction
 
 Function Maintenance()
@@ -51,6 +62,7 @@ Function Maintenance()
     Debug.MessageBox("Mismatched MinAI.esp and minai_MainQuestController version")
   EndIf
   Info("Maintenance() - minai v" +GetVersion() + " initializing.")
+  CheckForCriticalDependencies()
   ; Set keybinds
   SetSapienceKey()
   SetNarratorKey()
@@ -86,6 +98,7 @@ Function Maintenance()
   MinaiUtil = (Self as Quest) as minai_Util
   MinaiUtil.Maintenance()
   dirtAndBlood = (Self as Quest) as minai_DirtAndBlood
+  envAwareness = (Self as Quest) as minai_EnvironmentalAwareness
   minai_ToggleSapienceSpell = Game.GetFormFromFile(0x0E93, "MinAI.esp") as Spell
   if (!followers)
     Fatal("Could not load followers script - Mismatched script and esp versions")
@@ -101,6 +114,7 @@ Function Maintenance()
     minAIFF.SetActorVariable(playerRef, "isTalkingToNarrator", false)
   EndIf
   dirtAndBlood.Maintenance(Self)
+  envAwareness.Maintenance(Self)
   sex.Maintenance(Self)
   survival.Maintenance(Self)
   arousal.Maintenance(Self)
@@ -218,7 +232,7 @@ EndFunction
 int function CountMatch(string sayLine, string lineToMatch)
   int count = 0
   int index = 0
-  while index != -1
+  while index != -1 && count < 30
     index = StringUtil.Find(sayLine, lineToMatch, index+1)
     count += 1
   endWhile

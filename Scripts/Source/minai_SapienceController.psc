@@ -128,8 +128,10 @@ actor[] Function FindActors(bool returnAll = False, Actor exclude = None)
     ret = new actor[2]
     int actor1 = PO3_SKSEFunctions.GenerateRandomInt(0, nearbyActors.Length - 1)
     int actor2 = actor1
-    while actor2 == actor1
+    int count = 0
+    while actor2 == actor1 && count < 30
       actor2 = PO3_SKSEFunctions.GenerateRandomInt(0, nearbyActors.Length - 1)
+      count += 1
     endwhile
     ret[0] = nearbyActors[actor1]
     ret[1] = nearbyActors[actor2]
@@ -151,7 +153,7 @@ bool Function IsFighting(actor actor1, actor actor2)
 EndFunction
 
 Event OnUpdate()
-  if minai_SapienceEnabled.GetValueInt() != 1 || !bHasAIFF
+  if !bHasAIFF || !config.enableRadiantDialogue
     StopRadiantDialogue()
     return
   EndIf
@@ -264,7 +266,7 @@ Function CheckForRechat(string speakerName)
 EndFunction
 
 Event OnTextReceived(String speakerName, String sayLine)
-  if minai_SapienceEnabled.GetValueInt() == 1
+  if config.enableRadiantDialogue
     ; Update dialogue time when text is received
     aiff.UpdateLastDialogueTime(speakerName)
     
@@ -282,7 +284,7 @@ EndFunction
 
 
 Function StartNextUpdate(float nextTime = 0.0)
-  if minai_SapienceEnabled.GetValueInt() == 1  && config.radiantDialogueChance > 0
+  if config.enableRadiantDialogue && config.radiantDialogueChance > 0
     if nextTime == 0.0
       RegisterForSingleUpdate(config.radiantDialogueFrequency)
     else

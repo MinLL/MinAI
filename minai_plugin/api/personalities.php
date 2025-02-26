@@ -7,6 +7,15 @@ require_once("../logger.php");
 
 $db = new sql();
 
+// Add this helper function at the top of the file after the requires
+function extractJson($text) {
+    // Extract everything between first { and last }
+    if (preg_match('/\{[\s\S]*\}/s', $text, $matches)) {
+        return $matches[0];
+    }
+    return $text;
+}
+
 // Handle GET request to fetch table data
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $table = 'minai_x_personalities'; // Set default table
@@ -30,7 +39,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     throw new Exception('Missing data or id for update');
                 }
                 
-                $data = json_decode($_POST['data'], true);
+                $rawData = $_POST['data'];
+                $jsonData = extractJson($rawData);
+                $data = json_decode($jsonData, true);
+                
+                if ($data === null) {
+                    throw new Exception('Invalid JSON data provided');
+                }
+                
                 $id = $_POST['id'];
                 
                 // Check if entry exists

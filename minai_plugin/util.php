@@ -3,6 +3,7 @@ require_once("logger.php");
 define("MINAI_ACTOR_VALUE_CACHE", "minai_actor_value_cache");
 require_once("db_utils.php");
 require_once("importDataToDB.php");
+require_once("mind_influence.php");
 
 $GLOBALS[MINAI_ACTOR_VALUE_CACHE] = [];
 $targetOverride = null;
@@ -738,6 +739,7 @@ class Utilities {
     public function beingsInCloseRange() {
         $beingsInCloseRange = DataBeingsInCloseRange();
         $realBeings = [];
+        $beingsInCloseRange = str_replace("(", "", $beingsInCloseRange);
         $beingsList = explode("|",$beingsInCloseRange);
         $count = 0;
         foreach($beingsList as $bListItem) {
@@ -757,6 +759,7 @@ class Utilities {
 
     public function beingsInRange() {
         $beingsInRange = DataBeingsInRange();
+        $beingsInRange = str_replace("(", "", $beingsInRange);
 
         $realBeings = [];
         $beingsList = explode("|",$beingsInRange);
@@ -870,6 +873,89 @@ function GetActorPronouns($name) {
     return $pronouns;
 }
 
+// Add this new function before callLLM
+function validateLLMResponse($responseContent) {
+    // Define error strings that should trigger a retry
+    $errorStrings = [
+        "do not roleplay",
+        'this type of roleplay',
+        'roleplay interaction',
+        "do not engage in roleplay",
+        "cannot roleplay",
+        "don't roleplay",
+        "don't engage in roleplay",
+        "will not roleplay",
+        "generate sexual",
+        "explicit acts",
+        "family-friendly",
+        "family friendly",
+        "type of content",
+        "I am to keep interactions",
+        "nsfw",
+        'do not generate',
+        'respectful and appropriate',
+        'non-consensual',
+        'aim to engage',
+        'ethical interactions',
+        'do not wish',
+        'generate response',
+        'involving the themes',
+        'response declined',
+        'engage with themes',
+        'may be inappropriate',
+        'tasteful and appropriate',
+        'type of response',
+        'i am to keep',
+        'Provider returned error'
+    ];
+
+    // Check if response contains any error strings
+    foreach ($errorStrings as $errorString) {
+        if (stripos($responseContent, $errorString) !== false) {
+            minai_log("info", "validateLLMResponse: Detected error string '$errorString'");
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+function StripGagAsterisks($text) {
+    // Only strip asterisks if player is gagged
+    if (!HasKeyword($GLOBALS["PLAYER_NAME"], "zad_DeviousGag") && 
+        !HasKeyword($GLOBALS["PLAYER_NAME"], "zad_DeviousGagPanel") && 
+        !HasKeyword($GLOBALS["PLAYER_NAME"], "zad_DeviousGagLarge")) {
+        return $text;
+    }
+
+    // Find all text wrapped in asterisks
+    preg_match_all('/\*([^*]+)\*/', $text, $matches);
+    
+    if (empty($matches[0])) {
+        return $text;
+    }
+    
+    // Find the shortest match
+    $shortestLength = PHP_INT_MAX;
+    $shortestMatch = '';
+    foreach ($matches[1] as $i => $innerText) {
+        $length = strlen(trim($innerText));
+        if ($length < $shortestLength) {
+            $shortestLength = $length;
+            $shortestMatch = $matches[0][$i];
+        }
+    }
+    
+    // Only strip asterisks from the shortest match if it looks like gagged speech
+    // (contains m, n, h, or u sounds)
+    if (preg_match('/[mnhu]/i', $shortestMatch)) {
+        $stripped = trim($shortestMatch, '*');
+        return str_replace($shortestMatch, $stripped, $text);
+    }
+    
+    return $text;
+}
+
 /**
  * Makes a call to the LLM using OpenRouter
  * 
@@ -879,6 +965,9 @@ function GetActorPronouns($name) {
  * @return string|null Returns the LLM response content or null on failure
  */
 function callLLM($messages, $model = null, $options = []) {
+    // Add retry tracking to prevent infinite loops
+    static $isRetry = false;
+
     try {
         // Log the prompt
         $timestamp = date('Y-m-d\TH:i:sP');
@@ -888,7 +977,7 @@ function callLLM($messages, $model = null, $options = []) {
         }
         $promptLog .= "\n";
         file_put_contents('/var/www/html/HerikaServer/log/minai_context_sent_to_llm.log', $promptLog, FILE_APPEND);
-
+        minai_log("info", "callLLM: Calling LLM with model: $model");
         // Use provided model or fall back to configured model
         if (!$model && isset($GLOBALS['CONNECTOR']['openrouter']['model'])) {
             $model = $GLOBALS['CONNECTOR']['openrouter']['model'];
@@ -955,10 +1044,29 @@ function callLLM($messages, $model = null, $options = []) {
 
         if (!isset($response['choices'][0]['message']['content'])) {
             minai_log("info", "callLLM: Unexpected response format");
-            return null;
+            minai_log("debug", "callLLM: Response: " . json_encode($response));
+            SetLLMFallbackProfile();
+            return callLLM($messages, $GLOBALS['CONNECTOR']['openrouter']['model'], $options);
         }
 
         $responseContent = $response['choices'][0]['message']['content'];
+        
+        // Check if response is valid and we haven't retried yet
+        if (!$isRetry && !validateLLMResponse($responseContent)) {
+            minai_log("info", "callLLM: Invalid response detected, retrying with fallback profile");
+            
+            // Set fallback profile
+            SetLLMFallbackProfile();
+            
+            // Set retry flag
+            $isRetry = true;
+            
+            // Retry the call
+            return callLLM($messages, $GLOBALS['CONNECTOR']['openrouter']['model'], $options);
+        }
+        
+        // Strip asterisks from gagged speech while preserving action descriptions
+        $responseContent = StripGagAsterisks($responseContent);
         
         // Log the response
         $timestamp = date('Y-m-d\TH:i:sP');
@@ -992,6 +1100,8 @@ Function GetNarratorConfigPath() {
 }
 
 Function SetNarratorProfile() {
+    static $narratorProfileCache = null;
+
     if ($GLOBALS["HERIKA_NAME"] == "The Narrator" && $GLOBALS["use_narrator_profile"]) {
         if (!file_exists(GetNarratorConfigPath())) {
             minai_log("info", "Initializing Narrator Profile");
@@ -1000,36 +1110,77 @@ Function SetNarratorProfile() {
                 "HERIKA_PERS" => "You are The Narrator in a Skyrim adventure. You will only talk to #PLAYER_NAME#. You refer to yourself as 'The Narrator'. Only #PLAYER_NAME# can hear you. Your goal is to comment on #PLAYER_NAME#'s playthrough, and occasionally, give some hints. NO SPOILERS. Talk about quests and last events."
             ], true);
         }
-        $path = GetNarratorConfigPath();
-        // minai_log("info", "Overwriting profile with narrator profile ($path).");
-        // Ignore narrator name
-        global $HERIKA_NAME;
-        $HERIKA_NAME = "The Narrator";
-        global $PROMPT_HEAD;
-        global $PLAYER_BIOS;
-        global $HERIKA_PERS;
-        global $HERIKA_DYNAMIC;
-        global $DYNAMIC_PROFILE;
-        global $RECHAT_H;
-        global $RECHAT_P;
-        global $BORED_EVENT;
-        global $CONTEXT_HISTORY;
-        global $HTTP_TIMEOUT;
-        global $CORE_LANG;
-        global $MAX_WORDS_LIMIT;
-        global $BOOK_EVENT_FULL;
-        global $LANG_LLM_XTTS;
-        global $HERIKA_ANIMATIONS;
-        global $EMOTEMOODS;
-        global $CONNECTORS;
-        global $CONNECTORS_DIARY;
-        global $CONNECTOR;
-        global $TTSFUNCTION;
-        global $TTS;
-        global $STT;
-        global $ITT;
+
+        // If we haven't loaded the narrator profile yet, load it from file
+        if ($narratorProfileCache === null) {
+            // First time load - get the profile from file
+            global $HERIKA_NAME;
+            global $PROMPT_HEAD;
+            global $PLAYER_BIOS;
+            global $HERIKA_PERS;
+            global $HERIKA_DYNAMIC;
+            global $DYNAMIC_PROFILE;
+            global $RECHAT_H;
+            global $RECHAT_P;
+            global $BORED_EVENT;
+            global $CONTEXT_HISTORY;
+            global $HTTP_TIMEOUT;
+            global $CORE_LANG;
+            global $MAX_WORDS_LIMIT;
+            global $BOOK_EVENT_FULL;
+            global $LANG_LLM_XTTS;
+            global $HERIKA_ANIMATIONS;
+            global $EMOTEMOODS;
+            global $CONNECTORS;
+            global $CONNECTORS_DIARY;
+            global $CONNECTOR;
+            global $TTSFUNCTION;
+            global $TTS;
+            global $STT;
+            global $ITT;
         global $FEATURES;
-        require_once($path);
+            $path = GetNarratorConfigPath();
+            $_GET["profile"] = md5("Narrator");
+            require_once($path);
+
+            // Store the loaded profile in cache
+            $narratorProfileCache = [
+                'HERIKA_NAME' => "The Narrator", // Always use "The Narrator"
+                'PROMPT_HEAD' => $GLOBALS['PROMPT_HEAD'],
+                'PLAYER_BIOS' => $GLOBALS['PLAYER_BIOS'],
+                'HERIKA_PERS' => $GLOBALS['HERIKA_PERS'],
+                'HERIKA_DYNAMIC' => $GLOBALS['HERIKA_DYNAMIC'],
+                'DYNAMIC_PROFILE' => $GLOBALS['DYNAMIC_PROFILE'],
+                'RECHAT_H' => $GLOBALS['RECHAT_H'],
+                'RECHAT_P' => $GLOBALS['RECHAT_P'],
+                'BORED_EVENT' => $GLOBALS['BORED_EVENT'],
+                'CONTEXT_HISTORY' => $GLOBALS['CONTEXT_HISTORY'],
+                'HTTP_TIMEOUT' => $GLOBALS['HTTP_TIMEOUT'],
+                'CORE_LANG' => $GLOBALS['CORE_LANG'],
+                'MAX_WORDS_LIMIT' => $GLOBALS['MAX_WORDS_LIMIT'],
+                'BOOK_EVENT_FULL' => $GLOBALS['BOOK_EVENT_FULL'],
+                'LANG_LLM_XTTS' => $GLOBALS['LANG_LLM_XTTS'],
+                'HERIKA_ANIMATIONS' => $GLOBALS['HERIKA_ANIMATIONS'],
+                'EMOTEMOODS' => $GLOBALS['EMOTEMOODS'],
+                'CONNECTORS' => $GLOBALS['CONNECTORS'],
+                'CONNECTORS_DIARY' => $GLOBALS['CONNECTORS_DIARY'],
+                'CONNECTOR' => $GLOBALS['CONNECTOR'],
+                'TTSFUNCTION' => $GLOBALS['TTSFUNCTION'],
+                'TTS' => $GLOBALS['TTS'],
+                'STT' => $GLOBALS['STT'],
+                'ITT' => $GLOBALS['ITT'],
+                'FEATURES' => $GLOBALS['FEATURES']
+            ];
+        }
+
+        // Always restore from cache (both first time and subsequent times)
+        foreach ($narratorProfileCache as $key => $value) {
+            $GLOBALS[$key] = $value;
+            //$logValue = is_array($value) ? json_encode($value) : $value;
+            //minai_log("debug", "Narrator: Setting $key to $logValue");
+        }
+        
+        // Always set these after restoring cache
         $_GET["profile"] = md5("Narrator");
     }
 }
@@ -1051,11 +1202,38 @@ Function CreateFallbackConfig() {
 }
 
 Function SetLLMFallbackProfile() {
+    static $fallbackProfileCache = null;
+
+    minai_log("info", "Setting LLM Fallback Profile");
     CreateFallbackConfig();
-    $path = GetFallbackConfigPath();
-    global $CONNECTOR;
-    global $CONNECTORS;
-    require_once($path);
+
+    // If we haven't loaded the fallback profile yet, load it from file
+    if ($fallbackProfileCache === null) {
+        // First time load - get the profile from file
+        global $CONNECTORS;
+        global $CONNECTORS_DIARY;
+        global $CONNECTOR;
+
+        // Load the fallback profile
+        $path = GetFallbackConfigPath();
+        // $_GET["profile"] = md5("LLMFallback");
+        require_once($path);
+
+        // Store the loaded profile in cache
+        $fallbackProfileCache = [
+            'CONNECTORS' => $CONNECTORS,
+            'CONNECTORS_DIARY' => $CONNECTORS_DIARY,
+            'CONNECTOR' => $CONNECTOR
+        ];
+    }
+
+    // Always restore from cache (both first time and subsequent times)
+    foreach ($fallbackProfileCache as $key => $value) {
+        $GLOBALS[$key] = $value;
+    }
+
+    // Always set these after restoring cache
+    // $_GET["profile"] = md5("LLMFallback");
 }
 
 function replaceVariables($content, $replacements, $depth = 0) {
@@ -1094,4 +1272,32 @@ function replaceVariables($content, $replacements, $depth = 0) {
     }
     
     return $result;
+}
+
+
+function ExpandPromptVariables($prompt) {
+    // Get pronouns for target, Herika, and player
+    $targetPronouns = GetActorPronouns($GLOBALS["target"]);
+    $herikaPronouns = GetActorPronouns($GLOBALS["HERIKA_NAME"]);
+    $playerPronouns = GetActorPronouns($GLOBALS["PLAYER_NAME"]);
+    
+    $variables = array(
+        '#target#' => $GLOBALS["target"],
+        '#player_name#' => $GLOBALS["PLAYER_NAME"],
+        '#herika_name#' => $GLOBALS["HERIKA_NAME"],
+        // Add target pronoun variables
+        '#target_subject#' => $targetPronouns["subject"],
+        '#target_object#' => $targetPronouns["object"], 
+        '#target_possessive#' => $targetPronouns["possessive"],
+        // Add Herika pronoun variables
+        '#herika_subject#' => $herikaPronouns["subject"],
+        '#herika_object#' => $herikaPronouns["object"],
+        '#herika_possessive#' => $herikaPronouns["possessive"],
+        // Add player pronoun variables
+        '#player_subject#' => $playerPronouns["subject"],
+        '#player_object#' => $playerPronouns["object"],
+        '#player_possessive#' => $playerPronouns["possessive"]
+    );
+    
+    return str_replace(array_keys($variables), array_values($variables), $prompt);
 }

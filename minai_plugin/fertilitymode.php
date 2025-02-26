@@ -1,4 +1,6 @@
 <?php
+require_once("FillHerUp.php");
+
 Function GetFertilityContext($name) {
     $ret = "";
     $state = GetActorValue($name, "fertility_state");
@@ -33,6 +35,9 @@ Function GetFertilityContext($name) {
             $ret .= "{$name} is currently menstruating.\n";
         }
     }
+
+    // Add Fill Her Up context
+    $ret .= GetFillHerUpContext($name);
 
     if ($ret != "") {
         $ret .= "\n";

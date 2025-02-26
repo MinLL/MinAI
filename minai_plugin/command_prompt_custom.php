@@ -12,43 +12,25 @@ function SetPromptHead($override) {
     }
 }
 
-function ExpandPromptVariables($prompt) {
-    // Get pronouns for target, Herika, and player
-    $targetPronouns = GetActorPronouns($GLOBALS["target"]);
-    $herikaPronouns = GetActorPronouns($GLOBALS["HERIKA_NAME"]);
-    $playerPronouns = GetActorPronouns($GLOBALS["PLAYER_NAME"]);
-    
-    $variables = array(
-        '#target#' => $GLOBALS["target"],
-        '#player_name#' => $GLOBALS["PLAYER_NAME"],
-        '#herika_name#' => $GLOBALS["HERIKA_NAME"],
-        // Add target pronoun variables
-        '#target_subject#' => $targetPronouns["subject"],
-        '#target_object#' => $targetPronouns["object"], 
-        '#target_possessive#' => $targetPronouns["possessive"],
-        // Add Herika pronoun variables
-        '#herika_subject#' => $herikaPronouns["subject"],
-        '#herika_object#' => $herikaPronouns["object"],
-        '#herika_possessive#' => $herikaPronouns["possessive"],
-        // Add player pronoun variables
-        '#player_subject#' => $playerPronouns["subject"],
-        '#player_object#' => $playerPronouns["object"],
-        '#player_possessive#' => $playerPronouns["possessive"]
-    );
-    
-    return str_replace(array_keys($variables), array_values($variables), $prompt);
-}
-
 if (IsEnabled($GLOBALS["PLAYER_NAME"], "isSinging")) {
     $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] = ExpandPromptVariables($GLOBALS["action_prompts"]["singing"]);
 }
 elseif (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"] && $GLOBALS["HERIKA_NAME"] == "The Narrator") {
+    $mindState = GetMindInfluenceState($GLOBALS["PLAYER_NAME"]);
+    $mindPrompt = GetMindInfluencePrompt($mindState, IsExplicitScene() ? "explicit" : (IsEnabled($GLOBALS["PLAYER_NAME"], "inCombat") ? "combat" : "default"));
+    
     if (IsExplicitScene()) {
         $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] = ExpandPromptVariables($GLOBALS["action_prompts"]["self_narrator_explicit"]);
+        if ($mindPrompt) {
+            $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] .= " " . $mindPrompt;
+        }
     } else {
         $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] = ExpandPromptVariables($GLOBALS["action_prompts"]["self_narrator_normal"]);
+        if ($mindPrompt) {
+            $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] .= " " . $mindPrompt;
+        }
     }
-    $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] .= "Aim for your responses to be 2-4 sentences. ";
+    $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] .= " Aim for your responses to be 2-4 sentences. ";
 }
 else {
     if (IsExplicitScene()) {

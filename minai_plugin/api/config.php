@@ -11,9 +11,7 @@ require_once("../logger.php");
 // Then load the custom config if it exists, otherwise create it from base
 if (!file_exists("$pluginPath/config.php")) {
     copy("$pluginPath/config.base.php", "$pluginPath/config.php");
-} else {
-    require_once("$pluginPath/config.php");
-}
+} 
 
 // Function to build a string for indexed arrays using Array("value1", "value2") format
 function buildArrayString($array) {
@@ -46,6 +44,22 @@ function buildAssociativeArrayString($array) {
 
 // Read config data from the file (GET request)
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    if (isset($_GET['defaults']) && $_GET['defaults'] === 'true') {
+        // Return default configuration
+        require_once("$pluginPath/config.base.php");
+        // Merge NSFW prompts if NSFW is not disabled
+        if (!$GLOBALS['disable_nsfw'] && isset($GLOBALS['action_prompts_nsfw'])) {
+            $GLOBALS['action_prompts'] = array_merge($GLOBALS['action_prompts'], $GLOBALS['action_prompts_nsfw']);
+        }
+    }
+    else {
+        require_once("$pluginPath/config.base.php");
+        // Merge NSFW prompts if NSFW is not disabled
+        if (!$GLOBALS['disable_nsfw'] && isset($GLOBALS['action_prompts_nsfw'])) {
+            $GLOBALS['action_prompts'] = array_merge($GLOBALS['action_prompts'], $GLOBALS['action_prompts_nsfw']);
+        }
+        require_once("$pluginPath/config.php");
+    }
     // Prepare the response using the loaded configuration
     $configData = array(
         // Basic settings
@@ -79,7 +93,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         "input_delay_for_radiance" => intval($GLOBALS["input_delay_for_radiance"]),
         
         // Action prompts
-        "action_prompts" => $GLOBALS["action_prompts"],
+        "action_prompts" => array(
+            "singing" => $GLOBALS["action_prompts"]["singing"],
+            "player_diary" => $GLOBALS["action_prompts"]["player_diary"],
+            "follower_diary" => $GLOBALS["action_prompts"]["follower_diary"],
+            "self_narrator_explicit" => $GLOBALS["action_prompts"]["self_narrator_explicit"],
+            "self_narrator_normal" => $GLOBALS["action_prompts"]["self_narrator_normal"],
+            "explicit_scene" => $GLOBALS["action_prompts"]["explicit_scene"],
+            "normal_scene" => $GLOBALS["action_prompts"]["normal_scene"]
+        ),
         
         // Add roleplay settings to GET response
         "roleplay_settings" => $GLOBALS["roleplay_settings"],
@@ -149,7 +171,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $newConfig .= "\$GLOBALS['input_delay_for_radiance'] = " . (intval($input['input_delay_for_radiance']) ?: 15) . ";\n";
         
         // Action prompts
-        $newConfig .= "\$GLOBALS['action_prompts'] = " . buildAssociativeArrayString($input['action_prompts']) . ";\n";
+        $newConfig .= "\$GLOBALS['action_prompts'] = " . buildAssociativeArrayString(array(
+            'singing' => $input['action_prompts']['singing'],
+            'player_diary' => $input['action_prompts']['player_diary'],
+            'follower_diary' => $input['action_prompts']['follower_diary'],
+            'self_narrator_explicit' => $input['action_prompts']['self_narrator_explicit'],
+            'self_narrator_normal' => $input['action_prompts']['self_narrator_normal'],
+            'explicit_scene' => $input['action_prompts']['explicit_scene'],
+            'normal_scene' => $input['action_prompts']['normal_scene']
+        )) . ";\n";
         
         // Save roleplay settings
         $newConfig .= "\$GLOBALS['roleplay_settings'] = " . var_export($input['roleplay_settings'], true) . ";\n";
