@@ -47,9 +47,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (isset($_GET['defaults']) && $_GET['defaults'] === 'true') {
         // Return default configuration
         require_once("$pluginPath/config.base.php");
+        // Merge NSFW prompts if NSFW is not disabled
+        if (!$GLOBALS['disable_nsfw'] && isset($GLOBALS['action_prompts_nsfw'])) {
+            $GLOBALS['action_prompts'] = array_merge($GLOBALS['action_prompts'], $GLOBALS['action_prompts_nsfw']);
+        }
     }
     else {
         require_once("$pluginPath/config.base.php");
+        // Merge NSFW prompts if NSFW is not disabled
+        if (!$GLOBALS['disable_nsfw'] && isset($GLOBALS['action_prompts_nsfw'])) {
+            $GLOBALS['action_prompts'] = array_merge($GLOBALS['action_prompts'], $GLOBALS['action_prompts_nsfw']);
+        }
         require_once("$pluginPath/config.php");
     }
     // Prepare the response using the loaded configuration

@@ -43,6 +43,10 @@ $GLOBALS['action_prompts'] = Array(
     "follower_diary" => "#herika_name# regularly keeps a diary, which you are now tasked to update. Please write a several page story of #herika_name#'s  recent thoughts, feelings, and adventures. Respond as if you are writing this into a private diary, including completely unfiltered thoughts and feelings. WRITE AS IF YOU ARE #herika_name# WRITING INTO A PRIVATE DIARY."
 );
 
+$GLOBALS['action_prompts_nsfw'] = Array(
+    "normal_scene" => "Select the most contextually appropriate ACTION to respond to #target#. Prioritize actions that directly address the current interaction (like BeginTrading for commerce, Talk for dialogue). Use combat or intimate actions such as Grope when warranted by the situation, or when your character wants to do so. Your character must act according to their personality and profession first, and prioritize maintaining dialogue and scene continuity.",
+);
+
 // Roleplay translation settings
 $GLOBALS['roleplay_settings'] = Array(
     "context_messages" => 10,
