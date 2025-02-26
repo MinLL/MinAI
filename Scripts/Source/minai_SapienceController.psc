@@ -153,7 +153,7 @@ bool Function IsFighting(actor actor1, actor actor2)
 EndFunction
 
 Event OnUpdate()
-  if minai_SapienceEnabled.GetValueInt() != 1 || !bHasAIFF
+  if !bHasAIFF || !config.enableRadiantDialogue
     StopRadiantDialogue()
     return
   EndIf
@@ -266,7 +266,7 @@ Function CheckForRechat(string speakerName)
 EndFunction
 
 Event OnTextReceived(String speakerName, String sayLine)
-  if minai_SapienceEnabled.GetValueInt() == 1
+  if config.enableRadiantDialogue
     ; Update dialogue time when text is received
     aiff.UpdateLastDialogueTime(speakerName)
     
@@ -284,7 +284,7 @@ EndFunction
 
 
 Function StartNextUpdate(float nextTime = 0.0)
-  if minai_SapienceEnabled.GetValueInt() == 1  && config.radiantDialogueChance > 0
+  if config.enableRadiantDialogue && config.radiantDialogueChance > 0
     if nextTime == 0.0
       RegisterForSingleUpdate(config.radiantDialogueFrequency)
     else

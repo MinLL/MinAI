@@ -198,11 +198,15 @@ bool Property enableConsoleLogging = True Auto
 
 int enableConsoleLoggingOID
 
-; Add near other property declarations
 bool disableSapienceInStealthDefault = False
 bool Property disableSapienceInStealth = False Auto
 
 int disableSapienceInStealthOID
+
+int enableRadiantDialogueOID
+
+bool enableRadiantDialogueDefault = True
+bool Property enableRadiantDialogue = True Auto
 
 Event OnConfigInit()
   main.Info("Building mcm menu.")
@@ -276,6 +280,7 @@ Function RenderGeneralPage()
   requestResponseCooldownOID = AddSliderOption("LLM Response Request Cooldown", requestResponseCooldown, "{1}")
   AddHeaderOption("Sapience Settings")
   useSapienceOID = AddToggleOption("Enable Sapience", minai_SapienceEnabled.GetValueInt() == 1)
+  enableRadiantDialogueOID = AddToggleOption("Enable Radiant Dialogue", enableRadiantDialogue)
   disableSapienceInStealthOID = AddToggleOption("Disable Sapience While Sneaking", disableSapienceInStealth)
   radiantDialogueFrequencyOID = AddSliderOption("Radiant Dialogue (NPC -> NPC) Frequency", radiantDialogueFrequency, "{1}")
   radiantDialogueChanceOID = AddSliderOption("Radiant Dialogue (NPC -> NPC) Chance", radiantDialogueChance, "{1}")
@@ -636,6 +641,14 @@ Event OnOptionSelect(int oid)
   elseif oid == disableSapienceInStealthOID
     disableSapienceInStealth = !disableSapienceInStealth
     SetToggleOptionValue(oid, disableSapienceInStealth)
+  elseif oid == enableRadiantDialogueOID
+    enableRadiantDialogue = !enableRadiantDialogue
+    if enableRadiantDialogue
+      sapience.StartRadiantDialogue()
+    else
+      sapience.StopRadiantDialogue()
+    EndIf
+    SetToggleOptionValue(oid, enableRadiantDialogue)
   EndIf
   int i = 0
   string[] categories = JMap.allKeysPArray(aCategoryMap)
@@ -796,6 +809,14 @@ Event OnOptionDefault(int oid)
   elseif oid == disableSapienceInStealthOID
     disableSapienceInStealth = disableSapienceInStealthDefault
     SetToggleOptionValue(oid, disableSapienceInStealth)
+  elseif oid == enableRadiantDialogueOID
+    enableRadiantDialogue = enableRadiantDialogueDefault
+    if enableRadiantDialogue
+      sapience.StartRadiantDialogue()
+    else
+      sapience.StopRadiantDialogue()
+    EndIf
+    SetToggleOptionValue(oid, enableRadiantDialogue)
   EndIf
 EndEvent
 
@@ -906,6 +927,8 @@ Event OnOptionHighlight(int oid)
     SetInfoText("Hotkey to roleplay as your character using text")
   elseif oid == disableSapienceInStealthOID
     SetInfoText("When enabled, sapience will be automatically disabled while the player is sneaking (Allowing for private conversations with followers and such)")
+  elseif oid == enableRadiantDialogueOID
+    SetInfoText("Enable or disable radiant dialogue between NPCs. When disabled, NPCs will not automatically start conversations with each other.")
   EndIf
   int i = 0
   string[] actions = JMap.allKeysPArray(aiff.actionRegistry)
