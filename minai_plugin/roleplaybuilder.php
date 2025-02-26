@@ -270,7 +270,7 @@ function interceptRoleplayInput() {
 
         // Call LLM with specific parameters for dialogue generation
         $response = callLLM($messages, $CONNECTOR["openrouter"]["model"], [
-            'temperature' => $CONNECTOR["openrouter"]["temperature"],
+            'temperature' => floatval($CONNECTOR["openrouter"]["temperature"]),
             'max_tokens' => 150
         ]);
 
