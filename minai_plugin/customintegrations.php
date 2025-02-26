@@ -116,7 +116,17 @@ function ProcessIntegrations() {
             }
             else {
                 // $GLOBALS["HERIKA_NAME"] is npc1
-                $GLOBALS["HERIKA_TARGET"] = explode(":", $GLOBALS["gameRequest"][3])[3];
+                // Fix parsing of target NPC name from radiant event
+                $requestData = $GLOBALS["gameRequest"][3] ?? '';
+                if (strpos($requestData, 'Context location:') !== false) {
+                    // Parse target from format "(Context location: )Min:NPCName"
+                    $parts = explode(':', $requestData);
+                    $GLOBALS["HERIKA_TARGET"] = trim(end($parts));
+                } else {
+                    // Fallback to original parsing for other formats
+                    $GLOBALS["HERIKA_TARGET"] = explode(":", $requestData)[3] ?? '';
+                }
+
                 if (empty(trim($GLOBALS["HERIKA_TARGET"]))) {
                     minai_log("info", "Blocking radiant/rechat - target is empty or invalid");
                     $MUST_DIE = true;
