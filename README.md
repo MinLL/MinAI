@@ -2,7 +2,9 @@
 A significant expansion to CHIM that brings AI to the entirety of the Skyrim world, and bridges LLMs with various Skyrim Mods. 
 
 Documentation for modders can be found [here](https://github.com/MinLL/MinAI/blob/main/ModdersGuide.md). FAQ can be found [here](https://github.com/MinLL/MinAI/blob/main/FAQ.md).
- 
+
+ If you like my work and want to encourage further development, [consider donating](https://ko-fi.com/minll).
+ 
  ## Description
 
 This mod serves as an interface bridging Large Language Models (LLM)'s with a number of Skyrim's mods, as well as a number of vanilla features. This mod's goal is to enable seamless AI interaction with any NPC in the world and provide completely unscripted, dynamically generated, fully voiced roleplay scenarios that integrate with in-game mechanics and features with supported mods.
