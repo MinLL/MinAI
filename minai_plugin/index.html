@@ -439,11 +439,38 @@
                 flex: 1 1 100%;
             }
         }
+
+        /* Add this new style for Ko-fi button positioning */
+        .kofi-button-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+        }
+
+        @media (max-width: 768px) {
+            .kofi-button-container {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin: 20px auto;
+                text-align: center;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="content-wrapper">
+            <!-- Move Ko-fi button here, right after content-wrapper opens -->
+            <div class="kofi-button-container">
+                <script src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
+                <script>
+                    kofiwidget2.init('Support me on Ko-fi', '#72a4f2', 'S6S51B7MJA');
+                    kofiwidget2.draw();
+                </script>
+            </div>
+
             <h1>Welcome to the MinAI Configuration Page</h1>
             <p>Manage your game settings, configuration, diagnose problems, and more from here.</p>
 
