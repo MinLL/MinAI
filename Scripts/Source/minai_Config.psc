@@ -373,9 +373,54 @@ Function RenderAction(int actionObj)
 EndFunction
 
 Function RenderActionCategory(string category)
-  AddHeaderOption(StringUtil.Format("$MINAI_CATEGORY_HEADER_FORMAT", category))
+  ; Get the appropriate header text
+  string headerText = ""
+  if category == "General"
+    headerText = "$MINAI_HEADER_GENERAL"
+  elseif category == "Survival"
+    headerText = "$MINAI_HEADER_SURVIVAL"
+  elseif category == "External"
+    headerText = "$MINAI_HEADER_EXTERNAL"
+  elseif category == "Followers"
+    headerText = "$MINAI_HEADER_FOLLOWERS"
+  elseif category == "Arousal"
+    headerText = "$MINAI_HEADER_AROUSAL"
+  elseif category == "Sex"
+    headerText = "$MINAI_HEADER_SEX"
+  elseif category == "Devious Stuff"
+    headerText = "$MINAI_HEADER_DEVIOUS"
+  elseif category == "Devious Followers"
+    headerText = "$MINAI_HEADER_DEVIOUS_FOLLOWERS"
+  elseif category == "Submissive Lola"
+    headerText = "$MINAI_HEADER_SUBMISSIVE_LOLA"
+  endif
+
+  ; Get the appropriate expand text
+  string expandText = ""
+  if category == "General"
+    expandText = "$MINAI_EXPAND_GENERAL"
+  elseif category == "Survival"
+    expandText = "$MINAI_EXPAND_SURVIVAL"
+  elseif category == "External"
+    expandText = "$MINAI_EXPAND_EXTERNAL"
+  elseif category == "Followers"
+    expandText = "$MINAI_EXPAND_FOLLOWERS"
+  elseif category == "Arousal"
+    expandText = "$MINAI_EXPAND_AROUSAL"
+  elseif category == "Sex"
+    expandText = "$MINAI_EXPAND_SEX"
+  elseif category == "Devious Stuff"
+    expandText = "$MINAI_EXPAND_DEVIOUS"
+  elseif category == "Devious Followers"
+    expandText = "$MINAI_EXPAND_DEVIOUS_FOLLOWERS"
+  elseif category == "Submissive Lola"
+    expandText = "$MINAI_EXPAND_SUBMISSIVE_LOLA"
+  endif
+
+  ; Use the texts
+  AddHeaderOption(headerText)
   if category != currentCategory
-    int categoryOID = AddTextOption(StringUtil.Format("$MINAI_EXPAND_CATEGORY_FORMAT", category), "")
+    int categoryOID = AddTextOption(expandText, "")
     JMap.setInt(aCategoryMap, category, categoryOID)
     return
   EndIf
@@ -413,21 +458,21 @@ Function RenderActionsPage()
   string[] actionCategories
   if sex.IsNSFW()
     actionCategories = new String[9];
-    actionCategories[0] = "$MINAI_CATEGORY_GENERAL";
-    actionCategories[1] = "$MINAI_CATEGORY_SURVIVAL";
-    actionCategories[2] = "$MINAI_CATEGORY_EXTERNAL";
-    actionCategories[3] = "$MINAI_CATEGORY_FOLLOWERS";
-    actionCategories[4] = "$MINAI_CATEGORY_AROUSAL";
-    actionCategories[5] = "$MINAI_CATEGORY_SEX";
-    actionCategories[6] = "$MINAI_CATEGORY_DEVIOUS"; 
-    actionCategories[7] = "$MINAI_CATEGORY_DEVIOUS_FOLLOWERS";
-    actionCategories[8] = "$MINAI_CATEGORY_SUBMISSIVE_LOLA";
+    actionCategories[0] = "General";
+    actionCategories[1] = "Survival";
+    actionCategories[2] = "External";
+    actionCategories[3] = "Followers";
+    actionCategories[4] = "Arousal";
+    actionCategories[5] = "Sex";
+    actionCategories[6] = "Devious Stuff"; 
+    actionCategories[7] = "Devious Followers";
+    actionCategories[8] = "Submissive Lola";
   else
     actionCategories = new String[4];
-    actionCategories[0] = "$MINAI_CATEGORY_GENERAL";
-    actionCategories[1] = "$MINAI_CATEGORY_SURVIVAL";
-    actionCategories[2] = "$MINAI_CATEGORY_EXTERNAL";
-    actionCategories[3] = "$MINAI_CATEGORY_FOLLOWERS";
+    actionCategories[0] = "General";
+    actionCategories[1] = "Survival";
+    actionCategories[2] = "External";
+    actionCategories[3] = "Followers";
   EndIf
   int i = 0
   while i < actionCategories.Length
