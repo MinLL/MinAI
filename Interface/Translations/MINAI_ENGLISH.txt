@@ -1,0 +1,151 @@
+//MINAI_MCM
+$MINAI_GENERAL	General
+$MINAI_PHYSICS_CBPC	Physics (CBPC)
+$MINAI_DEVIOUS_STUFF	Devious Stuff
+$MINAI_SEX_SETTINGS	Sex Settings
+$MINAI_ACTION_REGISTRY	Action Registry
+
+$MINAI_LLM_SETTINGS	LLM Settings
+$MINAI_AUTO_UPDATE_FOLLOWER_DIARIES	Automatically Update Follower Diaries
+$MINAI_UPDATE_NARRATOR_DIARY	Update Narrator Diary on Sleep
+$MINAI_UPDATE_NARRATOR_PROFILE	Update Narrator Dynamic Profile on Sleep
+$MINAI_LLM_RESPONSE_COOLDOWN	LLM Response Request Cooldown
+$MINAI_SAPIENCE_SETTINGS	Sapience Settings
+$MINAI_ENABLE_SAPIENCE	Enable Sapience
+$MINAI_ENABLE_RADIANT_DIALOGUE	Enable Radiant Dialogue
+$MINAI_DISABLE_SAPIENCE_SNEAKING	Disable Sapience While Sneaking
+$MINAI_RADIANT_DIALOGUE_FREQUENCY	Radiant Dialogue (NPC -> NPC) Frequency
+$MINAI_RADIANT_DIALOGUE_CHANCE	Radiant Dialogue (NPC -> NPC) Chance
+$MINAI_MIN_RADIANCE_RECHATS	Minimum Radiance Rechats
+$MINAI_MAX_RADIANCE_RECHATS	Maximum Radiance Rechats
+$MINAI_GENERAL_SETTINGS	General Settings
+$MINAI_ALLOW_COMBAT_DIALOGUE	CHIM Config - Allow Dialogue during Combat
+$MINAI_PRESERVE_DIALOGUE_QUEUE	CHIM Config - Preserve Dialogue Queue
+$MINAI_GENERAL_CATEGORY	General
+$MINAI_ADD_SPELLS	Add Spells to Player
+$MINAI_REMOVE_SPELLS	Remove Spells from Player
+$MINAI_TOGGLE_SAPIENCE	Toggle Sapience
+$MINAI_ROLEPLAY_VOICE	Roleplay Voice
+$MINAI_ROLEPLAY_TEXT	Roleplay Text
+$MINAI_SING	Sing
+$MINAI_TALK_TO_NARRATOR	Talk to Narrator
+$MINAI_TYPE_TO_NARRATOR	Type to Narrator
+$MINAI_DISABLE_AI_ANIMATIONS	Disable AI-FF Animations
+$MINAI_DEBUG	Debug
+$MINAI_DEBUG_CATEGORY	Debug
+$MINAI_ENABLE_CONSOLE_LOGGING	Enable Console Logging
+$MINAI_TEST_MOD_EVENTS	Test Mod Events
+
+$MINAI_CBPC_SETTINGS	CBPC Settings
+$MINAI_ENABLE_CBPC	Enable CBPC
+$MINAI_DISABLE_SELF_TOUCH	Disable Self Touch
+$MINAI_DISABLE_SELF_ASS_TOUCH	Disable Self Ass Touch
+$MINAI_PHYSICS_SPEECH_RATE	Physics Speech Comment Rate
+$MINAI_PHYSICS_SPEECH_RATE_SEX	Physics Speech Comment Rate (Sex)
+$MINAI_SELF_TOUCH_THRESHOLD	Self Touch Threshold
+$MINAI_NPC_TOUCH_THRESHOLD	NPC Touch Threshold
+$MINAI_PHYSICS_CALCULATION_RATE	Physics Calculation Rate
+
+$MINAI_AROUSAL_SETTINGS	Arousal Settings
+$MINAI_AROUSAL_SEX_THRESHOLD	Arousal Threshold for Sex
+$MINAI_AROUSAL_HARASS_THRESHOLD	Arousal Threshold for Flirting/Harassment
+$MINAI_CONFIRM_SEX	Ask before a sex scene is initiated
+$MINAI_ALLOW_SEX_TRANSITIONS	Allow Sex Scene Transitions
+$MINAI_ALLOW_JOIN_SEX	Allow NPC's to join Ongoing Sex Scenes
+$MINAI_TRACK_VICTIM_AWARENESS	Track Victim Actor Awareness
+$MINAI_NPC_SEX_SETTINGS	NPC Sex Settings
+$MINAI_ENABLE_NPC_SEX	Enable NPC -> NPC Sex
+$MINAI_SEX_COMMENTS	Comments during sex
+$MINAI_GENDER_WEIGHT	Gender weight
+$MINAI_COMMENTS_RATE	Comments rate
+$MINAI_PRIORITIZE_PLAYER_COMMENTS	Prioritize comments in player's scene
+$MINAI_FORCE_ORGASM_COMMENT	Force orgasm comment
+$MINAI_FORCE_POST_SCENE_COMMENT	Force post scene comment
+$MINAI_ENABLE_AMBIENT_COMMENTS	Enable ambient comments between events
+$MINAI_MAX_THREADS	Max threads
+
+$MINAI_DD_SETTINGS	DD Settings
+$MINAI_DD_NOT_DETECTED	Devious Devices not detected
+$MINAI_ALLOW_DEVICE_LOCK	Allow the LLM to lock devices on actors
+$MINAI_ALLOW_DEVICE_UNLOCK	Allow the LLM to unlock devices on actors
+
+$MINAI_ACTION_ENABLE_DISABLE	Enable/Disable
+$MINAI_ACTION_INTERVAL	Interval
+$MINAI_ACTION_EXPONENT	Exponent
+$MINAI_ACTION_MAX_INTERVAL	Maximum Interval
+$MINAI_ACTION_DECAY_WINDOW	Decay Window
+$MINAI_EDIT_ACTION	Edit Action
+
+$MINAI_ACTIONS	Actions
+$MINAI_EXPAND	Expand
+
+$MINAI_CATEGORY_GENERAL	General
+$MINAI_CATEGORY_SURVIVAL	Survival
+$MINAI_CATEGORY_EXTERNAL	External
+$MINAI_CATEGORY_FOLLOWERS	Followers
+$MINAI_CATEGORY_AROUSAL	Arousal
+$MINAI_CATEGORY_SEX	Sex
+$MINAI_CATEGORY_DEVIOUS	Devious Stuff
+$MINAI_CATEGORY_DEVIOUS_FOLLOWERS	Devious Followers
+$MINAI_CATEGORY_SUBMISSIVE_LOLA	Submissive Lola
+
+
+$MINAI_CONSOLE_LOGGING_INFO	Controls whether log messages are printed to the console in addition to the Papyrus log
+$MINAI_CBPC_GLOBAL_INFO	Enables or disables CBPC globally. Requires save/reload to take effect
+$MINAI_AUTO_UPDATE_DIARY_INFO	Automatically update the diary for all followers upon sleeping.
+$MINAI_UPDATE_NARRATOR_DIARY_INFO	Controls whether the narrator maintains a diary that is updated when sleeping.
+$MINAI_UPDATE_NARRATOR_PROFILE_INFO	Controls whether the narrator's dynamic profile is updated when sleeping.
+$MINAI_ENABLE_AI_SEX_INFO	Allow NPC's to decide to have sex with eachother.
+$MINAI_USE_SAPIENCE_INFO	The Sapience System enables and disables AI dynamically in a radius around the player using SPID, and allows NPC's to radiantly interact with eachother without direct player involvement.
+$MINAI_CBPC_DISABLE_SELF_TOUCH_INFO	Enables or disables collision detection on self
+$MINAI_CBPC_DISABLE_SELF_ASS_TOUCH_INFO	Enables or disables collision detection on one's own ass. Useful to avoid detection events in VR
+$MINAI_CBPC_OTHER_TOUCH_THRESHOLD_INFO	How long (Cumulatively) within a given period a part must be touched for collision to register for touching others
+$MINAI_CBPC_SELF_TOUCH_THRESHOLD_INFO	How long (Cumulatively) within a given period a part must be touched for collision to register for touching oneself
+$MINAI_COLLISION_COOLDOWN_INFO	How often physics are calculated in seconds. Lower = more responsive, higher = less script load
+$MINAI_COLLISION_SPEECH_COOLDOWN_INFO	How often the AI should be prompted to react to physics in seconds (outside of sex)
+$MINAI_RADIANT_DIALOGUE_FREQUENCY_INFO	How often the radiant dialogue chance is checked for nearby AI
+$MINAI_RADIANT_DIALOGUE_CHANCE_INFO	How likely the radiant dialogue system is to be invoked each time it is checked
+$MINAI_COLLISION_SEX_COOLDOWN_INFO	How often the AI should be prompted to react to physics in seconds (during sex)
+$MINAI_ALLOW_DEVICE_LOCK_INFO	Should the AI be allowed to lock devices on actors?
+$MINAI_ALLOW_DEVICE_UNLOCK_INFO	Should the AI be allowed to unlock devices from actors?
+$MINAI_REQUEST_RESPONSE_COOLDOWN_INFO	The minimum time in seconds inbetween requests for the LLM to react to an in-game event
+$MINAI_AROUSAL_FOR_SEX_INFO	Minimum Arousal level required for the Sex related actions to be exposed to the LLM
+$MINAI_MIN_RADIANCE_RECHATS_INFO	Minimum number of times a radiant dialogue can be rechatted
+$MINAI_MAX_RADIANCE_RECHATS_INFO	Maximum number of times a radiant dialogue can be rechatted
+$MINAI_AROUSAL_FOR_HARASS_INFO	Minimum Arousal level required for actions like spanking, groping, kissing to be exposed to the LLM
+$MINAI_CONFIRM_SEX_INFO	Show a confirmation message before sex scenes start
+$MINAI_ALLOW_ACTORS_TO_JOIN_SEX_INFO	Allow actors to join ongoing sex scenes
+$MINAI_ALLOW_SEX_TRANSITIONS_INFO	Allow actors to transition between different sex scene types mid-scene
+$MINAI_TOGGLE_COMBAT_DIALOGUE_INFO	Allow dialogue to be spoken during combat. Facilitates actor to actor dialogue, trash talking, taunts, etc.
+$MINAI_DISABLE_AI_ANIMATIONS_INFO	Forces AI-FF animations to be disabled. There seems to be a CTD in the AIAgent DLL while resetting idle state sometimes, this avoids it.
+$MINAI_GENDER_WEIGHT_COMMENTS_INFO	Chances how often either gender npcs will talk. 0 - males only will talk. 100 - females only wil talk
+$MINAI_COMMENTS_RATE_INFO	Comments during sex scene cooldown in seconds. Example: If average AI response - 10 seconds, set this option to >10. Don't set too low it can consume a lot of resources and characters will talk non-stop...
+$MINAI_FORCE_ORGASM_COMMENT_INFO	Ignore comments during sex cooldown, and request message on orgasm event immediately.
+$MINAI_FORCE_POST_SCENE_COMMENT_INFO	Ignore comments during sex cooldown, and request message after sex scene ends.
+$MINAI_PRIORITIZE_PLAYER_THREAD_INFO	If there are scenes with player involve, all comments will be within this scenes.
+$MINAI_ACTION_ENABLED_INFO	Enable or disable the action. This will prevent it from being exposed to the LLM
+$MINAI_ACTION_INTERVAL_INFO	The base cooldown (in seconds) inbetween uses of the action. Increases by the exponent every time this is triggered. Set to 0 to disable backoff entirely
+$MINAI_ACTION_EXPONENT_INFO	The exponent applied to the interval's cooldown for uses of this action
+$MINAI_ACTION_MAX_INTERVAL_INFO	The cap on the maximum value that the interval will rise to from repeated uses of the action. Useful if you want to have a cap on how long the cooldown will become
+$MINAI_ACTION_DECAY_WINDOW_INFO	The duration of time which must pass without the action being used for the cooldown to return to the base value
+$MINAI_TEST_ACTIONS_INFO	For debugging purposes. Send test mod events to the backend
+$MINAI_ADD_SPELLS_INFO	Add spells such as Toggle Sapience, and other mod utility spells to the player
+$MINAI_TOGGLE_SAPIENCE_INFO	Hotkey to toggle Sapience on or off
+$MINAI_REMOVE_SPELLS_INFO	Remove the spells that this mod adds from the player
+$MINAI_ENABLE_AMBIENT_COMMENTS_INFO	Enable ambient comments between events. Follows comments during sex scene cooldown. Polling mechanism checking each time if there is no cooldown on comments and fires ambient talking.
+$MINAI_MAX_THREADS_INFO	Maximum concurrent threads for adult frameworks. Ostim usually crashes at 6+, try yourself and set to the number you game can handle.
+$MINAI_SING_KEY_INFO	Hotkey to make your character sing
+$MINAI_NARRATOR_KEY_INFO	Hotkey to initiate a private conversation with just the narrator
+$MINAI_NARRATOR_TEXT_KEY_INFO	Hotkey to type to the narrator
+$MINAI_PRESERVE_QUEUE_INFO	When enabled, the dialogue queue will be preserved when actions are enabled. This allows for more natural conversation flow.
+$MINAI_TRACK_VICTIM_AWARENESS_INFO	When enabled, tracks whether actors in sex scenes are victims or aggressors. This may not be completely accurate, and is mod-dependent.
+$MINAI_ROLEPLAY_KEY_INFO	Hotkey to roleplay as your character using voice
+$MINAI_ROLEPLAY_TEXT_KEY_INFO	Hotkey to roleplay as your character using text
+$MINAI_DISABLE_SAPIENCE_IN_STEALTH_INFO	When enabled, sapience will be automatically disabled while the player is sneaking (Allowing for private conversations with followers and such)
+$MINAI_ENABLE_RADIANT_DIALOGUE_INFO	Enable or disable radiant dialogue between NPCs. When disabled, NPCs will not automatically start conversations with each other.
+
+
+$MINAI_KEY_ALREADY_MAPPED	This key is already mapped to:
+$MINAI_CONTINUE_CONFIRM	Are you sure you want to continue?
+$MINAI_YES	Yes
+$MINAI_NO	No
