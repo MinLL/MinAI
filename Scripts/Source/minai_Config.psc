@@ -235,15 +235,15 @@ Function SetupPages()
   if sex.IsNSFW()
     Pages = new string[5]
     Pages[0] = "$MINAI_GENERAL"
-    Pages[1] = "Physics (CBPC)"
-    Pages[2] = "Devious Stuff"
-    Pages[3] = "Sex Settings"
-    Pages[4] = "Action Registry"
+    Pages[1] = "$MINAI_PHYSICS_CBPC"
+    Pages[2] = "$MINAI_DEVIOUS_STUFF"
+    Pages[3] = "$MINAI_SEX_SETTINGS"
+    Pages[4] = "$MINAI_ACTION_REGISTRY"
   Else
     Pages = new string[3]
-    Pages[0] = "General"
-    Pages[1] = "Physics (CBPC)"
-    Pages[2] = "Action Registry"
+    Pages[0] = "$MINAI_GENERAL"
+    Pages[1] = "$MINAI_PHYSICS_CBPC"
+    Pages[2] = "$MINAI_ACTION_REGISTRY"
   EndIf
 EndFunction
 
@@ -258,13 +258,13 @@ Event OnPageReset(string page)
   EndIf
   if page == "" || page == "$MINAI_GENERAL"
     RenderGeneralPage()
-  elseIf page == "Physics (CBPC)"
+  elseIf page == "$MINAI_PHYSICS_CBPC"
     RenderPhysicsPage()
-  elseif page == "Devious Stuff"
+  elseif page == "$MINAI_DEVIOUS_STUFF"
     RenderDeviousPage()
-  elseif page == "Sex Settings"
+  elseif page == "$MINAI_SEX_SETTINGS"
     RenderSexPage()
-  elseif page == "Action Registry"
+  elseif page == "$MINAI_ACTION_REGISTRY"
     RenderActionsPage();
   else
     RenderPlaceholderPage()
@@ -273,76 +273,74 @@ EndEvent
 
 Function RenderGeneralPage()
   SetCursorFillMode(TOP_TO_BOTTOM)		
-  AddHeaderOption("LLM Settings")
-  autoUpdateDiaryOID = AddToggleOption("Automatically Update Follower Diaries", autoUpdateDiary)
-  updateNarratorDiaryOID = AddToggleOption("Update Narrator Diary on Sleep", updateNarratorDiary)
-  updateNarratorProfileOID = AddToggleOption("Update Narrator Dynamic Profile on Sleep", updateNarratorProfile)
-  requestResponseCooldownOID = AddSliderOption("LLM Response Request Cooldown", requestResponseCooldown, "{1}")
-  AddHeaderOption("Sapience Settings")
-  useSapienceOID = AddToggleOption("Enable Sapience", minai_SapienceEnabled.GetValueInt() == 1)
-  enableRadiantDialogueOID = AddToggleOption("Enable Radiant Dialogue", enableRadiantDialogue)
-  disableSapienceInStealthOID = AddToggleOption("Disable Sapience While Sneaking", disableSapienceInStealth)
-  radiantDialogueFrequencyOID = AddSliderOption("Radiant Dialogue (NPC -> NPC) Frequency", radiantDialogueFrequency, "{1}")
-  radiantDialogueChanceOID = AddSliderOption("Radiant Dialogue (NPC -> NPC) Chance", radiantDialogueChance, "{1}")
-  minRadianceRechatsOID = AddSliderOption("Minimum Radiance Rechats", minRadianceRechats, "{0}")
-  maxRadianceRechatsOID = AddSliderOption("Maximum Radiance Rechats", maxRadianceRechats, "{0}")
+  AddHeaderOption("$MINAI_LLM_SETTINGS")
+  autoUpdateDiaryOID = AddToggleOption("$MINAI_AUTO_UPDATE_FOLLOWER_DIARIES", autoUpdateDiary)
+  updateNarratorDiaryOID = AddToggleOption("$MINAI_UPDATE_NARRATOR_DIARY", updateNarratorDiary)
+  updateNarratorProfileOID = AddToggleOption("$MINAI_UPDATE_NARRATOR_PROFILE", updateNarratorProfile)
+  requestResponseCooldownOID = AddSliderOption("$MINAI_LLM_RESPONSE_COOLDOWN", requestResponseCooldown, "{1}")
+  AddHeaderOption("$MINAI_SAPIENCE_SETTINGS")
+  useSapienceOID = AddToggleOption("$MINAI_ENABLE_SAPIENCE", minai_SapienceEnabled.GetValueInt() == 1)
+  enableRadiantDialogueOID = AddToggleOption("$MINAI_ENABLE_RADIANT_DIALOGUE", enableRadiantDialogue)
+  disableSapienceInStealthOID = AddToggleOption("$MINAI_DISABLE_SAPIENCE_SNEAKING", disableSapienceInStealth)
+  radiantDialogueFrequencyOID = AddSliderOption("$MINAI_RADIANT_DIALOGUE_FREQUENCY", radiantDialogueFrequency, "{1}")
+  radiantDialogueChanceOID = AddSliderOption("$MINAI_RADIANT_DIALOGUE_CHANCE", radiantDialogueChance, "{1}")
+  minRadianceRechatsOID = AddSliderOption("$MINAI_MIN_RADIANCE_RECHATS", minRadianceRechats, "{0}")
+  maxRadianceRechatsOID = AddSliderOption("$MINAI_MAX_RADIANCE_RECHATS", maxRadianceRechats, "{0}")
   SetCursorPosition(1) ; Move cursor to top right position
-  AddHeaderOption("General Settings")
-  toggleCombatDialogueOID = AddToggleOption("CHIM Config - Allow Dialogue during Combat", toggleCombatDialogue)
-  preserveQueueOID = AddToggleOption("CHIM Config - Preserve Dialogue Queue", preserveQueue)
-  addSpellsOID = AddTextOption("General", "Add Spells to Player")
-  removeSpellsOID = AddTextOption("General", "Remove Spells from Player")
-  toggleSapienceOID = AddKeyMapOption("Toggle Sapience", toggleSapienceKey)
-  roleplayKeyOID = AddKeyMapOption("Roleplay Voice", roleplayKey)
-  roleplayTextKeyOID = AddKeyMapOption("Roleplay Text", roleplayTextKey)
+  AddHeaderOption("$MINAI_GENERAL_SETTINGS")
+  toggleCombatDialogueOID = AddToggleOption("$MINAI_ALLOW_COMBAT_DIALOGUE", toggleCombatDialogue)
+  preserveQueueOID = AddToggleOption("$MINAI_PRESERVE_DIALOGUE_QUEUE", preserveQueue)
+  addSpellsOID = AddTextOption("$MINAI_GENERAL_CATEGORY", "$MINAI_ADD_SPELLS")
+  removeSpellsOID = AddTextOption("$MINAI_GENERAL_CATEGORY", "$MINAI_REMOVE_SPELLS")
+  toggleSapienceOID = AddKeyMapOption("$MINAI_TOGGLE_SAPIENCE", toggleSapienceKey)
+  roleplayKeyOID = AddKeyMapOption("$MINAI_ROLEPLAY_VOICE", roleplayKey)
+  roleplayTextKeyOID = AddKeyMapOption("$MINAI_ROLEPLAY_TEXT", roleplayTextKey)
   ; Disable for now until I finish implementing this
-  ; singKeyOID = AddKeyMapOption("Sing", singKey)              ; New keybind option
-  narratorKeyOID = AddKeyMapOption("Talk to Narrator", narratorKey)  ; New keybind option
-  narratorTextKeyOID = AddKeyMapOption("Type to Narrator", narratorTextKey)
-  disableAIAnimationsOID = AddToggleOption("Disable AI-FF Animations", disableAIAnimations)
-  AddHeaderOption("Debug")
-  enableConsoleLoggingOID = AddToggleOption("Enable Console Logging", enableConsoleLogging)
-  testActionsOID = AddTextOption("Debug", "Test Mod Events")
+  ; singKeyOID = AddKeyMapOption("$MINAI_SING", singKey)              ; New keybind option
+  narratorKeyOID = AddKeyMapOption("$MINAI_TALK_TO_NARRATOR", narratorKey)  ; New keybind option
+  narratorTextKeyOID = AddKeyMapOption("$MINAI_TYPE_TO_NARRATOR", narratorTextKey)
+  disableAIAnimationsOID = AddToggleOption("$MINAI_DISABLE_AI_ANIMATIONS", disableAIAnimations)
+  AddHeaderOption("$MINAI_DEBUG")
+  enableConsoleLoggingOID = AddToggleOption("$MINAI_ENABLE_CONSOLE_LOGGING", enableConsoleLogging)
+  testActionsOID = AddTextOption("$MINAI_DEBUG_CATEGORY", "$MINAI_TEST_MOD_EVENTS")
 EndFunction
 
 Function RenderPhysicsPage()
   SetCursorFillMode(TOP_TO_BOTTOM)		
-  AddHeaderOption("CBPC Settings")
-  UseCBPCOID = AddToggleOption("Enable CBPC", useCBPC.GetValueInt() == 1)
-  cbpcDisableSelfTouchOID = AddToggleOption("Disable Self Touch", cbpcDisableSelfTouch)
-  cbpcDisableSelfAssTouchOID = AddToggleOption("Disable Self Ass Touch", cbpcDisableSelfAssTouch)
-  collisionSpeechCooldownOID = AddSliderOption("Physics Speech Comment Rate", collisionSpeechCooldown, "{1}")
-  collisionSexCooldownOID = AddSliderOption("Physics Speech Comment Rate (Sex)", collisionSexCooldown, "{1}")
-  cbpcSelfTouchThresholdOID = AddSliderOption("Self Touch Threshold", cbpcSelfTouchThreshold, "{1}")
-  cbpcOtherTouchThresholdOID = AddSliderOption("NPC Touch Threshold", cbpcOtherTouchThreshold, "{1}")
-  collisionCooldownOID = AddSliderOption("Physics Calculation Rate", collisionCooldown, "{1}")
+  AddHeaderOption("$MINAI_CBPC_SETTINGS")
+  UseCBPCOID = AddToggleOption("$MINAI_ENABLE_CBPC", useCBPC.GetValueInt() == 1)
+  cbpcDisableSelfTouchOID = AddToggleOption("$MINAI_DISABLE_SELF_TOUCH", cbpcDisableSelfTouch)
+  cbpcDisableSelfAssTouchOID = AddToggleOption("$MINAI_DISABLE_SELF_ASS_TOUCH", cbpcDisableSelfAssTouch)
+  collisionSpeechCooldownOID = AddSliderOption("$MINAI_PHYSICS_SPEECH_RATE", collisionSpeechCooldown, "{1}")
+  collisionSexCooldownOID = AddSliderOption("$MINAI_PHYSICS_SPEECH_RATE_SEX", collisionSexCooldown, "{1}")
+  cbpcSelfTouchThresholdOID = AddSliderOption("$MINAI_SELF_TOUCH_THRESHOLD", cbpcSelfTouchThreshold, "{1}")
+  cbpcOtherTouchThresholdOID = AddSliderOption("$MINAI_NPC_TOUCH_THRESHOLD", cbpcOtherTouchThreshold, "{1}")
+  collisionCooldownOID = AddSliderOption("$MINAI_PHYSICS_CALCULATION_RATE", collisionCooldown, "{1}")
 EndFunction
-
 
 Function RenderSexPage()
   ; left column
   SetCursorFillMode(TOP_TO_BOTTOM)
-  AddHeaderOption("Arousal Settings ")
-  arousalForSexOID = AddSliderOption("Arousal Threshold for Sex", arousalForSex, "{0}")
-  arousalForHarassOID = AddSliderOption("Arousal Threshold for Flirting/Harassment", arousalForHarass, "{0}")
-  confirmSexOID = AddToggleOption("Ask before a sex scene is initiated", confirmSex)
-  allowSexTransitionsOID = AddToggleOption("Allow Sex Scene Transitions", allowSexTransitions)
-  allowActorsToJoinSexOID = AddToggleOption("Allow NPC's to join Ongoing Sex Scenes", allowActorsToJoinSex)
-  trackVictimAwarenessOID = AddToggleOption("Track Victim Actor Awareness", trackVictimAwareness)
-  AddHeaderOption("NPC Sex Settings")
-  enableAISexOID = AddToggleOption("Enable NPC -> NPC Sex", enableAISex)
+  AddHeaderOption("$MINAI_AROUSAL_SETTINGS")
+  arousalForSexOID = AddSliderOption("$MINAI_AROUSAL_SEX_THRESHOLD", arousalForSex, "{0}")
+  arousalForHarassOID = AddSliderOption("$MINAI_AROUSAL_HARASS_THRESHOLD", arousalForHarass, "{0}")
+  confirmSexOID = AddToggleOption("$MINAI_CONFIRM_SEX", confirmSex)
+  allowSexTransitionsOID = AddToggleOption("$MINAI_ALLOW_SEX_TRANSITIONS", allowSexTransitions)
+  allowActorsToJoinSexOID = AddToggleOption("$MINAI_ALLOW_JOIN_SEX", allowActorsToJoinSex)
+  trackVictimAwarenessOID = AddToggleOption("$MINAI_TRACK_VICTIM_AWARENESS", trackVictimAwareness)
+  AddHeaderOption("$MINAI_NPC_SEX_SETTINGS")
+  enableAISexOID = AddToggleOption("$MINAI_ENABLE_NPC_SEX", enableAISex)
   ; right column
   SetCursorPosition(1)
-  AddHeaderOption("Comments during sex")
-  genderWeightCommentsOID = AddSliderOption("Gender weight", genderWeightComments, "{0}")
-  commentsRateOID = AddSliderOption("Comments rate", commentsRate)
-  prioritizePlayerThreadOID = AddToggleOption("Prioritize comments in player's scene", prioritizePlayerThread)
-  forceOrgasmCommentOID = AddToggleOption("Force orgasm comment", forceOrgasmComment)
-  forcePostSceneCommentOID = AddToggleOption("Force post scene comment", forcePostSceneComment)
-  enableAmbientCommentsOID = AddToggleOption("Enable ambient comments between events", enableAmbientComments)
-  maxThreadsOID = AddSliderOption("Max threads", maxThreads)
+  AddHeaderOption("$MINAI_SEX_COMMENTS")
+  genderWeightCommentsOID = AddSliderOption("$MINAI_GENDER_WEIGHT", genderWeightComments, "{0}")
+  commentsRateOID = AddSliderOption("$MINAI_COMMENTS_RATE", commentsRate)
+  prioritizePlayerThreadOID = AddToggleOption("$MINAI_PRIORITIZE_PLAYER_COMMENTS", prioritizePlayerThread)
+  forceOrgasmCommentOID = AddToggleOption("$MINAI_FORCE_ORGASM_COMMENT", forceOrgasmComment)
+  forcePostSceneCommentOID = AddToggleOption("$MINAI_FORCE_POST_SCENE_COMMENT", forcePostSceneComment)
+  enableAmbientCommentsOID = AddToggleOption("$MINAI_ENABLE_AMBIENT_COMMENTS", enableAmbientComments)
+  maxThreadsOID = AddSliderOption("$MINAI_MAX_THREADS", maxThreads)
 EndFunction
-
 
 Function RenderDeviousPage()
   SetCursorFillMode(TOP_TO_BOTTOM)		
@@ -375,9 +373,9 @@ Function RenderAction(int actionObj)
 EndFunction
 
 Function RenderActionCategory(string category)
-  AddHeaderOption(">>> " + category + " $MINAI_ACTIONS")
+  AddHeaderOption(StringUtil.Format("$MINAI_CATEGORY_HEADER_FORMAT", category))
   if category != currentCategory
-    int categoryOID = AddTextOption("$MINAI_EXPAND " + category + " $MINAI_ACTIONS", "")
+    int categoryOID = AddTextOption(StringUtil.Format("$MINAI_EXPAND_CATEGORY_FORMAT", category), "")
     JMap.setInt(aCategoryMap, category, categoryOID)
     return
   EndIf
@@ -441,11 +439,9 @@ Function RenderActionsPage()
   EndIf
 EndFunction
 
-
 Function RenderPlaceholderPage()
   AddHeaderOption("Not Yet Implemented") 
 EndFunction
-
 
 Function SetGlobalToggle(int oid, GlobalVariable var, bool value)
   if value
@@ -464,7 +460,6 @@ Function ToggleGlobal(int oid, GlobalVariable var)
   EndIf
   SetToggleOptionValue(oid, var.GetValueInt() == 1)
 EndFunction
-
 
 Function StoreConfig(string var, string value)
   actor Player = Game.GetPlayer()
@@ -672,7 +667,6 @@ Event OnOptionSelect(int oid)
   EndWhile
 EndEvent
 
-
 Event OnOptionDefault(int oid)
   bool changedAction = False
   if oid == enableConsoleLoggingOID
@@ -817,7 +811,6 @@ Event OnOptionDefault(int oid)
     SetToggleOptionValue(oid, enableRadiantDialogue)
   EndIf
 EndEvent
-
 
 Event OnOptionHighlight(int oid)
   Main.Debug("OnOptionHighlight(" + oid + ")")
@@ -1053,8 +1046,6 @@ Event OnOptionSliderOpen(int oid)
   EndIf
 EndEvent
 
-
-
 Event OnOptionSliderAccept(int oid, float value)
   if oid == cbpcSelfTouchThresholdOID
     cbpcSelfTouchThreshold = value
@@ -1122,7 +1113,6 @@ Event OnOptionSliderAccept(int oid, float value)
     StoreConfig("maxThreads", commentsRate)
   EndIf
 EndEvent
-
 
 Event OnOptionKeyMapChange(int a_option, int a_keyCode, string a_conflictControl, string a_conflictName)
     {Called when a key has been remapped}

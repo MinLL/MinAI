@@ -89,7 +89,6 @@ $MINAI_CATEGORY_DEVIOUS	Devious Stuff
 $MINAI_CATEGORY_DEVIOUS_FOLLOWERS	Devious Followers
 $MINAI_CATEGORY_SUBMISSIVE_LOLA	Submissive Lola
 
-
 $MINAI_CONSOLE_LOGGING_INFO	Controls whether log messages are printed to the console in addition to the Papyrus log
 $MINAI_CBPC_GLOBAL_INFO	Enables or disables CBPC globally. Requires save/reload to take effect
 $MINAI_AUTO_UPDATE_DIARY_INFO	Automatically update the diary for all followers upon sleeping.
@@ -144,8 +143,11 @@ $MINAI_ROLEPLAY_TEXT_KEY_INFO	Hotkey to roleplay as your character using text
 $MINAI_DISABLE_SAPIENCE_IN_STEALTH_INFO	When enabled, sapience will be automatically disabled while the player is sneaking (Allowing for private conversations with followers and such)
 $MINAI_ENABLE_RADIANT_DIALOGUE_INFO	Enable or disable radiant dialogue between NPCs. When disabled, NPCs will not automatically start conversations with each other.
 
-
 $MINAI_KEY_ALREADY_MAPPED	This key is already mapped to:
 $MINAI_CONTINUE_CONFIRM	Are you sure you want to continue?
 $MINAI_YES	Yes
 $MINAI_NO	No
+
+$MINAI_CATEGORY_HEADER_FORMAT	>>> {0} Actions
+$MINAI_EXPAND_CATEGORY_FORMAT	Expand {0} Actions
+
