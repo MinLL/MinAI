@@ -3,7 +3,7 @@ A significant expansion to CHIM that brings AI to the entirety of the Skyrim wor
 
 Documentation for modders can be found [here](https://github.com/MinLL/MinAI/blob/main/ModdersGuide.md). FAQ can be found [here](https://github.com/MinLL/MinAI/blob/main/FAQ.md).
 
- If you like my work and want to encourage further development, [consider donating](https://ko-fi.com/minll).
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/S6S51B7MJA)
  
  ## Description
 
