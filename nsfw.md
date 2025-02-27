@@ -101,5 +101,5 @@ MinAI includes 3467 ostim/sexlab scene descriptions (as of 10/24/2024) for bette
 * Adds LLM awareness of inflation states - The AI will know when actors are inflated vaginally, anally, or orally
 * The AI is aware of exact amounts in each orifice and will incorporate this into their responses
 * Includes support for impregnation states from Fill Her Up
-* The AI will acknowledge when actors expel cum, absorb it into their body, or their belly inflates/deflates
+* The AI will acknowledge when events from Fill Her Up occur.
 * Provides detailed contextual descriptions of belly size and other physical changes
