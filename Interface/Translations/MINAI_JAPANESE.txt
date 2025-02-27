@@ -1,0 +1,152 @@
+//MINAI_CONFIG
+$MINAI_GENERAL	一般
+$MINAI_PHYSICS_CBPC	物理演算 (CBPC)
+$MINAI_DEVIOUS_STUFF	デビアスデバイス
+$MINAI_SEX_SETTINGS	性的設定
+$MINAI_ACTION_REGISTRY	アクション登録
+
+$MINAI_LLM_SETTINGS	LLM設定
+$MINAI_AUTO_UPDATE_FOLLOWER_DIARIES	フォロワー日記を自動更新
+$MINAI_UPDATE_NARRATOR_DIARY	睡眠時にナレーター日記を更新
+$MINAI_UPDATE_NARRATOR_PROFILE	睡眠時にナレーター動的プロファイルを更新
+$MINAI_LLM_RESPONSE_COOLDOWN	LLM応答リクエストのクールダウン
+$MINAI_SAPIENCE_SETTINGS	サピエンス設定
+$MINAI_ENABLE_SAPIENCE	サピエンスを有効化
+$MINAI_ENABLE_RADIANT_DIALOGUE	ラディアントダイアログを有効化
+$MINAI_DISABLE_SAPIENCE_SNEAKING	スニーク中はサピエンスを無効化
+$MINAI_RADIANT_DIALOGUE_FREQUENCY	ラディアントダイアログ (NPC→NPC) 頻度
+$MINAI_RADIANT_DIALOGUE_CHANCE	ラディアントダイアログ (NPC→NPC) 確率
+$MINAI_MIN_RADIANCE_RECHATS	最小ラディアンス再会話回数
+$MINAI_MAX_RADIANCE_RECHATS	最大ラディアンス再会話回数
+$MINAI_GENERAL_SETTINGS	一般設定
+$MINAI_ALLOW_COMBAT_DIALOGUE	CHIM設定 - 戦闘中の会話を許可
+$MINAI_PRESERVE_DIALOGUE_QUEUE	CHIM設定 - 会話キューを保持
+$MINAI_GENERAL_CATEGORY	一般
+$MINAI_ADD_SPELLS	プレイヤーに呪文を追加
+$MINAI_REMOVE_SPELLS	プレイヤーから呪文を削除
+$MINAI_TOGGLE_SAPIENCE	サピエンス切替
+$MINAI_ROLEPLAY_VOICE	ロールプレイ（音声）
+$MINAI_ROLEPLAY_TEXT	ロールプレイ（テキスト）
+$MINAI_SING	歌う
+$MINAI_TALK_TO_NARRATOR	ナレーターと会話
+$MINAI_TYPE_TO_NARRATOR	ナレーターにテキスト入力
+$MINAI_DISABLE_AI_ANIMATIONS	AI-FFアニメーションを無効化
+$MINAI_DEBUG	デバッグ
+$MINAI_DEBUG_CATEGORY	デバッグ
+$MINAI_ENABLE_CONSOLE_LOGGING	コンソールログを有効化
+$MINAI_TEST_MOD_EVENTS	MODイベントをテスト
+
+$MINAI_CBPC_SETTINGS	CBPC設定
+$MINAI_ENABLE_CBPC	CBPCを有効化
+$MINAI_DISABLE_SELF_TOUCH	自己接触を無効化
+$MINAI_DISABLE_SELF_ASS_TOUCH	自己臀部接触を無効化
+$MINAI_PHYSICS_SPEECH_RATE	物理演算に関するコメント頻度
+$MINAI_PHYSICS_SPEECH_RATE_SEX	物理演算に関するコメント頻度（性行為中）
+$MINAI_SELF_TOUCH_THRESHOLD	自己接触閾値
+$MINAI_NPC_TOUCH_THRESHOLD	NPC接触閾値
+$MINAI_PHYSICS_CALCULATION_RATE	物理演算計算頻度
+
+$MINAI_AROUSAL_SETTINGS	興奮設定
+$MINAI_AROUSAL_SEX_THRESHOLD	性行為のための興奮閾値
+$MINAI_AROUSAL_HARASS_THRESHOLD	フリート/ハラスメントのための興奮閾値
+$MINAI_CONFIRM_SEX	性的シーン開始前に確認
+$MINAI_ALLOW_SEX_TRANSITIONS	性的シーン遷移を許可
+$MINAI_ALLOW_JOIN_SEX	NPCが進行中の性的シーンに参加することを許可
+$MINAI_TRACK_VICTIM_AWARENESS	被害者アクター認識を追跡
+$MINAI_NPC_SEX_SETTINGS	NPC性行為設定
+$MINAI_ENABLE_NPC_SEX	NPC→NPC性行為を有効化
+$MINAI_SEX_COMMENTS	性行為中のコメント
+$MINAI_GENDER_WEIGHT	性別の重み
+$MINAI_COMMENTS_RATE	コメント頻度
+$MINAI_PRIORITIZE_PLAYER_COMMENTS	プレイヤーのシーンでのコメントを優先
+$MINAI_FORCE_ORGASM_COMMENT	オーガズムコメントを強制
+$MINAI_FORCE_POST_SCENE_COMMENT	シーン後のコメントを強制
+$MINAI_ENABLE_AMBIENT_COMMENTS	イベント間の環境コメントを有効化
+$MINAI_MAX_THREADS	最大スレッド数
+
+$MINAI_DD_SETTINGS	DD設定
+$MINAI_DD_NOT_DETECTED	Devious Devicesが検出されませんでした
+$MINAI_ALLOW_DEVICE_LOCK	LLMがアクターにデバイスをロックすることを許可
+$MINAI_ALLOW_DEVICE_UNLOCK	LLMがアクターからデバイスをアンロックすることを許可
+
+$MINAI_ACTION_ENABLE_DISABLE	有効/無効
+$MINAI_ACTION_INTERVAL	間隔
+$MINAI_ACTION_EXPONENT	指数
+$MINAI_ACTION_MAX_INTERVAL	最大間隔
+$MINAI_ACTION_DECAY_WINDOW	減衰ウィンドウ
+$MINAI_EDIT_ACTION	アクションを編集
+
+$MINAI_ACTIONS	アクション
+$MINAI_EXPAND	展開
+
+$MINAI_CATEGORY_GENERAL	一般
+$MINAI_CATEGORY_SURVIVAL	サバイバル
+$MINAI_CATEGORY_EXTERNAL	外部
+$MINAI_CATEGORY_FOLLOWERS	フォロワー
+$MINAI_CATEGORY_AROUSAL	興奮
+$MINAI_CATEGORY_SEX	性行為
+$MINAI_CATEGORY_DEVIOUS	デビアスデバイス
+$MINAI_CATEGORY_DEVIOUS_FOLLOWERS	デビアスフォロワー
+$MINAI_CATEGORY_SUBMISSIVE_LOLA	従順なローラ
+
+$MINAI_CONSOLE_LOGGING_INFO	ログメッセージをPapyrusログだけでなくコンソールにも表示するかどうかを制御します
+$MINAI_CBPC_GLOBAL_INFO	CBPCをグローバルに有効/無効にします。変更を適用するには保存/再読み込みが必要です
+$MINAI_AUTO_UPDATE_DIARY_INFO	睡眠時に全フォロワーの日記を自動的に更新します。
+$MINAI_UPDATE_NARRATOR_DIARY_INFO	ナレーターが睡眠時に更新される日記を維持するかどうかを制御します。
+$MINAI_UPDATE_NARRATOR_PROFILE_INFO	ナレーターの動的プロファイルが睡眠時に更新されるかどうかを制御します。
+$MINAI_ENABLE_AI_SEX_INFO	NPCが互いに性行為を決定することを許可します。
+$MINAI_USE_SAPIENCE_INFO	サピエンスシステムはSPIDを使用してプレイヤーの周囲の半径内でAIを動的に有効/無効にし、NPCがプレイヤーの直接関与なしに互いにラディアントに相互作用することを可能にします。
+$MINAI_CBPC_DISABLE_SELF_TOUCH_INFO	自己との衝突検出を有効/無効にします
+$MINAI_CBPC_DISABLE_SELF_ASS_TOUCH_INFO	自分自身の臀部との衝突検出を有効/無効にします。VRでの検出イベントを避けるのに役立ちます
+$MINAI_CBPC_OTHER_TOUCH_THRESHOLD_INFO	他者との衝突を登録するために、特定の期間内に部位が触れられる必要がある累積時間
+$MINAI_CBPC_SELF_TOUCH_THRESHOLD_INFO	自己接触の衝突を登録するために、特定の期間内に部位が触れられる必要がある累積時間
+$MINAI_COLLISION_COOLDOWN_INFO	物理演算が計算される頻度（秒単位）。低い値＝より応答性が高い、高い値＝スクリプト負荷が少ない
+$MINAI_COLLISION_SPEECH_COOLDOWN_INFO	AIが物理に反応するよう促される頻度（秒単位）（性行為外）
+$MINAI_RADIANT_DIALOGUE_FREQUENCY_INFO	近くのAIに対してラディアントダイアログの確率がチェックされる頻度
+$MINAI_RADIANT_DIALOGUE_CHANCE_INFO	ラディアントダイアログシステムがチェック時に呼び出される可能性
+$MINAI_COLLISION_SEX_COOLDOWN_INFO	AIが物理に反応するよう促される頻度（秒単位）（性行為中）
+$MINAI_ALLOW_DEVICE_LOCK_INFO	AIがアクターにデバイスをロックすることを許可するべきですか？
+$MINAI_ALLOW_DEVICE_UNLOCK_INFO	AIがアクターからデバイスをアンロックすることを許可するべきですか？
+$MINAI_REQUEST_RESPONSE_COOLDOWN_INFO	ゲーム内イベントに対するLLMの反応をリクエストする間の最小時間（秒単位）
+$MINAI_AROUSAL_FOR_SEX_INFO	性関連アクションがLLMに公開されるために必要な最小興奮レベル
+$MINAI_MIN_RADIANCE_RECHATS_INFO	ラディアントダイアログが再会話できる最小回数
+$MINAI_MAX_RADIANCE_RECHATS_INFO	ラディアントダイアログが再会話できる最大回数
+$MINAI_AROUSAL_FOR_HARASS_INFO	スパンキング、愛撫、キスなどのアクションがLLMに公開されるために必要な最小興奮レベル
+$MINAI_CONFIRM_SEX_INFO	性的シーン開始前に確認メッセージを表示します
+$MINAI_ALLOW_ACTORS_TO_JOIN_SEX_INFO	アクターが進行中の性的シーンに参加することを許可します
+$MINAI_ALLOW_SEX_TRANSITIONS_INFO	アクターがシーン途中で異なる種類の性的シーンに移行することを許可します
+$MINAI_TOGGLE_COMBAT_DIALOGUE_INFO	戦闘中の会話を許可します。アクター間の会話、挑発、嘲笑などを容易にします。
+$MINAI_DISABLE_AI_ANIMATIONS_INFO	AI-FFアニメーションを強制的に無効化します。アイドル状態をリセットする際にAIAgent DLLでCTDが発生することがあり、これを回避します。
+$MINAI_GENDER_WEIGHT_COMMENTS_INFO	各性別のNPCが会話する頻度を変更します。0 - 男性のみ会話。100 - 女性のみ会話。
+$MINAI_COMMENTS_RATE_INFO	性的シーン中のコメントのクールダウン（秒単位）。例：平均AI応答時間が10秒の場合、このオプションを>10に設定。リソースを大量に消費し、キャラクターが絶え間なく話し続ける可能性があるため、低すぎる値に設定しないでください...
+$MINAI_FORCE_ORGASM_COMMENT_INFO	性行為中のコメントクールダウンを無視し、オーガズムイベント時にすぐにメッセージをリクエストします。
+$MINAI_FORCE_POST_SCENE_COMMENT_INFO	性行為中のコメントクールダウンを無視し、性的シーン終了後にメッセージをリクエストします。
+$MINAI_PRIORITIZE_PLAYER_THREAD_INFO	プレイヤーが関与するシーンがある場合、すべてのコメントはこれらのシーン内になります。
+$MINAI_ACTION_ENABLED_INFO	アクションを有効/無効にします。これによりLLMへの公開が防止されます
+$MINAI_ACTION_INTERVAL_INFO	アクションの使用間の基本クールダウン（秒単位）。トリガーされるたびに指数関数的に増加します。バックオフを完全に無効にするには0に設定します
+$MINAI_ACTION_EXPONENT_INFO	このアクションの使用に対して間隔のクールダウンに適用される指数
+$MINAI_ACTION_MAX_INTERVAL_INFO	アクションの繰り返し使用によって間隔が上昇する最大値の上限。クールダウンがどれだけ長くなるかの上限を設定したい場合に便利です
+$MINAI_ACTION_DECAY_WINDOW_INFO	クールダウンが基本値に戻るためにアクションが使用されずに経過する必要がある時間の長さ
+$MINAI_TEST_ACTIONS_INFO	デバッグ目的。バックエンドにテストMODイベントを送信します
+$MINAI_ADD_SPELLS_INFO	サピエンス切替や他のMODユーティリティ呪文などをプレイヤーに追加します
+$MINAI_TOGGLE_SAPIENCE_INFO	サピエンスのオン/オフを切り替えるホットキー
+$MINAI_REMOVE_SPELLS_INFO	このMODがプレイヤーに追加する呪文を削除します
+$MINAI_ENABLE_AMBIENT_COMMENTS_INFO	イベント間の環境コメントを有効にします。性的シーン中のコメントクールダウンに従います。コメントにクールダウンがないかを毎回チェックし、環境会話を起動するポーリングメカニズムです。
+$MINAI_MAX_THREADS_INFO	成人向けフレームワークの最大同時スレッド数。Ostimは通常6+でクラッシュします。ゲームが処理できる数を自分で試して設定してください。
+$MINAI_SING_KEY_INFO	キャラクターに歌わせるホットキー
+$MINAI_NARRATOR_KEY_INFO	ナレーターとのプライベート会話を開始するホットキー
+$MINAI_NARRATOR_TEXT_KEY_INFO	ナレーターにテキスト入力するホットキー
+$MINAI_PRESERVE_QUEUE_INFO	有効にすると、アクションが有効化されたときに会話キューが保持されます。これにより、より自然な会話の流れが可能になります。
+$MINAI_TRACK_VICTIM_AWARENESS_INFO	有効にすると、性的シーンでのアクターが被害者か加害者かを追跡します。これは完全に正確ではなく、MODに依存します。
+$MINAI_ROLEPLAY_KEY_INFO	音声を使用してキャラクターとしてロールプレイするホットキー
+$MINAI_ROLEPLAY_TEXT_KEY_INFO	テキストを使用してキャラクターとしてロールプレイするホットキー
+$MINAI_DISABLE_SAPIENCE_IN_STEALTH_INFO	有効にすると、プレイヤーがスニーク中は自動的にサピエンスが無効になります（フォロワーとのプライベート会話などを可能にします）
+$MINAI_ENABLE_RADIANT_DIALOGUE_INFO	NPC間のラディアントダイアログを有効/無効にします。無効にすると、NPCは自動的に互いに会話を開始しません。
+
+$MINAI_KEY_ALREADY_MAPPED	このキーは既に以下に割り当てられています：
+$MINAI_CONTINUE_CONFIRM	続行してもよろしいですか？
+$MINAI_YES	はい
+$MINAI_NO	いいえ
+
+$MINAI_CATEGORY_HEADER_FORMAT	>>> {0}アクション
+$MINAI_EXPAND_CATEGORY_FORMAT	{0}アクションを展開
