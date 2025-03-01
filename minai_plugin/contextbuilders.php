@@ -171,7 +171,7 @@ Function GetClothingContext($name, $forceNarrator = false) {
   
   // if $eqContext["context"] not empty, then will set ret
   if (!empty($eqContext["context"])) {
-    $ret .= "{$name} is wearing {$eqContext["context"]}";
+    $ret .= "{$name} is wearing {$eqContext["context"]}\n";
   } elseif (IsEnabled($name, "isNaked")) {
     $ret .= "{$name} is naked and exposed.\n";
   } elseif (!empty($cuirass)) {
@@ -220,27 +220,29 @@ Function GetClothingContext($name, $forceNarrator = false) {
     if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorHarness")) {
       $ret .= "{$concealedPrefix}{$name} is wearing a form-fitting body harness.\n";
     }
-    if (HasKeywordAndNotSkip($name, $eqContext, "SLA_HalfNakedBikini")) {
-      $ret .= "{$concealedPrefix}{$name} is wearing a set of revealing bikini armor.\n";
-    }
-    if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorHalfNaked")) {
-      $ret .= "{$concealedPrefix}{$name} is wearing very revealing attire, leaving them half naked.\n";
-    }
-    if (HasKeywordAndNotSkip($name, $eqContext, "EroticArmor")) {
-      // $ret .= "{$concealedPrefix}{$name} is wearing a sexy revealing outfit.\n";
-    }
-    if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorSpendex")) {
-      $ret .= "{$concealedPrefix}{$name}'s outfit is made out of latex (Referred to as Ebonite).\n";
-    }
-    if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorTransparent")) {
-      $ret .= "{$concealedPrefix}{$name}'s outfit is transparent, leaving nothing to the imagination.\n";
-    }
-    if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorLewdLeotard")) {
-      $ret .= "{$concealedPrefix}{$name} is wearing a sheer, revealing leotard leaving very little to the imagination.\n";
-    }
-    if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorRubber")) {
-      $ret .= "{$concealedPrefix}{$name}'s outfit is made out of tight form-fitting rubber (Referred to as Ebonite).\n";
-    }
+  }
+
+  // Always visible clothing
+  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_HalfNakedBikini")) {
+    $ret .= "{$concealedPrefix}{$name} is wearing a set of revealing bikini armor.\n";
+  }
+  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorHalfNaked")) {
+    $ret .= "{$concealedPrefix}{$name} is wearing very revealing attire, leaving them half naked.\n";
+  }
+  if (HasKeywordAndNotSkip($name, $eqContext, "EroticArmor")) {
+    // $ret .= "{$concealedPrefix}{$name} is wearing a sexy revealing outfit.\n";
+  }
+  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorSpendex")) {
+    $ret .= "{$concealedPrefix}{$name}'s outfit is made out of latex (Referred to as Ebonite).\n";
+  }
+  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorTransparent")) {
+    $ret .= "{$concealedPrefix}{$name}'s outfit is transparent, leaving nothing to the imagination.\n";
+  }
+  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorLewdLeotard")) {
+    $ret .= "{$concealedPrefix}{$name} is wearing a sheer, revealing leotard leaving very little to the imagination.\n";
+  }
+  if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorRubber")) {
+    $ret .= "{$concealedPrefix}{$name}'s outfit is made out of tight form-fitting rubber (Referred to as Ebonite).\n";
   }
 
   // Always visible accessories

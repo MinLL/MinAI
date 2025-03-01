@@ -143,22 +143,18 @@ function BuildEquipmentContext(&$parsedData)
       $context .= ", ";
     }
 
-    if (empty($name)) {
-      if (!empty($description)) {
-        $context .= "{$description}";
-      }
-    } else {
-      if (empty($description)) {
-        $context .= "{$name}";
-      } else {
-        $context .= "{$name} - {$description}";
-      }
-    }
-
+    // If there's a description, use only that
     if (!empty($description)) {
+      $context .= $description;
+      // Add keywords to skip since we used the description
       foreach ($segment['keywords'] as $keyword) {
         $skipKeywords[strtolower($keyword)] = true;
       }
+    } 
+    // If no description but has a name, use the name
+    else if (!empty($name)) {
+      $context .= $name;
+      // Don't add to skipKeywords since we may want keyword-based descriptions
     }
   }
   
