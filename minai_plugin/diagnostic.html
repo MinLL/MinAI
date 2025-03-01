@@ -199,7 +199,7 @@
             flex-grow: 1;
             background-color: var(--background-dark);
             border-radius: 8px;
-            padding: 10px;
+            padding: 0;
             font-family: 'Consolas', monospace;
             font-size: 0.9rem;
             line-height: 1.3;
@@ -208,35 +208,21 @@
             border: 1px solid var(--border-color);
             height: calc(100% - 100px);
             scroll-behavior: smooth;
-        }
-
-        .log-content.updating {
-            scroll-behavior: auto;
-        }
-
-        .log-content::-webkit-scrollbar {
-            width: 12px;
-        }
-
-        .log-content::-webkit-scrollbar-track {
-            background: var(--background-dark);
-        }
-
-        .log-content::-webkit-scrollbar-thumb {
-            background-color: var(--border-color);
-            border-radius: 6px;
-            border: 3px solid var(--background-dark);
+            width: 100%;
         }
 
         .log-line {
-            margin: 1px 0;
-            padding: 1px 4px;
+            margin: 0;
+            padding: 1px 10px;
             border-radius: 2px;
-            white-space: nowrap;
-            overflow: hidden;
             position: relative;
             cursor: pointer;
             transition: background-color 0.2s;
+            display: flex;
+            align-items: baseline;
+            min-height: 1.3em;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .log-line.error {
@@ -270,12 +256,11 @@
 
         .timestamp {
             color: var(--info-color);
-            background: rgba(77, 171, 247, 0.1);
-            border-radius: 2px;
+            opacity: 0.8;
             font-size: 0.85em;
-            display: inline;
-            min-width: unset;
+            padding-right: 8px;
             white-space: nowrap;
+            flex: 0 0 auto;
         }
 
         .filter-container {
@@ -674,9 +659,9 @@
 
         .log-module {
             color: var(--info-color);
+            opacity: 0.8;
             font-size: 0.85em;
-            display: inline;
-            min-width: unset;
+            padding-right: 8px;
             white-space: nowrap;
         }
 
@@ -694,20 +679,23 @@
 
         .log-message {
             color: var(--text-color);
-            display: inline;
-            padding: 0;
-            margin-left: 4px;
+            flex: 1;
         }
 
         /* Default wrap behavior */
         .log-viewer.wrap .log-line {
-            white-space: normal;
+            white-space: pre-wrap;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            flex-wrap: wrap;
         }
 
         .log-viewer.wrap .log-message {
             white-space: pre-wrap;
             word-break: break-word;
+            overflow-wrap: break-word;
             overflow: visible;
+            flex: 1;
         }
 
         /* No-wrap behavior */
@@ -719,6 +707,7 @@
             white-space: pre;
             text-overflow: clip;
             overflow: hidden;
+            flex: 1;
         }
 
         /* Make the log content container scrollable horizontally in nowrap mode */
@@ -731,9 +720,13 @@
         .log-viewer.wrap .json-number,
         .log-viewer.wrap .json-boolean,
         .log-viewer.wrap .json-null,
-        .log-viewer.wrap .json-key {
+        .log-viewer.wrap .json-key,
+        .log-viewer.wrap .available-action-keyword,
+        .log-viewer.wrap .available-action-name,
+        .log-viewer.wrap .available-action-desc {
             white-space: pre-wrap;
             word-break: break-word;
+            overflow-wrap: break-word;
         }
 
         /* Add these styles */
@@ -1378,13 +1371,35 @@
             return content.split('\n').map(line => {
                 if (!line.trim()) return '';
                 
-                // Simple sanitization
-                const sanitizedLine = line
+                // Extract timestamp if present
+                const timestampMatch = line.match(/^\[(.*?)\]/);
+                const timestamp = timestampMatch ? timestampMatch[1] : '';
+                let remainingText = timestampMatch ? line.slice(timestampMatch[0].length).trim() : line;
+                
+                // Extract module if present (e.g., [php:notice])
+                const moduleMatch = remainingText.match(/^\[([\w:]+)\]/);
+                const module = moduleMatch ? moduleMatch[1] : '';
+                const message = moduleMatch ? remainingText.slice(moduleMatch[0].length).trim() : remainingText;
+                
+                // Sanitize all parts
+                const sanitizedTimestamp = timestamp
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
+                const sanitizedModule = module
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
+                const sanitizedMessage = message
                     .replace(/&/g, '&amp;')
                     .replace(/</g, '&lt;')
                     .replace(/>/g, '&gt;');
                 
-                return `<div class="log-line">${sanitizedLine}</div>`;
+                return `<div class="log-line">
+                    ${timestamp ? `<span class="timestamp">[${sanitizedTimestamp}]</span>` : ''}
+                    ${module ? `<span class="log-module">[${sanitizedModule}]</span>` : ''}
+                    <span class="log-message">${sanitizedMessage}</span>
+                </div>`;
             }).filter(line => line).join('');
         }
 
@@ -1396,46 +1411,51 @@
                 if (line.trim() === '=') {
                     return '<hr style="border: 1px dashed var(--border-color); margin: 10px 0;">';
                 }
-                
-                // Sanitize the line
-                let sanitizedLine = line
+
+                // First sanitize the entire line
+                let processedLine = line
                     .replace(/&/g, '&amp;')
                     .replace(/</g, '&lt;')
                     .replace(/>/g, '&gt;');
                 
-                // Highlight AVAILABLE ACTION
-                sanitizedLine = sanitizedLine.replace(
-                    /AVAILABLE ACTION: (\w+) \((.*?)\)/g,
-                    '<span class="available-action-keyword">AVAILABLE ACTION:</span> ' +
-                    '<span class="available-action-name">$1</span> ' +
-                    '<span class="available-action-desc">($2)</span>'
+                // Then process AVAILABLE ACTION with proper HTML
+                processedLine = processedLine.replace(
+                    /AVAILABLE ACTION:\s*([^(]+?)\s*\((.*?)\)/g,
+                    'AVAILABLE_ACTION_PLACEHOLDER$1PLACEHOLDER_SEPARATOR$2PLACEHOLDER_END'
                 );
-                
-                // Highlight quoted strings
-                sanitizedLine = sanitizedLine.replace(
+
+                // Apply other highlighting rules
+                processedLine = processedLine.replace(
                     /(['"])(.*?)\1/g, 
                     '<span class="php-string">$1$2$1</span>'
                 );
                 
-                // Highlight array keys
-                sanitizedLine = sanitizedLine.replace(
+                processedLine = processedLine.replace(
                     /(\w+)\s*=>/g,
                     '<span class="php-array-key">$1</span> =>'
                 );
                 
-                // Highlight array keyword
-                sanitizedLine = sanitizedLine.replace(
+                processedLine = processedLine.replace(
                     /\barray\s*\(/g,
                     '<span class="php-array">array</span> ('
                 );
                 
-                // Highlight numbers
-                sanitizedLine = sanitizedLine.replace(
+                processedLine = processedLine.replace(
                     /\b(\d+)\b/g,
                     '<span class="php-number">$1</span>'
                 );
+
+                // Finally, replace our placeholder with the properly formatted action
+                processedLine = processedLine.replace(
+                    /AVAILABLE_ACTION_PLACEHOLDER(.*?)PLACEHOLDER_SEPARATOR(.*?)PLACEHOLDER_END/g,
+                    (match, action, desc) => {
+                        return '<span class="available-action-keyword">AVAILABLE ACTION:</span> ' +
+                               '<span class="available-action-name">' + action.trim() + '</span> ' +
+                               '<span class="available-action-desc">(' + desc.trim() + ')</span>';
+                    }
+                );
                 
-                return `<div class="log-line">${sanitizedLine}</div>`;
+                return `<div class="log-line">${processedLine}</div>`;
             }).filter(line => line).join('\n');
         }
 
