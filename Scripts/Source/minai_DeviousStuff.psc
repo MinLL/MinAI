@@ -751,8 +751,8 @@ EndFunction
 
 Event CommandDispatcher(String speakerName,String  command, String parameter)
   Main.Debug("Devious - CommandDispatcher(" + speakerName +", " + command +", " + parameter + ")")
-  Actor akSpeaker=AIAgentFunctions.getAgentByName(speakerName)
-  actor akTarget= AIAgentFunctions.getAgentByName(parameter)
+  Actor akSpeaker=aiff.AIGetAgentByName(speakerName)
+  actor akTarget= aiff.AIGetAgentByName(parameter)
   if !akTarget
     akTarget = PlayerRef
   EndIf
@@ -1368,7 +1368,7 @@ string Function SerializeTattooForDB(Actor target)
     
     ; Send the full tattoo data to be stored
     if result != ""
-        AIAgentFunctions.logMessage(Main.GetActorName(target) + "@" + result, "storetattoodesc")
+        aiff.AILogMessage(Main.GetActorName(target) + "@" + result, "storetattoodesc")
     endif
     
     return result

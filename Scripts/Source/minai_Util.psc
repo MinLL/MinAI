@@ -1,7 +1,6 @@
 scriptname minai_Util extends Quest
 
 Actor Property PlayerRef auto
-GlobalVariable property logLevel Auto
 minai_Config Property config Auto
 
 Function Maintenance()
@@ -86,33 +85,39 @@ EndFunction
 
 
 Function Error(String str)
-  if logLevel.GetValueInt() >= 1
+  if config.logLevel >= 1
     Log(str, "ERROR")
   EndIf
 EndFunction
 
 
 Function Warn(String str)
-  if logLevel.GetValueInt() >= 2
+  if config.logLevel >= 2
     Log(str, "WARN")
   EndIf
 EndFunction
 
 
 Function Info(String str)
-  if logLevel.GetValueInt() >= 3
+  if config.logLevel >= 3
     Log(str, "INFO")
   EndIf
 EndFunction
 
 Function Debug(String str)
-  if LogLevel.GetValueInt() >= 4
+  if config.logLevel >= 4
     Log(str, "DEBUG")
   EndIf
 EndFunction
 
 Function DebugVerbose(String str)
-  if LogLevel.GetValueInt() >= 5
+  if config.logLevel >= 5
     Log(str, "VERBOSE")
+  EndIf
+EndFunction
+
+Function Trace(String str)
+  if config.logLevel >= 6
+    Log(str, "TRACE")
   EndIf
 EndFunction

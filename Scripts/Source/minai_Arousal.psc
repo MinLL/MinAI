@@ -460,8 +460,8 @@ EndFunction
 
 
 Event CommandDispatcher(String speakerName,String  command, String parameter)
-  Actor akSpeaker=AIAgentFunctions.getAgentByName(speakerName)
-  actor akTarget= AIAgentFunctions.getAgentByName(parameter)
+  Actor akSpeaker=aiff.AIGetAgentByName(speakerName)
+  actor akTarget= aiff.AIGetAgentByName(parameter)
   if !akTarget
     akTarget = PlayerRef
   EndIf
