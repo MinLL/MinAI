@@ -246,6 +246,33 @@ int enableAIAgentLogMessageForActorOID
 int logLevelDefault = 3 ; INFO level by default
 int Property logLevel = 3 Auto
 
+; Performance settings
+float Property highFrequencyUpdateInterval = 5.0 Auto
+float Property mediumFrequencyUpdateInterval = 15.0 Auto
+float Property lowFrequencyUpdateInterval = 30.0 Auto
+float Property contextUpdateInterval = 30.0 Auto
+bool Property highPerformanceMode = false Auto
+
+; Default values for normal mode
+float Property highFrequencyUpdateIntervalDefault = 5.0 Auto
+float Property mediumFrequencyUpdateIntervalDefault = 15.0 Auto
+float Property lowFrequencyUpdateIntervalDefault = 30.0 Auto
+float Property contextUpdateIntervalDefault = 30.0 Auto
+bool Property highPerformanceModeDefault = false Auto
+
+; Default values for high performance mode
+float Property highPerformanceHighFrequencyDefault = 8.0 Auto
+float Property highPerformanceMediumFrequencyDefault = 20.0 Auto
+float Property highPerformanceLowFrequencyDefault = 40.0 Auto
+float Property highPerformanceContextUpdateDefault = 45.0 Auto
+
+; MCM OIDs for performance settings
+int Property highFrequencyUpdateIntervalOID Auto
+int Property mediumFrequencyUpdateIntervalOID Auto
+int Property lowFrequencyUpdateIntervalOID Auto
+int Property contextUpdateIntervalOID Auto
+int Property highPerformanceModeOID Auto
+
 Event OnConfigInit()
   main.Info("Building mcm menu.")
   InitializeMCM()
@@ -271,17 +298,19 @@ EndFunction
 
 Function SetupPages()
   if sex.IsNSFW()
-    Pages = new string[5]
+    Pages = new string[6]
     Pages[0] = "General"
     Pages[1] = "Physics (CBPC)"
     Pages[2] = "Devious Stuff"
     Pages[3] = "Sex Settings"
     Pages[4] = "Action Registry"
+    Pages[5] = "Performance"
   Else
-    Pages = new string[3]
+    Pages = new string[4]
     Pages[0] = "General"
     Pages[1] = "Physics (CBPC)"
     Pages[2] = "Action Registry"
+    Pages[3] = "Performance"
   EndIf
 EndFunction
 
@@ -304,6 +333,8 @@ Event OnPageReset(string page)
     RenderSexPage()
   elseif page == "Action Registry"
     RenderActionsPage();
+  elseif page == "Performance"
+    RenderPerformancePage()
   else
     RenderPlaceholderPage()
   EndIf
@@ -498,6 +529,32 @@ EndFunction
 
 Function RenderPlaceholderPage()
   AddHeaderOption("Not Yet Implemented") 
+EndFunction
+
+
+Function RenderPerformancePage()
+  SetCursorFillMode(TOP_TO_BOTTOM)
+  
+  AddHeaderOption("Performance Settings")
+  highPerformanceModeOID = AddToggleOption("Use Optimized Settings for Performance", highPerformanceMode)
+  
+  AddEmptyOption()
+  AddHeaderOption("Update Intervals")
+  highFrequencyUpdateIntervalOID = AddSliderOption("High Frequency Interval", highFrequencyUpdateInterval, "{1} seconds")
+  
+  mediumFrequencyUpdateIntervalOID = AddSliderOption("Medium Frequency Interval", mediumFrequencyUpdateInterval, "{1} seconds")
+  
+  lowFrequencyUpdateIntervalOID = AddSliderOption("Low Frequency Interval", lowFrequencyUpdateInterval, "{1} seconds")
+  
+  AddEmptyOption()
+  contextUpdateIntervalOID = AddSliderOption("Context Update Interval", contextUpdateInterval, "{1} seconds")
+  
+  if highPerformanceMode
+    SetOptionFlags(highFrequencyUpdateIntervalOID, OPTION_FLAG_DISABLED)
+    SetOptionFlags(mediumFrequencyUpdateIntervalOID, OPTION_FLAG_DISABLED)
+    SetOptionFlags(lowFrequencyUpdateIntervalOID, OPTION_FLAG_DISABLED)
+    SetOptionFlags(contextUpdateIntervalOID, OPTION_FLAG_DISABLED)
+  endif
 EndFunction
 
 
@@ -734,6 +791,51 @@ Event OnOptionSelect(int oid)
   elseif oid == enableAIAgentLogMessageForActorOID
     enableAIAgentLogMessageForActor = !enableAIAgentLogMessageForActor
     SetToggleOptionValue(oid, enableAIAgentLogMessageForActor)
+  elseif oid == logLevelOID
+    logLevel = logLevelDefault
+    SetSliderOptionValue(oid, logLevelDefault, "{0}")
+  elseif oid == highPerformanceModeOID
+    highPerformanceMode = !highPerformanceMode
+    SetToggleOptionValue(oid, highPerformanceMode)
+    
+    if highPerformanceMode
+      ; Apply optimized settings
+      highFrequencyUpdateInterval = highPerformanceHighFrequencyDefault
+      mediumFrequencyUpdateInterval = highPerformanceMediumFrequencyDefault
+      lowFrequencyUpdateInterval = highPerformanceLowFrequencyDefault
+      contextUpdateInterval = highPerformanceContextUpdateDefault
+      
+      ; Update MCM display
+      SetSliderOptionValue(highFrequencyUpdateIntervalOID, highFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(mediumFrequencyUpdateIntervalOID, mediumFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(lowFrequencyUpdateIntervalOID, lowFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(contextUpdateIntervalOID, contextUpdateInterval, "{1} seconds")
+      
+      ; Disable sliders
+      SetOptionFlags(highFrequencyUpdateIntervalOID, OPTION_FLAG_DISABLED)
+      SetOptionFlags(mediumFrequencyUpdateIntervalOID, OPTION_FLAG_DISABLED)
+      SetOptionFlags(lowFrequencyUpdateIntervalOID, OPTION_FLAG_DISABLED)
+      SetOptionFlags(contextUpdateIntervalOID, OPTION_FLAG_DISABLED)
+    else
+      ; Reset to defaults
+      highFrequencyUpdateInterval = highFrequencyUpdateIntervalDefault
+      mediumFrequencyUpdateInterval = mediumFrequencyUpdateIntervalDefault
+      lowFrequencyUpdateInterval = lowFrequencyUpdateIntervalDefault
+      contextUpdateInterval = contextUpdateIntervalDefault
+      
+      ; Update MCM display
+      SetSliderOptionValue(highFrequencyUpdateIntervalOID, highFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(mediumFrequencyUpdateIntervalOID, mediumFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(lowFrequencyUpdateIntervalOID, lowFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(contextUpdateIntervalOID, contextUpdateInterval, "{1} seconds")
+      
+      ; Enable sliders
+      SetOptionFlags(highFrequencyUpdateIntervalOID, OPTION_FLAG_NONE)
+      SetOptionFlags(mediumFrequencyUpdateIntervalOID, OPTION_FLAG_NONE)
+      SetOptionFlags(lowFrequencyUpdateIntervalOID, OPTION_FLAG_NONE)
+      SetOptionFlags(contextUpdateIntervalOID, OPTION_FLAG_NONE)
+    endif
+    ForcePageReset()
   EndIf
   int i = 0
   string[] categories = JMap.allKeysPArray(aCategoryMap)
@@ -1076,6 +1178,16 @@ Event OnOptionHighlight(int oid)
     SetInfoText("ADVANCED DEBUGGING: Controls AIAgent logMessageForActor calls. Do not change unless instructed. Disabling may break core functionality.")
   elseif oid == logLevelOID
     SetInfoText("Controls logging verbosity. 0=None, 1=Fatal, 2=Error, 3=Info, 4=Debug, 5=Verbose, 6=Trace")
+  elseif oid == highFrequencyUpdateIntervalOID
+    SetInfoText("Updates highly dynamic states like arousal, environmental context, and so forth")
+  elseif oid == mediumFrequencyUpdateIntervalOID
+    SetInfoText("Updates states that change more frequently than low frequency states like survival and followers.")
+  elseif oid == lowFrequencyUpdateIntervalOID
+    SetInfoText("Updates states that change less frequently.")
+  elseif oid == contextUpdateIntervalOID
+    SetInfoText("How often NPCs should update their context. Effectively this checks how often the above settings are checked.")
+  elseif oid == highPerformanceModeOID
+    SetInfoText("Use optimized performance settings that reduce update frequency for better performance")
   EndIf
   int i = 0
   string[] actions = JMap.allKeysPArray(aiff.actionRegistry)
@@ -1204,6 +1316,67 @@ Event OnOptionSliderOpen(int oid)
     SetSliderDialogDefaultValue(logLevelDefault)
     SetSliderDialogRange(0, 6)
     SetSliderDialogInterval(1)
+  elseif oid == highFrequencyUpdateIntervalOID
+    SetSliderDialogStartValue(highFrequencyUpdateInterval)
+    SetSliderDialogDefaultValue(highFrequencyUpdateIntervalDefault)
+    SetSliderDialogRange(1.0, 15.0)
+    SetSliderDialogInterval(1.0)
+  elseif oid == mediumFrequencyUpdateIntervalOID
+    SetSliderDialogStartValue(mediumFrequencyUpdateInterval)
+    SetSliderDialogDefaultValue(mediumFrequencyUpdateIntervalDefault)
+    SetSliderDialogRange(5.0, 30.0)
+    SetSliderDialogInterval(1.0)
+  elseif oid == lowFrequencyUpdateIntervalOID
+    SetSliderDialogStartValue(lowFrequencyUpdateInterval)
+    SetSliderDialogDefaultValue(lowFrequencyUpdateIntervalDefault)
+    SetSliderDialogRange(15.0, 60.0)
+    SetSliderDialogInterval(1.0)
+  elseif oid == contextUpdateIntervalOID
+    SetSliderDialogStartValue(contextUpdateInterval)
+    SetSliderDialogDefaultValue(contextUpdateIntervalDefault)
+    SetSliderDialogRange(15.0, 60.0)
+    SetSliderDialogInterval(1.0)
+  elseif oid == highPerformanceModeOID
+    highPerformanceMode = !highPerformanceMode
+    SetToggleOptionValue(oid, highPerformanceMode)
+    
+    if highPerformanceMode
+      ; Apply optimized settings
+      highFrequencyUpdateInterval = highPerformanceHighFrequencyDefault
+      mediumFrequencyUpdateInterval = highPerformanceMediumFrequencyDefault
+      lowFrequencyUpdateInterval = highPerformanceLowFrequencyDefault
+      contextUpdateInterval = highPerformanceContextUpdateDefault
+      
+      ; Update MCM display
+      SetSliderOptionValue(highFrequencyUpdateIntervalOID, highFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(mediumFrequencyUpdateIntervalOID, mediumFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(lowFrequencyUpdateIntervalOID, lowFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(contextUpdateIntervalOID, contextUpdateInterval, "{1} seconds")
+      
+      ; Disable sliders
+      SetOptionFlags(highFrequencyUpdateIntervalOID, OPTION_FLAG_DISABLED)
+      SetOptionFlags(mediumFrequencyUpdateIntervalOID, OPTION_FLAG_DISABLED)
+      SetOptionFlags(lowFrequencyUpdateIntervalOID, OPTION_FLAG_DISABLED)
+      SetOptionFlags(contextUpdateIntervalOID, OPTION_FLAG_DISABLED)
+    else
+      ; Reset to defaults
+      highFrequencyUpdateInterval = highFrequencyUpdateIntervalDefault
+      mediumFrequencyUpdateInterval = mediumFrequencyUpdateIntervalDefault
+      lowFrequencyUpdateInterval = lowFrequencyUpdateIntervalDefault
+      contextUpdateInterval = contextUpdateIntervalDefault
+      
+      ; Update MCM display
+      SetSliderOptionValue(highFrequencyUpdateIntervalOID, highFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(mediumFrequencyUpdateIntervalOID, mediumFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(lowFrequencyUpdateIntervalOID, lowFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(contextUpdateIntervalOID, contextUpdateInterval, "{1} seconds")
+      
+      ; Enable sliders
+      SetOptionFlags(highFrequencyUpdateIntervalOID, OPTION_FLAG_NONE)
+      SetOptionFlags(mediumFrequencyUpdateIntervalOID, OPTION_FLAG_NONE)
+      SetOptionFlags(lowFrequencyUpdateIntervalOID, OPTION_FLAG_NONE)
+      SetOptionFlags(contextUpdateIntervalOID, OPTION_FLAG_NONE)
+    endif
   EndIf
 EndEvent
 
@@ -1277,6 +1450,59 @@ Event OnOptionSliderAccept(int oid, float value)
   elseif oid == logLevelOID
     logLevel = value as Int
     SetSliderOptionValue(oid, value, "{0}")
+  elseif oid == highFrequencyUpdateIntervalOID
+    highFrequencyUpdateInterval = value
+    SetSliderOptionValue(oid, value, "{1} seconds")
+  elseif oid == mediumFrequencyUpdateIntervalOID
+    mediumFrequencyUpdateInterval = value
+    SetSliderOptionValue(oid, value, "{1} seconds")
+  elseif oid == lowFrequencyUpdateIntervalOID
+    lowFrequencyUpdateInterval = value
+    SetSliderOptionValue(oid, value, "{1} seconds")
+  elseif oid == contextUpdateIntervalOID
+    contextUpdateInterval = value
+    SetSliderOptionValue(oid, value, "{1} seconds")
+  elseif oid == highPerformanceModeOID
+    highPerformanceMode = !highPerformanceMode
+    SetToggleOptionValue(oid, highPerformanceMode)
+    
+    if highPerformanceMode
+      ; Apply optimized settings
+      highFrequencyUpdateInterval = 8.0
+      mediumFrequencyUpdateInterval = 20.0
+      lowFrequencyUpdateInterval = 40.0
+      contextUpdateInterval = 45.0
+      
+      ; Update MCM display
+      SetSliderOptionValue(highFrequencyUpdateIntervalOID, highFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(mediumFrequencyUpdateIntervalOID, mediumFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(lowFrequencyUpdateIntervalOID, lowFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(contextUpdateIntervalOID, contextUpdateInterval, "{1} seconds")
+      
+      ; Disable sliders
+      SetOptionFlags(highFrequencyUpdateIntervalOID, OPTION_FLAG_DISABLED)
+      SetOptionFlags(mediumFrequencyUpdateIntervalOID, OPTION_FLAG_DISABLED)
+      SetOptionFlags(lowFrequencyUpdateIntervalOID, OPTION_FLAG_DISABLED)
+      SetOptionFlags(contextUpdateIntervalOID, OPTION_FLAG_DISABLED)
+    else
+      ; Reset to defaults
+      highFrequencyUpdateInterval = highFrequencyUpdateIntervalDefault
+      mediumFrequencyUpdateInterval = mediumFrequencyUpdateIntervalDefault
+      lowFrequencyUpdateInterval = lowFrequencyUpdateIntervalDefault
+      contextUpdateInterval = contextUpdateIntervalDefault
+      
+      ; Update MCM display
+      SetSliderOptionValue(highFrequencyUpdateIntervalOID, highFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(mediumFrequencyUpdateIntervalOID, mediumFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(lowFrequencyUpdateIntervalOID, lowFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(contextUpdateIntervalOID, contextUpdateInterval, "{1} seconds")
+      
+      ; Enable sliders
+      SetOptionFlags(highFrequencyUpdateIntervalOID, OPTION_FLAG_NONE)
+      SetOptionFlags(mediumFrequencyUpdateIntervalOID, OPTION_FLAG_NONE)
+      SetOptionFlags(lowFrequencyUpdateIntervalOID, OPTION_FLAG_NONE)
+      SetOptionFlags(contextUpdateIntervalOID, OPTION_FLAG_NONE)
+    endif
   EndIf
 EndEvent
 

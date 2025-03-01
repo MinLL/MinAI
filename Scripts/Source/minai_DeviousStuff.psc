@@ -1033,6 +1033,16 @@ Function SetContext(actor akTarget)
     if slOwner
       Main.Info("Submissive Lola owner=" + main.GetActorName(slOwner))
       aiff.SetActorVariable(playerRef, "subLolaOwnerName", main.GetActorName(slOwner))
+      aiff.SetActorVariable(playerRef, "subLolaGlobalSubmissionScore", SubLolaMQ.GlobalSubmissionScore.GetValue())
+      aiff.SetActorVariable(playerRef, "subLolaTimesSexIsRequired", SubLolaMQ.TimesSexIsRequired)
+      aiff.SetActorVariable(playerRef, "subLolaTimesServiceIsRequired", SubLolaMQ.TimesServiceIsRequired)
+      aiff.SetActorVariable(playerRef, "subLolaSlaveContract", SubLolaMQ.SlaveContract.GetValue())
+      aiff.SetActorVariable(playerRef, "subLolaOwnerAttitude", (Quest.GetQuest("vkj_MCM") as vkjmcm).OwnerAttitude)
+      if (SubLolaMQ.MayAskForService)
+        aiff.SetActorVariable(playerRef, "subLolaMayAskForService",  1)
+      else
+        aiff.SetActorVariable(playerRef, "subLolaMayAskForService",  0)
+      endif
     else
       aiff.SetActorVariable(playerRef, "subLolaOwnerName", "")
     EndIf
@@ -1042,16 +1052,7 @@ Function SetContext(actor akTarget)
     else
       aiff.SetActorVariable(playerRef, "subLolaPlaymateName", "")
     EndIf
-    aiff.SetActorVariable(playerRef, "subLolaGlobalSubmissionScore", SubLolaMQ.GlobalSubmissionScore.GetValue())
-    aiff.SetActorVariable(playerRef, "subLolaTimesSexIsRequired", SubLolaMQ.TimesSexIsRequired)
-    aiff.SetActorVariable(playerRef, "subLolaTimesServiceIsRequired", SubLolaMQ.TimesServiceIsRequired)
-    aiff.SetActorVariable(playerRef, "subLolaSlaveContract", SubLolaMQ.SlaveContract.GetValue())
-    aiff.SetActorVariable(playerRef, "subLolaOwnerAttitude", (Quest.GetQuest("vkj_MCM") as vkjmcm).OwnerAttitude)
-    if (SubLolaMQ.MayAskForService)
-      aiff.SetActorVariable(playerRef, "subLolaMayAskForService",  1)
-    else
-      aiff.SetActorVariable(playerRef, "subLolaMayAskForService",  0)
-    endif
+
   EndIf
   if bHasDeviouslyAccessible && akTarget == PlayerRef
     aiff.SetActorVariable(playerRef, "deviouslyAccessibleEyeFuckTrack", eyefucktrack.GetValueInt())
@@ -1063,40 +1064,7 @@ Function SetContext(actor akTarget)
     aiff.SetActorVariable(playerRef, "dwp_eldwhoresp", PlayerRef.HasSpell(dwp_eldwhoresp))
     aiff.SetActorVariable(playerRef, "dwp_eldwhoresp_neq", PlayerRef.HasSpell(dwp_eldwhoresp_neq))
     aiff.SetActorVariable(playerRef, "dwp_eldritchwaifueffect_soldsoul", PlayerRef.HasPerk(dwp_eldritchwaifueffect_soldsoul))
-    aiff.SetActorVariable(playerRef, "dwp_eldritchwaifueffect_soldsoul_belted", PlayerRef.HasPerk(dwp_eldritchwaifueffect_soldsoul_belted))
-    ; Add magic effect checks
-    aiff.SetActorVariable(playerRef, "dwp_descbadgirl", PlayerRef.HasMagicEffect(dwp_descbadgirl))
-    aiff.SetActorVariable(playerRef, "dwp_descbadgirl2", PlayerRef.HasMagicEffect(dwp_descbadgirl2))
-    aiff.SetActorVariable(playerRef, "dwp_descbadgirl2b", PlayerRef.HasMagicEffect(dwp_descbadgirl2b))
-    aiff.SetActorVariable(playerRef, "dwp_descbadgirl2c", PlayerRef.HasMagicEffect(dwp_descbadgirl2c))
-    aiff.SetActorVariable(playerRef, "dwp_descbadgirl2d", PlayerRef.HasMagicEffect(dwp_descbadgirl2d))
-    aiff.SetActorVariable(playerRef, "dwp_descbadgirlb", PlayerRef.HasMagicEffect(dwp_descbadgirlb))
-    aiff.SetActorVariable(playerRef, "dwp_descbadgirlBASE", PlayerRef.HasMagicEffect(dwp_descbadgirlBASE))
-    aiff.SetActorVariable(playerRef, "dwp_descbadgirlc", PlayerRef.HasMagicEffect(dwp_descbadgirlc))
-    aiff.SetActorVariable(playerRef, "dwp_descbadgirld", PlayerRef.HasMagicEffect(dwp_descbadgirld))
-    aiff.SetActorVariable(playerRef, "dwp_descgoodgirl", PlayerRef.HasMagicEffect(dwp_descgoodgirl))
-    aiff.SetActorVariable(playerRef, "dwp_descgoodgirl2", PlayerRef.HasMagicEffect(dwp_descgoodgirl2))
-    aiff.SetActorVariable(playerRef, "dwp_descgoodgirl2b", PlayerRef.HasMagicEffect(dwp_descgoodgirl2b))
-    aiff.SetActorVariable(playerRef, "dwp_descgoodgirl2c", PlayerRef.HasMagicEffect(dwp_descgoodgirl2c))
-    aiff.SetActorVariable(playerRef, "dwp_descgoodgirl2d", PlayerRef.HasMagicEffect(dwp_descgoodgirl2d))
-    aiff.SetActorVariable(playerRef, "dwp_descgoodgirlb", PlayerRef.HasMagicEffect(dwp_descgoodgirlb))
-    aiff.SetActorVariable(playerRef, "dwp_descgoodgirlBASE", PlayerRef.HasMagicEffect(dwp_descgoodgirlBASE))
-    aiff.SetActorVariable(playerRef, "dwp_descgoodgirlc", PlayerRef.HasMagicEffect(dwp_descgoodgirlc))
-    aiff.SetActorVariable(playerRef, "dwp_descgoodgirld", PlayerRef.HasMagicEffect(dwp_descgoodgirld))
-    aiff.SetActorVariable(playerRef, "dwp_descmindcontrol", PlayerRef.HasMagicEffect(dwp_descmindcontrol))
-    aiff.SetActorVariable(playerRef, "dwp_descmindcontrol2", PlayerRef.HasMagicEffect(dwp_descmindcontrol2))
-    aiff.SetActorVariable(playerRef, "dwp_descmindcontrolpost", PlayerRef.HasMagicEffect(dwp_descmindcontrolpost))
-    aiff.SetActorVariable(playerRef, "dwp_descmindcontrolpunishment", PlayerRef.HasMagicEffect(dwp_descmindcontrolpunishment))
-    aiff.SetActorVariable(playerRef, "dwp_descverybadgirl", PlayerRef.HasMagicEffect(dwp_descverybadgirl))
-    aiff.SetActorVariable(playerRef, "dwp_descverybadgirl2", PlayerRef.HasMagicEffect(dwp_descverybadgirl2))
-    aiff.SetActorVariable(playerRef, "dwp_descverybadgirl2b", PlayerRef.HasMagicEffect(dwp_descverybadgirl2b))
-    aiff.SetActorVariable(playerRef, "dwp_descverybadgirl2c", PlayerRef.HasMagicEffect(dwp_descverybadgirl2c))
-    aiff.SetActorVariable(playerRef, "dwp_descverybadgirl2d", PlayerRef.HasMagicEffect(dwp_descverybadgirl2d))
-    aiff.SetActorVariable(playerRef, "dwp_descverybadgirlb", PlayerRef.HasMagicEffect(dwp_descverybadgirlb))
-    aiff.SetActorVariable(playerRef, "dwp_descverybadgirlBASE", PlayerRef.HasMagicEffect(dwp_descverybadgirlBASE))
-    aiff.SetActorVariable(playerRef, "dwp_descverybadgirlc", PlayerRef.HasMagicEffect(dwp_descverybadgirlc))
-    aiff.SetActorVariable(playerRef, "dwp_descverybadgirld", PlayerRef.HasMagicEffect(dwp_descverybadgirld))
-    
+    aiff.SetActorVariable(playerRef, "dwp_eldritchwaifueffect_soldsoul_belted", PlayerRef.HasPerk(dwp_eldritchwaifueffect_soldsoul_belted))    
     ; Determine mind control status
     string mindControlStatus = "normal"
     if PlayerRef.HasMagicEffect(dwp_descgoodgirl) || PlayerRef.HasMagicEffect(dwp_descgoodgirl2) || \
@@ -1124,9 +1092,6 @@ Function SetContext(actor akTarget)
     endif
     
     aiff.SetActorVariable(playerRef, "dwp_mindcontrol", mindControlStatus)
-
-    ; Remove individual effect checks
-    ; ... rest of existing DeviouslyAccessible context setting ...
   EndIf
   if bHasSlaveTats && akTarget
     SerializeTattooForDB(akTarget) ; This will store the data in the DB

@@ -527,7 +527,7 @@ Function SetContext(actor akTarget)
     actorRace = StringUtil.Substring(actorRace, 0, cotrIndex)
   EndIf
   if actorRace == "fox"
-    actorRace = "human"
+    actorRace = "nord"
   EndIf
   aiff.SetActorVariable(akTarget, "race", actorRace)
 EndFunction
