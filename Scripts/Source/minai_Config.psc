@@ -334,14 +334,15 @@ Function RenderGeneralPage()
   roleplayKeyOID = AddKeyMapOption("$MINAI_ROLEPLAY_VOICE", roleplayKey)
   roleplayTextKeyOID = AddKeyMapOption("$MINAI_ROLEPLAY_TEXT", roleplayTextKey)
   ; Disable for now until I finish implementing this
-  ; singKeyOID = AddKeyMapOption("$MINAI_SING", singKey)              ; New keybind option
-  narratorKeyOID = AddKeyMapOption("$MINAI_TALK_TO_NARRATOR", narratorKey)  ; New keybind option
-  narratorTextKeyOID = AddKeyMapOption("$MINAI_TYPE_TO_NARRATOR", narratorTextKey)
-  disableAIAnimationsOID = AddToggleOption("$MINAI_DISABLE_AI_ANIMATIONS", disableAIAnimations)
-  AddHeaderOption("$MINAI_DEBUG")
+  ; singKeyOID = AddKeyMapOption("Sing", singKey)              ; New keybind option
+  narratorKeyOID = AddKeyMapOption("Talk to Narrator", narratorKey)  ; New keybind option
+  narratorTextKeyOID = AddKeyMapOption("Type to Narrator", narratorTextKey)
+  disableAIAnimationsOID = AddToggleOption("Disable AI-FF Animations", disableAIAnimations)
+  AddHeaderOption("Debug")
   logLevelOID = AddSliderOption("Log Level", logLevel, "{0}")
-  enableConsoleLoggingOID = AddToggleOption("$MINAI_ENABLE_CONSOLE_LOGGING", enableConsoleLogging)
-  testActionsOID = AddTextOption("$MINAI_DEBUG_CATEGORY", "$MINAI_TEST_MOD_EVENTS")
+  enableConsoleLoggingOID = AddToggleOption("Enable Console Logging", enableConsoleLogging)
+  AddHeaderOption("Advanced Debugging (Do Not Change)")
+  testActionsOID = AddTextOption("Debug", "Test Mod Events")
   enableAIAgentSetConfOID = AddToggleOption("Enable setConf calls", enableAIAgentSetConf)
   enableAIAgentLogMessageOID = AddToggleOption("Enable logMessage calls", enableAIAgentLogMessage)
   enableAIAgentSetAnimationBusyOID = AddToggleOption("Enable setAnimationBusy calls", enableAIAgentSetAnimationBusy)
@@ -1084,7 +1085,7 @@ Event OnOptionHighlight(int oid)
   elseif oid == disableSapienceInStealthOID
     SetInfoText("$MINAI_DISABLE_SAPIENCE_IN_STEALTH_INFO")
   elseif oid == enableRadiantDialogueOID
-    SetInfoText("$MINAI_ENABLE_RADIANT_DIALOGUE_INFO")
+    SetInfoText("Enable or disable radiant dialogue between NPCs. When disabled, NPCs will not automatically start conversations with each other.")
   elseif oid == enableAIAgentSetConfOID
     SetInfoText("ADVANCED DEBUGGING: Controls AIAgent setConf calls. Do not change unless instructed. Disabling may break core functionality.")
   elseif oid == enableAIAgentLogMessageOID
