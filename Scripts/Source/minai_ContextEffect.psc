@@ -14,7 +14,7 @@ Event OnEffectStart(Actor akTarget, Actor akCaster)
   main = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_MainQuestController
   aiff = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_AIFF
   ContextSpell = Game.GetFormFromFile(0x090A, "MinAI.esp") as Spell
-  config = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_Config
+  config = Game.GetFormFromFile(0x0912, "MinAI.esp") as minai_Config
   fillHerUp = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_FillHerUp
   if (!akTarget || !main || !aiff || !aiff.IsInitialized())
     Debug.Trace("[minai] Skipping OnEffectStart, not ready")
