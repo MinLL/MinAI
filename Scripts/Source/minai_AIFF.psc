@@ -9,6 +9,7 @@ minai_Config config
 minai_Reputation reputation
 minai_DirtAndBlood dirtAndBlood
 minai_EnvironmentalAwareness envAwareness
+minai_Util MinaiUtil 
 
 minai_FertilityMode fertility
 GlobalVariable minai_DynamicSapienceToggleStealth
@@ -85,6 +86,7 @@ Function Maintenance(minai_MainQuestController _main)
   dirtAndBlood = (Self as Quest)as minai_DirtAndBlood
   envAwareness = (Self as Quest)as minai_EnvironmentalAwareness
   fertility = (Self as Quest)as minai_FertilityMode
+  minaiUtil = (Self as Quest) as minai_Util
   followers = Game.GetFormFromFile(0x0913, "MinAI.esp") as minai_Followers
   reputation = (Self as Quest) as minai_Reputation
   if (!followers)
@@ -101,7 +103,7 @@ Function Maintenance(minai_MainQuestController _main)
     Main.Error("Could not load null voice type")
   EndIf
   if isInitialized
-    AIAgentFunctions.logMessage("initializing","minai_init")
+    AILogMessage("initializing","minai_init")
     RegisterForSingleUpdate(playerContextUpdateInterval)
   EndIf
   if (Game.GetModByName("MinAI_AIFF.esp") != 255)
@@ -248,8 +250,8 @@ Function SetContext(actor akTarget)
   EndIf  
   Main.Debug("AIFF - SetContext(" + Main.GetActorName(akTarget) + ") START")
   if akTarget == Player
-    AIAgentFunctions.logMessage("_minai_PLAYER//playerName@" + Main.GetActorName(player), "setconf")
-    AIAgentFunctions.logMessage("_minai_PLAYER//nearbyActors@" + GetNearbyAiStr(), "setconf")
+    AILogMessage("_minai_PLAYER//playerName@" + Main.GetActorName(player), "setconf")
+    AILogMessage("_minai_PLAYER//nearbyActors@" + GetNearbyAiStr(), "setconf")
     ; Make sure this doesn't get stuck
     if player.IsSneaking()
       minai_DynamicSapienceToggleStealth.SetValue(0.0)
@@ -278,7 +280,7 @@ EndFunction
 
 Function SetAISexEnabled(bool enabled)
   if bHasAIFF
-    AIAgentFunctions.logMessage("_minai_PLAYER//enableAISex@" + enabled, "setconf")
+    AILogMessage("_minai_PLAYER//enableAISex@" + enabled, "setconf")
   EndIf
 EndFunction
 
@@ -293,7 +295,7 @@ Function SetActorVariable(Actor akActor, string variable, string value)
   EndIf
   string actorName = main.GetActorName(akActor)
   Main.DebugVerbose("Set actor value for actor " + actorName + " "+ variable + " to " + value)
-  AIAgentFunctions.logMessage("_minai_" + actorName + "//" + variable + "@" + value, "setconf")
+  AILogMessage("_minai_" + actorName + "//" + variable + "@" + value, "setconf")
 EndFunction
 
 
@@ -305,7 +307,7 @@ Function RegisterEvent(string eventLine, string eventType)
   if (!bHasAIFF)
     return
   EndIf
-  AIAgentFunctions.logMessage(eventLine, eventType)
+  AILogMessage(eventLine, eventType)
 EndFunction
 
 Event OnTextReceived(String speakerName, String sayLine)
@@ -315,7 +317,7 @@ EndEvent
 
 Event CommandDispatcher(String speakerName,String  command, String parameter)
   Main.Info("AIFF - CommandDispatcher(" + speakerName +", " + command +", " + parameter + ")")
-  Actor akActor = AIAgentFunctions.getAgentByName(speakerName)
+  Actor akActor = AIGetAgentByName(speakerName)
   if vibratorCommands.Find(command) >= 0
     command = "MinaiGlobalVibrator"
   EndIf
@@ -336,7 +338,7 @@ Function ChillOut()
   if (!bHasAIFF)
     return
   EndIf
-    ; AIAgentFunctions.logMessage("Relax and enjoy","force_current_task")
+    ; AILogMessage("Relax and enjoy","force_current_task")
   EndIf
 EndFunction
 
@@ -345,7 +347,7 @@ Function SetAnimationBusy(int busy, string name)
     if busy == 0 && config.disableAIAnimations
       Main.Warn("Not reenabling animations - AI animations are disabled")
     EndIf
-    AIAgentFunctions.setAnimationBusy(busy,name)
+    AISetAnimationBusy(busy,name)
   EndIf
 EndFunction
 
@@ -457,10 +459,10 @@ EndFunction
 
 
 actor[] Function GetNearbyAI()
-  actor[] actors = AIAgentFunctions.findAllNearbyAgents()
+  actor[] actors = AIFindAllNearbyAgents()
   int i = 0
   if config.disableAIAnimations
-    AIAgentFunctions.setConf("_animations",0,0,"")
+    AISetConf("_animations",0,0,"")
   EndIf
   while i < actors.length
     main.Info("Found nearby actor: " + Main.GetActorName(actors[i]))
@@ -477,11 +479,11 @@ EndFunction
 
 
 String Function GetNearbyAIStr()
-  actor[] actors = AIAgentFunctions.findAllNearbyAgents()
+  actor[] actors = AIFindAllNearbyAgents()
   string ret = ""
   int i = 0
   if config.disableAIAnimations
-    AIAgentFunctions.setConf("_animations",0,0,"")
+    AISetConf("_animations",0,0,"")
   EndIf
   while i < actors.Length
     ret += Main.GetActorName(actors[i])
@@ -627,7 +629,7 @@ Function ResetActionBackoff(string actionName, bool bypassCooldown)
     Main.Info("ActionRegistry: " + actionName + " backoff has decayed back to base values.")
   EndIf
   if offCooldown || bypassCooldown    
-    AIAgentFunctions.logMessage("_minai_ACTION//" + actionName + "@" + isEnabled, "setconf")
+    AILogMessage("_minai_ACTION//" + actionName + "@" + isEnabled, "setconf")
     if lastExecuted > 0.01
       Main.Info("ActionRegistry: Backoff for " + actionName + " reset.")
     EndIf
@@ -672,7 +674,7 @@ Function ExecuteAction(string actionName)
     JMap.SetObj(actionRegistry, actionName, actionObj)
   EndIf
   Main.Info("ActionRegistry: Executed " + actionName +" ( " + isEnabled + " ), interval=" + interval + ", exponent= " + exponent +", maxInterval = " + maxInterval + ", currentInterval = " + currentInterval + ", currentTime = " + currentTime + ", nextExecution =  " + nextExecution)
-  AIAgentFunctions.logMessage("_minai_ACTION//" + actionName + "@" + isEnabled, "setconf")
+  AILogMessage("_minai_ACTION//" + actionName + "@" + isEnabled, "setconf")
 EndFunction
 
 
@@ -698,7 +700,7 @@ EndFunction
 Event OnAIActorChange(string npcName, string actionName)
   Main.Info("OnAIActorChange(" + npcName + "): " + actionName)
   if actionName == "Add"
-    actor agent = AIAgentFunctions.getAgentByName(npcName)
+    actor agent = AIGetAgentByName(npcName)
     if !agent
       Main.Error("OnAIActorChange: Could not find NPC to add context spell to")
       return
@@ -721,7 +723,7 @@ Function StoreContext(string modName, string eventKey, string eventValue, string
     return
   EndIf
   Main.Debug("StoreContext(" + modName +", " + eventKey + ", " + ttl +"): " + eventValue)
-  AIAgentFunctions.logMessage(modName + "@" + eventKey + "@" + eventValue + "@" + npcName + "@" + ttl, "storecontext")
+  AILogMessage(modName + "@" + eventKey + "@" + eventValue + "@" + npcName + "@" + ttl, "storecontext")
 EndFunction
 
 
@@ -734,7 +736,7 @@ Function StoreAction(string actionName, string actionPrompt, int enabled, int tt
     return
   EndIf
   Main.Debug("StoreAction(" + actionName +", " + enabled + ", " + ttl +"): " + actionPrompt)
-	AIAgentFunctions.logMessage(actionName + "@" + actionPrompt + "@" + enabled + "@" + ttl + "@" + targetDescription + "@" + targetEnum + "@" + npcName, "registeraction")
+	AILogMessage(actionName + "@" + actionPrompt + "@" + enabled + "@" + ttl + "@" + targetDescription + "@" + targetEnum + "@" + npcName, "registeraction")
 EndFunction
 
 
@@ -751,7 +753,7 @@ Function CleanupSapientActors()
   Main.Debug("SAPIENCE: CleanupSapientActors()")
   ; Cleanup actors that are not currently loaded
   string[] actorNames = JMap.allKeysPArray(sapientActors)
-  actor[] nearbyActors = AIAgentFunctions.findAllNearbyAgents()
+  actor[] nearbyActors = AIFindAllNearbyAgents()
   int i = 0
   while i < actorNames.Length
     actor akActor = JMap.GetForm(sapientActors, actorNames[i]) as Actor
@@ -794,7 +796,7 @@ Function RemoveActorAI(string targetName)
   EndIf
 
   Main.Info("SAPIENCE: Removing " + targetName + " from AI")
-  AIAgentFunctions.removeAgentByName(targetName)
+  AIRemoveAgentByName(targetName)
   JMap.RemoveKey(sapientActors, targetName)
   JMap.RemoveKey(lastDialogueTimes, targetName) ; Clean up the dialogue time entry
 EndFunction
@@ -805,10 +807,10 @@ Function EnableActorAI(actor akTarget)
     Main.Warn("SAPIENCE: Not adding missing npc, invalid name.")
     return
   EndIf
-  Actor agent = AIAgentFunctions.getAgentByName(targetName)
+  Actor agent = AIGetAgentByName(targetName)
   if !agent
     Main.Info("SAPIENCE: Adding " + targetName + " to AI")
-    AIAgentFunctions.setDrivenByAIA(akTarget, false)
+    AISetDrivenByAIA(akTarget, false)
     TrackContext(akTarget)
     TrackSapientActor(akTarget)
   EndIf
@@ -816,13 +818,13 @@ EndFunction
 
 Function UpdateDiary(string targetName)
   if bHasAIFF
-    AIAgentFunctions.requestMessageForActor("Please, update your diary","diary", targetName)
+    AIRequestMessageForActor("Please, update your diary","diary", targetName)
   EndIf
 EndFunction
 
 Function UpdateProfile(string targetName)
   if bHasAIFF
-    AIAgentFunctions.requestMessageForActor("Please, update your profile", "updateprofile", targetName)
+    AIRequestMessageForActor("Please, update your profile", "updateprofile", targetName)
   EndIf
 EndFunction
 
@@ -841,13 +843,148 @@ EndFunction
 Function EnablePreserveQueue()
   if bHasAIFF
     Main.Info("CHIM CONFIG: Preserving dialogue queue.")
-    AIAgentFunctions.setConf("_preserve_queue", 1, 0, "")
+    AISetConf("_preserve_queue", 1, 0, "")
   EndIf
 EndFunction
 
 Function DisablePreserveQueue()
   if bHasAIFF
     Main.Info("CHIM CONFIG: Not preserving dialogue queue.")
-    AIAgentFunctions.setConf("_preserve_queue", 0, 0, "")
+    AISetConf("_preserve_queue", 0, 0, "")
   EndIf
+EndFunction
+
+Function AISetConf(string configKey, int value1, int value2, string value3)
+    if config.enableAIAgentSetConf && bHasAIFF && config.logLevel >= 6
+        float startTime = Utility.GetCurrentRealTime()
+        MinaiUtil.Trace("AISetConf(" + configKey + ", " + value1 + ", " + value2 + ", " + value3 + ") - START")
+        int result = AIAgentFunctions.setConf(configKey, value1, value2, value3)
+        MinaiUtil.Trace("AISetConf() - END - Result: " + result + " - Took " + (Utility.GetCurrentRealTime() - startTime) + " seconds")
+    else
+        AIAgentFunctions.setConf(configKey, value1, value2, value3)
+    EndIf
+EndFunction
+
+Function AILogMessage(string msgText, string msgType)
+    if config.enableAIAgentLogMessage && bHasAIFF && config.logLevel >= 6
+        float startTime = Utility.GetCurrentRealTime()
+        MinaiUtil.Trace("AILogMessage(" + msgText + ", " + msgType + ") - START")
+        int result = AIAgentFunctions.logMessage(msgText, msgType)
+        MinaiUtil.Trace("AILogMessage() - END - Result: " + result + " - Took " + (Utility.GetCurrentRealTime() - startTime) + " seconds")
+    else
+        AIAgentFunctions.logMessage(msgText, msgType)
+    EndIf
+EndFunction
+
+Function AISetAnimationBusy(int busy, string name)
+    if config.enableAIAgentSetAnimationBusy && bHasAIFF && config.logLevel >= 6
+        float startTime = Utility.GetCurrentRealTime()
+        MinaiUtil.Trace("AISetAnimationBusy(" + busy + ", " + name + ") - START")
+        AIAgentFunctions.setAnimationBusy(busy, name)
+        MinaiUtil.Trace("AISetAnimationBusy() - END - Took " + (Utility.GetCurrentRealTime() - startTime) + " seconds")
+    else
+        AIAgentFunctions.setAnimationBusy(busy, name)
+    EndIf
+EndFunction
+
+Actor[] Function AIFindAllNearbyAgents()
+    if config.enableAIAgentFindAllNearbyAgents && bHasAIFF && config.logLevel >= 6
+        float startTime = Utility.GetCurrentRealTime()
+        MinaiUtil.Trace("AIFindAllNearbyAgents() - START")
+        Actor[] result = AIAgentFunctions.findAllNearbyAgents()
+        MinaiUtil.Trace("AIFindAllNearbyAgents() - END - Found " + result.Length + " agents - Took " + (Utility.GetCurrentRealTime() - startTime) + " seconds")
+        return result
+    elseif config.enableAIAgentFindAllNearbyAgents && bHasAIFF
+        return AIAgentFunctions.findAllNearbyAgents()
+    EndIf
+EndFunction
+
+Actor Function AIGetAgentByName(string name)
+    if config.enableAIAgentGetAgentByName && bHasAIFF && config.logLevel >= 6
+        float startTime = Utility.GetCurrentRealTime()
+        MinaiUtil.Trace("AIGetAgentByName(" + name + ") - START")
+        Actor result = AIAgentFunctions.getAgentByName(name)
+        MinaiUtil.Trace("AIGetAgentByName() - END - Found: " + (result != None) + " - Took " + (Utility.GetCurrentRealTime() - startTime) + " seconds")
+        return result
+    elseif config.enableAIAgentGetAgentByName && bHasAIFF
+        return AIAgentFunctions.getAgentByName(name)
+    EndIf
+    return None
+EndFunction
+
+Function AIRemoveAgentByName(string name)
+    if config.enableAIAgentRemoveAgentByName && bHasAIFF && config.logLevel >= 6
+        float startTime = Utility.GetCurrentRealTime()
+        MinaiUtil.Trace("AIRemoveAgentByName(" + name + ") - START")
+        AIAgentFunctions.removeAgentByName(name)
+        MinaiUtil.Trace("AIRemoveAgentByName() - END - Took " + (Utility.GetCurrentRealTime() - startTime) + " seconds")
+    else
+        AIAgentFunctions.removeAgentByName(name)
+    EndIf
+EndFunction
+
+Function AISetDrivenByAIA(Actor akActor, bool driven)
+    if config.enableAIAgentSetDrivenByAIA && bHasAIFF && config.logLevel >= 6
+        float startTime = Utility.GetCurrentRealTime()
+        MinaiUtil.Trace("AISetDrivenByAIA(" + Main.GetActorName(akActor) + ", " + driven + ") - START")
+        AIAgentFunctions.setDrivenByAIA(akActor, driven)
+        MinaiUtil.Trace("AISetDrivenByAIA() - END - Took " + (Utility.GetCurrentRealTime() - startTime) + " seconds")
+    else
+        AIAgentFunctions.setDrivenByAIA(akActor, driven)
+    EndIf
+EndFunction
+
+Function AIRequestMessageForActor(string msgText, string msgType, string actorName)
+    if config.enableAIAgentRequestMessageForActor && bHasAIFF && config.logLevel >= 6
+        float startTime = Utility.GetCurrentRealTime()
+        MinaiUtil.Trace("AIRequestMessageForActor(" + msgText + ", " + msgType + ", " + actorName + ") - START")
+        int result = AIAgentFunctions.requestMessageForActor(msgText, msgType, actorName)
+        MinaiUtil.Trace("AIRequestMessageForActor() - END - Result: " + result + " - Took " + (Utility.GetCurrentRealTime() - startTime) + " seconds")
+    else
+        AIAgentFunctions.requestMessageForActor(msgText, msgType, actorName)
+    EndIf
+EndFunction
+
+Function AIRequestMessage(string msgText, string msgType)
+    if config.enableAIAgentRequestMessage && bHasAIFF && config.logLevel >= 6
+        float startTime = Utility.GetCurrentRealTime()
+        MinaiUtil.Trace("AIRequestMessage(" + msgText + ", " + msgType + ") - START")
+        int result = AIAgentFunctions.requestMessage(msgText, msgType)
+        MinaiUtil.Trace("AIRequestMessage() - END - Result: " + result + " - Took " + (Utility.GetCurrentRealTime() - startTime) + " seconds")
+    else
+        AIAgentFunctions.requestMessage(msgText, msgType)
+    EndIf
+EndFunction
+
+Function AILogMessageForActor(string msgText, string msgType, string actorName)
+    if config.enableAIAgentLogMessageForActor && bHasAIFF && config.logLevel >= 6
+        float startTime = Utility.GetCurrentRealTime()
+        MinaiUtil.Trace("AILogMessageForActor(" + msgText + ", " + msgType + ", " + actorName + ") - START")
+        int result = AIAgentFunctions.logMessageForActor(msgText, msgType, actorName)
+        MinaiUtil.Trace("AILogMessageForActor() - END - Result: " + result + " - Took " + (Utility.GetCurrentRealTime() - startTime) + " seconds")
+    else
+        AIAgentFunctions.logMessageForActor(msgText, msgType, actorName)
+    EndIf
+EndFunction
+
+Function AIRecordSoundEx(int keyCode)
+    if config.enableAIAgentRecordSoundEx && bHasAIFF && config.logLevel >= 6
+        float startTime = Utility.GetCurrentRealTime()
+        MinaiUtil.Trace("AIRecordSoundEx(" + keyCode + ") - START")
+        int result = AIAgentFunctions.recordSoundEx(keyCode)
+        MinaiUtil.Trace("AIRecordSoundEx() - END - Result: " + result + " - Took " + (Utility.GetCurrentRealTime() - startTime) + " seconds")
+    else
+        AIAgentFunctions.recordSoundEx(keyCode)
+    EndIf
+EndFunction
+
+Function AIStopRecording(int keyCode)
+    if config.enableAIAgentStopRecording && bHasAIFF && config.logLevel >= 6
+        float startTime = Utility.GetCurrentRealTime()
+        MinaiUtil.Trace("AIStopRecording(" + keyCode + ") - START")
+        int result = AIAgentFunctions.stopRecording(keyCode)
+        MinaiUtil.Trace("AIStopRecording() - END - Result: " + result + " - Took " + (Utility.GetCurrentRealTime() - startTime) + " seconds")
+    else
+        AIAgentFunctions.stopRecording(keyCode)
+    EndIf
 EndFunction

@@ -65,11 +65,11 @@ Event OnUpdate()
   endif
   ; clean up follow, since it can be override or npc has entered a scene
   aiff.CheckIfActorShouldStillFollow(akTarget)
-  if AIAgentFunctions.getAgentByName(targetName)
+  if aiff.AIGetAgentByName(targetName)
     Main.Debug("Updating context for managed NPC: " + targetName)
     ; sex = (Self as Quest) as minai_Sex
     aiff.SetContext(akTarget)
-    if !AIAgentFunctions.getAgentByName(targetName)
+    if !aiff.AIGetAgentByName(targetName)
       Main.Debug("Actor " + targetName + " went away: Removing context tracking")
       DisableSelf(akTarget)
     else

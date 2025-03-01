@@ -483,8 +483,8 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     return
   EndIf
   Main.Debug("Sex - CommandDispatcher(" + speakerName +", " + command +", " + parameter + ")")
-  actor akSpeaker = AIAgentFunctions.getAgentByName(speakerName)
-  actor akTarget = AIAgentFunctions.getAgentByName(parameter)
+  actor akSpeaker = aiff.AIGetAgentByName(speakerName)
+  actor akTarget = aiff.AIGetAgentByName(parameter)
   if !akTarget
     akTarget = PlayerRef
   EndIf
@@ -587,7 +587,7 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
       iIndex += 1
     Endwhile
     JMap.setObj(clothingMap, speakerName, equippedArmor)
-    AIAgentFunctions.logMessageForActor("command@ExtCmdRemoveClothes@@"+speakerName+" removes clothes and armor","funcret",speakerName)
+    aiff.AILogMessageForActor("command@ExtCmdRemoveClothes@@"+speakerName+" removes clothes and armor","funcret",speakerName)
   elseif (command=="ExtCmdPutOnClothes")
     int equippedItems=JMap.getObj(clothingMap,speakerName) as Int;
     Int iElement = JValue.count(equippedItems)
@@ -600,7 +600,7 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
       iIndex += 1
     Endwhile
     equippedItems = JValue.release(equippedItems)
-    AIAgentFunctions.logMessageForActor("command@ExtCmdPutOnClothes@@"+speakerName+" puts on clothes and armor","funcret",speakerName)
+    aiff.AILogMessageForActor("command@ExtCmdPutOnClothes@@"+speakerName+" puts on clothes and armor","funcret",speakerName)
   elseif (command=="ExtCmdFollow")
     StartFollow(akSpeaker, akTarget)
   elseif (command=="ExtCmdStopFollowing")
@@ -683,7 +683,7 @@ EndEvent
 ; we need it for some native logic of AIFF doesn't participate in MinAI php logic
 Function SetSexSceneState(string sexState)
   if bHasAIFF
-    AIAgentFunctions.logMessage("sexscene@" + sexState,"setconf")
+    aiff.AILogMessage("sexscene@" + sexState,"setconf")
   EndIf
   if sexState == "off"
     lastTag = ""
@@ -869,7 +869,7 @@ function UpdateThreadTable(string type, string framework = "ostim", int ThreadID
 
   jsonToSend += "}"
 
-  AIAgentFunctions.logMessage("command@ExtCmdUpdateThreadsTable@"+ jsonToSend +"@", "updateThreadsDB")
+  aiff.AILogMessage("command@ExtCmdUpdateThreadsTable@"+ jsonToSend +"@", "updateThreadsDB")
 endfunction
 
 function sexTalkClimax(actor speaker, bool hasPlayer, string framework, bool chastity = false)

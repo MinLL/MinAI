@@ -208,6 +208,44 @@ int enableRadiantDialogueOID
 bool enableRadiantDialogueDefault = True
 bool Property enableRadiantDialogue = True Auto
 
+bool Property enableAIAgentSetConf = True Auto
+bool Property enableAIAgentLogMessage = True Auto
+bool Property enableAIAgentSetAnimationBusy = True Auto
+bool Property enableAIAgentFindAllNearbyAgents = True Auto
+bool Property enableAIAgentGetAgentByName = True Auto
+bool Property enableAIAgentRemoveAgentByName = True Auto
+bool Property enableAIAgentSetDrivenByAIA = True Auto
+bool Property enableAIAgentRequestMessageForActor = True Auto
+
+int enableAIAgentSetConfOID
+int enableAIAgentLogMessageOID  
+int enableAIAgentSetAnimationBusyOID
+int enableAIAgentFindAllNearbyAgentsOID
+int enableAIAgentGetAgentByNameOID
+int enableAIAgentRemoveAgentByNameOID
+int enableAIAgentSetDrivenByAIAOID
+int enableAIAgentRequestMessageForActorOID
+
+; Add these properties near the other config properties
+bool Property enableAIAgentRequestMessage = True Auto
+bool Property enableAIAgentRecordSoundEx = True Auto
+bool Property enableAIAgentStopRecording = True Auto
+
+; Add these OIDs near the other OID definitions
+int enableAIAgentRequestMessageOID
+int enableAIAgentRecordSoundExOID  
+int enableAIAgentStopRecordingOID
+
+; Add near other AIAgent properties
+bool Property enableAIAgentLogMessageForActor = True Auto
+
+; Add near other AIAgent OIDs
+int enableAIAgentLogMessageForActorOID
+
+; Add near other config properties
+int logLevelDefault = 3 ; INFO level by default
+int Property logLevel = 3 Auto
+
 Event OnConfigInit()
   main.Info("Building mcm menu.")
   InitializeMCM()
@@ -301,8 +339,21 @@ Function RenderGeneralPage()
   narratorTextKeyOID = AddKeyMapOption("$MINAI_TYPE_TO_NARRATOR", narratorTextKey)
   disableAIAnimationsOID = AddToggleOption("$MINAI_DISABLE_AI_ANIMATIONS", disableAIAnimations)
   AddHeaderOption("$MINAI_DEBUG")
+  logLevelOID = AddSliderOption("Log Level", logLevel, "{0}")
   enableConsoleLoggingOID = AddToggleOption("$MINAI_ENABLE_CONSOLE_LOGGING", enableConsoleLogging)
   testActionsOID = AddTextOption("$MINAI_DEBUG_CATEGORY", "$MINAI_TEST_MOD_EVENTS")
+  enableAIAgentSetConfOID = AddToggleOption("Enable setConf calls", enableAIAgentSetConf)
+  enableAIAgentLogMessageOID = AddToggleOption("Enable logMessage calls", enableAIAgentLogMessage)
+  enableAIAgentSetAnimationBusyOID = AddToggleOption("Enable setAnimationBusy calls", enableAIAgentSetAnimationBusy)
+  enableAIAgentFindAllNearbyAgentsOID = AddToggleOption("Enable findAllNearbyAgents calls", enableAIAgentFindAllNearbyAgents)
+  enableAIAgentGetAgentByNameOID = AddToggleOption("Enable getAgentByName calls", enableAIAgentGetAgentByName)
+  enableAIAgentRemoveAgentByNameOID = AddToggleOption("Enable removeAgentByName calls", enableAIAgentRemoveAgentByName)
+  enableAIAgentSetDrivenByAIAOID = AddToggleOption("Enable setDrivenByAIA calls", enableAIAgentSetDrivenByAIA)
+  enableAIAgentRequestMessageForActorOID = AddToggleOption("Enable requestMessageForActor calls", enableAIAgentRequestMessageForActor)
+  enableAIAgentRequestMessageOID = AddToggleOption("Enable requestMessage calls", enableAIAgentRequestMessage)
+  enableAIAgentRecordSoundExOID = AddToggleOption("Enable recordSoundEx calls", enableAIAgentRecordSoundEx)
+  enableAIAgentStopRecordingOID = AddToggleOption("Enable stopRecording calls", enableAIAgentStopRecording)
+  enableAIAgentLogMessageForActorOID = AddToggleOption("Enable logMessageForActor calls", enableAIAgentLogMessageForActor)
 EndFunction
 
 Function RenderPhysicsPage()
@@ -687,6 +738,39 @@ Event OnOptionSelect(int oid)
       sapience.StopRadiantDialogue()
     EndIf
     SetToggleOptionValue(oid, enableRadiantDialogue)
+  elseif oid == enableAIAgentSetConfOID
+    enableAIAgentSetConf = !enableAIAgentSetConf
+    SetToggleOptionValue(oid, enableAIAgentSetConf)
+  elseif oid == enableAIAgentLogMessageOID
+    enableAIAgentLogMessage = !enableAIAgentLogMessage
+    SetToggleOptionValue(oid, enableAIAgentLogMessage)
+  elseif oid == enableAIAgentSetAnimationBusyOID
+    enableAIAgentSetAnimationBusy = !enableAIAgentSetAnimationBusy
+    SetToggleOptionValue(oid, enableAIAgentSetAnimationBusy)
+  elseif oid == enableAIAgentFindAllNearbyAgentsOID
+    enableAIAgentFindAllNearbyAgents = !enableAIAgentFindAllNearbyAgents
+    SetToggleOptionValue(oid, enableAIAgentFindAllNearbyAgents)
+  elseif oid == enableAIAgentGetAgentByNameOID
+    enableAIAgentGetAgentByName = !enableAIAgentGetAgentByName
+    SetToggleOptionValue(oid, enableAIAgentGetAgentByName)
+  elseif oid == enableAIAgentRemoveAgentByNameOID
+    enableAIAgentRemoveAgentByName = !enableAIAgentRemoveAgentByName
+    SetToggleOptionValue(oid, enableAIAgentRemoveAgentByName)
+  elseif oid == enableAIAgentSetDrivenByAIAOID
+    enableAIAgentSetDrivenByAIA = !enableAIAgentSetDrivenByAIA
+    SetToggleOptionValue(oid, enableAIAgentSetDrivenByAIA)
+  elseif oid == enableAIAgentRequestMessageForActorOID
+    enableAIAgentRequestMessage = !enableAIAgentRequestMessage
+    SetToggleOptionValue(oid, enableAIAgentRequestMessage)
+  elseif oid == enableAIAgentRecordSoundExOID
+    enableAIAgentRecordSoundEx = !enableAIAgentRecordSoundEx
+    SetToggleOptionValue(oid, enableAIAgentRecordSoundEx)
+  elseif oid == enableAIAgentStopRecordingOID
+    enableAIAgentStopRecording = !enableAIAgentStopRecording
+    SetToggleOptionValue(oid, enableAIAgentStopRecording)
+  elseif oid == enableAIAgentLogMessageForActorOID
+    enableAIAgentLogMessageForActor = !enableAIAgentLogMessageForActor
+    SetToggleOptionValue(oid, enableAIAgentLogMessageForActor)
   EndIf
   int i = 0
   string[] categories = JMap.allKeysPArray(aCategoryMap)
@@ -854,6 +938,42 @@ Event OnOptionDefault(int oid)
       sapience.StopRadiantDialogue()
     EndIf
     SetToggleOptionValue(oid, enableRadiantDialogue)
+  elseif oid == enableAIAgentSetConfOID
+    enableAIAgentSetConf = !enableAIAgentSetConf
+    SetToggleOptionValue(oid, enableAIAgentSetConf)
+  elseif oid == enableAIAgentLogMessageOID
+    enableAIAgentLogMessage = !enableAIAgentLogMessage
+    SetToggleOptionValue(oid, enableAIAgentLogMessage)
+  elseif oid == enableAIAgentSetAnimationBusyOID
+    enableAIAgentSetAnimationBusy = !enableAIAgentSetAnimationBusy
+    SetToggleOptionValue(oid, enableAIAgentSetAnimationBusy)
+  elseif oid == enableAIAgentFindAllNearbyAgentsOID
+    enableAIAgentFindAllNearbyAgents = !enableAIAgentFindAllNearbyAgents
+    SetToggleOptionValue(oid, enableAIAgentFindAllNearbyAgents)
+  elseif oid == enableAIAgentGetAgentByNameOID
+    enableAIAgentGetAgentByName = !enableAIAgentGetAgentByName
+    SetToggleOptionValue(oid, enableAIAgentGetAgentByName)
+  elseif oid == enableAIAgentRemoveAgentByNameOID
+    enableAIAgentRemoveAgentByName = !enableAIAgentRemoveAgentByName
+    SetToggleOptionValue(oid, enableAIAgentRemoveAgentByName)
+  elseif oid == enableAIAgentSetDrivenByAIAOID
+    enableAIAgentSetDrivenByAIA = !enableAIAgentSetDrivenByAIA
+    SetToggleOptionValue(oid, enableAIAgentSetDrivenByAIA)
+  elseif oid == enableAIAgentRequestMessageForActorOID
+    enableAIAgentRequestMessage = !enableAIAgentRequestMessage
+    SetToggleOptionValue(oid, enableAIAgentRequestMessage)
+  elseif oid == enableAIAgentRecordSoundExOID
+    enableAIAgentRecordSoundEx = !enableAIAgentRecordSoundEx
+    SetToggleOptionValue(oid, enableAIAgentRecordSoundEx)
+  elseif oid == enableAIAgentStopRecordingOID
+    enableAIAgentStopRecording = !enableAIAgentStopRecording
+    SetToggleOptionValue(oid, enableAIAgentStopRecording)
+  elseif oid == enableAIAgentLogMessageForActorOID
+    enableAIAgentLogMessageForActor = True ; Default value
+    SetToggleOptionValue(oid, enableAIAgentLogMessageForActor)
+  elseif oid == logLevelOID
+    logLevel = logLevelDefault
+    SetSliderOptionValue(oid, logLevelDefault, "{0}")
   EndIf
 EndEvent
 
@@ -965,6 +1085,32 @@ Event OnOptionHighlight(int oid)
     SetInfoText("$MINAI_DISABLE_SAPIENCE_IN_STEALTH_INFO")
   elseif oid == enableRadiantDialogueOID
     SetInfoText("$MINAI_ENABLE_RADIANT_DIALOGUE_INFO")
+  elseif oid == enableAIAgentSetConfOID
+    SetInfoText("ADVANCED DEBUGGING: Controls AIAgent setConf calls. Do not change unless instructed. Disabling may break core functionality.")
+  elseif oid == enableAIAgentLogMessageOID
+    SetInfoText("ADVANCED DEBUGGING: Controls AIAgent logMessage calls. Do not change unless instructed. Disabling may break core functionality.")
+  elseif oid == enableAIAgentSetAnimationBusyOID
+    SetInfoText("ADVANCED DEBUGGING: Controls AIAgent setAnimationBusy calls. Do not change unless instructed. Disabling may break core functionality.")
+  elseif oid == enableAIAgentFindAllNearbyAgentsOID
+    SetInfoText("ADVANCED DEBUGGING: Controls AIAgent findAllNearbyAgents calls. Do not change unless instructed. Disabling may break core functionality.")
+  elseif oid == enableAIAgentGetAgentByNameOID
+    SetInfoText("ADVANCED DEBUGGING: Controls AIAgent getAgentByName calls. Do not change unless instructed. Disabling may break core functionality.")
+  elseif oid == enableAIAgentRemoveAgentByNameOID
+    SetInfoText("ADVANCED DEBUGGING: Controls AIAgent removeAgentByName calls. Do not change unless instructed. Disabling may break core functionality.")
+  elseif oid == enableAIAgentSetDrivenByAIAOID
+    SetInfoText("ADVANCED DEBUGGING: Controls AIAgent setDrivenByAIA calls. Do not change unless instructed. Disabling may break core functionality.")
+  elseif oid == enableAIAgentRequestMessageForActorOID
+    SetInfoText("ADVANCED DEBUGGING: Controls AIAgent requestMessageForActor calls. Do not change unless instructed. Disabling may break core functionality.")
+  elseif oid == enableAIAgentRequestMessageOID
+    SetInfoText("ADVANCED DEBUGGING: Controls AIAgent requestMessage calls. Do not change unless instructed. Disabling may break core functionality.")
+  elseif oid == enableAIAgentRecordSoundExOID
+    SetInfoText("ADVANCED DEBUGGING: Controls AIAgent recordSoundEx calls. Do not change unless instructed. Disabling may break core functionality.")
+  elseif oid == enableAIAgentStopRecordingOID
+    SetInfoText("ADVANCED DEBUGGING: Controls AIAgent stopRecording calls. Do not change unless instructed. Disabling may break core functionality.")
+  elseif oid == enableAIAgentLogMessageForActorOID
+    SetInfoText("ADVANCED DEBUGGING: Controls AIAgent logMessageForActor calls. Do not change unless instructed. Disabling may break core functionality.")
+  elseif oid == logLevelOID
+    SetInfoText("Controls logging verbosity. 0=None, 1=Fatal, 2=Error, 3=Info, 4=Debug, 5=Verbose, 6=Trace")
   EndIf
   int i = 0
   string[] actions = JMap.allKeysPArray(aiff.actionRegistry)
@@ -1088,6 +1234,11 @@ Event OnOptionSliderOpen(int oid)
     SetSliderDialogDefaultValue(maxThreadsDefault)
     SetSliderDialogRange(0, 20)
     SetSliderDialogInterval(1.0)
+  elseif oid == logLevelOID
+    SetSliderDialogStartValue(logLevel)
+    SetSliderDialogDefaultValue(logLevelDefault)
+    SetSliderDialogRange(0, 6)
+    SetSliderDialogInterval(1)
   EndIf
 EndEvent
 
@@ -1156,6 +1307,9 @@ Event OnOptionSliderAccept(int oid, float value)
     maxThreads = value
     SetSliderOptionValue(oid, value, "{0}")
     StoreConfig("maxThreads", commentsRate)
+  elseif oid == logLevelOID
+    logLevel = value as Int
+    SetSliderOptionValue(oid, value, "{0}")
   EndIf
 EndEvent
 

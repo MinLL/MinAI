@@ -48,12 +48,12 @@ EndFunction
 
 Function EnableCombatDialogue()
   ; Enable combat dialogue
-  AIAgentFunctions.setConf("_combat_dialogue",1,0,"")
+  aiff.AISetConf("_combat_dialogue",1,0,"")
 EndFunction
 
 Function DisableCombatDialogue()
   ; Disable combat dialogue
-  AIAgentFunctions.setConf("_combat_dialogue",0,0,"")
+  aiff.AISetConf("_combat_dialogue",0,0,"")
 EndFunction
 
 
@@ -98,7 +98,7 @@ actor[] Function FindActorsForRechat(actor lastSpeaker)
 EndFunction 
 
 actor[] Function FindActors(bool returnAll = False, Actor exclude = None)
-  actor[] allNearbyActors = AIAgentFunctions.findAllNearbyAgents()
+  actor[] allNearbyActors = aiff.AIFindAllNearbyAgents()
   actor[] nearbyActors
   actor[] ret
   int i = 0
@@ -176,23 +176,23 @@ Event OnUpdate()
       bool actorsAreFighting = IsFighting(nearbyActors[0], nearbyActors[1])
       if IsSearching(nearbyActors[0], nearbyActors[1]) && !actorsAreFighting
         Main.Info("SAPIENCE: Triggering Search Dialogue ( " + actor1name + " => " + actor2name + ")")
-        AIAgentFunctions.requestMessageForActor(actor2name, "radiantsearchingfriend", actor1name)
+        aiff.AIRequestMessageForActor(actor2name, "radiantsearchingfriend", actor1name)
         TriggerRechat(actor1name, actor2name)
       elseif IsSearching(nearbyActors[0], nearbyActors[1]) && actorsAreFighting
         Main.Info("SAPIENCE: Triggering Search Dialogue ( " + actor1name + " => " + actor2name + ")")
-        AIAgentFunctions.requestMessageForActor(actor2name, "radiantsearchinghostile", actor1name)
+        aiff.AIRequestMessageForActor(actor2name, "radiantsearchinghostile", actor1name)
         TriggerRechat(actor1name, actor2name)
       elseIf IsInCombat(nearbyActors[0], nearbyActors[1]) && !actorsAreFighting
         Main.Info("SAPIENCE: Triggering Combat Dialogue ( " + actor1name + " => " + actor2name + ")")
-        AIAgentFunctions.requestMessageForActor(actor2name, "radiantcombatfriend", actor1name)
+        aiff.AIRequestMessageForActor(actor2name, "radiantcombatfriend", actor1name)
         TriggerRechat(actor1name, actor2name)
       elseIf IsInCombat(nearbyActors[0], nearbyActors[1]) && actorsAreFighting
         Main.Info("SAPIENCE: Triggering Combat Dialogue ( " + actor1name + " => " + actor2name + ")")
-        AIAgentFunctions.requestMessageForActor(actor2name, "radiantcombathostile", actor1name)
+        aiff.AIRequestMessageForActor(actor2name, "radiantcombathostile", actor1name)
         TriggerRechat(actor1name, actor2name)
       else
         Main.Info("SAPIENCE: Triggering Radiant Dialogue ( " + actor1name + " => " + actor2name + ")")
-        AIAgentFunctions.requestMessageForActor(actor2name, "radiant", actor1name)
+        aiff.AIRequestMessageForActor(actor2name, "radiant", actor1name)
         TriggerRechat(actor1name, actor2name)
       EndIf
       ; Set a longer delay after triggering a rechat to avoid overwhelming AIFF if the player has the cooldown set too low.
@@ -230,7 +230,7 @@ Function TriggerRechat(string actor1name, string actor2name)
     return
   EndIf
   Main.Info("SAPIENCE: Rechat triggered (" + actor2name + " => " + actor1name + "): " + numRechatsSoFar + "/" + targetRechatCount)
-  AIAgentFunctions.requestMessageForActor(actor1name, "minai_force_rechat", actor2name)
+  aiff.AIRequestMessageForActor(actor1name, "minai_force_rechat", actor2name)
   numRechatsSoFar += 1
 EndFunction
 
@@ -251,7 +251,7 @@ Function CheckForRechat(string speakerName)
   if speakerName == actor2name
     bRechatActive = true
   EndIf
-  Actor speaker = AIAgentFunctions.GetAgentByName(speakerName)
+  Actor speaker = aiff.AIGetAgentByName(speakerName)
   Main.Debug("SAPIENCE: Checking for rechat (" + speakerName + ", " + actor1name + ", " + actor2name + ", bRechatActive: " + bRechatActive + ")")
   if speaker && speaker != lastRechatActor && bRechatActive
     Actor[] eligibleActors = FindActorsForRechat(speaker)
