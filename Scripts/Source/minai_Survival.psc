@@ -242,8 +242,8 @@ EndFunction
 
 
 Event CommandDispatcher(String speakerName,String  command, String parameter)
-  Actor akSpeaker=AIAgentFunctions.getAgentByName(speakerName)
-  actor akTarget= AIAgentFunctions.getAgentByName(parameter)
+  Actor akSpeaker=aiff.AIGetAgentByName(speakerName)
+  actor akTarget= aiff.AIGetAgentByName(parameter)
   if !akTarget
     akTarget = PlayerRef
   EndIf
@@ -354,25 +354,26 @@ float Function GetCurrentHourOfDay()
 EndFunction
 
 Function SetContext(actor akTarget)
+  Main.Debug("SetContext Survival(" + main.GetActorName(akTarget) + ")")
   if !aiff
     return
   EndIf
-  if bHasSunhelm
-    aiff.SetActorVariable(playerRef, "hunger", sunhelmMain.Hunger.CurrentHungerStage)
-    aiff.SetActorVariable(playerRef, "thirst", sunhelmMain.Thirst.CurrentThirstStage)
-    aiff.SetActorVariable(playerRef, "fatigue", sunhelmMain.Fatigue.CurrentFatigueStage)
-  ElseIf bHasSurvivalMode && Survival_ModeEnabled.GetValueInt() == 1
-    ; Convert needs to percentage values for consistency
-    float hungerPercent = ((Survival_HungerNeedValue.GetValue() / Survival_HungerNeedMaxValue.GetValue())) * 100
-    float coldPercent = (Survival_ColdNeedValue.GetValue() / Survival_ColdNeedMaxValue.GetValue()) * 100
-    float exhaustionPercent = (Survival_ExhaustionNeedValue.GetValue() / Survival_ExhaustionNeedMaxValue.GetValue()) * 100
-    
-    ; Store values as integers 0-100 for consistency with Sunhelm
-    aiff.SetActorVariable(playerRef, "hunger", hungerPercent as int)
-    aiff.SetActorVariable(playerRef, "cold", coldPercent as int)
-    aiff.SetActorVariable(playerRef, "fatigue", exhaustionPercent as int)
-  EndIf
   if akTarget == playerRef
+    if bHasSunhelm
+      aiff.SetActorVariable(playerRef, "hunger", sunhelmMain.Hunger.CurrentHungerStage)
+      aiff.SetActorVariable(playerRef, "thirst", sunhelmMain.Thirst.CurrentThirstStage)
+      aiff.SetActorVariable(playerRef, "fatigue", sunhelmMain.Fatigue.CurrentFatigueStage)
+    ElseIf bHasSurvivalMode && Survival_ModeEnabled.GetValueInt() == 1
+      ; Convert needs to percentage values for consistency
+      float hungerPercent = ((Survival_HungerNeedValue.GetValue() / Survival_HungerNeedMaxValue.GetValue())) * 100
+      float coldPercent = (Survival_ColdNeedValue.GetValue() / Survival_ColdNeedMaxValue.GetValue()) * 100
+      float exhaustionPercent = (Survival_ExhaustionNeedValue.GetValue() / Survival_ExhaustionNeedMaxValue.GetValue()) * 100
+      
+      ; Store values as integers 0-100 for consistency with Sunhelm
+      aiff.SetActorVariable(playerRef, "hunger", hungerPercent as int)
+      aiff.SetActorVariable(playerRef, "cold", coldPercent as int)
+      aiff.SetActorVariable(playerRef, "fatigue", exhaustionPercent as int)
+    EndIf
     ; Track intoxication effects
     if bHasRequiem
       if REQ_Effect_Alcohol

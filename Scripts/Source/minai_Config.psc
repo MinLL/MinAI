@@ -79,6 +79,9 @@ GlobalVariable useCBPC
 GlobalVariable minai_UseOstim
 GlobalVariable minai_SapienceEnabled
 
+bool Property enableCBPC = false Auto
+bool enableCBPCDefault = false
+
 string currentAction
 string currentCategory
 
@@ -208,6 +211,71 @@ int enableRadiantDialogueOID
 bool enableRadiantDialogueDefault = True
 bool Property enableRadiantDialogue = True Auto
 
+bool Property enableAIAgentSetConf = True Auto
+bool Property enableAIAgentLogMessage = True Auto
+bool Property enableAIAgentSetAnimationBusy = True Auto
+bool Property enableAIAgentFindAllNearbyAgents = True Auto
+bool Property enableAIAgentGetAgentByName = True Auto
+bool Property enableAIAgentRemoveAgentByName = True Auto
+bool Property enableAIAgentSetDrivenByAIA = True Auto
+bool Property enableAIAgentRequestMessageForActor = True Auto
+
+int enableAIAgentSetConfOID
+int enableAIAgentLogMessageOID  
+int enableAIAgentSetAnimationBusyOID
+int enableAIAgentFindAllNearbyAgentsOID
+int enableAIAgentGetAgentByNameOID
+int enableAIAgentRemoveAgentByNameOID
+int enableAIAgentSetDrivenByAIAOID
+int enableAIAgentRequestMessageForActorOID
+
+; Add these properties near the other config properties
+bool Property enableAIAgentRequestMessage = True Auto
+bool Property enableAIAgentRecordSoundEx = True Auto
+bool Property enableAIAgentStopRecording = True Auto
+
+; Add these OIDs near the other OID definitions
+int enableAIAgentRequestMessageOID
+int enableAIAgentRecordSoundExOID  
+int enableAIAgentStopRecordingOID
+
+; Add near other AIAgent properties
+bool Property enableAIAgentLogMessageForActor = True Auto
+
+; Add near other AIAgent OIDs
+int enableAIAgentLogMessageForActorOID
+
+; Add near other config properties
+int logLevelDefault = 3 ; INFO level by default
+int Property logLevel = 3 Auto
+
+; Performance settings
+float Property highFrequencyUpdateInterval = 5.0 Auto
+float Property mediumFrequencyUpdateInterval = 15.0 Auto
+float Property lowFrequencyUpdateInterval = 30.0 Auto
+float Property contextUpdateInterval = 30.0 Auto
+bool Property highPerformanceMode = false Auto
+
+; Default values for normal mode
+float Property highFrequencyUpdateIntervalDefault = 5.0 Auto
+float Property mediumFrequencyUpdateIntervalDefault = 15.0 Auto
+float Property lowFrequencyUpdateIntervalDefault = 30.0 Auto
+float Property contextUpdateIntervalDefault = 30.0 Auto
+bool Property highPerformanceModeDefault = false Auto
+
+; Default values for high performance mode
+float Property highPerformanceHighFrequencyDefault = 8.0 Auto
+float Property highPerformanceMediumFrequencyDefault = 20.0 Auto
+float Property highPerformanceLowFrequencyDefault = 40.0 Auto
+float Property highPerformanceContextUpdateDefault = 45.0 Auto
+
+; MCM OIDs for performance settings
+int Property highFrequencyUpdateIntervalOID Auto
+int Property mediumFrequencyUpdateIntervalOID Auto
+int Property lowFrequencyUpdateIntervalOID Auto
+int Property contextUpdateIntervalOID Auto
+int Property highPerformanceModeOID Auto
+
 Event OnConfigInit()
   main.Info("Building mcm menu.")
   InitializeMCM()
@@ -222,7 +290,6 @@ Function InitializeMCM()
   sapience = Game.GetFormFromFile(0x091D, "MinAI.esp") as minai_SapienceController
   minai_SapienceEnabled = Game.GetFormFromFile(0x091A, "MinAI.esp") as GlobalVariable
   Main.Info("Initializing MCM ( " + JMap.Count(aiff.actionRegistry) + " actions in registry).")
-  useCBPC = Game.GetFormFromFile(0x0910, "MinAI.esp") as GlobalVariable
   ActionRegistryIsDirty = False
   SetupPages()
 EndFunction
@@ -233,17 +300,19 @@ EndFunction
 
 Function SetupPages()
   if sex.IsNSFW()
-    Pages = new string[5]
+    Pages = new string[6]
     Pages[0] = "General"
     Pages[1] = "Physics (CBPC)"
     Pages[2] = "Devious Stuff"
     Pages[3] = "Sex Settings"
     Pages[4] = "Action Registry"
+    Pages[5] = "Performance"
   Else
-    Pages = new string[3]
+    Pages = new string[4]
     Pages[0] = "General"
     Pages[1] = "Physics (CBPC)"
     Pages[2] = "Action Registry"
+    Pages[3] = "Performance"
   EndIf
 EndFunction
 
@@ -266,6 +335,8 @@ Event OnPageReset(string page)
     RenderSexPage()
   elseif page == "Action Registry"
     RenderActionsPage();
+  elseif page == "Performance"
+    RenderPerformancePage()
   else
     RenderPlaceholderPage()
   EndIf
@@ -301,14 +372,28 @@ Function RenderGeneralPage()
   narratorTextKeyOID = AddKeyMapOption("Type to Narrator", narratorTextKey)
   disableAIAnimationsOID = AddToggleOption("Disable AI-FF Animations", disableAIAnimations)
   AddHeaderOption("Debug")
+  logLevelOID = AddSliderOption("Log Level", logLevel, "{0}")
   enableConsoleLoggingOID = AddToggleOption("Enable Console Logging", enableConsoleLogging)
+  AddHeaderOption("Advanced Debugging (Do Not Change)")
   testActionsOID = AddTextOption("Debug", "Test Mod Events")
+  enableAIAgentSetConfOID = AddToggleOption("Enable setConf calls", enableAIAgentSetConf)
+  enableAIAgentLogMessageOID = AddToggleOption("Enable logMessage calls", enableAIAgentLogMessage)
+  enableAIAgentSetAnimationBusyOID = AddToggleOption("Enable setAnimationBusy calls", enableAIAgentSetAnimationBusy)
+  enableAIAgentFindAllNearbyAgentsOID = AddToggleOption("Enable findAllNearbyAgents calls", enableAIAgentFindAllNearbyAgents)
+  enableAIAgentGetAgentByNameOID = AddToggleOption("Enable getAgentByName calls", enableAIAgentGetAgentByName)
+  enableAIAgentRemoveAgentByNameOID = AddToggleOption("Enable removeAgentByName calls", enableAIAgentRemoveAgentByName)
+  enableAIAgentSetDrivenByAIAOID = AddToggleOption("Enable setDrivenByAIA calls", enableAIAgentSetDrivenByAIA)
+  enableAIAgentRequestMessageForActorOID = AddToggleOption("Enable requestMessageForActor calls", enableAIAgentRequestMessageForActor)
+  enableAIAgentRequestMessageOID = AddToggleOption("Enable requestMessage calls", enableAIAgentRequestMessage)
+  enableAIAgentRecordSoundExOID = AddToggleOption("Enable recordSoundEx calls", enableAIAgentRecordSoundEx)
+  enableAIAgentStopRecordingOID = AddToggleOption("Enable stopRecording calls", enableAIAgentStopRecording)
+  enableAIAgentLogMessageForActorOID = AddToggleOption("Enable logMessageForActor calls", enableAIAgentLogMessageForActor)
 EndFunction
 
 Function RenderPhysicsPage()
   SetCursorFillMode(TOP_TO_BOTTOM)		
   AddHeaderOption("CBPC Settings")
-  UseCBPCOID = AddToggleOption("Enable CBPC", useCBPC.GetValueInt() == 1)
+  UseCBPCOID = AddToggleOption("Enable CBPC", enableCBPC)
   cbpcDisableSelfTouchOID = AddToggleOption("Disable Self Touch", cbpcDisableSelfTouch)
   cbpcDisableSelfAssTouchOID = AddToggleOption("Disable Self Ass Touch", cbpcDisableSelfAssTouch)
   collisionSpeechCooldownOID = AddSliderOption("Physics Speech Comment Rate", collisionSpeechCooldown, "{1}")
@@ -449,6 +534,32 @@ Function RenderPlaceholderPage()
 EndFunction
 
 
+Function RenderPerformancePage()
+  SetCursorFillMode(TOP_TO_BOTTOM)
+  
+  AddHeaderOption("Performance Settings")
+  highPerformanceModeOID = AddToggleOption("Use Optimized Settings for Performance", highPerformanceMode)
+  
+  AddEmptyOption()
+  AddHeaderOption("Update Intervals")
+  highFrequencyUpdateIntervalOID = AddSliderOption("High Frequency Interval", highFrequencyUpdateInterval, "{1} seconds")
+  
+  mediumFrequencyUpdateIntervalOID = AddSliderOption("Medium Frequency Interval", mediumFrequencyUpdateInterval, "{1} seconds")
+  
+  lowFrequencyUpdateIntervalOID = AddSliderOption("Low Frequency Interval", lowFrequencyUpdateInterval, "{1} seconds")
+  
+  AddEmptyOption()
+  contextUpdateIntervalOID = AddSliderOption("Context Update Interval", contextUpdateInterval, "{1} seconds")
+  
+  if highPerformanceMode
+    SetOptionFlags(highFrequencyUpdateIntervalOID, OPTION_FLAG_DISABLED)
+    SetOptionFlags(mediumFrequencyUpdateIntervalOID, OPTION_FLAG_DISABLED)
+    SetOptionFlags(lowFrequencyUpdateIntervalOID, OPTION_FLAG_DISABLED)
+    SetOptionFlags(contextUpdateIntervalOID, OPTION_FLAG_DISABLED)
+  endif
+EndFunction
+
+
 Function SetGlobalToggle(int oid, GlobalVariable var, bool value)
   if value
     var.SetValue(1)
@@ -545,7 +656,8 @@ Event OnOptionSelect(int oid)
     enableConsoleLogging = !enableConsoleLogging
     SetToggleOptionValue(oid, enableConsoleLogging)
   elseif oid == UseCBPCOID
-    toggleGlobal(oid, useCBPC)
+    enableCBPC = !enableCBPC
+    SetToggleOptionValue(oid, enableCBPC)
     Debug.Notification("CBPC setting changed. Save/Reload to take effect")
   elseif oid == autoUpdateDiaryOID
     autoUpdateDiary = !autoUpdateDiary
@@ -649,6 +761,84 @@ Event OnOptionSelect(int oid)
       sapience.StopRadiantDialogue()
     EndIf
     SetToggleOptionValue(oid, enableRadiantDialogue)
+  elseif oid == enableAIAgentSetConfOID
+    enableAIAgentSetConf = !enableAIAgentSetConf
+    SetToggleOptionValue(oid, enableAIAgentSetConf)
+  elseif oid == enableAIAgentLogMessageOID
+    enableAIAgentLogMessage = !enableAIAgentLogMessage
+    SetToggleOptionValue(oid, enableAIAgentLogMessage)
+  elseif oid == enableAIAgentSetAnimationBusyOID
+    enableAIAgentSetAnimationBusy = !enableAIAgentSetAnimationBusy
+    SetToggleOptionValue(oid, enableAIAgentSetAnimationBusy)
+  elseif oid == enableAIAgentFindAllNearbyAgentsOID
+    enableAIAgentFindAllNearbyAgents = !enableAIAgentFindAllNearbyAgents
+    SetToggleOptionValue(oid, enableAIAgentFindAllNearbyAgents)
+  elseif oid == enableAIAgentGetAgentByNameOID
+    enableAIAgentGetAgentByName = !enableAIAgentGetAgentByName
+    SetToggleOptionValue(oid, enableAIAgentGetAgentByName)
+  elseif oid == enableAIAgentRemoveAgentByNameOID
+    enableAIAgentRemoveAgentByName = !enableAIAgentRemoveAgentByName
+    SetToggleOptionValue(oid, enableAIAgentRemoveAgentByName)
+  elseif oid == enableAIAgentSetDrivenByAIAOID
+    enableAIAgentSetDrivenByAIA = !enableAIAgentSetDrivenByAIA
+    SetToggleOptionValue(oid, enableAIAgentSetDrivenByAIA)
+  elseif oid == enableAIAgentRequestMessageForActorOID
+    enableAIAgentRequestMessage = !enableAIAgentRequestMessage
+    SetToggleOptionValue(oid, enableAIAgentRequestMessage)
+  elseif oid == enableAIAgentRecordSoundExOID
+    enableAIAgentRecordSoundEx = !enableAIAgentRecordSoundEx
+    SetToggleOptionValue(oid, enableAIAgentRecordSoundEx)
+  elseif oid == enableAIAgentStopRecordingOID
+    enableAIAgentStopRecording = !enableAIAgentStopRecording
+    SetToggleOptionValue(oid, enableAIAgentStopRecording)
+  elseif oid == enableAIAgentLogMessageForActorOID
+    enableAIAgentLogMessageForActor = !enableAIAgentLogMessageForActor
+    SetToggleOptionValue(oid, enableAIAgentLogMessageForActor)
+  elseif oid == logLevelOID
+    logLevel = logLevelDefault
+    SetSliderOptionValue(oid, logLevelDefault, "{0}")
+  elseif oid == highPerformanceModeOID
+    highPerformanceMode = !highPerformanceMode
+    SetToggleOptionValue(oid, highPerformanceMode)
+    
+    if highPerformanceMode
+      ; Apply optimized settings
+      highFrequencyUpdateInterval = highPerformanceHighFrequencyDefault
+      mediumFrequencyUpdateInterval = highPerformanceMediumFrequencyDefault
+      lowFrequencyUpdateInterval = highPerformanceLowFrequencyDefault
+      contextUpdateInterval = highPerformanceContextUpdateDefault
+      
+      ; Update MCM display
+      SetSliderOptionValue(highFrequencyUpdateIntervalOID, highFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(mediumFrequencyUpdateIntervalOID, mediumFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(lowFrequencyUpdateIntervalOID, lowFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(contextUpdateIntervalOID, contextUpdateInterval, "{1} seconds")
+      
+      ; Disable sliders
+      SetOptionFlags(highFrequencyUpdateIntervalOID, OPTION_FLAG_DISABLED)
+      SetOptionFlags(mediumFrequencyUpdateIntervalOID, OPTION_FLAG_DISABLED)
+      SetOptionFlags(lowFrequencyUpdateIntervalOID, OPTION_FLAG_DISABLED)
+      SetOptionFlags(contextUpdateIntervalOID, OPTION_FLAG_DISABLED)
+    else
+      ; Reset to defaults
+      highFrequencyUpdateInterval = highFrequencyUpdateIntervalDefault
+      mediumFrequencyUpdateInterval = mediumFrequencyUpdateIntervalDefault
+      lowFrequencyUpdateInterval = lowFrequencyUpdateIntervalDefault
+      contextUpdateInterval = contextUpdateIntervalDefault
+      
+      ; Update MCM display
+      SetSliderOptionValue(highFrequencyUpdateIntervalOID, highFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(mediumFrequencyUpdateIntervalOID, mediumFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(lowFrequencyUpdateIntervalOID, lowFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(contextUpdateIntervalOID, contextUpdateInterval, "{1} seconds")
+      
+      ; Enable sliders
+      SetOptionFlags(highFrequencyUpdateIntervalOID, OPTION_FLAG_NONE)
+      SetOptionFlags(mediumFrequencyUpdateIntervalOID, OPTION_FLAG_NONE)
+      SetOptionFlags(lowFrequencyUpdateIntervalOID, OPTION_FLAG_NONE)
+      SetOptionFlags(contextUpdateIntervalOID, OPTION_FLAG_NONE)
+    endif
+    ForcePageReset()
   EndIf
   int i = 0
   string[] categories = JMap.allKeysPArray(aCategoryMap)
@@ -681,7 +871,8 @@ Event OnOptionDefault(int oid)
     enableConsoleLogging = enableConsoleLoggingDefault
     SetToggleOptionValue(oid, enableConsoleLogging)
   elseif oid == UseCBPCOID
-    SetGlobalToggle(oid, UseCBPC, true)
+    enableCBPC = enableCBPCDefault
+    SetToggleOptionValue(oid, enableCBPC)
     Debug.Notification("CBPC setting changed. Save/Reload to take effect")
   elseif oid == autoUpdateDiaryOID
     autoUpdateDiary = autoUpdateDiaryDefault
@@ -817,6 +1008,42 @@ Event OnOptionDefault(int oid)
       sapience.StopRadiantDialogue()
     EndIf
     SetToggleOptionValue(oid, enableRadiantDialogue)
+  elseif oid == enableAIAgentSetConfOID
+    enableAIAgentSetConf = !enableAIAgentSetConf
+    SetToggleOptionValue(oid, enableAIAgentSetConf)
+  elseif oid == enableAIAgentLogMessageOID
+    enableAIAgentLogMessage = !enableAIAgentLogMessage
+    SetToggleOptionValue(oid, enableAIAgentLogMessage)
+  elseif oid == enableAIAgentSetAnimationBusyOID
+    enableAIAgentSetAnimationBusy = !enableAIAgentSetAnimationBusy
+    SetToggleOptionValue(oid, enableAIAgentSetAnimationBusy)
+  elseif oid == enableAIAgentFindAllNearbyAgentsOID
+    enableAIAgentFindAllNearbyAgents = !enableAIAgentFindAllNearbyAgents
+    SetToggleOptionValue(oid, enableAIAgentFindAllNearbyAgents)
+  elseif oid == enableAIAgentGetAgentByNameOID
+    enableAIAgentGetAgentByName = !enableAIAgentGetAgentByName
+    SetToggleOptionValue(oid, enableAIAgentGetAgentByName)
+  elseif oid == enableAIAgentRemoveAgentByNameOID
+    enableAIAgentRemoveAgentByName = !enableAIAgentRemoveAgentByName
+    SetToggleOptionValue(oid, enableAIAgentRemoveAgentByName)
+  elseif oid == enableAIAgentSetDrivenByAIAOID
+    enableAIAgentSetDrivenByAIA = !enableAIAgentSetDrivenByAIA
+    SetToggleOptionValue(oid, enableAIAgentSetDrivenByAIA)
+  elseif oid == enableAIAgentRequestMessageForActorOID
+    enableAIAgentRequestMessage = !enableAIAgentRequestMessage
+    SetToggleOptionValue(oid, enableAIAgentRequestMessage)
+  elseif oid == enableAIAgentRecordSoundExOID
+    enableAIAgentRecordSoundEx = !enableAIAgentRecordSoundEx
+    SetToggleOptionValue(oid, enableAIAgentRecordSoundEx)
+  elseif oid == enableAIAgentStopRecordingOID
+    enableAIAgentStopRecording = !enableAIAgentStopRecording
+    SetToggleOptionValue(oid, enableAIAgentStopRecording)
+  elseif oid == enableAIAgentLogMessageForActorOID
+    enableAIAgentLogMessageForActor = True ; Default value
+    SetToggleOptionValue(oid, enableAIAgentLogMessageForActor)
+  elseif oid == logLevelOID
+    logLevel = logLevelDefault
+    SetSliderOptionValue(oid, logLevelDefault, "{0}")
   EndIf
 EndEvent
 
@@ -926,9 +1153,45 @@ Event OnOptionHighlight(int oid)
   elseif oid == roleplayTextKeyOID
     SetInfoText("Hotkey to roleplay as your character using text")
   elseif oid == disableSapienceInStealthOID
-    SetInfoText("When enabled, sapience will be automatically disabled while the player is sneaking (Allowing for private conversations with followers and such)")
+    SetInfoText("When enabled, sapience will be automatically disabled while the player is sneaking (Allowing for private conversations with followers and such). Requires save and reload for the setting to take effect.")
   elseif oid == enableRadiantDialogueOID
     SetInfoText("Enable or disable radiant dialogue between NPCs. When disabled, NPCs will not automatically start conversations with each other.")
+  elseif oid == enableAIAgentSetConfOID
+    SetInfoText("ADVANCED DEBUGGING: Controls AIAgent setConf calls. Do not change unless instructed. Disabling may break core functionality.")
+  elseif oid == enableAIAgentLogMessageOID
+    SetInfoText("ADVANCED DEBUGGING: Controls AIAgent logMessage calls. Do not change unless instructed. Disabling may break core functionality.")
+  elseif oid == enableAIAgentSetAnimationBusyOID
+    SetInfoText("ADVANCED DEBUGGING: Controls AIAgent setAnimationBusy calls. Do not change unless instructed. Disabling may break core functionality.")
+  elseif oid == enableAIAgentFindAllNearbyAgentsOID
+    SetInfoText("ADVANCED DEBUGGING: Controls AIAgent findAllNearbyAgents calls. Do not change unless instructed. Disabling may break core functionality.")
+  elseif oid == enableAIAgentGetAgentByNameOID
+    SetInfoText("ADVANCED DEBUGGING: Controls AIAgent getAgentByName calls. Do not change unless instructed. Disabling may break core functionality.")
+  elseif oid == enableAIAgentRemoveAgentByNameOID
+    SetInfoText("ADVANCED DEBUGGING: Controls AIAgent removeAgentByName calls. Do not change unless instructed. Disabling may break core functionality.")
+  elseif oid == enableAIAgentSetDrivenByAIAOID
+    SetInfoText("ADVANCED DEBUGGING: Controls AIAgent setDrivenByAIA calls. Do not change unless instructed. Disabling may break core functionality.")
+  elseif oid == enableAIAgentRequestMessageForActorOID
+    SetInfoText("ADVANCED DEBUGGING: Controls AIAgent requestMessageForActor calls. Do not change unless instructed. Disabling may break core functionality.")
+  elseif oid == enableAIAgentRequestMessageOID
+    SetInfoText("ADVANCED DEBUGGING: Controls AIAgent requestMessage calls. Do not change unless instructed. Disabling may break core functionality.")
+  elseif oid == enableAIAgentRecordSoundExOID
+    SetInfoText("ADVANCED DEBUGGING: Controls AIAgent recordSoundEx calls. Do not change unless instructed. Disabling may break core functionality.")
+  elseif oid == enableAIAgentStopRecordingOID
+    SetInfoText("ADVANCED DEBUGGING: Controls AIAgent stopRecording calls. Do not change unless instructed. Disabling may break core functionality.")
+  elseif oid == enableAIAgentLogMessageForActorOID
+    SetInfoText("ADVANCED DEBUGGING: Controls AIAgent logMessageForActor calls. Do not change unless instructed. Disabling may break core functionality.")
+  elseif oid == logLevelOID
+    SetInfoText("Controls logging verbosity. 0=None, 1=Fatal, 2=Error, 3=Info, 4=Debug, 5=Verbose, 6=Trace")
+  elseif oid == highFrequencyUpdateIntervalOID
+    SetInfoText("Updates highly dynamic states like arousal, environmental context, and so forth")
+  elseif oid == mediumFrequencyUpdateIntervalOID
+    SetInfoText("Updates states that change more frequently than low frequency states like survival and followers.")
+  elseif oid == lowFrequencyUpdateIntervalOID
+    SetInfoText("Updates states that change less frequently.")
+  elseif oid == contextUpdateIntervalOID
+    SetInfoText("How often NPCs should update their context. Effectively this checks how often the above settings are checked.")
+  elseif oid == highPerformanceModeOID
+    SetInfoText("Use optimized performance settings that reduce update frequency for better performance")
   EndIf
   int i = 0
   string[] actions = JMap.allKeysPArray(aiff.actionRegistry)
@@ -1052,6 +1315,72 @@ Event OnOptionSliderOpen(int oid)
     SetSliderDialogDefaultValue(maxThreadsDefault)
     SetSliderDialogRange(0, 20)
     SetSliderDialogInterval(1.0)
+  elseif oid == logLevelOID
+    SetSliderDialogStartValue(logLevel)
+    SetSliderDialogDefaultValue(logLevelDefault)
+    SetSliderDialogRange(0, 6)
+    SetSliderDialogInterval(1)
+  elseif oid == highFrequencyUpdateIntervalOID
+    SetSliderDialogStartValue(highFrequencyUpdateInterval)
+    SetSliderDialogDefaultValue(highFrequencyUpdateIntervalDefault)
+    SetSliderDialogRange(1.0, 15.0)
+    SetSliderDialogInterval(1.0)
+  elseif oid == mediumFrequencyUpdateIntervalOID
+    SetSliderDialogStartValue(mediumFrequencyUpdateInterval)
+    SetSliderDialogDefaultValue(mediumFrequencyUpdateIntervalDefault)
+    SetSliderDialogRange(5.0, 30.0)
+    SetSliderDialogInterval(1.0)
+  elseif oid == lowFrequencyUpdateIntervalOID
+    SetSliderDialogStartValue(lowFrequencyUpdateInterval)
+    SetSliderDialogDefaultValue(lowFrequencyUpdateIntervalDefault)
+    SetSliderDialogRange(15.0, 60.0)
+    SetSliderDialogInterval(1.0)
+  elseif oid == contextUpdateIntervalOID
+    SetSliderDialogStartValue(contextUpdateInterval)
+    SetSliderDialogDefaultValue(contextUpdateIntervalDefault)
+    SetSliderDialogRange(15.0, 60.0)
+    SetSliderDialogInterval(1.0)
+  elseif oid == highPerformanceModeOID
+    highPerformanceMode = !highPerformanceMode
+    SetToggleOptionValue(oid, highPerformanceMode)
+    
+    if highPerformanceMode
+      ; Apply optimized settings
+      highFrequencyUpdateInterval = highPerformanceHighFrequencyDefault
+      mediumFrequencyUpdateInterval = highPerformanceMediumFrequencyDefault
+      lowFrequencyUpdateInterval = highPerformanceLowFrequencyDefault
+      contextUpdateInterval = highPerformanceContextUpdateDefault
+      
+      ; Update MCM display
+      SetSliderOptionValue(highFrequencyUpdateIntervalOID, highFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(mediumFrequencyUpdateIntervalOID, mediumFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(lowFrequencyUpdateIntervalOID, lowFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(contextUpdateIntervalOID, contextUpdateInterval, "{1} seconds")
+      
+      ; Disable sliders
+      SetOptionFlags(highFrequencyUpdateIntervalOID, OPTION_FLAG_DISABLED)
+      SetOptionFlags(mediumFrequencyUpdateIntervalOID, OPTION_FLAG_DISABLED)
+      SetOptionFlags(lowFrequencyUpdateIntervalOID, OPTION_FLAG_DISABLED)
+      SetOptionFlags(contextUpdateIntervalOID, OPTION_FLAG_DISABLED)
+    else
+      ; Reset to defaults
+      highFrequencyUpdateInterval = highFrequencyUpdateIntervalDefault
+      mediumFrequencyUpdateInterval = mediumFrequencyUpdateIntervalDefault
+      lowFrequencyUpdateInterval = lowFrequencyUpdateIntervalDefault
+      contextUpdateInterval = contextUpdateIntervalDefault
+      
+      ; Update MCM display
+      SetSliderOptionValue(highFrequencyUpdateIntervalOID, highFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(mediumFrequencyUpdateIntervalOID, mediumFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(lowFrequencyUpdateIntervalOID, lowFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(contextUpdateIntervalOID, contextUpdateInterval, "{1} seconds")
+      
+      ; Enable sliders
+      SetOptionFlags(highFrequencyUpdateIntervalOID, OPTION_FLAG_NONE)
+      SetOptionFlags(mediumFrequencyUpdateIntervalOID, OPTION_FLAG_NONE)
+      SetOptionFlags(lowFrequencyUpdateIntervalOID, OPTION_FLAG_NONE)
+      SetOptionFlags(contextUpdateIntervalOID, OPTION_FLAG_NONE)
+    endif
   EndIf
 EndEvent
 
@@ -1122,6 +1451,62 @@ Event OnOptionSliderAccept(int oid, float value)
     maxThreads = value
     SetSliderOptionValue(oid, value, "{0}")
     StoreConfig("maxThreads", commentsRate)
+  elseif oid == logLevelOID
+    logLevel = value as Int
+    SetSliderOptionValue(oid, value, "{0}")
+  elseif oid == highFrequencyUpdateIntervalOID
+    highFrequencyUpdateInterval = value
+    SetSliderOptionValue(oid, value, "{1} seconds")
+  elseif oid == mediumFrequencyUpdateIntervalOID
+    mediumFrequencyUpdateInterval = value
+    SetSliderOptionValue(oid, value, "{1} seconds")
+  elseif oid == lowFrequencyUpdateIntervalOID
+    lowFrequencyUpdateInterval = value
+    SetSliderOptionValue(oid, value, "{1} seconds")
+  elseif oid == contextUpdateIntervalOID
+    contextUpdateInterval = value
+    SetSliderOptionValue(oid, value, "{1} seconds")
+  elseif oid == highPerformanceModeOID
+    highPerformanceMode = !highPerformanceMode
+    SetToggleOptionValue(oid, highPerformanceMode)
+    
+    if highPerformanceMode
+      ; Apply optimized settings
+      highFrequencyUpdateInterval = 8.0
+      mediumFrequencyUpdateInterval = 20.0
+      lowFrequencyUpdateInterval = 40.0
+      contextUpdateInterval = 45.0
+      
+      ; Update MCM display
+      SetSliderOptionValue(highFrequencyUpdateIntervalOID, highFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(mediumFrequencyUpdateIntervalOID, mediumFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(lowFrequencyUpdateIntervalOID, lowFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(contextUpdateIntervalOID, contextUpdateInterval, "{1} seconds")
+      
+      ; Disable sliders
+      SetOptionFlags(highFrequencyUpdateIntervalOID, OPTION_FLAG_DISABLED)
+      SetOptionFlags(mediumFrequencyUpdateIntervalOID, OPTION_FLAG_DISABLED)
+      SetOptionFlags(lowFrequencyUpdateIntervalOID, OPTION_FLAG_DISABLED)
+      SetOptionFlags(contextUpdateIntervalOID, OPTION_FLAG_DISABLED)
+    else
+      ; Reset to defaults
+      highFrequencyUpdateInterval = highFrequencyUpdateIntervalDefault
+      mediumFrequencyUpdateInterval = mediumFrequencyUpdateIntervalDefault
+      lowFrequencyUpdateInterval = lowFrequencyUpdateIntervalDefault
+      contextUpdateInterval = contextUpdateIntervalDefault
+      
+      ; Update MCM display
+      SetSliderOptionValue(highFrequencyUpdateIntervalOID, highFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(mediumFrequencyUpdateIntervalOID, mediumFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(lowFrequencyUpdateIntervalOID, lowFrequencyUpdateInterval, "{1} seconds")
+      SetSliderOptionValue(contextUpdateIntervalOID, contextUpdateInterval, "{1} seconds")
+      
+      ; Enable sliders
+      SetOptionFlags(highFrequencyUpdateIntervalOID, OPTION_FLAG_NONE)
+      SetOptionFlags(mediumFrequencyUpdateIntervalOID, OPTION_FLAG_NONE)
+      SetOptionFlags(lowFrequencyUpdateIntervalOID, OPTION_FLAG_NONE)
+      SetOptionFlags(contextUpdateIntervalOID, OPTION_FLAG_NONE)
+    endif
   EndIf
 EndEvent
 

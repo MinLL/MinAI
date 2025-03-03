@@ -143,22 +143,18 @@ function BuildEquipmentContext(&$parsedData)
       $context .= ", ";
     }
 
-    if (empty($name)) {
-      if (!empty($description)) {
-        $context .= "{$description}";
-      }
-    } else {
-      if (empty($description)) {
-        $context .= "{$name}";
-      } else {
-        $context .= "{$name} - {$description}";
-      }
-    }
-
+    // If there's a description, use only that
     if (!empty($description)) {
+      $context .= $description;
+      // Add keywords to skip since we used the description
       foreach ($segment['keywords'] as $keyword) {
         $skipKeywords[strtolower($keyword)] = true;
       }
+    } 
+    // If no description but has a name, use the name
+    else if (!empty($name)) {
+      $context .= $name;
+      // Don't add to skipKeywords since we may want keyword-based descriptions
     }
   }
   
@@ -184,7 +180,7 @@ function GetAllEquipmentContext($actorName)
   // if this fails, still be able to continue without this functionality
   try {
     $encodedString = GetActorValue($actorName, "AllWornEquipment");
-    minai_log("info", "AllWornEquipment: " . $encodedString);
+    // minai_log("info", "AllWornEquipment: " . $encodedString);
     // we can potentially cache this by hashing the encodedString since equipment doesn't change often
     // especially for npc, but this should be fine for now
     $parsedResult = ParseEncodedEquipmentData($encodedString);

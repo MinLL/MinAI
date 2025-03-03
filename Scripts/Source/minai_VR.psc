@@ -22,8 +22,6 @@ string[] PromptKeys ; List of keys to trigger an AI reaction
 float lastCollisionSpeechTime
 float lastMoanTime
  
-GlobalVariable useCBPC
-
 int touchedLocations = 0
 
 string BREASTS_KEY = "Breasts"
@@ -57,9 +55,7 @@ function Maintenance(minai_MainQuestController _main)
   Main.Info("Initializing VR Module.")
   bHasAIFF = (Game.GetModByName("AIAgent.esp") != 255)
 
-  useCBPC = Game.GetFormFromFile(0x0910, "MinAI.esp") as GlobalVariable
-
-  if useCBPC.GetValueInt() == 1
+  if config.enableCBPC
     Main.Info("Enabling CBPC")
     
     lastCollisionSpeechTime = 0.0
@@ -79,6 +75,10 @@ function Maintenance(minai_MainQuestController _main)
     RegisterForSingleUpdate(config.collisionCooldown)
   Else
     Main.Info("CBPC is disabled")
+    UnregisterForModEvent("CBPCPlayerCollisionWithFemaleEvent")
+    UnregisterForModEvent("CBPCPlayerCollisionWithMaleEvent")
+    UnregisterForModEvent("CBPCPlayerGenitalCollisionWithFemaleEvent")
+    UnregisterForModEvent("CBPCPlayerGenitalCollisionWithMaleEvent")
   EndIf
 EndFunction
 
@@ -144,7 +144,7 @@ EndEvent
 
 
 Function SetContext(actor akTarget)
-  
+  Main.Debug("SetContext VR(" + main.GetActorName(akTarget) + ")")
 EndFunction
 
 
@@ -195,7 +195,12 @@ Function OnCollision(string eventName, string nodeName, float collisionDuration,
     return
   EndIf
   collisionMutex = True
-  if !useCBPC || useCBPC.GetValueInt() != 1
+  if !config.enableCBPC
+    Main.Warn("CBPC is disabled, but OnCollision() was triggered.")
+    UnregisterForModEvent("CBPCPlayerCollisionWithFemaleEvent")
+    UnregisterForModEvent("CBPCPlayerCollisionWithMaleEvent")
+    UnregisterForModEvent("CBPCPlayerGenitalCollisionWithFemaleEvent")
+    UnregisterForModEvent("CBPCPlayerGenitalCollisionWithMaleEvent")
     UnregisterForUpdate()
     return
   EndIf
@@ -272,7 +277,7 @@ EndFunction
 
 
 Event OnUpdate()
-  if useCBPC.GetValueInt() != 1
+  if !config.enableCBPC
     Main.Warn("CBPC: Aborting update, cbpc is disabled")
     return
   EndIf

@@ -24,7 +24,7 @@ if (ShouldEnableSexFunctions($actorName)) {
             RegisterAction("ExtCmdStopFollowing");
         } else {
             if (!IsInScene($GLOBALS['HERIKA_NAME'])) {
-                minai_log("info", $GLOBALS['HERIKA_NAME']." is not in a scene");
+                // minai_log("info", $GLOBALS['HERIKA_NAME']." is not in a scene");
                 RegisterAction("ExtCmdFollow");
             } else {
                 minai_log("info", $GLOBALS['HERIKA_NAME']." is in a scene");

@@ -42,6 +42,7 @@ Function Maintenance(minai_MainQuestController _main)
 EndFunction
 
 Function SetContext(actor akTarget)
+    Main.Debug("SetContext FertilityMode(" + main.GetActorName(akTarget) + ")")
     if !aiff || !bHasFertilityMode || !FertilityStorage || !FMUtility
         return
     EndIf

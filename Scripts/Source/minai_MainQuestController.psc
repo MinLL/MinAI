@@ -3,8 +3,6 @@ ScriptName minai_MainQuestController extends Quest
 GlobalVariable minai_WhichAI
 actor playerRef
 
-GlobalVariable property logLevel Auto
-
 ; AI
 minai_Mantella minMantella
 minai_AIFF minAIFF
@@ -38,7 +36,7 @@ Event OnInit()
 EndEvent
 
 Int Function GetVersion()
-  return 111
+  return 122
 EndFunction
 
 Function CheckForCriticalDependencies()
@@ -56,10 +54,6 @@ Function Maintenance()
   config = Game.GetFormFromFile(0x0912, "MinAI.esp") as minai_Config
   if !config
     Fatal("Could not load configuration - script version mismatch with esp")
-  EndIf
-  logLevel = Game.GetFormFromFile(0x090B, "MinAI.esp") as GlobalVariable
-  if (!logLevel)
-    Debug.MessageBox("Mismatched MinAI.esp and minai_MainQuestController version")
   EndIf
   Info("Maintenance() - minai v" +GetVersion() + " initializing.")
   CheckForCriticalDependencies()
@@ -174,7 +168,7 @@ Function RequestLLMResponse(string eventLine, string eventType)
     if currentTime - lastRequestTime > config.requestResponseCooldown
       lastRequestTime = currentTime
       Info("Requesting response from LLM: " + eventLine)
-      AIAgentFunctions.RequestMessage(eventLine, eventType)
+      minAIFF.AIRequestMessage(eventLine, eventType)
     Else
       RegisterEvent(eventLine, eventType)
     EndIf
@@ -190,7 +184,7 @@ Function RequestLLMResponseFromActor(string eventLine, string eventType, string 
     if currentTime - lastRequestTime > config.requestResponseCooldown
       lastRequestTime = currentTime
       Info("Requesting response from LLM: " + eventLine)
-      AIAgentFunctions.requestMessageForActor(eventLine, eventType, name)
+      minAIFF.AIRequestMessageForActor(eventLine, eventType, name)
     Else
       RegisterEvent(eventLine, eventType)
     EndIf
@@ -207,7 +201,7 @@ Function RequestLLMResponseNPC(string speaker, string eventLine, string target, 
     if currentTime - lastRequestTime > config.requestResponseCooldown
       lastRequestTime = currentTime
       Info("Requesting response from LLM: " + lineToSend)
-      AIAgentFunctions.requestMessageForActor(lineToSend, type, target)
+      minAIFF.AIRequestMessageForActor(lineToSend, type, target)
     EndIf
   elseif bHasMantella
     RegisterEvent(eventLine, "npc_chat")
@@ -581,7 +575,7 @@ Function OnSingKeyPressed()
     If(bHasAIFF)
         Info("Starting singing recording")
         minAIFF.SetActorVariable(playerRef, "isSinging", true)
-        AIAgentFunctions.recordSoundEx(config.singKey)
+        minAIFF.AIRecordSoundEx(config.singKey)
         Debug.Notification("Hold to record singing, release quickly to sing without recording")
     Else
         Debug.Notification("AIFF not installed - singing requires AIFF")
@@ -591,13 +585,13 @@ EndFunction
 Function OnSingKeyReleased(float holdTime)
     If(bHasAIFF)
         Info("Stopping singing recording")
-        AIAgentFunctions.stopRecording(config.singKey)
+        minAIFF.AIStopRecording(config.singKey)
         
         ; Only send message if key was held for less than 1 second
         if holdTime < 1.0
             string playerName = GetActorName(playerRef)
             string eventLine = playerName + " wants to sing"
-            AIAgentFunctions.requestMessageForActor(eventLine, "minai_sing", playerName)
+            minAIFF.AIRequestMessageForActor(eventLine, "minai_sing", playerName)
             Debug.Notification("Quick press - generating song")
         else
             Debug.Notification("Recording stopped")
@@ -609,7 +603,7 @@ Function OnNarratorKeyPressed()
     If(bHasAIFF)
         Info("Starting narrator recording")
         minAIFF.SetActorVariable(playerRef, "isTalkingToNarrator", true)
-        AIAgentFunctions.recordSoundEx(config.narratorKey)
+        minAIFF.AIRecordSoundEx(config.narratorKey)
         Debug.Notification("Hold to record message for narrator, release quickly to talk without recording")
     Else
         Debug.Notification("AIFF not installed - narrator conversations require AIFF")
@@ -621,11 +615,11 @@ Function OnNarratorKeyReleased(float holdTime)
         ; Reset the last request time to prevent immediate response from other systems
         lastRequestTime = Utility.GetCurrentRealTime()
         Info("Stopping narrator recording")
-        AIAgentFunctions.stopRecording(config.narratorKey)
+        minAIFF.AIStopRecording(config.narratorKey)
         
         ; Only send message if key was held for less than 1 second
         if holdTime < 1.0
-            AIAgentFunctions.requestMessage("", "minai_narrator_talk")
+            minAIFF.AIRequestMessage("", "minai_narrator_talk")
             Debug.Notification("Quick press - asking narrator to speak")
         else
             Debug.Notification("Recording stopped")
@@ -667,7 +661,7 @@ Function OnNarratorTextKeyPressed()
             ; Reset the last request time to prevent immediate response
             lastRequestTime = Utility.GetCurrentRealTime()
             string playerName = GetActorName(playerRef)
-            AIAgentFunctions.requestMessage(messageText, "minai_narrator_talk")
+            minAIFF.AIRequestMessage(messageText, "minai_narrator_talk")
             Debug.Notification("Message sent to narrator")
         EndIf
     Else
@@ -690,7 +684,7 @@ Function OnRoleplayKeyPressed()
     If(bHasAIFF)
         Info("Starting roleplay recording")
         minAIFF.SetActorVariable(playerRef, "isRoleplaying", true)
-        AIAgentFunctions.recordSoundEx(config.roleplayKey)
+        minAIFF.AIRecordSoundEx(config.roleplayKey)
         Debug.Notification("Hold to record, release quickly to roleplay without recording")
     Else
         Debug.Notification("AIFF not installed - roleplay requires AIFF")
@@ -702,11 +696,11 @@ Function OnRoleplayKeyReleased(float holdTime)
         ; Reset the last request time to prevent immediate response
         lastRequestTime = Utility.GetCurrentRealTime()
         Info("Stopping roleplay recording")
-        AIAgentFunctions.stopRecording(config.roleplayKey)
+        minAIFF.AIStopRecording(config.roleplayKey)
         
         ; Only send message if key was held for less than 1 second
         if holdTime < 1.0
-            AIAgentFunctions.requestMessage("", "minai_roleplay")
+            minAIFF.AIRequestMessage("", "minai_roleplay")
             Debug.Notification("Quick press - generating roleplay response")
         else
             Debug.Notification("Recording stopped")
@@ -726,7 +720,7 @@ Function OnRoleplayTextKeyPressed()
         If(messageText != "")
             ; Reset the last request time to prevent immediate response
             lastRequestTime = Utility.GetCurrentRealTime()
-            AIAgentFunctions.requestMessage(messageText, "inputtext")
+            minAIFF.AIRequestMessage(messageText, "inputtext")
             Debug.Notification("Message sent")
         EndIf
     Else

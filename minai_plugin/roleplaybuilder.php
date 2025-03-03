@@ -55,20 +55,37 @@ function convertToFirstPerson($text, $name, $pronouns) {
 }
 
 function GetNameFromProfile() {
-    $HERIKA_NAME = "";
     if (isset($_GET["profile"])) {
-        if (file_exists("/var/www/html/HerikaServer/conf".DIRECTORY_SEPARATOR."conf_{$_GET["profile"]}.php")) {
-           // error_log("PROFILE: {$_GET["profile"]}");
-            include("/var/www/html/HerikaServer/conf".DIRECTORY_SEPARATOR."conf_{$_GET["profile"]}.php");
-    
+        $configPath = "/var/www/html/HerikaServer/conf".DIRECTORY_SEPARATOR."conf_{$_GET["profile"]}.php";
+        minai_log("info", "Looking for profile at: " . $configPath);
+        
+        if (file_exists($configPath)) {
+            // Read the file contents
+            $contents = file_get_contents($configPath);
+            if ($contents === false) {
+                minai_log("error", "Failed to read profile file: " . $configPath);
+                return $GLOBALS["HERIKA_NAME"];
+            }
+            
+            // Find all matches of HERIKA_NAME assignments
+            if (preg_match_all('/\$HERIKA_NAME\s*=\s*([\'"])((?:(?!\1).|\\\1)*)\1/', $contents, $matches, PREG_SET_ORDER)) {
+                // Get the last match
+                $lastMatch = end($matches);
+                $name = stripslashes($lastMatch[2]); // Remove any escape characters
+                minai_log("info", "Found last name assignment in profile: " . $name);
+                return $name;
+            } else {
+                minai_log("warning", "Could not find any HERIKA_NAME assignments in profile file");
+            }
         } else {
-            // error_log(__FILE__.". Using default profile because GET PROFILE NOT EXISTS");
+            minai_log("warning", "Profile file does not exist: " . $configPath);
         }
-    }
-    else {
+    } else {
         minai_log("info", "No profile specified, using default profile.");
     }
-    return $HERIKA_NAME;
+    
+    minai_log("info", "Returning default HERIKA_NAME: " . $GLOBALS["HERIKA_NAME"]);
+    return $GLOBALS["HERIKA_NAME"];
 }
 
 function getGaggedSpeech($name) {
@@ -116,7 +133,8 @@ function interceptRoleplayInput() {
             $path = GetNarratorConfigPath();    
             include($path);
         }
-        $GLOBALS["HERIKA_NAME"] = $originalHerikaName;
+        minai_log("info", "HERIKA_NAME: " . $HERIKA_NAME);
+        $HERIKA_NAME = $originalHerikaName;
         
         SetEnabled($GLOBALS["PLAYER_NAME"], "isRoleplaying", false);
         $settings = $GLOBALS['roleplay_settings'];
