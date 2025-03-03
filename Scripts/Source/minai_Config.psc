@@ -753,15 +753,6 @@ Event OnOptionSelect(int oid)
   elseif oid == disableSapienceInStealthOID
     disableSapienceInStealth = !disableSapienceInStealth
     SetToggleOptionValue(oid, disableSapienceInStealth)
-    
-    ; If disabling the feature, make sure sapience is re-enabled
-    if !disableSapienceInStealth
-      GlobalVariable stealth = Game.GetFormFromFile(0x0E97, "MinAI.esp") as GlobalVariable
-      if stealth && stealth.GetValueInt() == 0
-        stealth.SetValue(1.0)
-        Main.Info("Re-enabling sapience after feature disabled")
-      EndIf
-    EndIf
   elseif oid == enableRadiantDialogueOID
     enableRadiantDialogue = !enableRadiantDialogue
     if enableRadiantDialogue
@@ -1162,7 +1153,7 @@ Event OnOptionHighlight(int oid)
   elseif oid == roleplayTextKeyOID
     SetInfoText("Hotkey to roleplay as your character using text")
   elseif oid == disableSapienceInStealthOID
-    SetInfoText("When enabled, sapience will be automatically disabled while the player is sneaking (Allowing for private conversations with followers and such)")
+    SetInfoText("When enabled, sapience will be automatically disabled while the player is sneaking (Allowing for private conversations with followers and such). Requires save and reload for the setting to take effect.")
   elseif oid == enableRadiantDialogueOID
     SetInfoText("Enable or disable radiant dialogue between NPCs. When disabled, NPCs will not automatically start conversations with each other.")
   elseif oid == enableAIAgentSetConfOID

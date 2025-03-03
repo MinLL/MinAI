@@ -299,12 +299,6 @@ Function SetContext(actor akTarget)
   if akTarget == Player
     AILogMessage("_minai_PLAYER//playerName@" + Main.GetActorName(player), "setconf")
     AILogMessage("_minai_PLAYER//nearbyActors@" + GetNearbyAiStr(), "setconf")
-    ; Make sure this doesn't get stuck
-    if player.IsSneaking()
-      minai_DynamicSapienceToggleStealth.SetValue(0.0)
-    else
-      minai_DynamicSapienceToggleStealth.SetValue(1.0)
-    EndIf
   EndIf
 
   ; Cache the current game time to avoid multiple calls
