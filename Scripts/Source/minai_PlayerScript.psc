@@ -44,9 +44,16 @@ Event OnPlayerLoadGame()
   followers = Game.GetFormFromFile(0x0913, "MinAI.esp") as minai_Followers
   config = Game.GetFormFromFile(0x0912, "MinAI.esp") as minai_Config
   minai_PlayerStateTracker = Game.GetFormFromFile(0x0921, "MinAI.esp") as Spell
+  
+  ; Ensure sapience isn't incorrectly disabled on load
+  minai_DynamicSapienceToggleStealth = Game.GetFormFromFile(0x0E97, "MinAI.esp") as GlobalVariable
+  if minai_DynamicSapienceToggleStealth && !config.disableSapienceInStealth && minai_DynamicSapienceToggleStealth.GetValueInt() == 0
+    MainQuestController.Info("Re-enabling sapience on load as stealth feature is disabled")
+    minai_DynamicSapienceToggleStealth.SetValue(1.0)
+  EndIf
+  
   StartTrackingPlayer()
   MainQuestController.Maintenance()
-  
 EndEvent
 
 Event OnLocationChange(Location akOldLoc, Location akNewLoc)
@@ -69,13 +76,18 @@ EndEvent
 ; Add new event handler for animation events
 Event OnAnimationEvent(ObjectReference akSource, string asEventName)
   MainQuestController.Debug("OnAnimationEvent() - akSource: " + akSource + " asEventName: " + asEventName)
-  if akSource == playerRef
-    if asEventName == "tailSneakIdle" || asEventName == "tailSneakLocomotion"
-      if config.disableSapienceInStealth
-        minai_DynamicSapienceToggleStealth.SetValue(0.0)
-        MainQuestController.Info("Disabling sapience due to stealth")
-      EndIf
-    elseif asEventName == "tailMTIdle" || asEventName == "tailMTLocomotion" || asEventName == "tailCombatIdle" || asEventName == "tailCombatLocomotion"
+  if akSource == playerRef && minai_DynamicSapienceToggleStealth ; Only process if we have the global variable
+    bool isStealthAnim = (asEventName == "tailSneakIdle" || asEventName == "tailSneakLocomotion")
+    bool isNonStealthAnim = (asEventName == "tailMTIdle" || asEventName == "tailMTLocomotion" || asEventName == "tailCombatIdle" || asEventName == "tailCombatLocomotion")
+    
+    if isStealthAnim && config.disableSapienceInStealth
+      ; Only disable if the feature is enabled
+      minai_DynamicSapienceToggleStealth.SetValue(0.0)
+      MainQuestController.Info("Disabling sapience due to stealth")
+    elseif isNonStealthAnim
+      ; Always re-enable when leaving stealth if either:
+      ; 1. The feature is enabled (normal operation)
+      ; 2. The feature is disabled (cleanup any disabled state)
       if config.disableSapienceInStealth || minai_DynamicSapienceToggleStealth.GetValueInt() == 0
         MainQuestController.Info("Re-enabling sapience after leaving stealth")
         minai_DynamicSapienceToggleStealth.SetValue(1.0)

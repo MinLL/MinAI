@@ -753,6 +753,15 @@ Event OnOptionSelect(int oid)
   elseif oid == disableSapienceInStealthOID
     disableSapienceInStealth = !disableSapienceInStealth
     SetToggleOptionValue(oid, disableSapienceInStealth)
+    
+    ; If disabling the feature, make sure sapience is re-enabled
+    if !disableSapienceInStealth
+      GlobalVariable stealth = Game.GetFormFromFile(0x0E97, "MinAI.esp") as GlobalVariable
+      if stealth && stealth.GetValueInt() == 0
+        stealth.SetValue(1.0)
+        Main.Info("Re-enabling sapience after feature disabled")
+      EndIf
+    EndIf
   elseif oid == enableRadiantDialogueOID
     enableRadiantDialogue = !enableRadiantDialogue
     if enableRadiantDialogue
