@@ -145,6 +145,7 @@ EndFunction
 ; for CHIM, use tags to pass to the PHP where lists of characters are built 
 ; ie tom dick and harry smell like roses
 Function SetContext(actor akActor)
+  Main.Debug("SetContext DirtAndBlood(" + main.GetActorName(akActor) + ")")
   if !bHasDirtandBlood
     return
   EndIf

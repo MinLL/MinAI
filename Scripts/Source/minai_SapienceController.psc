@@ -67,6 +67,7 @@ EndEvent
 
 
 Function SetContext(actor akTarget)
+  Main.Debug("SetContext SapienceController(" + main.GetActorName(akTarget) + ")")
   
 EndFunction
 

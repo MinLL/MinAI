@@ -484,6 +484,7 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
 EndEvent
 
 Function SetContext(actor akTarget)
+  Main.Debug("SetContext Arousal(" + main.GetActorName(akTarget) + ")")
   if !aiff
     return
   EndIf

@@ -173,6 +173,7 @@ Event OnAnimationEvent(ObjectReference akSource, string asEventName)
 EndEvent
 
 Function SetContext(actor akTarget)
+    Main.Debug("SetContext FillHerUp(" + main.GetActorName(akTarget) + ")")
     if !bHasFillHerUp || !aiff
         return
     EndIf

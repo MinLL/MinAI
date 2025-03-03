@@ -61,7 +61,7 @@ EndEvent
 
 
 Function SetContext(actor akTarget)
-  
+  Main.Debug("SetContext CombatManager(" + main.GetActorName(akTarget) + ")")
 EndFunction
 
 

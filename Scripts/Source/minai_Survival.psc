@@ -354,6 +354,7 @@ float Function GetCurrentHourOfDay()
 EndFunction
 
 Function SetContext(actor akTarget)
+  Main.Debug("SetContext Survival(" + main.GetActorName(akTarget) + ")")
   if !aiff
     return
   EndIf

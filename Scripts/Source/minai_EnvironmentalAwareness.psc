@@ -126,6 +126,7 @@ function Maintenance(minai_MainQuestController _main)
 EndFunction
 
 function SetContext(actor akActor)
+  Main.Debug("SetContext EnvironmentalAwareness(" + Main.GetActorName(akActor) + ")")
   string an = Main.GetActorName(akActor)
   if(akActor == playerRef)
     string envDescription = GetDayState()

@@ -977,6 +977,7 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
 EndEvent
 
 Function SetContext(actor akTarget)
+  Main.Debug("SetContext DeviousStuff(" + main.GetActorName(akTarget) + ")")
   if !aiff
     return
   EndIf

@@ -79,6 +79,9 @@ GlobalVariable useCBPC
 GlobalVariable minai_UseOstim
 GlobalVariable minai_SapienceEnabled
 
+bool Property enableCBPC = false Auto
+bool enableCBPCDefault = false
+
 string currentAction
 string currentCategory
 
@@ -287,7 +290,6 @@ Function InitializeMCM()
   sapience = Game.GetFormFromFile(0x091D, "MinAI.esp") as minai_SapienceController
   minai_SapienceEnabled = Game.GetFormFromFile(0x091A, "MinAI.esp") as GlobalVariable
   Main.Info("Initializing MCM ( " + JMap.Count(aiff.actionRegistry) + " actions in registry).")
-  useCBPC = Game.GetFormFromFile(0x0910, "MinAI.esp") as GlobalVariable
   ActionRegistryIsDirty = False
   SetupPages()
 EndFunction
@@ -391,7 +393,7 @@ EndFunction
 Function RenderPhysicsPage()
   SetCursorFillMode(TOP_TO_BOTTOM)		
   AddHeaderOption("CBPC Settings")
-  UseCBPCOID = AddToggleOption("Enable CBPC", useCBPC.GetValueInt() == 1)
+  UseCBPCOID = AddToggleOption("Enable CBPC", enableCBPC)
   cbpcDisableSelfTouchOID = AddToggleOption("Disable Self Touch", cbpcDisableSelfTouch)
   cbpcDisableSelfAssTouchOID = AddToggleOption("Disable Self Ass Touch", cbpcDisableSelfAssTouch)
   collisionSpeechCooldownOID = AddSliderOption("Physics Speech Comment Rate", collisionSpeechCooldown, "{1}")
@@ -654,7 +656,8 @@ Event OnOptionSelect(int oid)
     enableConsoleLogging = !enableConsoleLogging
     SetToggleOptionValue(oid, enableConsoleLogging)
   elseif oid == UseCBPCOID
-    toggleGlobal(oid, useCBPC)
+    enableCBPC = !enableCBPC
+    SetToggleOptionValue(oid, enableCBPC)
     Debug.Notification("CBPC setting changed. Save/Reload to take effect")
   elseif oid == autoUpdateDiaryOID
     autoUpdateDiary = !autoUpdateDiary
@@ -868,7 +871,8 @@ Event OnOptionDefault(int oid)
     enableConsoleLogging = enableConsoleLoggingDefault
     SetToggleOptionValue(oid, enableConsoleLogging)
   elseif oid == UseCBPCOID
-    SetGlobalToggle(oid, UseCBPC, true)
+    enableCBPC = enableCBPCDefault
+    SetToggleOptionValue(oid, enableCBPC)
     Debug.Notification("CBPC setting changed. Save/Reload to take effect")
   elseif oid == autoUpdateDiaryOID
     autoUpdateDiary = autoUpdateDiaryDefault
