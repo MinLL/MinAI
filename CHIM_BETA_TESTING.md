@@ -6,9 +6,13 @@ The debug build of CHIM is designed to provide enhanced diagnostic information w
 
 ## Prerequisites
 
+
+
 1. **Install Visual C++ Debug Redistributables**
    - Download the Visual Studio Build Tools from [Microsoft's website](https://visualstudio.microsoft.com/downloads/#remote-tools-for-visual-studio-2022)
+   - ![1](https://github.com/user-attachments/assets/12b2f8bc-8664-40a1-876e-13b6bdbd376e)
    - During installation, select and install the "C++ Build Tools" component
+   - ![2](https://github.com/user-attachments/assets/be8f4597-bf00-4b92-92e5-4e24abec7136)
    - This step is **mandatory** - the debug version will not work without these redistributables
 
 ## Installation Steps
