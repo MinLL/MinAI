@@ -38,7 +38,7 @@ The debug build of CHIM is designed to provide enhanced diagnostic information w
 
 If you encounter any problems, please include the following log files in your report:
 - `Documents/My Games/Skyrim Special Edition/SKSE/AIagent.log`
-- `Documents/My Games/Skyrim Special Edition/SKSE/Papyrus.0.log`
+- `Documents/My Games/Skyrim Special Edition/Logs/Scripts/Papyrus.0.log`
 
 These logs are essential for diagnosing any issues you might encounter during beta testing.
 
