@@ -79,6 +79,10 @@ Event OnUpdate()
       Main.Debug("Actor " + targetName + " went away: Removing context tracking")
       DisableSelf(akTarget)
     else
+      if (!config)
+        config = Game.GetFormFromFile(0x0912, "MinAI.esp") as minai_Config
+        Main.Warn("Context: Populated missing config.")
+      EndIf
       RegisterForSingleUpdate(config.contextUpdateInterval)
     endif
   Else
