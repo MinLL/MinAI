@@ -26,6 +26,7 @@ function bundleSFWContext(&$nc) {
   $nc .= "\n";
   $localActors = $utilities->beingsInCloseRange();
   // send localActors list to GetDirtAndBlood so as to make comma seperated lists
+  $nc .= GetRelationshipContext($GLOBALS["HERIKA_NAME"]);
   $nc .= GetDirtAndBloodContext($localActors);
   $nc .= GetExposureContext($localActors);
   $nc .= GetEnvironmentalContext($GLOBALS["HERIKA_NAME"]);

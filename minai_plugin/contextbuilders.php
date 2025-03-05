@@ -6,6 +6,7 @@ require_once("wornequipment.php");
 require_once("customintegrations.php");
 require_once("weather.php");
 require_once("reputation.php");
+require_once("relationship.php");
 require_once("submissivelola.php");
 require_once("dirtandblood.php");
 require_once("exposure.php");
