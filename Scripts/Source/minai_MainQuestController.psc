@@ -36,7 +36,7 @@ Event OnInit()
 EndEvent
 
 Int Function GetVersion()
-  return 111
+  return 122
 EndFunction
 
 Function CheckForCriticalDependencies()

@@ -484,6 +484,7 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
 EndEvent
 
 Function SetContext(actor akTarget)
+  Main.Debug("SetContext Arousal(" + main.GetActorName(akTarget) + ")")
   if !aiff
     return
   EndIf
@@ -527,7 +528,7 @@ Function SetContext(actor akTarget)
     actorRace = StringUtil.Substring(actorRace, 0, cotrIndex)
   EndIf
   if actorRace == "fox"
-    actorRace = "human"
+    actorRace = "nord"
   EndIf
   aiff.SetActorVariable(akTarget, "race", actorRace)
 EndFunction

@@ -11,12 +11,15 @@ minai_DirtAndBlood dirtAndBlood
 minai_EnvironmentalAwareness envAwareness
 minai_Util MinaiUtil 
 
+; Per-actor mutex for SetContext
+int Property contextMutexMap Auto  ; JMap of actor names to mutex states
+
 minai_FertilityMode fertility
 GlobalVariable minai_DynamicSapienceToggleStealth
 bool bHasAIFF = False
 
-int Property contextUpdateInterval Auto
-int Property playerContextUpdateInterval Auto
+int Property contextUpdateInterval Auto ; Deprecated, use config.contextUpdateInterval instead
+int Property playerContextUpdateInterval Auto ; Deprecated, use config.highFrequencyUpdateInterval instead
 string[] vibratorCommands
 
 Actor player
@@ -36,6 +39,9 @@ Faction FollowingPlayerFaction
 
 ; Add new property to track last dialogue time for actors
 int Property lastDialogueTimes Auto  ; JMap of actor names to timestamps
+
+; Add new property for update tracking
+int Property updateTracker Auto  ; JMap for tracking last update times
 
 Function InitFollow()
   bHasFollowPlayer = False
@@ -58,11 +64,21 @@ Function Maintenance(minai_MainQuestController _main)
     Main.Info("AIFF - Maintenance: Version update detected. Resetting action registry.")
     ResetActionRegistry()
   EndIf
-  contextUpdateInterval = 30
-  ; This is inefficient. We need to more selectively set specific parts of the context rather than repeatedly re-set everything.
-  ; Things like arousal need to update this often probably, most things don't.
-  ; TODO: Break this out and fix this.
-  playerContextUpdateInterval = 5
+
+  ; Initialize and cleanup mutex map
+  if contextMutexMap != 0
+    JValue.release(contextMutexMap)
+  endif
+  contextMutexMap = JMap.object()
+  JValue.retain(contextMutexMap)
+
+  ; Initialize update tracker
+  if updateTracker != 0
+    JValue.Release(updateTracker)
+  endif
+  updateTracker = JMap.object()
+  JValue.retain(updateTracker)
+  
   main = _main
   config = Game.GetFormFromFile(0x0912, "MinAI.esp") as minai_Config
   if !config
@@ -104,7 +120,7 @@ Function Maintenance(minai_MainQuestController _main)
   EndIf
   if isInitialized
     AILogMessage("initializing","minai_init")
-    RegisterForSingleUpdate(playerContextUpdateInterval)
+    RegisterForSingleUpdate(config.highFrequencyUpdateInterval)
   EndIf
   if (Game.GetModByName("MinAI_AIFF.esp") != 255)
     Main.Fatal("You are are running an old version of the beta with min_AIFF.esp. This file is no longer required. Delete this file.")
@@ -248,33 +264,89 @@ Function SetContext(actor akTarget)
     Main.Warn("SetContext(" + akTarget + ") - Still Initializing.")
     return
   EndIf  
-  Main.Debug("AIFF - SetContext(" + Main.GetActorName(akTarget) + ") START")
+
+  ; Initialize mutex map if needed
+  if !contextMutexMap
+    contextMutexMap = JMap.object()
+    JValue.retain(contextMutexMap)
+  EndIf
+
+  ; Get actor name for mutex tracking
+  string actorName = Main.GetActorName(akTarget)
+  
+  ; Add trace logging for player
+  if akTarget == player && config.logLevel >= 6
+    MinaiUtil.Debug("JMap Sizes:")
+    MinaiUtil.Debug("- contextMutexMap: " + JMap.count(contextMutexMap) + " entries")
+    MinaiUtil.Debug("- actionRegistry: " + JMap.count(actionRegistry) + " entries") 
+    MinaiUtil.Debug("- sapientActors: " + JMap.count(sapientActors) + " entries")
+    MinaiUtil.Debug("- lastDialogueTimes: " + JMap.count(lastDialogueTimes) + " entries")
+    MinaiUtil.Debug("- updateTracker: " + JMap.count(updateTracker) + " entries")
+  EndIf
+  
+  ; Check if this actor's context is already being set
+  if JMap.getInt(contextMutexMap, actorName) == 1
+    Main.Warn("AIFF - SetContext(" + actorName + ") - Already setting context for this actor, skipping")
+    return
+  EndIf
+
+  ; Set mutex for this actor
+  JMap.setInt(contextMutexMap, actorName, 1)
+  
+  Main.Debug("AIFF - SetContext(" + actorName + ") START")
+  
+  ; Only update player-specific context if it's the player
   if akTarget == Player
     AILogMessage("_minai_PLAYER//playerName@" + Main.GetActorName(player), "setconf")
     AILogMessage("_minai_PLAYER//nearbyActors@" + GetNearbyAiStr(), "setconf")
-    ; Make sure this doesn't get stuck
-    if player.IsSneaking()
-      minai_DynamicSapienceToggleStealth.SetValue(0.0)
-    else
-      minai_DynamicSapienceToggleStealth.SetValue(1.0)
-    EndIf
   EndIf
-  StoreActorVoice(akTarget)
+
+  ; Cache the current game time to avoid multiple calls
+  float currentGameTime = Utility.GetCurrentGameTime()
+  
+  ; Get actor's unique ID for tracking
+  string actorKey = Main.GetActorName(akTarget)
+  
+  ; Only update voice if it hasn't been stored yet
+  if !JMap.hasKey(updateTracker, actorKey + "_voice")
+    StoreActorVoice(akTarget)
+    JMap.setFlt(updateTracker, actorKey + "_voice", currentGameTime)
+  endif
+
+  ; Update high-frequency states (every update)
+  Main.Debug("AIFF - SetContext(" + actorName + ") - Setting high-frequency states")
   devious.SetContext(akTarget)
   arousal.SetContext(akTarget)
-  survival.SetContext(akTarget)
-  followers.SetContext(akTarget)
-  reputation.SetContext(akTarget)
-  dirtAndBlood.SetContext(akTarget)
   envAwareness.SetContext(akTarget)
-  fertility.SetContext(akTarget)
-  sex.SetContext(akTarget)
-  StoreKeywords(akTarget)
-  StoreFactions(akTarget)
+  
+  ; Update medium-frequency states
+  if !JMap.hasKey(updateTracker, actorKey + "_med") || (currentGameTime - JMap.getFlt(updateTracker, actorKey + "_med")) * 24 * 3600 >= config.mediumFrequencyUpdateInterval
+    Main.Debug("AIFF - SetContext(" + actorName + ") - Setting medium-frequency states")
+    survival.SetContext(akTarget)
+    followers.SetContext(akTarget)
+    JMap.setFlt(updateTracker, actorKey + "_med", currentGameTime)
+  endif
+  
+  ; Update low-frequency states
+  if !JMap.hasKey(updateTracker, actorKey + "_low") || (currentGameTime - JMap.getFlt(updateTracker, actorKey + "_low")) * 24 * 3600 >= config.lowFrequencyUpdateInterval
+    Main.Debug("AIFF - SetContext(" + actorName + ") - Setting low-frequency states")
+    reputation.SetContext(akTarget)
+    dirtAndBlood.SetContext(akTarget)
+    fertility.SetContext(akTarget)
+    sex.SetContext(akTarget)
+    StoreKeywords(akTarget)
+    StoreFactions(akTarget)
+    JMap.setFlt(updateTracker, actorKey + "_low", currentGameTime)
+  endif
+
   if config.disableAIAnimations && akTarget != player
     SetAnimationBusy(1, Main.GetActorName(akTarget))
   EndIf
-  Main.Debug("AIFF - SetContext(" + Main.GetActorName(akTarget) + ") FINISH")
+
+  ; Release mutex for this actor
+  JMap.setInt(contextMutexMap, actorName, 0)
+  
+  Main.Debug("AIFF - SetContext(" + actorName + ") FINISH")
 EndFunction
 
 
@@ -446,11 +518,13 @@ EndFunction
 Event OnUpdate()
   if (!IsInitialized())
     UnregisterForUpdate()
-    return;
+    return
   EndIf
   SetContext(player)
-  UpdateActions()  
-  RegisterForSingleUpdate(playerContextUpdateInterval)
+  UpdateActions()
+  
+  ; Use the base update interval
+  RegisterForSingleUpdate(config.highFrequencyUpdateInterval)
 EndEvent
 
 bool Function HasAIFF()
@@ -789,7 +863,7 @@ Function RemoveActorAI(string targetName)
   float currentTime = Utility.GetCurrentRealTime()
   
   ; If actor had dialogue within last 60 seconds, don't remove
-  ; They will get  cleaned up later on location change by cleanup
+  ; They will get cleaned up later on location change by cleanup
   if (lastDialogueTime > 0 && (currentTime - lastDialogueTime) < 60.0 && minai_DynamicSapienceToggleStealth.GetValueInt() == 1)
     Main.Debug("SAPIENCE: Not removing " + targetName + " - recent dialogue activity")
     return
@@ -797,8 +871,22 @@ Function RemoveActorAI(string targetName)
 
   Main.Info("SAPIENCE: Removing " + targetName + " from AI")
   AIRemoveAgentByName(targetName)
+  
+  ; Clean up all tracking data for this actor
   JMap.RemoveKey(sapientActors, targetName)
-  JMap.RemoveKey(lastDialogueTimes, targetName) ; Clean up the dialogue time entry
+  JMap.RemoveKey(lastDialogueTimes, targetName)
+  
+  ; Clean up context mutex
+  if contextMutexMap
+    JMap.RemoveKey(contextMutexMap, targetName)
+  EndIf
+  
+  ; Clean up update tracking data
+  if updateTracker
+    JMap.RemoveKey(updateTracker, targetName + "_voice")
+    JMap.RemoveKey(updateTracker, targetName + "_med")
+    JMap.RemoveKey(updateTracker, targetName + "_low")
+  EndIf
 EndFunction
 
 Function EnableActorAI(actor akTarget)

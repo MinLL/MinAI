@@ -13,6 +13,14 @@ if (IsEnabled($GLOBALS["PLAYER_NAME"], "isSinging")) {
         "action"=>implode("|",$GLOBALS["FUNC_LIST"]),
         "target"=>"action's target|destination name",
         "lang"=>"en|es",
+        "response_tone_happiness"=>"Value from 0-1",
+        "response_tone_sadness"=>"Value from 0-1",
+        "response_tone_disgust"=>"Value from 0-1",
+        "response_tone_fear"=>"Value from 0-1",
+        "response_tone_surprise"=>"Value from 0-1",
+        "response_tone_anger"=>"Value from 0-1",
+        "response_tone_other"=>"Value from 0-1",
+        "response_tone_neutral"=>"Value from 0-1"
     ];
 }
 elseif (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"] && $GLOBALS["HERIKA_NAME"] == "The Narrator") {
@@ -29,5 +37,13 @@ elseif (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"] && $GLOBAL
         "action"=>implode("|",$GLOBALS["FUNC_LIST"]),
         "target"=>"action's target|destination name",
         "lang"=>"en|es",
+        "response_tone_happiness"=>"Value from 0-1",
+        "response_tone_sadness"=>"Value from 0-1",
+        "response_tone_disgust"=>"Value from 0-1",
+        "response_tone_fear"=>"Value from 0-1",
+        "response_tone_surprise"=>"Value from 0-1",
+        "response_tone_anger"=>"Value from 0-1",
+        "response_tone_other"=>"Value from 0-1",
+        "response_tone_neutral"=>"Value from 0-1"
     ];
 }

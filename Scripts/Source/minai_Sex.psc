@@ -148,6 +148,7 @@ Function Maintenance(minai_MainQuestController _main)
 EndFunction
 
 Function SetContext(actor akTarget)
+  Main.Debug("SetContext Sex(" + main.GetActorName(akTarget) + ")")
   if !aiff
     return
   EndIf

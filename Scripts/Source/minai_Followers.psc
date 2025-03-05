@@ -69,7 +69,7 @@ EndEvent
 
 
 Function SetContext(actor akTarget)
-  
+  Main.Debug("SetContext Followers(" + main.GetActorName(akTarget) + ")")
 EndFunction
 
 

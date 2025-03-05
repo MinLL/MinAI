@@ -157,6 +157,7 @@ EndEvent
 
 
 Function SetContext(actor akTarget)
+  Main.Debug("SetContext Reputation(" + main.GetActorName(akTarget) + ")")
   if akTarget != PlayerRef
     return
   EndIf
