@@ -16,6 +16,7 @@ function Maintenance(minai_MainQuestController _main)
  
 EndFunction
 
+
 Function UpdateEventsForMantella(Actor actorToSpeakTo, Actor actorSpeaking, actor[] actorsFromFormList)
   MinaiUtil.Log("UpdateEventsForMantella - Relationship","INFO")
   if !aiff
@@ -47,7 +48,7 @@ EndFunction
 string Function GetStringForActor(actor currentActor)
   String actorName = main.GetActorName(currentActor)
   String playerName = main.GetActorName(playerRef)
-  rrank = currentActor.GetRelationshipRank(playerRef)
+  int rrank = currentActor.GetRelationshipRank(playerRef)
   string msg = ""
   If (rrank == -4)
     msg = playerName + " is an archnemesis of " + actorName + ". "
