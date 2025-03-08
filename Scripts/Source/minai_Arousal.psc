@@ -514,11 +514,11 @@ Function SetContext(actor akTarget)
   string gender = "male"
   if akTarget.GetActorBase().GetSex() != 0
     gender = "female"
-    if akTarget.HasKeyword(TNG_Gentlewoman)
+    if bHasTNG && akTarget.HasKeyword(TNG_Gentlewoman)
       aiff.SetActorVariable(akTarget, "tngsize", TNG_PapyrusUtil.GetActorSize(akTarget))
     EndIf
   EndIf
-  if gender == "male"
+  if bHasTNG && gender == "male"
     aiff.SetActorVariable(akTarget, "tngsize", TNG_PapyrusUtil.GetActorSize(akTarget))
   EndIf
   aiff.SetActorVariable(akTarget, "gender", gender)
