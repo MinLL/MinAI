@@ -169,18 +169,18 @@ endfunction
 
 int function AddActorsToActiveThread(int ThreadID, actor[] newActors)
   actor[] currentActors = OThread.GetActors(ThreadID)
-  int i = 0
-  while(i < newActors.Length)
-    currentActors = PapyrusUtil.PushActor(currentActors, newActors[i])
-    i += 1
-  endwhile
-
-  OThread.Stop(ThreadID)
-  while(OThread.isRunning(ThreadID))
-    Utility.Wait(0.2)
-  endwhile
-
-  StartOstim(currentActors)
+  if currentActors.Length + newActors.Length <= 5
+    int i = 0
+    while(i < newActors.Length)
+      currentActors = PapyrusUtil.PushActor(currentActors, newActors[i])
+      i += 1
+    endwhile
+    OThread.Stop(ThreadID)
+    while(OThread.isRunning(ThreadID))
+      Utility.Wait(0.2)
+    endwhile
+    StartOstim(currentActors)
+  endif
 endfunction
 
 function Navigate(int ThreadID, string newScene)
