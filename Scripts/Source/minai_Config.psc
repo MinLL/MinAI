@@ -325,15 +325,15 @@ Event OnPageReset(string page)
   if aOIDMap == 0 || JMap.Count(aOIDMap) == 0
     InitializeMCM()
   EndIf
-  if page == "" || page == "$MINAI_GENERAL"
+  if page == "" || page == "General"
     RenderGeneralPage()
-  elseIf page == "$MINAI_PHYSICS_CBPC"
+  elseIf page == "Physics (CBPC)"
     RenderPhysicsPage()
-  elseif page == "$MINAI_DEVIOUS_STUFF"
+  elseif page == "Devious Stuff"
     RenderDeviousPage()
-  elseif page == "$MINAI_SEX_SETTINGS"
+  elseif page == "Sex Settings"
     RenderSexPage()
-  elseif page == "$MINAI_ACTION_REGISTRY"
+  elseif page == "Action Registry"
     RenderActionsPage();
   elseif page == "Performance"
     RenderPerformancePage()
@@ -344,28 +344,28 @@ EndEvent
 
 Function RenderGeneralPage()
   SetCursorFillMode(TOP_TO_BOTTOM)		
-  AddHeaderOption("$MINAI_LLM_SETTINGS")
-  autoUpdateDiaryOID = AddToggleOption("$MINAI_AUTO_UPDATE_FOLLOWER_DIARIES", autoUpdateDiary)
-  updateNarratorDiaryOID = AddToggleOption("$MINAI_UPDATE_NARRATOR_DIARY", updateNarratorDiary)
-  updateNarratorProfileOID = AddToggleOption("$MINAI_UPDATE_NARRATOR_PROFILE", updateNarratorProfile)
-  requestResponseCooldownOID = AddSliderOption("$MINAI_LLM_RESPONSE_COOLDOWN", requestResponseCooldown, "{1}")
-  AddHeaderOption("$MINAI_SAPIENCE_SETTINGS")
-  useSapienceOID = AddToggleOption("$MINAI_ENABLE_SAPIENCE", minai_SapienceEnabled.GetValueInt() == 1)
-  enableRadiantDialogueOID = AddToggleOption("$MINAI_ENABLE_RADIANT_DIALOGUE", enableRadiantDialogue)
-  disableSapienceInStealthOID = AddToggleOption("$MINAI_DISABLE_SAPIENCE_SNEAKING", disableSapienceInStealth)
-  radiantDialogueFrequencyOID = AddSliderOption("$MINAI_RADIANT_DIALOGUE_FREQUENCY", radiantDialogueFrequency, "{1}")
-  radiantDialogueChanceOID = AddSliderOption("$MINAI_RADIANT_DIALOGUE_CHANCE", radiantDialogueChance, "{1}")
-  minRadianceRechatsOID = AddSliderOption("$MINAI_MIN_RADIANCE_RECHATS", minRadianceRechats, "{0}")
-  maxRadianceRechatsOID = AddSliderOption("$MINAI_MAX_RADIANCE_RECHATS", maxRadianceRechats, "{0}")
+  AddHeaderOption("LLM Settings")
+  autoUpdateDiaryOID = AddToggleOption("Automatically Update Follower Diaries", autoUpdateDiary)
+  updateNarratorDiaryOID = AddToggleOption("Update Narrator Diary on Sleep", updateNarratorDiary)
+  updateNarratorProfileOID = AddToggleOption("Update Narrator Dynamic Profile on Sleep", updateNarratorProfile)
+  requestResponseCooldownOID = AddSliderOption("LLM Response Request Cooldown", requestResponseCooldown, "{1}")
+  AddHeaderOption("Sapience Settings")
+  useSapienceOID = AddToggleOption("Enable Sapience", minai_SapienceEnabled.GetValueInt() == 1)
+  enableRadiantDialogueOID = AddToggleOption("Enable Radiant Dialogue", enableRadiantDialogue)
+  disableSapienceInStealthOID = AddToggleOption("Disable Sapience While Sneaking", disableSapienceInStealth)
+  radiantDialogueFrequencyOID = AddSliderOption("Radiant Dialogue (NPC -> NPC) Frequency", radiantDialogueFrequency, "{1}")
+  radiantDialogueChanceOID = AddSliderOption("Radiant Dialogue (NPC -> NPC) Chance", radiantDialogueChance, "{1}")
+  minRadianceRechatsOID = AddSliderOption("Minimum Radiance Rechats", minRadianceRechats, "{0}")
+  maxRadianceRechatsOID = AddSliderOption("Maximum Radiance Rechats", maxRadianceRechats, "{0}")
   SetCursorPosition(1) ; Move cursor to top right position
-  AddHeaderOption("$MINAI_GENERAL_SETTINGS")
-  toggleCombatDialogueOID = AddToggleOption("$MINAI_ALLOW_COMBAT_DIALOGUE", toggleCombatDialogue)
-  preserveQueueOID = AddToggleOption("$MINAI_PRESERVE_DIALOGUE_QUEUE", preserveQueue)
-  addSpellsOID = AddTextOption("$MINAI_GENERAL_CATEGORY", "$MINAI_ADD_SPELLS")
-  removeSpellsOID = AddTextOption("$MINAI_GENERAL_CATEGORY", "$MINAI_REMOVE_SPELLS")
-  toggleSapienceOID = AddKeyMapOption("$MINAI_TOGGLE_SAPIENCE", toggleSapienceKey)
-  roleplayKeyOID = AddKeyMapOption("$MINAI_ROLEPLAY_VOICE", roleplayKey)
-  roleplayTextKeyOID = AddKeyMapOption("$MINAI_ROLEPLAY_TEXT", roleplayTextKey)
+  AddHeaderOption("General Settings")
+  toggleCombatDialogueOID = AddToggleOption("CHIM Config - Allow Dialogue during Combat", toggleCombatDialogue)
+  preserveQueueOID = AddToggleOption("CHIM Config - Preserve Dialogue Queue", preserveQueue)
+  addSpellsOID = AddTextOption("General", "Add Spells to Player")
+  removeSpellsOID = AddTextOption("General", "Remove Spells from Player")
+  toggleSapienceOID = AddKeyMapOption("Toggle Sapience", toggleSapienceKey)
+  roleplayKeyOID = AddKeyMapOption("Roleplay Voice", roleplayKey)
+  roleplayTextKeyOID = AddKeyMapOption("Roleplay Text", roleplayTextKey)
   ; Disable for now until I finish implementing this
   ; singKeyOID = AddKeyMapOption("Sing", singKey)              ; New keybind option
   narratorKeyOID = AddKeyMapOption("Talk to Narrator", narratorKey)  ; New keybind option
@@ -403,40 +403,43 @@ Function RenderPhysicsPage()
   collisionCooldownOID = AddSliderOption("Physics Calculation Rate", collisionCooldown, "{1}")
 EndFunction
 
+
 Function RenderSexPage()
   ; left column
   SetCursorFillMode(TOP_TO_BOTTOM)
-  AddHeaderOption("$MINAI_AROUSAL_SETTINGS")
-  arousalForSexOID = AddSliderOption("$MINAI_AROUSAL_SEX_THRESHOLD", arousalForSex, "{0}")
-  arousalForHarassOID = AddSliderOption("$MINAI_AROUSAL_HARASS_THRESHOLD", arousalForHarass, "{0}")
-  confirmSexOID = AddToggleOption("$MINAI_CONFIRM_SEX", confirmSex)
-  allowSexTransitionsOID = AddToggleOption("$MINAI_ALLOW_SEX_TRANSITIONS", allowSexTransitions)
-  allowActorsToJoinSexOID = AddToggleOption("$MINAI_ALLOW_JOIN_SEX", allowActorsToJoinSex)
-  trackVictimAwarenessOID = AddToggleOption("$MINAI_TRACK_VICTIM_AWARENESS", trackVictimAwareness)
-  AddHeaderOption("$MINAI_NPC_SEX_SETTINGS")
-  enableAISexOID = AddToggleOption("$MINAI_ENABLE_NPC_SEX", enableAISex)
+  AddHeaderOption("Arousal Settings ")
+  arousalForSexOID = AddSliderOption("Arousal Threshold for Sex", arousalForSex, "{0}")
+  arousalForHarassOID = AddSliderOption("Arousal Threshold for Flirting/Harassment", arousalForHarass, "{0}")
+  confirmSexOID = AddToggleOption("Ask before a sex scene is initiated", confirmSex)
+  allowSexTransitionsOID = AddToggleOption("Allow Sex Scene Transitions", allowSexTransitions)
+  allowActorsToJoinSexOID = AddToggleOption("Allow NPC's to join Ongoing Sex Scenes", allowActorsToJoinSex)
+  trackVictimAwarenessOID = AddToggleOption("Track Victim Actor Awareness", trackVictimAwareness)
+  AddHeaderOption("NPC Sex Settings")
+  enableAISexOID = AddToggleOption("Enable NPC -> NPC Sex", enableAISex)
   ; right column
   SetCursorPosition(1)
-  AddHeaderOption("$MINAI_SEX_COMMENTS")
-  genderWeightCommentsOID = AddSliderOption("$MINAI_GENDER_WEIGHT", genderWeightComments, "{0}")
-  commentsRateOID = AddSliderOption("$MINAI_COMMENTS_RATE", commentsRate)
-  prioritizePlayerThreadOID = AddToggleOption("$MINAI_PRIORITIZE_PLAYER_COMMENTS", prioritizePlayerThread)
-  forceOrgasmCommentOID = AddToggleOption("$MINAI_FORCE_ORGASM_COMMENT", forceOrgasmComment)
-  forcePostSceneCommentOID = AddToggleOption("$MINAI_FORCE_POST_SCENE_COMMENT", forcePostSceneComment)
-  enableAmbientCommentsOID = AddToggleOption("$MINAI_ENABLE_AMBIENT_COMMENTS", enableAmbientComments)
-  maxThreadsOID = AddSliderOption("$MINAI_MAX_THREADS", maxThreads)
+  AddHeaderOption("Comments during sex")
+  genderWeightCommentsOID = AddSliderOption("Gender weight", genderWeightComments, "{0}")
+  commentsRateOID = AddSliderOption("Comments rate", commentsRate)
+  prioritizePlayerThreadOID = AddToggleOption("Prioritize comments in player's scene", prioritizePlayerThread)
+  forceOrgasmCommentOID = AddToggleOption("Force orgasm comment", forceOrgasmComment)
+  forcePostSceneCommentOID = AddToggleOption("Force post scene comment", forcePostSceneComment)
+  enableAmbientCommentsOID = AddToggleOption("Enable ambient comments between events", enableAmbientComments)
+  maxThreadsOID = AddSliderOption("Max threads", maxThreads)
 EndFunction
+
 
 Function RenderDeviousPage()
   SetCursorFillMode(TOP_TO_BOTTOM)		
-  AddHeaderOption("$MINAI_DD_SETTINGS")
+  AddHeaderOption("DD Settings")
   if (!devious.HasDD())
-    AddHeaderOption("$MINAI_DD_NOT_DETECTED")
+    AddHeaderOption("Devious Devices not detected")
     return
   EndIf
-  AllowDeviceLockOID = AddToggleOption("$MINAI_ALLOW_DEVICE_LOCK", allowDeviceLock)
-  AllowDeviceUnlockOID = AddToggleOption("$MINAI_ALLOW_DEVICE_UNLOCK", allowDeviceUnlock)
+  AllowDeviceLockOID = AddToggleOption("Allow the LLM to lock devices on actors", allowDeviceLock)
+  AllowDeviceUnlockOID = AddToggleOption("Allow the LLM to unlock devices on actors", allowDeviceUnlock)
 EndFunction
+
 
 Function RenderAction(int actionObj)
   SetCursorPosition(1)
@@ -450,62 +453,18 @@ Function RenderAction(int actionObj)
   float maxInterval = JMap.getFlt(actionObj, "maxInterval")
   float decayWindow = JMap.getFlt(actionObj, "decayWindow")
   Main.Debug("Rendering action " + name + " with mcmName " + mcmName)
-  actionEnabledOID  = AddToggleOption("$MINAI_ACTION_ENABLE_DISABLE", enabled == 1)
-  actionIntervalOID = AddSliderOption("$MINAI_ACTION_INTERVAL", interval, "{1}")
-  actionExponentOID = AddSliderOption("$MINAI_ACTION_EXPONENT", exponent, "{1}")
-  actionMaxIntervalOID = AddSliderOption("$MINAI_ACTION_MAX_INTERVAL", maxInterval, "{0}")
-  actionDecayWindowOID = AddSliderOption("$MINAI_ACTION_DECAY_WINDOW", decayWindow, "{0}")
+  actionEnabledOID  = AddToggleOption("Enable/Disable", enabled == 1)
+  actionIntervalOID = AddSliderOption("Interval", interval, "{1}")
+  actionExponentOID = AddSliderOption("Exponent", exponent, "{1}")
+  actionMaxIntervalOID = AddSliderOption("Maximum Interval", maxInterval, "{0}")
+  actionDecayWindowOID = AddSliderOption("Decay Window", decayWindow, "{0}")
+
 EndFunction
 
 Function RenderActionCategory(string category)
-  ; Get the appropriate header text
-  string headerText = ""
-  if category == "General"
-    headerText = "$MINAI_HEADER_GENERAL"
-  elseif category == "Survival"
-    headerText = "$MINAI_HEADER_SURVIVAL"
-  elseif category == "External"
-    headerText = "$MINAI_HEADER_EXTERNAL"
-  elseif category == "Followers"
-    headerText = "$MINAI_HEADER_FOLLOWERS"
-  elseif category == "Arousal"
-    headerText = "$MINAI_HEADER_AROUSAL"
-  elseif category == "Sex"
-    headerText = "$MINAI_HEADER_SEX"
-  elseif category == "Devious Stuff"
-    headerText = "$MINAI_HEADER_DEVIOUS"
-  elseif category == "Devious Followers"
-    headerText = "$MINAI_HEADER_DEVIOUS_FOLLOWERS"
-  elseif category == "Submissive Lola"
-    headerText = "$MINAI_HEADER_SUBMISSIVE_LOLA"
-  endif
-
-  ; Get the appropriate expand text
-  string expandText = ""
-  if category == "General"
-    expandText = "$MINAI_EXPAND_GENERAL"
-  elseif category == "Survival"
-    expandText = "$MINAI_EXPAND_SURVIVAL"
-  elseif category == "External"
-    expandText = "$MINAI_EXPAND_EXTERNAL"
-  elseif category == "Followers"
-    expandText = "$MINAI_EXPAND_FOLLOWERS"
-  elseif category == "Arousal"
-    expandText = "$MINAI_EXPAND_AROUSAL"
-  elseif category == "Sex"
-    expandText = "$MINAI_EXPAND_SEX"
-  elseif category == "Devious Stuff"
-    expandText = "$MINAI_EXPAND_DEVIOUS"
-  elseif category == "Devious Followers"
-    expandText = "$MINAI_EXPAND_DEVIOUS_FOLLOWERS"
-  elseif category == "Submissive Lola"
-    expandText = "$MINAI_EXPAND_SUBMISSIVE_LOLA"
-  endif
-
-  ; Use the texts
-  AddHeaderOption(headerText)
+  AddHeaderOption(">>> " + category + " Actions")
   if category != currentCategory
-    int categoryOID = AddTextOption(expandText, "")
+    int categoryOID = AddTextOption("Expand " + category + " Actions", "")
     JMap.setInt(aCategoryMap, category, categoryOID)
     return
   EndIf
@@ -518,7 +477,7 @@ Function RenderActionCategory(string category)
     if mcmPage == category
       string mcmName = JMap.getStr(actionObj, "mcmName")
       string name = JMap.getStr(actionObj, "name")
-      int oid = AddTextOption(mcmName, "$MINAI_EDIT_ACTION")
+      int oid = AddTextOption(mcmName, "Edit Action")
       Main.Debug("Adding action " + name + " to aOIDMap with oid " + oid + " and name " + mcmName + " and page " + mcmPage)
       JMap.setInt(aOIDMap, name, oid)
     EndIf
@@ -569,6 +528,7 @@ Function RenderActionsPage()
   EndIf
 EndFunction
 
+
 Function RenderPlaceholderPage()
   AddHeaderOption("Not Yet Implemented") 
 EndFunction
@@ -617,6 +577,7 @@ Function ToggleGlobal(int oid, GlobalVariable var)
   EndIf
   SetToggleOptionValue(oid, var.GetValueInt() == 1)
 EndFunction
+
 
 Function StoreConfig(string var, string value)
   actor Player = Game.GetPlayer()
@@ -903,6 +864,7 @@ Event OnOptionSelect(int oid)
   EndWhile
 EndEvent
 
+
 Event OnOptionDefault(int oid)
   bool changedAction = False
   if oid == enableConsoleLoggingOID
@@ -1085,110 +1047,111 @@ Event OnOptionDefault(int oid)
   EndIf
 EndEvent
 
+
 Event OnOptionHighlight(int oid)
   Main.Debug("OnOptionHighlight(" + oid + ")")
   if oid == enableConsoleLoggingOID
-    SetInfoText("$MINAI_CONSOLE_LOGGING_INFO")
+    SetInfoText("Controls whether log messages are printed to the console in addition to the Papyrus log")
   elseif oid == UseCBPCOID
-    SetInfoText("$MINAI_CBPC_GLOBAL_INFO")
+    SetInfoText("Enables or disables CBPC globally. Requires save/reload to take effect")
   elseif oid == autoUpdateDiaryOID
-    SetInfoText("$MINAI_AUTO_UPDATE_DIARY_INFO")
+    SetInfoText("Automatically update the diary for all followers upon sleeping.")
   elseif oid == updateNarratorDiaryOID
-    SetInfoText("$MINAI_UPDATE_NARRATOR_DIARY_INFO")
+    SetInfoText("Controls whether the narrator maintains a diary that is updated when sleeping.")
   elseif oid == updateNarratorProfileOID
-    SetInfoText("$MINAI_UPDATE_NARRATOR_PROFILE_INFO")
+    SetInfoText("Controls whether the narrator's dynamic profile is updated when sleeping.")
   elseif oid == enableAISexOID
-    SetInfoText("$MINAI_ENABLE_AI_SEX_INFO")
+    SetInfoText("Allow NPC's to decide to have sex with eachother.")
   elseif  oid == useSapienceOID
-    SetInfoText("$MINAI_USE_SAPIENCE_INFO")
+    SetInfoText("The Sapience System enables and disables AI dynamically in a radius around the player using SPID, and allows NPC's to radiantly interact with eachother without direct player involvement.")
   elseif oid == cbpcDisableSelfTouchOID
-    SetInfoText("$MINAI_CBPC_DISABLE_SELF_TOUCH_INFO")
+    SetInfoText("Enables or disables collision detection on self")
   elseif oid == cbpcDisableSelfAssTouchOID
-    SetInfoText("$MINAI_CBPC_DISABLE_SELF_ASS_TOUCH_INFO")
+    SetInfoText("Enables or disables collision detection on one's own ass. Useful to avoid detection events in VR")
   elseif oid == cbpcOtherTouchThresholdOID
-    SetInfoText("$MINAI_CBPC_OTHER_TOUCH_THRESHOLD_INFO")
+    SetInfoText("How long (Cumulatively) within a given period a part must be touched for collision to register for touching others")
   elseif oid == cbpcSelfTouchThresholdOID
-    SetInfoText("$MINAI_CBPC_SELF_TOUCH_THRESHOLD_INFO")
+    SetInfoText("How long (Cumulatively) within a given period a part must be touched for collision to register for touching oneself")
   elseif oid == collisionCooldownOID
-    SetInfoText("$MINAI_COLLISION_COOLDOWN_INFO")
+    SetInfoText("How often physics are calculated in seconds. Lower = more responsive, higher = less script load")
   elseif oid == collisionSpeechCooldownOID
-    SetInfoText("$MINAI_COLLISION_SPEECH_COOLDOWN_INFO")
+    SetInfoText("How often the AI should be prompted to react to physics in seconds (outside of sex)")
   elseif oid == radiantDialogueFrequencyOID
-    SetInfoText("$MINAI_RADIANT_DIALOGUE_FREQUENCY_INFO")
+    SetInfoText("How often the radiant dialogue chance is checked for nearby AI")
   elseif oid == radiantDialogueChanceOID
-    SetInfoText("$MINAI_RADIANT_DIALOGUE_CHANCE_INFO")
+    SetInfoText("How likely the radiant dialogue system is to be invoked each time it is checked")
   elseif oid == collisionSexCooldownOID
-    SetInfoText("$MINAI_COLLISION_SEX_COOLDOWN_INFO")
+    SetInfoText("How often the AI should be prompted to react to physics in seconds (during sex)")
   elseif oid == allowDeviceLockOID
-    SetInfoText("$MINAI_ALLOW_DEVICE_LOCK_INFO")
+    SetInfoText("Should the AI be allowed to lock devices on actors?")
   elseif oid == allowDeviceUnlockOID
-    SetInfoText("$MINAI_ALLOW_DEVICE_UNLOCK_INFO")
+    SetInfoText("Should the AI be allowed to unlock devices from actors?")
   elseif oid == requestResponseCooldownOID
-    SetInfoText("$MINAI_REQUEST_RESPONSE_COOLDOWN_INFO")
+    SetInfoText("The minimum time in seconds inbetween requests for the LLM to react to an in-game event")
   elseif oid == arousalForSexOID
-    SetInfoText("$MINAI_AROUSAL_FOR_SEX_INFO")
+    SetInfoText("Minimum Arousal level required for the Sex related actions to be exposed to the LLM")
   elseif oid == minRadianceRechatsOID
-    SetInfoText("$MINAI_MIN_RADIANCE_RECHATS_INFO")
+    SetInfoText("Minimum number of times a radiant dialogue can be rechatted")
   elseif oid == maxRadianceRechatsOID
-    SetInfoText("$MINAI_MAX_RADIANCE_RECHATS_INFO")
+    SetInfoText("Maximum number of times a radiant dialogue can be rechatted")
   elseif oid == arousalForHarassOID
-    SetInfoText("$MINAI_AROUSAL_FOR_HARASS_INFO")
+    SetInfoText("Minimum Arousal level required for actions like spanking, groping, kissing to be exposed to the LLM")
   elseif oid == confirmSexOID
-    SetInfoText("$MINAI_CONFIRM_SEX_INFO")
+    SetInfoText("Show a confirmation message before sex scenes start")
   elseif oid == allowActorsToJoinSexOID
-    SetInfoText("$MINAI_ALLOW_ACTORS_TO_JOIN_SEX_INFO")
+    SetInfoText("Allow actors to join ongoing sex scenes")
   elseif oid == allowSexTransitionsOID
-    SetInfoText("$MINAI_ALLOW_SEX_TRANSITIONS_INFO")
+    SetInfoText("Allow actors to transition between different sex scene types mid-scene")
   elseif oid == toggleCombatDialogueOID
-    SetInfoText("$MINAI_TOGGLE_COMBAT_DIALOGUE_INFO")
+    SetInfoText("Allow dialogue to be spoken during combat. Facilitates actor to actor dialogue, trash talking, taunts, etc.")
   elseif oid == disableAIAnimationsOID
-    SetInfoText("$MINAI_DISABLE_AI_ANIMATIONS_INFO")
+    SetInfoText("Forces AI-FF animations to be disabled. There seems to be a CTD in the AIAgent DLL while resetting idle state sometimes, this avoids it.")
   elseif oid == genderWeightCommentsOID
-    SetInfoText("$MINAI_GENDER_WEIGHT_COMMENTS_INFO")
+    SetInfoText("Chances how often either gender npcs will talk. 0 - males only will talk. 100 - females only wil talk")
   elseif oid == commentsRateOID
-    SetInfoText("$MINAI_COMMENTS_RATE_INFO")
+    SetInfoText("Comments during sex scene cooldown in seconds. Example: If average AI response - 10 seconds, set this option to >10. Don't set too low it can consume a lot of resources and characters will talk non-stop...")
   elseif oid == forceOrgasmCommentOID
-    SetInfoText("$MINAI_FORCE_ORGASM_COMMENT_INFO")
+    SetInfoText("Ignore comments during sex cooldown, and request message on orgasm event immediately.")
   elseif oid == forcePostSceneCommentOID
-    SetInfoText("$MINAI_FORCE_POST_SCENE_COMMENT_INFO")
+    SetInfoText("Ignore comments during sex cooldown, and request message after sex scene ends.")
   elseif oid == prioritizePlayerThreadOID
-    SetInfoText("$MINAI_PRIORITIZE_PLAYER_THREAD_INFO")
+    SetInfoText("If there are scenes with player involve, all comments will be within this scenes.")
   elseif oid == actionEnabledOID
-    SetInfoText("$MINAI_ACTION_ENABLED_INFO")
+    SetInfoText("Enable or disable the action. This will prevent it from being exposed to the LLM")
   elseif oid == actionIntervalOID
-    SetInfoText("$MINAI_ACTION_INTERVAL_INFO")
+    SetInfoText("The base cooldown (in seconds) inbetween uses of the action. Increases by the exponent every time this is triggered. Set to 0 to disable backoff entirely")
   elseif oid == actionExponentOID
-    SetInfoText("$MINAI_ACTION_EXPONENT_INFO")
+    SetInfoText("The exponent applied to the interval's cooldown for uses of this action")
   elseif oid == actionMaxIntervalOID
-    SetInfoText("$MINAI_ACTION_MAX_INTERVAL_INFO")
+    SetInfoText("The cap on the maximum value that the interval will rise to from repeated uses of the action. Useful if you want to have a cap on how long the cooldown will become")
   elseif oid == actionDecayWindowOID
-    SetInfoText("$MINAI_ACTION_DECAY_WINDOW_INFO")
+    SetInfoText("The duration of time which must pass without the action being used for the cooldown to return to the base value")
   elseif oid == testActionsOID
-    SetInfoText("$MINAI_TEST_ACTIONS_INFO")
+    SetInfoText("For debugging purposes. Send test mod events to the backend")
   elseif oid == addSpellsOID
-    SetInfoText("$MINAI_ADD_SPELLS_INFO")
+    SetInfoText("Add spells such as Toggle Sapience, and other mod utility spells to the player")
   elseif oid == toggleSapienceOID
-    SetInfoText("$MINAI_TOGGLE_SAPIENCE_INFO")
+    SetInfoText("Hotkey to toggle Sapience on or off")
   elseif oid == removeSpellsOID
-    SetInfoText("$MINAI_REMOVE_SPELLS_INFO")
+    SetInfoText("Remove the spells that this mod adds from the player")
   elseif oid == enableAmbientCommentsOID
-    SetInfoText("$MINAI_ENABLE_AMBIENT_COMMENTS_INFO")
+    SetInfoText("Enable ambient comments between events. Follows comments during sex scene cooldown. Polling mechanism checking each time if there is no cooldown on comments and fires ambient talking.")
   elseif oid == maxThreadsOID
-    SetInfoText("$MINAI_MAX_THREADS_INFO")
+    SetInfoText("Maximum concurrent threads for adult frameworks. Ostim usually crashes at 6+, try yourself and set to the number you game can handle.")
   elseif oid == singKeyOID
-    SetInfoText("$MINAI_SING_KEY_INFO")
+    SetInfoText("Hotkey to make your character sing")
   elseif oid == narratorKeyOID
-    SetInfoText("$MINAI_NARRATOR_KEY_INFO")
+    SetInfoText("Hotkey to initiate a private conversation with just the narrator")
   elseif oid == narratorTextKeyOID
-    SetInfoText("$MINAI_NARRATOR_TEXT_KEY_INFO")
+    SetInfoText("Hotkey to type to the narrator")
   elseif oid == preserveQueueOID
-    SetInfoText("$MINAI_PRESERVE_QUEUE_INFO")
+    SetInfoText("When enabled, the dialogue queue will be preserved when actions are enabled. This allows for more natural conversation flow.")
   elseif oid == trackVictimAwarenessOID
-    SetInfoText("$MINAI_TRACK_VICTIM_AWARENESS_INFO")
+    SetInfoText("When enabled, tracks whether actors in sex scenes are victims or aggressors. This may not be completely accurate, and is mod-dependent.")
   elseif oid == roleplayKeyOID
-    SetInfoText("$MINAI_ROLEPLAY_KEY_INFO")
+    SetInfoText("Hotkey to roleplay as your character using voice")
   elseif oid == roleplayTextKeyOID
-    SetInfoText("$MINAI_ROLEPLAY_TEXT_KEY_INFO")
+    SetInfoText("Hotkey to roleplay as your character using text")
   elseif oid == disableSapienceInStealthOID
     SetInfoText("When enabled, sapience will be automatically disabled while the player is sneaking (Allowing for private conversations with followers and such). Requires save and reload for the setting to take effect.")
   elseif oid == enableRadiantDialogueOID
@@ -1421,6 +1384,8 @@ Event OnOptionSliderOpen(int oid)
   EndIf
 EndEvent
 
+
+
 Event OnOptionSliderAccept(int oid, float value)
   if oid == cbpcSelfTouchThresholdOID
     cbpcSelfTouchThreshold = value
@@ -1545,17 +1510,18 @@ Event OnOptionSliderAccept(int oid, float value)
   EndIf
 EndEvent
 
-Event OnOptionKeyMapChange(int a_option, int a_keyCode, string a_conflictControl, string a_conflictName)
+
+event OnOptionKeyMapChange(int a_option, int a_keyCode, string a_conflictControl, string a_conflictName)
     {Called when a key has been remapped}
     bool continue = true
     if (a_conflictControl != "")
         string msg
         if (a_conflictName != "")
-            msg = "$MINAI_KEY_ALREADY_MAPPED\n'" + a_conflictControl + "'\n(" + a_conflictName + ")\n\n$MINAI_CONTINUE_CONFIRM"
+            msg = "This key is already mapped to:\n'" + a_conflictControl + "'\n(" + a_conflictName + ")\n\nAre you sure you want to continue?"
         else
-            msg = "$MINAI_KEY_ALREADY_MAPPED\n'" + a_conflictControl + "'\n\n$MINAI_CONTINUE_CONFIRM"
+            msg = "This key is already mapped to:\n'" + a_conflictControl + "'\n\nAre you sure you want to continue?"
         endIf
-        continue = ShowMessage(msg, true, "$MINAI_YES", "$MINAI_NO")
+        continue = ShowMessage(msg, true, "$Yes", "$No")
     endIf
 
     if (continue)
