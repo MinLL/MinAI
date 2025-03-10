@@ -101,7 +101,17 @@ function Maintenance(minai_MainQuestController _main)
   aiff = (Self as Quest) as minai_AIFF
   MinaiUtil = (self as Quest) as minai_Util
   bHasFrostfall = False
-  iActorMap = JMap.object()
+  if (iActorMap)
+    ; Release actor map every time the game loads to avoid infinite memory growth
+    JValue.release(iActorMap)
+    iActorMap = 0
+  endif
+  if (!iActorMap)
+    Main.Debug("Environmental Awareness: Creating new actor map")
+    iActorMap = JMap.object()
+    JValue.retain(iActorMap)
+  endif
+  
   playerRef = Game.GetPlayer()
   playerName = main.GetActorName(playerRef)
   If Game.GetModByName("Frostfall.esp") != 255
