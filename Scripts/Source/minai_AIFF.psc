@@ -8,6 +8,7 @@ minai_DeviousStuff devious
 minai_Config config
 minai_Reputation reputation
 minai_DirtAndBlood dirtAndBlood
+minai_Relationship relationship
 minai_EnvironmentalAwareness envAwareness
 minai_Util MinaiUtil 
 
@@ -100,6 +101,7 @@ Function Maintenance(minai_MainQuestController _main)
   arousal = (Self as Quest)as minai_Arousal
   devious = (Self as Quest)as minai_DeviousStuff
   dirtAndBlood = (Self as Quest)as minai_DirtAndBlood
+  relationship = (Self as Quest)as minai_Relationship
   envAwareness = (Self as Quest)as minai_EnvironmentalAwareness
   fertility = (Self as Quest)as minai_FertilityMode
   minaiUtil = (Self as Quest) as minai_Util
@@ -332,6 +334,7 @@ Function SetContext(actor akTarget)
     Main.Debug("AIFF - SetContext(" + actorName + ") - Setting low-frequency states")
     reputation.SetContext(akTarget)
     dirtAndBlood.SetContext(akTarget)
+    relationship.SetContext(akTarget)
     fertility.SetContext(akTarget)
     sex.SetContext(akTarget)
     StoreKeywords(akTarget)

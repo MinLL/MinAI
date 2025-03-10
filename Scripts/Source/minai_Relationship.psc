@@ -40,17 +40,19 @@ EndFunction
 ; ie tom dick and harry smell like roses
 Function SetContext(actor akActor)
   Main.Debug("SetContext Relationship(" + main.GetActorName(akActor) + ")")
-  int msg = akActor.GetRelationshipRank(playerRef)
+  int msg = GetSafeRelationshipRank(akActor, playerRef)
   aiff.SetActorVariable(akActor, "relationshipRank", msg) 
 EndFunction
 
 ; for mantella, the whole string
-string Function GetStringForActor(actor currentActor)
-  String actorName = main.GetActorName(currentActor)
+string Function GetStringForActor(actor akActor)
+  String actorName = main.GetActorName(akActor)
   String playerName = main.GetActorName(playerRef)
-  int rrank = currentActor.GetRelationshipRank(playerRef)
+  int rrank = GetSafeRelationshipRank(akActor, playerRef)
   string msg = ""
-  If (rrank == -4)
+  If (rrank == -999)
+    msg = "The relationship between " + playerName + " and " + actorName + " is unknown."
+  ElseIf (rrank == -4)
     msg = playerName + " is an archnemesis of " + actorName + ". "
   ElseIf (rrank == -3)
     msg = playerName + " is an enemy of " + actorName + ". "
@@ -58,7 +60,7 @@ string Function GetStringForActor(actor currentActor)
     msg = playerName + " is a foe of " + actorName + ". "
   ElseIf (rrank == -1)
     msg = playerName + " is a rival of " + actorName + ". "
-  ElseIf (rrank == -0)
+  ElseIf (rrank == 0)
     msg = playerName + " is an acquaintance of " + actorName + ". "
   ElseIf (rrank == 1)
     msg = playerName + " is a friend of " + actorName + ". "
@@ -70,4 +72,13 @@ string Function GetStringForActor(actor currentActor)
     msg = playerName + " is a lover of " + actorName + ". "
   EndIf
   return msg
+EndFunction
+
+int Function GetSafeRelationshipRank(Actor akActor, Actor akTarget)
+  if !akActor || !akTarget
+    Debug.Trace("Warning: Invalid actor reference in GetSafeRelationshipRank")
+    return -999 ; Error code
+  endif
+  int rank = akActor.GetRelationshipRank(akTarget)
+  return rank
 EndFunction
