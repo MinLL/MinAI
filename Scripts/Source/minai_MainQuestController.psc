@@ -19,6 +19,7 @@ minai_CombatManager combat
 minai_SapienceController sapience
 minai_Reputation reputation  
 minai_DirtAndBlood dirtAndBlood
+minai_Relationship relationship
 minai_EnvironmentalAwareness envAwareness
 minai_Util MinaiUtil  
 Spell minai_ToggleSapienceSpell
@@ -31,13 +32,16 @@ actor[] nearbyAI
 bool Property PlayerInCombat auto
 int Property currentVersion Auto
 
+
 Event OnInit()
   Maintenance()
 EndEvent
 
+
 Int Function GetVersion()
   return 122
 EndFunction
+
 
 Function CheckForCriticalDependencies()
   Info("Checking for critical dependencies...")
@@ -48,6 +52,7 @@ Function CheckForCriticalDependencies()
     Info("Papyrus Tweaks NG detected: " + pTweaksVersion[0] + "." + pTweaksVersion[1] + "." + pTweaksVersion[2])
   EndIf
 EndFunction
+
 
 Function Maintenance()
   playerRef = game.GetPlayer()
@@ -92,6 +97,7 @@ Function Maintenance()
   MinaiUtil = (Self as Quest) as minai_Util
   MinaiUtil.Maintenance()
   dirtAndBlood = (Self as Quest) as minai_DirtAndBlood
+  relationship = (Self as Quest) as minai_Relationship
   envAwareness = (Self as Quest) as minai_EnvironmentalAwareness
   minai_ToggleSapienceSpell = Game.GetFormFromFile(0x0E93, "MinAI.esp") as Spell
   if (!followers)
@@ -108,6 +114,7 @@ Function Maintenance()
     minAIFF.SetActorVariable(playerRef, "isTalkingToNarrator", false)
   EndIf
   dirtAndBlood.Maintenance(Self)
+  relationship.Maintenance(Self)
   envAwareness.Maintenance(Self)
   sex.Maintenance(Self)
   survival.Maintenance(Self)
@@ -138,14 +145,13 @@ Function Maintenance()
 EndFunction
 
 
-
-
 Function RegisterAction(String eventLine)
   ;Debug("RegisterAction(" + eventLine + ")")
   if bHasMantella
     minMantella.RegisterAction(eventLine)
   EndIf
 EndFunction
+
 
 Function RegisterEvent(String eventLine, string eventType = "")
   ;Debug("RegisterEvent(" + eventLine + ", " + eventType + ")")
@@ -158,7 +164,6 @@ Function RegisterEvent(String eventLine, string eventType = "")
     EndIf
     minAIFF.RegisterEvent(eventLine, eventType)
   EndIf
-  
 EndFunction
 
 
@@ -207,8 +212,6 @@ Function RequestLLMResponseNPC(string speaker, string eventLine, string target, 
     RegisterEvent(eventLine, "npc_chat")
    EndIf
 EndFunction
-
-
 
 ; deprecated - use global function from minai_Util
 string Function GetActorName(actor akActor)
@@ -268,7 +271,6 @@ Function DebugVerbose(String str)
   MinaiUtil.DebugVerbose(str)
 EndFunction
 
-
 ; Inform the LLM that something has happened, without requesting the LLM to respond immediately.
 ; int handle = ModEvent.Create("MinAI_RegisterEvent")
 ;  if (handle)
@@ -280,7 +282,6 @@ Event OnRegisterEvent(string eventLine, string eventType)
   Info("OnRegisterEvent(" + eventType + "): " + eventLine)
   RegisterEvent(eventLine, eventType)
 EndEvent
-
 
 ; Inform the LLM that something has happened, and request a specific actor to respond.
 ; Use "everyone" for targetName if you don't want a specific response.
@@ -296,8 +297,6 @@ Event OnRequestResponse(string eventLine, string eventType, string targetName)
   RequestLLMResponseFromActor(eventLine, eventType, targetName)
 EndEvent
 
-
-
 ; Inform the LLM that an actor has spoken, and request a specific actor to respond.
 ; Use "everyone" for targetName if you don't want a specific response.
 ; int handle = ModEvent.Create("MinAI_RequestResponseDialogue")
@@ -311,8 +310,6 @@ Event OnRequestResponseDialogue(string speakerName, string eventLine, string tar
   Info("OnRequestResponse(" + speakerName + " => " + targetName + "): " + eventLine)
   RequestLLMResponseNPC(speakerName, eventLine, targetName)
 EndEvent
-
-
 
 ; Set persistent context to be included in every LLM request until TTL expires.
 ; int handle = ModEvent.Create("MinAI_SetContext")
@@ -353,7 +350,6 @@ Event OnSetContextNPC(string modName, string eventKey, string eventValue, string
   endif
 EndEvent
 
-
 ; Register an action
 ; int handle = ModEvent.Create("MinAI_RegisterAction")
 ;  if (handle)
@@ -376,8 +372,6 @@ Event OnRegisterAction(string actionName, string actionPrompt, string mcmDescrip
     ; Nothing to do for mantella.
   endif
 EndEvent
-
-
 
 ; Register an action to only be available to a specific NPC
 ; int handle = ModEvent.Create("MinAI_RegisterActionNPC")
@@ -413,6 +407,7 @@ Function SendTestEvent()
   endIf
 EndFunction
 
+
 Function SetTestContext()
   int handle = ModEvent.Create("MinAI_SetContext")
   if (handle)
@@ -423,6 +418,7 @@ Function SetTestContext()
     ModEvent.Send(handle)
   endIf
 EndFunction
+
 
 Function SetTestContextNPC()
   int handle = ModEvent.Create("MinAI_SetContextNPC")
@@ -436,6 +432,7 @@ Function SetTestContextNPC()
   endIf
 EndFunction
 
+
 Function SetTestContextPlayer()
   int handle = ModEvent.Create("MinAI_SetContextNPC")
   if (handle)
@@ -447,6 +444,7 @@ Function SetTestContextPlayer()
     ModEvent.Send(handle)
   endIf
 EndFunction 
+
 
 Function RegisterTestAction()
   int handle = ModEvent.Create("MinAI_RegisterAction")
@@ -462,6 +460,7 @@ Function RegisterTestAction()
     ModEvent.Send(handle)
   endIf
 EndFunction
+
 
 Function RegisterTestActionNPC()
   int handle = ModEvent.Create("MinAI_RegisterActionNPC")
@@ -479,6 +478,7 @@ Function RegisterTestActionNPC()
   endIf
 EndFunction
 
+
 Function RegisterTestActionPlayer()
   int handle = ModEvent.Create("MinAI_RegisterActionNPC")
   if (handle)
@@ -494,6 +494,7 @@ Function RegisterTestActionPlayer()
     ModEvent.Send(handle)
   endIf
 EndFunction
+
 
 Function TestModEvents()
   SendTestEvent()
@@ -511,10 +512,12 @@ Function AddSpellsToPlayer()
   playerRef.AddSpell(minai_ToggleSapienceSpell)
 EndFunction
 
+
 Function RemoveSpellsFromPlayer()
   Info("Removing spells from player")
   playerRef.RemoveSpell(minai_ToggleSapienceSpell)
 EndFunction
+
 
 Function SetSapienceKey(bool showNotification = false)
     ; Register new key if valid
@@ -525,6 +528,7 @@ Function SetSapienceKey(bool showNotification = false)
         endif
     endIf
 EndFunction
+
 
 Event OnKeyDown(int keyCode)
     ; Don't process key events if game is paused
@@ -551,6 +555,7 @@ Event OnKeyDown(int keyCode)
         sapience.ResetAndStartNextUpdate()
     EndIf
 EndEvent
+
 
 Event OnKeyUp(int keyCode, float holdTime)
     ; Don't process key events if game is paused
@@ -582,6 +587,7 @@ Function OnSingKeyPressed()
     EndIf
 EndFunction
 
+
 Function OnSingKeyReleased(float holdTime)
     If(bHasAIFF)
         Info("Stopping singing recording")
@@ -599,6 +605,7 @@ Function OnSingKeyReleased(float holdTime)
     EndIf
 EndFunction
 
+
 Function OnNarratorKeyPressed()
     If(bHasAIFF)
         Info("Starting narrator recording")
@@ -609,6 +616,7 @@ Function OnNarratorKeyPressed()
         Debug.Notification("AIFF not installed - narrator conversations require AIFF")
     EndIf
 EndFunction
+
 
 Function OnNarratorKeyReleased(float holdTime)
     If(bHasAIFF)
@@ -638,6 +646,7 @@ Function SetSingKey(bool showNotification = false)
     endIf
 EndFunction
 
+
 Function SetNarratorKey(bool showNotification = false)
     ; Register new key if valid
     if (config.narratorKey != -1)
@@ -647,6 +656,7 @@ Function SetNarratorKey(bool showNotification = false)
         endif
     endIf
 EndFunction
+
 
 Function OnNarratorTextKeyPressed()
     If(bHasAIFF)
@@ -680,6 +690,7 @@ Function SetNarratorTextKey(bool showNotification = false)
     endIf
 EndFunction
 
+
 Function OnRoleplayKeyPressed()
     If(bHasAIFF)
         Info("Starting roleplay recording")
@@ -690,6 +701,7 @@ Function OnRoleplayKeyPressed()
         Debug.Notification("AIFF not installed - roleplay requires AIFF")
     EndIf
 EndFunction
+
 
 Function OnRoleplayKeyReleased(float holdTime)
     If(bHasAIFF)
@@ -707,6 +719,7 @@ Function OnRoleplayKeyReleased(float holdTime)
         EndIf
     EndIf
 EndFunction
+
 
 Function OnRoleplayTextKeyPressed()
     If(bHasAIFF)
@@ -738,6 +751,7 @@ Function SetRoleplayKey(bool showNotification = false)
         endif
     endIf
 EndFunction
+
 
 Function SetRoleplayTextKey(bool showNotification = false)
     ; Register new key if valid
