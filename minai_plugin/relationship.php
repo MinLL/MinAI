@@ -61,5 +61,3 @@ function GetRelationshipContext($targetActor) {
 
     return "\n". $contextString;
 }
-
-?>

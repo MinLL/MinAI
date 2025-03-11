@@ -50,9 +50,7 @@ string Function GetStringForActor(actor akActor)
   String playerName = main.GetActorName(playerRef)
   int rrank = GetSafeRelationshipRank(akActor, playerRef)
   string msg = ""
-  If (rrank == -999)
-    msg = "The relationship between " + playerName + " and " + actorName + " is unknown."
-  ElseIf (rrank == -4)
+  If (rrank == -4)
     msg = playerName + " is an archnemesis of " + actorName + ". "
   ElseIf (rrank == -3)
     msg = playerName + " is an enemy of " + actorName + ". "
