@@ -276,6 +276,12 @@ int Property lowFrequencyUpdateIntervalOID Auto
 int Property contextUpdateIntervalOID Auto
 int Property highPerformanceModeOID Auto
 
+; Add the diary hotkey OID near the other OID definitions
+int diaryKeyOID      ; New OID for diary keybind
+
+; Add the diary hotkey property near the other key properties
+int Property diaryKey = -1 Auto      ; Property for diary key
+
 Event OnConfigInit()
   main.Info("Building mcm menu.")
   InitializeMCM()
@@ -370,6 +376,7 @@ Function RenderGeneralPage()
   ; singKeyOID = AddKeyMapOption("Sing", singKey)              ; New keybind option
   narratorKeyOID = AddKeyMapOption("Talk to Narrator", narratorKey)  ; New keybind option
   narratorTextKeyOID = AddKeyMapOption("Type to Narrator", narratorTextKey)
+  diaryKeyOID = AddKeyMapOption("Diary Hotkey", diaryKey)  ; New diary hotkey option
   disableAIAnimationsOID = AddToggleOption("Disable AI-FF Animations", disableAIAnimations)
   AddHeaderOption("Debug")
   logLevelOID = AddSliderOption("Log Level", logLevel, "{0}")
@@ -1192,6 +1199,8 @@ Event OnOptionHighlight(int oid)
     SetInfoText("How often NPCs should update their context. Effectively this checks how often the above settings are checked.")
   elseif oid == highPerformanceModeOID
     SetInfoText("Use optimized performance settings that reduce update frequency for better performance")
+  elseif oid == diaryKeyOID
+    SetInfoText("Hotkey to update diaries. When crouching: updates narrator diary. When standing: updates all diaries. When looking at an NPC: updates that NPC's diary.")
   EndIf
   int i = 0
   string[] actions = JMap.allKeysPArray(aiff.actionRegistry)
@@ -1549,6 +1558,10 @@ event OnOptionKeyMapChange(int a_option, int a_keyCode, string a_conflictControl
             roleplayTextKey = a_keyCode
             SetKeymapOptionValue(a_option, a_keyCode)
             main.SetRoleplayTextKey(true)
+        elseif (a_option == diaryKeyOID)
+            diaryKey = a_keyCode
+            SetKeymapOptionValue(a_option, a_keyCode)
+            main.SetDiaryKey(true)
         endIf
     endIf
 EndEvent

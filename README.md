@@ -11,7 +11,7 @@ This mod serves as an interface bridging Large Language Models (LLM)'s with a nu
 
 Due to this utilizing an LLM, the results can be unpredictable. Sometimes the AI can be uncooperative or unreasonable. It works pretty well most of the time though. There are absolutely no predefined scenarios in this mod - Anything you encounter is generated based off of the circumstances in your world, the NPC's personality you're interacting with, and the LLM's whims.
 
-This release should be considered a beta. It may be janky, have bugs, or strange NPC behavior from the LLM. I have tested this quite a bit over several play-throughs and it's been working well. I am looking for additional feedback on potential integrations. Due to the nature of this mod's integration, it is extremely unlikely to break your savegame in future updates, which will most likely always be backwards compatible.
+This release should be considered a beta. It may be janky, have bugs, or strange NPC behavior from the LLM. I have tested this quite a bit over several play-throughs and it's been working well. I am looking for additional feedback on potential integrations. Due to the nature of this mod's integration, it is extremely unlikely to break your savegame in future updates, which will most likely always be backwards compatible.
 
 This mod requires you to fund an openrouter.ai account, or run a model locally. The costs for leveraging the LLM are quite cheap - in 4 days of play while developing this mod, I spent less than $1.00 USD in credits - you should expect to pay a few cents for a given play-session. I highly recommend using openrouter instead of trying to run a model locally, as it requires a prohibitive amount of hardware to run locally. I had worse results using an rtx 3090 exclusively dedicated to the AI than just leveraging openrouter.
 
@@ -107,7 +107,7 @@ This mod enables a number of optional [nsfw](https://github.com/MinLL/MinAI/blob
 
 # Installation
 ## Requirements
-* This mod requires a functional installation of either [CHIM](https://www.nexusmods.com/skyrimspecialedition/mods/126330), [Mantella](https://www.nexusmods.com/skyrimspecialedition/mods/98631), or both (and their respective dependencies). DO THIS FIRST and seek assistance in those forums. When you are up and running well, return here and continue installation as follows:
+* This mod requires a functional installation of either [CHIM](https://www.nexusmods.com/skyrimspecialedition/mods/126330), [Mantella](https://www.nexusmods.com/skyrimspecialedition/mods/98631), or both (and their respective dependencies). DO THIS FIRST and seek assistance in those forums. When you are up and running well, return here and continue installation as follows:
 * [Papyrus Tweaks NG](https://www.nexusmods.com/skyrimspecialedition/mods/77779).
 * [JContainers SE](https://www.nexusmods.com/skyrimspecialedition/mods/16495).
 * [powerofthree's Papyrus Extender](https://www.nexusmods.com/skyrimspecialedition/mods/22854). (VR: also install [Papyrus Extender VR](https://www.nexusmods.com/skyrimspecialedition/mods/58296))
@@ -125,8 +125,37 @@ This mod enables a number of optional [nsfw](https://github.com/MinLL/MinAI/blob
 * In the Mantella Web Interface under Other, set the "Max Count Events" setting to a minimum of 15. I use 50 with the full set of integrations.
 * (Recommended, Optional) Enable Radiant Dialogue in Mantella's MCM setting. This has a lot of very good and fun interactions when combined with this mod.
 * (Optional) If you want a specific character to roleplay in a specific manner, or have a specific personality, edit the skyrim_characters.csv file that ships with Mantella to update that character's bio.
-* (Optional) Change the language model that's being used. I am using nousresearch/hermes-3-llama-3.1-70b, and have had good results with it. Feel free to try other models though, and share your experience!
+* (Optional) Change the language model that's being used. I am using nousresearch/hermes-3-llama-3.1-70b, and have had good results with it. Feel free to try other models though, and share your experience!
 
 # Known Issues
 * The AI can be unpredictable at times. This is due to the nature of using an LLM. Refining the prompt, or customizing the personality of the npc you're interacting with can help with this.
 * Sometimes the AI refuses to use the keywords that trigger events (Such as -teaseweak-). If this happens, remind the NPC to use the keywords. This is much more of an issue with Mantella than CHIM, where this issue does not really happen much.
+
+# MinAI Diary Hotkey Feature
+
+## Overview
+
+This feature adds a new hotkey to MinAI that allows players to update diaries on demand. The hotkey's behavior changes based on the player's current state:
+
+1. **When crouching**: Updates only the narrator's diary
+2. **When standing and not looking at an NPC**: Updates all follower diaries and the narrator's diary (similar to the sleep update)
+3. **When looking at an NPC**: Updates only that specific NPC's diary
+
+## Benefits
+
+- **Convenience**: No need to wait for sleep to update diaries
+- **Targeted updates**: Update specific NPC diaries without updating all of them
+- **Narrator focus**: Quickly update just the narrator's diary when needed
+- **Immersive**: The crouching mechanic provides an immersive way to "focus" on the narrator
+
+## Installation
+
+See the INSTALLATION.md file for detailed installation instructions.
+
+## Usage
+
+1. Set the diary hotkey in the MCM menu under the "General" tab
+2. Use the hotkey in different situations:
+   - Crouch and press the hotkey to update the narrator's diary
+   - Stand normally and press the hotkey to update all diaries
+   - Look at an NPC and press the hotkey to update just that NPC's diary

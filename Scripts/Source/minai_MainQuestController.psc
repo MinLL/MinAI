@@ -69,6 +69,7 @@ Function Maintenance()
   SetNarratorTextKey()
   SetRoleplayKey()
   SetRoleplayTextKey()
+  SetDiaryKey()
   ; Register for Mod Events
   ; Public interface functions
   RegisterForModEvent("MinAI_RegisterEvent", "OnRegisterEvent")
@@ -553,6 +554,9 @@ Event OnKeyDown(int keyCode)
     ElseIf(keyCode == config.roleplayTextKey)
         OnRoleplayTextKeyPressed()
         sapience.ResetAndStartNextUpdate()
+    ElseIf(keyCode == config.diaryKey)
+        OnDiaryKeyPressed()
+        sapience.ResetAndStartNextUpdate()
     EndIf
 EndEvent
 
@@ -761,4 +765,47 @@ Function SetRoleplayTextKey(bool showNotification = false)
             Debug.Notification("Roleplay text key mapped to " + config.roleplayTextKey)
         endif
     endIf
+EndFunction
+
+; Add diary hotkey functions
+Function SetDiaryKey(bool showNotification = false)
+    ; Register new key if valid
+    if (config.diaryKey != -1)
+        RegisterForKey(config.diaryKey)
+        if showNotification
+            Debug.Notification("Diary key mapped to " + config.diaryKey)
+        endif
+    endIf
+EndFunction
+
+Function OnDiaryKeyPressed()
+    If(bHasAIFF)
+        Info("Diary hotkey pressed")
+        
+        ; Check if player is sneaking/crouching
+        bool isSneaking = playerRef.IsSneaking()
+        
+        ; Get actor under crosshair
+        Actor targetActor = Game.GetCurrentCrosshairRef() as Actor
+        
+        if (isSneaking)
+            ; When crouching: Update only narrator's diary
+            Info("Player is crouching - updating narrator diary only")
+            minAIFF.UpdateDiary("The Narrator")
+            Debug.Notification("Updating narrator's diary")
+        elseif (targetActor != None)
+            ; When looking at an NPC: Update that NPC's diary
+            string targetName = GetActorName(targetActor)
+            Info("Player is looking at " + targetName + " - updating their diary")
+            minAIFF.UpdateDiary(targetName)
+            Debug.Notification("Updating " + targetName + "'s diary")
+        else
+            ; When standing and not looking at anyone: Update all diaries
+            Info("Player is standing - updating all diaries")
+            followers.UpdateFollowerDiaries()
+            Debug.Notification("Updating all follower + player diaries")
+        endif
+    Else
+        Debug.Notification("CHIM not installed - diary updates require CHIM")
+    EndIf
 EndFunction
