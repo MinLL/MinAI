@@ -7,35 +7,23 @@ SexLabFramework slf
 minai_Util MinaiUtil
 minai_SexSexlab sexlab
 
-bool bHasTNG
-Keyword TNG_Gentlewoman
-
 function Maintenance(minai_Config localConfig, SexLabFramework localSlf)
   slf = localSlf
   config = localConfig
   MinaiUtil = (self as Quest) as minai_Util
   sexlab = (self as Quest) as minai_SexSexlab
-  bHasTNG = Game.GetModByName("TheNewGentleman.esp") != 255
-  if bHasTNG
-    TNG_Gentlewoman = Game.GetFormFromFile(0xFF8, "TheNewGentleman.esp") as Keyword
-  endif
 endfunction
 
-int Function GetGender(Actor akActor)
-  if !akActor
-    return -1 ; Invalid actor
+int function GetGender(actor targetActor)
+  int sex = targetActor.GetActorBase().GetSex()
+  
+  ; sex 1+ is considered female
+  if(sex >= 1)
+    return 1
   endif
-  if bHasTNG
-    if akActor.GetActorBase().GetSex() != 0 && !akActor.HasKeyword(TNG_Gentlewoman)
-      return 1 ; Female
-    else
-      return 0 ; Male
-    endif
-  elseif slf
-    return slf.GetGender(akActor)
-  endif
-  return akActor.GetLeveledActorBase().GetSex()
-EndFunction
+
+  return sex
+endfunction
 
 int function getPlayerThread(string framework)
   if(framework == "ostim")
@@ -47,7 +35,6 @@ int function getPlayerThread(string framework)
   elseif(slf != none)
     return slf.FindPlayerController()
   endif
-  return -1
 endfunction
 
 bool function isPlayerInvolved(int ThreadID, string framework)
@@ -62,6 +49,10 @@ String Function GetActorNameForSex(actor akActor)
   if ret
     return ret
   EndIf
+  ret = MinaiUtil.GetActorName(akActor)
+  if ret
+    return ret
+  EndIf
   return "a monster"
 EndFunction
 
@@ -71,9 +62,6 @@ actor Function GetWeightedRandomActorToSpeak(actor[] actors, bool bHasOstim = fa
   actor[] maleActors = PapyrusUtil.ActorArray(0)
   actor[] femaleActors = PapyrusUtil.ActorArray(0)
   int count = actors.Length
-  if !actors || count == 0
-    return None
-  endif
   while count > 0
     count -= 1
     actor currActor = actors[count]
@@ -86,6 +74,7 @@ actor Function GetWeightedRandomActorToSpeak(actor[] actors, bool bHasOstim = fa
         isMuted = true
       endif
     endif
+
     if(currActor == PlayerRef || isMuted)
       ; player doesn't participate in llm talking :)
       ; some actions in ostim prevents actors from talking, which makes sense
@@ -117,9 +106,6 @@ actor Function GetWeightedRandomActorToSpeak(actor[] actors, bool bHasOstim = fa
 EndFunction
 
 bool Function CanAnimate(actor akTarget, bool useOstim = false)
-  if !akTarget
-    return False
-  endif
   if (akTarget.IsOnMount())
     return False
   EndIf
@@ -146,6 +132,7 @@ string function buildSceneString(string sceneId, string actorString, string even
   elseif(eventType == "scenechange")
     return actorString + " changed the scene to " + result
   endif
+
   return result
 endfunction
 
@@ -181,13 +168,16 @@ actor[] function BuildGroup(int size, int jMalesArr, int jFemalesArr)
       else
         group[i] = UnshiftActor(jFemalesArr)
       endif
+      
       i += 1
     endwhile
+
     MinaiUtil.Debug("BuildGroup: Succesfully built group of size: "+group.length+" with both genders")
+
     return group
   endif
 
-  int jActorsArr = 0
+  int jActorsArr
   
   ; just take a part of actors from either arrays since there is no other genders left
   if (JArray.count(jMalesArr) > 0) 
@@ -222,15 +212,12 @@ bool function CheckGroup(actor[] actors, string framework)
   else
     return sexlab.FindSexlabAnimations(actors, "").Length != 0
   endif
+  
 endfunction
 
 ; similar to js unshift function
 ; picks first item and returns it with removing it from original array
 actor function UnshiftActor(int jActorsArr)
-  if JArray.count(jActorsArr) == 0
-    MinaiUtil.Debug("UnshiftActor: No actors available")
-    return None
-  endif
   actor currActor = JArray.getForm(jActorsArr, 0) as actor
   JArray.eraseForm(jActorsArr, currActor)
   MinaiUtil.Debug("UnshiftActor: "+currActor.GetDisplayName())
@@ -240,9 +227,6 @@ endfunction
 ; count males actors
 ; to count females take original actors array minus males count
 int function countMales(actor[] actors)
-  if !actors
-    return 0
-  endif
   int i = 0
   int numMales = 0
   while i < actors.Length
@@ -251,5 +235,6 @@ int function countMales(actor[] actors)
     EndIf
     i += 1
   Endwhile
+
   return numMales
 endfunction
