@@ -62,6 +62,7 @@ EndEvent
 
 Function SetContext(actor akTarget)
   Main.Debug("SetContext CombatManager(" + main.GetActorName(akTarget) + ")")
+  aiff.SetActorVariable(akTarget, "inCombat", akTarget.GetCombatState() >= 1)
 EndFunction
 
 

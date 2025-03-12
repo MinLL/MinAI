@@ -14,7 +14,7 @@ Function StartTrackingPlayer()
   if playerRef.HasSpell(minai_PlayerStateTracker)
     playerRef.RemoveSpell(minai_PlayerStateTracker)
   EndIf
-  
+  aiff.SetActorVariable(playerRef, "inCombat", playerRef.GetCombatState() >= 1)
   minai_DynamicSapienceToggleStealth = Game.GetFormFromFile(0x0E97, "MinAI.esp") as GlobalVariable
   if (!minai_DynamicSapienceToggleStealth)
     MainQuestController.Error("Could not retrieve minai_DynamicSapienceToggleStealth from esp")

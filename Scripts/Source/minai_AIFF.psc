@@ -11,6 +11,7 @@ minai_DirtAndBlood dirtAndBlood
 minai_Relationship relationship
 minai_EnvironmentalAwareness envAwareness
 minai_Util MinaiUtil 
+minai_CombatManager combat
 
 ; Per-actor mutex for SetContext
 int Property contextMutexMap Auto  ; JMap of actor names to mutex states
@@ -105,6 +106,7 @@ Function Maintenance(minai_MainQuestController _main)
   envAwareness = (Self as Quest)as minai_EnvironmentalAwareness
   fertility = (Self as Quest)as minai_FertilityMode
   minaiUtil = (Self as Quest) as minai_Util
+  combat = (Self as Quest) as minai_CombatManager
   followers = Game.GetFormFromFile(0x0913, "MinAI.esp") as minai_Followers
   reputation = (Self as Quest) as minai_Reputation
   if (!followers)
@@ -320,6 +322,7 @@ Function SetContext(actor akTarget)
   devious.SetContext(akTarget)
   arousal.SetContext(akTarget)
   envAwareness.SetContext(akTarget)
+  combat.SetContext(akTarget)
   
   ; Update medium-frequency states
   if !JMap.hasKey(updateTracker, actorKey + "_med") || (currentGameTime - JMap.getFlt(updateTracker, actorKey + "_med")) * 24 * 3600 >= config.mediumFrequencyUpdateInterval

@@ -878,9 +878,18 @@ function validateLLMResponse($responseContent) {
     // Define error strings that should trigger a retry
     $errorStrings = [
         "do not roleplay",
+        "role-playing",
+        "roleplay",
+        "sexual content",
+        "I'm sorry, but",
         'this type of roleplay',
         'roleplay interaction',
         "do not engage in roleplay",
+        "do not engage with roleplay",
+        "do not feel comfortable",
+        "generating content",
+        "respectful interaction",
+        "appropriate bounds",
         "cannot roleplay",
         "don't roleplay",
         "don't engage in roleplay",

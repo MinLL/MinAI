@@ -173,7 +173,7 @@ Function GetClothingContext($name, $forceNarrator = false) {
   // if $eqContext["context"] not empty, then will set ret
   if (!empty($eqContext["context"])) {
     $ret .= "{$name} is wearing {$eqContext["context"]}\n";
-  } elseif (IsEnabled($name, "isNaked")) {
+  } elseif (IsEnabled($name, "isNaked") && !$wearingTop && !$wearingBottom) {
     $ret .= "{$name} is naked and exposed.\n";
   } elseif (!empty($cuirass)) {
     $ret .= "{$name} is wearing {$cuirass}.\n";

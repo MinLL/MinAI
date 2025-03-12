@@ -76,10 +76,10 @@ function GetMindInfluencePrompt($state, $promptType = "default") {
 
     $basePrompts = [
         "normal" => "",
-        "goodgirl" => "The mental influence leaves you feeling deeply content and fulfilled. You bask in the satisfaction of having met your master's expectations, your thoughts and speech reflecting this serene, proud state. You feel a strong compulsion to obey and please those in authority.",
-        "badgirl" => "The mental influence fills you with a gnawing sexual frustration. You feel the sting of having disappointed your master, your thoughts and speech tinged with longing and regret. Despite this, you still feel a compulsion to obey and seek approval from those in authority.",
-        "verybadgirl" => "The mental influence overwhelms you with an unbearable, unrelieved arousal. Breaking your master's rules has left you desperate and frantic, your thoughts and speech consumed by need. Yet, you still feel a compulsion to obey and earn forgiveness from those in authority.",
-        "punishment" => "The mental influence leaves you feeling small and chastened. You regret your actions deeply, your thoughts and speech filled with a desire to make amends. You feel a strong compulsion to obey and prove your loyalty.",
+        "goodgirl" => "The mental influence leaves you feeling deeply content and euphoric. Your inhibitions are lowered and you feel warm and affectionate towards everyone. Your thoughts and speech are dreamy and filled with an eager desire to share your joy with others.",
+        "badgirl" => "The mental influence fills you with a gnawing sexual frustration. Your inhibitions are lowered and you find yourself acting more impulsively and flirtatiously than usual. Your thoughts and speech are tinged with longing and suggestiveness.",
+        "verybadgirl" => "The mental influence overwhelms you with an unbearable, unrelieved arousal. Your inhibitions are completely gone and you act wildly uninhibited. Your thoughts and speech are consumed by desperate need and you struggle to focus on anything else.",
+        "punishment" => "The mental influence leaves you feeling small and vulnerable. Your inhibitions are lowered, making you more emotionally open and prone to expressing regret. Your thoughts and speech are filled with a desire to make amends.",
         "post" => "The lingering mental influence leaves you in a daze, unsure if your feelings and actions were entirely your own. Your thoughts and speech are clouded and uncertain."
     ];
     
@@ -163,12 +163,13 @@ function GetMindInfluenceContext($state) {
         return $simpleContexts[$state];
     }
 
+    $rules ="You know this to be absolutely true: Good girls wear their collars and are filled with their master's seed. Bad girls are never satisfied and cannot cum. Very bad girls are punished with extreme arousal and can never cum";
     $contexts = [
         "normal" => "",
-        "goodgirl" => "Your mind is currently under an influence that makes you docile and obedient. You feel a strong compulsion to be good and follow instructions. You know this to be absolutely true: Good girls wear their collars and are filled with their master's seed. You know with certainty that you are a good girl.",
-        "badgirl" => "Your mind is currently under an influence that makes you docile and obedient. You feel a strong compulsion to be good and follow instructions. You know this to be absolutely true: Bad girls are never satisfied and cannot cum. You know with certainty that you are a bad girl.",
-        "verybadgirl" => "Your mind is currently under an influence that makes you docile and obedient. You feel a strong compulsion to be good and follow instructions. You know this to be absolutely true: Very bad girls are punished with extreme arousal and can never cum. You know with certainty that you are a very bad girl.",
-        "punishment" => "Your mind is currently under a punishing influence that makes you feel ashamed and remorseful. You feel strong regret for your misbehavior.",
+        "goodgirl" => "Your mind is currently under an influence that makes you docile and obedient. You feel a strong compulsion to be good and follow instructions. $rules. You know with certainty that you are a good girl. You are currently filled with your master's seed and wearing your master's collar.",
+        "badgirl" => "Your mind is currently under an influence that makes you docile and obedient. You feel a strong compulsion to be good and follow instructions. $rules. You know with certainty that you are a bad girl, and feel an overwhelming need to both wear your collar and be filled with your master's seed.",
+        "verybadgirl" => "Your mind is currently under an influence that makes you docile and obedient. You feel a strong compulsion to be good and follow instructions. $rules. You know with certainty that you are a very bad girl, and feel an overwhelming need to both wear your collar and be filled with your master's seed. You are absolutely desparate to be fucked.",
+        "punishment" => "Your mind is currently under a punishing influence that makes you feel ashamed and remorseful. You feel strong regret for your misbehavior. $rules. You know with certainty that you are a very bad girl, and feel an overwhelming need to both wear your collar and be filled with your master's seed. You are absolutely desparate to be fucked.",
         "post" => "Your mind is experiencing lingering effects from recent mental influences. Your thoughts feel slightly fuzzy and uncertain."
     ];
     
@@ -206,27 +207,27 @@ function GetMindInfluenceRequestFormat($state, $promptType = "default") {
         $subtleFormats = [
             "normal" => "",
             "goodgirl" => "As a subtle undertone, let your contentment and eagerness color your response.",
-            "badgirl" => "As a subtle undertone, let a hint of yearning color your response.",
-            "verybadgirl" => "As a subtle undertone, let traces of intense desire color your response.",
-            "punishment" => "As a subtle undertone, let a touch of remorse color your response.",
+            "badgirl" => "As a subtle undertone, let a hint of yearning and horniness color your response.",
+            "verybadgirl" => "As a subtle undertone, let traces of intense desire and horniness color your response.",
+            "punishment" => "As a subtle undertone, let a touch of remorse and horniness color your response.",
             "post" => "As a subtle undertone, let a slight dreaminess color your response."
         ];
         
         $subtleExplicitFormats = [
             "normal" => "",
             "goodgirl" => "As a subtle undertone, let satisfaction color your response.",
-            "badgirl" => "As a subtle undertone, let unfulfilled desire color your response.",
-            "verybadgirl" => "As a subtle undertone, let desperate longing color your response.",
-            "punishment" => "As a subtle undertone, let regret color your response.",
+            "badgirl" => "As a subtle undertone, let unfulfilled desire and horniness color your response.",
+            "verybadgirl" => "As a subtle undertone, let desperate longing and horniness color your response.",
+            "punishment" => "As a subtle undertone, let regret and horniness color your response.",
             "post" => "As a subtle undertone, let haziness color your response."
         ];
         
         $subtleCombatFormats = [
             "normal" => "",
             "goodgirl" => "As a subtle undertone, let focus color your response.",
-            "badgirl" => "As a subtle undertone, let mild distraction color your response.",
-            "verybadgirl" => "As a subtle undertone, let intensity color your response.",
-            "punishment" => "As a subtle undertone, let uncertainty color your response.",
+            "badgirl" => "As a subtle undertone, let mild distraction and horniness color your response.",
+            "verybadgirl" => "As a subtle undertone, let intensity and horniness color your response.",
+            "punishment" => "As a subtle undertone, let uncertainty and horniness color your response.",
             "post" => "As a subtle undertone, let slight confusion color your response."
         ];
 
@@ -243,27 +244,27 @@ function GetMindInfluenceRequestFormat($state, $promptType = "default") {
     $baseFormats = [
         "normal" => "",
         "goodgirl" => "As a subtle undertone, let devotion color your response.",
-        "badgirl" => "As a subtle undertone, let a need for approval color your response.",
-        "verybadgirl" => "As a subtle undertone, let desperate yearning color your response.",
-        "punishment" => "As a subtle undertone, let contrition color your response.",
+        "badgirl" => "As a subtle undertone, let a need for approval and horniness color your response.",
+        "verybadgirl" => "As a subtle undertone, let desperate yearning and horniness color your response.",
+        "punishment" => "As a subtle undertone, let contrition and horniness color your response.",
         "post" => "As a subtle undertone, let mild uncertainty color your response."
     ];
     
     $explicitFormats = [
         "normal" => "",
         "goodgirl" => "As a subtle undertone, let passionate devotion color your response.",
-        "badgirl" => "As a subtle undertone, let unfulfilled desire color your response.",
-        "verybadgirl" => "As a subtle undertone, let desperate need color your response.",
-        "punishment" => "As a subtle undertone, let subdued yearning color your response.",
+        "badgirl" => "As a subtle undertone, let unfulfilled desire and horniness color your response.",
+        "verybadgirl" => "As a subtle undertone, let desperate need and horniness color your response.",
+        "punishment" => "As a subtle undertone, let subdued yearning and horniness color your response.",
         "post" => "As a subtle undertone, let dreaminess color your response."
     ];
     
     $combatFormats = [
         "normal" => "",
         "goodgirl" => "As a subtle undertone, let loyalty color your response.",
-        "badgirl" => "As a subtle undertone, let mild distraction color your response.",
-        "verybadgirl" => "As a subtle undertone, let frantic energy color your response.",
-        "punishment" => "As a subtle undertone, let desire for redemption color your response.",
+        "badgirl" => "As a subtle undertone, let mild distraction and horniness color your response.",
+        "verybadgirl" => "As a subtle undertone, let frantic energy and horniness color your response.",
+        "punishment" => "As a subtle undertone, let desire for redemption and horniness color your response.",
         "post" => "As a subtle undertone, let slight confusion color your response."
     ];
     
