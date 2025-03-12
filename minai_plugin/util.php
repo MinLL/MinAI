@@ -579,6 +579,7 @@ if (HasKeyword($name, "EroticArmor")) {
     $wearingBottom = true;
     $wearingTop = true;
 }
+//error_log("DEBUG Actor: $name, wearingTop: $wearingTop, wearingBottom: $wearingBottom");
 return ["wearingTop" => $wearingTop, "wearingBottom" => $wearingBottom];
 }
 

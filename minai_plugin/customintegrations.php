@@ -210,6 +210,21 @@ function ProcessIntegrations() {
 
     if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "storetattoodesc") {
         minai_log("info", "Processing storetattoodesc event");
+        
+        // Parse the tattoo data from the request
+        $data = explode("@", $GLOBALS["gameRequest"][3]);
+        if (count($data) >= 2) {
+            $actorName = $data[0];
+            $tattooData = $data[1];
+            
+            // Store the actor's tattoo data
+            StoreTattooData($actorName, $tattooData);
+            
+            minai_log("info", "Stored tattoo data for " . $actorName);
+        } else {
+            minai_log("error", "Invalid tattoo data format");
+        }
+        
         $MUST_DIE=true;
     }
 
@@ -329,5 +344,178 @@ function ShouldBlockTNTREvent($eventName) {
     }
     
     return false;
+}
+
+function StoreTattooData($actorName, $tattooData) {
+    $db = $GLOBALS['db'];
+    
+    try {
+        
+        // Create the tattoo_description table if it doesn't exist
+        $db->execQuery("CREATE TABLE IF NOT EXISTS tattoo_description (
+            section TEXT NOT NULL,
+            name TEXT NOT NULL,
+            description TEXT,
+            hidden_by TEXT,
+            PRIMARY KEY (section, name)
+        )");
+        
+        // Create the actor_tattoos table if it doesn't exist
+        $db->execQuery("CREATE TABLE IF NOT EXISTS actor_tattoos (
+            actor_name TEXT NOT NULL,
+            tattoo_data TEXT NOT NULL,
+            updated_at INTEGER NOT NULL,
+            PRIMARY KEY (actor_name)
+        )");
+        
+        // Delete any existing data for this actor
+        $db->delete("actor_tattoos", "actor_name='" . $db->escape($actorName) . "'");
+        
+        // Insert the new data
+        $db->insert(
+            'actor_tattoos',
+            array(
+                'actor_name' => $db->escape($actorName),
+                'tattoo_data' => $db->escape($tattooData),
+                'updated_at' => time()
+            )
+        );
+        
+        minai_log("info", "Successfully stored tattoo data for " . $actorName . ": " . substr($tattooData, 0, 100) . "...");
+        
+        // Now process each tattoo to ensure it exists in the tattoo_description table
+        $tattoos = explode("~", $tattooData);
+        $processedCount = 0;
+        $skippedCount = 0;
+        $errorCount = 0;
+        
+        minai_log("info", "Processing " . count($tattoos) . " tattoo entries");
+        
+        foreach ($tattoos as $index => $tattoo) {
+            if (empty(trim($tattoo))) {
+                minai_log("info", "Skipping empty tattoo entry at index " . $index);
+                $skippedCount++;
+                continue; // Skip empty entries
+            }
+            
+            $fields = explode("&", $tattoo);
+            if (count($fields) < 2) {
+                minai_log("info", "Skipping tattoo with insufficient fields at index " . $index . ": " . $tattoo);
+                $skippedCount++;
+                continue; // Need at least section and name
+            }
+            
+            $section = trim($fields[0]);
+            $name = trim($fields[1]);
+            
+            // Skip if section or name is empty
+            if (empty($section) || empty($name)) {
+                minai_log("info", "Skipping tattoo with empty section or name at index " . $index . ": " . $tattoo);
+                $skippedCount++;
+                continue;
+            }
+            
+            try {
+                // Check if this tattoo already exists in the description table
+                $exists = $db->fetchOne(
+                    "SELECT COUNT(*) FROM tattoo_description WHERE section='" . $db->escape($section) . "' AND name='" . $db->escape($name) . "'"
+                );
+                
+                minai_log("info", "Tattoo " . $section . "/" . $name . " exists check result: " . ($exists ? "Yes" : "No"));
+                
+                // If it doesn't exist, add it with default values
+                if (!$exists) {
+                    // Create a default description based on the name
+                    $defaultDescription = "a " . $name . " tattoo";
+                    
+                    // Set sensible defaults based on area
+                    $defaultHiddenBy = "";
+                    if (count($fields) >= 3) {
+                        $area = strtoupper(trim($fields[2]));
+                        
+                        // Face/head area tattoos
+                        if (in_array($area, ['FACE', 'HEAD'])) {
+                            $defaultHiddenBy = "helmet,zad_DeviousHood";
+                        } 
+                        // Neck area tattoos
+                        else if ($area == 'NECK') {
+                            $defaultHiddenBy = "helmet,zad_DeviousCollar,zad_DeviousHood";
+                        }
+                        // Hand/arm area tattoos
+                        else if (in_array($area, ['HAND', 'ARM', 'WRIST'])) {
+                            $defaultHiddenBy = "gloves,zad_DeviousGloves,zad_DeviousArmCuffs";
+                        }
+                        // Foot/leg area tattoos
+                        else if (in_array($area, ['FOOT', 'ANKLE'])) {
+                            $defaultHiddenBy = "boots,zad_DeviousAnkleShackles";
+                        }
+                        // Leg area tattoos
+                        else if ($area == 'LEG') {
+                            $defaultHiddenBy = "boots,wearing_bottom,zad_DeviousLegCuffs,zad_DeviousHobbleSkirt";
+                        }
+                        // Upper body tattoos
+                        else if (in_array($area, ['BODY', 'BACK', 'CHEST'])) {
+                            $defaultHiddenBy = "cuirass,wearing_top,zad_DeviousSuit,zad_DeviousPetSuit,zad_DeviousStraitJacket,SLA_ArmorHarness,SLA_ArmorSpendex,SLA_ArmorRubber";
+                        }
+                        // Breast area tattoos
+                        else if ($area == 'BREAST') {
+                            $defaultHiddenBy = "cuirass,wearing_top,zad_DeviousBra,SLA_Brabikini,zad_DeviousSuit,zad_DeviousPetSuit";
+                        }
+                        // Lower body tattoos
+                        else if (in_array($area, ['PELVIS', 'BUTT'])) {
+                            $defaultHiddenBy = "cuirass,wearing_bottom,zad_DeviousBelt,SLA_Thong,SLA_PantiesNormal,SLA_PantsNormal,SLA_PelvicCurtain,SLA_FullSkirt,SLA_MiniSkirt,SLA_MicroHotPants";
+                        }
+                        // Thigh area tattoos
+                        else if ($area == 'THIGH') {
+                            $defaultHiddenBy = "cuirass,wearing_bottom,SLA_PantsNormal,SLA_FullSkirt,SLA_MiniSkirt";
+                        }
+                        // Default for any other area
+                        else {
+                            $defaultHiddenBy = "cuirass";
+                        }
+                    }
+                    
+                    minai_log("info", "Inserting new tattoo: " . $section . "/" . $name . " with description: " . $defaultDescription . " and hidden_by: " . $defaultHiddenBy);
+                    
+                    $result = $db->insert(
+                        'tattoo_description',
+                        array(
+                            'section' => $db->escape($section),
+                            'name' => $db->escape($name),
+                            'description' => $defaultDescription,
+                            'hidden_by' => $defaultHiddenBy
+                        )
+                    );
+                    
+                    minai_log("info", "Insert result: " . ($result ? "Success" : "Failed"));
+                    $processedCount++;
+                }
+            } catch (Exception $e) {
+                minai_log("error", "Error processing tattoo " . $section . "/" . $name . ": " . $e->getMessage());
+                $errorCount++;
+            }
+        }
+        
+        minai_log("info", "Tattoo processing complete. Processed: " . $processedCount . ", Skipped: " . $skippedCount . ", Errors: " . $errorCount);
+        
+        // Verify the data was stored correctly
+        $storedData = $db->fetchOne(
+            "SELECT tattoo_data FROM actor_tattoos WHERE actor_name='" . $db->escape($actorName) . "'"
+        );
+        
+        if ($storedData) {
+            if (is_array($storedData)) {
+                $storedData = $storedData['tattoo_data'] ?? '';
+            }
+            minai_log("info", "Verification: Stored data length: " . strlen($storedData) . ", Original data length: " . strlen($tattooData));
+        } else {
+            minai_log("error", "Verification failed: No data found for actor " . $actorName);
+        }
+        
+        return true;
+    } catch (Exception $e) {
+        minai_log("error", "Error storing tattoo data: " . $e->getMessage());
+        return false;
+    }
 }
 

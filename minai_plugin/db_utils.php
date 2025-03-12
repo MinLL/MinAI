@@ -72,12 +72,25 @@ function CreateEquipmentDescriptionTableIfNotExist()
   );
 }
 
+function CreateTattooDescriptionTableIfNotExists() {
+  $db = $GLOBALS['db'];
+  $db->execQuery(
+    "CREATE TABLE IF NOT EXISTS tattoo_description (
+      section TEXT NOT NULL,
+      name TEXT NOT NULL,
+      description TEXT,
+      hidden_by TEXT,
+      PRIMARY KEY (section, name)
+    )"
+  );
+}
 
 function InitiateDBTables() {
     CreateThreadsTableIfNotExists();
     CreateActionsTableIfNotExists();
     CreateContextTableIfNotExists();
     CreateEquipmentDescriptionTableIfNotExist();
+    CreateTattooDescriptionTableIfNotExists();
 }
 
 function ResetDBTables() {
@@ -86,4 +99,5 @@ function ResetDBTables() {
     CreateActionsTableIfNotExists();
     CreateContextTableIfNotExists();
     CreateEquipmentDescriptionTableIfNotExist();
+    CreateTattooDescriptionTableIfNotExists();
 }

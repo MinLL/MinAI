@@ -37,8 +37,6 @@ class expose {
     }
 }
 
-// The script is Structured this way to that it will be easier to implement the playmate part.
-// I never played with one so far, so I am not able to do it from the get go.
 function GetExposureContext($localActors) {
     $utilities = new Utilities();
     if (!$utilities->IsModEnabled("TNG")) {
@@ -72,7 +70,8 @@ function GetExposureContext($localActors) {
     // build lists
     $verbiage = "";
     if(!empty($isnaked)) {
-        $verbiage .= expose::rollUpAList($isnaked) . "naked and exposed.\n";
+        // This doesn't respect non-cuirass clothing. Disable for now to avoid having to query the database for each actor.
+        // $verbiage .= expose::rollUpAList($isnaked) . "naked and exposed.\n";
     }
     if(!empty($tngsize0)) {
         $verbiage .= expose::rollUpAList($tngsize0, true) . "an embarrassingly tiny prick.\n";

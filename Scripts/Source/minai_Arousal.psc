@@ -45,6 +45,9 @@ bool bHasArousedKeywords = False
 bool bHasBabo = False
 bool bHasTNG = False
 int cuirassSlot = 0x00000004
+int helmetSlot = 0x00000001
+int glovesSlot = 0x00000008
+int bootsSlot = 0x00000080
 
 
 minai_MainQuestController main
@@ -197,11 +200,28 @@ function WriteClothingString(actor akActor, actor player, bool isYou=false, acto
 		if (currentActor != None)
 			String actorName = main.GetActorName(currentActor)
 			Armor cuirass = currentActor.GetWornForm(cuirassSlot) as Armor
+			Armor helmet = currentActor.GetWornForm(helmetSlot) as Armor
+			Armor gloves = currentActor.GetWornForm(glovesSlot) as Armor
+			Armor boots = currentActor.GetWornForm(bootsSlot) as Armor
+			
 			if cuirass == None
 				main.RegisterAction(actorName + " is naked.")
 			else
 				main.RegisterAction(actorName + " is wearing " + cuirass.GetName())
 			EndIf
+			
+			if helmet != None
+				main.RegisterAction(actorName + " is wearing " + helmet.GetName() + " on their head.")
+			EndIf
+			
+			if gloves != None
+				main.RegisterAction(actorName + " is wearing " + gloves.GetName() + " on their hands.")
+			EndIf
+			
+			if boots != None
+				main.RegisterAction(actorName + " is wearing " + boots.GetName() + " on their feet.")
+			EndIf
+			
 			if bHasTNG
 				bool exposed = IsTNGExposed(currentActor)
 				if exposed && ((currentActor.GetActorBase().GetSex() == 0) || currentActor.HasKeyword(TNG_Gentlewoman))
@@ -490,6 +510,10 @@ Function SetContext(actor akTarget)
   EndIf
   String actorName = main.GetActorName(akTarget)
   Armor cuirass = akTarget.GetWornForm(cuirassSlot) as Armor
+  Armor helmet = akTarget.GetWornForm(helmetSlot) as Armor
+  Armor gloves = akTarget.GetWornForm(glovesSlot) as Armor
+  Armor boots = akTarget.GetWornForm(bootsSlot) as Armor
+  
   aiff.SetActorVariable(akTarget, "isnaked", !cuirass)
   aiff.SetActorVariable(akTarget, "arousal", GetActorArousal(akTarget))
   aiff.SetActorVariable(akTarget, "isexposed", IsTNGExposed(akTarget))
@@ -498,6 +522,24 @@ Function SetContext(actor akTarget)
     aiff.SetActorVariable(akTarget, "cuirass", "")
   Else
     aiff.SetActorVariable(akTarget, "cuirass", cuirass.GetName())
+  EndIf
+
+  if helmet == None
+    aiff.SetActorVariable(akTarget, "helmet", "")
+  Else
+    aiff.SetActorVariable(akTarget, "helmet", helmet.GetName())
+  EndIf
+
+  if gloves == None
+    aiff.SetActorVariable(akTarget, "gloves", "")
+  Else
+    aiff.SetActorVariable(akTarget, "gloves", gloves.GetName())
+  EndIf
+
+  if boots == None
+    aiff.SetActorVariable(akTarget, "boots", "")
+  Else
+    aiff.SetActorVariable(akTarget, "boots", boots.GetName())
   EndIf
 
   string wornEquipments = GetWornEquipments(akTarget)
