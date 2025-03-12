@@ -70,6 +70,8 @@ Function Maintenance()
   SetRoleplayKey()
   SetRoleplayTextKey()
   SetDiaryKey()
+  SetDungeonMasterKey()
+  SetDungeonMasterTextKey()
   ; Register for Mod Events
   ; Public interface functions
   RegisterForModEvent("MinAI_RegisterEvent", "OnRegisterEvent")
@@ -557,6 +559,12 @@ Event OnKeyDown(int keyCode)
     ElseIf(keyCode == config.diaryKey)
         OnDiaryKeyPressed()
         sapience.ResetAndStartNextUpdate()
+    ElseIf(keyCode == config.dungeonMasterKey)
+        OnDungeonMasterKeyPressed()
+        sapience.ResetAndStartNextUpdate()
+    ElseIf(keyCode == config.dungeonMasterTextKey)
+        OnDungeonMasterTextKeyPressed()
+        sapience.ResetAndStartNextUpdate()
     EndIf
 EndEvent
 
@@ -575,6 +583,9 @@ Event OnKeyUp(int keyCode, float holdTime)
         sapience.ResetAndStartNextUpdate()
     ElseIf(keyCode == config.roleplayKey)
         OnRoleplayKeyReleased(holdTime)
+        sapience.ResetAndStartNextUpdate()
+    ElseIf(keyCode == config.dungeonMasterKey)
+        OnDungeonMasterKeyReleased(holdTime)
         sapience.ResetAndStartNextUpdate()
     EndIf
 EndEvent
@@ -677,6 +688,9 @@ Function OnNarratorTextKeyPressed()
             string playerName = GetActorName(playerRef)
             minAIFF.AIRequestMessage(messageText, "minai_narrator_talk")
             Debug.Notification("Message sent to narrator")
+        else
+            Debug.Notification("No message entered - cancelled")
+            minAIFF.SetActorVariable(playerRef, "isTalkingToNarrator", false)
         EndIf
     Else
         Debug.Notification("AIFF not installed - narrator conversations require AIFF")
@@ -807,5 +821,107 @@ Function OnDiaryKeyPressed()
         endif
     Else
         Debug.Notification("CHIM not installed - diary updates require CHIM")
+    EndIf
+EndFunction
+
+; Add dungeon master hotkey functions
+Function SetDungeonMasterKey(bool showNotification = false)
+    ; Register new key if valid
+    if (config.dungeonMasterKey != -1)
+        RegisterForKey(config.dungeonMasterKey)
+        if showNotification
+            Debug.Notification("Dungeon Master voice key mapped to " + config.dungeonMasterKey)
+        endif
+    endIf
+EndFunction
+
+Function SetDungeonMasterTextKey(bool showNotification = false)
+    ; Register new key if valid
+    if (config.dungeonMasterTextKey != -1)
+        RegisterForKey(config.dungeonMasterTextKey)
+        if showNotification
+            Debug.Notification("Dungeon Master text key mapped to " + config.dungeonMasterTextKey)
+        endif
+    endIf
+EndFunction
+
+Function OnDungeonMasterKeyPressed()
+    If(bHasAIFF)
+        ; Get actor under crosshair
+        Actor targetActor = Game.GetCurrentCrosshairRef() as Actor
+        string targetName = "everyone"
+        
+        ; If we have a valid target, use that instead of everyone
+        if (targetActor != None)
+            targetName = GetActorName(targetActor)
+        endif
+        
+        Info("Starting dungeon master recording for " + targetName)
+        minAIFF.SetActorVariable(playerRef, "isDungeonMaster", true)
+        minAIFF.AIRecordSoundEx(config.dungeonMasterKey)
+        Debug.Notification("Hold to record message for " + targetName + ", release quickly to send generic event")
+    Else
+        Debug.Notification("CHIM not installed - dungeon master requires CHIM")
+    EndIf
+EndFunction
+
+Function OnDungeonMasterKeyReleased(float holdTime)
+    If(bHasAIFF)
+        ; Reset the last request time to prevent immediate response from other systems
+        lastRequestTime = Utility.GetCurrentRealTime()
+        Info("Stopping dungeon master recording")
+        minAIFF.AIStopRecording(config.dungeonMasterKey)
+        
+        ; Get actor under crosshair
+        Actor targetActor = Game.GetCurrentCrosshairRef() as Actor
+        string targetName = "everyone"
+        
+        ; If we have a valid target, use that instead of everyone
+        if (targetActor != None)
+            targetName = GetActorName(targetActor)
+        endif
+        
+        ; Only send message if key was held for less than 1 second
+        if holdTime < 1.0
+            Info("Sending dungeon master event to " + targetName)
+            minAIFF.AIRequestMessageForActor("The dungeon master has triggered an event", "minai_dungeon_master", targetName)
+            Debug.Notification("Dungeon master event sent to " + targetName)
+        else
+            Debug.Notification("Recording stopped - message will be sent to " + targetName)
+        EndIf
+    EndIf
+EndFunction
+
+Function OnDungeonMasterTextKeyPressed()
+    If(bHasAIFF)
+        ; Get actor under crosshair
+        Actor targetActor = Game.GetCurrentCrosshairRef() as Actor
+        string targetName = "everyone"
+        
+        ; If we have a valid target, use that instead of everyone
+        if (targetActor != None)
+            targetName = GetActorName(targetActor)
+        endif
+        
+        Info("Opening dungeon master text input for " + targetName)
+        minAIFF.SetActorVariable(playerRef, "isDungeonMaster", true)
+        
+        ; Open text input menu
+        UIExtensions.OpenMenu("UITextEntryMenu") 
+        string messageText = UIExtensions.GetMenuResultString("UITextEntryMenu")
+        
+        If(messageText != "")
+            ; Reset the last request time to prevent immediate response
+            lastRequestTime = Utility.GetCurrentRealTime()
+            
+            Info("Sending dungeon master text to " + targetName + ": " + messageText)
+            minAIFF.AIRequestMessageForActor("The dungeon master says: " + messageText, "minai_dungeon_master", targetName)
+            Debug.Notification("Dungeon master message sent to " + targetName)
+        Else
+            Debug.Notification("No message entered - cancelled")
+            minAIFF.SetActorVariable(playerRef, "isDungeonMaster", false)
+        EndIf
+    Else
+        Debug.Notification("CHIM not installed - dungeon master requires CHIM")
     EndIf
 EndFunction

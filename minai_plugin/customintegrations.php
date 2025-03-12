@@ -4,6 +4,7 @@
 
 require_once("util.php");
 require_once(__DIR__.DIRECTORY_SEPARATOR."updateThreadsDB.php");
+require_once(__DIR__.DIRECTORY_SEPARATOR."dungeonmaster.php");
 
 
 
@@ -199,6 +200,15 @@ function ProcessIntegrations() {
         SetNarratorProfile();
         
         SetNarratorPrompts(isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"]);
+    }
+
+    // Handle dungeon master events
+    if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "minai_dungeon_master") {
+        // Get the request data
+        $requestData = $GLOBALS["gameRequest"][3] ?? '';
+        
+        // Process the dungeon master event
+        ProcessDungeonMasterEvent($requestData);
     }
 
     if (isset($GLOBALS["gameRequest"]) && strpos($GLOBALS["gameRequest"][0], "minai_tntr_") === 0) {

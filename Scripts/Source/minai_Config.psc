@@ -60,19 +60,24 @@ int singKeyOID          ; New OID for sing keybind
 int narratorKeyOID      ; New OID for narrator keybind
 int narratorTextKeyOID  ; New OID for narrator text input keybind
 
-; Add new OID definitions near other key OIDs
 int roleplayKeyOID      ; New OID for roleplay voice keybind
 int roleplayTextKeyOID  ; New OID for roleplay text input keybind
+int diaryKeyOID         ; OID for diary hotkey
+int dungeonMasterKeyOID        ; New OID for dungeon master voice keybind
+int dungeonMasterTextKeyOID    ; New OID for dungeon master text input keybind
 
 ; Key properties
 int Property toggleSapienceKey = -1 Auto
 int Property singKey = -1 Auto          ; New property for sing key
 int Property narratorKey = -1 Auto      ; New property for narrator key
 int Property narratorTextKey = -1 Auto  ; New property for narrator text input key
+int Property diaryKey = -1 Auto         ; Property for diary hotkey
 
 ; Add new key properties
 int Property roleplayKey = -1 Auto          ; Property for roleplay voice key
 int Property roleplayTextKey = -1 Auto      ; Property for roleplay text key
+int Property dungeonMasterKey = -1 Auto     ; Property for dungeon master voice key
+int Property dungeonMasterTextKey = -1 Auto ; Property for dungeon master text key
 
 ; Legacy globals
 GlobalVariable useCBPC
@@ -276,11 +281,6 @@ int Property lowFrequencyUpdateIntervalOID Auto
 int Property contextUpdateIntervalOID Auto
 int Property highPerformanceModeOID Auto
 
-; Add the diary hotkey OID near the other OID definitions
-int diaryKeyOID      ; New OID for diary keybind
-
-; Add the diary hotkey property near the other key properties
-int Property diaryKey = -1 Auto      ; Property for diary key
 
 Event OnConfigInit()
   main.Info("Building mcm menu.")
@@ -377,6 +377,8 @@ Function RenderGeneralPage()
   narratorKeyOID = AddKeyMapOption("Talk to Narrator", narratorKey)  ; New keybind option
   narratorTextKeyOID = AddKeyMapOption("Type to Narrator", narratorTextKey)
   diaryKeyOID = AddKeyMapOption("Diary Hotkey", diaryKey)  ; New diary hotkey option
+  dungeonMasterKeyOID = AddKeyMapOption("Dungeon Master Voice", dungeonMasterKey)  ; New dungeon master voice hotkey
+  dungeonMasterTextKeyOID = AddKeyMapOption("Dungeon Master Text", dungeonMasterTextKey)  ; New dungeon master text hotkey
   disableAIAnimationsOID = AddToggleOption("Disable AI-FF Animations", disableAIAnimations)
   AddHeaderOption("Debug")
   logLevelOID = AddSliderOption("Log Level", logLevel, "{0}")
@@ -1201,6 +1203,10 @@ Event OnOptionHighlight(int oid)
     SetInfoText("Use optimized performance settings that reduce update frequency for better performance")
   elseif oid == diaryKeyOID
     SetInfoText("Hotkey to update diaries. When crouching: updates narrator diary. When standing: updates all diaries. When looking at an NPC: updates that NPC's diary.")
+  elseif oid == dungeonMasterKeyOID
+    SetInfoText("Hotkey to speak as the dungeon master")
+  elseif oid == dungeonMasterTextKeyOID
+    SetInfoText("Hotkey to type as the dungeon master")
   EndIf
   int i = 0
   string[] actions = JMap.allKeysPArray(aiff.actionRegistry)
@@ -1562,6 +1568,14 @@ event OnOptionKeyMapChange(int a_option, int a_keyCode, string a_conflictControl
             diaryKey = a_keyCode
             SetKeymapOptionValue(a_option, a_keyCode)
             main.SetDiaryKey(true)
+        elseif (a_option == dungeonMasterKeyOID)
+            dungeonMasterKey = a_keyCode
+            SetKeymapOptionValue(a_option, a_keyCode)
+            main.SetDungeonMasterKey(true)
+        elseif (a_option == dungeonMasterTextKeyOID)
+            dungeonMasterTextKey = a_keyCode
+            SetKeymapOptionValue(a_option, a_keyCode)
+            main.SetDungeonMasterTextKey(true)
         endIf
     endIf
 EndEvent

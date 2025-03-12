@@ -25,6 +25,15 @@ if (IsEnabled($GLOBALS["PLAYER_NAME"], "isTalkingToNarrator") && isPlayerInput()
     SetNarratorProfile();
 }
 
+// If using dungeon master, set appropriate state
+if (IsEnabled($GLOBALS["PLAYER_NAME"], "isDungeonMaster") && isPlayerInput()) {
+    SetEnabled($GLOBALS["PLAYER_NAME"], "isDungeonMaster", false);
+    $GLOBALS["minai_processing_input"] = true;
+    $GLOBALS["gameRequest"][0] = "minai_dungeon_master";
+    $GLOBALS["gameRequest"][3] = str_replace("{$GLOBALS["PLAYER_NAME"]}:", "The Narrator: ", $GLOBALS["gameRequest"][3]);
+    minai_log("info", "Processing dungeon master input: {$GLOBALS["gameRequest"][3]}");
+}
+
 if (IsEnabled($GLOBALS["PLAYER_NAME"], "isSinging")) {
     minai_log("info", "Forcing herika_name to the narrator: Is singing");
     // $GLOBALS["HERIKA_NAME"] = "The Narrator";

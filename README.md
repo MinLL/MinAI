@@ -148,9 +148,6 @@ This feature adds a new hotkey to MinAI that allows players to update diaries on
 - **Narrator focus**: Quickly update just the narrator's diary when needed
 - **Immersive**: The crouching mechanic provides an immersive way to "focus" on the narrator
 
-## Installation
-
-See the INSTALLATION.md file for detailed installation instructions.
 
 ## Usage
 
@@ -159,3 +156,54 @@ See the INSTALLATION.md file for detailed installation instructions.
    - Crouch and press the hotkey to update the narrator's diary
    - Stand normally and press the hotkey to update all diaries
    - Look at an NPC and press the hotkey to update just that NPC's diary
+
+# MinAI Dungeon Master Hotkeys
+
+## Overview
+
+This feature adds two new hotkeys to MinAI that allow players to act as a "dungeon master" and introduce events or information to the game world:
+
+1. **Dungeon Master Voice**: Record voice input or send a generic event prompt
+2. **Dungeon Master Text**: Type a custom message to send to an NPC or The Narrator
+
+The dungeon master's messages are treated as authoritative information about the game world, allowing players to create custom scenarios and guide NPC responses.
+
+## Benefits
+
+- **Enhanced Storytelling**: Introduce custom events, challenges, or plot developments
+- **World Building**: Add details to the game world that NPCs will acknowledge and respond to
+- **Roleplaying**: Create more dynamic and interactive roleplaying scenarios
+- **NPC Direction**: Guide NPC behavior by providing them with new information
+- **Scenario Creation**: Set up custom scenarios without needing to modify the game
+- **Flexible Narration**: Send messages to specific NPCs or to The Narrator for general world events
+
+## Usage
+
+1. Set the dungeon master hotkeys in the MCM menu under the "General" tab
+2. For targeted messages to an NPC:
+   - Look at the NPC you want to send a message to
+3. For general narration:
+   - Don't target any NPC (look at empty space or objects)
+   - The message will be sent to The Narrator
+4. For voice input:
+   - Press and hold the Dungeon Master Voice key to record your message
+   - Release quickly to send a generic event prompt without recording
+5. For text input:
+   - Press the Dungeon Master Text key
+   - Type your message in the text entry box that appears
+   - The message will be sent to the targeted NPC or The Narrator
+
+## Examples
+
+Here are some examples of how you can use the dungeon master feature:
+
+### When targeting an NPC:
+- **Create Personal Challenges**: "You feel a strange magical effect that temporarily weakens your spells."
+- **Add Character Background**: "You suddenly remember an important detail from your past."
+- **Guide Roleplay**: "You notice something suspicious about the person across the room."
+
+### When targeting The Narrator (no NPC targeted):
+- **Create Weather Events**: "A sudden thunderstorm begins, with lightning striking nearby."
+- **Introduce NPCs**: "A group of bandits appears on the road ahead."
+- **Set Up Scenarios**: "A hidden treasure chest is visible behind the waterfall."
+- **Create Atmosphere**: "The tavern is unusually crowded tonight, with many patrons celebrating."
