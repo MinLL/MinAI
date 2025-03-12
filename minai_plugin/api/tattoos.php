@@ -238,8 +238,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT' && isset($_GET['action']) && $_GET['act
         exit;
     }
     
-    // Begin transaction
-    $db->beginTransaction();
     
     try {
         // Clear existing tattoo descriptions if requested
@@ -260,13 +258,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT' && isset($_GET['action']) && $_GET['act
             
             if ($exists) {
                 // Update the existing tattoo
-                $db->update(
+                $db->delete(
+                    'tattoo_description',
+                    "section='" . $db->escape($tattoo['section']) . "' AND name='" . $db->escape($tattoo['name']) . "'"
+                );
+                
+                // Insert the tattoo with updated values
+                $db->insert(
                     'tattoo_description',
                     [
+                        'section' => $db->escape($tattoo['section']),
+                        'name' => $db->escape($tattoo['name']),
                         'description' => $db->escape($tattoo['description'] ?? ''),
                         'hidden_by' => $db->escape($tattoo['hidden_by'] ?? '')
-                    ],
-                    "section='" . $db->escape($tattoo['section']) . "' AND name='" . $db->escape($tattoo['name']) . "'"
+                    ]
                 );
             } else {
                 // Insert a new tattoo
@@ -281,9 +286,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT' && isset($_GET['action']) && $_GET['act
                 );
             }
         }
-        
-        // Commit the transaction
-        $db->commit();
         
         echo json_encode([
             'success' => true
@@ -380,26 +382,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT' && isset($_GET['action']) && $_GET['act
         exit;
     }
     
-    // Begin transaction
-    $db->beginTransaction();
     
     try {
         // Update all tattoos in the specified section
-        $db->update(
+        // First, get all tattoos in the section
+        $tattoos = $db->fetchAll(
+            "SELECT * FROM tattoo_description WHERE section='" . $db->escape($data['section']) . "'"
+        );
+        
+        // Delete all tattoos in the section
+        $db->delete(
             'tattoo_description',
-            [
-                'hidden_by' => $db->escape($data['hidden_by'])
-            ],
             "section='" . $db->escape($data['section']) . "'"
         );
+        
+        // Reinsert all tattoos with the new hidden_by value
+        foreach ($tattoos as $tattoo) {
+            $db->insert(
+                'tattoo_description',
+                [
+                    'section' => $db->escape($tattoo['section']),
+                    'name' => $db->escape($tattoo['name']),
+                    'description' => $db->escape($tattoo['description'] ?? ''),
+                    'hidden_by' => $db->escape($data['hidden_by'])
+                ]
+            );
+        }
         
         // Get the count of updated rows
         $updatedCount = $db->fetchOne(
             "SELECT COUNT(*) FROM tattoo_description WHERE section='" . $db->escape($data['section']) . "'"
         );
-        
-        // Commit the transaction
-        $db->commit();
         
         echo json_encode([
             'success' => true,
@@ -419,9 +432,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT' && isset($_GET['action']) && $_GET['act
 // Test endpoint to add sample tattoo data
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['add_test_data'])) {
     try {
-        // Begin transaction
-        $db->beginTransaction();
-        
         // Add sample tattoo descriptions
         $sampleTattoos = [
             ['section' => 'Face', 'name' => 'War Paint', 'description' => 'Traditional Nordic war paint across the face', 'hidden_by' => 'full_body,hood,helmet'],
@@ -471,9 +481,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['add_test_data'])) {
                 ]
             );
         }
-        
-        // Commit transaction
-        $db->commit();
         
         echo json_encode([
             'success' => true,
@@ -601,13 +608,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['debug_save_description'
         
         if ($exists) {
             // Update the existing tattoo
-            $result = $db->update(
+            $result = $db->delete(
+                'tattoo_description',
+                "section='" . $db->escape($section) . "' AND name='" . $db->escape($name) . "'"
+            );
+            
+            // Insert with updated values
+            $result = $db->insert(
                 'tattoo_description',
                 [
+                    'section' => $db->escape($section),
+                    'name' => $db->escape($name),
                     'description' => $db->escape($description),
                     'hidden_by' => $db->escape($hiddenBy)
-                ],
-                "section='" . $db->escape($section) . "' AND name='" . $db->escape($name) . "'"
+                ]
             );
             
             $message = "Updated existing tattoo description";
