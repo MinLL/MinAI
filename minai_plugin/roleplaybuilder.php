@@ -180,6 +180,7 @@ function interceptRoleplayInput() {
         $devicesStatus = convertToFirstPerson(GetDDContext($PLAYER_NAME, true), $PLAYER_NAME, $playerPronouns);
         $fertilityStatus = convertToFirstPerson(GetFertilityContext($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
         $mindState = convertToFirstPerson(GetMindInfluenceContext(GetMindInfluenceState($PLAYER_NAME)), $PLAYER_NAME, $playerPronouns);
+        $tattooStatus = convertToFirstPerson(GetTattooContext($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
         // Replace variables in system prompt and request
         $variableReplacements = [
             'PLAYER_NAME' => $PLAYER_NAME,
@@ -200,6 +201,7 @@ function interceptRoleplayInput() {
             'CLOTHING_STATUS' => $clothingStatus,
             'DEVICES_STATUS' => $devicesStatus,
             'FERTILITY_STATUS' => $fertilityStatus,
+            'TATTOO_STATUS' => $tattooStatus,
             'HERIKA_NAME' => $HERIKA_NAME,
             'HERIKA_PERS' => $HERIKA_PERS,
             'MIND_STATE' => $mindState

@@ -10,8 +10,12 @@ $nearbyActors = GetActorValue("PLAYER", "nearbyActors", true);
 $new_content = "";
 
 if (!$GLOBALS["disable_nsfw"]) {
-  $new_content .= BuildContext(GetTargetActor()) . "\n";
-  $new_content .= BuildContext($GLOBALS["HERIKA_NAME"]);
+  if ($GLOBALS["HERIKA_NAME"] == "The Narrator") {
+    $new_content .= BuildContext("The Narrator") . "\n";
+  } else {
+    $new_content .= BuildContext(GetTargetActor()) . "\n";
+    $new_content .= BuildContext($GLOBALS["HERIKA_NAME"]);
+  }
   $new_content .= BuildNSFWReputationContext($GLOBALS["HERIKA_NAME"]) . "\n";
 }
 

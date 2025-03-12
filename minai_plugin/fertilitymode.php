@@ -11,7 +11,7 @@ Function GetFertilityContext($name) {
     }
 
     $isNarrator = ($GLOBALS["HERIKA_NAME"] == "The Narrator");
-    $isSelf = GetTargetActor() == $name;
+    $isSelf = false; //GetTargetActor() == $name;
     
     // Pregnancy states are visible to everyone
     if ($state == "third_trimester") {

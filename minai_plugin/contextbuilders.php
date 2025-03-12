@@ -14,9 +14,7 @@ require_once("fertilitymode.php");
 
 Function BuildContext($name) {
   if ($name == "The Narrator") {
-      // The narrator is always talking to the player, don't need to do this
-      //return BuildContext($GLOBALS["PLAYER_NAME"]);
-      return "";
+    $name = $GLOBALS["PLAYER_NAME"];
   }
   $context = "";
   $context .= GetPhysicalDescription($name);
@@ -33,7 +31,7 @@ Function BuildContext($name) {
   $context .= GetSurvivalContext($name);
 
   // Add mind influence context for the narrator only
-  if ($name == "The Narrator" || strtolower($name) == strtolower($GLOBALS["PLAYER_NAME"])) {
+  if ($GLOBALS["HERIKA_NAME"] == "The Narrator") {
       $mindState = GetMindInfluenceState($name);
       if ($mindState != "normal") {
           $context .= GetMindInfluenceContext($mindState) . "\n";

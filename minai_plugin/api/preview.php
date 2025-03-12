@@ -32,6 +32,7 @@ try {
     $clothingStatus = convertToFirstPerson(GetClothingContext($playerName), $playerName, $playerPronouns);
     $devicesStatus = convertToFirstPerson(GetDDContext($playerName), $playerName, $playerPronouns);
     $fertilityStatus = convertToFirstPerson(GetFertilityContext($playerName), $playerName, $playerPronouns);
+    $tattooStatus = convertToFirstPerson(GetTattooContext($playerName), $playerName, $playerPronouns);
 
     // Get nearby actors and locations
     $nearbyActors = array_filter(array_map('trim', explode('|', DataBeingsInRange())));
@@ -62,6 +63,7 @@ try {
         'CLOTHING_STATUS' => $clothingStatus,
         'DEVICES_STATUS' => $devicesStatus,
         'FERTILITY_STATUS' => $fertilityStatus,
+        'TATTOO_STATUS' => $tattooStatus,
         'HERIKA_PERS' => $GLOBALS["HERIKA_PERS"] ?? "",
         'MIND_STATE' => $mindState
     ];
