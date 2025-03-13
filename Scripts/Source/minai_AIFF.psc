@@ -16,6 +16,10 @@ minai_CombatManager combat
 ; Per-actor mutex for SetContext
 int Property contextMutexMap Auto  ; JMap of actor names to mutex states
 
+; Items registry for LLM context
+int Property itemRegistry Auto  ; JMap of form IDs to item data
+int Property itemBatchSize = 50 Auto  ; How many items to send in one batch
+
 minai_FertilityMode fertility
 GlobalVariable minai_DynamicSapienceToggleStealth
 bool bHasAIFF = False
@@ -45,6 +49,11 @@ int Property lastDialogueTimes Auto  ; JMap of actor names to timestamps
 ; Add new property for update tracking
 int Property updateTracker Auto  ; JMap for tracking last update times
 
+; Add inventory tracking properties
+int Property inventoryTracker Auto  ; JMap for tracking actor inventories
+float Property lastInventoryUpdate Auto  ; Last time inventory was updated
+float Property inventoryUpdateThrottle = 1.0 Auto  ; Minimum seconds between inventory updates
+
 Function InitFollow()
   bHasFollowPlayer = False
   FollowPlayerPackage = Game.GetFormFromFile(0x000E8E, "MinAI.esp") as Package
@@ -73,6 +82,21 @@ Function Maintenance(minai_MainQuestController _main)
   endif
   contextMutexMap = JMap.object()
   JValue.retain(contextMutexMap)
+
+  ; Initialize item registry
+  if itemRegistry == 0
+    Main.Info("Initializing item registry")
+    itemRegistry = JMap.object()
+    JValue.retain(itemRegistry)
+    SeedCommonItems()
+  endif
+
+  ; Initialize inventory tracking
+  if inventoryTracker == 0
+    Main.Info("Initializing inventory tracker")
+    inventoryTracker = JMap.object()
+    JValue.retain(inventoryTracker)
+  endif
 
   ; Initialize update tracker
   if updateTracker != 0
@@ -279,13 +303,15 @@ Function SetContext(actor akTarget)
   string actorName = Main.GetActorName(akTarget)
   
   ; Add trace logging for player
-  if akTarget == player && config.logLevel >= 6
+  if akTarget == player && config.logLevel >= 4
     MinaiUtil.Debug("JMap Sizes:")
     MinaiUtil.Debug("- contextMutexMap: " + JMap.count(contextMutexMap) + " entries")
     MinaiUtil.Debug("- actionRegistry: " + JMap.count(actionRegistry) + " entries") 
     MinaiUtil.Debug("- sapientActors: " + JMap.count(sapientActors) + " entries")
     MinaiUtil.Debug("- lastDialogueTimes: " + JMap.count(lastDialogueTimes) + " entries")
     MinaiUtil.Debug("- updateTracker: " + JMap.count(updateTracker) + " entries")
+    MinaiUtil.Debug("- itemRegistry: " + JMap.count(itemRegistry) + " entries")
+    MinaiUtil.Debug("- inventoryTracker: " + JMap.count(inventoryTracker) + " entries")
   EndIf
   
   ; Check if this actor's context is already being set
@@ -317,6 +343,17 @@ Function SetContext(actor akTarget)
     JMap.setFlt(updateTracker, actorKey + "_voice", currentGameTime)
   endif
 
+  ; Track inventory with high frequency updates
+  ; But use a brief throttle for performance
+  float lastInvUpdate = JMap.getFlt(updateTracker, actorKey + "_inv", 0.0)
+  if (currentGameTime - lastInvUpdate) * 24 * 3600 >= 5.0  ; 5 seconds in game time
+    if akTarget == player
+      Main.Debug("AIFF - SetContext(" + actorName + ") - Updating player inventory")
+    EndIf
+    TrackActorInventory(akTarget)
+    JMap.setFlt(updateTracker, actorKey + "_inv", currentGameTime)
+  endif
+
   ; Update high-frequency states (every update)
   Main.Debug("AIFF - SetContext(" + actorName + ") - Setting high-frequency states")
   devious.SetContext(akTarget)
@@ -342,6 +379,7 @@ Function SetContext(actor akTarget)
     sex.SetContext(akTarget)
     StoreKeywords(akTarget)
     StoreFactions(akTarget)
+    TrackActorInventory(akTarget)
     JMap.setFlt(updateTracker, actorKey + "_low", currentGameTime)
   endif
 
@@ -1081,4 +1119,514 @@ Function AIStopRecording(int keyCode)
     else
         AIAgentFunctions.stopRecording(keyCode)
     EndIf
+EndFunction
+
+Function PersistItemRegistry(bool useBatching = true)
+  if (!IsInitialized() || !bHasAIFF)
+    Main.Info("PersistItemRegistry() - Not initialized or AIFF not available.")
+    return
+  EndIf
+
+  string[] formIds = JMap.allKeysPArray(itemRegistry)
+  int i = 0
+  int batchCount = 0
+  string batchData = ""
+
+  while i < formIds.Length
+    int itemData = JMap.getObj(itemRegistry, formIds[i])
+    if itemData != 0
+      string modName = JMap.getStr(itemData, "modName")
+      string formId = formIds[i]
+      string itemName = JMap.getStr(itemData, "name")
+      int formTypeId = JMap.getInt(itemData, "formTypeId")
+      string description = JMap.getStr(itemData, "description")
+      
+      ; If no name is stored, try to get it from the form
+      if itemName == ""
+        Form itemForm = JMap.getForm(itemData, "form")
+        if itemForm
+          itemName = itemForm.GetName()
+          ; Store name for future use
+          if itemName != ""
+            JMap.setStr(itemData, "name", itemName)
+          EndIf
+        EndIf
+      EndIf
+
+      if useBatching
+        ; Add to batch
+        if batchData != ""
+          batchData += "~"  ; Use ~ as batch separator since | is reserved
+        EndIf
+        batchData += formId + "@" + modName + "@" + itemName + "@" + formTypeId + "@" + description
+
+        batchCount += 1
+        ; Send batch if we hit batch size or this is the last item
+        if batchCount >= itemBatchSize || i == formIds.Length - 1
+          AILogMessage(batchData, "minai_storeitem_batch")
+          batchData = ""
+          batchCount = 0
+        EndIf
+      else
+        ; Send individually
+        AILogMessage(formId + "@" + modName + "@" + itemName + "@" + formTypeId + "@" + description, "minai_storeitem")
+      EndIf
+    EndIf
+    i += 1
+  EndWhile
+EndFunction
+
+Function AddItemToRegistry(Form akForm, string description = "", string customName = "")
+  if (!IsInitialized())
+    Main.Info("AddItemToRegistry() - Not initialized.")
+    return
+  EndIf
+
+  if !akForm
+    Main.Warn("AddItemToRegistry() - Form is None")
+    return
+  EndIf
+
+  ; Get form info using MinaiUtil functions
+  string formId = minai_Util.FormToHex(akForm)
+  string modName = minai_Util.FormToModName(akForm)
+  int formTypeId = akForm.GetType()
+  
+  ; Use the custom name if provided, otherwise use the form's actual name
+  string itemName = customName
+  if itemName == ""
+    itemName = akForm.GetName()
+  EndIf
+
+  ; Create or get existing item data
+  int itemData = JMap.getObj(itemRegistry, formId)
+  if itemData == 0
+    itemData = JMap.object()
+    JValue.retain(itemData)
+  EndIf
+
+  ; Update item data
+  JMap.setStr(itemData, "modName", modName)
+  JMap.setInt(itemData, "formTypeId", formTypeId)
+  JMap.setForm(itemData, "form", akForm)
+  JMap.setStr(itemData, "name", itemName)
+  
+  ; Store the description if provided
+  if description != ""
+    JMap.setStr(itemData, "description", description)
+  EndIf
+  
+  JMap.setObj(itemRegistry, formId, itemData)
+
+  ; Log different messages depending on whether this is a custom-named item
+  if customName != "" && customName != akForm.GetName()
+    Main.Debug("Added/Updated custom named item in registry: " + formId + " from " + modName + " (custom name: " + itemName + ", original name: " + akForm.GetName() + ")")
+  else
+    Main.Debug("Added/Updated item in registry: " + formId + " from " + modName + " (type: " + formTypeId + ", name: " + itemName + ")")
+  EndIf
+EndFunction
+
+Function SetItemBatchSize(int size)
+  if size < 1
+    size = 1
+  EndIf
+  itemBatchSize = size
+  Main.Debug("Set item batch size to " + size)
+EndFunction
+
+Function RemoveItemFromRegistry(string formId)
+  if (!IsInitialized())
+    Main.Info("RemoveItemFromRegistry() - Not initialized.")
+    return
+  EndIf
+
+  int itemData = JMap.getObj(itemRegistry, formId)
+  if itemData != 0
+    JValue.release(itemData)
+    JMap.removeKey(itemRegistry, formId)
+    Main.Debug("Removed item from registry: " + formId)
+  EndIf
+EndFunction
+
+Function ClearItemRegistry()
+  if (!IsInitialized())
+    Main.Info("ClearItemRegistry() - Not initialized.")
+    return
+  EndIf
+
+  string[] formIds = JMap.allKeysPArray(itemRegistry)
+  int i = 0
+  while i < formIds.Length
+    RemoveItemFromRegistry(formIds[i])
+    i += 1
+  endwhile
+
+  Main.Debug("Cleared item registry")
+EndFunction
+
+int Function GetItemFromPartialID(string partialFormId, string modName = "")
+  ; Convert partial form ID to full form ID
+  string fullFormId = GetFullFormID(partialFormId, modName)
+  if !fullFormId
+    Main.Warn("GetItemFromPartialID() - Failed to generate full form ID from " + partialFormId + " and " + modName)
+    return 0
+  EndIf
+  
+  ; Get the item data from registry
+  return JMap.getObj(itemRegistry, fullFormId)
+EndFunction
+
+string Function GetFullFormID(string partialFormId, string modName = "")
+  ; Validate input format (0x123456)
+  if !partialFormId || StringUtil.GetLength(partialFormId) != 8 || StringUtil.Find(partialFormId, "0x") != 0
+    Main.Warn("GetFullFormID() - Invalid partial form ID format: " + partialFormId)
+    return ""
+  EndIf
+
+  ; Get just the 6-digit ID portion
+  string sixDigitId = StringUtil.Substring(partialFormId, 2, 6)
+  
+  ; Variables to track best match when no mod name specified
+  string bestMatch = ""
+  int highestModIndex = -1
+  bool multipleMatches = false
+  
+  ; Iterate through registry to find matching item(s)
+  string[] formIds = JMap.allKeysPArray(itemRegistry)
+  int i = 0
+  while i < formIds.Length
+    int itemData = JMap.getObj(itemRegistry, formIds[i])
+    if itemData != 0
+      ; Check if form ID ends with our 6 digits
+      if StringUtil.Find(formIds[i], sixDigitId) != -1
+        if modName != "" ; If mod name specified, must match exactly
+          string storedModName = JMap.getStr(itemData, "modName")
+          if storedModName == modName
+            return formIds[i]
+          EndIf
+        else ; No mod name specified, track highest mod index match
+          string storedModName = JMap.getStr(itemData, "modName")
+          int currentModIndex = Game.GetModByName(storedModName)
+          if currentModIndex > highestModIndex
+            if bestMatch != ""
+              multipleMatches = true
+            EndIf
+            bestMatch = formIds[i]
+            highestModIndex = currentModIndex
+          EndIf
+        EndIf
+      EndIf
+    EndIf
+    i += 1
+  EndWhile
+  
+  ; If no mod name specified and we found matches, log and return best match
+  if modName == "" && bestMatch != ""
+    if multipleMatches
+      Main.Info("GetFullFormID() - Multiple matches found for " + partialFormId + ", using match from highest mod index")
+    EndIf
+    return bestMatch
+  EndIf
+  
+  String debugMsg = "GetFullFormID() - No matching item found for " + partialFormId
+  if modName != ""
+    debugMsg += " in mod " + modName
+  EndIf
+  Main.Debug(debugMsg)
+  return ""
+EndFunction
+
+; Proof of concept. Will add a proper system for this later.
+Function SeedCommonItems()
+  if (!IsInitialized())
+    Main.Info("SeedCommonItems() - Not initialized.")
+    return
+  EndIf
+
+  Main.Info("Seeding item registry with common Skyrim items...")
+
+  ; Currency
+  AddItemToRegistry(Game.GetFormFromFile(0x00000F, "Skyrim.esm"), "The currency of Skyrim, used for trading goods and services.", "Gold") ; Gold/Septim
+
+  ; Common Food
+  AddItemToRegistry(Game.GetFormFromFile(0x064B31, "Skyrim.esm"), "A crisp, sweet fruit commonly grown in orchards throughout Skyrim.") ; Apple
+  AddItemToRegistry(Game.GetFormFromFile(0x064B33, "Skyrim.esm"), "A staple food item found in nearly every household in Skyrim.") ; Bread
+  AddItemToRegistry(Game.GetFormFromFile(0x064B34, "Skyrim.esm"), "An orange root vegetable often used in soups and stews.") ; Carrot
+  AddItemToRegistry(Game.GetFormFromFile(0x064B35, "Skyrim.esm"), "A large wheel of cheese that can be cut into wedges.") ; Cheese Wheel
+  AddItemToRegistry(Game.GetFormFromFile(0x064B36, "Skyrim.esm"), "A wedge cut from a larger wheel of cheese.") ; Cheese Wedge
+  AddItemToRegistry(Game.GetFormFromFile(0x064B38, "Skyrim.esm"), "A starchy tuber vegetable commonly used in cooking.") ; Potato
+  AddItemToRegistry(Game.GetFormFromFile(0x064B39, "Skyrim.esm"), "A red, juicy fruit used in various recipes.") ; Tomato
+  AddItemToRegistry(Game.GetFormFromFile(0x064B3A, "Skyrim.esm"), "A sugary dessert treat prized throughout Skyrim.") ; Sweet Roll
+  AddItemToRegistry(Game.GetFormFromFile(0x064B3D, "Skyrim.esm"), "A leafy green vegetable that can be eaten raw or cooked.") ; Cabbage
+  AddItemToRegistry(Game.GetFormFromFile(0x064B3F, "Skyrim.esm"), "A slender vegetable with a mild onion-like flavor.") ; Leek
+  
+  ; Common Drinks
+  AddItemToRegistry(Game.GetFormFromFile(0x034C5E, "Skyrim.esm"), "A refined wine made from grapes grown in the higher elevations of Skyrim.") ; Alto Wine
+  AddItemToRegistry(Game.GetFormFromFile(0x034C5F, "Skyrim.esm"), "A common alcoholic beverage made from fermented grapes.", "Wine") ; Wine
+  AddItemToRegistry(Game.GetFormFromFile(0x034C60, "Skyrim.esm"), "A traditional Nordic alcoholic beverage made from fermented honey.") ; Nord Mead
+  AddItemToRegistry(Game.GetFormFromFile(0x034C61, "Skyrim.esm"), "A popular alcoholic beverage made from fermented grains.") ; Beer
+  AddItemToRegistry(Game.GetFormFromFile(0x034C6A, "Skyrim.esm"), "A premium mead produced by the influential Black-Briar family in Riften.") ; Black-Briar Mead
+  
+  ; Common Ingredients
+  AddItemToRegistry(Game.GetFormFromFile(0x06BC0A, "Skyrim.esm"), "A common cooking ingredient used to season food and preserve meat.") ; Salt Pile
+  AddItemToRegistry(Game.GetFormFromFile(0x06BC0E, "Skyrim.esm"), "A pungent bulb used in cooking to add flavor to various dishes.") ; Garlic
+  AddItemToRegistry(Game.GetFormFromFile(0x06BC10, "Skyrim.esm"), "A grain used for baking bread and brewing alcoholic beverages.") ; Wheat
+  
+  ; Common Crafting Materials
+  AddItemToRegistry(Game.GetFormFromFile(0x05ACE4, "Skyrim.esm"), "A basic metal ingot used for crafting weapons and armor.") ; Iron Ingot
+  AddItemToRegistry(Game.GetFormFromFile(0x05ACE5, "Skyrim.esm"), "A refined metal ingot stronger than iron, used for crafting better weapons and armor.") ; Steel Ingot
+  AddItemToRegistry(Game.GetFormFromFile(0x05ACE3, "Skyrim.esm"), "Tanned animal hide used for crafting light armor and various items.") ; Leather
+  AddItemToRegistry(Game.GetFormFromFile(0x0800E4, "Skyrim.esm"), "Narrow strips of leather used in various crafting recipes.") ; Leather Strips
+  AddItemToRegistry(Game.GetFormFromFile(0x05AD93, "Skyrim.esm"), "Chopped wood used for building and as fuel for fires.") ; Firewood
+  
+  ; Common Soul Gems
+  AddItemToRegistry(Game.GetFormFromFile(0x02E4E2, "Skyrim.esm"), "The smallest soul gem, capable of holding petty souls.") ; Petty Soul Gem
+  AddItemToRegistry(Game.GetFormFromFile(0x02E4E3, "Skyrim.esm"), "A small soul gem capable of holding lesser souls.") ; Lesser Soul Gem
+  AddItemToRegistry(Game.GetFormFromFile(0x02E4E4, "Skyrim.esm"), "A medium-sized soul gem capable of holding common souls.") ; Common Soul Gem
+  AddItemToRegistry(Game.GetFormFromFile(0x02E4E5, "Skyrim.esm"), "A large soul gem capable of holding greater souls.") ; Greater Soul Gem
+  AddItemToRegistry(Game.GetFormFromFile(0x02E4E6, "Skyrim.esm"), "The largest standard soul gem, capable of holding grand souls.") ; Grand Soul Gem
+  
+  ; Common Potions
+  AddItemToRegistry(Game.GetFormFromFile(0x03EADE, "Skyrim.esm"), "A weak potion that restores a small amount of health.") ; Minor Healing Potion
+  AddItemToRegistry(Game.GetFormFromFile(0x03EADF, "Skyrim.esm"), "A weak potion that restores a small amount of magicka.") ; Minor Magicka Potion
+  AddItemToRegistry(Game.GetFormFromFile(0x03EAE0, "Skyrim.esm"), "A weak potion that restores a small amount of stamina.") ; Minor Stamina Potion
+  
+  ; Common Misc Items
+  AddItemToRegistry(Game.GetFormFromFile(0x01D4EC, "Skyrim.esm"), "A tool used to unlock doors and containers without the proper key.") ; Lockpick
+  AddItemToRegistry(Game.GetFormFromFile(0x06851E, "Skyrim.esm"), "A portable light source used to illuminate dark areas.") ; Torch
+  AddItemToRegistry(Game.GetFormFromFile(0x04B0BA, "Skyrim.esm"), "Burnt wood used for drawing and writing.") ; Charcoal
+  AddItemToRegistry(Game.GetFormFromFile(0x04B0BC, "Skyrim.esm"), "A roll of paper used for writing notes and letters.") ; Roll of Paper
+  AddItemToRegistry(Game.GetFormFromFile(0x04B0BD, "Skyrim.esm"), "A container of ink used with quills for writing on paper.") ; Inkwell
+
+  Main.Info("Finished seeding item registry with common items")
+  PersistItemRegistry()
+EndFunction
+
+Function PopulateInventoryEventFilter(Actor akActor)
+  if !akActor || !itemRegistry
+    return
+  EndIf
+  
+  Main.Debug("Adding inventory event filters for " + Main.GetActorName(akActor))
+  
+  ; Add all items from registry as individual filters
+  string[] formIds = JMap.allKeysPArray(itemRegistry)
+  int i = 0
+  int filteredCount = 0
+  
+  while i < formIds.Length
+    int itemData = JMap.getObj(itemRegistry, formIds[i])
+    if itemData != 0
+      Form itemForm = JMap.getForm(itemData, "form")
+      if itemForm
+        akActor.AddInventoryEventFilter(itemForm)
+        filteredCount += 1
+      EndIf
+    EndIf
+    i += 1
+  EndWhile
+  
+  Main.Debug("Added " + filteredCount + " inventory event filters for " + Main.GetActorName(akActor))
+EndFunction
+
+Function RemoveInventoryEventFilters(Actor akActor)
+  if !akActor || !itemRegistry
+    return
+  EndIf
+  
+  Main.Debug("Removing inventory event filters for " + Main.GetActorName(akActor))
+  
+  ; Remove all items from registry as individual filters
+  string[] formIds = JMap.allKeysPArray(itemRegistry)
+  int i = 0
+  
+  while i < formIds.Length
+    int itemData = JMap.getObj(itemRegistry, formIds[i])
+    if itemData != 0
+      Form itemForm = JMap.getForm(itemData, "form")
+      if itemForm
+        akActor.RemoveInventoryEventFilter(itemForm)
+      EndIf
+    EndIf
+    i += 1
+  EndWhile
+EndFunction
+
+Function TrackActorInventory(actor akActor)
+  if !akActor
+    return
+  EndIf
+  
+  string actorName = Main.GetActorName(akActor)
+  if actorName == ""
+    return
+  EndIf
+  
+  ; Get current inventory state
+  int currentInventory = JMap.object()
+  JValue.retain(currentInventory)
+  
+  ; Get all items from registry
+  string[] formIds = JMap.allKeysPArray(itemRegistry)
+  int i = 0
+  while i < formIds.Length
+    int itemData = JMap.getObj(itemRegistry, formIds[i])
+    if itemData != 0
+      Form itemForm = JMap.getForm(itemData, "form")
+      if itemForm
+        int count = akActor.GetItemCount(itemForm)
+        if count > 0
+          JMap.setInt(currentInventory, formIds[i], count)
+        EndIf
+      EndIf
+    EndIf
+    i += 1
+  EndWhile
+  
+  ; Store in tracker
+  JMap.setObj(inventoryTracker, actorName, currentInventory)
+  
+  ; Check if we should update server
+  float currentTime = Utility.GetCurrentRealTime()
+  if currentTime - lastInventoryUpdate >= inventoryUpdateThrottle
+    PersistInventory(akActor)
+    lastInventoryUpdate = currentTime
+  EndIf
+EndFunction
+
+Function PersistInventory(actor akActor)
+  if !akActor || !bHasAIFF
+    return
+  EndIf
+  
+  string actorName = Main.GetActorName(akActor)
+  if actorName == ""
+    Main.Warn("PersistInventory - Actor has no name, cannot persist inventory")
+    return
+  EndIf
+  
+  int currentInventory = JMap.getObj(inventoryTracker, actorName)
+  if !currentInventory
+    Main.Debug("PersistInventory - No inventory data found for " + actorName)
+    return
+  EndIf
+  
+  ; Build inventory string
+  string inventoryData = ""
+  string[] formIds = JMap.allKeysPArray(currentInventory)
+  int i = 0
+  int itemCount = 0
+  
+  Main.Debug("PersistInventory - Building inventory data for " + actorName + " with " + formIds.Length + " items")
+  
+  while i < formIds.Length
+    if inventoryData != ""
+      inventoryData += "~"  ; Use ~ as batch separator since | is reserved
+    EndIf
+    string formId = formIds[i]
+    int count = JMap.getInt(currentInventory, formId)
+    inventoryData += formId + "&" + count
+    
+    ; Get item name for detailed logging if needed
+    if config.logLevel >= 6
+      int itemData = JMap.getObj(itemRegistry, formId)
+      string itemName = "Unknown Item"
+      if itemData != 0
+        itemName = JMap.getStr(itemData, "name")
+        if itemName == ""
+          Form itemForm = JMap.getForm(itemData, "form")
+          if itemForm
+            itemName = itemForm.GetName()
+          EndIf
+        EndIf
+      EndIf
+      MinaiUtil.Trace("  - " + itemName + " (" + formId + "): " + count)
+    EndIf
+    
+    itemCount += 1
+    i += 1
+  EndWhile
+  
+  ; Send to server
+  if inventoryData != ""
+    ; Log message stats before sending
+    Main.Debug("Persisting inventory for " + actorName + " - " + itemCount + " items, data length: " + StringUtil.GetLength(inventoryData) + " chars")
+      ; Set as a single variable if not too long
+      SetActorVariable(akActor, "Inventory", inventoryData)
+  else
+    Main.Debug("PersistInventory - No items to persist for " + actorName)
+    ; Clear any existing inventory data
+    SetActorVariable(akActor, "Inventory", "")
+  EndIf
+EndFunction
+
+Function OnInventoryChanged(actor akActor, Form akBaseItem, int aiItemCount, bool abAdded)
+  if !akActor || !akBaseItem
+    return
+  EndIf
+  
+  ; Get actor name for logging
+  string actorName = Main.GetActorName(akActor)
+  string itemName = akBaseItem.GetName()
+  string formId = minai_Util.FormToHex(akBaseItem)
+  
+  ; Only track if item is in our registry
+  if !JMap.hasKey(itemRegistry, formId)
+    if config.logLevel >= 5  ; Debug level
+      Main.Debug("OnInventoryChanged - Ignoring non-tracked item: " + itemName + " (" + formId + ") for " + actorName)
+    EndIf
+    return
+  EndIf
+  
+  ; Log the inventory change
+  string changeType
+  if abAdded
+    changeType = "added"
+  else
+    changeType = "removed"
+  endif
+  Main.Debug("Inventory " + changeType + " for " + actorName + ": " + aiItemCount + "x " + itemName + " (" + formId + ")")
+  
+  ; Get the current actor inventory map
+  int actorInventory = JMap.getObj(inventoryTracker, actorName)
+  if !actorInventory
+    ; Create new inventory object if none exists
+    actorInventory = JMap.object()
+    JValue.retain(actorInventory)
+    JMap.setObj(inventoryTracker, actorName, actorInventory)
+    Main.Debug("Created new inventory tracking object for " + actorName)
+  EndIf
+  
+  ; Update the specific item count directly
+  int currentCount = JMap.getInt(actorInventory, formId, 0)
+  int newCount = 0
+  
+  if abAdded
+    newCount = currentCount + aiItemCount
+  else
+    newCount = currentCount - aiItemCount
+    if newCount < 0
+      newCount = 0  ; Prevent negative counts
+    EndIf
+  EndIf
+  
+  ; Set the updated count or remove if zero
+  if newCount > 0
+    JMap.setInt(actorInventory, formId, newCount)
+    Main.Debug("Updated " + actorName + " inventory: " + itemName + " count = " + newCount)
+  else
+    JMap.removeKey(actorInventory, formId)
+    Main.Debug("Removed " + itemName + " from " + actorName + " inventory tracking")
+  EndIf
+  
+  ; Check if we should update server based on throttle
+  float currentTime = Utility.GetCurrentRealTime()
+  if currentTime - lastInventoryUpdate >= inventoryUpdateThrottle
+    Main.Debug("Throttle elapsed, persisting inventory for " + actorName)
+    PersistInventory(akActor)
+    lastInventoryUpdate = currentTime
+  elseif config.logLevel >= 5
+    float timeRemaining = inventoryUpdateThrottle - (currentTime - lastInventoryUpdate)
+    Main.Debug("Inventory update throttled - " + timeRemaining + " seconds remaining before next update")
+  EndIf
 EndFunction

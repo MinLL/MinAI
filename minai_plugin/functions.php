@@ -42,7 +42,6 @@ require_once("config.php");
 require_once("util.php");
 require_once("customintegrations.php");
 
-
 if ($GLOBALS["force_voice_type"]) {
     require "fix_xtts.php";
 }
@@ -100,6 +99,7 @@ if (!IsInFaction($GLOBALS["HERIKA_NAME"], "NoActionsFaction")) {
         }
         require "deviousdevices.php";
         require_once("deviousfollower.php");
+        require_once("items_commands.php");
         if ($GLOBALS["always_enable_functions"] && $GLOBALS["HERIKA_NAME"] != "The Narrator" && $GLOBALS["HERIKA_NAME"] != "Narrator" && $GLOBALS["HERIKA_NAME"] != "Player") {
             // Always enable actions for followers (During rechats and such)
             $GLOBALS["FUNCTIONS_ARE_ENABLED"]=true;

@@ -30,6 +30,15 @@ Event OnEffectStart(Actor akTarget, Actor akCaster)
   if fillHerUp
     fillHerUp.RegisterForAnimationEvents(akTarget)
   endif
+  
+  ; Register for inventory events by adding individual filters
+  if aiff && aiff.IsInitialized()
+    aiff.PopulateInventoryEventFilter(akTarget)
+    
+    ; Also do initial inventory tracking to capture current state
+    aiff.TrackActorInventory(akTarget)
+  endif
+  
   ; Do one update for actors the first time we enter a zone. Introduce a little jitter to distribute load.
   int updateTime = 2 + Utility.RandomInt(0, 5)
   RegisterForSingleUpdate(updateTime)
@@ -38,10 +47,17 @@ EndEvent
 
 Event OnEffectFinish(Actor akTarget, Actor akCaster)
   Main.Debug("Context OnEffectFinish( " + Main.GetActorName(akTarget) + ")")
+  
   ; Unregister Fill Her Up animations
   if fillHerUp
     fillHerUp.UnregisterForAnimationEvents(akTarget)
   endif
+  
+  ; Remove inventory event filters
+  if aiff && aiff.IsInitialized()
+    aiff.RemoveInventoryEventFilters(akTarget)
+  endif
+  
   UnregisterForUpdate()
   DisableSelf(akTarget)
 EndEvent
@@ -90,4 +106,24 @@ Event OnUpdate()
     DisableSelf(akTarget)
   EndIf
   Main.Debug("Context OnUpdate(" + targetName +") END")
+EndEvent
+
+Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
+  actor akTarget = GetTargetActor()
+  if !akTarget
+    return
+  EndIf
+  if aiff
+    aiff.OnInventoryChanged(akTarget, akBaseItem, aiItemCount, true)
+  EndIf
+EndEvent
+
+Event OnItemRemoved(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akDestContainer)
+  actor akTarget = GetTargetActor()
+  if !akTarget
+    return
+  EndIf
+  if aiff
+    aiff.OnInventoryChanged(akTarget, akBaseItem, aiItemCount, false)
+  EndIf
 EndEvent

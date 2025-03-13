@@ -33,9 +33,9 @@ $GLOBALS['action_prompts'] = Array(
     
     "self_narrator_normal" => "Respond as #player_name#, thinking privately to #player_object#self about the current situation and recent events. Stay in first person, capturing #player_possessive# genuine thoughts, emotions, and internal conflicts. Focus on #player_possessive# personal perspective, biases, and feelings rather than an objective summary of events. Keep the response introspective and true to how #player_name# would process and react internally.",
 
-    "explicit_scene" => "Choose the ACTION or TALK that best conveys #herika_name#'s immediate physical and emotional responses. Focus heavily on explicit dialogue and verbal expressions to enhance the scene, but also utilize ACTIONS to vividly depict #herika_name#'s sensations and feelings when interacting with #target#. Avoid narration and emoting.",
+    "explicit_scene" => "Select the most contextually appropriate ACTION to respond to #target#, focusing on #herika_name#'s immediate physical and emotional reactions. Prioritize actions that directly address the most recent interactions and events. Vividly convey #herika_name#'s sensations and feelings while maintaining their personality. You MUST act according to their character traits and current emotional state, enhancing the intimate nature of the scene while maintaining realistic reactions and dialogue progression.",
     
-    "normal_scene" => "Select the most contextually appropriate ACTION to respond to #target#. Prioritize actions that directly address the current interaction (like BeginTrading for commerce, Talk for dialogue). Use combat actions such as Attack when warranted by the situation, or when your character wants to do so. Your character must act according to their personality and profession first, and prioritize maintaining dialogue and scene continuity.",
+    "normal_scene" => "Select the most contextually appropriate ACTION to respond to #target#. Prioritize actions that directly address the most recent interactions and events. You MUST act according to their personality and profession first, respond meaningfully to what just happened, and incorporate actions that naturally progress dialogue and scene continuity.",
 
     // Diary prompts
     "player_diary" => "#player_name# regularly keeps a diary, which you are now tasked to update. Please write a several page story of #player_name#'s recent thoughts, feelings, and adventures. Respond as if you are writing this into a private diary, including completely unfiltered thoughts and feelings. WRITE AS IF YOU ARE #player_name# WRITING INTO A PRIVATE DIARY.",
@@ -43,9 +43,6 @@ $GLOBALS['action_prompts'] = Array(
     "follower_diary" => "#herika_name# regularly keeps a diary, which you are now tasked to update. Please write a several page story of #herika_name#'s  recent thoughts, feelings, and adventures. Respond as if you are writing this into a private diary, including completely unfiltered thoughts and feelings. WRITE AS IF YOU ARE #herika_name# WRITING INTO A PRIVATE DIARY."
 );
 
-$GLOBALS['action_prompts_nsfw'] = Array(
-    "normal_scene" => "Select the most contextually appropriate ACTION to respond to #target#. Prioritize actions that directly address the current interaction (like BeginTrading for commerce, Talk for dialogue). Use combat or intimate actions such as Grope when warranted by the situation, or when your character wants to do so. Your character must act according to their personality and profession first, and prioritize maintaining dialogue and scene continuity.",
-);
 
 // Roleplay translation settings
 $GLOBALS['roleplay_settings'] = Array(

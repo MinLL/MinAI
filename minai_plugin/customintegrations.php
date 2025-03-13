@@ -5,7 +5,7 @@
 require_once("util.php");
 require_once(__DIR__.DIRECTORY_SEPARATOR."updateThreadsDB.php");
 require_once(__DIR__.DIRECTORY_SEPARATOR."dungeonmaster.php");
-
+require_once(__DIR__.DIRECTORY_SEPARATOR."items.php");
 
 
 
@@ -238,6 +238,62 @@ function ProcessIntegrations() {
         $MUST_DIE=true;
     }
 
+    // Add handling for minai_storeitem and minai_storeitem_batch
+    if (isset($GLOBALS["gameRequest"]) && ($GLOBALS["gameRequest"][0] == "minai_storeitem" || $GLOBALS["gameRequest"][0] == "minai_storeitem_batch")) {
+        minai_log("info", "Processing " . $GLOBALS["gameRequest"][0] . " event");
+        
+        $data = $GLOBALS["gameRequest"][3];
+        $success = true;
+
+        if ($GLOBALS["gameRequest"][0] == "minai_storeitem_batch") {
+            // Process batched items
+            $items = explode("~", $data);  // Changed from | to ~ as separator
+            foreach ($items as $item) {
+                $itemData = explode("@", $item);
+                if (count($itemData) >= 4) {
+                    $formId = $itemData[0];
+                    $modName = $itemData[1];
+                    $name = $itemData[2];
+                    $formTypeId = $itemData[3];
+                    $description = isset($itemData[4]) ? $itemData[4] : "";
+                    
+                    // Translate form type ID to category
+                    $category = translateFormTypeToCategory($formTypeId);
+                    
+                    if (!AddItem($formId, $modName, $name, $description, true, $category)) {
+                        $success = false;
+                        minai_log("error", "Failed to store item data for " . $formId . " from " . $modName);
+                    }
+                }
+            }
+            minai_log("info", "Processed batch of " . count($items) . " items");
+        } else {
+            // Process single item
+            $itemData = explode("@", $data);
+            if (count($itemData) >= 4) {
+                $formId = $itemData[0];
+                $modName = $itemData[1];
+                $name = $itemData[2];
+                $formTypeId = $itemData[3];
+                $description = isset($itemData[4]) ? $itemData[4] : "";
+                
+                // Translate form type ID to category
+                $category = translateFormTypeToCategory($formTypeId);
+                
+                $success = AddItem($formId, $modName, $name, $description, true, $category);
+            } else {
+                $success = false;
+                minai_log("error", "Invalid item data format");
+            }
+        }
+        
+        if (!$success) {
+            minai_log("error", "One or more items failed to store");
+        }
+        
+        $MUST_DIE=true;
+    }
+
     // Add handling for minai_combatenddefeat
     if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "minai_combatenddefeat") {
         // Store the defeat timestamp
@@ -258,6 +314,43 @@ function ProcessIntegrations() {
     if ($MUST_DIE) {
         minai_log("info", "Done procesing custom request");
         die('X-CUSTOM-CLOSE');
+    }
+}
+
+/**
+ * Translates Skyrim form type ID to a category name for items
+ * 
+ * @param int $formTypeId The numeric form type ID from Skyrim
+ * @return string The corresponding category name
+ */
+function translateFormTypeToCategory($formTypeId) {
+    // Convert string to int if needed
+    $formTypeId = intval($formTypeId);
+    
+    // Form type to category mapping based on Skyrim's form types
+    switch ($formTypeId) {
+        case 26: return "Armor";
+        case 27: return "Book";
+        case 30: return "Ingredient";
+        case 32: return "Misc";
+        case 33: return "Apparatus";
+        case 41: return "Weapon";
+        case 42: return "Ammo";
+        case 45: return "Key";
+        case 46: return "Potion";
+        case 48: return "Note";
+        case 49: return "Constructible";
+        case 52: return "SoulGem";
+        case 23: return "Scroll";
+        case 24: return "Activator";
+        case 28: return "Container";
+        case 29: return "Door";
+        case 31: return "Light";
+        case 34: return "Static";
+        case 39: return "Flora";
+        case 40: return "Furniture";
+        case 43: return "NPC";
+        default: return "Other";
     }
 }
 
@@ -528,4 +621,3 @@ function StoreTattooData($actorName, $tattooData) {
         return false;
     }
 }
-

@@ -24,6 +24,7 @@ minai_EnvironmentalAwareness envAwareness
 minai_Util MinaiUtil  
 Spell minai_ToggleSapienceSpell
 minai_FertilityMode fertility
+minai_ItemCommands itemCommands
 
 bool bHasMantella = False;
 bool bHasAIFF = False;
@@ -102,6 +103,7 @@ Function Maintenance()
   dirtAndBlood = (Self as Quest) as minai_DirtAndBlood
   relationship = (Self as Quest) as minai_Relationship
   envAwareness = (Self as Quest) as minai_EnvironmentalAwareness
+  itemCommands = (Self as Quest) as minai_ItemCommands
   minai_ToggleSapienceSpell = Game.GetFormFromFile(0x0E93, "MinAI.esp") as Spell
   if (!followers)
     Fatal("Could not load followers script - Mismatched script and esp versions")
@@ -129,6 +131,7 @@ Function Maintenance()
   combat.Maintenance(Self)
   sapience.Maintenance(Self)
   reputation.Maintenance(Self)
+  itemCommands.Maintenance(Self)
   
   if bHasMantella
     minMantella.Maintenance(Self)
