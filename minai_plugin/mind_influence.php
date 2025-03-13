@@ -191,8 +191,8 @@ function GetMindInfluenceRequestFormat($state, $promptType = "default") {
 
     // Add request formats for simple states
     $simpleFormats = [
-        "drunk" => "As a subtle undertone, let your response show very mild signs of intoxication.",
-        "high" => "As a subtle undertone, let your response show slight traces of skooma's effects."
+        "drunk" => "As a subtle undertone, let your response show signs of intoxication.",
+        "high" => "As a subtle undertone, let your response show traces of skooma's effects."
     ];
 
     // Return simple formats if in a simple state

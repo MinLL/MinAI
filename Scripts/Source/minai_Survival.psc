@@ -6,6 +6,7 @@ bool bHasBFT = False
 bool bHasCampfire = False
 bool bHasSurvivalMode = False
 bool bHasRequiem = False
+bool bHasGourmet = False
 
 _shweathersystem sunhelmWeather
 _SunHelmMain property sunhelmMain auto
@@ -35,6 +36,33 @@ GlobalVariable property Survival_ExhaustionNeedMaxValue auto
 
 MagicEffect property REQ_Effect_Alcohol auto
 MagicEffect property REQ_Effect_Drug_Skooma01_FX auto
+
+; Gourmet Alcohol Effects
+MagicEffect property MAG_AlcoholDamageMagicka auto
+MagicEffect property MAG_AlcoholDamageStamina auto
+MagicEffect property MAG_AlcoholFortifyMagicka auto
+MagicEffect property MAG_AlcoholFortifyStamina auto
+MagicEffect property MAG_AlcoholUpgradeEffect01 auto
+MagicEffect property MAG_AlcoholUpgradeEffect02 auto
+MagicEffect property MAG_AlcoholUpgradePerkEffect01 auto
+MagicEffect property MAG_AlcoholUpgradePerkEffect02 auto
+
+; Gourmet Drug Effects
+MagicEffect property MAG_DrugsAddictionEffect auto
+MagicEffect property MAG_DrugsDamageHealth auto
+MagicEffect property MAG_DrugsDamageMagicka auto
+MagicEffect property MAG_DrugsDamageStamina auto
+MagicEffect property MAG_DrugsFortifyHealth auto
+MagicEffect property MAG_DrugsFortifyHealthAlt auto
+MagicEffect property MAG_DrugsFortifyHealthRegen auto
+MagicEffect property MAG_DrugsFortifyMagicka auto
+MagicEffect property MAG_DrugsFortifyMagickaRegen auto
+MagicEffect property MAG_DrugsFortifyStamina auto
+MagicEffect property MAG_DrugsFortifyStaminaRegen auto
+MagicEffect property MAG_DrugsVisualEffectEversnow auto
+MagicEffect property MAG_DrugsVisualEffectSkooma auto
+MagicEffect property MAG_DrugsVisualEffectSkoomaRed auto
+MagicEffect property MAG_DrugsVisualEffectSleepingTreeSap auto
 
 function Maintenance(minai_MainQuestController _main)
   playerRef = Game.GetPlayer()
@@ -132,7 +160,50 @@ function Maintenance(minai_MainQuestController _main)
     EndIf
   EndIf
 
+  ; Load Gourmet effects
+  if Game.GetModByName("Gourmet.esp") != 255
+    bHasGourmet = True
+    Main.Info("Found Gourmet")
+    
+    ; Load alcohol effects
+    MAG_AlcoholDamageMagicka = Game.GetFormFromFile(0x01B806, "Gourmet.esp") as MagicEffect
+    MAG_AlcoholDamageStamina = Game.GetFormFromFile(0x01B803, "Gourmet.esp") as MagicEffect
+    MAG_AlcoholFortifyMagicka = Game.GetFormFromFile(0x01B804, "Gourmet.esp") as MagicEffect
+    MAG_AlcoholFortifyStamina = Game.GetFormFromFile(0x01B805, "Gourmet.esp") as MagicEffect
+    MAG_AlcoholUpgradeEffect01 = Game.GetFormFromFile(0x01B927, "Gourmet.esp") as MagicEffect
+    MAG_AlcoholUpgradeEffect02 = Game.GetFormFromFile(0x01B928, "Gourmet.esp") as MagicEffect
+    MAG_AlcoholUpgradePerkEffect01 = Game.GetFormFromFile(0x01B925, "Gourmet.esp") as MagicEffect
+    MAG_AlcoholUpgradePerkEffect02 = Game.GetFormFromFile(0x01B926, "Gourmet.esp") as MagicEffect
+    
+    ; Load drug effects
+    MAG_DrugsAddictionEffect = Game.GetFormFromFile(0x01B95F, "Gourmet.esp") as MagicEffect
+    MAG_DrugsDamageHealth = Game.GetFormFromFile(0x01B93F, "Gourmet.esp") as MagicEffect
+    MAG_DrugsDamageMagicka = Game.GetFormFromFile(0x01B823, "Gourmet.esp") as MagicEffect
+    MAG_DrugsDamageStamina = Game.GetFormFromFile(0x01B824, "Gourmet.esp") as MagicEffect
+    MAG_DrugsFortifyHealth = Game.GetFormFromFile(0x01B82E, "Gourmet.esp") as MagicEffect
+    MAG_DrugsFortifyHealthAlt = Game.GetFormFromFile(0x01B942, "Gourmet.esp") as MagicEffect
+    MAG_DrugsFortifyHealthRegen = Game.GetFormFromFile(0x01B941, "Gourmet.esp") as MagicEffect
+    MAG_DrugsFortifyMagicka = Game.GetFormFromFile(0x01B825, "Gourmet.esp") as MagicEffect
+    MAG_DrugsFortifyMagickaRegen = Game.GetFormFromFile(0x01B940, "Gourmet.esp") as MagicEffect
+    MAG_DrugsFortifyStamina = Game.GetFormFromFile(0x01B826, "Gourmet.esp") as MagicEffect
+    MAG_DrugsFortifyStaminaRegen = Game.GetFormFromFile(0x01B93E, "Gourmet.esp") as MagicEffect
+    MAG_DrugsVisualEffectEversnow = Game.GetFormFromFile(0x01B973, "Gourmet.esp") as MagicEffect
+    MAG_DrugsVisualEffectSkooma = Game.GetFormFromFile(0x01B827, "Gourmet.esp") as MagicEffect
+    MAG_DrugsVisualEffectSkoomaRed = Game.GetFormFromFile(0x01B82D, "Gourmet.esp") as MagicEffect
+    MAG_DrugsVisualEffectSleepingTreeSap = Game.GetFormFromFile(0x0E3CBB, "Gourmet.esp") as MagicEffect
+
+    ; Verify all effects loaded correctly
+    if !MAG_AlcoholDamageMagicka || !MAG_AlcoholDamageStamina || !MAG_AlcoholFortifyMagicka || !MAG_AlcoholFortifyStamina || \
+       !MAG_DrugsAddictionEffect || !MAG_DrugsDamageHealth || !MAG_DrugsDamageMagicka || !MAG_DrugsDamageStamina || \
+       !MAG_DrugsFortifyHealth || !MAG_DrugsFortifyHealthAlt || !MAG_DrugsFortifyHealthRegen || !MAG_DrugsFortifyMagicka || \
+       !MAG_DrugsFortifyStaminaRegen || !MAG_DrugsVisualEffectEversnow || !MAG_DrugsVisualEffectSkooma || !MAG_DrugsVisualEffectSkoomaRed
+      Main.Error("Could not load all Gourmet effects - Drug/Alcohol state tracking will be disabled")
+      bHasGourmet = False
+    EndIf
+  EndIf
+
   aiff.SetModAvailable("Requiem", bHasRequiem)
+  aiff.SetModAvailable("Gourmet", bHasGourmet)
 EndFunction
 
 
@@ -381,6 +452,48 @@ Function SetContext(actor akTarget)
       EndIf
       if REQ_Effect_Drug_Skooma01_FX
         aiff.SetActorVariable(playerRef, "isOnSkooma", playerRef.HasMagicEffect(REQ_Effect_Drug_Skooma01_FX))
+      EndIf
+    EndIf
+    
+    ; Track Gourmet effects if mod is present
+    if bHasGourmet
+      ; Track alcohol effects and set isDrunk if any alcohol effect is active
+      bool hasAnyAlcoholEffect = playerRef.HasMagicEffect(MAG_AlcoholDamageMagicka) || \
+                                playerRef.HasMagicEffect(MAG_AlcoholDamageStamina) || \
+                                playerRef.HasMagicEffect(MAG_AlcoholFortifyMagicka) || \
+                                playerRef.HasMagicEffect(MAG_AlcoholFortifyStamina) || \
+                                playerRef.HasMagicEffect(MAG_AlcoholUpgradeEffect01) || \
+                                playerRef.HasMagicEffect(MAG_AlcoholUpgradeEffect02) || \
+                                playerRef.HasMagicEffect(MAG_AlcoholUpgradePerkEffect01) || \
+                                playerRef.HasMagicEffect(MAG_AlcoholUpgradePerkEffect02)
+      
+      if hasAnyAlcoholEffect
+        aiff.SetActorVariable(playerRef, "isDrunk", true)
+      ElseIf !bHasRequiem 
+        aiff.SetActorVariable(playerRef, "isDrunk", false)
+      EndIf
+      
+      ; Track drug effects and set isOnSkooma if any drug effect is active
+      bool hasAnyDrugEffect = playerRef.HasMagicEffect(MAG_DrugsAddictionEffect) || \
+                             playerRef.HasMagicEffect(MAG_DrugsDamageHealth) || \
+                             playerRef.HasMagicEffect(MAG_DrugsDamageMagicka) || \
+                             playerRef.HasMagicEffect(MAG_DrugsDamageStamina) || \
+                             playerRef.HasMagicEffect(MAG_DrugsFortifyHealth) || \
+                             playerRef.HasMagicEffect(MAG_DrugsFortifyHealthAlt) || \
+                             playerRef.HasMagicEffect(MAG_DrugsFortifyHealthRegen) || \
+                             playerRef.HasMagicEffect(MAG_DrugsFortifyMagicka) || \
+                             playerRef.HasMagicEffect(MAG_DrugsFortifyMagickaRegen) || \
+                             playerRef.HasMagicEffect(MAG_DrugsFortifyStamina) || \
+                             playerRef.HasMagicEffect(MAG_DrugsFortifyStaminaRegen) || \
+                             playerRef.HasMagicEffect(MAG_DrugsVisualEffectEversnow) || \
+                             playerRef.HasMagicEffect(MAG_DrugsVisualEffectSkooma) || \
+                             playerRef.HasMagicEffect(MAG_DrugsVisualEffectSkoomaRed) || \
+                             playerRef.HasMagicEffect(MAG_DrugsVisualEffectSleepingTreeSap)
+      
+      if hasAnyDrugEffect
+        aiff.SetActorVariable(playerRef, "isOnSkooma", true)
+      ElseIf !bHasRequiem 
+        aiff.SetActorVariable(playerRef, "isOnSkooma", false)
       EndIf
     EndIf
     

@@ -57,6 +57,18 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
 * Players can now request food (A full sunhelm meal) to be served to them by servers or innkeepers.
 * The AI will be aware of the player's general hunger, thirst, and fatigue levels.
 
+### Gourmet
+* NPCs are aware of the player's intoxication state from alcohol consumption
+* NPCs can detect various alcohol effects including damage/fortify effects on magicka and stamina
+* NPCs are aware of drug effects including Skooma, Eversnow, and Sleeping Tree Sap
+* Tracks both beneficial and harmful effects from substances
+* Integrates with visual effects to enhance roleplay around substance use
+
+### Requiem
+* NPCs can detect alcohol intoxication from Requiem's effects
+* NPCs are aware of Skooma usage through Requiem's drug system
+* Seamlessly integrates with Gourmet's effects when both mods are present
+
 ### Dirt And Blood
 * The AI will be aware of the player's personal cleanliness, and to what degree they are covered in blood. Does not include clothing.
 * The NPCs are aware of their own dirtiness, though calibrated for the norms of Skyrim where clean people are nobles and elites.
