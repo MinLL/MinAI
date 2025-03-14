@@ -33,7 +33,7 @@ int Function GetGender(Actor akActor)
     endif
   endif
   if bHasTNG
-    if akActor.GetActorBase().GetSex() != 0 && !akActor.HasKeyword(TNG_Gentlewoman)
+    if skyrimSex != 0 && !akActor.HasKeyword(TNG_Gentlewoman)
       return 1 ; Female
     else
       return 0 ; Male
