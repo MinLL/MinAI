@@ -16,10 +16,6 @@ minai_CombatManager combat
 ; Per-actor mutex for SetContext
 int Property contextMutexMap Auto  ; JMap of actor names to mutex states
 
-; Items registry for LLM context
-int Property itemRegistry Auto  ; JMap of form IDs to item data
-int Property itemBatchSize = 50 Auto  ; How many items to send in one batch
-
 minai_FertilityMode fertility
 GlobalVariable minai_DynamicSapienceToggleStealth
 bool bHasAIFF = False
@@ -38,20 +34,35 @@ Spell ContextSpell
 GlobalVariable minai_SapienceEnabled
 int Property actionRegistry Auto
 int sapientActors = 0
-
+bool inventoryMutex
 bool bHasFollowPlayer = False
 Package FollowPlayerPackage
 Faction FollowingPlayerFaction
 
+int property inventoryTracker auto hidden
+
+; Update throttling
+int property updateTracker auto hidden
+
+float property inventoryUpdateThrottle = 5.0 auto hidden
+
+; Property for inventory burst tracking
+int property inventoryBurstTracker auto hidden
+
+; How many inventory events in a short window before throttling
+int property inventoryEventThreshold = 10 auto hidden
+
+; Time window in seconds for burst detection
+float property inventoryBurstWindow = 1.0 auto hidden
+
+; Whether to use inventory burst protection
+bool property useInventoryBurstProtection = true auto hidden
+
+; Maximum number of items to send in a single batch
+int property maxInventoryBatchSize = 30 auto hidden
+
 ; Add new property to track last dialogue time for actors
 int Property lastDialogueTimes Auto  ; JMap of actor names to timestamps
-
-; Add new property for update tracking
-int Property updateTracker Auto  ; JMap for tracking last update times
-
-; Add inventory tracking properties
-int Property inventoryTracker Auto  ; JMap for tracking actor inventories
-float Property inventoryUpdateThrottle = 1.0 Auto  ; Default minimum seconds between inventory updates
 
 Function InitFollow()
   bHasFollowPlayer = False
@@ -70,6 +81,7 @@ Function InitFollow()
 EndFunction
 
 Function Maintenance(minai_MainQuestController _main)
+  inventoryMutex = False
   if (main.GetVersion() != main.CurrentVersion)
     Main.Info("CHIM - Maintenance: Version update detected. Resetting action registry.")
     ResetActionRegistry()
@@ -82,14 +94,6 @@ Function Maintenance(minai_MainQuestController _main)
   contextMutexMap = JMap.object()
   JValue.retain(contextMutexMap)
 
-  ; Initialize item registry
-  if itemRegistry == 0
-    Main.Info("Initializing item registry")
-    itemRegistry = JMap.object()
-    JValue.retain(itemRegistry)
-    SeedCommonItems()
-  endif
-
   ; Initialize inventory tracking
   if inventoryTracker == 0
     Main.Info("Initializing inventory tracker")
@@ -97,12 +101,38 @@ Function Maintenance(minai_MainQuestController _main)
     JValue.retain(inventoryTracker)
   endif
 
-  ; Initialize update tracker
-  if updateTracker != 0
-    JValue.Release(updateTracker)
+  ; Initialize inventory burst tracker
+  if inventoryBurstTracker
+    JValue.release(inventoryBurstTracker)
+    inventoryBurstTracker = 0
+  EndIf
+  if inventoryBurstTracker == 0
+    Main.Info("Initializing inventory burst tracker")
+    inventoryBurstTracker = JMap.object()
+    JValue.retain(inventoryBurstTracker)
   endif
-  updateTracker = JMap.object()
-  JValue.retain(updateTracker)
+  ; Initialize update tracker
+  if updateTracker
+    JValue.release(updateTracker)
+    updateTracker = 0
+  EndIf
+  if updateTracker == 0
+    updateTracker = JMap.object()
+    JValue.retain(updateTracker)
+  EndIf
+  ; Set default throttle parameters
+  if inventoryUpdateThrottle <= 0
+    inventoryUpdateThrottle = 5.0  ; Default 5 second throttle
+  EndIf
+  
+  ; Set default burst parameters if not already set
+  if inventoryEventThreshold <= 0
+    inventoryEventThreshold = 10   ; Default 10 events threshold
+  EndIf
+  
+  if inventoryBurstWindow <= 0
+    inventoryBurstWindow = 1.0     ; Default 1 second window
+  EndIf
   
   main = _main
   config = Game.GetFormFromFile(0x0912, "MinAI.esp") as minai_Config
@@ -152,7 +182,7 @@ Function Maintenance(minai_MainQuestController _main)
   if (Game.GetModByName("MinAI_AIFF.esp") != 255)
     Main.Fatal("You are are running an old version of the beta with min_AIFF.esp. This file is no longer required. Delete this file.")
   EndIf
-
+  
   vibratorCommands = new String[10]
   vibratorCommands[0] = "ExtCmdTeaseWithVibratorVeryWeak"
   vibratorCommands[1] = "ExtCmdTeaseWithVibratorWeak"
@@ -179,6 +209,8 @@ Function Maintenance(minai_MainQuestController _main)
   if config.preserveQueue
     EnablePreserveQueue()
   EndIf
+  
+  Main.Info("MinAI AIFF Maintenance complete - Inventory tracking initialized")
 EndFunction
 
 
@@ -215,6 +247,7 @@ Function CleanupStates()
         ; Actor is not present, clean up their inventory data
         int inventory = JMap.getObj(inventoryTracker, actorNames[i])
         if inventory
+          ; Release inventory object
           JValue.release(inventory)
         EndIf
         JMap.removeKey(inventoryTracker, actorNames[i])
@@ -222,6 +255,19 @@ Function CleanupStates()
         ; Also clean up update tracking data
         string invUpdateKey = actorNames[i] + "_invUpdate"
         JMap.removeKey(updateTracker, invUpdateKey)
+        string invThrottleKey = actorNames[i] + "_invThrottle"
+        JMap.removeKey(updateTracker, invThrottleKey)
+        string invNeedScanKey = actorNames[i] + "_needScan"
+        JMap.removeKey(updateTracker, invNeedScanKey)
+        
+        ; Clean up burst tracker data
+        if inventoryBurstTracker && JMap.hasKey(inventoryBurstTracker, actorNames[i])
+          int burstData = JMap.getObj(inventoryBurstTracker, actorNames[i])
+          if burstData
+            JValue.release(burstData)
+          endif
+          JMap.removeKey(inventoryBurstTracker, actorNames[i])
+        endif
         
         removedCount += 1
       EndIf
@@ -325,13 +371,13 @@ EndFunction
 
 Function SetContext(actor akTarget)
   if !akTarget
-    Main.Warn("CHIM - SetContext() called with none target")
+    Main.Warn("CHIM SetContext - Target is None")
     return
   EndIf
   if (!IsInitialized())
-    Main.Warn("SetContext(" + akTarget + ") - Still Initializing.")
+    Main.Warn("CHIM SetContext(" + akTarget + ") - Still Initializing.")
     return
-  EndIf  
+  EndIf
 
   ; Initialize mutex map if needed
   if !contextMutexMap
@@ -341,6 +387,10 @@ Function SetContext(actor akTarget)
 
   ; Get actor name for mutex tracking
   string actorName = Main.GetActorName(akTarget)
+  if actorName == ""
+    Main.Warn("CHIM SetContext - Actor has no name")
+    return
+  EndIf
   
   ; Add trace logging for player
   if akTarget == player && config.logLevel >= 4
@@ -350,8 +400,8 @@ Function SetContext(actor akTarget)
     MinaiUtil.Debug("- sapientActors: " + JMap.count(sapientActors) + " entries")
     MinaiUtil.Debug("- lastDialogueTimes: " + JMap.count(lastDialogueTimes) + " entries")
     MinaiUtil.Debug("- updateTracker: " + JMap.count(updateTracker) + " entries")
-    MinaiUtil.Debug("- itemRegistry: " + JMap.count(itemRegistry) + " entries")
     MinaiUtil.Debug("- inventoryTracker: " + JMap.count(inventoryTracker) + " entries")
+    MinaiUtil.Debug("- inventoryBurstTracker: " + JMap.count(inventoryBurstTracker) + " entries")
   EndIf
   
   ; Check if this actor's context is already being set
@@ -359,7 +409,7 @@ Function SetContext(actor akTarget)
     Main.Warn("CHIM - SetContext(" + actorName + ") - Already setting context for this actor, skipping")
     return
   EndIf
-
+  
   ; Set mutex for this actor
   JMap.setInt(contextMutexMap, actorName, 1)
   
@@ -388,6 +438,7 @@ Function SetContext(actor akTarget)
   arousal.SetContext(akTarget)
   envAwareness.SetContext(akTarget)
   combat.SetContext(akTarget)
+  PersistInventory(akTarget)
   
   ; Update medium-frequency states
   if !JMap.hasKey(updateTracker, actorKey + "_med") || (currentGameTime - JMap.getFlt(updateTracker, actorKey + "_med")) * 24 * 3600 >= config.mediumFrequencyUpdateInterval
@@ -400,7 +451,6 @@ Function SetContext(actor akTarget)
   ; Update low-frequency states
   if !JMap.hasKey(updateTracker, actorKey + "_low") || (currentGameTime - JMap.getFlt(updateTracker, actorKey + "_low")) * 24 * 3600 >= config.lowFrequencyUpdateInterval
     Main.Debug("CHIM - SetContext(" + actorName + ") - Setting low-frequency states")
-    TrackActorInventory(akTarget)
     devious.SetContext(akTarget)
     reputation.SetContext(akTarget)
     dirtAndBlood.SetContext(akTarget)
@@ -409,14 +459,13 @@ Function SetContext(actor akTarget)
     sex.SetContext(akTarget)
     StoreKeywords(akTarget)
     StoreFactions(akTarget)
-    TrackActorInventory(akTarget)
     JMap.setFlt(updateTracker, actorKey + "_low", currentGameTime)
   endif
 
   if config.disableAIAnimations && akTarget != player
     SetAnimationBusy(1, Main.GetActorName(akTarget))
   EndIf
-
+  
   ; Release mutex for this actor
   JMap.setInt(contextMutexMap, actorName, 0)
   
@@ -597,9 +646,55 @@ Event OnUpdate()
   SetContext(player)
   UpdateActions()
   
+  ; Check for actors that need a full inventory scan due to throttling
+  CheckThrottledActors()
+  
   ; Use the base update interval
   RegisterForSingleUpdate(config.highFrequencyUpdateInterval)
 EndEvent
+
+; Function to check for actors that need a full inventory scan due to throttling
+Function CheckThrottledActors()
+  if !updateTracker || !inventoryBurstTracker
+    Main.Warn("CHIM CheckThrottledActors - updateTracker or inventoryBurstTracker is None")
+    return
+  EndIf
+  
+  ; Get all keys from updateTracker that end with "_needScan"
+  string[] keys = JMap.allKeysPArray(updateTracker)
+  int i = 0
+  int processedCount = 0
+  
+  while i < keys.Length
+    string actorKey = keys[i]
+    if StringUtil.Find(actorKey, "_needScan") > 0
+      ; Extract actor name from key (remove "_needScan")
+      string actorName = StringUtil.Substring(actorKey, 0, StringUtil.Find(actorKey, "_needScan"))
+      int needScan = JMap.getInt(updateTracker, actorKey)
+      
+      ; Check if this actor needs a scan
+      if needScan == 1
+        ; Find the actor by name
+        Actor foundActor = AIGetAgentByName(actorName)
+        if foundActor
+          Main.Info("Processing throttled actor scan for " + actorName)
+          TrackActorInventory(foundActor)
+          processedCount += 1
+        else
+          ; Actor not found, just remove the flag
+          JMap.setInt(updateTracker, actorKey, 0)
+          Main.Debug("Removed scan flag for absent actor " + actorName)
+        EndIf
+      EndIf
+    EndIf
+    
+    i += 1
+  endwhile
+  
+  if processedCount > 0
+    Main.Info("Processed full inventory scans for " + processedCount + " throttled actors")
+  EndIf
+EndFunction
 
 bool Function HasAIFF()
   return bHasAIFF
@@ -1163,328 +1258,7 @@ Function AIStopRecording(int keyCode)
     EndIf
 EndFunction
 
-Function PersistItemRegistry(bool useBatching = true)
-  if (!IsInitialized() || !bHasAIFF)
-    Main.Info("PersistItemRegistry() - Not initialized or AIFF not available.")
-    return
-  EndIf
-
-  string[] formIds = JMap.allKeysPArray(itemRegistry)
-  int i = 0
-  int batchCount = 0
-  string batchData = ""
-
-  while i < formIds.Length
-    int itemData = JMap.getObj(itemRegistry, formIds[i])
-    if itemData != 0
-      string modName = JMap.getStr(itemData, "modName")
-      string formId = formIds[i]
-      string itemName = JMap.getStr(itemData, "name")
-      int formTypeId = JMap.getInt(itemData, "formTypeId")
-      string description = JMap.getStr(itemData, "description")
-      
-      ; If no name is stored, try to get it from the form
-      if itemName == ""
-        Form itemForm = JMap.getForm(itemData, "form")
-        if itemForm
-          itemName = itemForm.GetName()
-          ; Store name for future use
-          if itemName != ""
-            JMap.setStr(itemData, "name", itemName)
-          EndIf
-        EndIf
-      EndIf
-
-      if useBatching
-        ; Add to batch
-        if batchData != ""
-          batchData += "~"  ; Use ~ as batch separator since | is reserved
-        EndIf
-        batchData += formId + "@" + modName + "@" + itemName + "@" + formTypeId + "@" + description
-
-        batchCount += 1
-        ; Send batch if we hit batch size or this is the last item
-        if batchCount >= itemBatchSize || i == formIds.Length - 1
-          AILogMessage(batchData, "minai_storeitem_batch")
-          batchData = ""
-          batchCount = 0
-        EndIf
-      else
-        ; Send individually
-        AILogMessage(formId + "@" + modName + "@" + itemName + "@" + formTypeId + "@" + description, "minai_storeitem")
-      EndIf
-    EndIf
-    i += 1
-  EndWhile
-EndFunction
-
-Function AddItemToRegistry(Form akForm, string description = "")
-  if (!IsInitialized())
-    Main.Info("AddItemToRegistry() - Not initialized.")
-    return
-  EndIf
-
-  if !akForm
-    Main.Warn("AddItemToRegistry() - Form is None")
-    return
-  EndIf
-
-  ; Get form info using MinaiUtil functions
-  string formId = minai_Util.FormToHex(akForm)
-  string modName = minai_Util.FormToModName(akForm)
-  int formTypeId = akForm.GetType()
-  
-  ; Use the form's actual name
-  string itemName = akForm.GetName()
-
-  ; Create or get existing item data
-  int itemData = JMap.getObj(itemRegistry, formId)
-  if itemData == 0
-    itemData = JMap.object()
-    JValue.retain(itemData)
-  EndIf
-
-  ; Update item data
-  JMap.setStr(itemData, "modName", modName)
-  JMap.setInt(itemData, "formTypeId", formTypeId)
-  JMap.setForm(itemData, "form", akForm)
-  JMap.setStr(itemData, "name", itemName)
-  
-  ; Store the description if provided
-  if description != ""
-    JMap.setStr(itemData, "description", description)
-  EndIf
-  
-  JMap.setObj(itemRegistry, formId, itemData)
-
-  Main.Info("Added/Updated item in registry: " + formId + " from " + modName + " (type: " + formTypeId + ", name: " + itemName + ")")
-EndFunction
-
-Function SetItemBatchSize(int size)
-  if size < 1
-    size = 1
-  EndIf
-  itemBatchSize = size
-  Main.Debug("Set item batch size to " + size)
-EndFunction
-
-Function RemoveItemFromRegistry(string formId)
-  if (!IsInitialized())
-    Main.Info("RemoveItemFromRegistry() - Not initialized.")
-    return
-  EndIf
-
-  int itemData = JMap.getObj(itemRegistry, formId)
-  if itemData != 0
-    JValue.release(itemData)
-    JMap.removeKey(itemRegistry, formId)
-    Main.Debug("Removed item from registry: " + formId)
-  EndIf
-EndFunction
-
-Function ClearItemRegistry()
-  if (!IsInitialized())
-    Main.Info("ClearItemRegistry() - Not initialized.")
-    return
-  EndIf
-
-  string[] formIds = JMap.allKeysPArray(itemRegistry)
-  int i = 0
-  while i < formIds.Length
-    RemoveItemFromRegistry(formIds[i])
-    i += 1
-  endwhile
-
-  Main.Debug("Cleared item registry")
-EndFunction
-
-int Function GetItemFromPartialID(string partialFormId, string modName = "")
-  ; Convert partial form ID to full form ID
-  string fullFormId = GetFullFormID(partialFormId, modName)
-  if !fullFormId
-    Main.Warn("GetItemFromPartialID() - Failed to generate full form ID from " + partialFormId + " and " + modName)
-    return 0
-  EndIf
-  
-  ; Get the item data from registry
-  return JMap.getObj(itemRegistry, fullFormId)
-EndFunction
-
-string Function GetFullFormID(string partialFormId, string modName = "")
-  ; Validate input format (0x123456)
-  if !partialFormId || StringUtil.GetLength(partialFormId) != 8 || StringUtil.Find(partialFormId, "0x") != 0
-    Main.Warn("GetFullFormID() - Invalid partial form ID format: " + partialFormId)
-    return ""
-  EndIf
-
-  ; Get just the 6-digit ID portion
-  string sixDigitId = StringUtil.Substring(partialFormId, 2, 6)
-  
-  ; Variables to track best match when no mod name specified
-  string bestMatch = ""
-  int highestModIndex = -1
-  bool multipleMatches = false
-  
-  ; Iterate through registry to find matching item(s)
-  string[] formIds = JMap.allKeysPArray(itemRegistry)
-  int i = 0
-  while i < formIds.Length
-    int itemData = JMap.getObj(itemRegistry, formIds[i])
-    if itemData != 0
-      ; Check if form ID ends with our 6 digits
-      if StringUtil.Find(formIds[i], sixDigitId) != -1
-        if modName != "" ; If mod name specified, must match exactly
-          string storedModName = JMap.getStr(itemData, "modName")
-          if storedModName == modName
-            return formIds[i]
-          EndIf
-        else ; No mod name specified, track highest mod index match
-          string storedModName = JMap.getStr(itemData, "modName")
-          int currentModIndex = Game.GetModByName(storedModName)
-          if currentModIndex > highestModIndex
-            if bestMatch != ""
-              multipleMatches = true
-            EndIf
-            bestMatch = formIds[i]
-            highestModIndex = currentModIndex
-          EndIf
-        EndIf
-      EndIf
-    EndIf
-    i += 1
-  EndWhile
-  
-  ; If no mod name specified and we found matches, log and return best match
-  if modName == "" && bestMatch != ""
-    if multipleMatches
-      Main.Info("GetFullFormID() - Multiple matches found for " + partialFormId + ", using match from highest mod index")
-    EndIf
-    return bestMatch
-  EndIf
-  
-  String debugMsg = "GetFullFormID() - No matching item found for " + partialFormId
-  if modName != ""
-    debugMsg += " in mod " + modName
-  EndIf
-  Main.Debug(debugMsg)
-  return ""
-EndFunction
-
-; Proof of concept. Will add a proper system for this later.
-Function SeedCommonItems()
-  if (!IsInitialized())
-    Main.Info("SeedCommonItems() - Not initialized.")
-    return
-  EndIf
-
-  Main.Info("Seeding item registry with common Skyrim items...")
-
-  ; Currency
-  AddItemToRegistry(Game.GetFormFromFile(0x00000F, "Skyrim.esm"), "The currency of Skyrim, used for trading goods and services.") ; Gold/Septim
-
-  ; Common Food
-  AddItemToRegistry(Game.GetFormFromFile(0x064B31, "Skyrim.esm"), "A crisp, sweet fruit commonly grown in orchards throughout Skyrim.") ; Apple
-  AddItemToRegistry(Game.GetFormFromFile(0x064B33, "Skyrim.esm"), "A staple food item found in nearly every household in Skyrim.") ; Bread
-  AddItemToRegistry(Game.GetFormFromFile(0x064B34, "Skyrim.esm"), "An orange root vegetable often used in soups and stews.") ; Carrot
-  AddItemToRegistry(Game.GetFormFromFile(0x064B35, "Skyrim.esm"), "A large wheel of cheese that can be cut into wedges.") ; Cheese Wheel
-  AddItemToRegistry(Game.GetFormFromFile(0x064B36, "Skyrim.esm"), "A wedge cut from a larger wheel of cheese.") ; Cheese Wedge
-  AddItemToRegistry(Game.GetFormFromFile(0x064B38, "Skyrim.esm"), "A starchy tuber vegetable commonly used in cooking.") ; Potato
-  AddItemToRegistry(Game.GetFormFromFile(0x064B39, "Skyrim.esm"), "A red, juicy fruit used in various recipes.") ; Tomato
-  AddItemToRegistry(Game.GetFormFromFile(0x064B3A, "Skyrim.esm"), "A sugary dessert treat prized throughout Skyrim.") ; Sweet Roll
-  AddItemToRegistry(Game.GetFormFromFile(0x064B3D, "Skyrim.esm"), "A leafy green vegetable that can be eaten raw or cooked.") ; Cabbage
-  AddItemToRegistry(Game.GetFormFromFile(0x064B3F, "Skyrim.esm"), "A slender vegetable with a mild onion-like flavor.") ; Leek
-  
-  ; Common Drinks
-  AddItemToRegistry(Game.GetFormFromFile(0x034C5E, "Skyrim.esm"), "A refined wine made from grapes grown in the higher elevations of Skyrim.") ; Alto Wine
-  AddItemToRegistry(Game.GetFormFromFile(0x034C5F, "Skyrim.esm"), "A common alcoholic beverage made from fermented grapes.") ; Wine
-  AddItemToRegistry(Game.GetFormFromFile(0x034C60, "Skyrim.esm"), "A traditional Nordic alcoholic beverage made from fermented honey.") ; Nord Mead
-  AddItemToRegistry(Game.GetFormFromFile(0x034C61, "Skyrim.esm"), "A popular alcoholic beverage made from fermented grains.") ; Beer
-  AddItemToRegistry(Game.GetFormFromFile(0x034C6A, "Skyrim.esm"), "A premium mead produced by the influential Black-Briar family in Riften.") ; Black-Briar Mead
-  
-  ; Common Ingredients
-  AddItemToRegistry(Game.GetFormFromFile(0x06BC0A, "Skyrim.esm"), "A common cooking ingredient used to season food and preserve meat.") ; Salt Pile
-  AddItemToRegistry(Game.GetFormFromFile(0x06BC0E, "Skyrim.esm"), "A pungent bulb used in cooking to add flavor to various dishes.") ; Garlic
-  AddItemToRegistry(Game.GetFormFromFile(0x06BC10, "Skyrim.esm"), "A grain used for baking bread and brewing alcoholic beverages.") ; Wheat
-  
-  ; Common Crafting Materials
-  AddItemToRegistry(Game.GetFormFromFile(0x05ACE4, "Skyrim.esm"), "A basic metal ingot used for crafting weapons and armor.") ; Iron Ingot
-  AddItemToRegistry(Game.GetFormFromFile(0x05ACE5, "Skyrim.esm"), "A refined metal ingot stronger than iron, used for crafting better weapons and armor.") ; Steel Ingot
-  AddItemToRegistry(Game.GetFormFromFile(0x05ACE3, "Skyrim.esm"), "Tanned animal hide used for crafting light armor and various items.") ; Leather
-  AddItemToRegistry(Game.GetFormFromFile(0x0800E4, "Skyrim.esm"), "Narrow strips of leather used in various crafting recipes.") ; Leather Strips
-  AddItemToRegistry(Game.GetFormFromFile(0x05AD93, "Skyrim.esm"), "Chopped wood used for building and as fuel for fires.") ; Firewood
-  
-  ; Common Soul Gems
-  AddItemToRegistry(Game.GetFormFromFile(0x02E4E2, "Skyrim.esm"), "The smallest soul gem, capable of holding petty souls.") ; Petty Soul Gem
-  AddItemToRegistry(Game.GetFormFromFile(0x02E4E3, "Skyrim.esm"), "A small soul gem capable of holding lesser souls.") ; Lesser Soul Gem
-  AddItemToRegistry(Game.GetFormFromFile(0x02E4E4, "Skyrim.esm"), "A medium-sized soul gem capable of holding common souls.") ; Common Soul Gem
-  AddItemToRegistry(Game.GetFormFromFile(0x02E4E5, "Skyrim.esm"), "A large soul gem capable of holding greater souls.") ; Greater Soul Gem
-  AddItemToRegistry(Game.GetFormFromFile(0x02E4E6, "Skyrim.esm"), "The largest standard soul gem, capable of holding grand souls.") ; Grand Soul Gem
-  
-  ; Common Potions
-  AddItemToRegistry(Game.GetFormFromFile(0x03EADE, "Skyrim.esm"), "A weak potion that restores a small amount of health.") ; Minor Healing Potion
-  AddItemToRegistry(Game.GetFormFromFile(0x03EADF, "Skyrim.esm"), "A weak potion that restores a small amount of magicka.") ; Minor Magicka Potion
-  AddItemToRegistry(Game.GetFormFromFile(0x03EAE0, "Skyrim.esm"), "A weak potion that restores a small amount of stamina.") ; Minor Stamina Potion
-  
-  ; Common Misc Items
-  AddItemToRegistry(Game.GetFormFromFile(0x01D4EC, "Skyrim.esm"), "A tool used to unlock doors and containers without the proper key.") ; Lockpick
-  AddItemToRegistry(Game.GetFormFromFile(0x06851E, "Skyrim.esm"), "A portable light source used to illuminate dark areas.") ; Torch
-  AddItemToRegistry(Game.GetFormFromFile(0x04B0BA, "Skyrim.esm"), "Burnt wood used for drawing and writing.") ; Charcoal
-  AddItemToRegistry(Game.GetFormFromFile(0x04B0BC, "Skyrim.esm"), "A roll of paper used for writing notes and letters.") ; Roll of Paper
-  AddItemToRegistry(Game.GetFormFromFile(0x04B0BD, "Skyrim.esm"), "A container of ink used with quills for writing on paper.") ; Inkwell
-
-  Main.Info("Finished seeding item registry with common items")
-  PersistItemRegistry()
-EndFunction
-
-Function PopulateInventoryEventFilter(Actor akActor)
-  if !akActor || !itemRegistry
-    return
-  EndIf
-  
-  Main.Debug("Adding inventory event filters for " + Main.GetActorName(akActor))
-  
-  ; Add all items from registry as individual filters
-  string[] formIds = JMap.allKeysPArray(itemRegistry)
-  int i = 0
-  int filteredCount = 0
-  
-  while i < formIds.Length
-    int itemData = JMap.getObj(itemRegistry, formIds[i])
-    if itemData != 0
-      Form itemForm = JMap.getForm(itemData, "form")
-      if itemForm
-        akActor.AddInventoryEventFilter(itemForm)
-        filteredCount += 1
-      EndIf
-    EndIf
-    i += 1
-  EndWhile
-  
-  Main.Debug("Added " + filteredCount + " inventory event filters for " + Main.GetActorName(akActor))
-EndFunction
-
-Function RemoveInventoryEventFilters(Actor akActor)
-  if !akActor || !itemRegistry
-    return
-  EndIf
-  
-  Main.Debug("Removing inventory event filters for " + Main.GetActorName(akActor))
-  
-  ; Remove all items from registry as individual filters
-  string[] formIds = JMap.allKeysPArray(itemRegistry)
-  int i = 0
-  
-  while i < formIds.Length
-    int itemData = JMap.getObj(itemRegistry, formIds[i])
-    if itemData != 0
-      Form itemForm = JMap.getForm(itemData, "form")
-      if itemForm
-        akActor.RemoveInventoryEventFilter(itemForm)
-      EndIf
-    EndIf
-    i += 1
-  EndWhile
-EndFunction
+; Simplified implementation of inventory tracking
 
 Function TrackActorInventory(actor akActor)
   if !akActor
@@ -1496,130 +1270,369 @@ Function TrackActorInventory(actor akActor)
     return
   EndIf
   
-  ; Get current inventory state
-  int currentInventory = JMap.object()
-  JValue.retain(currentInventory)
+  ; Get current inventory array or create a new one
+  int currentInventory = JMap.getObj(inventoryTracker, actorName)
+  if !currentInventory
+    currentInventory = JArray.object()
+    JValue.retain(currentInventory)
+    JMap.setObj(inventoryTracker, actorName, currentInventory)
+  endif
   
-  ; Get all items from registry
-  string[] formIds = JMap.allKeysPArray(itemRegistry)
+  ; Check if a full scan was scheduled due to rapid inventory changes
+  bool needScan = JMap.getInt(updateTracker, actorName + "_needScan") == 1
+  
+  ; Handle throttling reset
+  bool wasThrottled = false
+  if needScan && useInventoryBurstProtection
+    int burstData = JMap.getObj(inventoryBurstTracker, actorName)
+    if burstData && JMap.getInt(burstData, "throttled") == 1
+      JMap.setInt(burstData, "throttled", 0)
+      JMap.setInt(burstData, "count", 0)
+      JMap.setFlt(burstData, "startTime", Utility.GetCurrentRealTime())
+      Main.Info("Resetting inventory throttling for " + actorName + " after full scan")
+      wasThrottled = true
+    EndIf
+  EndIf
+  
+  Main.Debug("TrackActorInventory - Scanning inventory for " + actorName)
+  
+  ; Get total number of items in inventory
+  int itemCount = akActor.GetNumItems()
+  int scannedCount = 0
+  
+  ; Clear existing inventory before scan if this was a throttled actor
+  if wasThrottled
+    JArray.clear(currentInventory)
+    Main.Debug("Cleared existing inventory data for " + actorName + " before full scan")
+  EndIf
+  
+  ; Iterate through each item
   int i = 0
-  while i < formIds.Length
-    int itemData = JMap.getObj(itemRegistry, formIds[i])
-    if itemData != 0
-      Form itemForm = JMap.getForm(itemData, "form")
-      if itemForm
-        int count = akActor.GetItemCount(itemForm)
-        if count > 0
-          JMap.setInt(currentInventory, formIds[i], count)
+  while i < itemCount
+    ; Get the form at index i
+    Form itemForm = akActor.GetNthForm(i)
+    
+    if itemForm
+      ; Get item count to check if it exists (>0)
+      int count = akActor.GetItemCount(itemForm)
+      if count > 0
+        ; Check if the form already exists in the array before adding
+        if JArray.findForm(currentInventory, itemForm) == -1
+          ; Store just the Form object in the array
+          JArray.addForm(currentInventory, itemForm)
+          scannedCount += 1
         EndIf
       EndIf
     EndIf
+    
     i += 1
-  EndWhile
+  endwhile
   
-  ; Store in tracker
-  JMap.setObj(inventoryTracker, actorName, currentInventory)
+  Main.Debug("TrackActorInventory - Scanned " + scannedCount + " items for " + actorName + " (total inventory size: " + itemCount + ")")
   
-  ; Check if we should update server
-  float currentTime = Utility.GetCurrentRealTime()
-  string invUpdateKey = actorName + "_invUpdate"
-  float lastUpdate = JMap.getFlt(updateTracker, invUpdateKey, 0.0)
-  
-  ; Check if custom throttle exists, otherwise use default
-  string throttleKey = actorName + "_invThrottle"
-  float actorThrottle = JMap.getFlt(updateTracker, throttleKey, inventoryUpdateThrottle)
-
-  if currentTime - lastUpdate >= actorThrottle
-    PersistInventory(akActor)
-    JMap.setFlt(updateTracker, invUpdateKey, currentTime)
+  ; Clear the need scan flag
+  if needScan
+    JMap.setInt(updateTracker, actorName + "_needScan", 0)
   EndIf
+  
+  PersistInventory(akActor)
 EndFunction
 
 Function PersistInventory(actor akActor)
+  ; Skip if actor is None or we're not using this system
   if !akActor || !bHasAIFF
     return
   EndIf
   
   string actorName = Main.GetActorName(akActor)
   if actorName == ""
-    Main.Warn("PersistInventory - Actor has no name, cannot persist inventory")
+    Main.Warn("PersistInventory - Actor has no name")
     return
   EndIf
   
-  int currentInventory = JMap.getObj(inventoryTracker, actorName)
-  if !currentInventory
-    Main.Debug("PersistInventory - No inventory data found for " + actorName)
+  ; Apply throttling if needed - only update once per throttle period
+  float currentTime = Utility.GetCurrentRealTime() ; Use real-time seconds
+  float timeSinceLastUpdate = currentTime - GetActorInventoryLastUpdate(akActor)
+  float actorThrottle = GetActorInventoryThrottle(akActor)
+  
+  if timeSinceLastUpdate < actorThrottle
+    Main.Debug("PersistInventory - Throttling inventory update for " + actorName + " (last update was " + timeSinceLastUpdate + " seconds ago, throttle is " + actorThrottle + " seconds)")
     return
   EndIf
   
-  ; Build inventory string
-  string inventoryData = ""
-  string[] formIds = JMap.allKeysPArray(currentInventory)
+  ; Get actor's inventory array
+  int actorInventory = JMap.getObj(inventoryTracker, actorName)
+  if !actorInventory
+    Main.Debug("PersistInventory - No inventory tracking object found for " + actorName)
+    return
+  EndIf
+  
+  ; Get current inventory data for the actor
+  int itemCount = JArray.count(actorInventory)
+  if itemCount == 0
+    Main.Debug("PersistInventory - Inventory tracking empty for " + actorName)
+    return
+  EndIf
+  
+  ; Update the last inventory time
+  SetActorInventoryLastUpdate(akActor, currentTime)
+  
+  ; Process inventory as batches if needed
+  int totalItems = itemCount
+  int processedItems = 0
+  int batchCount = 1
+  int maxItems = maxInventoryBatchSize
+  bool needsBatching = totalItems > maxItems
+  
+  ; Determine total number of batches
+  int totalBatches = 1
+  if needsBatching
+    totalBatches = Math.Ceiling(totalItems as float / maxItems)
+  EndIf
+  
   int i = 0
-  int itemCount = 0
   
-  Main.Debug("PersistInventory - Building inventory data for " + actorName + " with " + formIds.Length + " items")
-  
-  while i < formIds.Length
-    if inventoryData != ""
-      inventoryData += "~"  ; Use ~ as batch separator since | is reserved
-    EndIf
-    string formId = formIds[i]
-    int count = JMap.getInt(currentInventory, formId)
-    inventoryData += formId + "&" + count
+  ; Process all items in batches
+  while processedItems < totalItems
+    ; Start a new batch
+    string batchData = ""
+    int itemsInBatch = 0
     
-    ; Get item name for detailed logging if needed
-    if config.logLevel >= 6
-      int itemData = JMap.getObj(itemRegistry, formId)
-      string itemName = "Unknown Item"
-      if itemData != 0
-        itemName = JMap.getStr(itemData, "name")
-        if itemName == ""
-          Form itemForm = JMap.getForm(itemData, "form")
-          if itemForm
-            itemName = itemForm.GetName()
+    ; Determine batch status
+    string batchStatus
+    if totalBatches == 1
+      batchStatus = "final" ; Only one batch, mark as final
+    elseif batchCount == 1
+      batchStatus = "initial" ; First batch of many
+    elseif batchCount == totalBatches
+      batchStatus = "final" ; Last batch of many
+    else
+      batchStatus = "partial" ; Middle batch
+    endif
+    
+    ; Process up to maxItems per batch
+    while i < itemCount && itemsInBatch < maxItems
+      Form itemForm = JArray.getForm(actorInventory, i)
+      
+      ; Only process valid forms
+      if itemForm
+        ; Get count directly from the actor
+        int count = akActor.GetItemCount(itemForm)
+        
+        ; Skip items that no longer exist in inventory
+        if count > 0
+          ; Get item details directly from the form
+          string itemName = itemForm.GetName()
+          string modName = minai_Util.FormToModName(itemForm)
+          int formTypeId = itemForm.GetType()
+          string modIndex = minai_Util.FormToModIndexHex(itemForm)
+          string formId = minai_Util.FormToHex(itemForm)
+          if formId == ""
+            formId = "0x" + itemForm.GetFormID()
           EndIf
-        EndIf
-      EndIf
-      MinaiUtil.Trace("  - " + itemName + " (" + formId + "): " + count)
-    EndIf
+          
+          ; Skip items with no name or from unknown mods
+          if itemName != "" && modName != ""
+            ; Add separator between items
+            if batchData != ""
+              batchData += "~"
+            EndIf
+            
+            ; Format: formId@modName@itemName@formTypeId@modIndex@count
+            batchData += formId + "@" + modName + "@" + itemName + "@" + formTypeId + "@" + modIndex + "@" + count
+          else
+            if itemName == ""
+              Main.Debug("PersistInventory - SKIPPING item: Empty name for " + formId)
+            endif
+            
+            if modName == ""
+              Main.Debug("PersistInventory - SKIPPING item: Empty mod name for " + formId)
+            endif
+          EndIf
+        endif
+      endif
+      
+      itemsInBatch += 1
+      processedItems += 1
+      i += 1
+    EndWhile
     
-    itemCount += 1
-    i += 1
+    ; Send this batch to server - always send if it's the final batch, even if empty
+    if batchData != "" || batchStatus == "final"
+      ; Log message stats
+      if needsBatching
+        Main.Debug("Persisting inventory for " + actorName + " - Batch " + batchCount + "/" + totalBatches + " with " + itemsInBatch + " items (status: " + batchStatus + ")")
+      else
+        Main.Debug("Persisting inventory for " + actorName + " - " + itemsInBatch + " items, data length: " + StringUtil.GetLength(batchData) + " chars (status: " + batchStatus + ")")
+      EndIf
+      
+      ; Handle empty final batch case
+      if batchData == "" && batchStatus == "final"
+        Main.Debug("Sending empty final batch for " + actorName)
+      EndIf
+      
+      ; Store the actor name with the batch data and status
+      string actorBatchData = actorName + "@" + batchStatus + "@" + batchData
+      
+      ; Send the batch data to the server
+      AILogMessage(actorBatchData, "minai_storeitem_batch")
+      
+      ; Add a small delay between batches to avoid overwhelming the server
+      if needsBatching && processedItems < totalItems
+        Utility.Wait(0.1)
+      EndIf
+      
+      batchCount += 1
+    EndIf
   EndWhile
   
-  ; Send to server
-  if inventoryData != ""
-    ; Log message stats before sending
-    Main.Debug("Persisting inventory for " + actorName + " - " + itemCount + " items, data length: " + StringUtil.GetLength(inventoryData) + " chars")
-      ; Set as a single variable if not too long
-      SetActorVariable(akActor, "Inventory", inventoryData)
-  else
+  if totalItems == 0
     Main.Debug("PersistInventory - No items to persist for " + actorName)
-    ; Clear any existing inventory data
-    SetActorVariable(akActor, "Inventory", "")
   EndIf
 EndFunction
 
-Function OnInventoryChanged(actor akActor, Form akBaseItem, int aiItemCount, bool abAdded)
-  if !akActor || !akBaseItem
+; Function to check if an actor's inventory events are currently being throttled
+bool Function IsInventoryThrottled(actor akActor)
+  if !akActor || !useInventoryBurstProtection
+    return false
+  EndIf
+  
+  string actorName = Main.GetActorName(akActor)
+  if actorName == ""
+    return false
+  EndIf
+  
+  ; Get actor's burst tracking data
+  int burstData = JMap.getObj(inventoryBurstTracker, actorName)
+  if !burstData
+    return false
+  EndIf
+  
+  ; Check if throttled flag is set
+  return JMap.getInt(burstData, "throttled") == 1
+EndFunction
+
+; Function to mark actor for full inventory scan
+Function MarkActorForFullScan(actor akActor)
+  if !akActor
     return
+  EndIf
+  
+  string actorName = Main.GetActorName(akActor)
+  if actorName == ""
+    return
+  EndIf
+  
+  ; Mark for scan in update tracker
+  JMap.setInt(updateTracker, actorName + "_needScan", 1)
+  
+  Main.Info("Marked " + actorName + " for full inventory scan due to rapid changes")
+EndFunction
+
+; Function to handle inventory change event with throttling
+
+Function SetThrottled(int burstData, actor akActor)
+  Main.Warn("Inventory tracking throttled for " + Main.GetActorName(akActor))
+  JMap.setInt(burstData, "throttled", 1)
+  MarkActorForFullScan(akActor)
+EndFunction
+
+int Function GetBurstData(string actorName)
+  int burstData = JMap.getObj(inventoryBurstTracker, actorName)
+  if !burstData
+    burstData = JMap.object()
+    JValue.retain(burstData)
+    JMap.setFlt(burstData, "startTime", Utility.GetCurrentRealTime())
+    JMap.setInt(burstData, "count", 0)
+    JMap.setInt(burstData, "throttled", 0)
+    JMap.setObj(inventoryBurstTracker, actorName, burstData)
+  EndIf
+  return burstData
+EndFunction
+
+
+bool Function OnInventoryChanged(actor akActor, Form akBaseItem, int aiItemCount, bool abAdded)
+  bool isThrottled = IsInventoryThrottled(akActor)
+  if inventoryMutex && !isThrottled
+    int attempts = 0
+    while inventoryMutex && !isThrottled
+      Utility.Wait(0.5)
+      attempts += 1
+      if attempts > 10 
+        Main.Warn("OnInventoryChanged - Failed to acquire inventory mutex, backing off")
+        ; Throttle
+        SetThrottled(GetBurstData(Main.GetActorName(akActor)), akActor)
+        ; Make sure we don't leave mutex locked even during throttle
+        inventoryMutex = False
+        return true
+      EndIf
+      isThrottled = IsInventoryThrottled(akActor)
+    endWhile
+  EndIf
+  
+  if isThrottled
+    Main.Warn("Made it past spinlock in OnInventoryChanged, but inventory is throttled. Backing off.")
+    inventoryMutex = False
+    return true
+  EndIf
+  
+  inventoryMutex = True
+  
+  if !akActor || !akBaseItem
+    inventoryMutex = False  ; Clear mutex before returning
+    return false
   EndIf
   
   ; Get actor name for logging
   string actorName = Main.GetActorName(akActor)
-  string itemName = akBaseItem.GetName()
-  string formId = minai_Util.FormToHex(akBaseItem)
-  
-  ; Only track if item is in our registry
-  if !JMap.hasKey(itemRegistry, formId)
-    if config.logLevel >= 5  ; Debug level
-      Main.Debug("OnInventoryChanged - Ignoring non-tracked item: " + itemName + " (" + formId + ") for " + actorName)
-    EndIf
-    return
+  if actorName == ""
+    Main.Warn("OnInventoryChanged - Actor has no name, skipping")
+    inventoryMutex = False  ; Clear mutex before returning
+    return false
   EndIf
   
-  ; Log the inventory change
+  ; Check for burst protection if enabled
+  if useInventoryBurstProtection
+    float currentTime = Utility.GetCurrentRealTime()
+    
+    ; Get or create burst tracking data for this actor
+    int burstData = GetBurstData(actorName)
+    
+    ; Check if we're in a new time window
+    float startTime = JMap.getFlt(burstData, "startTime")
+    if currentTime - startTime > inventoryBurstWindow
+      ; Reset for new window
+      JMap.setFlt(burstData, "startTime", currentTime)
+      JMap.setInt(burstData, "count", 1)
+      JMap.setInt(burstData, "throttled", 0)
+    else
+      ; Increment count in current window
+      int eventCount = JMap.getInt(burstData, "count") + 1
+      JMap.setInt(burstData, "count", eventCount)
+      
+      ; Check if we've exceeded threshold and should throttle
+      if eventCount > inventoryEventThreshold
+        if JMap.getInt(burstData, "throttled") == 0
+          Main.Info("Inventory burst detected for " + actorName + " - Throttling and scheduling full scan")
+          JMap.setInt(burstData, "throttled", 1)
+          MarkActorForFullScan(akActor)
+        EndIf
+        
+        ; If already throttled, skip processing this event
+        inventoryMutex = False  ; Clear mutex before returning
+        return true  ; Return true to indicate throttling
+      EndIf
+    EndIf
+  EndIf
+  
+  ; Get basic item info for logging
+  string itemName = akBaseItem.GetName()
+  string formId = minai_Util.FormToHex(akBaseItem)
+  if formId == ""
+    formId = "0x" + akBaseItem.GetFormID()
+  EndIf
+  
+  ; Track all inventory changes
   string changeType
   if abAdded
     changeType = "added"
@@ -1628,51 +1641,64 @@ Function OnInventoryChanged(actor akActor, Form akBaseItem, int aiItemCount, boo
   endif
   Main.Debug("Inventory " + changeType + " for " + actorName + ": " + aiItemCount + "x " + itemName + " (" + formId + ")")
   
-  ; Get the current actor inventory map
+  ; Get the current actor inventory array
   int actorInventory = JMap.getObj(inventoryTracker, actorName)
   if !actorInventory
     ; Create new inventory object if none exists
-    actorInventory = JMap.object()
+    actorInventory = JArray.object()
     JValue.retain(actorInventory)
     JMap.setObj(inventoryTracker, actorName, actorInventory)
-    Main.Debug("Created new inventory tracking object for " + actorName)
+    Main.Debug("Created new inventory array for " + actorName)
   EndIf
   
-  ; Update the specific item count directly
-  int currentCount = JMap.getInt(actorInventory, formId, 0)
-  int newCount = 0
+  ; Get the actual current count from the actor
+  int actualCount = akActor.GetItemCount(akBaseItem)
   
-  if abAdded
-    newCount = currentCount + aiItemCount
+  ; Find the item's index in the array if it exists
+  int itemIndex = JArray.findForm(actorInventory, akBaseItem)
+  
+  ; Update array based on current item count
+  if actualCount > 0
+    ; Add item if it's not already in the array
+    if itemIndex == -1
+      JArray.addForm(actorInventory, akBaseItem)
+      Main.Debug("Added " + itemName + " to " + actorName + " inventory tracking")
+    EndIf
   else
-    newCount = currentCount - aiItemCount
-    if newCount < 0
-      newCount = 0  ; Prevent negative counts
+    ; Remove item if it's in the array and count is zero
+    if itemIndex != -1
+      JArray.eraseIndex(actorInventory, itemIndex)
+      Main.Debug("Removed " + itemName + " from " + actorName + " inventory tracking")
     EndIf
   EndIf
-  
-  ; Set the updated count or remove if zero
-  if newCount > 0
-    JMap.setInt(actorInventory, formId, newCount)
-    Main.Debug("Updated " + actorName + " inventory: " + itemName + " count = " + newCount)
-  else
-    JMap.removeKey(actorInventory, formId)
-    Main.Debug("Removed " + itemName + " from " + actorName + " inventory tracking")
-  EndIf
-  
-  ; Check if we should update server based on throttle
-  float currentTime = Utility.GetCurrentRealTime()
-  string invUpdateKey = actorName + "_invUpdate"
-  float lastUpdate = JMap.getFlt(updateTracker, invUpdateKey, 0.0)
 
-  if currentTime - lastUpdate >= inventoryUpdateThrottle
-    Main.Debug("Throttle elapsed, persisting inventory for " + actorName)
-    PersistInventory(akActor)
-    JMap.setFlt(updateTracker, invUpdateKey, currentTime)
-  else
-    float timeRemaining = inventoryUpdateThrottle - (currentTime - lastUpdate)
-    Main.Debug("Inventory update throttled for " + actorName + " - " + timeRemaining + " seconds remaining before next update")
+  PersistInventory(akActor)
+  
+  inventoryMutex = False  ; Clear mutex before returning
+  return false  ; Return false to indicate no throttling occurred
+EndFunction
+
+; Function to clean up inventory tracking data
+Function CleanupInventoryTracker()
+  if !inventoryTracker
+    return
   EndIf
+  
+  string[] actorNames = JMap.allKeysPArray(inventoryTracker)
+  int i = 0
+  while i < actorNames.Length
+    int inventory = JMap.getObj(inventoryTracker, actorNames[i])
+    if inventory
+      JValue.release(inventory)
+    EndIf
+    i += 1
+  EndWhile
+  
+  JValue.release(inventoryTracker)
+  inventoryTracker = JMap.object()
+  JValue.retain(inventoryTracker)
+  
+  Main.Info("Cleaned up inventory tracker")
 EndFunction
 
 ; Function to set a custom inventory update throttle for a specific actor
@@ -1697,4 +1723,99 @@ Function SetActorInventoryThrottle(actor akActor, float throttleTime)
   string throttleKey = actorName + "_invThrottle"
   JMap.setFlt(updateTracker, throttleKey, throttleTime)
   Main.Info("Set custom inventory throttle for " + actorName + " to " + throttleTime + " seconds")
+EndFunction
+
+
+; Public function to check if an actor's inventory events are being throttled
+; Other scripts can use this to decide whether to register for events
+bool Function IsActorInventoryThrottled(actor akActor)
+  if !akActor || !useInventoryBurstProtection
+    return false
+  EndIf
+  
+  return IsInventoryThrottled(akActor)
+EndFunction
+
+; Function to enable or disable inventory burst protection
+Function SetInventoryBurstProtection(bool enable)
+  useInventoryBurstProtection = enable
+  
+  if enable
+    Main.Info("Inventory burst protection enabled")
+  else
+    Main.Info("Inventory burst protection disabled")
+  EndIf
+  
+  ; If disabling, clear any throttled state
+  if !enable
+    string[] actorNames = JMap.allKeysPArray(inventoryBurstTracker)
+    int i = 0
+    while i < actorNames.Length
+      int burstData = JMap.getObj(inventoryBurstTracker, actorNames[i])
+      if burstData
+        JMap.setInt(burstData, "throttled", 0)
+      EndIf
+      i += 1
+    endwhile
+    
+    Main.Info("Cleared throttling state for all actors")
+  EndIf
+EndFunction
+
+; Function to adjust burst detection parameters
+Function SetBurstThresholdParameters(int threshold, float windowSeconds)
+  if threshold > 0
+    inventoryEventThreshold = threshold
+  EndIf
+  
+  if windowSeconds > 0
+    inventoryBurstWindow = windowSeconds
+  EndIf
+  
+  Main.Info("Set inventory burst parameters: threshold=" + inventoryEventThreshold + ", window=" + inventoryBurstWindow + "s")
+EndFunction
+
+; Function to get the last update time for an actor's inventory in seconds
+float Function GetActorInventoryLastUpdate(actor akActor)
+  if !akActor
+    return 0.0
+  EndIf
+  
+  string actorName = Main.GetActorName(akActor)
+  if actorName == ""
+    return 0.0
+  EndIf
+  
+  string updateKey = actorName + "_invUpdate"
+  return JMap.getFlt(updateTracker, updateKey, 0.0)
+EndFunction
+
+; Function to set the last update time for an actor's inventory in seconds
+Function SetActorInventoryLastUpdate(actor akActor, float currentTime)
+  if !akActor
+    return
+  EndIf
+  
+  string actorName = Main.GetActorName(akActor)
+  if actorName == ""
+    return
+  EndIf
+  
+  string updateKey = actorName + "_invUpdate"
+  JMap.setFlt(updateTracker, updateKey, currentTime)
+EndFunction
+
+; Function to get the throttle time for an actor's inventory in seconds
+float Function GetActorInventoryThrottle(actor akActor)
+  if !akActor
+    return inventoryUpdateThrottle
+  EndIf
+  
+  string actorName = Main.GetActorName(akActor)
+  if actorName == ""
+    return inventoryUpdateThrottle
+  EndIf
+  
+  string throttleKey = actorName + "_invThrottle"
+  return JMap.getFlt(updateTracker, throttleKey, inventoryUpdateThrottle)
 EndFunction

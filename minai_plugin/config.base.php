@@ -25,6 +25,10 @@ $GLOBALS['enforce_short_responses'] = false;
 $GLOBALS['use_llm_fallback'] = false;
 $GLOBALS['enforce_single_json'] = false;
 
+// Inventory system configuration
+$GLOBALS['inventory_items_limit'] = 5; // Number of Items to expose to LLM from an actor's inventory
+$GLOBALS['use_item_relevancy_scoring'] = false; // Use relevancy scoring for items
+
 // Default action prompts with variables
 $GLOBALS['action_prompts'] = Array(
     "singing" => "Respond with a song from #player_name#. Be creative, and match the mood of the scene.",

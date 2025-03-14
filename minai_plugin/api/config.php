@@ -92,6 +92,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         // Server settings
         "input_delay_for_radiance" => intval($GLOBALS["input_delay_for_radiance"]),
         
+        // Inventory settings
+        "inventory_items_limit" => intval($GLOBALS["inventory_items_limit"]),
+        "use_item_relevancy_scoring" => $GLOBALS["use_item_relevancy_scoring"],
+        
         // Action prompts
         "action_prompts" => array(
             "singing" => $GLOBALS["action_prompts"]["singing"],
@@ -169,6 +173,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Server settings
         $newConfig .= "\$GLOBALS['input_delay_for_radiance'] = " . (intval($input['input_delay_for_radiance']) ?: 15) . ";\n";
+        
+        // Inventory settings
+        $newConfig .= "\$GLOBALS['inventory_items_limit'] = " . (intval($input['inventory_items_limit']) ?: 5) . ";\n";
+        $newConfig .= "\$GLOBALS['use_item_relevancy_scoring'] = " . ($input['use_item_relevancy_scoring'] ? 'true' : 'false') . ";\n";
         
         // Action prompts
         $newConfig .= "\$GLOBALS['action_prompts'] = " . buildAssociativeArrayString(array(

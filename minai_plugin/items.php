@@ -97,11 +97,27 @@ function UpdateItem($id, $data) {
     
     try {
         if (isset($data['item_id'])) {
-            // Validate item_id format
-            if (!preg_match('/^0x[0-9A-Fa-f]{8}$/', $data['item_id'])) {
+            // Process the form ID
+            $item_id = $data['item_id'];
+            
+            // Add 0x prefix if missing
+            if (strpos($item_id, '0x') !== 0) {
+                $item_id = '0x' . $item_id;
+            }
+            
+            // If form ID is 8 digits (after 0x prefix), extract just the last 6 digits
+            if (strlen($item_id) == 10) { // "0x" + 8 hex digits
+                $item_id = '0x' . substr($item_id, 4, 6); // Keep just the last 6 digits with 0x prefix
+                minai_log("info", "Truncated form ID to 6 digits: " . $item_id);
+            }
+            
+            // Validate item_id format (0x??012345 or 0x012345)
+            if (!preg_match('/^0x[0-9A-Fa-f]{6,8}$/', $item_id)) {
+                minai_log("error", "Invalid form ID format: " . $item_id);
                 return false;
             }
-            $updates[] = "item_id = '" . $db->escape($data['item_id']) . "'";
+            
+            $updates[] = "item_id = '" . $db->escape($item_id) . "'";
         }
         
         if (isset($data['file_name'])) {
@@ -132,9 +148,24 @@ function UpdateItem($id, $data) {
             $updates[] = "category = {$category}";
         }
         
+        // Add support for item_type field
+        if (isset($data['item_type'])) {
+            $item_type = $data['item_type'] ? "'" . $db->escape($data['item_type']) . "'" : "'Item'";
+            $updates[] = "item_type = {$item_type}";
+        }
+        
+        // Add support for mod_index field
+        if (isset($data['mod_index'])) {
+            $mod_index = $data['mod_index'] ? "'" . $db->escape($data['mod_index']) . "'" : 'NULL';
+            $updates[] = "mod_index = {$mod_index}";
+        }
+        
         if (empty($updates)) {
             return false;
         }
+        
+        // Add last_seen update
+        $updates[] = "last_seen = CURRENT_TIMESTAMP";
         
         $query = "UPDATE minai_items SET " . implode(", ", $updates) . " WHERE id = {$id}";
         $db->execQuery($query);
@@ -182,7 +213,16 @@ function GetItems($filters = [], $sort_by = 'name', $sort_order = 'ASC') {
         $where_clauses = [];
         
         if (isset($filters['item_id'])) {
-            $where_clauses[] = "item_id LIKE '%" . $db->escape($filters['item_id']) . "%'";
+            // For form IDs, we need to handle exact matches (when formId starts with 0x)
+            // and partial matches (for search functionality)
+            $item_id = $db->escape($filters['item_id']);
+            if (substr($item_id, 0, 2) === '0x') {
+                // This is a complete form ID, do exact match (case-insensitive)
+                $where_clauses[] = "UPPER(item_id) = UPPER('{$item_id}')";
+            } else {
+                // This is a partial ID or search term, use LIKE
+                $where_clauses[] = "item_id LIKE '%" . $item_id . "%'";
+            }
         }
         
         if (isset($filters['file_name'])) {
@@ -287,196 +327,3 @@ function GetAvailableItems() {
         return [];
     }
 }
-
-/**
- * Update item relevance scores based on the current situation
- * 
- * @param string $situation Description of the current situation
- * @return bool True if scores were updated successfully, false otherwise
- */
-function UpdateItemRelevanceScores($situation) {
-    $db = $GLOBALS['db'];
-    
-    // Get all available items
-    $items = GetAvailableItems();
-    
-    if (empty($items)) {
-        return false;
-    }
-    
-    // Prepare item data for LLM
-    $item_data = [];
-    foreach ($items as $item) {
-        $item_data[] = [
-            'id' => $item['id'],
-            'name' => $item['name'],
-            'description' => $item['description']
-        ];
-    }
-    
-    // Prepare messages for LLM
-    $messages = [
-        [
-            'role' => 'system',
-            'content' => 'You are an assistant that helps determine the relevance of items in a given situation. 
-                         You will be given a list of items and a description of a situation. 
-                         For each item, assign a relevance score from 0 to 10, where 0 means completely irrelevant 
-                         and 10 means extremely relevant to the situation. 
-                         Respond with a JSON array of objects containing item IDs and scores.'
-        ],
-        [
-            'role' => 'user',
-            'content' => "Situation: " . $situation . "\n\nItems:\n" . json_encode($item_data)
-        ]
-    ];
-    
-    // Call LLM
-    $response = callLLM($messages);
-    
-    if (!$response) {
-        return false;
-    }
-    
-    // Parse response
-    $scores = json_decode($response, true);
-    
-    if (!is_array($scores)) {
-        return false;
-    }
-    
-    // Update scores in database
-    foreach ($scores as $score) {
-        if (isset($score['id']) && isset($score['score'])) {
-            $id = intval($score['id']);
-            $relevance_score = intval($score['score']);
-            
-            // Ensure score is within valid range
-            $relevance_score = max(0, min(10, $relevance_score));
-            
-            $query = "UPDATE minai_items SET relevance_score = {$relevance_score} WHERE id = {$id}";
-            $db->execQuery($query);
-        }
-    }
-    
-    return true;
-}
-
-/**
- * Get relevant items for a given situation
- * 
- * @param string $situation Description of the current situation
- * @param int $limit Maximum number of items to return
- * @return array Array of relevant items
- */
-function GetRelevantItems($situation, $limit = 10) {
-    // Update relevance scores
-    UpdateItemRelevanceScores($situation);
-    
-    $db = $GLOBALS['db'];
-    
-    // Get items sorted by relevance score
-    $query = "SELECT * FROM minai_items WHERE is_available = TRUE ORDER BY relevance_score DESC LIMIT {$limit}";
-    
-    return $db->fetchAll($query);
-}
-
-/**
- * Import items from a JSON file
- * 
- * @param string $file_path Path to the JSON file
- * @return int Number of items imported
- */
-function ImportItemsFromJson($file_path) {
-    if (!file_exists($file_path)) {
-        return 0;
-    }
-    
-    $json_data = file_get_contents($file_path);
-    $items = json_decode($json_data, true);
-    
-    if (!is_array($items)) {
-        return 0;
-    }
-    
-    $count = 0;
-    
-    foreach ($items as $item) {
-        if (isset($item['item_id']) && isset($item['file_name']) && isset($item['name'])) {
-            $description = isset($item['description']) ? $item['description'] : '';
-            $is_available = isset($item['is_available']) ? $item['is_available'] : true;
-            $category = isset($item['category']) ? $item['category'] : null;
-            
-            if (AddItem($item['item_id'], $item['file_name'], $item['name'], $description, $is_available, $category)) {
-                $count++;
-            }
-        }
-    }
-    
-    return $count;
-}
-
-/**
- * Export items to a JSON file
- * 
- * @param string $file_path Path to save the JSON file
- * @param array $filters Optional filters to apply
- * @return int Number of items exported
- */
-function ExportItemsToJson($file_path, $filters = []) {
-    $items = GetItems($filters);
-    
-    if (empty($items)) {
-        return 0;
-    }
-    
-    $json_data = json_encode($items, JSON_PRETTY_PRINT);
-    
-    if (file_put_contents($file_path, $json_data)) {
-        return count($items);
-    }
-    
-    return 0;
-}
-
-/**
- * Process items seen in-game
- * 
- * @param array $items Array of items seen in-game
- * @return int Number of items processed
- */
-function ProcessInGameItems($items) {
-    if (!is_array($items)) {
-        return 0;
-    }
-    
-    $count = 0;
-    
-    foreach ($items as $item) {
-        if (isset($item['item_id']) && isset($item['file_name']) && isset($item['name'])) {
-            $description = isset($item['description']) ? $item['description'] : '';
-            
-            if (AddItem($item['item_id'], $item['file_name'], $item['name'], $description)) {
-                $count++;
-            }
-        }
-    }
-    
-    return $count;
-}
-
-/**
- * Get categories with item counts
- * 
- * @return array Array of categories with counts, empty array if none found or on error
- */
-function GetItemCategories() {
-    $db = $GLOBALS['db'];
-    
-    try {
-        $query = "SELECT category, COUNT(*) as count FROM minai_items WHERE category IS NOT NULL GROUP BY category ORDER BY category ASC";
-        return $db->fetchAll($query);
-    } catch (Exception $e) {
-        error_log("Error in GetItemCategories: " . $e->getMessage());
-        return [];
-    }
-} 

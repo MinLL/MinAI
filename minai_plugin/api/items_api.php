@@ -13,8 +13,6 @@ require_once("../items.php");
 require_once("$pluginPath/db_utils.php");
 // Ensure required tables exist
 CreateItemsTableIfNotExists();
-CreateScenariosTableIfNotExists();
-CreateItemRelevanceTableIfNotExists();
 
 // Get the request method
 $method = $_SERVER['REQUEST_METHOD'];
@@ -53,14 +51,28 @@ function handleGetRequest() {
             sendResponse(404, ['error' => 'Item not found']);
         }
     } elseif (isset($_GET['action']) && $_GET['action'] === 'categories') {
-        // Get categories
-        $categories = GetItemCategories();
-        sendResponse(200, $categories);
-    } elseif (isset($_GET['action']) && $_GET['action'] === 'relevance' && isset($_GET['situation'])) {
-        // Get relevant items for a situation
-        $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
-        $items = GetRelevantItems($_GET['situation'], $limit);
-        sendResponse(200, $items);
+        // Get distinct categories and count of items in each
+        $db = $GLOBALS['db'];
+        try {
+            $query = "SELECT category, COUNT(*) as count FROM minai_items WHERE category IS NOT NULL GROUP BY category ORDER BY category";
+            $categories = $db->fetchAll($query);
+            sendResponse(200, $categories);
+        } catch (Exception $e) {
+            sendResponse(500, ['error' => 'Failed to retrieve categories']);
+        }
+    } elseif (isset($_GET['action']) && $_GET['action'] === 'types') {
+        // Get distinct item types
+        $db = $GLOBALS['db'];
+        try {
+            $query = "SELECT DISTINCT item_type FROM minai_items WHERE item_type IS NOT NULL ORDER BY item_type";
+            $types = $db->fetchAll($query);
+            sendResponse(200, $types);
+        } catch (Exception $e) {
+            sendResponse(500, ['error' => 'Failed to retrieve item types']);
+        }
+    } elseif (isset($_GET['action']) && $_GET['action'] === 'reset') {
+        // Reset the items database
+        resetItemsDatabase();
     } else {
         // Get a list of items with optional filters
         $filters = [];
@@ -74,6 +86,8 @@ function handleGetRequest() {
         if (isset($_GET['description'])) $filters['description'] = $_GET['description'];
         if (isset($_GET['category'])) $filters['category'] = $_GET['category'];
         if (isset($_GET['is_available'])) $filters['is_available'] = $_GET['is_available'] === 'true';
+        if (isset($_GET['item_type'])) $filters['item_type'] = $_GET['item_type'];
+        if (isset($_GET['mod_index'])) $filters['mod_index'] = $_GET['mod_index'];
         
         $items = GetItems($filters, $sort_by, $sort_order);
         sendResponse(200, $items);
@@ -91,18 +105,48 @@ function handlePostRequest() {
     if (isset($_GET['action']) && $_GET['action'] === 'import') {
         if (isset($_FILES['import_file'])) {
             $file_path = $_FILES['import_file']['tmp_name'];
-            $count = ImportItemsFromJson($file_path);
-            sendResponse(200, ['message' => "{$count} items imported successfully"]);
+            try {
+                // Read JSON file
+                $json_data = file_get_contents($file_path);
+                $items = json_decode($json_data, true);
+                
+                if (!$items || !is_array($items)) {
+                    sendResponse(400, ['error' => 'Invalid JSON format']);
+                    return;
+                }
+                
+                $count = 0;
+                foreach ($items as $item) {
+                    if (isset($item['item_id']) && isset($item['file_name']) && isset($item['name'])) {
+                        $description = isset($item['description']) ? $item['description'] : '';
+                        $is_available = isset($item['is_available']) ? $item['is_available'] : true;
+                        $category = isset($item['category']) ? $item['category'] : null;
+                        $item_type = isset($item['item_type']) ? $item['item_type'] : 'Item';
+                        $mod_index = isset($item['mod_index']) ? $item['mod_index'] : null;
+                        
+                        if (AddItem($item['item_id'], $item['file_name'], $item['name'], $description, $is_available, $category)) {
+                            // Update additional fields after adding
+                            $db = $GLOBALS['db'];
+                            $result = $db->fetchAll("SELECT id FROM minai_items WHERE item_id = '{$db->escape($item['item_id'])}' AND file_name = '{$db->escape($item['file_name'])}'");
+                            if (count($result) > 0) {
+                                $id = $result[0]['id'];
+                                $data = [
+                                    'item_type' => $item_type,
+                                    'mod_index' => $mod_index
+                                ];
+                                UpdateItem($id, $data);
+                            }
+                            $count++;
+                        }
+                    }
+                }
+                
+                sendResponse(200, ['message' => "{$count} items imported successfully"]);
+            } catch (Exception $e) {
+                sendResponse(500, ['error' => 'Error importing items: ' . $e->getMessage()]);
+            }
         } else {
             sendResponse(400, ['error' => 'No file uploaded']);
-        }
-    } elseif (isset($_GET['action']) && $_GET['action'] === 'process_ingame') {
-        // Process in-game items
-        if (isset($data['items']) && is_array($data['items'])) {
-            $count = ProcessInGameItems($data['items']);
-            sendResponse(200, ['message' => "{$count} in-game items processed successfully"]);
-        } else {
-            sendResponse(400, ['error' => 'Invalid items data']);
         }
     } else {
         // Add a new item
@@ -112,6 +156,23 @@ function handlePostRequest() {
             $category = isset($data['category']) ? $data['category'] : null;
             
             if (AddItem($data['item_id'], $data['file_name'], $data['name'], $description, $is_available, $category)) {
+                // Get the ID of the newly added item
+                $db = $GLOBALS['db'];
+                $result = $db->fetchAll("SELECT id FROM minai_items WHERE item_id = '{$db->escape($data['item_id'])}' AND file_name = '{$db->escape($data['file_name'])}'");
+                
+                if (count($result) > 0) {
+                    $id = $result[0]['id'];
+                    
+                    // Update additional fields if provided
+                    $updateData = [];
+                    if (isset($data['item_type'])) $updateData['item_type'] = $data['item_type'];
+                    if (isset($data['mod_index'])) $updateData['mod_index'] = $data['mod_index'];
+                    
+                    if (!empty($updateData)) {
+                        UpdateItem($id, $updateData);
+                    }
+                }
+                
                 sendResponse(201, ['message' => 'Item added successfully']);
             } else {
                 sendResponse(400, ['error' => 'Failed to add item']);
@@ -156,6 +217,22 @@ function handleDeleteRequest() {
         }
     } else {
         sendResponse(400, ['error' => 'Missing item ID']);
+    }
+}
+
+/**
+ * Reset items database by deleting all items
+ */
+function resetItemsDatabase() {
+    $db = $GLOBALS['db'];
+    
+    try {
+        // Delete all items
+        $db->execQuery("DELETE FROM minai_items");
+        
+        sendResponse(200, ['message' => 'Items database has been reset successfully']);
+    } catch (Exception $e) {
+        sendResponse(500, ['error' => 'Failed to reset database: ' . $e->getMessage()]);
     }
 }
 

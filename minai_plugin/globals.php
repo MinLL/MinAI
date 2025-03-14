@@ -36,3 +36,17 @@ $GLOBALS["TTS_FALLBACK_FNCT"] = function($responseTextUnmooded, $mood, $response
     return null;
 };
 
+
+
+
+$GLOBALS["external_fast_commands"] = [
+    // Events that set $MUST_DIE=true in customintegrations.php
+    "minai_init",             // Initialization event
+    "storecontext",           // Store custom context
+    "registeraction",         // Register custom action
+    "updatethreadsdb",        // Update threads database
+    "storetattoodesc"        // Store tattoo description
+    // "minai_storeitem",        // Store single item
+    // "minai_storeitem_batch"  // Store multiple items
+    // "minai_clearinventory"    // Clear inventory
+];

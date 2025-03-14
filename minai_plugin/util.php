@@ -64,6 +64,35 @@ function CanVibrate($name) {
     return IsEnabled($name, "CanVibrate") && IsActionEnabled("MinaiGlobalVibrator");
 }
 
+
+/**
+ * Set an actor value in the database
+ * 
+ * @param string $name The actor name
+ * @param string $key The key to set
+ * @param string $value The value to set
+ * @return bool True if successful
+ */
+function SetActorValue($name, $key, $value) {
+    $db = $GLOBALS['db'];
+    $name = $db->escape($name);
+    $key = $db->escape($key);
+    $value = $db->escape($value);
+    $id = "_minai_{$name}//{$key}";
+    
+    // Delete existing value
+    $db->delete("conf_opts", "id='{$id}'");
+    
+    // Insert new value
+    return $db->insert(
+        'conf_opts',
+        array(
+            'id' => $id,
+            'value' => $value
+        )
+    );
+}
+
 // Return the specified actor value.
 // Caches the results of several queries that are repeatedly referenced.
 Function GetActorValue($name, $key, $preserveCase=false, $skipCache=false) {

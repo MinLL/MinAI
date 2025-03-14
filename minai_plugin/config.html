@@ -1154,6 +1154,31 @@
                                 <p>Automatically seed NPC profiles that are renamed via Realnames Extended...</p>
                                 <input type="checkbox" id="realnames-support">
                             </div>
+                            
+                            <!-- Inventory Settings Header -->
+                            <div class="option-group">
+                                <h4>Inventory Settings</h4>
+                                
+                                <!-- inventory_items_limit -->
+                                <div class="option-group">
+                                    <div class="option-label-container">
+                                        <label class="option-label" for="inventory-items-limit">Inventory Items Limit</label>
+                                        <button class="reset-button" onclick="resetOptionToDefault('inventory-items-limit')">Reset to Default</button>
+                                    </div>
+                                    <p>Number of items to expose to the LLM from an actor's inventory. Higher values give the LLM more options but use more context.</p>
+                                    <input type="number" id="inventory-items-limit" min="1" max="20">
+                                </div>
+                                
+                                <!-- use_item_relevancy_scoring -->
+                                <div class="option-group checkbox-group">
+                                    <div class="option-label-container">
+                                        <label class="option-label" for="use-item-relevancy-scoring">Use Item Relevancy Scoring</label>
+                                        <button class="reset-button" onclick="resetOptionToDefault('use-item-relevancy-scoring')">Reset to Default</button>
+                                    </div>
+                                    <p>Use relevancy scoring for inventory items (Future implementation - Currently unavailable)</p>
+                                    <input type="checkbox" id="use-item-relevancy-scoring">
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -1781,6 +1806,11 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 document.getElementById('strip-emotes').checked = configData.strip_emotes_from_output;
                 document.getElementById('use-defeat').checked = configData.use_defeat;
                 document.getElementById('realnames-support').checked = configData.realnames_support;
+                
+                // Load inventory settings
+                document.getElementById('inventory-items-limit').value = configData.inventory_items_limit;
+                document.getElementById('use-item-relevancy-scoring').checked = configData.use_item_relevancy_scoring;
+                
                 populateVoiceTypeFallbacks(configData.voicetype_fallbacks);
                 document.getElementById('singing-prompt').value = configData.action_prompts.singing;
                 document.getElementById('self-narrator-explicit').value = configData.action_prompts.self_narrator_explicit;
@@ -1891,6 +1921,11 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 strip_emotes_from_output: document.getElementById('strip-emotes').checked,
                 use_defeat: document.getElementById('use-defeat').checked,
                 realnames_support: document.getElementById('realnames-support').checked,
+                
+                // Inventory settings
+                inventory_items_limit: document.getElementById('inventory-items-limit').value,
+                use_item_relevancy_scoring: document.getElementById('use-item-relevancy-scoring').checked,
+                
                 voicetype_fallbacks: getVoiceTypeFallbacks(),
                 action_prompts: {
                     singing: document.getElementById('singing-prompt').value,
@@ -2563,6 +2598,8 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     strip_emotes_from_output: document.getElementById('strip-emotes').checked,
                     use_defeat: document.getElementById('use-defeat').checked,
                     realnames_support: document.getElementById('realnames-support').checked,
+                    inventory_items_limit: parseInt(document.getElementById('inventory-items-limit').value),
+                    use_item_relevancy_scoring: document.getElementById('use-item-relevancy-scoring').checked,
                     voicetype_fallbacks: getVoiceTypeFallbacks(),
                     action_prompts: {
                         singing: document.getElementById('singing-prompt').value,
@@ -2665,6 +2702,10 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                         document.getElementById('strip-emotes').checked = importedConfig.strip_emotes_from_output ?? baseConfig.strip_emotes_from_output;
                         document.getElementById('use-defeat').checked = importedConfig.use_defeat ?? baseConfig.use_defeat;
                         document.getElementById('realnames-support').checked = importedConfig.realnames_support ?? baseConfig.realnames_support;
+
+                        // Inventory settings
+                        document.getElementById('inventory-items-limit').value = importedConfig.inventory_items_limit ?? baseConfig.inventory_items_limit;
+                        document.getElementById('use-item-relevancy-scoring').checked = importedConfig.use_item_relevancy_scoring ?? baseConfig.use_item_relevancy_scoring;
 
                         // Handle arrays and objects
                         if (importedConfig.commands_to_purge) {
@@ -2972,6 +3013,10 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 'voicetype-fallbacks': 'voicetype_fallbacks',
                 'commands-to-purge': 'commands_to_purge',
                 'events-to-ignore': 'events_to_ignore',
+                
+                // Inventory settings
+                'inventory-items-limit': 'inventory_items_limit',
+                'use-item-relevancy-scoring': 'use_item_relevancy_scoring',
 
                 // Action prompts
                 'singing-prompt': 'action_prompts.singing',
@@ -3095,6 +3140,10 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     'voicetype-fallbacks': 'voicetype_fallbacks',
                     'commands-to-purge': 'commands_to_purge',
                     'events-to-ignore': 'events_to_ignore',
+
+                    // Inventory settings
+                    'inventory-items-limit': 'inventory_items_limit',
+                    'use-item-relevancy-scoring': 'use_item_relevancy_scoring',
 
                     // Action prompts
                     'singing-prompt': 'action_prompts.singing',

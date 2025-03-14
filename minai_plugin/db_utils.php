@@ -105,6 +105,8 @@ function CreateItemsTableIfNotExists() {
                 is_available BOOLEAN DEFAULT TRUE,
                 item_type TEXT DEFAULT 'Item',
                 category TEXT,
+                mod_index TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 UNIQUE(item_id, file_name)
               )"
@@ -116,73 +118,6 @@ function CreateItemsTableIfNotExists() {
     }
 }
 
-function DropScenariosTableIfExists() {
-    $db = $GLOBALS['db'];
-    try {
-        $db->execQuery("DROP TABLE IF EXISTS minai_scenarios CASCADE");
-    } catch (Exception $e) {
-        // Ignore errors during cleanup
-    }
-}
-
-function CreateScenariosTableIfNotExists() {
-    $db = $GLOBALS['db'];
-    try {
-        // Check if table exists first
-        $result = $db->fetchAll("SELECT to_regclass('minai_scenarios') as exists");
-        if (!$result[0]['exists']) {
-            // Create table with SERIAL
-            $db->execQuery(
-              "CREATE TABLE IF NOT EXISTS minai_scenarios (
-                id SERIAL PRIMARY KEY,
-                name TEXT NOT NULL UNIQUE,
-                description TEXT,
-                category TEXT,
-                is_active BOOLEAN DEFAULT TRUE,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-              )"
-            );
-        }
-    } catch (Exception $e) {
-        // Log error but don't fail
-        error_log("Error creating scenarios table: " . $e->getMessage());
-    }
-}
-
-function DropItemRelevanceTableIfExists() {
-    $db = $GLOBALS['db'];
-    try {
-        $db->execQuery("DROP TABLE IF EXISTS minai_item_relevance CASCADE");
-    } catch (Exception $e) {
-        // Ignore errors during cleanup
-    }
-}
-
-function CreateItemRelevanceTableIfNotExists() {
-    $db = $GLOBALS['db'];
-    try {
-        // Check if table exists first
-        $result = $db->fetchAll("SELECT to_regclass('minai_item_relevance') as exists");
-        if (!$result[0]['exists']) {
-            // Create table with SERIAL
-            $db->execQuery(
-              "CREATE TABLE IF NOT EXISTS minai_item_relevance (
-                id SERIAL PRIMARY KEY,
-                item_id INTEGER NOT NULL REFERENCES minai_items(id) ON DELETE CASCADE,
-                scenario_id INTEGER NOT NULL REFERENCES minai_scenarios(id) ON DELETE CASCADE,
-                relevance_score DECIMAL(4,2) NOT NULL CHECK (relevance_score >= 0 AND relevance_score <= 100),
-                notes TEXT,
-                last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                UNIQUE(item_id, scenario_id)
-              )"
-            );
-        }
-    } catch (Exception $e) {
-        // Log error but don't fail
-        error_log("Error creating item relevance table: " . $e->getMessage());
-    }
-}
-
 function InitiateDBTables() {
     CreateThreadsTableIfNotExists();
     CreateActionsTableIfNotExists();
@@ -190,14 +125,12 @@ function InitiateDBTables() {
     CreateEquipmentDescriptionTableIfNotExist();
     CreateTattooDescriptionTableIfNotExists();
     CreateItemsTableIfNotExists();
-    //CreateScenariosTableIfNotExists();
-    //CreateItemRelevanceTableIfNotExists();
 }
 
 function ResetDBTables() {
     DropThreadsTableIfExists();
-    DropItemRelevanceTableIfExists();
-    DropScenariosTableIfExists();
+    // DropItemRelevanceTableIfExists();
+    //DropScenariosTableIfExists();
     DropItemsTableIfExists();
     CreateThreadsTableIfNotExists();
     CreateActionsTableIfNotExists();
@@ -205,6 +138,4 @@ function ResetDBTables() {
     CreateEquipmentDescriptionTableIfNotExist();
     CreateTattooDescriptionTableIfNotExists();
     CreateItemsTableIfNotExists();
-    //CreateScenariosTableIfNotExists();
-    //CreateItemRelevanceTableIfNotExists();
 }

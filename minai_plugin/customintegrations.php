@@ -246,49 +246,217 @@ function ProcessIntegrations() {
         $success = true;
 
         if ($GLOBALS["gameRequest"][0] == "minai_storeitem_batch") {
+            // First, check if this is an inventory batch (which includes actor name)
+            $actorName = null;
+            $batchStatus = null;
+            $inventoryData = "";
+            
+            // Check if the data contains actor name and batch status
+            $parts = explode("@", $data, 3);
+            if (count($parts) == 3) {
+                $actorName = $parts[0];
+                $batchStatus = $parts[1]; // New: extract batch status
+                $data = $parts[2]; // Remove actor name and status from data for processing
+                
+                minai_log("info", "Processing inventory batch for {$actorName} with status: {$batchStatus}");
+            } else {
+                minai_log("warn", "Invalid batch format - expected actor@status@data but got: " . substr($data, 0, 50) . "...");
+            }
+            
             // Process batched items
             $items = explode("~", $data);  // Changed from | to ~ as separator
-            foreach ($items as $item) {
-                $itemData = explode("@", $item);
-                if (count($itemData) >= 4) {
-                    $formId = $itemData[0];
-                    $modName = $itemData[1];
-                    $name = $itemData[2];
-                    $formTypeId = $itemData[3];
-                    $description = isset($itemData[4]) ? $itemData[4] : "";
+            $processedItemsCount = 0;
+            $skippedItemsCount = 0;
+            $invalidItemsCount = 0;
+            
+            // Debug log the raw data length
+            $dataLength = strlen($data);
+            minai_log("debug", "Raw batch data length: {$dataLength} bytes with status: {$batchStatus}");
+            
+            // For inventory tracking, build a formatted string in the old format
+            if ($actorName) {
+                $inventoryItems = array();
+                
+                // Different handling based on batch status
+                if ($batchStatus == "initial") {
+                    // Clear temporary inventory storage for initial batch
+                    SetActorValue($actorName, "Inventory2", "");
+                    minai_log("info", "Initial batch - clearing temporary inventory");
+                } 
+                else {
+                    // For non-initial batches (partial or final), get existing temporary inventory
+                    $existingInventory = GetActorValue($actorName, "Inventory2", false, true);
                     
-                    // Translate form type ID to category
-                    $category = translateFormTypeToCategory($formTypeId);
-                    
-                    if (!AddItem($formId, $modName, $name, $description, true, $category)) {
-                        $success = false;
-                        minai_log("error", "Failed to store item data for " . $formId . " from " . $modName);
+                    // Parse existing inventory if any
+                    if (!empty($existingInventory)) {
+                        $existingItems = explode("~", $existingInventory);
+                        foreach ($existingItems as $item) {
+                            $itemParts = explode("&", $item);
+                            if (count($itemParts) == 2) {
+                                $formId = $itemParts[0];
+                                $count = intval($itemParts[1]);
+                                $inventoryItems[$formId] = $count;
+                            }
+                        }
+                        
+                        $logMessage = ($batchStatus == "final") 
+                            ? "Merged with existing temporary inventory for final batch: " 
+                            : "Merged with existing temporary inventory: ";
+                        minai_log("info", $logMessage . count($inventoryItems) . " items");
+                    } else {
+                        minai_log("debug", "No existing temporary inventory found for {$actorName}");
                     }
                 }
             }
-            minai_log("info", "Processed batch of " . count($items) . " items");
+            
+            // Debug the actual items received
+            minai_log("info", "Received " . count($items) . " items in batch");
+            
+            // Special handling for empty final batch
+            if ($batchStatus == "final" && empty(trim($data))) {
+                minai_log("info", "Received empty final batch - will finalize inventory");
+                
+                // Even if this batch is empty, we still need to process the finalization
+                // if there's any data in the temporary inventory
+                $existingInventory = GetActorValue($actorName, "Inventory2", false, true);
+                if (!empty($existingInventory)) {
+                    // Parse the existing inventory to create the final inventory items array
+                    $existingItems = explode("~", $existingInventory);
+                    foreach ($existingItems as $item) {
+                        $itemParts = explode("&", $item);
+                        if (count($itemParts) == 2) {
+                            $formId = $itemParts[0];
+                            $count = intval($itemParts[1]);
+                            $inventoryItems[$formId] = $count;
+                        }
+                    }
+                    
+                    minai_log("info", "Empty final batch with existing temporary inventory: " . count($inventoryItems) . " items");
+                } else {
+                    // Empty final batch with no temporary inventory means clear the main inventory
+                    SetActorValue($actorName, "Inventory", "");
+                    minai_log("info", "Empty final batch with no temporary inventory - cleared main inventory");
+                }
+            }
+            
+            // Process items in the batch if there are any
+            if (!empty(trim($data))) {
+                foreach ($items as $index => $item) {
+                    if (empty(trim($item))) {
+                        $skippedItemsCount++;
+                        minai_log("debug", "Skipping empty item at index {$index}");
+                        continue; // Skip empty items
+                    }
+                    
+                    $itemData = explode("@", $item);
+                    if (count($itemData) >= 6) {  // Ensure we have all required fields
+                        $formId = $itemData[0];
+                        $modName = $itemData[1];
+                        $name = $itemData[2];
+                        $formTypeId = $itemData[3];
+                        $modIndex = $itemData[4];
+                        $count = intval($itemData[5]);
+                        
+                        // Skip items with empty names or mod names
+                        if (empty($name) || empty($modName)) {
+                            minai_log("debug", "Skipping item with empty name or mod at index {$index}: " . substr($item, 0, 30));
+                            $skippedItemsCount++;
+                            continue;
+                        }
+                        
+                        
+                        minai_log("debug", "Processing item [{$index}]: {$name} (ID: {$formId}, Mod: {$modName}, Count: {$count})");
+                        
+                        // If this is inventory data, track the item and count
+                        if ($actorName && $count > 0) {
+                            $inventoryItems[$formId] = $count;
+                        }
+                        
+                        // Translate form type ID to category
+                        $category = translateFormTypeToCategory($formTypeId);
+                        
+                        // Update the AddItem call to include the mod_index
+                        if (!AddItemWithModIndex($formId, $modName, $name, "", $modIndex, true, $category)) {
+                            $success = false;
+                            minai_log("error", "Failed to store item data for " . $formId . " from " . $modName);
+                        } else {
+                            $processedItemsCount++;
+                        }
+                    } else {
+                        $invalidItemsCount++;
+                        minai_log("error", "Invalid item data format at index {$index}, fields count: " . count($itemData) . ", data: " . substr($item, 0, 50));
+                    }
+                }
+            }
+            
+            // If this was an inventory batch, store the actor's inventory
+            if ($actorName && !empty($inventoryItems)) {
+                // Convert to the format expected by the database (formId&count~formId&count...)
+                $inventoryStr = "";
+                foreach ($inventoryItems as $formId => $count) {
+                    if (!empty($inventoryStr)) {
+                        $inventoryStr .= "~";
+                    }
+                    $inventoryStr .= $formId . "&" . $count;
+                }
+                
+                // Store to appropriate location based on batch status
+                if ($batchStatus == "final") {
+                    // Final batch - store to permanent inventory and clear temporary
+                    SetActorValue($actorName, "Inventory", $inventoryStr);
+                    SetActorValue($actorName, "Inventory2", "");
+                    minai_log("info", "Stored FINAL inventory for " . $actorName . " with " . count($inventoryItems) . " items");
+                } else {
+                    // Non-final batch - store to temporary inventory
+                    SetActorValue($actorName, "Inventory2", $inventoryStr);
+                    minai_log("info", "Stored temporary inventory for " . $actorName . " with " . count($inventoryItems) . " items (batch status: " . $batchStatus . ")");
+                }
+            }
+            
+            // Log detailed statistics
+            minai_log("info", "Batch processing complete - Processed: {$processedItemsCount}, Skipped: {$skippedItemsCount}, Invalid: {$invalidItemsCount}");
         } else {
             // Process single item
             $itemData = explode("@", $data);
-            if (count($itemData) >= 4) {
+            if (count($itemData) >= 5) {  // Updated to require mod_index
                 $formId = $itemData[0];
                 $modName = $itemData[1];
                 $name = $itemData[2];
                 $formTypeId = $itemData[3];
-                $description = isset($itemData[4]) ? $itemData[4] : "";
+                $modIndex = $itemData[4];
+                $description = isset($itemData[5]) ? $itemData[5] : "";
                 
                 // Translate form type ID to category
                 $category = translateFormTypeToCategory($formTypeId);
                 
-                $success = AddItem($formId, $modName, $name, $description, true, $category);
+                $success = AddItemWithModIndex($formId, $modName, $name, $description, $modIndex, true, $category);
             } else {
                 $success = false;
-                minai_log("error", "Invalid item data format");
+                minai_log("error", "Invalid item data format, missing required fields");
             }
         }
         
         if (!$success) {
             minai_log("error", "One or more items failed to store");
+        }
+        
+        $MUST_DIE=true;
+    }
+
+    // Add handling for minai_clearinventory
+    // There's a race condition inbetween the inventory being cleared and new inventory being stored
+    // I don't think it's a huge deal though, so leaving it for now.
+    if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "minai_clearinventory") {
+        minai_log("info", "Processing minai_clearinventory event");
+        
+        $actorName = $GLOBALS["gameRequest"][3];
+        if ($actorName) {
+            // Clear both the main and temporary inventory
+            SetActorValue($actorName, "Inventory", "");
+            SetActorValue($actorName, "Inventory2", "");
+            minai_log("info", "Cleared inventory for actor: " . $actorName);
+        } else {
+            minai_log("error", "No actor name provided for inventory clear");
         }
         
         $MUST_DIE=true;
@@ -618,6 +786,84 @@ function StoreTattooData($actorName, $tattooData) {
         return true;
     } catch (Exception $e) {
         minai_log("error", "Error storing tattoo data: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Add a new item to the database with mod index support
+ * 
+ * @param string $item_id The 8 digit hex ID of the item (format: 0x??012345)
+ * @param string $file_name The name of the file the item lives in (e.g., "Skyrim.esm")
+ * @param string $name The plain text name of the item
+ * @param string $description A description of the item
+ * @param string $mod_index The mod index (FE, 00, etc.)
+ * @param bool $is_available Whether the item is available for use
+ * @param string $category Optional category for the item
+ * @return bool True if the item was added successfully, false otherwise
+ */
+function AddItemWithModIndex($item_id, $file_name, $name, $description, $mod_index, $is_available = true, $category = null) {
+    $db = $GLOBALS['db'];
+    
+    // Process the form ID
+    // Add 0x prefix if missing
+    if (strpos($item_id, '0x') !== 0) {
+        $item_id = '0x' . $item_id;
+    }
+    
+    // If form ID is 8 digits (after 0x prefix), extract just the last 6 digits
+    if (strlen($item_id) == 10) { // "0x" + 8 hex digits
+        $item_id = '0x' . substr($item_id, 4, 6); // Keep just the last 6 digits with 0x prefix
+        minai_log("info", "Truncated form ID to 6 digits: " . $item_id);
+    }
+    
+    // Validate item_id format (0x??012345 or 0x012345)
+    if (!preg_match('/^0x[0-9A-Fa-f]{6,8}$/', $item_id)) {
+        minai_log("error", "Invalid form ID format: " . $item_id);
+        return false;
+    }
+    
+    // Validate file extension
+    $valid_extensions = ['esm', 'esp', 'esl'];
+    $file_extension = pathinfo($file_name, PATHINFO_EXTENSION);
+    if (!in_array(strtolower($file_extension), $valid_extensions)) {
+        minai_log("error", "Invalid file extension: " . $file_extension . " for file " . $file_name);
+        return false;
+    }
+    
+    // Log incoming data for debugging
+    minai_log("debug", "AddItemWithModIndex - Processing: ID={$item_id}, File={$file_name}, Name={$name}, ModIdx={$mod_index}, Category={$category}");
+    
+    try {
+        // Escape inputs
+        $item_id = $db->escape($item_id);
+        $file_name = $db->escape($file_name);
+        $name = $db->escape($name);
+        $description = $db->escape($description);
+        $mod_index = $db->escape($mod_index);
+        $is_available = $is_available ? 'TRUE' : 'FALSE';
+        $category = $category ? "'" . $db->escape($category) . "'" : 'NULL';
+        
+        // Check if item already exists
+        $result = $db->fetchAll("SELECT id FROM minai_items WHERE item_id = '{$item_id}' AND file_name = '{$file_name}'");
+        
+        if (count($result) > 0) {
+            // Item exists, delete it
+            $query = "DELETE FROM minai_items WHERE item_id = '{$item_id}' AND file_name = '{$file_name}'";
+            $db->execQuery($query);
+            minai_log("debug", "Deleted existing item: " . $item_id . " from " . $file_name);
+        } 
+        // Item doesn't exist, insert it
+        $query = "INSERT INTO minai_items 
+                    (item_id, file_name, name, description, is_available, category, mod_index) 
+                    VALUES 
+                    ('{$item_id}', '{$file_name}', '{$name}', '{$description}', {$is_available}, {$category}, '{$mod_index}')";
+        
+        $db->execQuery($query);
+        minai_log("debug", "Successfully stored item: " . $name . " (" . $item_id . ")");
+        return true; // If we get here, the query was successful
+    } catch (Exception $e) {
+        minai_log("error", "Error in AddItemWithModIndex: " . $e->getMessage() . " for item: " . $item_id . " from " . $file_name);
         return false;
     }
 }

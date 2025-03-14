@@ -1,12 +1,8 @@
 Scriptname minai_ItemCommands extends Quest
 
-; Main quest controller script
 minai_MainQuestController Property Main Auto
-; Access to the AIFF framework
 minai_AIFF Property aiff Auto
-; Player reference
 Actor Property PlayerRef Auto
-; Utility script for common functions
 minai_Util Property MinaiUtil Auto
 
 ; Initialization flag
@@ -62,82 +58,68 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   EndIf
 EndEvent
 
-; Helper function to get a Form from the item registry
-Form Function GetItemFormFromRegistry(string itemId)
-  if !itemId || itemId == ""
+
+
+; New helper function to parse form ID from the new format "0x00000F:Skyrim.esm:5"
+; Returns the Form object
+Form Function GetFormFromLLMFormat(string parameter)
+  if !parameter || parameter == ""
     return None
   EndIf
   
-  ; If itemId already has 0x prefix, use it as is, otherwise add it
-  if StringUtil.Find(itemId, "0x") != 0
-    itemId = "0x" + itemId
+  ; Parse the parameter (formId:modName:count)
+  string[] parts = StringUtil.Split(parameter, ":")
+  if parts.Length < 2
+    Main.Warn("GetFormFromLLMFormat - Invalid format, expected formId:modName[:count]: " + parameter)
+    return None
   EndIf
   
-  ; Try to get item data from registry
-  int itemData = JMap.getObj(aiff.itemRegistry, itemId)
-  if itemData != 0
-    return JMap.getForm(itemData, "form")
+  string formIdStr = parts[0]
+  string modName = parts[1]
+  
+  ; Process form ID string - strip 0x prefix if present
+  if StringUtil.Find(formIdStr, "0x") == 0
+    formIdStr = StringUtil.SubString(formIdStr, 2)
   EndIf
   
-  ; If not found, log warning and return None
-  Main.Warn("GetItemFormFromRegistry - Item ID not found in registry: " + itemId)
-  return None
+  ; Use the utility function to convert hex to integer
+  int formId = minai_Util.HexToInt(formIdStr)
+  if formId == 0
+    Main.Warn("GetFormFromLLMFormat - Failed to parse form ID: " + formIdStr)
+    return None
+  EndIf
+  
+  ; Get the form from the given mod
+  Form itemForm = Game.GetFormFromFile(formId, modName)
+  if !itemForm
+    Main.Warn("GetFormFromLLMFormat - Form not found: " + formIdStr + " in mod " + modName)
+    return None
+  EndIf
+  
+  return itemForm
 EndFunction
 
-; Helper function to find an item by name in the registry
-Form Function GetItemFormFromName(string itemName)
-  if !itemName || itemName == ""
-    return None
+; Helper function to extract the count from the parameter
+int Function GetCountFromLLMFormat(string parameter)
+  if !parameter || parameter == ""
+    return 1
   EndIf
   
-  Main.Debug("GetItemFormFromName - Searching for item: " + itemName)
+  ; Parse the parameter (formId:modName:count)
+  string[] parts = StringUtil.Split(parameter, ":")
   
-  ; Get all item IDs from registry
-  string[] itemIds = JMap.allKeysPArray(aiff.itemRegistry)
+  ; Default count is 1
+  int count = 1
   
-  if !itemIds || itemIds.Length == 0
-    Main.Warn("GetItemFormFromName - Item registry is empty")
-    return None
+  ; Parse count if provided
+  if parts.Length >= 3 && parts[2] != ""
+    count = parts[2] as int
+    if count <= 0
+      count = 1
+    EndIf
   EndIf
   
-  ; Search through registry for matching names
-  int i = 0
-  while i < itemIds.Length
-    int itemData = JMap.getObj(aiff.itemRegistry, itemIds[i])
-    if itemData != 0
-      Form itemForm = JMap.getForm(itemData, "form")
-      if itemForm
-        string registryItemName = itemForm.GetName()
-        if registryItemName == itemName
-          Main.Debug("GetItemFormFromName - Found match: " + registryItemName + " (ID: " + itemIds[i] + ")")
-          return itemForm
-        EndIf
-      EndIf
-    EndIf
-    i += 1
-  EndWhile
-  
-  ; Try partial matching if exact match not found
-  i = 0
-  while i < itemIds.Length
-    int itemData = JMap.getObj(aiff.itemRegistry, itemIds[i])
-    if itemData != 0
-      Form itemForm = JMap.getForm(itemData, "form")
-      if itemForm
-        string registryItemName = itemForm.GetName()
-        ; Check if the registry item name contains the search string
-        if StringUtil.Find(registryItemName, itemName) >= 0
-          Main.Debug("GetItemFormFromName - Found partial match: " + registryItemName + " (ID: " + itemIds[i] + ")")
-          return itemForm
-        EndIf
-      EndIf
-    EndIf
-    i += 1
-  EndWhile
-  
-  ; If still not found, log warning and return None
-  Main.Warn("GetItemFormFromName - Item name not found in registry: " + itemName)
-  return None
+  return count
 EndFunction
 
 ; Give an item from NPC to player
@@ -149,30 +131,14 @@ Function GiveItemToPlayer(Actor akSpeaker, String parameter)
   
   string speakerName = Main.GetActorName(akSpeaker)
   string playerName = Main.GetActorName(PlayerRef)
-  string[] params = StringUtil.Split(parameter, ":")
   
-  if params.Length < 1
-    Main.Warn("GiveItemToPlayer - Missing item name parameter")
-    return
-  EndIf
+  ; Parse the item information and count
+  Form itemForm = GetFormFromLLMFormat(parameter)
+  int count = GetCountFromLLMFormat(parameter)
   
-  string itemName = params[0]
-  int count = 1
-  
-  ; Parse count if provided
-  if params.Length >= 2 && params[1] != ""
-    count = params[1] as int
-    if count <= 0
-      count = 1
-    EndIf
-  EndIf
-  
-  ; Get item from registry by name
-  Form itemForm = GetItemFormFromName(itemName)
   if !itemForm
-    Main.Warn("GiveItemToPlayer - Item not found in registry: " + itemName)
-    Debug.Notification("Item not found in registry: " + itemName)
-    ; aiff.AIRequestMessageForActor(speakerName + " tried to give " + playerName + " " + itemName + ", but couldn't find it.", "chat_minai_giveitem", speakerName)
+    Main.Warn("GiveItemToPlayer - Invalid item format or item not found: " + parameter)
+    Debug.Notification("Invalid item format or item not found: " + parameter)
     return
   EndIf
   
@@ -220,29 +186,14 @@ Function TakeItemFromPlayer(Actor akSpeaker, String parameter)
   
   string speakerName = Main.GetActorName(akSpeaker)
   string playerName = Main.GetActorName(PlayerRef)
-  string[] params = StringUtil.Split(parameter, ":")
   
-  if params.Length < 1
-    Main.Warn("TakeItemFromPlayer - Missing item name parameter")
-    return
-  EndIf
+  ; Parse the item information and count
+  Form itemForm = GetFormFromLLMFormat(parameter)
+  int count = GetCountFromLLMFormat(parameter)
   
-  string itemName = params[0]
-  int count = 1
-  
-  ; Parse count if provided
-  if params.Length >= 2 && params[1] != ""
-    count = params[1] as int
-    if count <= 0
-      count = 1
-    EndIf
-  EndIf
-  
-  ; Get item from registry by name
-  Form itemForm = GetItemFormFromName(itemName)
   if !itemForm
-    Main.Warn("TakeItemFromPlayer - Item not found in registry: " + itemName)
-    main.RequestLLMResponseFromActor(speakerName + " tried to take " + itemName + " from " + playerName + ", but couldn't find it.", "chatnf_minai_narrate", speakerName)
+    Main.Warn("TakeItemFromPlayer - Invalid item format or item not found: " + parameter)
+    main.RequestLLMResponseFromActor(speakerName + " tried to take an item from " + playerName + ", but couldn't find it.", "chatnf_minai_narrate", speakerName)
     return
   EndIf
   
@@ -293,39 +244,22 @@ Function TradeItemWithPlayer(Actor akSpeaker, String parameter)
   
   string speakerName = Main.GetActorName(akSpeaker)
   string playerName = Main.GetActorName(PlayerRef)
-  string[] params = StringUtil.Split(parameter, ":")
+  string[] params = StringUtil.Split(parameter, "|")
   
   if params.Length < 2
-    Main.Warn("TradeItemWithPlayer - Missing required parameters")
+    Main.Warn("TradeItemWithPlayer - Missing required parameters, expected format: formId:modName:count|formId:modName:count")
     return
   EndIf
   
-  string giveItemName = params[0]
-  string takeItemName = params[1]
-  int giveCount = 1
-  int takeCount = 1
+  ; Parse the items to give and take with their counts
+  Form giveItemForm = GetFormFromLLMFormat(params[0])
+  int giveCount = GetCountFromLLMFormat(params[0])
   
-  ; Parse counts if provided
-  if params.Length >= 3 && params[2] != ""
-    giveCount = params[2] as int
-    if giveCount <= 0
-      giveCount = 1
-    EndIf
-  EndIf
-  
-  if params.Length >= 4 && params[3] != ""
-    takeCount = params[3] as int
-    if takeCount <= 0
-      takeCount = 1
-    EndIf
-  EndIf
-  
-  ; Get items from registry by name
-  Form giveItemForm = GetItemFormFromName(giveItemName)
-  Form takeItemForm = GetItemFormFromName(takeItemName)
+  Form takeItemForm = GetFormFromLLMFormat(params[1])
+  int takeCount = GetCountFromLLMFormat(params[1])
   
   if !giveItemForm || !takeItemForm
-    Main.Warn("TradeItemWithPlayer - One or more items not found in registry")
+    Main.Warn("TradeItemWithPlayer - One or more items not found or invalid format")
     main.RequestLLMResponseFromActor(speakerName + " tried to trade items with " + playerName + ", but one or more items couldn't be found.", "chatnf_minai_narrate", speakerName)
     return
   EndIf

@@ -299,6 +299,13 @@
             font-size: 0.9rem;
         }
 
+        .warning-text {
+            color: var(--error-color);
+            font-size: 0.9rem;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 15px;
@@ -356,6 +363,9 @@
                     <select id="category-filter">
                         <option value="">All Categories</option>
                     </select>
+                    <select id="type-filter">
+                        <option value="">All Types</option>
+                    </select>
                     <select id="availability-filter">
                         <option value="">All Availability</option>
                         <option value="true">Available</option>
@@ -365,6 +375,8 @@
                         <option value="name">Sort by Name</option>
                         <option value="last_seen">Sort by Last Seen</option>
                         <option value="category">Sort by Category</option>
+                        <option value="item_type">Sort by Type</option>
+                        <option value="created_at">Sort by Created</option>
                     </select>
                     <select id="sort-order">
                         <option value="ASC">Ascending</option>
@@ -381,9 +393,12 @@
                                 <th>File Name</th>
                                 <th>Name</th>
                                 <th>Description</th>
+                                <th>Type</th>
                                 <th>Category</th>
+                                <th>Mod Index</th>
                                 <th>Available</th>
                                 <th>Last Seen</th>
+                                <th>Created At</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -428,8 +443,18 @@
                     </div>
                     
                     <div class="form-group">
+                        <label for="item-type">Item Type</label>
+                        <input type="text" id="item-type" name="item_type" placeholder="Item, Weapon, Armor, etc." value="Item">
+                    </div>
+                    
+                    <div class="form-group">
                         <label for="item-category">Category</label>
                         <input type="text" id="item-category" name="category" placeholder="Weapons, Armor, Potions, etc.">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="mod-index">Mod Index</label>
+                        <input type="text" id="mod-index" name="mod_index" placeholder="Optional mod index">
                     </div>
                     
                     <div class="form-group checkbox-group">
@@ -468,7 +493,21 @@
                     </select>
                 </div>
                 
+                <div class="form-group">
+                    <label for="export-type">Export Type (optional)</label>
+                    <select id="export-type">
+                        <option value="">All Types</option>
+                    </select>
+                </div>
+                
                 <button id="export-button">Export to JSON</button>
+            </div>
+            
+            <div class="section">
+                <h2>Database Management</h2>
+                
+                <button id="reset-db-button" class="delete">Reset Database</button>
+                <p class="warning-text">Warning: This will delete all items from the database. This action cannot be undone.</p>
             </div>
         </div>
     </div>

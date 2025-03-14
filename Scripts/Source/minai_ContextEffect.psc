@@ -9,13 +9,14 @@ minai_MainQuestController main
 minai_Config config
 Spell ContextSpell
 minai_FillHerUp fillHerUp
-
+Form gold
 Event OnEffectStart(Actor akTarget, Actor akCaster)
   main = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_MainQuestController
   aiff = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_AIFF
   ContextSpell = Game.GetFormFromFile(0x090A, "MinAI.esp") as Spell
   config = Game.GetFormFromFile(0x0912, "MinAI.esp") as minai_Config
   fillHerUp = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_FillHerUp
+  gold = Game.GetFormFromFile(0x00000F, "Skyrim.esm") as Form
   if (!akTarget || !main || !aiff || !aiff.IsInitialized())
     Debug.Trace("[minai] Skipping OnEffectStart, not ready")
     return
@@ -31,12 +32,9 @@ Event OnEffectStart(Actor akTarget, Actor akCaster)
     fillHerUp.RegisterForAnimationEvents(akTarget)
   endif
   
-  ; Register for inventory events by adding individual filters
-  if aiff && aiff.IsInitialized()
-    aiff.PopulateInventoryEventFilter(akTarget)
-    
-    ; Also do initial inventory tracking to capture current state
-    aiff.TrackActorInventory(akTarget)
+  if aiff && aiff.IsInitialized()    
+    ; Initialize actor inventory tracking
+    EnableInventoryTracking()
   endif
   
   ; Do one update for actors the first time we enter a zone. Introduce a little jitter to distribute load.
@@ -51,11 +49,6 @@ Event OnEffectFinish(Actor akTarget, Actor akCaster)
   ; Unregister Fill Her Up animations
   if fillHerUp
     fillHerUp.UnregisterForAnimationEvents(akTarget)
-  endif
-  
-  ; Remove inventory event filters
-  if aiff && aiff.IsInitialized()
-    aiff.RemoveInventoryEventFilters(akTarget)
   endif
   
   UnregisterForUpdate()
@@ -105,6 +98,9 @@ Event OnUpdate()
     Main.Debug("Actor " + targetName + " went away: Removing context tracking")
     DisableSelf(akTarget)
   EndIf
+  if aiff.IsInventoryThrottled(akTarget)
+    EnableInventoryTracking()
+  endif
   Main.Debug("Context OnUpdate(" + targetName +") END")
 EndEvent
 
@@ -114,7 +110,10 @@ Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemRefere
     return
   EndIf
   if aiff
-    aiff.OnInventoryChanged(akTarget, akBaseItem, aiItemCount, true)
+    if aiff.OnInventoryChanged(akTarget, akBaseItem, aiItemCount, true)
+      ; Throttled
+      DisableInventoryTracking()
+    endif 
   EndIf
 EndEvent
 
@@ -124,6 +123,34 @@ Event OnItemRemoved(Form akBaseItem, int aiItemCount, ObjectReference akItemRefe
     return
   EndIf
   if aiff
-    aiff.OnInventoryChanged(akTarget, akBaseItem, aiItemCount, false)
+    if aiff.OnInventoryChanged(akTarget, akBaseItem, aiItemCount, false)
+      ; Throttled
+      DisableInventoryTracking()
+    endif 
   EndIf
 EndEvent
+
+
+event DisableInventoryTracking()
+  ; Filter out everything except gold to neuter the item change events
+  actor akTarget = GetTargetActor()
+  Main.Info("Disabling inventory tracking for " + Main.GetActorName(akTarget))
+  if (!gold)
+    gold = Game.GetFormFromFile(0x00000F, "Skyrim.esm") as Form
+  endif
+  AddInventoryEventFilter(gold)
+endEvent
+
+
+event EnableInventoryTracking()
+  ; Remove the filter to allow all item changes again
+  actor akTarget = GetTargetActor()
+  Main.Info("Enabling inventory tracking for " + Main.GetActorName(akTarget))
+  if (!gold)
+    gold = Game.GetFormFromFile(0x00000F, "Skyrim.esm") as Form
+  endif
+  RemoveInventoryEventFilter(gold)
+  aiff.TrackActorInventory(akTarget)
+endEvent
+
+

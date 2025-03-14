@@ -9,9 +9,7 @@ Spell minai_PlayerStateTracker
 actor playerRef
 GlobalVariable minai_DynamicSapienceToggleStealth
 minai_SapienceController Property sapience Auto
-
-; Add a property to track whether we're monitoring inventory
-bool isTrackingInventory = false
+Form gold
 
 Function StartTrackingPlayer()
   if playerRef.HasSpell(minai_PlayerStateTracker)
@@ -30,9 +28,6 @@ Function StartTrackingPlayer()
   MainQuestController.Info("Starting player state tracking")
   playerRef.AddSpell(minai_PlayerStateTracker, false)
 
-  ; Start tracking inventory
-  RegisterForInventoryEvents()
-
   ; Only register for animation events if the feature is enabled
   if config.disableSapienceInStealth
     RegisterStealthAnimEvents()
@@ -47,6 +42,9 @@ Function RegisterStealthAnimEvents()
   RegisterForAnimationEvent(playerRef, "tailMTLocomotion")
   RegisterForAnimationEvent(playerRef, "tailCombatIdle")
   RegisterForAnimationEvent(playerRef, "tailCombatLocomotion")
+  if aiff.IsInventoryThrottled(playerRef)
+    EnableInventoryTracking()
+  EndIf
 EndFunction
 
 Function UnregisterStealthAnimEvents()
@@ -59,40 +57,7 @@ Function UnregisterStealthAnimEvents()
   UnregisterForAnimationEvent(playerRef, "tailCombatLocomotion")
 EndFunction
 
-; New function to register for inventory events
-Function RegisterForInventoryEvents()
-  if isTrackingInventory
-    MainQuestController.Debug("Already tracking player inventory events")
-    return
-  EndIf
-  
-  if bHasAIFF && aiff && aiff.IsInitialized()
-    MainQuestController.Info("Registering player inventory events")
-    
-    ; Apply inventory event filters
-    aiff.PopulateInventoryEventFilter(playerRef)
-    
-    ; Do initial inventory tracking
-    aiff.TrackActorInventory(playerRef)
-    
-    isTrackingInventory = true
-  else
-    MainQuestController.Warn("Cannot register player inventory events - AIFF not initialized")
-  EndIf
-EndFunction
 
-; New function to unregister inventory events
-Function UnregisterInventoryEvents()
-  if !isTrackingInventory
-    return
-  EndIf
-  
-  if bHasAIFF && aiff && aiff.IsInitialized()
-    MainQuestController.Info("Unregistering player inventory events")
-    aiff.RemoveInventoryEventFilters(playerRef)
-    isTrackingInventory = false
-  endif
-EndFunction
 
 Function UpdateStealthFeatureState(bool enabled)
   ; Called when the feature is toggled in MCM
@@ -114,6 +79,7 @@ EndFunction
 Event OnPlayerLoadGame()
   playerRef = game.GetPlayer()
   RegisterForSleep()
+  gold = Game.GetFormFromFile(0x00000F, "Skyrim.esm") as Form
   bHasAIFF = (Game.GetModByName("AIAgent.esp") != 255)
   if (bHasAIFF)
     aiff = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_AIFF
@@ -128,25 +94,14 @@ Event OnPlayerLoadGame()
     MainQuestController.Info("Re-enabling sapience on load as stealth feature is disabled")
     minai_DynamicSapienceToggleStealth.SetValue(1.0)
   EndIf
-  
   StartTrackingPlayer()
   MainQuestController.Maintenance()
-
-  ; Re-register for inventory events
-  if isTrackingInventory
-    RegisterForInventoryEvents()
-  EndIf
+  EnableInventoryTracking()
 EndEvent
 
 Event OnLocationChange(Location akOldLoc, Location akNewLoc)
   if (bHasAIFF)
     aiff.CleanupSapientActors()
-    
-    ; Force inventory update on location change
-    if isTrackingInventory
-      MainQuestController.Debug("Updating player inventory on location change")
-      aiff.TrackActorInventory(playerRef)
-    EndIf
   EndIf
 endEvent
 
@@ -158,12 +113,6 @@ Event OnSleepStart(float afSleepStartTime, float afDesiredSleepEndTime)
   EndIf
   if config.updateNarratorProfile && bHasAIFF
     aiff.UpdateProfile("The Narrator")
-  EndIf
-  
-  ; Update inventory when player sleeps
-  if isTrackingInventory
-    MainQuestController.Debug("Updating player inventory on sleep")
-    aiff.TrackActorInventory(playerRef)
   EndIf
 EndEvent
 
@@ -186,20 +135,45 @@ EndEvent
 
 ; Add event handler for item added
 Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
-  if !bHasAIFF || !aiff || !isTrackingInventory
+  if !bHasAIFF || !aiff
     return
   EndIf
   
   MainQuestController.Debug("Player OnItemAdded - Form: " + akBaseItem + ", Count: " + aiItemCount)
-  aiff.OnInventoryChanged(playerRef, akBaseItem, aiItemCount, true)
+  if aiff.OnInventoryChanged(playerRef, akBaseItem, aiItemCount, true)
+    DisableInventoryTracking()
+  endif
 EndEvent
 
 ; Add event handler for item removed
 Event OnItemRemoved(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akDestContainer)
-  if !bHasAIFF || !aiff || !isTrackingInventory
+  if !bHasAIFF || !aiff
     return
   EndIf
   
   MainQuestController.Debug("Player OnItemRemoved - Form: " + akBaseItem + ", Count: " + aiItemCount)
-  aiff.OnInventoryChanged(playerRef, akBaseItem, aiItemCount, false)
+  if aiff.OnInventoryChanged(playerRef, akBaseItem, aiItemCount, false)
+    DisableInventoryTracking()
+  endif
 EndEvent
+
+
+event DisableInventoryTracking()
+  ; Filter out everything except gold to neuter the item change events
+  MainQuestController.Info("Disabling inventory tracking for player")
+  if (!gold)
+    gold = Game.GetFormFromFile(0x00000F, "Skyrim.esm") as Form
+  endif
+  AddInventoryEventFilter(gold)
+endEvent
+
+
+event EnableInventoryTracking()
+  ; Remove the filter to allow all item changes again
+  MainQuestController.Info("Enabling inventory tracking for player")
+  if (!gold)
+    gold = Game.GetFormFromFile(0x00000F, "Skyrim.esm") as Form
+  endif
+  RemoveInventoryEventFilter(gold)
+  aiff.TrackActorInventory(playerRef)
+endEvent

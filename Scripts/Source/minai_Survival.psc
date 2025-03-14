@@ -487,8 +487,7 @@ Function SetContext(actor akTarget)
                              playerRef.HasMagicEffect(MAG_DrugsFortifyStaminaRegen) || \
                              playerRef.HasMagicEffect(MAG_DrugsVisualEffectEversnow) || \
                              playerRef.HasMagicEffect(MAG_DrugsVisualEffectSkooma) || \
-                             playerRef.HasMagicEffect(MAG_DrugsVisualEffectSkoomaRed) || \
-                             playerRef.HasMagicEffect(MAG_DrugsVisualEffectSleepingTreeSap)
+                             playerRef.HasMagicEffect(MAG_DrugsVisualEffectSkoomaRed)
       
       if hasAnyDrugEffect
         aiff.SetActorVariable(playerRef, "isOnSkooma", true)

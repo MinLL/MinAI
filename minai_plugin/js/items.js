@@ -4,11 +4,13 @@ let itemsPerPage = 10;
 let totalPages = 1;
 let currentItems = [];
 let categories = [];
+let itemTypes = [];
 
 // DOM elements
 const messageElement = document.getElementById('message');
 const itemsTableBody = document.getElementById('items-table-body');
 const categoryFilter = document.getElementById('category-filter');
+const typeFilter = document.getElementById('type-filter');
 const availabilityFilter = document.getElementById('availability-filter');
 const sortBySelect = document.getElementById('sort-by');
 const sortOrderSelect = document.getElementById('sort-order');
@@ -22,9 +24,7 @@ const addItemForm = document.getElementById('add-item-form');
 const importForm = document.getElementById('import-form');
 const exportButton = document.getElementById('export-button');
 const exportCategorySelect = document.getElementById('export-category');
-const testRelevanceButton = document.getElementById('test-relevance-button');
-const situationDescription = document.getElementById('situation-description');
-const relevanceTableBody = document.getElementById('relevance-table-body');
+const exportTypeSelect = document.getElementById('export-type');
 const tabs = document.querySelectorAll('.tab');
 const tabContents = document.querySelectorAll('.tab-content');
 
@@ -48,8 +48,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load items
     loadItems();
     
-    // Load categories
+    // Load categories and item types
     loadCategories();
+    loadItemTypes();
     
     // Set up event listeners
     setupEventListeners();
@@ -77,6 +78,7 @@ function setupEventListeners() {
     resetButton.addEventListener('click', function() {
         searchInput.value = '';
         categoryFilter.value = '';
+        typeFilter.value = '';
         availabilityFilter.value = '';
         sortBySelect.value = 'name';
         sortOrderSelect.value = 'ASC';
@@ -86,6 +88,11 @@ function setupEventListeners() {
     
     // Filters and sorting
     categoryFilter.addEventListener('change', function() {
+        currentPage = 1;
+        loadItems();
+    });
+    
+    typeFilter.addEventListener('change', function() {
         currentPage = 1;
         loadItems();
     });
@@ -137,10 +144,13 @@ function setupEventListeners() {
         exportItems();
     });
     
-    // Test relevance button
-    testRelevanceButton.addEventListener('click', function() {
-        testRelevance();
-    });
+    // Reset database button
+    const resetDbButton = document.getElementById('reset-db-button');
+    if (resetDbButton) {
+        resetDbButton.addEventListener('click', function() {
+            resetDatabase();
+        });
+    }
 }
 
 // Load items from the API
@@ -154,6 +164,11 @@ function loadItems() {
     // Add category filter if selected
     if (categoryFilter.value) {
         params.append('category', categoryFilter.value);
+    }
+    
+    // Add type filter if selected
+    if (typeFilter.value) {
+        params.append('item_type', typeFilter.value);
     }
     
     // Add availability filter if selected
@@ -196,7 +211,9 @@ function filterAndDisplayItems() {
                 (item.item_id && item.item_id.toLowerCase().includes(searchTerm)) ||
                 (item.file_name && item.file_name.toLowerCase().includes(searchTerm)) ||
                 (item.description && item.description.toLowerCase().includes(searchTerm)) ||
-                (item.category && item.category.toLowerCase().includes(searchTerm))
+                (item.category && item.category.toLowerCase().includes(searchTerm)) ||
+                (item.item_type && item.item_type.toLowerCase().includes(searchTerm)) ||
+                (item.mod_index && item.mod_index.toLowerCase().includes(searchTerm))
             );
         });
     }
@@ -234,9 +251,12 @@ function filterAndDisplayItems() {
             <td>${item.file_name}</td>
             <td>${item.name}</td>
             <td>${item.description || ''}</td>
+            <td>${item.item_type || 'Item'}</td>
             <td>${item.category || ''}</td>
+            <td>${item.mod_index || ''}</td>
             <td>${item.is_available ? 'Yes' : 'No'}</td>
             <td>${formatDate(item.last_seen)}</td>
+            <td>${formatDate(item.created_at)}</td>
             <td>
                 <button class="edit-button" data-id="${item.id}">Edit</button>
                 <button class="delete-button delete" data-id="${item.id}">Delete</button>
@@ -302,6 +322,45 @@ function loadCategories() {
         });
 }
 
+// Load item types from the API
+function loadItemTypes() {
+    fetch('api/items_api.php?action=types')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to load item types');
+            }
+            return response.json();
+        })
+        .then(data => {
+            itemTypes = data;
+            
+            // Clear existing options (except the first one)
+            while (typeFilter.options.length > 1) {
+                typeFilter.remove(1);
+            }
+            
+            while (exportTypeSelect.options.length > 1) {
+                exportTypeSelect.remove(1);
+            }
+            
+            // Add item types to filters
+            itemTypes.forEach(type => {
+                const option1 = document.createElement('option');
+                option1.value = type.item_type;
+                option1.textContent = type.item_type;
+                typeFilter.appendChild(option1);
+                
+                const option2 = document.createElement('option');
+                option2.value = type.item_type;
+                option2.textContent = type.item_type;
+                exportTypeSelect.appendChild(option2);
+            });
+        })
+        .catch(error => {
+            showMessage(error.message, 'error');
+        });
+}
+
 // Add a new item
 function addItem() {
     // Get form data
@@ -339,8 +398,11 @@ function addItem() {
         .then(data => {
             showMessage(data.message, 'success');
             addItemForm.reset();
+            // Set default value for item_type back to "Item"
+            document.getElementById('item-type').value = 'Item';
             loadItems();
             loadCategories();
+            loadItemTypes();
         })
         .catch(error => {
             showMessage(error.message, 'error');
@@ -386,8 +448,18 @@ function editItem(id) {
                 </div>
                 
                 <div class="form-group">
+                    <label for="edit-item-type">Item Type</label>
+                    <input type="text" id="edit-item-type" name="item_type" value="${item.item_type || 'Item'}">
+                </div>
+                
+                <div class="form-group">
                     <label for="edit-item-category">Category</label>
                     <input type="text" id="edit-item-category" name="category" value="${item.category || ''}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-mod-index">Mod Index</label>
+                    <input type="text" id="edit-mod-index" name="mod_index" value="${item.mod_index || ''}">
                 </div>
                 
                 <div class="form-group checkbox-group">
@@ -458,6 +530,7 @@ function editItem(id) {
                 document.body.removeChild(modal);
                 loadItems();
                 loadCategories();
+                loadItemTypes();
             })
             .catch(error => {
                 showMessage(error.message, 'error');
@@ -486,6 +559,7 @@ function deleteItem(id) {
             showMessage(data.message, 'success');
             loadItems();
             loadCategories();
+            loadItemTypes();
         })
         .catch(error => {
             showMessage(error.message, 'error');
@@ -521,6 +595,7 @@ function importItems() {
             showMessage(data.message, 'success');
             loadItems();
             loadCategories();
+            loadItemTypes();
             fileInput.value = '';
         })
         .catch(error => {
@@ -536,6 +611,11 @@ function exportItems() {
     // Add category filter if selected
     if (exportCategorySelect.value) {
         params.append('category', exportCategorySelect.value);
+    }
+    
+    // Add type filter if selected
+    if (exportTypeSelect.value) {
+        params.append('item_type', exportTypeSelect.value);
     }
     
     // Make API request
@@ -566,100 +646,12 @@ function exportItems() {
         });
 }
 
-// Test item relevance
-function testRelevance() {
-    // Get situation description
-    const situation = situationDescription.value;
-    
-    if (!situation) {
-        showMessage('Please enter a situation description', 'error');
-        return;
-    }
-    
-    // Show loading message
-    showMessage('Testing relevance...', 'info');
-    
-    // Make API request
-    fetch(`api/items_api.php?action=relevance&situation=${encodeURIComponent(situation)}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to test relevance');
-            }
-            return response.json();
-        })
-        .then(data => {
-            // Clear the table
-            relevanceTableBody.innerHTML = '';
-            
-            // Display items
-            data.forEach(item => {
-                // Create table row
-                const row = document.createElement('tr');
-                
-                // Add cells
-                row.innerHTML = `
-                    <td>${item.name}</td>
-                    <td>${item.description || ''}</td>
-                    <td>${item.category || ''}</td>
-                    <td>
-                        <span class="relevance-score ${getRelevanceClass(item.relevance_score)}">
-                            ${item.relevance_score}
-                        </span>
-                    </td>
-                `;
-                
-                // Add row to table
-                relevanceTableBody.appendChild(row);
-            });
-            
-            hideMessage();
-        })
-        .catch(error => {
-            showMessage(error.message, 'error');
-        });
-}
-
-// Helper function to get relevance class
-function getRelevanceClass(score) {
-    if (score >= 7) {
-        return 'relevance-high';
-    } else if (score >= 4) {
-        return 'relevance-medium';
-    } else {
-        return 'relevance-low';
-    }
-}
-
 // Format date to a more readable format
 function formatDate(dateString) {
     if (!dateString) return 'Never';
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return 'Invalid Date';
     
-    const now = new Date();
-    const diff = now - date;
-    const seconds = Math.floor(diff / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-
-    // If less than 24 hours ago, show relative time
-    if (days < 1) {
-        if (hours < 1) {
-            if (minutes < 1) {
-                return 'Just now';
-            }
-            return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
-        }
-        return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
-    }
-    
-    // If less than 7 days ago, show days ago
-    if (days < 7) {
-        return `${days} day${days !== 1 ? 's' : ''} ago`;
-    }
-    
-    // Otherwise show the full date
     const options = { 
         year: 'numeric', 
         month: 'short', 
@@ -716,4 +708,31 @@ style.textContent = `
         cursor: pointer;
     }
 `;
-document.head.appendChild(style); 
+document.head.appendChild(style);
+
+// Reset database function
+function resetDatabase() {
+    // Confirm reset
+    if (!confirm('WARNING: This will delete ALL items from the database. This action CANNOT be undone. Are you absolutely sure?')) {
+        return;
+    }
+    
+    // Make API request
+    fetch(`api/items_api.php?action=reset`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to reset database');
+            }
+            return response.json();
+        })
+        .then(data => {
+            showMessage(data.message, 'success');
+            // Reload items and filters
+            loadItems();
+            loadCategories();
+            loadItemTypes();
+        })
+        .catch(error => {
+            showMessage(error.message, 'error');
+        });
+} 
