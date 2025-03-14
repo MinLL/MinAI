@@ -25,17 +25,23 @@ int Function GetGender(Actor akActor)
   if !akActor
     return -1 ; Invalid actor
   endif
+  int skyrimSex = akActor.GetActorBase().GetSex()
+  if slf
+    int slfSex = slf.GetGender(akActor)
+    if slfSex != skyrimSex
+      return slfSex
+    endif
+  endif
   if bHasTNG
     if akActor.GetActorBase().GetSex() != 0 && !akActor.HasKeyword(TNG_Gentlewoman)
       return 1 ; Female
     else
       return 0 ; Male
     endif
-  elseif slf
-    return slf.GetGender(akActor)
+  else
+    return skyrimSex
   endif
-  return akActor.GetLeveledActorBase().GetSex()
-EndFunction
+endfunction
 
 int function getPlayerThread(string framework)
   if(framework == "ostim")
