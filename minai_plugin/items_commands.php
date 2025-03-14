@@ -280,7 +280,7 @@ if (IsPlayer(GetTargetActor())) {
 
     // Define TakeItem command
     $GLOBALS["F_NAMES"]["ExtCmdTakeItem"] = "TakeItem";
-    $GLOBALS["F_TRANSLATIONS"]["ExtCmdTakeItem"] = "(Target MUST be specified as itemName:count) Take/receive an item or items from {$GLOBALS["PLAYER_NAME"]} (for receiving payment, gifts, collecting items, quest requirements, trading). Available items: {$playerItemsStr}.";
+    $GLOBALS["F_TRANSLATIONS"]["ExtCmdTakeItem"] = "(Target MUST be specified as itemName:count) Take/receive an item or items from {$GLOBALS["PLAYER_NAME"]} (Accepting or receiving payment, gifts, collecting items, quest requirements, trading). Available items: {$playerItemsStr}.";
     $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdTakeItem"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdTakeItem"],

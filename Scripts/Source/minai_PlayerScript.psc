@@ -10,6 +10,7 @@ actor playerRef
 GlobalVariable minai_DynamicSapienceToggleStealth
 minai_SapienceController Property sapience Auto
 Form gold
+bool trackingEnabled = False
 
 Function StartTrackingPlayer()
   if playerRef.HasSpell(minai_PlayerStateTracker)
@@ -42,9 +43,6 @@ Function RegisterStealthAnimEvents()
   RegisterForAnimationEvent(playerRef, "tailMTLocomotion")
   RegisterForAnimationEvent(playerRef, "tailCombatIdle")
   RegisterForAnimationEvent(playerRef, "tailCombatLocomotion")
-  if aiff.IsInventoryThrottled(playerRef)
-    EnableInventoryTracking()
-  EndIf
 EndFunction
 
 Function UnregisterStealthAnimEvents()
@@ -103,6 +101,7 @@ Event OnLocationChange(Location akOldLoc, Location akNewLoc)
   if (bHasAIFF)
     aiff.CleanupSapientActors()
   EndIf
+  EnableInventoryTracking()
 endEvent
 
 
@@ -114,6 +113,7 @@ Event OnSleepStart(float afSleepStartTime, float afDesiredSleepEndTime)
   if config.updateNarratorProfile && bHasAIFF
     aiff.UpdateProfile("The Narrator")
   EndIf
+  EnableInventoryTracking()
 EndEvent
 
 ; Add new event handler for animation events
@@ -138,7 +138,9 @@ Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemRefere
   if !bHasAIFF || !aiff
     return
   EndIf
-  
+  if !trackingEnabled
+    return
+  endif
   MainQuestController.Debug("Player OnItemAdded - Form: " + akBaseItem + ", Count: " + aiItemCount)
   if aiff.OnInventoryChanged(playerRef, akBaseItem, aiItemCount, true)
     DisableInventoryTracking()
@@ -150,6 +152,9 @@ Event OnItemRemoved(Form akBaseItem, int aiItemCount, ObjectReference akItemRefe
   if !bHasAIFF || !aiff
     return
   EndIf
+  if !trackingEnabled
+    return
+  endif
   
   MainQuestController.Debug("Player OnItemRemoved - Form: " + akBaseItem + ", Count: " + aiItemCount)
   if aiff.OnInventoryChanged(playerRef, akBaseItem, aiItemCount, false)
@@ -164,13 +169,16 @@ event DisableInventoryTracking()
   if (!gold)
     gold = Game.GetFormFromFile(0x00000F, "Skyrim.esm") as Form
   endif
+  trackingEnabled = False
   AddInventoryEventFilter(gold)
+  
 endEvent
 
 
 event EnableInventoryTracking()
   ; Remove the filter to allow all item changes again
   MainQuestController.Info("Enabling inventory tracking for player")
+  trackingEnabled = True
   if (!gold)
     gold = Game.GetFormFromFile(0x00000F, "Skyrim.esm") as Form
   endif

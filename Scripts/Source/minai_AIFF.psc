@@ -680,6 +680,10 @@ Function CheckThrottledActors()
           Main.Info("Processing throttled actor scan for " + actorName)
           TrackActorInventory(foundActor)
           processedCount += 1
+        elseif Main.GetActorName(player) == actorName
+          Main.Info("Processing throttled actor scan for player")
+          TrackActorInventory(player)
+          processedCount += 1
         else
           ; Actor not found, just remove the flag
           JMap.setInt(updateTracker, actorKey, 0)
@@ -1667,7 +1671,7 @@ bool Function OnInventoryChanged(actor akActor, Form akBaseItem, int aiItemCount
   else
     ; Remove item if it's in the array and count is zero
     if itemIndex != -1
-      JArray.eraseIndex(actorInventory, itemIndex)
+      JArray.eraseForm(actorInventory, akBaseItem)
       Main.Debug("Removed " + itemName + " from " + actorName + " inventory tracking")
     EndIf
   EndIf
