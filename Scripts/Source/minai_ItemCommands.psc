@@ -171,7 +171,8 @@ Function GiveItemToPlayer(Actor akSpeaker, String parameter)
   Form itemForm = GetItemFormFromName(itemName)
   if !itemForm
     Main.Warn("GiveItemToPlayer - Item not found in registry: " + itemName)
-    aiff.AIRequestMessageForActor(speakerName + " tried to give " + playerName + " " + itemName + ", but couldn't find it.", "chat_minai_giveitem", speakerName)
+    Debug.Notification("Item not found in registry: " + itemName)
+    ; aiff.AIRequestMessageForActor(speakerName + " tried to give " + playerName + " " + itemName + ", but couldn't find it.", "chat_minai_giveitem", speakerName)
     return
   EndIf
   
@@ -194,7 +195,7 @@ Function GiveItemToPlayer(Actor akSpeaker, String parameter)
   
   ; Give item to player
   akSpeaker.RemoveItem(itemForm, count, true, PlayerRef)
-  Main.Debug("GiveItemToPlayer - " + speakerName + " gave " + count + "x " + actualItemName + " to " + playerName)
+  Main.Info("GiveItemToPlayer - " + speakerName + " gave " + count + "x " + actualItemName + " to " + playerName)
   
   ; Update inventories after transfer
   aiff.TrackActorInventory(akSpeaker)
@@ -267,7 +268,7 @@ Function TakeItemFromPlayer(Actor akSpeaker, String parameter)
   
   ; Take item from player
   PlayerRef.RemoveItem(itemForm, count, true, akSpeaker)
-  Main.Debug("TakeItemFromPlayer - " + speakerName + " took " + count + "x " + actualItemName + " from " + playerName)
+  Main.Info("TakeItemFromPlayer - " + speakerName + " took " + count + "x " + actualItemName + " from " + playerName)
   
   ; Update inventories after transfer
   aiff.TrackActorInventory(akSpeaker)

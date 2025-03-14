@@ -1218,7 +1218,7 @@ Function PersistItemRegistry(bool useBatching = true)
   EndWhile
 EndFunction
 
-Function AddItemToRegistry(Form akForm, string description = "", string customName = "")
+Function AddItemToRegistry(Form akForm, string description = "")
   if (!IsInitialized())
     Main.Info("AddItemToRegistry() - Not initialized.")
     return
@@ -1234,11 +1234,8 @@ Function AddItemToRegistry(Form akForm, string description = "", string customNa
   string modName = minai_Util.FormToModName(akForm)
   int formTypeId = akForm.GetType()
   
-  ; Use the custom name if provided, otherwise use the form's actual name
-  string itemName = customName
-  if itemName == ""
-    itemName = akForm.GetName()
-  EndIf
+  ; Use the form's actual name
+  string itemName = akForm.GetName()
 
   ; Create or get existing item data
   int itemData = JMap.getObj(itemRegistry, formId)
@@ -1260,12 +1257,7 @@ Function AddItemToRegistry(Form akForm, string description = "", string customNa
   
   JMap.setObj(itemRegistry, formId, itemData)
 
-  ; Log different messages depending on whether this is a custom-named item
-  if customName != "" && customName != akForm.GetName()
-    Main.Debug("Added/Updated custom named item in registry: " + formId + " from " + modName + " (custom name: " + itemName + ", original name: " + akForm.GetName() + ")")
-  else
-    Main.Debug("Added/Updated item in registry: " + formId + " from " + modName + " (type: " + formTypeId + ", name: " + itemName + ")")
-  EndIf
+  Main.Info("Added/Updated item in registry: " + formId + " from " + modName + " (type: " + formTypeId + ", name: " + itemName + ")")
 EndFunction
 
 Function SetItemBatchSize(int size)
@@ -1388,7 +1380,7 @@ Function SeedCommonItems()
   Main.Info("Seeding item registry with common Skyrim items...")
 
   ; Currency
-  AddItemToRegistry(Game.GetFormFromFile(0x00000F, "Skyrim.esm"), "The currency of Skyrim, used for trading goods and services.", "Gold") ; Gold/Septim
+  AddItemToRegistry(Game.GetFormFromFile(0x00000F, "Skyrim.esm"), "The currency of Skyrim, used for trading goods and services.") ; Gold/Septim
 
   ; Common Food
   AddItemToRegistry(Game.GetFormFromFile(0x064B31, "Skyrim.esm"), "A crisp, sweet fruit commonly grown in orchards throughout Skyrim.") ; Apple
@@ -1404,7 +1396,7 @@ Function SeedCommonItems()
   
   ; Common Drinks
   AddItemToRegistry(Game.GetFormFromFile(0x034C5E, "Skyrim.esm"), "A refined wine made from grapes grown in the higher elevations of Skyrim.") ; Alto Wine
-  AddItemToRegistry(Game.GetFormFromFile(0x034C5F, "Skyrim.esm"), "A common alcoholic beverage made from fermented grapes.", "Wine") ; Wine
+  AddItemToRegistry(Game.GetFormFromFile(0x034C5F, "Skyrim.esm"), "A common alcoholic beverage made from fermented grapes.") ; Wine
   AddItemToRegistry(Game.GetFormFromFile(0x034C60, "Skyrim.esm"), "A traditional Nordic alcoholic beverage made from fermented honey.") ; Nord Mead
   AddItemToRegistry(Game.GetFormFromFile(0x034C61, "Skyrim.esm"), "A popular alcoholic beverage made from fermented grains.") ; Beer
   AddItemToRegistry(Game.GetFormFromFile(0x034C6A, "Skyrim.esm"), "A premium mead produced by the influential Black-Briar family in Riften.") ; Black-Briar Mead
