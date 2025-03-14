@@ -51,8 +51,7 @@ int Property updateTracker Auto  ; JMap for tracking last update times
 
 ; Add inventory tracking properties
 int Property inventoryTracker Auto  ; JMap for tracking actor inventories
-float Property lastInventoryUpdate Auto  ; Last time inventory was updated
-float Property inventoryUpdateThrottle = 1.0 Auto  ; Minimum seconds between inventory updates
+float Property inventoryUpdateThrottle = 1.0 Auto  ; Default minimum seconds between inventory updates
 
 Function InitFollow()
   bHasFollowPlayer = False
@@ -72,7 +71,7 @@ EndFunction
 
 Function Maintenance(minai_MainQuestController _main)
   if (main.GetVersion() != main.CurrentVersion)
-    Main.Info("AIFF - Maintenance: Version update detected. Resetting action registry.")
+    Main.Info("CHIM - Maintenance: Version update detected. Resetting action registry.")
     ResetActionRegistry()
   EndIf
 
@@ -111,7 +110,7 @@ Function Maintenance(minai_MainQuestController _main)
     main.Fatal("Could not load configuration - script version mismatch with esp")
   EndIf
   player = Game.GetPlayer()
-  Main.Info("- Initializing for AIFF.")
+  Main.Info("- Initializing for CHIM.")
   AIAssisted = Game.GetFormFromFile(0x217a8,"AIAgent.esp") as Keyword
   if !AIAssisted
     main.Fatal("You are running an old / outdated version of AI Follower Framework. Some functionality will be broken.")
@@ -195,6 +194,47 @@ Function CleanupStates()
     EndFollowTarget(actors[i], true)
     i += 1
   EndWhile
+  
+  ; Clean up tracking data for actors no longer present
+  if inventoryTracker && updateTracker
+    ; Create a map of actor names that are currently present
+    int presentActors = JMap.object()
+    i = 0
+    while i < actors.Length
+      JMap.setInt(presentActors, Main.GetActorName(actors[i]), 1)
+      i += 1
+    EndWhile
+    
+    ; Check all actors in inventoryTracker and remove those not present
+    string[] actorNames = JMap.allKeysPArray(inventoryTracker)
+    i = 0
+    int removedCount = 0
+    while i < actorNames.Length
+      ; Skip player - always keep player's data
+      if actorNames[i] != Main.GetActorName(player) && !JMap.hasKey(presentActors, actorNames[i])
+        ; Actor is not present, clean up their inventory data
+        int inventory = JMap.getObj(inventoryTracker, actorNames[i])
+        if inventory
+          JValue.release(inventory)
+        EndIf
+        JMap.removeKey(inventoryTracker, actorNames[i])
+        
+        ; Also clean up update tracking data
+        string invUpdateKey = actorNames[i] + "_invUpdate"
+        JMap.removeKey(updateTracker, invUpdateKey)
+        
+        removedCount += 1
+      EndIf
+      i += 1
+    EndWhile
+    
+    if removedCount > 0
+      Main.Debug("CleanupStates - Removed tracking data for " + removedCount + " absent actors")
+    EndIf
+    
+    ; Release the temporary map
+    JValue.release(presentActors)
+  EndIf
 EndFunction
 
 Function StartFollowTarget(actor akNpc, actor akTarget)
@@ -285,7 +325,7 @@ EndFunction
 
 Function SetContext(actor akTarget)
   if !akTarget
-    Main.Warn("AIFF - SetContext() called with none target")
+    Main.Warn("CHIM - SetContext() called with none target")
     return
   EndIf
   if (!IsInitialized())
@@ -316,14 +356,14 @@ Function SetContext(actor akTarget)
   
   ; Check if this actor's context is already being set
   if JMap.getInt(contextMutexMap, actorName) == 1
-    Main.Warn("AIFF - SetContext(" + actorName + ") - Already setting context for this actor, skipping")
+    Main.Warn("CHIM - SetContext(" + actorName + ") - Already setting context for this actor, skipping")
     return
   EndIf
 
   ; Set mutex for this actor
   JMap.setInt(contextMutexMap, actorName, 1)
   
-  Main.Debug("AIFF - SetContext(" + actorName + ") START")
+  Main.Debug("CHIM - SetContext(" + actorName + ") START")
   
   ; Only update player-specific context if it's the player
   if akTarget == Player
@@ -343,27 +383,15 @@ Function SetContext(actor akTarget)
     JMap.setFlt(updateTracker, actorKey + "_voice", currentGameTime)
   endif
 
-  ; Track inventory with high frequency updates
-  ; But use a brief throttle for performance
-  float lastInvUpdate = JMap.getFlt(updateTracker, actorKey + "_inv", 0.0)
-  if (currentGameTime - lastInvUpdate) * 24 * 3600 >= 5.0  ; 5 seconds in game time
-    if akTarget == player
-      Main.Debug("AIFF - SetContext(" + actorName + ") - Updating player inventory")
-    EndIf
-    TrackActorInventory(akTarget)
-    JMap.setFlt(updateTracker, actorKey + "_inv", currentGameTime)
-  endif
-
   ; Update high-frequency states (every update)
-  Main.Debug("AIFF - SetContext(" + actorName + ") - Setting high-frequency states")
-  devious.SetContext(akTarget)
+  Main.Debug("CHIM - SetContext(" + actorName + ") - Setting high-frequency states")
   arousal.SetContext(akTarget)
   envAwareness.SetContext(akTarget)
   combat.SetContext(akTarget)
   
   ; Update medium-frequency states
   if !JMap.hasKey(updateTracker, actorKey + "_med") || (currentGameTime - JMap.getFlt(updateTracker, actorKey + "_med")) * 24 * 3600 >= config.mediumFrequencyUpdateInterval
-    Main.Debug("AIFF - SetContext(" + actorName + ") - Setting medium-frequency states")
+    Main.Debug("CHIM - SetContext(" + actorName + ") - Setting medium-frequency states")
     survival.SetContext(akTarget)
     followers.SetContext(akTarget)
     JMap.setFlt(updateTracker, actorKey + "_med", currentGameTime)
@@ -371,7 +399,9 @@ Function SetContext(actor akTarget)
   
   ; Update low-frequency states
   if !JMap.hasKey(updateTracker, actorKey + "_low") || (currentGameTime - JMap.getFlt(updateTracker, actorKey + "_low")) * 24 * 3600 >= config.lowFrequencyUpdateInterval
-    Main.Debug("AIFF - SetContext(" + actorName + ") - Setting low-frequency states")
+    Main.Debug("CHIM - SetContext(" + actorName + ") - Setting low-frequency states")
+    TrackActorInventory(akTarget)
+    devious.SetContext(akTarget)
     reputation.SetContext(akTarget)
     dirtAndBlood.SetContext(akTarget)
     relationship.SetContext(akTarget)
@@ -390,7 +420,7 @@ Function SetContext(actor akTarget)
   ; Release mutex for this actor
   JMap.setInt(contextMutexMap, actorName, 0)
   
-  Main.Debug("AIFF - SetContext(" + actorName + ") FINISH")
+  Main.Debug("CHIM - SetContext(" + actorName + ") FINISH")
 EndFunction
 
 
@@ -432,7 +462,7 @@ EndEvent
 
 
 Event CommandDispatcher(String speakerName,String  command, String parameter)
-  Main.Info("AIFF - CommandDispatcher(" + speakerName +", " + command +", " + parameter + ")")
+  Main.Info("CHIM - CommandDispatcher(" + speakerName +", " + command +", " + parameter + ")")
   Actor akActor = AIGetAgentByName(speakerName)
   if vibratorCommands.Find(command) >= 0
     command = "MinaiGlobalVibrator"
@@ -554,7 +584,7 @@ bool Function IsInitialized()
 EndFunction
 
 Function SetInitialized()
-  Main.Info("AIFF initialization complete.")
+  Main.Info("CHIM initialization complete.")
   isInitialized = True
 EndFunction
 
@@ -827,7 +857,7 @@ Event OnAIActorChange(string npcName, string actionName)
       TrackContext(agent)
     EndIf
   EndIf
-  ; Can't process spell removal here, since the actor will already be gone from the aiff system at this point. The context script will clean that up instead. 
+  ; Can't process spell removal here, since the actor will already be gone from the CHIM system at this point. The context script will clean that up instead. 
 EndEvent
 
 
@@ -930,6 +960,18 @@ Function RemoveActorAI(string targetName)
     JMap.RemoveKey(updateTracker, targetName + "_voice")
     JMap.RemoveKey(updateTracker, targetName + "_med")
     JMap.RemoveKey(updateTracker, targetName + "_low")
+    JMap.RemoveKey(updateTracker, targetName + "_invUpdate")
+    JMap.RemoveKey(updateTracker, targetName + "_invThrottle")
+  EndIf
+  
+  ; Clean up inventory tracking data
+  if inventoryTracker && JMap.hasKey(inventoryTracker, targetName)
+    int inventory = JMap.getObj(inventoryTracker, targetName)
+    if inventory
+      JValue.release(inventory)
+    EndIf
+    JMap.removeKey(inventoryTracker, targetName)
+    Main.Debug("SAPIENCE: Removed inventory tracking data for " + targetName)
   EndIf
 EndFunction
 
@@ -1488,9 +1530,16 @@ Function TrackActorInventory(actor akActor)
   
   ; Check if we should update server
   float currentTime = Utility.GetCurrentRealTime()
-  if currentTime - lastInventoryUpdate >= inventoryUpdateThrottle
+  string invUpdateKey = actorName + "_invUpdate"
+  float lastUpdate = JMap.getFlt(updateTracker, invUpdateKey, 0.0)
+  
+  ; Check if custom throttle exists, otherwise use default
+  string throttleKey = actorName + "_invThrottle"
+  float actorThrottle = JMap.getFlt(updateTracker, throttleKey, inventoryUpdateThrottle)
+
+  if currentTime - lastUpdate >= actorThrottle
     PersistInventory(akActor)
-    lastInventoryUpdate = currentTime
+    JMap.setFlt(updateTracker, invUpdateKey, currentTime)
   EndIf
 EndFunction
 
@@ -1621,12 +1670,39 @@ Function OnInventoryChanged(actor akActor, Form akBaseItem, int aiItemCount, boo
   
   ; Check if we should update server based on throttle
   float currentTime = Utility.GetCurrentRealTime()
-  if currentTime - lastInventoryUpdate >= inventoryUpdateThrottle
+  string invUpdateKey = actorName + "_invUpdate"
+  float lastUpdate = JMap.getFlt(updateTracker, invUpdateKey, 0.0)
+
+  if currentTime - lastUpdate >= inventoryUpdateThrottle
     Main.Debug("Throttle elapsed, persisting inventory for " + actorName)
     PersistInventory(akActor)
-    lastInventoryUpdate = currentTime
-  elseif config.logLevel >= 5
-    float timeRemaining = inventoryUpdateThrottle - (currentTime - lastInventoryUpdate)
-    Main.Debug("Inventory update throttled - " + timeRemaining + " seconds remaining before next update")
+    JMap.setFlt(updateTracker, invUpdateKey, currentTime)
+  else
+    float timeRemaining = inventoryUpdateThrottle - (currentTime - lastUpdate)
+    Main.Debug("Inventory update throttled for " + actorName + " - " + timeRemaining + " seconds remaining before next update")
   EndIf
+EndFunction
+
+; Function to set a custom inventory update throttle for a specific actor
+Function SetActorInventoryThrottle(actor akActor, float throttleTime)
+  if !akActor
+    Main.Warn("SetActorInventoryThrottle - Actor is None")
+    return
+  EndIf
+  
+  string actorName = Main.GetActorName(akActor)
+  if actorName == ""
+    Main.Warn("SetActorInventoryThrottle - Actor has no name")
+    return
+  EndIf
+  
+  ; Validate the throttle value - must be at least 0.1 seconds
+  if throttleTime < 0.1
+    throttleTime = 0.1
+  EndIf
+  
+  ; Store the custom throttle value directly in updateTracker
+  string throttleKey = actorName + "_invThrottle"
+  JMap.setFlt(updateTracker, throttleKey, throttleTime)
+  Main.Info("Set custom inventory throttle for " + actorName + " to " + throttleTime + " seconds")
 EndFunction
