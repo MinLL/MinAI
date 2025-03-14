@@ -148,7 +148,7 @@ if (IsPlayer(GetTargetActor())) {
 
     // Define GiveItem command
     $GLOBALS["F_NAMES"]["ExtCmdGiveItem"] = "GiveItem";
-    $GLOBALS["F_TRANSLATIONS"]["ExtCmdGiveItem"] = "Give an item or items to {$GLOBALS["PLAYER_NAME"]} (for gifting, payment, quest items, rewards, trading). Available items: {$targetItemsStr}. (Target MUST be specified as itemName:count)";
+    $GLOBALS["F_TRANSLATIONS"]["ExtCmdGiveItem"] = "(Target MUST be specified as itemName:count) Give an item or items to {$GLOBALS["PLAYER_NAME"]} (for gifting, payment, quest items, rewards, trading). Available items: {$targetItemsStr}.";
     $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdGiveItem"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdGiveItem"],
@@ -167,7 +167,7 @@ if (IsPlayer(GetTargetActor())) {
 
     // Define TakeItem command
     $GLOBALS["F_NAMES"]["ExtCmdTakeItem"] = "TakeItem";
-    $GLOBALS["F_TRANSLATIONS"]["ExtCmdTakeItem"] = "Take an item or items from {$GLOBALS["PLAYER_NAME"]} (for receiving payment, collecting items, quest requirements, trading). Available items: {$playerItemsStr}. (Target MUST be specified as itemName:count)";
+    $GLOBALS["F_TRANSLATIONS"]["ExtCmdTakeItem"] = "(Target MUST be specified as itemName:count) Take/receive an item or items from {$GLOBALS["PLAYER_NAME"]} (for receiving payment, gifts, collecting items, quest requirements, trading). Available items: {$playerItemsStr}.";
     $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdTakeItem"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdTakeItem"],

@@ -342,7 +342,7 @@ Event OnUpdate()
   Else
     ; Prompt AIFF to comment on it if we're not in a sex scene at the moment
     if (sex.CanAnimate(playerRef)) 
-      main.RequestLLMResponseFromActor(lineToSay, "chatnf_vr_1", actorName)
+      main.RequestLLMResponseFromActor(lineToSay, "chatnf_minai_narrate", actorName)
     EndIf
     ; sex.sexTalkCollision(akActor, lineToSay)
     lastCollisionSpeechTime = currentTime

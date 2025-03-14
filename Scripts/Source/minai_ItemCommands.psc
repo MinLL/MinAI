@@ -183,7 +183,7 @@ Function GiveItemToPlayer(Actor akSpeaker, String parameter)
   int hasCount = akSpeaker.GetItemCount(itemForm)
   if hasCount <= 0
     Main.Warn("GiveItemToPlayer - " + speakerName + " doesn't have any " + actualItemName)
-    aiff.AIRequestMessageForActor(speakerName + " tried to give " + playerName + " " + actualItemName + ", but doesn't have any.", "chat_minai_giveitem", speakerName)
+    main.RequestLLMResponseFromActor(speakerName + " tried to give " + playerName + " " + actualItemName + ", but doesn't have any.", "chatnf_minai_narrate", speakerName)
     return
   EndIf
   
@@ -208,10 +208,7 @@ Function GiveItemToPlayer(Actor akSpeaker, String parameter)
   EndIf
   
   ; Return result to LLM
-  aiff.AIRequestMessageForActor(speakerName + " gave " + playerName + " " + countStr + actualItemName + ".", "chat_minai_giveitem", speakerName)
-  
-  ; Register the event for event tracking
-  Main.RegisterEvent(speakerName + " gave " + playerName + " " + countStr + actualItemName + ".")
+  main.RequestLLMResponseFromActor(speakerName + " gave " + playerName + " " + countStr + actualItemName + ".", "chatnf_minai_narrate", speakerName)
 EndFunction
 
 ; Take an item from player to NPC
@@ -245,7 +242,7 @@ Function TakeItemFromPlayer(Actor akSpeaker, String parameter)
   Form itemForm = GetItemFormFromName(itemName)
   if !itemForm
     Main.Warn("TakeItemFromPlayer - Item not found in registry: " + itemName)
-    aiff.AIRequestMessageForActor(speakerName + " tried to take " + itemName + " from " + playerName + ", but couldn't find it.", "chat_minai_takeitem", speakerName)
+    main.RequestLLMResponseFromActor(speakerName + " tried to take " + itemName + " from " + playerName + ", but couldn't find it.", "chatnf_minai_narrate", speakerName)
     return
   EndIf
   
@@ -256,7 +253,7 @@ Function TakeItemFromPlayer(Actor akSpeaker, String parameter)
   int hasCount = PlayerRef.GetItemCount(itemForm)
   if hasCount <= 0
     Main.Warn("TakeItemFromPlayer - " + playerName + " doesn't have any " + actualItemName)
-    aiff.AIRequestMessageForActor(speakerName + " tried to take " + actualItemName + " from " + playerName + ", but " + playerName + " doesn't have any.", "chat_minai_takeitem", speakerName)
+    main.RequestLLMResponseFromActor(speakerName + " tried to take " + actualItemName + " from " + playerName + ", but " + playerName + " doesn't have any.", "chatnf_minai_narrate", speakerName)
     return
   EndIf
   
@@ -281,7 +278,7 @@ Function TakeItemFromPlayer(Actor akSpeaker, String parameter)
   EndIf
   
   ; Return result to LLM
-  aiff.AIRequestMessageForActor(speakerName + " took " + countStr + actualItemName + " from " + playerName + ".", "chat_minai_takeitem", speakerName)
+  main.RequestLLMResponseFromActor(speakerName + " took " + countStr + actualItemName + " from " + playerName + ".", "chatnf_minai_narrate", speakerName)
   
   ; Register the event for event tracking
   Main.RegisterEvent(speakerName + " took " + countStr + actualItemName + " from " + playerName + ".")
@@ -329,7 +326,7 @@ Function TradeItemWithPlayer(Actor akSpeaker, String parameter)
   
   if !giveItemForm || !takeItemForm
     Main.Warn("TradeItemWithPlayer - One or more items not found in registry")
-    aiff.AIRequestMessageForActor(speakerName + " tried to trade items with " + playerName + ", but one or more items couldn't be found.", "chat_minai_tradeitem", speakerName)
+    main.RequestLLMResponseFromActor(speakerName + " tried to trade items with " + playerName + ", but one or more items couldn't be found.", "chatnf_minai_narrate", speakerName)
     return
   EndIf
   
@@ -341,7 +338,7 @@ Function TradeItemWithPlayer(Actor akSpeaker, String parameter)
   int npcHasCount = akSpeaker.GetItemCount(giveItemForm)
   if npcHasCount <= 0
     Main.Warn("TradeItemWithPlayer - " + speakerName + " doesn't have any " + actualGiveItemName)
-    aiff.AIRequestMessageForActor(speakerName + " tried to trade " + actualGiveItemName + " with " + playerName + ", but doesn't have any.", "chat_minai_tradeitem", speakerName)
+    main.RequestLLMResponseFromActor(speakerName + " tried to trade " + actualGiveItemName + " with " + playerName + ", but doesn't have any.", "chatnf_minai_narrate", speakerName)
     return
   EndIf
   
@@ -355,7 +352,7 @@ Function TradeItemWithPlayer(Actor akSpeaker, String parameter)
   int playerHasCount = PlayerRef.GetItemCount(takeItemForm)
   if playerHasCount <= 0
     Main.Warn("TradeItemWithPlayer - " + playerName + " doesn't have any " + actualTakeItemName)
-    aiff.AIRequestMessageForActor(speakerName + " tried to trade for " + playerName + "'s " + actualTakeItemName + ", but " + playerName + " doesn't have any.", "chat_minai_tradeitem", speakerName)
+    main.RequestLLMResponseFromActor(speakerName + " tried to trade for " + playerName + "'s " + actualTakeItemName + ", but " + playerName + " doesn't have any.", "chatnf_minai_narrate", speakerName)
     return
   EndIf
   
@@ -387,7 +384,7 @@ Function TradeItemWithPlayer(Actor akSpeaker, String parameter)
   EndIf
   
   ; Return result to LLM
-  aiff.AIRequestMessageForActor(speakerName + " traded " + giveCountStr + actualGiveItemName + " for " + playerName + "'s " + takeCountStr + actualTakeItemName + ".", "chat_minai_tradeitem", speakerName)
+  main.RequestLLMResponseFromActor(speakerName + " traded " + giveCountStr + actualGiveItemName + " for " + playerName + "'s " + takeCountStr + actualTakeItemName + ".", "chatnf_minai_narrate", speakerName)
   
   ; Register the event for event tracking
   Main.RegisterEvent(speakerName + " traded " + giveCountStr + actualGiveItemName + " for " + takeCountStr + actualTakeItemName + " with " + playerName + ".")

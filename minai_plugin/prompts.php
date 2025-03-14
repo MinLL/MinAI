@@ -636,3 +636,28 @@ $GLOBALS["PROMPTS"]["minai_fillherup_deflate_oral"] = [
     ]
 ];
 
+$cleanedMessage = $GLOBALS["gameRequest"][3];
+if (preg_match('/^.*?:\s*(.*)$/i', $cleanedMessage, $matches)) {
+    $cleanedMessage = $matches[1];
+    
+    // Get player name for regex pattern
+    $playerName = preg_quote($GLOBALS["PLAYER_NAME"], '/');
+    
+    // Clean location information (typically at the beginning before "PlayerName:")
+    $cleanedMessage = preg_replace('/^(.*?Hold:.*?\))' . $playerName . ':/i', '', $cleanedMessage);
+    
+    // Clean any parenthetical context at the end
+    $cleanedMessage = preg_replace('/\s*\([^)]*\)\s*$/', '', $cleanedMessage);
+    
+    // If just "PlayerName:" remains at the start, remove it too
+    $cleanedMessage = preg_replace('/^' . $playerName . ':\s*/i', '', $cleanedMessage);
+    
+    // Trim any extra spaces
+    $cleanedMessage = trim($cleanedMessage);
+} 
+
+$GLOBALS["PROMPTS"]["chatnf_minai_narrate"] = [
+    "player_request"=>[
+        "The Narrator: {$cleanedMessage}"
+    ]
+];
