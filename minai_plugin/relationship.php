@@ -31,7 +31,7 @@ class relation {
                 $statuses[] = "archenemy";
             }
         } else {
-            return "an acquaintance of";
+            return "a stranger to";
         }
 
         if (count($statuses) > 1) {
