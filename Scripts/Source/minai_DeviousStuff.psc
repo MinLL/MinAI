@@ -369,12 +369,79 @@ endFunction
 
 Event OnVibrateStart(string eventName, string actorName, float vibStrength, Form sender)
   string strength = getVibStrength(vibStrength)
-  Main.RegisterEvent("A low buzzing sound started to come from " + actorName + " as she started being " + strength + " stimulated by a vibrator.")
+  Actor akActor = aiff.AIGetAgentByName(actorName)
+  
+  ; Create a message that specifies which devices are vibrating
+  string vibratingDevices = ""
+  if akActor
+    if akActor.WornHasKeyword(libs.zad_DeviousPlugVaginal)
+      vibratingDevices += "vaginal plug"
+    EndIf
+    if akActor.WornHasKeyword(libs.zad_DeviousPlugAnal)
+      if vibratingDevices != ""
+        vibratingDevices += " and "
+      EndIf
+      vibratingDevices += "anal plug"
+    EndIf
+    if akActor.WornHasKeyword(libs.zad_DeviousPiercingsNipple)
+      if vibratingDevices != ""
+        vibratingDevices += " and "
+      EndIf
+      vibratingDevices += "nipple piercings"
+    EndIf
+    if akActor.WornHasKeyword(libs.zad_DeviousPiercingsVaginal)
+      if vibratingDevices != ""
+        vibratingDevices += " and "
+      EndIf
+      vibratingDevices += "clitoral ring"
+    EndIf
+  EndIf
+  
+  ; If no specific devices were found but we know vibration is happening,
+  ; use a generic message
+  if vibratingDevices == ""
+    Main.RegisterEvent("A low buzzing sound started to come from " + actorName + " as she started being " + strength + " stimulated by a vibrator.")
+  else
+    Main.RegisterEvent("A low buzzing sound started to come from " + actorName + " as her " + vibratingDevices + " began " + strength + " vibrating.")
+  EndIf
 EndEvent
 
 Event OnVibrateStop(string eventName, string actorName, float vibStrength, Form sender)
-  string strength = getVibStrength(vibStrength)
-  Main.RegisterEvent(actorName + " stopped being stimulated by a vibrator.")
+  Actor akActor = aiff.AIGetAgentByName(actorName)
+  
+  ; Create a message that specifies which devices were vibrating
+  string vibratingDevices = ""
+  if akActor
+    if akActor.WornHasKeyword(libs.zad_DeviousPlugVaginal)
+      vibratingDevices += "vaginal plug"
+    EndIf
+    if akActor.WornHasKeyword(libs.zad_DeviousPlugAnal)
+      if vibratingDevices != ""
+        vibratingDevices += " and "
+      EndIf
+      vibratingDevices += "anal plug"
+    EndIf
+    if akActor.WornHasKeyword(libs.zad_DeviousPiercingsNipple)
+      if vibratingDevices != ""
+        vibratingDevices += " and "
+      EndIf
+      vibratingDevices += "nipple piercings"
+    EndIf
+    if akActor.WornHasKeyword(libs.zad_DeviousPiercingsVaginal)
+      if vibratingDevices != ""
+        vibratingDevices += " and "
+      EndIf
+      vibratingDevices += "clitoral ring"
+    EndIf
+  EndIf
+  
+  ; If no specific devices were found but we know vibration was happening,
+  ; use a generic message
+  if vibratingDevices == ""
+    Main.RegisterEvent(actorName + " stopped being stimulated by a vibrator.")
+  else
+    Main.RegisterEvent("The vibrations from " + actorName + "'s " + vibratingDevices + " stopped.")
+  EndIf
 EndEvent
 
 
