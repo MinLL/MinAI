@@ -2034,8 +2034,8 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     const oldValue = oldConfig[key];
                     let newValue = newConfig[key];
                     
-                    // Special handling for input_delay_for_radiance
-                    if (key === 'input_delay_for_radiance') {
+                    // Special handling for numeric inputs
+                    if (key === 'input_delay_for_radiance' || key === 'inventory_items_limit') {
                         // Convert both to integers for comparison
                         const oldInt = parseInt(oldValue);
                         const newInt = parseInt(newValue);
@@ -3195,6 +3195,9 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                         let isModified;
                         if (element.type === 'checkbox') {
                             isModified = element.checked !== defaultValue;
+                        } else if (element.type === 'number' || optionId === 'inventory-items-limit' || optionId === 'input-delay') {
+                            // Convert to numbers before comparison for numeric inputs
+                            isModified = Number(element.value) !== Number(defaultValue);
                         } else {
                             isModified = element.value !== defaultValue;
                         }
