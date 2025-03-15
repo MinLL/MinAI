@@ -1,0 +1,20 @@
+[
+  {
+    "item_id": "0x00000F",
+    "file_name": "Skyrim.esm",
+    "name": "Gold",
+    "description": "The currency of Skyrim, used for buying and selling goods and services throughout the province.",
+    "item_type": "Misc",
+    "category": "Currency",
+    "mod_index": "00"
+  },
+  {
+    "item_id": "0x00000F",
+    "file_name": "Skyrim.esm",
+    "name": "Septim",
+    "description": "Imperial currency, also known as Gold. Named after the dynasty of Tiber Septim, the first Emperor of Tamriel.",
+    "item_type": "Misc",
+    "category": "Currency",
+    "mod_index": "00"
+  }
+] 

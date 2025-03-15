@@ -125,6 +125,9 @@ function InitiateDBTables() {
     CreateEquipmentDescriptionTableIfNotExist();
     CreateTattooDescriptionTableIfNotExists();
     CreateItemsTableIfNotExists();
+    
+    // Seed default items
+    SeedDefaultItems();
 }
 
 function ResetDBTables() {
@@ -138,4 +141,63 @@ function ResetDBTables() {
     CreateEquipmentDescriptionTableIfNotExist();
     CreateTattooDescriptionTableIfNotExists();
     CreateItemsTableIfNotExists();
+    SeedDefaultItems();
+}
+
+/**
+ * Seeds the minai_items table with default items from a JSON file
+ */
+function SeedDefaultItems() {
+    $db = $GLOBALS['db'];
+    $default_items_file = __DIR__ . '/default_items.json';
+    
+    // Check if the JSON file exists
+    if (!file_exists($default_items_file)) {
+        error_log("Default items file not found: $default_items_file");
+        return false;
+    }
+    
+    // Read and decode the JSON file
+    $json_content = file_get_contents($default_items_file);
+    $items = json_decode($json_content, true);
+    
+    if (!$items || !is_array($items)) {
+        error_log("Invalid JSON format in default items file");
+        return false;
+    }
+    
+    // Insert each item into the database
+    $inserted_count = 0;
+    foreach ($items as $item) {
+        try {
+            // Check if the item already exists
+            $existing = $db->fetchAll(
+                "SELECT id FROM minai_items WHERE item_id = $1 AND file_name = $2",
+                [$item['item_id'], $item['file_name']]
+            );
+            
+            if (empty($existing)) {
+                // Insert new item
+                $db->execQuery(
+                    "INSERT INTO minai_items 
+                    (item_id, file_name, name, description, item_type, category, mod_index) 
+                    VALUES ($1, $2, $3, $4, $5, $6, $7)",
+                    [
+                        $item['item_id'], 
+                        $item['file_name'], 
+                        $item['name'],
+                        $item['description'] ?? null,
+                        $item['item_type'] ?? 'Item',
+                        $item['category'] ?? null,
+                        $item['mod_index'] ?? null
+                    ]
+                );
+                $inserted_count++;
+            }
+        } catch (Exception $e) {
+            error_log("Error inserting default item '{$item['name']}': " . $e->getMessage());
+        }
+    }
+    
+    return $inserted_count;
 }

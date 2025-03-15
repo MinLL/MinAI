@@ -12,6 +12,8 @@ $GLOBALS["db"] = new sql();
 require_once("..".DIRECTORY_SEPARATOR."config.php");
 require_once("..".DIRECTORY_SEPARATOR."importDataToDB.php");
 require_once("..".DIRECTORY_SEPARATOR."util.php");
+require_once("..".DIRECTORY_SEPARATOR."db_utils.php");
+InitiateDBTables();
 
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 $data = json_decode(file_get_contents("php://input"), true);
