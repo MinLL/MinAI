@@ -92,6 +92,17 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
 * NPCs know who is riding a horse, swimming, sleeping and sitting.
 * Added time of day descriptors like "noon", "dawn", "dead of night" to help the LLM have more natural dialog like "are you enjoying the sunset?" 
 
+### Item Management System
+* NPCs can dynamically give items or gold to the player through natural conversation
+* NPCs can request and take items from the player's inventory
+* The system intelligently handles cases where NPCs don't have enough of an item to give or when players don't have requested items
+* NPCs are aware of both their own inventory contents and the player's inventory (with reasonable limits)
+* Common uses include:
+  * NPCs giving quest items, rewards, or gifts to the player
+  * NPCs requesting payment, quest items, or supplies from the player
+  * Trading specific items between NPCs and the player
+  * Merchants, vendors, and general NPCs can all participate in item exchanges
+
 ### NAT
 * NAT weathers are supported and recognized by the LLM (In addition to the general weather system).
 
@@ -101,6 +112,18 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
   * Renting a room from innkeepers
   * Arranging for carriage rides to any location
   * Receiving training in skills from NPC's
+
+### Crime System
+* Guards throughout Skyrim are aware of the player's bounties in their hold and sometimes in other holds
+* Higher-ranking guards (captains, commanders, officers) are more likely to know about bounties in other holds
+* During conversations, guards can:
+  * Add small bounties for minor infractions (trespassing, petty theft, disrespect)
+  * Add medium bounties for moderate crimes (assault, significant theft, property damage)
+  * Add large bounties for serious crimes (murder, attacking guards, major theft)
+  * Arrest the player for their crimes, sending them directly to jail
+  * Clear the player's bounty in their hold (through persuasion, bribery, or other means)
+* The Narrator / Self Narrator has detailed bounty information showing all holds where the player is wanted
+* The system automatically detects which hold's jurisdiction the guard belongs to
 
 ### NSFW
 This mod enables a number of optional [nsfw](https://github.com/MinLL/MinAI/blob/main/nsfw.md) integrations that are disabled by default. These will not effect your game unless you have the nsfw mods installed.
