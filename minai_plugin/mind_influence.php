@@ -76,7 +76,7 @@ function GetMindInfluencePrompt($state, $promptType = "default") {
 
     $basePrompts = [
         "normal" => "",
-        "goodgirl" => "The mental influence leaves you feeling deeply content and euphoric. Your inhibitions are lowered and you feel warm and affectionate towards everyone. Your thoughts and speech are dreamy and filled with an eager desire to share your joy with others.",
+        "goodgirl" => "The mental influence leaves you feeling deeply content and euphoric. Your inhibitions are lowered and you feel warm and affectionate towards everyone.",
         "badgirl" => "The mental influence fills you with a gnawing sexual frustration. Your inhibitions are lowered and you find yourself acting more impulsively and flirtatiously than usual. Your thoughts and speech are tinged with longing and suggestiveness.",
         "verybadgirl" => "The mental influence overwhelms you with an unbearable, unrelieved arousal. Your inhibitions are completely gone and you act wildly uninhibited. Your thoughts and speech are consumed by desperate need and you struggle to focus on anything else.",
         "punishment" => "The mental influence leaves you feeling small and vulnerable. Your inhibitions are lowered, making you more emotionally open and prone to expressing regret. Your thoughts and speech are filled with a desire to make amends.",

@@ -370,7 +370,9 @@ endFunction
 Event OnVibrateStart(string eventName, string actorName, float vibStrength, Form sender)
   string strength = getVibStrength(vibStrength)
   Actor akActor = aiff.AIGetAgentByName(actorName)
-  
+  if !akActor
+    akActor = playerRef
+  EndIf
   ; Create a message that specifies which devices are vibrating
   string vibratingDevices = ""
   if akActor
@@ -408,7 +410,9 @@ EndEvent
 
 Event OnVibrateStop(string eventName, string actorName, float vibStrength, Form sender)
   Actor akActor = aiff.AIGetAgentByName(actorName)
-  
+  if (!akActor)
+    akActor = playerRef
+  EndIf
   ; Create a message that specifies which devices were vibrating
   string vibratingDevices = ""
   if akActor
