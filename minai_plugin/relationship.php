@@ -51,6 +51,9 @@ class relation {
 }
 
 function GetRelationshipContext($targetActor) {
+    if ($targetActor == $GLOBALS["PLAYER_NAME"] || $targetActor == "The Narrator") {
+        return "";
+    }
     $utilities = new Utilities();
     $playerName = $GLOBALS["PLAYER_NAME"];
     $targetName = $targetActor;
