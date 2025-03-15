@@ -73,7 +73,7 @@ $GLOBALS['roleplay_settings'] = Array(
         "CHARACTER_STATUS" => Array(
             "enabled" => true,
             "header" => "=== YOUR CURRENT STATUS ===",
-            "content" => "#AROUSAL_STATUS#\n#SURVIVAL_STATUS#\n#CLOTHING_STATUS#\n#DEVICES_STATUS#\n#FERTILITY_STATUS#\n#TATTOO_STATUS#",
+            "content" => "#AROUSAL_STATUS#\n#SURVIVAL_STATUS#\n#CLOTHING_STATUS#\n#DEVICES_STATUS#\n#FERTILITY_STATUS#\n#TATTOO_STATUS#\n#BOUNTY_STATUS#",
             "order" => 1
         ),
         "NEARBY_ENTITIES" => Array(

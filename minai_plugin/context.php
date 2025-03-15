@@ -34,7 +34,7 @@ function bundleSFWContext(&$nc) {
   $nc .= GetDirtAndBloodContext($localActors);
   $nc .= GetExposureContext($localActors);
   $nc .= GetEnvironmentalContext($GLOBALS["HERIKA_NAME"]);
-  $nc .= BuildSFWReputationContext($GLOBALS["HERIKA_NAME"]);
+  $nc .= BuildSFWReputationContext($GLOBALS["HERIKA_NAME"]);  
   $nc .= GetThirdPartyContext();
   $nc .= GetWeatherContext() . "\n";
 }

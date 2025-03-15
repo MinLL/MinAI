@@ -25,6 +25,7 @@ minai_Util MinaiUtil
 Spell minai_ToggleSapienceSpell
 minai_FertilityMode fertility
 minai_ItemCommands itemCommands
+minai_Crime crimeController
 
 bool bHasMantella = False;
 bool bHasAIFF = False;
@@ -48,7 +49,10 @@ Function CheckForCriticalDependencies()
   Info("Checking for critical dependencies...")
   int[] pTweaksVersion = PapyrusTweaks.GetPapyrusTweaksVersion()
   if !pTweaksVersion
-    Fatal("Papyrus Tweaks NG is not installed. This is a critical dependency. Revert to a prior save and install the mod before continuing.")
+    Debug.MessageBox("Papyrus Tweaks NG is not installed. This is a critical dependency. Revert to a prior save and install the mod before continuing.")
+    Debug.Trace("[FATAL] Papyrus Tweaks NG is not installed. This is a critical dependency. Revert to a prior save and install the mod before continuing.")
+    ; We may not be able to call MinaiUtil if the dependency is not installed, so raise the message manually here.
+    ; Fatal("Papyrus Tweaks NG is not installed. This is a critical dependency. Revert to a prior save and install the mod before continuing.")
   Else
     Info("Papyrus Tweaks NG detected: " + pTweaksVersion[0] + "." + pTweaksVersion[1] + "." + pTweaksVersion[2])
   EndIf
@@ -104,6 +108,7 @@ Function Maintenance()
   relationship = (Self as Quest) as minai_Relationship
   envAwareness = (Self as Quest) as minai_EnvironmentalAwareness
   itemCommands = (Self as Quest) as minai_ItemCommands
+  crimeController = (Self as Quest) as minai_Crime
   minai_ToggleSapienceSpell = Game.GetFormFromFile(0x0E93, "MinAI.esp") as Spell
   if (!followers)
     Fatal("Could not load followers script - Mismatched script and esp versions")
@@ -132,6 +137,7 @@ Function Maintenance()
   sapience.Maintenance(Self)
   reputation.Maintenance(Self)
   itemCommands.Maintenance(Self)
+  crimeController.Maintenance(Self)
   
   if bHasMantella
     minMantella.Maintenance(Self)

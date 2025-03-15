@@ -42,11 +42,14 @@ Function GetFillHerUpContext($name) {
             }
             $ret .= ".\n";
         } else {
-            $ret .= "{$name}'s belly appears slightly swollen from cum";
-            if (!empty($cumVaginal)) {
-                $ret .= " (" . number_format($cumVaginal, 1) . " units)";
+            // Only show slight belly swelling if cum amount is 1 or greater
+            if (empty($cumVaginal) || $cumVaginal >= 1) {
+                $ret .= "{$name}'s belly appears slightly swollen from cum";
+                if (!empty($cumVaginal)) {
+                    $ret .= " (" . number_format($cumVaginal, 1) . " units)";
+                }
+                $ret .= ".\n";
             }
-            $ret .= ".\n";
         }
     }
 
@@ -76,11 +79,14 @@ Function GetFillHerUpContext($name) {
             }
             $ret .= ".\n";
         } else {
-            $ret .= "{$name}'s throat seems somewhat full of cum";
-            if (!empty($cumOral)) {
-                $ret .= " (" . number_format($cumOral, 1) . " units)";
+            // Only show slight oral fullness if cum amount is 1 or greater
+            if (empty($cumOral) || $cumOral >= 1) {
+                $ret .= "{$name}'s throat seems somewhat full of cum";
+                if (!empty($cumOral)) {
+                    $ret .= " (" . number_format($cumOral, 1) . " units)";
+                }
+                $ret .= ".\n";
             }
-            $ret .= ".\n";
         }
     }
 

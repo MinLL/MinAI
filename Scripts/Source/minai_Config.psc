@@ -6,6 +6,7 @@ minai_Sex  sex
 minai_DeviousStuff devious
 bool Property ActionRegistryIsDirty = false Auto
 minai_SapienceController sapience
+minai_Crime crimeController
 
 ; OID definitions
 int logLevelOID
@@ -239,7 +240,7 @@ bool Property enableAIAgentRequestMessage = True Auto
 bool Property enableAIAgentRecordSoundEx = True Auto
 bool Property enableAIAgentStopRecording = True Auto
 
-; Add these OIDs near the other OID definitions
+; Add these OIDs near the other OID declarations
 int enableAIAgentRequestMessageOID
 int enableAIAgentRecordSoundExOID  
 int enableAIAgentStopRecordingOID
@@ -281,6 +282,17 @@ int Property lowFrequencyUpdateIntervalOID Auto
 int Property contextUpdateIntervalOID Auto
 int Property highPerformanceModeOID Auto
 
+int SmallBountyAmountDefault = 50
+int Property SmallBountyAmount = 50 Auto
+int smallBountyAmountOID
+
+int MediumBountyAmountDefault = 200
+int Property MediumBountyAmount = 200 Auto
+int mediumBountyAmountOID
+
+int LargeBountyAmountDefault = 1000
+int Property LargeBountyAmount = 1000 Auto
+int largeBountyAmountOID
 
 Event OnConfigInit()
   main.Info("Building mcm menu.")
@@ -290,6 +302,7 @@ EndEvent
 Function InitializeMCM()
   minai_UseOStim = Game.GetFormFromFile(0x0906, "MinAI.esp") as GlobalVariable
   aiff = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_AIFF
+  crimeController = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_Crime
   sex = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_Sex
   main = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_MainQuestController
   devious = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_DeviousStuff
@@ -306,19 +319,21 @@ EndFunction
 
 Function SetupPages()
   if sex.IsNSFW()
-    Pages = new string[6]
+    Pages = new string[7]
     Pages[0] = "General"
     Pages[1] = "Physics (CBPC)"
     Pages[2] = "Devious Stuff"
     Pages[3] = "Sex Settings"
-    Pages[4] = "Action Registry"
-    Pages[5] = "Performance"
+    Pages[4] = "Crime Settings"
+    Pages[5] = "Action Registry"
+    Pages[6] = "Performance"
   Else
-    Pages = new string[4]
+    Pages = new string[5]
     Pages[0] = "General"
     Pages[1] = "Physics (CBPC)"
-    Pages[2] = "Action Registry"
-    Pages[3] = "Performance"
+    Pages[2] = "Crime Settings"
+    Pages[3] = "Action Registry"
+    Pages[4] = "Performance"
   EndIf
 EndFunction
 
@@ -339,6 +354,8 @@ Event OnPageReset(string page)
     RenderDeviousPage()
   elseif page == "Sex Settings"
     RenderSexPage()
+  elseif page == "Crime Settings"
+    RenderCrimePage()
   elseif page == "Action Registry"
     RenderActionsPage();
   elseif page == "Performance"
@@ -1053,6 +1070,18 @@ Event OnOptionDefault(int oid)
   elseif oid == logLevelOID
     logLevel = logLevelDefault
     SetSliderOptionValue(oid, logLevelDefault, "{0}")
+  elseif oid == smallBountyAmountOID
+    SmallBountyAmount = SmallBountyAmountDefault
+    SetSliderOptionValue(oid, SmallBountyAmount, "{0} gold")
+    crimeController.StoreCrimeVariables()
+  elseif oid == mediumBountyAmountOID
+    MediumBountyAmount = MediumBountyAmountDefault
+    SetSliderOptionValue(oid, MediumBountyAmount, "{0} gold")
+    crimeController.StoreCrimeVariables()
+  elseif oid == largeBountyAmountOID
+    LargeBountyAmount = LargeBountyAmountDefault
+    SetSliderOptionValue(oid, LargeBountyAmount, "{0} gold")
+    crimeController.StoreCrimeVariables()
   EndIf
 EndEvent
 
@@ -1207,6 +1236,12 @@ Event OnOptionHighlight(int oid)
     SetInfoText("Hotkey to speak as the dungeon master")
   elseif oid == dungeonMasterTextKeyOID
     SetInfoText("Hotkey to type as the dungeon master")
+  elseif oid == smallBountyAmountOID
+    SetInfoText("Amount of gold given for minor infractions (trespassing, petty theft, etc.)")
+  elseif oid == mediumBountyAmountOID
+    SetInfoText("Amount of gold given for moderate crimes (assault, significant theft, etc.)")
+  elseif oid == largeBountyAmountOID
+    SetInfoText("Amount of gold given for serious crimes (murder, grievous assault, etc.)")
   EndIf
   int i = 0
   string[] actions = JMap.allKeysPArray(aiff.actionRegistry)
@@ -1396,6 +1431,21 @@ Event OnOptionSliderOpen(int oid)
       SetOptionFlags(lowFrequencyUpdateIntervalOID, OPTION_FLAG_NONE)
       SetOptionFlags(contextUpdateIntervalOID, OPTION_FLAG_NONE)
     endif
+  elseif oid == smallBountyAmountOID
+    SetSliderDialogStartValue(SmallBountyAmount)
+    SetSliderDialogDefaultValue(SmallBountyAmountDefault)
+    SetSliderDialogRange(10, 1000)
+    SetSliderDialogInterval(10)
+  elseif oid == mediumBountyAmountOID
+    SetSliderDialogStartValue(MediumBountyAmount)
+    SetSliderDialogDefaultValue(MediumBountyAmountDefault)
+    SetSliderDialogRange(100, 10000)
+    SetSliderDialogInterval(50)
+  elseif oid == largeBountyAmountOID
+    SetSliderDialogStartValue(LargeBountyAmount)
+    SetSliderDialogDefaultValue(LargeBountyAmountDefault)
+    SetSliderDialogRange(100, 50000)
+    SetSliderDialogInterval(100)
   EndIf
 EndEvent
 
@@ -1522,6 +1572,18 @@ Event OnOptionSliderAccept(int oid, float value)
       SetOptionFlags(lowFrequencyUpdateIntervalOID, OPTION_FLAG_NONE)
       SetOptionFlags(contextUpdateIntervalOID, OPTION_FLAG_NONE)
     endif
+  elseif oid == smallBountyAmountOID
+    SmallBountyAmount = value as int
+    SetSliderOptionValue(oid, SmallBountyAmount, "{0} gold")
+    crimeController.StoreCrimeVariables()
+  elseif oid == mediumBountyAmountOID
+    MediumBountyAmount = value as int
+    SetSliderOptionValue(oid, MediumBountyAmount, "{0} gold")
+    crimeController.StoreCrimeVariables()
+  elseif oid == largeBountyAmountOID
+    LargeBountyAmount = value as int
+    SetSliderOptionValue(oid, LargeBountyAmount, "{0} gold")
+    crimeController.StoreCrimeVariables()
   EndIf
 EndEvent
 
@@ -1579,3 +1641,11 @@ event OnOptionKeyMapChange(int a_option, int a_keyCode, string a_conflictControl
         endIf
     endIf
 EndEvent
+
+Function RenderCrimePage()
+  SetCursorFillMode(TOP_TO_BOTTOM)		
+  AddHeaderOption("Bounty Settings")
+  smallBountyAmountOID = AddSliderOption("Small Bounty Amount", SmallBountyAmount, "{0} gold")
+  mediumBountyAmountOID = AddSliderOption("Medium Bounty Amount", MediumBountyAmount, "{0} gold")
+  largeBountyAmountOID = AddSliderOption("Large Bounty Amount", LargeBountyAmount, "{0} gold")
+EndFunction

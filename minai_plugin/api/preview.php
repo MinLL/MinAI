@@ -33,6 +33,8 @@ try {
     $devicesStatus = convertToFirstPerson(GetDDContext($playerName), $playerName, $playerPronouns);
     $fertilityStatus = convertToFirstPerson(GetFertilityContext($playerName), $playerName, $playerPronouns);
     $tattooStatus = convertToFirstPerson(GetTattooContext($playerName), $playerName, $playerPronouns);
+    // Add bounty context
+    $bountyStatus = convertToFirstPerson(GetBountyContext($playerName), $playerName, $playerPronouns);
 
     // Get nearby actors and locations
     $nearbyActors = array_filter(array_map('trim', explode('|', DataBeingsInRange())));
@@ -64,6 +66,7 @@ try {
         'DEVICES_STATUS' => $devicesStatus,
         'FERTILITY_STATUS' => $fertilityStatus,
         'TATTOO_STATUS' => $tattooStatus,
+        'BOUNTY_STATUS' => $bountyStatus,
         'HERIKA_PERS' => $GLOBALS["HERIKA_PERS"] ?? "",
         'MIND_STATE' => $mindState
     ];

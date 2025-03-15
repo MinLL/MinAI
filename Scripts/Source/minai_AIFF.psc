@@ -12,6 +12,7 @@ minai_Relationship relationship
 minai_EnvironmentalAwareness envAwareness
 minai_Util MinaiUtil 
 minai_CombatManager combat
+minai_Crime crimeController
 
 ; Per-actor mutex for SetContext
 int Property contextMutexMap Auto  ; JMap of actor names to mutex states
@@ -162,6 +163,7 @@ Function Maintenance(minai_MainQuestController _main)
   combat = (Self as Quest) as minai_CombatManager
   followers = Game.GetFormFromFile(0x0913, "MinAI.esp") as minai_Followers
   reputation = (Self as Quest) as minai_Reputation
+  crimeController = (Self as Quest) as minai_Crime
   if (!followers)
     Main.Fatal("Could not load followers script - Mismatched script and esp versions")
   EndIf
@@ -459,6 +461,7 @@ Function SetContext(actor akTarget)
     sex.SetContext(akTarget)
     StoreKeywords(akTarget)
     StoreFactions(akTarget)
+    crimeController.SetContext(akTarget)
     JMap.setFlt(updateTracker, actorKey + "_low", currentGameTime)
   endif
 

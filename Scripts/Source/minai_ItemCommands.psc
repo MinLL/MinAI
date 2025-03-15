@@ -153,8 +153,11 @@ Function GiveItemToPlayer(Actor akSpeaker, String parameter)
     return
   EndIf
   
-  ; Adjust count if NPC doesn't have enough
+  ; Check if NPC has enough of the item
+  bool hasEnough = true
+  int originalCount = count
   if hasCount < count
+    hasEnough = false
     Main.Debug("GiveItemToPlayer - Adjusting count from " + count + " to " + hasCount)
     count = hasCount
   EndIf
@@ -173,8 +176,16 @@ Function GiveItemToPlayer(Actor akSpeaker, String parameter)
     countStr = count + "x "
   EndIf
   
-  ; Return result to LLM
-  main.RequestLLMResponseFromActor(speakerName + " gave " + playerName + " " + countStr + actualItemName + ".", "chatnf_minai_narrate", speakerName)
+  ; Return result to LLM - different message based on whether NPC had enough items
+  if hasEnough
+    main.RequestLLMResponseFromActor(speakerName + " gave " + playerName + " " + countStr + actualItemName + ".", "chatnf_minai_narrate", speakerName)
+  else
+    string originalCountStr = ""
+    if originalCount > 1
+      originalCountStr = originalCount + "x "
+    EndIf
+    main.RequestLLMResponseFromActor(speakerName + " only had " + countStr + actualItemName + " to give " + playerName + ", so they gave what they had.", "chatnf_minai_narrate", speakerName)
+  EndIf
 EndFunction
 
 ; Take an item from player to NPC
@@ -208,8 +219,11 @@ Function TakeItemFromPlayer(Actor akSpeaker, String parameter)
     return
   EndIf
   
-  ; Adjust count if player doesn't have enough
+  ; Check if player has enough of the item
+  bool hasEnough = true
+  int originalCount = count
   if hasCount < count
+    hasEnough = false
     Main.Debug("TakeItemFromPlayer - Adjusting count from " + count + " to " + hasCount)
     count = hasCount
   EndIf
@@ -228,8 +242,16 @@ Function TakeItemFromPlayer(Actor akSpeaker, String parameter)
     countStr = count + "x "
   EndIf
   
-  ; Return result to LLM
-  main.RequestLLMResponseFromActor(speakerName + " took " + countStr + actualItemName + " from " + playerName + ".", "chatnf_minai_narrate", speakerName)
+  ; Return result to LLM - different message based on whether player had enough items
+  if hasEnough
+    main.RequestLLMResponseFromActor(speakerName + " took " + countStr + actualItemName + " from " + playerName + ".", "chatnf_minai_narrate", speakerName)
+  else
+    string originalCountStr = ""
+    if originalCount > 1
+      originalCountStr = originalCount + "x "
+    EndIf
+    main.RequestLLMResponseFromActor(speakerName + " took " + countStr + actualItemName + " from " + playerName + ", which was all " + playerName + " had.", "chatnf_minai_narrate", speakerName)
+  EndIf
   
   ; Register the event for event tracking
   Main.RegisterEvent(speakerName + " took " + countStr + actualItemName + " from " + playerName + ".")

@@ -16,6 +16,13 @@ function convertToFirstPerson($text, $name, $pronouns) {
         "Your",
     ], $text);
 
+    // General name replacement - replace all occurrences of the name
+    $text = preg_replace('/\b' . preg_quote($name, '/') . '\b(?!\')/', 'you', $text);
+    
+    // Capitalize 'you' if it appears at the beginning of a sentence
+    $text = preg_replace('/([.!?]\s+)you\b/', '$1You', $text);
+    $text = preg_replace('/^you\b/', 'You', $text);
+
     // Pronoun replacements
     $text = str_replace([
         " {$pronouns['subject']} is",
@@ -181,6 +188,9 @@ function interceptRoleplayInput() {
         $fertilityStatus = convertToFirstPerson(GetFertilityContext($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
         $mindState = convertToFirstPerson(GetMindInfluenceContext(GetMindInfluenceState($PLAYER_NAME)), $PLAYER_NAME, $playerPronouns);
         $tattooStatus = convertToFirstPerson(GetTattooContext($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
+        // Add crime context
+        $bountyStatus = convertToFirstPerson(GetBountyContext($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
+        
         // Replace variables in system prompt and request
         $variableReplacements = [
             'PLAYER_NAME' => $PLAYER_NAME,
@@ -202,6 +212,7 @@ function interceptRoleplayInput() {
             'DEVICES_STATUS' => $devicesStatus,
             'FERTILITY_STATUS' => $fertilityStatus,
             'TATTOO_STATUS' => $tattooStatus,
+            'BOUNTY_STATUS' => $bountyStatus,
             'HERIKA_NAME' => $HERIKA_NAME,
             'HERIKA_PERS' => $HERIKA_PERS,
             'MIND_STATE' => $mindState
