@@ -166,7 +166,7 @@ EndFunction
 
 
 Function RegisterEvent(String eventLine, string eventType = "")
-  ;Debug("RegisterEvent(" + eventLine + ", " + eventType + ")")
+  Debug("Main - RegisterEvent(" + eventLine + ", " + eventType + ")")
   if bHasMantella
     minMantella.RegisterEvent(eventLine)
   EndIf

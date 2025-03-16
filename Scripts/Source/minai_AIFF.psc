@@ -498,8 +498,9 @@ EndFunction
 
 
 Function RegisterEvent(string eventLine, string eventType)
+  Main.Info("CHIM - RegisterEvent(" + eventLine + ", " + eventType + ")")
   if (!IsInitialized())
-    Main.Info("RegisterEvent() - Still Initializing.")
+    Main.Info("CHIM - RegisterEvent() - Still Initializing.")
     return
   EndIf
   if (!bHasAIFF)

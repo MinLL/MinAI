@@ -29,8 +29,7 @@ try {
     $physDesc = convertToFirstPerson(GetPhysicalDescription($playerName), $playerName, $playerPronouns);
     $arousalStatus = convertToFirstPerson(GetArousalContext($playerName), $playerName, $playerPronouns);
     $survivalStatus = convertToFirstPerson(GetSurvivalContext($playerName), $playerName, $playerPronouns);
-    $clothingStatus = convertToFirstPerson(GetClothingContext($playerName), $playerName, $playerPronouns);
-    $devicesStatus = convertToFirstPerson(GetDDContext($playerName), $playerName, $playerPronouns);
+    $clothingStatus = convertToFirstPerson(GetUnifiedEquipmentContext($playerName), $playerName, $playerPronouns);
     $fertilityStatus = convertToFirstPerson(GetFertilityContext($playerName), $playerName, $playerPronouns);
     $tattooStatus = convertToFirstPerson(GetTattooContext($playerName), $playerName, $playerPronouns);
     // Add bounty context
@@ -63,7 +62,6 @@ try {
         'AROUSAL_STATUS' => $arousalStatus,
         'SURVIVAL_STATUS' => $survivalStatus,
         'CLOTHING_STATUS' => $clothingStatus,
-        'DEVICES_STATUS' => $devicesStatus,
         'FERTILITY_STATUS' => $fertilityStatus,
         'TATTOO_STATUS' => $tattooStatus,
         'BOUNTY_STATUS' => $bountyStatus,

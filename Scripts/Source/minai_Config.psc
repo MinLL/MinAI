@@ -294,6 +294,13 @@ int LargeBountyAmountDefault = 1000
 int Property LargeBountyAmount = 1000 Auto
 int largeBountyAmountOID
 
+; After other bool Property declarations
+bool includePromptSelfDefault = True
+bool Property includePromptSelf = True Auto
+
+; After other int OID declarations
+int includePromptSelfOID
+
 Event OnConfigInit()
   main.Info("Building mcm menu.")
   InitializeMCM()
@@ -371,6 +378,7 @@ Function RenderGeneralPage()
   autoUpdateDiaryOID = AddToggleOption("Automatically Update Follower Diaries", autoUpdateDiary)
   updateNarratorDiaryOID = AddToggleOption("Update Narrator Diary on Sleep", updateNarratorDiary)
   updateNarratorProfileOID = AddToggleOption("Update Narrator Dynamic Profile on Sleep", updateNarratorProfile)
+  includePromptSelfOID = AddToggleOption("Prompt Player for Event Responses", includePromptSelf)
   requestResponseCooldownOID = AddSliderOption("LLM Response Request Cooldown", requestResponseCooldown, "{1}")
   AddHeaderOption("Sapience Settings")
   useSapienceOID = AddToggleOption("Enable Sapience", minai_SapienceEnabled.GetValueInt() == 1)
@@ -865,6 +873,9 @@ Event OnOptionSelect(int oid)
       SetOptionFlags(contextUpdateIntervalOID, OPTION_FLAG_NONE)
     endif
     ForcePageReset()
+  elseif oid == includePromptSelfOID
+    includePromptSelf = !includePromptSelf
+    SetToggleOptionValue(oid, includePromptSelf)
   EndIf
   int i = 0
   string[] categories = JMap.allKeysPArray(aCategoryMap)
@@ -1082,6 +1093,9 @@ Event OnOptionDefault(int oid)
     LargeBountyAmount = LargeBountyAmountDefault
     SetSliderOptionValue(oid, LargeBountyAmount, "{0} gold")
     crimeController.StoreCrimeVariables()
+  elseif oid == includePromptSelfOID
+    includePromptSelf = includePromptSelfDefault
+    SetToggleOptionValue(oid, includePromptSelf)
   EndIf
 EndEvent
 
@@ -1242,6 +1256,8 @@ Event OnOptionHighlight(int oid)
     SetInfoText("Amount of gold given for moderate crimes (assault, significant theft, etc.)")
   elseif oid == largeBountyAmountOID
     SetInfoText("Amount of gold given for serious crimes (murder, grievous assault, etc.)")
+  elseif oid == includePromptSelfOID
+    SetInfoText("When enabled, prompts the player (narrator) to respond to certain in-game events in addition to or instead of NPC responses. Disable to rely solely on NPC responses.")
   EndIf
   int i = 0
   string[] actions = JMap.allKeysPArray(aiff.actionRegistry)

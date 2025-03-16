@@ -353,7 +353,7 @@ function AddItemWithModIndex($item_id, $file_name, $name, $description, $mod_ind
     // If form ID is 8 digits (after 0x prefix), extract just the last 6 digits
     if (strlen($item_id) == 10) { // "0x" + 8 hex digits
         $item_id = '0x' . substr($item_id, 4, 6); // Keep just the last 6 digits with 0x prefix
-        minai_log("info", "Truncated form ID to 6 digits: " . $item_id);
+        // minai_log("info", "Truncated form ID to 6 digits: " . $item_id);
     }
     
     // Validate item_id format (0x??012345 or 0x012345)
@@ -371,7 +371,7 @@ function AddItemWithModIndex($item_id, $file_name, $name, $description, $mod_ind
     }
     
     // Log incoming data for debugging
-    minai_log("debug", "AddItemWithModIndex - Processing: ID={$item_id}, File={$file_name}, Name={$name}, ModIdx={$mod_index}, Category={$category}");
+    // minai_log("debug", "AddItemWithModIndex - Processing: ID={$item_id}, File={$file_name}, Name={$name}, ModIdx={$mod_index}, Category={$category}");
     
     try {
         // Escape inputs
@@ -388,7 +388,7 @@ function AddItemWithModIndex($item_id, $file_name, $name, $description, $mod_ind
         
         if (count($result) > 0) {
             // Don't delete items that users may have customized.   
-            minai_log("debug", "Skipping deletion of item: " . $item_id . " from " . $file_name . " because it has been customized.");
+            // minai_log("debug", "Skipping deletion of item: " . $item_id . " from " . $file_name . " because it has been customized.");
             return true;
         }
         else {

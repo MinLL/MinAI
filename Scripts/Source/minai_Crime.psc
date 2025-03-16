@@ -393,6 +393,7 @@ Function SetContext(actor akTarget)
     aiff.SetActorVariable(akTarget, "bountyContext", bountyContext)
   else
     main.Debug("No active bounties found for context")
+    aiff.SetActorVariable(akTarget, "bountyContext", "")
   endif
 endFunction 
 

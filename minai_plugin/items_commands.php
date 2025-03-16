@@ -18,7 +18,7 @@ function GetActorInventoryItems($actorName) {
         return $inventory;
     }
     
-    minai_log("debug", "Parsing inventory for " . $actorName . ": " . $inventoryStr);
+    // minai_log("debug", "Parsing inventory for " . $actorName . ": " . $inventoryStr);
     
     // Parse the inventory string and collect all formIds and counts
     $inventoryData = [];
@@ -35,7 +35,7 @@ function GetActorInventoryItems($actorName) {
             $count = (int)$parts[1];
             
             if (empty($formId) || $count <= 0) {
-                minai_log("debug", "Skipping invalid item data: " . $item);
+                // minai_log("debug", "Skipping invalid item data: " . $item);
                 continue;
             }
             
@@ -127,7 +127,7 @@ function GetActorInventoryItems($actorName) {
                         'count' => $data['count']
                     ];
                     
-                    minai_log("debug", "Added item to inventory: " . $item['name'] . " x" . $data['count']);
+                    // minai_log("debug", "Added item to inventory: " . $item['name'] . " x" . $data['count']);
                 } else {
                     // Cache as null if not found
                     $GLOBALS['formIdCache'][$originalFormId] = null;

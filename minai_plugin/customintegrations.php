@@ -258,7 +258,7 @@ function ProcessIntegrations() {
                 $batchStatus = $parts[1]; // New: extract batch status
                 $data = $parts[2]; // Remove actor name and status from data for processing
                 
-                minai_log("info", "Processing inventory batch for {$actorName} with status: {$batchStatus}");
+                // minai_log("info", "Processing inventory batch for {$actorName} with status: {$batchStatus}");
             } else {
                 minai_log("warn", "Invalid batch format - expected actor@status@data but got: " . substr($data, 0, 50) . "...");
             }
@@ -271,7 +271,7 @@ function ProcessIntegrations() {
             
             // Debug log the raw data length
             $dataLength = strlen($data);
-            minai_log("debug", "Raw batch data length: {$dataLength} bytes with status: {$batchStatus}");
+            // minai_log("debug", "Raw batch data length: {$dataLength} bytes with status: {$batchStatus}");
             
             // For inventory tracking, build a formatted string in the old format
             if ($actorName) {
@@ -281,7 +281,7 @@ function ProcessIntegrations() {
                 if ($batchStatus == "initial") {
                     // Clear temporary inventory storage for initial batch
                     SetActorValue($actorName, "Inventory2", "");
-                    minai_log("info", "Initial batch - clearing temporary inventory");
+                    // minai_log("info", "Initial batch - clearing temporary inventory");
                 } 
                 else {
                     // For non-initial batches (partial or final), get existing temporary inventory
@@ -302,19 +302,19 @@ function ProcessIntegrations() {
                         $logMessage = ($batchStatus == "final") 
                             ? "Merged with existing temporary inventory for final batch: " 
                             : "Merged with existing temporary inventory: ";
-                        minai_log("info", $logMessage . count($inventoryItems) . " items");
+                        // minai_log("info", $logMessage . count($inventoryItems) . " items");
                     } else {
-                        minai_log("debug", "No existing temporary inventory found for {$actorName}");
+                        // minai_log("debug", "No existing temporary inventory found for {$actorName}");
                     }
                 }
             }
             
             // Debug the actual items received
-            minai_log("info", "Received " . count($items) . " items in batch");
+            //minai_log("info", "Received " . count($items) . " items in batch");
             
             // Special handling for empty final batch
             if ($batchStatus == "final" && empty(trim($data))) {
-                minai_log("info", "Received empty final batch - will finalize inventory");
+              //  minai_log("info", "Received empty final batch - will finalize inventory");
                 
                 // Even if this batch is empty, we still need to process the finalization
                 // if there's any data in the temporary inventory
@@ -331,11 +331,11 @@ function ProcessIntegrations() {
                         }
                     }
                     
-                    minai_log("info", "Empty final batch with existing temporary inventory: " . count($inventoryItems) . " items");
+                    // minai_log("info", "Empty final batch with existing temporary inventory: " . count($inventoryItems) . " items");
                 } else {
                     // Empty final batch with no temporary inventory means clear the main inventory
                     SetActorValue($actorName, "Inventory", "");
-                    minai_log("info", "Empty final batch with no temporary inventory - cleared main inventory");
+                    // minai_log("info", "Empty final batch with no temporary inventory - cleared main inventory");
                 }
             }
             
@@ -344,7 +344,7 @@ function ProcessIntegrations() {
                 foreach ($items as $index => $item) {
                     if (empty(trim($item))) {
                         $skippedItemsCount++;
-                        minai_log("debug", "Skipping empty item at index {$index}");
+                        // minai_log("debug", "Skipping empty item at index {$index}");
                         continue; // Skip empty items
                     }
                     
@@ -359,13 +359,13 @@ function ProcessIntegrations() {
                         
                         // Skip items with empty names or mod names
                         if (empty($name) || empty($modName)) {
-                            minai_log("debug", "Skipping item with empty name or mod at index {$index}: " . substr($item, 0, 30));
+                            // minai_log("debug", "Skipping item with empty name or mod at index {$index}: " . substr($item, 0, 30));
                             $skippedItemsCount++;
                             continue;
                         }
                         
                         
-                        minai_log("debug", "Processing item [{$index}]: {$name} (ID: {$formId}, Mod: {$modName}, Count: {$count})");
+                        // minai_log("debug", "Processing item [{$index}]: {$name} (ID: {$formId}, Mod: {$modName}, Count: {$count})");
                         
                         // If this is inventory data, track the item and count
                         if ($actorName && $count > 0) {
@@ -404,11 +404,11 @@ function ProcessIntegrations() {
                     // Final batch - store to permanent inventory and clear temporary
                     SetActorValue($actorName, "Inventory", $inventoryStr);
                     SetActorValue($actorName, "Inventory2", "");
-                    minai_log("info", "Stored FINAL inventory for " . $actorName . " with " . count($inventoryItems) . " items");
+                    // minai_log("info", "Stored FINAL inventory for " . $actorName . " with " . count($inventoryItems) . " items");
                 } else {
                     // Non-final batch - store to temporary inventory
                     SetActorValue($actorName, "Inventory2", $inventoryStr);
-                    minai_log("info", "Stored temporary inventory for " . $actorName . " with " . count($inventoryItems) . " items (batch status: " . $batchStatus . ")");
+                    //minai_log("info", "Stored temporary inventory for " . $actorName . " with " . count($inventoryItems) . " items (batch status: " . $batchStatus . ")");
                 }
             }
             
@@ -651,7 +651,7 @@ function StoreTattooData($actorName, $tattooData) {
             )
         );
         
-        minai_log("info", "Successfully stored tattoo data for " . $actorName . ": " . substr($tattooData, 0, 100) . "...");
+        // minai_log("info", "Successfully stored tattoo data for " . $actorName . ": " . substr($tattooData, 0, 100) . "...");
         
         // Now process each tattoo to ensure it exists in the tattoo_description table
         $tattoos = explode("~", $tattooData);
@@ -659,18 +659,18 @@ function StoreTattooData($actorName, $tattooData) {
         $skippedCount = 0;
         $errorCount = 0;
         
-        minai_log("info", "Processing " . count($tattoos) . " tattoo entries");
+        // minai_log("info", "Processing " . count($tattoos) . " tattoo entries");
         
         foreach ($tattoos as $index => $tattoo) {
             if (empty(trim($tattoo))) {
-                minai_log("info", "Skipping empty tattoo entry at index " . $index);
+                // minai_log("info", "Skipping empty tattoo entry at index " . $index);
                 $skippedCount++;
                 continue; // Skip empty entries
             }
             
             $fields = explode("&", $tattoo);
             if (count($fields) < 2) {
-                minai_log("info", "Skipping tattoo with insufficient fields at index " . $index . ": " . $tattoo);
+                // minai_log("info", "Skipping tattoo with insufficient fields at index " . $index . ": " . $tattoo);
                 $skippedCount++;
                 continue; // Need at least section and name
             }
@@ -680,7 +680,7 @@ function StoreTattooData($actorName, $tattooData) {
             
             // Skip if section or name is empty
             if (empty($section) || empty($name)) {
-                minai_log("info", "Skipping tattoo with empty section or name at index " . $index . ": " . $tattoo);
+                // minai_log("info", "Skipping tattoo with empty section or name at index " . $index . ": " . $tattoo);
                 $skippedCount++;
                 continue;
             }
@@ -691,7 +691,7 @@ function StoreTattooData($actorName, $tattooData) {
                     "SELECT COUNT(*) FROM tattoo_description WHERE section='" . $db->escape($section) . "' AND name='" . $db->escape($name) . "'"
                 );
                 
-                minai_log("info", "Tattoo " . $section . "/" . $name . " exists check result: " . ($exists ? "Yes" : "No"));
+                // minai_log("info", "Tattoo " . $section . "/" . $name . " exists check result: " . ($exists ? "Yes" : "No"));
                 
                 // If it doesn't exist, add it with default values
                 if (!$exists) {
@@ -745,7 +745,7 @@ function StoreTattooData($actorName, $tattooData) {
                         }
                     }
                     
-                    minai_log("info", "Inserting new tattoo: " . $section . "/" . $name . " with description: " . $defaultDescription . " and hidden_by: " . $defaultHiddenBy);
+                    // minai_log("info", "Inserting new tattoo: " . $section . "/" . $name . " with description: " . $defaultDescription . " and hidden_by: " . $defaultHiddenBy);
                     
                     $result = $db->insert(
                         'tattoo_description',
@@ -757,7 +757,7 @@ function StoreTattooData($actorName, $tattooData) {
                         )
                     );
                     
-                    minai_log("info", "Insert result: " . ($result ? "Success" : "Failed"));
+                    // minai_log("info", "Insert result: " . ($result ? "Success" : "Failed"));
                     $processedCount++;
                 }
             } catch (Exception $e) {

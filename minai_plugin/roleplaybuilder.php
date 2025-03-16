@@ -183,8 +183,8 @@ function interceptRoleplayInput() {
         $physDesc = convertToFirstPerson(GetPhysicalDescription($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
         $arousalStatus = convertToFirstPerson(GetArousalContext($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
         $survivalStatus = convertToFirstPerson(GetSurvivalContext($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
-        $clothingStatus = convertToFirstPerson(GetClothingContext($PLAYER_NAME, true), $PLAYER_NAME, $playerPronouns);
-        $devicesStatus = convertToFirstPerson(GetDDContext($PLAYER_NAME, true), $PLAYER_NAME, $playerPronouns);
+        $clothingStatus = convertToFirstPerson(GetUnifiedEquipmentContext($PLAYER_NAME, true), $PLAYER_NAME, $playerPronouns);
+        
         $fertilityStatus = convertToFirstPerson(GetFertilityContext($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
         $mindState = convertToFirstPerson(GetMindInfluenceContext(GetMindInfluenceState($PLAYER_NAME)), $PLAYER_NAME, $playerPronouns);
         $tattooStatus = convertToFirstPerson(GetTattooContext($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
@@ -209,7 +209,6 @@ function interceptRoleplayInput() {
             'AROUSAL_STATUS' => $arousalStatus,
             'SURVIVAL_STATUS' => $survivalStatus,
             'CLOTHING_STATUS' => $clothingStatus,
-            'DEVICES_STATUS' => $devicesStatus,
             'FERTILITY_STATUS' => $fertilityStatus,
             'TATTOO_STATUS' => $tattooStatus,
             'BOUNTY_STATUS' => $bountyStatus,

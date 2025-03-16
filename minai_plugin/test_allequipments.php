@@ -29,7 +29,7 @@ $HERIKA_NAME = "Herika";
 require_once("test_common.php");
 
 require_once("util.php");
-require_once("wornequipment.php");
+require_once("contextbuilders/wornequipment_context.php");
 
 
 function parse_valid_encoded_string_correctly_test() {

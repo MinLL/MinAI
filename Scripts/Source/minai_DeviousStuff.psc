@@ -369,83 +369,16 @@ endFunction
 
 Event OnVibrateStart(string eventName, string actorName, float vibStrength, Form sender)
   string strength = getVibStrength(vibStrength)
-  Actor akActor = aiff.AIGetAgentByName(actorName)
-  if !akActor
-    akActor = playerRef
-  EndIf
-  ; Create a message that specifies which devices are vibrating
-  string vibratingDevices = ""
-  if akActor
-    if akActor.WornHasKeyword(libs.zad_DeviousPlugVaginal)
-      vibratingDevices += "vaginal plug"
-    EndIf
-    if akActor.WornHasKeyword(libs.zad_DeviousPlugAnal)
-      if vibratingDevices != ""
-        vibratingDevices += " and "
-      EndIf
-      vibratingDevices += "anal plug"
-    EndIf
-    if akActor.WornHasKeyword(libs.zad_DeviousPiercingsNipple)
-      if vibratingDevices != ""
-        vibratingDevices += " and "
-      EndIf
-      vibratingDevices += "nipple piercings"
-    EndIf
-    if akActor.WornHasKeyword(libs.zad_DeviousPiercingsVaginal)
-      if vibratingDevices != ""
-        vibratingDevices += " and "
-      EndIf
-      vibratingDevices += "clitoral ring"
-    EndIf
-  EndIf
-  
-  ; If no specific devices were found but we know vibration is happening,
-  ; use a generic message
-  if vibratingDevices == ""
-    Main.RegisterEvent("A low buzzing sound started to come from " + actorName + " as she started being " + strength + " stimulated by a vibrator.")
-  else
-    Main.RegisterEvent("A low buzzing sound started to come from " + actorName + " as her " + vibratingDevices + " began " + strength + " vibrating.")
-  EndIf
+  Main.Info("OnVibrateStart: " + strength)
+  ; Use the new custom prompt for vibration start and pass the intensity
+  Main.RequestLLMResponseFromActor(strength, "minai_vibrate_start", actorName)
 EndEvent
 
 Event OnVibrateStop(string eventName, string actorName, float vibStrength, Form sender)
-  Actor akActor = aiff.AIGetAgentByName(actorName)
-  if (!akActor)
-    akActor = playerRef
-  EndIf
-  ; Create a message that specifies which devices were vibrating
-  string vibratingDevices = ""
-  if akActor
-    if akActor.WornHasKeyword(libs.zad_DeviousPlugVaginal)
-      vibratingDevices += "vaginal plug"
-    EndIf
-    if akActor.WornHasKeyword(libs.zad_DeviousPlugAnal)
-      if vibratingDevices != ""
-        vibratingDevices += " and "
-      EndIf
-      vibratingDevices += "anal plug"
-    EndIf
-    if akActor.WornHasKeyword(libs.zad_DeviousPiercingsNipple)
-      if vibratingDevices != ""
-        vibratingDevices += " and "
-      EndIf
-      vibratingDevices += "nipple piercings"
-    EndIf
-    if akActor.WornHasKeyword(libs.zad_DeviousPiercingsVaginal)
-      if vibratingDevices != ""
-        vibratingDevices += " and "
-      EndIf
-      vibratingDevices += "clitoral ring"
-    EndIf
-  EndIf
-  
-  ; If no specific devices were found but we know vibration was happening,
-  ; use a generic message
-  if vibratingDevices == ""
-    Main.RegisterEvent(actorName + " stopped being stimulated by a vibrator.")
-  else
-    Main.RegisterEvent("The vibrations from " + actorName + "'s " + vibratingDevices + " stopped.")
-  EndIf
+  string strength = getVibStrength(vibStrength)
+  Main.Info("OnVibrateStop: " + strength)
+  ; Use the new custom prompt for vibration stop and pass the intensity
+  Main.RequestLLMResponseFromActor(strength, "minai_vibrate_stop", actorName)
 EndEvent
 
 
@@ -849,43 +782,43 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     int vibTime = Utility.RandomInt(20,60)
     if (command == "ExtCmdForceOrgasm")
       libs.ActorOrgasm(akTarget)
-      Main.RegisterEvent(""+speakerName+" made " + targetName + " have an orgasm with a remote vibrator.")
+      Main.RegisterEvent(""+speakerName+" made " + targetName + " have an orgasm with a remote vibrator.", "chatnf_minai_narrate")
     elseIf (command == "ExtCmdTeaseWithVibratorVeryWeak")
       StartVibration(akTarget, 1, vibTime, True)
-      Main.RegisterEvent(""+speakerName+" very weakly teases " + targetName + " with a remote vibrator.")
+      Main.RegisterEvent(""+speakerName+" very weakly teases " + targetName + " with a remote vibrator.", "chatnf_minai_narrate")
     elseIf (command == "ExtCmdStimulateWithVibratorVeryWeak")
       StartVibration(akTarget, 1, vibTime, False)
-      Main.RegisterEvent(""+speakerName+" very weakly stimulates " + targetName + " with a remote vibrator.")
+      Main.RegisterEvent(""+speakerName+" very weakly stimulates " + targetName + " with a remote vibrator.", "chatnf_minai_narrate")
     elseIf (command == "ExtCmdTeaseWithVibratorWeak")
       StartVibration(akTarget, 2, vibTime, True)
-      Main.RegisterEvent(""+speakerName+" weakly teases " + targetName + " with a remote vibrator.")
+      Main.RegisterEvent(""+speakerName+" weakly teases " + targetName + " with a remote vibrator.", "chatnf_minai_narrate")
     elseIf (command == "ExtCmdStimulateWithVibratorWeak")
       StartVibration(akTarget, 2, vibTime, False)
-      Main.RegisterEvent(""+speakerName+" weakly stimulates " + targetName + " with a remote vibrator.")
+      Main.RegisterEvent(""+speakerName+" weakly stimulates " + targetName + " with a remote vibrator.", "chatnf_minai_narrate")
     elseIf (command == "ExtCmdTeaseWithVibratorMedium")
       StartVibration(akTarget, 3, vibTime, True)
-      Main.RegisterEvent(""+speakerName+" teases " + targetName + " with a remote vibrator.")
+      Main.RegisterEvent(""+speakerName+" teases " + targetName + " with a remote vibrator.", "chatnf_minai_narrate")
     elseIf (command == "ExtCmdStimulateWithVibratorMedium")
       StartVibration(akTarget, 3, vibTime, False)
-      Main.RegisterEvent(""+speakerName+" stimulates " + targetName + " with a remote vibrator.")
+      Main.RegisterEvent(""+speakerName+" stimulates " + targetName + " with a remote vibrator.", "chatnf_minai_narrate")
     elseIf (command == "ExtCmdTeaseWithVibratorStrong")
       StartVibration(akTarget, 4, vibTime, True)
-      Main.RegisterEvent(""+speakerName+" strongly teases " + targetName + " with a remote vibrator.")
+      Main.RegisterEvent(""+speakerName+" strongly teases " + targetName + " with a remote vibrator.", "chatnf_minai_narrate")
     elseIf (command == "ExtCmdStimulateWithVibratorStrong")
       StartVibration(akTarget, 4, vibTime, False)
-      Main.RegisterEvent(""+speakerName+" strongly stimulates " + targetName + " with a remote vibrator.")
+      Main.RegisterEvent(""+speakerName+" strongly stimulates " + targetName + " with a remote vibrator.", "chatnf_minai_narrate")
     elseIf (command == "ExtCmdTeaseWithVibratorVeryStrong")
       StartVibration(akTarget, 5, vibTime, True)
-      Main.RegisterEvent(""+speakerName+" very strongly teases " + targetName + " with a remote vibrator.")
+      Main.RegisterEvent(""+speakerName+" very strongly teases " + targetName + " with a remote vibrator.", "chatnf_minai_narrate")
     elseIf (command == "ExtCmdStimulateWithVibratorVeryStrong")
       StartVibration(akTarget, 5, vibTime, False)
-      Main.RegisterEvent(""+speakerName+" very strongly stimulates " + targetName + " with a remote vibrator.")
+      Main.RegisterEvent(""+speakerName+" very strongly stimulates " + targetName + " with a remote vibrator.", "chatnf_minai_narrate")
     elseIf (command == "ExtCmdTurnOffVibrator")
       libs.StopVibrating(akTarget)
-      Main.RegisterEvent(""+speakerName+" turns off " + targetName + "'s remote vibrator.")
+      Main.RegisterEvent(""+speakerName+" turns off " + targetName + "'s remote vibrator.", "chatnf_minai_narrate")
     elseIf (command == "ExtCmdshock")
       libs.ShockActor(akTarget)
-      Main.RegisterEvent(""+speakerName+" remotely shocks  " + targetName + ".")
+      Main.RegisterEvent(""+speakerName+" remotely shocks  " + targetName + ".", "chatnf_minai_narrate")
     elseIf (command == "ExtCmdEquipVibrator")
       ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_plugs_anal)
       ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_plugs_vaginal)

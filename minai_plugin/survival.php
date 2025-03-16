@@ -103,7 +103,7 @@ if (IsModEnabled("BetterFastTravel")) {
     $destinations[] = "Helgen";
 }
 $GLOBALS["F_NAMES"]["ExtCmdCarriageRide"]="BeginCarriageRide";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdCarriageRide"]="Give {$GLOBALS["PLAYER_NAME"]} a ride in your carriage";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdCarriageRide"]="(MUST use when giving a ride to {$GLOBALS['PLAYER_NAME']}). Give {$GLOBALS["PLAYER_NAME"]} a ride in your carriage. (Target MUST be specified as the destination). Available targets: " . implode(", ", $destinations);
 $GLOBALS["FUNCTIONS"][] = [
         "name" => $GLOBALS["F_NAMES"]["ExtCmdCarriageRide"],
         "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdCarriageRide"],
