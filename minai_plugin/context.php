@@ -4,42 +4,7 @@ require_once("util.php");
 require_once("contextbuilders.php");
 require_once("mind_influence.php");
 require_once("environmentalContext.php");
-
-$nearbyActors = GetActorValue("PLAYER", "nearbyActors", true);
-// Build context
-$new_content = "";
-
-if (!$GLOBALS["disable_nsfw"]) {
-  if ($GLOBALS["HERIKA_NAME"] == "The Narrator") {
-    $new_content .= BuildContext("The Narrator") . "\n";
-  } else {
-    $new_content .= BuildContext(GetTargetActor()) . "\n";
-    $new_content .= BuildContext($GLOBALS["HERIKA_NAME"]);
-  }
-  $new_content .= BuildNSFWReputationContext($GLOBALS["HERIKA_NAME"]) . "\n";
-}
-
-// SFW Descriptions
-// We're going to scan everyone who is nearby
-// for highly visible traits of people, like 
-// they reek or are filthy.
-bundleSFWContext($new_content);
-function bundleSFWContext(&$nc) {
-  $utilities = new Utilities();
-  // list of local npcs (sans narrator)
-  $nc .= "\n";
-  $localActors = $utilities->beingsInCloseRange();
-  // send localActors list to GetDirtAndBlood so as to make comma seperated lists
-  $nc .= GetRelationshipContext($GLOBALS["HERIKA_NAME"]);
-  $nc .= GetDirtAndBloodContext($localActors);
-  $nc .= GetExposureContext($localActors);
-  $nc .= GetEnvironmentalContext($GLOBALS["HERIKA_NAME"]);
-  $nc .= BuildSFWReputationContext($GLOBALS["HERIKA_NAME"]);  
-  $nc .= GetThirdPartyContext();
-  $nc .= GetWeatherContext() . "\n";
-}
-
-$GLOBALS["HERIKA_PERS"] = $GLOBALS["HERIKA_PERS"] . "\n" . $new_content;
+require_once("contextbuilders/system_prompt_context.php");
 
 // Clean up context
 $locaLastElement=[];
@@ -126,6 +91,11 @@ if ($GLOBALS["minai_processing_input"]) {
     minai_log("info", "Cleaning up player input");
     DeleteLastPlayerInput();
 }
+
+// Re-index the array after removing elements
 $GLOBALS["contextDataFull"] = array_values($GLOBALS["contextDataFull"]);
+
+// Update the system prompt (0th entry) with our optimized version
+UpdateSystemPrompt();
 
 require "/var/www/html/HerikaServer/ext/minai_plugin/command_prompt_custom.php";

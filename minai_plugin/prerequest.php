@@ -269,3 +269,6 @@ $GLOBALS["action_post_process_fnct"] = function($actions) {
 if (isset($GLOBALS['use_llm_fallback']) && $GLOBALS['use_llm_fallback']) {
     CreateFallbackConfig();
 }
+
+// Incompatible with new context system
+$GLOBALS["ADD_PLAYER_BIOS"]  = false;

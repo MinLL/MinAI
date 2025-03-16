@@ -127,7 +127,7 @@ function EnrichEquipmentDataFromDb(&$parsedData)
   }
 }
 
-function BuildEquipmentContext(&$parsedData) 
+function GetEquipmentContext(&$parsedData) 
 {
   $context = "";
   $skipKeywords = [];
@@ -181,7 +181,7 @@ function GetAllEquipmentContext($actorName)
     // especially for npc, but this should be fine for now
     $parsedResult = ParseEncodedEquipmentData($encodedString);
     EnrichEquipmentDataFromDb($parsedResult);
-    return BuildEquipmentContext($parsedResult);
+    return GetEquipmentContext($parsedResult);
   } catch (Exception $e) {
     minai_log("info", "Failed to get equipment context: " . $e->getMessage());
     minai_log("info", $e->getTraceAsString());
