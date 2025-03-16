@@ -196,6 +196,12 @@ $GLOBALS["PROMPTS"]["chatnf_minai_narrate"] = [
     ]
 ];
 
+$GLOBALS["PROMPTS"]["minai_narrate"] = [
+    "player_request"=>[
+        "The Narrator: {$cleanedMessage}"
+    ]
+];
+
 require_once("prompts/tntr_prompts.php");
 require_once("prompts/fillherup_prompts.php");
 require_once("prompts/vibrator_prompts.php");

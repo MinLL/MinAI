@@ -199,25 +199,27 @@ Function RequestLLMResponseFromActor(string eventLine, string eventType, string 
   if bHasAIFF
     float currentTime = Utility.GetCurrentRealTime()
     if currentTime - lastRequestTime > config.requestResponseCooldown
-      lastRequestTime = currentTime
-      Info("Requesting response from LLM: " + eventLine)
-      
+      lastRequestTime = currentTime     
       ; Handle different response targets
       if config.includePromptSelf
         if (responseTarget == "player")
           ; Request response from player ("The Narrator" is used for player internalization)
+          Info("Requesting response from LLM (player) " + name + ": " + eventLine)
           minAIFF.AIRequestMessageForActor(eventLine, eventType, "The Narrator")
         elseif (responseTarget == "both")
           ; Request response from player ("The Narrator" is used for player internalization)
+          Info("Requesting response from LLM (both) " + name + ": " + eventLine)
           minAIFF.AIRequestMessageForActor(eventLine, eventType, "The Narrator")
           ; Request response from NPC
           minAIFF.AIRequestMessageForActor(eventLine, eventType, name)
         else
           ; Handle "npc" and others
+          Info("Requesting response from LLM (npc) " + name + ": " + eventLine)
           minAIFF.AIRequestMessageForActor(eventLine, eventType, name)
         EndIf
       else
         ; Just prompt as normal if not using the config option
+        Info("Requesting response from LLM: " + eventLine)
         minAIFF.AIRequestMessageForActor(eventLine, eventType, name)
       endif
     Else
