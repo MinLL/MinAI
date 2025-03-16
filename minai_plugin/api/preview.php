@@ -11,7 +11,6 @@ $GLOBALS["db"] = new sql();
 
 // Load required files
 require_once("../util.php");
-require_once("../fertilitymode.php");
 require_once("../contextbuilders.php");
 require_once("../roleplaybuilder.php");
 
@@ -26,14 +25,14 @@ try {
     $playerPronouns = GetActorPronouns($playerName);
 
     // Get contexts and convert to first person
-    $physDesc = convertToFirstPerson(GetPhysicalDescription($playerName), $playerName, $playerPronouns);
-    $arousalStatus = convertToFirstPerson(GetArousalContext($playerName), $playerName, $playerPronouns);
-    $survivalStatus = convertToFirstPerson(GetSurvivalContext($playerName), $playerName, $playerPronouns);
+    $physDesc = convertToFirstPerson(callContextBuilder('physical_description', ['player_name' => $playerName]), $playerName, $playerPronouns);
+    $arousalStatus = convertToFirstPerson(callContextBuilder('arousal', ['player_name' => $playerName]), $playerName, $playerPronouns);
+    $survivalStatus = convertToFirstPerson(callContextBuilder('survival', ['player_name' => $playerName]), $playerName, $playerPronouns);
     $clothingStatus = convertToFirstPerson(GetUnifiedEquipmentContext($playerName), $playerName, $playerPronouns);
-    $fertilityStatus = convertToFirstPerson(GetFertilityContext($playerName), $playerName, $playerPronouns);
-    $tattooStatus = convertToFirstPerson(GetTattooContext($playerName), $playerName, $playerPronouns);
+    $fertilityStatus = convertToFirstPerson(callContextBuilder('fertility', ['player_name' => $playerName]), $playerName, $playerPronouns);
+    $tattooStatus = convertToFirstPerson(callContextBuilder('tattoos', ['player_name' => $playerName]), $playerName, $playerPronouns);
     // Add bounty context
-    $bountyStatus = convertToFirstPerson(GetBountyContext($playerName), $playerName, $playerPronouns);
+    $bountyStatus = convertToFirstPerson(callContextBuilder('bounty', ['player_name' => $playerName]), $playerName, $playerPronouns);
 
     // Get nearby actors and locations
     $nearbyActors = array_filter(array_map('trim', explode('|', DataBeingsInRange())));

@@ -1,6 +1,5 @@
 <?php
 
-require_once("util.php");
 if (IsModEnabled("OSL") || IsModEnabled("Aroused")) {
     RegisterAction("ExtCmdIncreaseArousal");
     RegisterAction("ExtCmdDecreaseArousal");

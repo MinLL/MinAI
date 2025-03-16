@@ -1,10 +1,5 @@
 <?php
 
-require_once("config.php");
-require_once("util.php");
-require_once("items.php");
-
-
 // Global cache for form ID lookups
 $GLOBALS['formIdCache'] = [];
 

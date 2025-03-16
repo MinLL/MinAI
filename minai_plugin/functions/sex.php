@@ -1,5 +1,5 @@
 <?php
-require_once("util.php");
+
 $target = $GLOBALS["target"];
 $actorName = $GLOBALS["HERIKA_NAME"];
 

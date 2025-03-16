@@ -1,5 +1,8 @@
 <?php
 require_once("/var/www/html/HerikaServer/lib/data_functions.php");
+// Add the system prompt context builder include
+require_once(__DIR__ . "/contextbuilders/system_prompt_context.php");
+
 function convertToFirstPerson($text, $name, $pronouns) {
     if (empty($text)) {
         return "";
@@ -180,16 +183,16 @@ function interceptRoleplayInput() {
         $playerPronouns = GetActorPronouns($PLAYER_NAME);
         
         // Get contexts and convert to first person
-        $physDesc = convertToFirstPerson(GetPhysicalDescription($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
-        $arousalStatus = convertToFirstPerson(GetArousalContext($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
-        $survivalStatus = convertToFirstPerson(GetSurvivalContext($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
+        $physDesc = convertToFirstPerson(callContextBuilder('physical_description', ['player_name' => $PLAYER_NAME]), $PLAYER_NAME, $playerPronouns);
+        $arousalStatus = convertToFirstPerson(callContextBuilder('arousal', ['player_name' => $PLAYER_NAME]), $PLAYER_NAME, $playerPronouns);
+        $survivalStatus = convertToFirstPerson(callContextBuilder('survival', ['player_name' => $PLAYER_NAME]), $PLAYER_NAME, $playerPronouns);
         $clothingStatus = convertToFirstPerson(GetUnifiedEquipmentContext($PLAYER_NAME, true), $PLAYER_NAME, $playerPronouns);
         
-        $fertilityStatus = convertToFirstPerson(GetFertilityContext($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
-        $mindState = convertToFirstPerson(GetMindInfluenceContext(GetMindInfluenceState($PLAYER_NAME)), $PLAYER_NAME, $playerPronouns);
-        $tattooStatus = convertToFirstPerson(GetTattooContext($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
+        $fertilityStatus = convertToFirstPerson(callContextBuilder('fertility', ['player_name' => $PLAYER_NAME]), $PLAYER_NAME, $playerPronouns);
+        $mindState = convertToFirstPerson(callContextBuilder('mind_influence', ['player_name' => $PLAYER_NAME]), $PLAYER_NAME, $playerPronouns);
+        $tattooStatus = convertToFirstPerson(callContextBuilder('tattoos', ['player_name' => $PLAYER_NAME]), $PLAYER_NAME, $playerPronouns);
         // Add crime context
-        $bountyStatus = convertToFirstPerson(GetBountyContext($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
+        $bountyStatus = convertToFirstPerson(callContextBuilder('bounty', ['player_name' => $PLAYER_NAME]), $PLAYER_NAME, $playerPronouns);
         
         // Replace variables in system prompt and request
         $variableReplacements = [

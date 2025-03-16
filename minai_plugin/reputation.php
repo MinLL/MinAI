@@ -1,4 +1,5 @@
 <?php
+/*
 function BuildNSFWReputationContext($targetName) {
     $ret = "";
     if (IsModEnabled("SLSF") && strtolower($targetName) == strtolower($GLOBALS["PLAYER_NAME"])) {
@@ -65,3 +66,4 @@ function BuildSFWReputationContext($targetName) {
         }
     return $ret;
 }
+*/

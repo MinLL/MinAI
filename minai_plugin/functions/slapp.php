@@ -80,15 +80,4 @@ $GLOBALS["FUNCTIONS"][] = [
 
 $GLOBALS["FUNCRET"]["ExtCmdMolest"]=$GLOBALS["GenericFuncRet"];
 
-require_once("deviousfollower.php");
-if (IsModEnabled("SLAPP") && !IsDeviousFollower($GLOBALS['HERIKA_NAME'])) {
-    RegisterAction("ExtCmdHug");
-    RegisterAction("ExtCmdKiss");
-}
-if (IsModEnabled("SLHH") && !IsDeviousFollower($GLOBALS['HERIKA_NAME'])) {
-    RegisterAction("ExtCmdMolest");
-}
-
-
-
-
+// actions registered in deviousfollowers_context.php

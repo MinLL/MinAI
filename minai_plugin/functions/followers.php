@@ -1,6 +1,4 @@
 <?php
-require_once("config.php");
-require_once("util.php");
 
 $GLOBALS["F_NAMES"]["ExtCmdStartLooting"]="StartLooting";
 $GLOBALS["F_TRANSLATIONS"]["ExtCmdStartLooting"]="Start looting the area";

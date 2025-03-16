@@ -1,8 +1,5 @@
 <?php
 
-require_once("util.php");
-// Name of the function. This is what will be offered to LLM. Can be overwrited by LANG. 
-
 $target = $GLOBALS["target"];
 
 $GLOBALS["F_NAMES"]["ExtCmdSpankAss"]="SpankAss";

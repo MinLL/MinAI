@@ -9,9 +9,9 @@ require_once(__DIR__ . "/../../config.php");
 require_once(__DIR__ . "/../../util.php");
 require_once(__DIR__ . "/../system_prompt_context.php");
 require_once(__DIR__ . "/../../environmentalContext.php");
-require_once(__DIR__ . "/../../weather.php");
-require_once(__DIR__ . "/../../dirtandblood.php");
-require_once(__DIR__ . "/../../exposure.php");
+require_once(__DIR__ . "/../../contextbuilders/weather_context.php");
+require_once(__DIR__ . "/../../contextbuilders/dirtandblood_context.php");
+require_once(__DIR__ . "/../../contextbuilders/exposure_context.php");
 
 /**
  * Initialize environmental context builders

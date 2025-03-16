@@ -1,7 +1,5 @@
 <?php
 
-require_once("util.php");
-require_once("deviousnarrator.php");
 
 $target = GetTargetActor();
 

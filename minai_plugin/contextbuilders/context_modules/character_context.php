@@ -8,9 +8,9 @@
 require_once(__DIR__ . "/../../config.php");
 require_once(__DIR__ . "/../../util.php");
 require_once(__DIR__ . "/../system_prompt_context.php");
-require_once(__DIR__ . "/../../dirtandblood.php");
-require_once(__DIR__ . "/../../exposure.php");
-require_once(__DIR__ . "/../../fertilitymode.php");
+require_once(__DIR__ . "/../../contextbuilders/dirtandblood_context.php");
+require_once(__DIR__ . "/../../contextbuilders/exposure_context.php");
+require_once(__DIR__ . "/../../contextbuilders/fertilitymode_context.php");
 
 /**
  * Helper function to validate and sanitize parameters for context builders
@@ -267,18 +267,8 @@ function BuildEquipmentContext($params) {
  * @return string Formatted tattoo context
  */
 function BuildTattooContext($params) {
-    // Determine which character we're building context for
-    $character = isset($params['is_target']) && $params['is_target'] 
-                ? $params['target'] 
-                : $params['herika_name'];
-    
-    $tattoo = GetActorValue($character, "tattoo");
-    
-    $ret = "";
-    if (!empty($tattoo)) {
-        $ret .= "{$character} has the following visible tattoos: {$tattoo}.";
-    }
-    
+    $character = $params['herika_name'];
+    $ret = GetTattooContext($character);
     return $ret;
 }
 
@@ -290,9 +280,7 @@ function BuildTattooContext($params) {
  */
 function BuildArousalContext($params) {
     // Determine which character we're building context for
-    $character = isset($params['is_target']) && $params['is_target'] 
-                ? $params['target'] 
-                : $params['herika_name'];
+    $character = $params['herika_name'];
     
     $arousal = GetActorValue($character, "arousal");
     
@@ -409,35 +397,30 @@ function BuildPlayerStatusContext($params) {
  * @return string Formatted bounty context
  */
 function BuildBountyContext($params) {
-    // Check if required parameters exist
-    if (!isset($params['herika_name']) || !isset($params['player_name']) || !isset($params['target'])) {
-        // Try to use globals as fallback
-        $herika_name = isset($params['herika_name']) ? $params['herika_name'] : 
-                      (isset($GLOBALS["HERIKA_NAME"]) ? $GLOBALS["HERIKA_NAME"] : "");
-        $player_name = isset($params['player_name']) ? $params['player_name'] : 
-                      (isset($GLOBALS["PLAYER_NAME"]) ? $GLOBALS["PLAYER_NAME"] : "");
-        $target = isset($params['target']) ? $params['target'] : 
-                (isset($GLOBALS["HERIKA_TARGET"]) ? $GLOBALS["HERIKA_TARGET"] : $player_name);
-        
-        // If we still don't have the required parameters, return empty string
-        if (empty($herika_name) || empty($player_name)) {
-            return "";
-        }
-    } else {
-        $herika_name = $params['herika_name'];
-        $player_name = $params['player_name'];
-        $target = $params['target'];
+    $herika_name = $params['herika_name'];
+    $player_name = $params['player_name'];
+    $target = $params['target'];
+
+    // Check conditions to show bounty:
+    // 1. If we are talking to the narrator OR
+    // 2. If the player is in the conversation AND the target is a guard
+    $showBounty = false;
+    
+    // Condition 1: Talking to the narrator
+    if ($herika_name == "The Narrator") {
+        $showBounty = true;
+    }
+    // Condition 2: Player is in conversation AND target is a guard
+    else if ($player_name == $target && (HasKeyword($target, "GuardFaction")) || HasKeyword($target, "Guard Faction")) {
+        $showBounty = true;
     }
     
-    // Only include bounty context if talking to a guard or the narrator
-    if ($target != $player_name || !($herika_name == "The Narrator" || 
-        IsInFaction($herika_name, "GuardFaction") || 
-        IsInFaction($herika_name, "Guard Faction"))) {
-        return "";
+    // Only return bounty context if conditions are met
+    if ($showBounty) {
+        return GetBountyContext($player_name);
     }
     
-    // This function would call the existing GetBountyContext function
-    return GetBountyContext($player_name);
+    return "";
 }
 
 /**

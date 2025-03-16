@@ -8,9 +8,9 @@
 require_once(__DIR__ . "/../../config.php");
 require_once(__DIR__ . "/../../util.php");
 require_once(__DIR__ . "/../system_prompt_context.php");
-require_once(__DIR__ . "/../../relationship.php");
-require_once(__DIR__ . "/../../deviousfollower.php");
-require_once(__DIR__ . "/../../submissivelola.php");
+require_once(__DIR__ . "/../../contextbuilders/relationship_context.php");
+require_once(__DIR__ . "/../../contextbuilders/deviousfollower_context.php");
+require_once(__DIR__ . "/../../contextbuilders/submissivelola_context.php");
 
 /**
  * Initialize relationship context builders

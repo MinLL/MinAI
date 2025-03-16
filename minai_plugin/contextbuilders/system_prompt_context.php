@@ -93,6 +93,16 @@ class ContextBuilderRegistry {
         
         return $filtered;
     }
+    
+    /**
+     * Get a specific builder by ID
+     * 
+     * @param string $id The unique identifier of the builder to retrieve
+     * @return array|null The builder configuration or null if not found
+     */
+    public function getBuilder($id) {
+        return isset($this->builders[$id]) ? $this->builders[$id] : null;
+    }
 }
 
 /**
@@ -317,6 +327,36 @@ function UpdateSystemPrompt() {
     } catch (Exception $e) {
         minai_log("error", "Error updating system prompt: " . $e->getMessage());
     }
+}
+
+/**
+ * Helper function to call a specific context builder and get its output
+ * 
+ * @param string $builderId The ID of the builder to call
+ * @param array $params Parameters to pass to the builder
+ * @return string The context string from the builder or empty string if not found
+ */
+function callContextBuilder($builderId, $params = []) {
+    $registry = ContextBuilderRegistry::getInstance();
+    $builder = $registry->getBuilder($builderId);
+    // Set default values for missing parameters using PLAYER_NAME
+    if (!isset($params['herika_name']) || !isset($params['target']) || !isset($params['player_name'])) {
+        $defaultName = $GLOBALS["PLAYER_NAME"];
+        $params = array_merge([
+            'herika_name' => $defaultName,
+            'target' => $defaultName,
+            'player_name' => $defaultName
+        ], $params);
+    }
+    if ($builder && is_callable($builder['builder_callback'])) {
+        try {
+            return call_user_func($builder['builder_callback'], $params);
+        } catch (Exception $e) {
+            minai_log("error", "Error calling context builder '{$builderId}': " . $e->getMessage());
+        }
+    }
+    
+    return '';
 }
 
 // Initialize the registry with core builders

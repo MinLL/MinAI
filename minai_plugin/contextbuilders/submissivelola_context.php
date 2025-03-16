@@ -1,5 +1,4 @@
 <?php
-require_once("util.php");
 
 // The script is Structured this way to that it will be easier to implement the playmate part.
 // I never played with one so far, so I am not able to do it from the get go.

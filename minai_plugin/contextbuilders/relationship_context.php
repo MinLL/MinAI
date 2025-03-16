@@ -1,5 +1,4 @@
 <?php
-require_once("util.php");
 
 class relation {
     static function rollUpRelationshipStatus($relationshipValue) {

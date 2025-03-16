@@ -1,7 +1,5 @@
 <?php
 
-require_once("util.php");
-
 function str_icontains($haystack, $needle) {
     return stripos($haystack, $needle) !== false;
 }

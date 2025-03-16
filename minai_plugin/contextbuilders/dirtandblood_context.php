@@ -1,6 +1,4 @@
 <?php
-require_once("util.php");
-
 
 class dnb {
     // includes is a common name so put it in a class to avoid name collisions
