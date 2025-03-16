@@ -172,25 +172,22 @@ function SeedDefaultItems() {
         try {
             // Check if the item already exists
             $existing = $db->fetchAll(
-                "SELECT id FROM minai_items WHERE item_id = $1 AND file_name = $2",
-                [$item['item_id'], $item['file_name']]
+                "SELECT id FROM minai_items WHERE item_id = '" . $item['item_id'] . "' AND file_name = '" . $item['file_name'] . "'"
             );
             
             if (empty($existing)) {
-                // Insert new item
-                $db->execQuery(
-                    "INSERT INTO minai_items 
-                    (item_id, file_name, name, description, item_type, category, mod_index) 
-                    VALUES ($1, $2, $3, $4, $5, $6, $7)",
-                    [
-                        $item['item_id'], 
-                        $item['file_name'], 
-                        $item['name'],
-                        $item['description'] ?? null,
-                        $item['item_type'] ?? 'Item',
-                        $item['category'] ?? null,
-                        $item['mod_index'] ?? null
-                    ]
+                // Insert new item using db->insert() method
+                $db->insert(
+                    'minai_items',
+                    array(
+                        'item_id' => $item['item_id'],
+                        'file_name' => $item['file_name'],
+                        'name' => $item['name'],
+                        'description' => $item['description'] ?? null,
+                        'item_type' => $item['item_type'] ?? 'Item',
+                        'category' => $item['category'] ?? null,
+                        'mod_index' => $item['mod_index'] ?? null
+                    )
                 );
                 $inserted_count++;
             }
