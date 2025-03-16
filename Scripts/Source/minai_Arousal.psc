@@ -3,6 +3,8 @@ scriptname minai_Arousal extends Quest
 BaboDialogueConfigMenu baboConfigs
 slaUtilScr Aroused
 
+Keyword Property ActorTypeNPC Auto
+
 Keyword SLA_HalfNakedBikini
 Keyword SLA_ArmorHalfNaked
 Keyword SLA_Brabikini
@@ -224,7 +226,7 @@ function WriteClothingString(actor akActor, actor player, bool isYou=false, acto
 			
 			if bHasTNG
 				bool exposed = IsTNGExposed(currentActor)
-				if exposed && ((currentActor.GetActorBase().GetSex() == 0) || currentActor.HasKeyword(TNG_Gentlewoman))
+				if exposed && currentActor.HasKeyword(ActorTypeNPC) && ((currentActor.GetActorBase().GetSex() == 0) || currentActor.HasKeyword(TNG_Gentlewoman))
 					main.RegisterAction(actorName + "'s genitals are exposed.")
           string sizeDescription = ""
           Main.Debug("TNG Dick Check on "+ actorName)
@@ -556,14 +558,11 @@ Function SetContext(actor akTarget)
   string gender = "male"
   if akTarget.GetActorBase().GetSex() != 0
     gender = "female"
-    if bHasTNG && akTarget.HasKeyword(TNG_Gentlewoman)
-      aiff.SetActorVariable(akTarget, "tngsize", TNG_PapyrusUtil.GetActorSize(akTarget))
-    EndIf
-  EndIf
-  if bHasTNG && gender == "male"
-    aiff.SetActorVariable(akTarget, "tngsize", TNG_PapyrusUtil.GetActorSize(akTarget))
   EndIf
   aiff.SetActorVariable(akTarget, "gender", gender)
+  if bHasTNG && akTarget.HasKeyword(ActorTypeNPC) && (gender == "male" || akTarget.HasKeyword(TNG_Gentlewoman))
+    aiff.SetActorVariable(akTarget, "tngsize", TNG_PapyrusUtil.GetActorSize(akTarget))
+  EndIf
   string actorRace = (akTarget.GetActorBase().GetRace() as Form).GetName()
   int cotrIndex = StringUtil.Find(actorRace, " DZ")
   if cotrIndex != -1
