@@ -344,12 +344,12 @@ EndEvent
 
 
 Event OnOrgasm(string eventName, string actorName, float numArg, Form sender)
-  Main.RequestLLMResponseNPC(actorName, "I just had an orgasm!", "everyone")
+  Main.RequestLLMResponseFromActor(actorName, "I just had an orgasm!", "everyone", "both")
 EndEvent
 
 
 Event OnEdged(string eventName, string actorName, float numArg, Form sender)
-  Main.RequestLLMResponseNPC(actorName, "I was brought right to the edge of orgasm but the vibrations stopped before I could cum!", "everyone")
+  Main.RequestLLMResponseFromActor(actorName, "I was brought right to the edge of orgasm but the vibrations stopped before I could cum!", "everyone", "both")
 EndEvent
 
 
