@@ -87,7 +87,7 @@ function AddBounty(int amount, string speakerName, string guardFaction)
   
   if !crimeFaction
     main.Warn("No crime faction found for guard: " + guardFaction)
-    main.RequestLLMResponseFromActor("The guard attempts to report the crime, but appears confused about which hold's laws apply here. Without proper jurisdiction, the crime goes unrecorded.", "chatnf_minai_narrate", "The Narrator")
+    main.RequestLLMResponseFromActor("The guard attempts to report the crime, but appears confused about which hold's laws apply here. Without proper jurisdiction, the crime goes unrecorded.", "chatnf_minai_narrate", speakerName, "player")
     return
   endif
   
@@ -110,7 +110,7 @@ function AddBounty(int amount, string speakerName, string guardFaction)
     bountyReason = "criminal behavior"
   endif
   
-  main.RequestLLMResponseFromActor(speakerName + " writes in the official ledger, documenting the " + bountyReason + ". A bounty of " + amount + " gold is placed on " + playerName + "'s head. The total bounty in " + factionName + " is now " + newBounty + " gold. Word of this crime will spread to other guards in the hold.", "chatnf_minai_narrate", "The Narrator")
+  main.RequestLLMResponseFromActor(speakerName + " writes in the official ledger, documenting the " + bountyReason + ". A bounty of " + amount + " gold is placed on " + playerName + "'s head. The total bounty in " + factionName + " is now " + newBounty + " gold. Word of this crime will spread to other guards in the hold.", "chatnf_minai_narrate", speakerName, "player")
 endFunction
 
 function Arrest(string speakerName, string guardFaction)
@@ -121,14 +121,14 @@ function Arrest(string speakerName, string guardFaction)
   
   if !crimeFaction
     main.Warn("No crime faction found for guard: " + guardFaction)
-    main.RequestLLMResponseFromActor("The guard seems uncertain about their authority in this location. After a moment of confusion, they abandon the arrest attempt.", "chatnf_minai_narrate", "The Narrator")
+    main.RequestLLMResponseFromActor("The guard seems uncertain about their authority in this location. After a moment of confusion, they abandon the arrest attempt.", "chatnf_minai_narrate", speakerName, "player")
     return
   endif
   
   ; Check if player has a bounty in this hold
   if crimeFaction.GetCrimeGold() <= 0
     string factionName = crimeFaction.GetName()
-    main.RequestLLMResponseFromActor(speakerName + " consults a small notebook, checking for outstanding bounties. After scanning the pages, the guard looks up with slight embarrassment. \"Hmm, seems there's been a misunderstanding. You have no bounty in " + factionName + ". You're free to go.\"", "chatnf_minai_narrate", "The Narrator")
+    main.RequestLLMResponseFromActor(speakerName + " consults a small notebook, checking for outstanding bounties. After scanning the pages, the guard looks up with slight embarrassment. \"Hmm, seems there's been a misunderstanding. You have no bounty in " + factionName + ". You're free to go.\"", "chatnf_minai_narrate", speakerName, "player")
     return
   endif
   
@@ -138,7 +138,7 @@ function Arrest(string speakerName, string guardFaction)
   string playerName = main.GetActorName(PlayerRef)
   crimeFaction.SendPlayerToJail()
   
-  main.RequestLLMResponseFromActor(speakerName + " confiscates any stolen items and escorts " + playerName +" to the local prison, where they will serve their sentence.", "chatnf_minai_narrate", "The Narrator")
+  main.RequestLLMResponseFromActor(speakerName + " confiscates any stolen items and escorts " + playerName +" to the local prison, where they will serve their sentence.", "chatnf_minai_narrate", speakerName, "player")
 endFunction
 
 function ClearBounty(string speakerName, string guardFaction)
@@ -149,7 +149,7 @@ function ClearBounty(string speakerName, string guardFaction)
   
   if !crimeFaction
     main.Warn("No crime faction found for guard: " + guardFaction)
-    main.RequestLLMResponseFromActor("The official appears confused, shuffling through documents with increasing frustration. \"I don't have the authority to clear bounties from other holds. You'll need to speak with the proper authorities.\"", "chatnf_minai_narrate", "The Narrator")
+    main.RequestLLMResponseFromActor("The official appears confused, shuffling through documents with increasing frustration. \"I don't have the authority to clear bounties from other holds. You'll need to speak with the proper authorities.\"", "chatnf_minai_narrate", speakerName, "player")
     return
   endif
   
@@ -158,7 +158,7 @@ function ClearBounty(string speakerName, string guardFaction)
   
   if originalBounty <= 0
     string factionName = crimeFaction.GetName()
-    main.RequestLLMResponseFromActor("The guard carefully examines the legal documents and ledgers for " + factionName + ". After flipping through several pages, they look up. \"There are no outstanding bounties or criminal charges against you in our records. Your name is clean here.\"", "chatnf_minai_narrate", "The Narrator")
+    main.RequestLLMResponseFromActor("The guard carefully examines the legal documents and ledgers for " + factionName + ". After flipping through several pages, they look up. \"There are no outstanding bounties or criminal charges against you in our records. Your name is clean here.\"", "chatnf_minai_narrate", speakerName, "player")
     return
   endif
   
@@ -169,7 +169,7 @@ function ClearBounty(string speakerName, string guardFaction)
   string factionName = crimeFaction.GetName()
   string playerName = main.GetActorName(PlayerRef)
   
-  main.RequestLLMResponseFromActor(speakerName + " reviews several official documents, comparing them with the bounty ledger. After careful consideration, the official stamps the papers with the hold's seal. \"Your debt to " + factionName + " has been settled. The bounty of " + originalBounty + " gold has been cleared from our records, " + playerName + ". You're once again welcome in our cities.\"", "chatnf_minai_narrate", "The Narrator")
+  main.RequestLLMResponseFromActor(speakerName + " reviews several official documents, comparing them with the bounty ledger. After careful consideration, the official stamps the papers with the hold's seal. \"Your debt to " + factionName + " has been settled. The bounty of " + originalBounty + " gold has been cleared from our records, " + playerName + ". You're once again welcome in our cities.\"", "chatnf_minai_narrate", speakerName, "player")
 endFunction
 
 ; Helper function to get the crime faction from a guard's faction

@@ -378,7 +378,7 @@ Function RenderGeneralPage()
   autoUpdateDiaryOID = AddToggleOption("Automatically Update Follower Diaries", autoUpdateDiary)
   updateNarratorDiaryOID = AddToggleOption("Update Narrator Diary on Sleep", updateNarratorDiary)
   updateNarratorProfileOID = AddToggleOption("Update Narrator Dynamic Profile on Sleep", updateNarratorProfile)
-  includePromptSelfOID = AddToggleOption("Prompt Player for Event Responses", includePromptSelf)
+  includePromptSelfOID = AddToggleOption("Include Self Prompts for Events", includePromptSelf)
   requestResponseCooldownOID = AddSliderOption("LLM Response Request Cooldown", requestResponseCooldown, "{1}")
   AddHeaderOption("Sapience Settings")
   useSapienceOID = AddToggleOption("Enable Sapience", minai_SapienceEnabled.GetValueInt() == 1)
@@ -907,6 +907,9 @@ Event OnOptionDefault(int oid)
   if oid == enableConsoleLoggingOID
     enableConsoleLogging = enableConsoleLoggingDefault
     SetToggleOptionValue(oid, enableConsoleLogging)
+  elseif oid == includePromptSelfOID
+    includePromptSelf = includePromptSelfDefault
+    SetToggleOptionValue(oid, includePromptSelf)
   elseif oid == UseCBPCOID
     enableCBPC = enableCBPCDefault
     SetToggleOptionValue(oid, enableCBPC)
@@ -1093,9 +1096,6 @@ Event OnOptionDefault(int oid)
     LargeBountyAmount = LargeBountyAmountDefault
     SetSliderOptionValue(oid, LargeBountyAmount, "{0} gold")
     crimeController.StoreCrimeVariables()
-  elseif oid == includePromptSelfOID
-    includePromptSelf = includePromptSelfDefault
-    SetToggleOptionValue(oid, includePromptSelf)
   EndIf
 EndEvent
 
@@ -1257,7 +1257,7 @@ Event OnOptionHighlight(int oid)
   elseif oid == largeBountyAmountOID
     SetInfoText("Amount of gold given for serious crimes (murder, grievous assault, etc.)")
   elseif oid == includePromptSelfOID
-    SetInfoText("When enabled, prompts the player (narrator) to respond to certain in-game events in addition to or instead of NPC responses. Disable to rely solely on NPC responses.")
+    SetInfoText("When enabled, prompts the player/narrator to respond to in-game events in addition to or instead of a nearby NPC. Disable to reduce interruptions.")
   EndIf
   int i = 0
   string[] actions = JMap.allKeysPArray(aiff.actionRegistry)

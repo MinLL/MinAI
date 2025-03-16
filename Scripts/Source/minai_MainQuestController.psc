@@ -195,13 +195,31 @@ Function RequestLLMResponse(string eventLine, string eventType)
 EndFunction
 
 
-Function RequestLLMResponseFromActor(string eventLine, string eventType, string name)
+Function RequestLLMResponseFromActor(string eventLine, string eventType, string name, string responseTarget = "npc")
   if bHasAIFF
     float currentTime = Utility.GetCurrentRealTime()
     if currentTime - lastRequestTime > config.requestResponseCooldown
       lastRequestTime = currentTime
       Info("Requesting response from LLM: " + eventLine)
-      minAIFF.AIRequestMessageForActor(eventLine, eventType, name)
+      
+      ; Handle different response targets
+      if config.includePromptSelf
+        if (responseTarget == "player")
+          ; Request response from player ("The Narrator" is used for player internalization)
+          minAIFF.AIRequestMessageForActor(eventLine, eventType, "The Narrator")
+        elseif (responseTarget == "both")
+          ; Request response from player ("The Narrator" is used for player internalization)
+          minAIFF.AIRequestMessageForActor(eventLine, eventType, "The Narrator")
+          ; Request response from NPC
+          minAIFF.AIRequestMessageForActor(eventLine, eventType, name)
+        else
+          ; Handle "npc" and others
+          minAIFF.AIRequestMessageForActor(eventLine, eventType, name)
+        EndIf
+      else
+        ; Just prompt as normal if not using the config option
+        minAIFF.AIRequestMessageForActor(eventLine, eventType, name)
+      endif
     Else
       RegisterEvent(eventLine, eventType)
     EndIf
@@ -306,7 +324,7 @@ EndEvent
 ;  endIf
 Event OnRequestResponse(string eventLine, string eventType, string targetName)
   Info("OnRequestResponse(" + eventType + " => " + targetName + "): " + eventLine)
-  RequestLLMResponseFromActor(eventLine, eventType, targetName)
+  RequestLLMResponseFromActor(eventLine, eventType, targetName, "npc")
 EndEvent
 
 ; Inform the LLM that an actor has spoken, and request a specific actor to respond.

@@ -12,6 +12,30 @@ require_once(__DIR__.DIRECTORY_SEPARATOR."items.php");
 function ProcessIntegrations() {
     if (isset($GLOBALS["gameRequest"])) {
         minai_log("info", "Processing request: " . json_encode($GLOBALS["gameRequest"]));
+        
+        // Deduplication check - only proceed if this isn't a duplicate request
+        if (isset($GLOBALS["gameRequest"][0]) && isset($GLOBALS["gameRequest"][3])) {
+            $eventType = $GLOBALS["gameRequest"][0];
+            $eventData = $GLOBALS["gameRequest"][3];
+            
+            // Create a hash of the request for efficient storage and comparison
+            $requestHash = md5($eventType . '|' . $eventData);
+            
+            // Check if we've seen this exact request recently
+            $lastRequestData = GetActorValue($GLOBALS["PLAYER_NAME"], "LastRequestHash", true);
+            $lastRequestTime = intval(GetActorValue($GLOBALS["PLAYER_NAME"], "LastRequestTime", true));
+            $currentTime = time();
+            
+            // If same request and within 5 seconds, consider it a duplicate
+            if ($lastRequestData === $requestHash && ($currentTime - $lastRequestTime) < 5) {
+                minai_log("info", "Duplicate request detected for {$eventType}, blocking.");
+                die('X-CUSTOM-CLOSE');
+            }
+            
+            // Store this request for future deduplication
+            SetActorValue($GLOBALS["PLAYER_NAME"], "LastRequestHash", $requestHash);
+            SetActorValue($GLOBALS["PLAYER_NAME"], "LastRequestTime", $currentTime);
+        }
     }
     // Handle allowing third party mods to register things with the context system
     $MUST_DIE=false;
@@ -230,7 +254,7 @@ function ProcessIntegrations() {
             // Store the actor's tattoo data
             StoreTattooData($actorName, $tattooData);
             
-            minai_log("info", "Stored tattoo data for " . $actorName);
+            // minai_log("info", "Stored tattoo data for " . $actorName);
         } else {
             minai_log("error", "Invalid tattoo data format");
         }
@@ -413,7 +437,7 @@ function ProcessIntegrations() {
             }
             
             // Log detailed statistics
-            minai_log("info", "Batch processing complete - Processed: {$processedItemsCount}, Skipped: {$skippedItemsCount}, Invalid: {$invalidItemsCount}");
+            // minai_log("info", "Batch processing complete - Processed: {$processedItemsCount}, Skipped: {$skippedItemsCount}, Invalid: {$invalidItemsCount}");
         } else {
             // Process single item
             $itemData = explode("@", $data);
@@ -766,7 +790,7 @@ function StoreTattooData($actorName, $tattooData) {
             }
         }
         
-        minai_log("info", "Tattoo processing complete. Processed: " . $processedCount . ", Skipped: " . $skippedCount . ", Errors: " . $errorCount);
+        // minai_log("info", "Tattoo processing complete. Processed: " . $processedCount . ", Skipped: " . $skippedCount . ", Errors: " . $errorCount);
         
         // Verify the data was stored correctly
         $storedData = $db->fetchOne(
@@ -777,7 +801,7 @@ function StoreTattooData($actorName, $tattooData) {
             if (is_array($storedData)) {
                 $storedData = $storedData['tattoo_data'] ?? '';
             }
-            minai_log("info", "Verification: Stored data length: " . strlen($storedData) . ", Original data length: " . strlen($tattooData));
+            // minai_log("info", "Verification: Stored data length: " . strlen($storedData) . ", Original data length: " . strlen($tattooData));
         } else {
             minai_log("error", "Verification failed: No data found for actor " . $actorName);
         }
