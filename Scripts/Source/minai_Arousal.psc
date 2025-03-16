@@ -563,7 +563,7 @@ Function SetContext(actor akTarget)
   if bHasTNG && akTarget.HasKeyword(ActorTypeNPC) && (gender == "male" || akTarget.HasKeyword(TNG_Gentlewoman))
     aiff.SetActorVariable(akTarget, "tngsize", TNG_PapyrusUtil.GetActorSize(akTarget))
   EndIf
-    string actorRace = (akTarget.GetActorBase().GetRace() as Form).GetName()
+  string actorRace = (akTarget.GetActorBase().GetRace() as Form).GetName()
   int cotrIndex = StringUtil.Find(actorRace, " DZ")
   if cotrIndex != -1
     actorRace = StringUtil.Substring(actorRace, 0, cotrIndex)
