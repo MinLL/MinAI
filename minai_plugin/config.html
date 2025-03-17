@@ -309,9 +309,9 @@
         }
         
         .preview-content-wrapper {
-            max-height: 1000px;
-            overflow: hidden;
-            transition: max-height 0.4s ease;
+            max-height: unset;
+            padding: 15px;
+            transition: max-height 0.3s ease;
         }
         
         .preview-content-wrapper.collapsed {
@@ -1083,6 +1083,147 @@
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.3);
+        }
+
+        /* Adjust variable entry styles for better visibility */
+        .variable-entry .preview-content {
+            max-height: 400px; /* Increased from 200px */
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            background-color: rgba(0, 0, 0, 0.1);
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .variable-entry {
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .variable-entry code {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        /* Improve section preview styling */
+        .section-preview {
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        .section-preview h3 {
+            margin-bottom: 10px;
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .section-preview .preview-content {
+            white-space: pre-wrap;
+            word-break: break-word;
+            background-color: rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            border-radius: 4px;
+            max-height: 500px; /* Increased from 300px */
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Make preview sections and content more visible */
+        .preview-content-wrapper {
+            max-height: unset; /* Remove max-height restriction */
+            padding: 15px;
+            transition: max-height 0.3s ease;
+        }
+
+        /* Improve scrollbars for better visibility */
+        .preview-content::-webkit-scrollbar, 
+        .variable-entry .preview-content::-webkit-scrollbar, 
+        .system-prompt-preview .preview-content::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .preview-content::-webkit-scrollbar-track, 
+        .variable-entry .preview-content::-webkit-scrollbar-track, 
+        .system-prompt-preview .preview-content::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+        }
+
+        .preview-content::-webkit-scrollbar-thumb, 
+        .variable-entry .preview-content::-webkit-scrollbar-thumb, 
+        .system-prompt-preview .preview-content::-webkit-scrollbar-thumb {
+            background: rgba(76, 175, 80, 0.5);
+            border-radius: 4px;
+        }
+
+        .preview-content::-webkit-scrollbar-thumb:hover, 
+        .variable-entry .preview-content::-webkit-scrollbar-thumb:hover, 
+        .system-prompt-preview .preview-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(76, 175, 80, 0.8);
+        }
+
+        /* Add an expand button for long content */
+        .expand-content-btn {
+            display: block;
+            margin: 5px auto;
+            padding: 4px 10px;
+            background-color: rgba(76, 175, 80, 0.2);
+            color: var(--text-color);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .expand-content-btn:hover {
+            background-color: rgba(76, 175, 80, 0.4);
+        }
+
+        /* Fix collapsed preview wrapper to handle content better */
+        .preview-content-wrapper.collapsed {
+            max-height: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        /* Make sure preview panel has appropriate spacing */
+        .preview-panel {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Add more space between preview items */
+        .preview-item {
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            padding-bottom: 20px;
+        }
+
+        /* Apply subtle hover effect to expandable sections */
+        .preview-label {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .preview-label:hover {
+            background-color: rgba(76, 175, 80, 0.1);
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
@@ -2580,17 +2721,23 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 try {
                     const data = JSON.parse(text);
                     
+                    // Add an expand all button at the top
+                    let expandAllButton = '<div style="text-align: right; margin-bottom: 15px;"><button class="button" onclick="expandAllPreviewContent()">Expand All Content</button></div>';
+                    
                     // Build variables preview
                     let variablesHtml = '<div class="preview-item"><div class="preview-label collapsed" onclick="togglePreviewSection(this)">Available Variables</div><div class="preview-content-wrapper collapsed">';
                     if (data && data.variables) {
                         for (const [key, value] of Object.entries(data.variables)) {
                             const displayValue = value === null ? '(null)' : 
                                                value === '' ? '(empty)' : 
-                                               value;
+                                               value.length > 500 ? escapeHtml(value.substring(0, 500)) + '... (truncated)' : 
+                                               formatWithLineBreaks(value);
+                            const needsExpand = value && value.length > 200;
                             variablesHtml += `
                                 <div class="variable-entry">
                                     <code>#${key.toUpperCase()}#</code>: 
                                     <div class="preview-content">${displayValue}</div>
+                                    ${needsExpand ? `<button class="expand-content-btn" onclick="expandContent(this)">Show Full Content</button>` : ''}
                                 </div>`;
                         }
                     } else {
@@ -2601,14 +2748,17 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     // Build sections preview
                     let sectionsHtml = '<div class="preview-item"><div class="preview-label collapsed" onclick="togglePreviewSection(this)">Section Preview</div><div class="preview-content-wrapper collapsed">';
                     if (data && data.sections && Object.keys(data.sections).length > 0) {
-                        for (const section of Object.values(data.sections)) {
+                        for (const [sectionKey, section] of Object.entries(data.sections)) {
                             if (!section || !section.enabled) continue;
                             const header = section.header || 'Unnamed Section';
                             const content = section.content || '(empty section)';
+                            const formattedContent = formatWithLineBreaks(content);
+                            const needsExpand = content && content.length > 300;
                             sectionsHtml += `
                                 <div class="section-preview">
-                                    <h3>${header}</h3>
-                                    <div class="preview-content">${content}</div>
+                                    <h3>${header} (${sectionKey})</h3>
+                                    <div class="preview-content">${formattedContent}</div>
+                                    ${needsExpand ? `<button class="expand-content-btn" onclick="expandContent(this)">Show Full Content</button>` : ''}
                                 </div>`;
                         }
                     } else {
@@ -2625,16 +2775,48 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                                 <div class="preview-content">${data.prompts.system_prompt}</div>
                             </div>
                             <div class="section-preview">
+                                <h3>System Prompt (Explicit)</h3>
+                                <div class="preview-content">${data.prompts.system_prompt_explicit}</div>
+                            </div>
+                            <div class="section-preview">
+                                <h3>System Prompt (Combat)</h3>
+                                <div class="preview-content">${data.prompts.system_prompt_combat}</div>
+                            </div>
+                            <div class="section-preview">
                                 <h3>Roleplay System Prompt</h3>
                                 <div class="preview-content">${data.prompts.roleplay_system_prompt}</div>
+                            </div>
+                            <div class="section-preview">
+                                <h3>Roleplay System Prompt (Explicit)</h3>
+                                <div class="preview-content">${data.prompts.roleplay_system_prompt_explicit}</div>
+                            </div>
+                            <div class="section-preview">
+                                <h3>Roleplay System Prompt (Combat)</h3>
+                                <div class="preview-content">${data.prompts.roleplay_system_prompt_combat}</div>
                             </div>
                             <div class="section-preview">
                                 <h3>Translation Request</h3>
                                 <div class="preview-content">${data.prompts.translation_request}</div>
                             </div>
                             <div class="section-preview">
+                                <h3>Translation Request (Explicit)</h3>
+                                <div class="preview-content">${data.prompts.translation_request_explicit}</div>
+                            </div>
+                            <div class="section-preview">
+                                <h3>Translation Request (Combat)</h3>
+                                <div class="preview-content">${data.prompts.translation_request_combat}</div>
+                            </div>
+                            <div class="section-preview">
                                 <h3>Roleplay Request</h3>
                                 <div class="preview-content">${data.prompts.roleplay_request}</div>
+                            </div>
+                            <div class="section-preview">
+                                <h3>Roleplay Request (Explicit)</h3>
+                                <div class="preview-content">${data.prompts.roleplay_request_explicit}</div>
+                            </div>
+                            <div class="section-preview">
+                                <h3>Roleplay Request (Combat)</h3>
+                                <div class="preview-content">${data.prompts.roleplay_request_combat}</div>
                             </div>
                         `;
                     } else {
@@ -2691,7 +2873,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     npcToNpcSystemPromptHtml += '</div></div>';
                     
                     document.getElementById('preview-content').innerHTML = 
-                        variablesHtml + sectionsHtml + promptsHtml + narratorSystemPromptHtml + actorSystemPromptHtml + npcToNpcSystemPromptHtml;
+                        expandAllButton + variablesHtml + sectionsHtml + promptsHtml + narratorSystemPromptHtml + actorSystemPromptHtml + npcToNpcSystemPromptHtml;
                         
                     // We no longer automatically expand all preview items
                     // Removing this to keep them collapsed by default
@@ -2712,8 +2894,21 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
         // Function to toggle preview sections
         function togglePreviewSection(element) {
             element.classList.toggle("collapsed");
-            const contentWrapper = element.nextElementSibling;
-            contentWrapper.classList.toggle("collapsed");
+            element.nextElementSibling.classList.toggle("collapsed");
+        }
+
+        // New function to fully expand scrollable content
+        function expandContent(element) {
+            const contentElement = element.previousElementSibling;
+            if (contentElement.style.maxHeight === 'none') {
+                // Return to original max-height
+                contentElement.style.maxHeight = '';
+                element.textContent = 'Show Full Content';
+            } else {
+                // Remove max-height constraint
+                contentElement.style.maxHeight = 'none';
+                element.textContent = 'Collapse Content';
+            }
         }
 
         const templates = {
@@ -3612,6 +3807,42 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
         document.addEventListener('DOMContentLoaded', function() {
             refreshPreview();
         });
+
+        function expandAllPreviewContent() {
+            // Expand all preview section headers
+            document.querySelectorAll('.preview-label.collapsed').forEach(el => {
+                el.classList.remove('collapsed');
+                el.nextElementSibling.classList.remove('collapsed');
+            });
+            
+            // Expand all content sections
+            document.querySelectorAll('.preview-content').forEach(el => {
+                el.style.maxHeight = 'none';
+            });
+            
+            // Update expand buttons
+            document.querySelectorAll('.expand-content-btn').forEach(el => {
+                el.textContent = 'Collapse Content';
+            });
+        }
+
+        // Add this helper function for escaping HTML
+        function escapeHtml(text) {
+            if (text === null || text === undefined) return '';
+            return text
+                .toString()
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // Add a function to format text with line breaks
+        function formatWithLineBreaks(text) {
+            if (!text) return '';
+            return escapeHtml(text).replace(/\n/g, '<br>');
+        }
     </script>
 
 </body>
