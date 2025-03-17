@@ -212,8 +212,8 @@ function BuildSystemPrompt() {
         // Set up the actor parameters based on role
         $actor_params = $params;
         if ($actor_role === 'primary') {
-            // For primary character in self_narrator mode, focus on player's variables
-            if ($is_self_narrator) {
+            // For primary character in narrator mode, focus on player's variables
+            if ($GLOBALS["HERIKA_NAME"] == "The Narrator") {
                 $actor_params['herika_name'] = "The Narrator";
             }
         } else {
