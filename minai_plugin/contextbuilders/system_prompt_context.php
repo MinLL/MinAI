@@ -169,8 +169,8 @@ function BuildSystemPrompt() {
 
     // Set up actors based on self_narrator mode
     $actors = array();
-    if ($is_self_narrator) {
-        // Only include player in self_narrator mode
+    if ($GLOBALS["HERIKA_NAME"] == "The Narrator") {
+        // Only include player in narrator mode (self narrator or not)
         $actors['primary'] = "The Narrator";
         
     } else {

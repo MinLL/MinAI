@@ -314,15 +314,9 @@ function GetPenisSize($name) {
         case 2: $sizeDescription = "Average Sized Cock"; break;
         case 3: $sizeDescription = "Large Cock"; break;
         case 4: $sizeDescription = "Impressively Huge Cock, one of the biggest you've ever seen"; break;
-        default: $sizeDescription = "Unknown";
+        default: $sizeDescription = "";
     }
     
-    // Add the numerical rating for cases 0-3 (special case for 4 which has additional text)
-    if ($sizeStage >= 0 && $sizeStage < 4) {
-        $sizeDescription .= " ({$sizeStage}/4)";
-    } else if ($sizeStage == 4) {
-        $sizeDescription = "Impressively Huge Cock (4/4), one of the biggest you've ever seen";
-    }
     
     if ($sizeDescription != "") {
         return "{$name} has an {$sizeDescription}. ";

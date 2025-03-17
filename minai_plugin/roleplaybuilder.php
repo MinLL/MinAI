@@ -218,7 +218,8 @@ function interceptRoleplayInput() {
             'BOUNTY_STATUS' => $bountyStatus,
             'HERIKA_NAME' => $HERIKA_NAME,
             'HERIKA_PERS' => $HERIKA_PERS,
-            'MIND_STATE' => $mindState
+            'MIND_STATE' => $mindState,
+            'DEVICE_STATUS' => '' // Remove old device status string
         ];
 
         // Determine scene context

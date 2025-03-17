@@ -73,7 +73,8 @@ try {
         'TATTOO_STATUS' => $tattooStatus,
         'BOUNTY_STATUS' => $bountyStatus,
         'HERIKA_PERS' => $GLOBALS["HERIKA_PERS"] ?? "",
-        'MIND_STATE' => $mindState
+        'MIND_STATE' => $mindState,
+        'DEVICE_STATUS' => '' // Remove old device status string
     ];
 
     // Get sections from roleplay settings
