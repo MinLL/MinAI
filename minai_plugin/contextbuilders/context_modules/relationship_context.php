@@ -66,6 +66,11 @@ function BuildRelationshipContext($params) {
     if ($herika_name == "The Narrator" || $target != $player_name) {
         return "";
     }
+
+    // Only show this for the primary actor
+    if ($GLOBALS["HERIKA_NAME"] != $herika_name) {
+        return "";
+    }
     // Call the existing GetRelationshipContext function
     return GetRelationshipContext($herika_name);
 }
