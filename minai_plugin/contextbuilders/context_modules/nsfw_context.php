@@ -23,6 +23,7 @@ function InitializeNSFWContextBuilders() {
         'description' => 'Character sexual reputation',
         'priority' => 100,
         'is_nsfw' => true,
+        'enabled' => isset($GLOBALS['minai_context']['nsfw_reputation']) ? (bool)$GLOBALS['minai_context']['nsfw_reputation'] : true,
         'builder_callback' => 'BuildNSFWReputationContext'
     ]);
     

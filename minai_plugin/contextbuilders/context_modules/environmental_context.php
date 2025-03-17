@@ -25,6 +25,7 @@ function InitializeEnvironmentalContextBuilders() {
         'header' => 'Current Location',
         'description' => 'Current location information',
         'priority' => 10,
+        'enabled' => isset($GLOBALS['minai_context']['location']) ? (bool)$GLOBALS['minai_context']['location'] : true,
         'builder_callback' => 'BuildLocationContext'
     ]);
     
@@ -34,6 +35,7 @@ function InitializeEnvironmentalContextBuilders() {
         'header' => 'Weather',
         'description' => 'Current weather conditions',
         'priority' => 20,
+        'enabled' => isset($GLOBALS['minai_context']['weather']) ? (bool)$GLOBALS['minai_context']['weather'] : true,
         'builder_callback' => 'BuildWeatherContext'
     ]);
     
@@ -43,6 +45,7 @@ function InitializeEnvironmentalContextBuilders() {
         'header' => 'Third Party',
         'description' => 'Third party information',
         'priority' => 30,
+        'enabled' => isset($GLOBALS['minai_context']['third_party']) ? (bool)$GLOBALS['minai_context']['third_party'] : true,
         'builder_callback' => 'BuildThirdPartyContext'
     ]);
     
@@ -52,6 +55,7 @@ function InitializeEnvironmentalContextBuilders() {
         'header' => 'Nearby Characters',
         'description' => 'Characters in close proximity',
         'priority' => 40,
+        'enabled' => isset($GLOBALS['minai_context']['nearby_characters']) ? (bool)$GLOBALS['minai_context']['nearby_characters'] : true,
         'builder_callback' => 'BuildNearbyCharactersContext'
     ]);
 }

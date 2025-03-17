@@ -109,6 +109,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         
         // Add roleplay settings to GET response
         "roleplay_settings" => $GLOBALS["roleplay_settings"],
+        
+        // Add context builder settings
+        "minai_context" => $GLOBALS["minai_context"],
     );
 
     // Return the config data as JSON
@@ -191,6 +194,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Save roleplay settings
         $newConfig .= "\$GLOBALS['roleplay_settings'] = " . var_export($input['roleplay_settings'], true) . ";\n";
+        
+        // Save context builder settings
+        $newConfig .= "\$GLOBALS['minai_context'] = " . var_export($input['minai_context'], true) . ";\n";
 
         // Write configuration
         $configFile = "$pluginPath/config.php";

@@ -68,6 +68,7 @@ function InitializeCharacterContextBuilders() {
         'header' => 'Physical Appearance',
         'description' => 'Physical description of the character',
         'priority' => 10,
+        'enabled' => isset($GLOBALS['minai_context']['physical_description']) ? (bool)$GLOBALS['minai_context']['physical_description'] : true,
         'builder_callback' => 'BuildPhysicalDescriptionContext'
     ]);
     
@@ -77,6 +78,7 @@ function InitializeCharacterContextBuilders() {
         'header' => 'Equipment',
         'description' => 'Equipment and worn items',
         'priority' => 20,
+        'enabled' => isset($GLOBALS['minai_context']['equipment']) ? (bool)$GLOBALS['minai_context']['equipment'] : true,
         'builder_callback' => 'BuildEquipmentContext'
     ]);
     
@@ -86,6 +88,7 @@ function InitializeCharacterContextBuilders() {
         'header' => 'Tattoos',
         'description' => 'Character tattoos',
         'priority' => 30,
+        'enabled' => isset($GLOBALS['minai_context']['tattoos']) ? (bool)$GLOBALS['minai_context']['tattoos'] : true,
         'builder_callback' => 'BuildTattooContext'
     ]);
     
@@ -96,6 +99,7 @@ function InitializeCharacterContextBuilders() {
         'description' => 'Character arousal level',
         'priority' => 40,
         'is_nsfw' => true,
+        'enabled' => isset($GLOBALS['minai_context']['arousal']) ? (bool)$GLOBALS['minai_context']['arousal'] : true,
         'builder_callback' => 'BuildArousalContext'
     ]);
     
@@ -106,6 +110,7 @@ function InitializeCharacterContextBuilders() {
         'description' => 'Character fertility status',
         'priority' => 50,
         'is_nsfw' => true,
+        'enabled' => isset($GLOBALS['minai_context']['fertility']) ? (bool)$GLOBALS['minai_context']['fertility'] : true,
         'builder_callback' => 'BuildFertilityContext'
     ]);
     
@@ -115,6 +120,7 @@ function InitializeCharacterContextBuilders() {
         'header' => 'Following Status',
         'description' => 'Character following status',
         'priority' => 60,
+        'enabled' => isset($GLOBALS['minai_context']['following']) ? (bool)$GLOBALS['minai_context']['following'] : true,
         'builder_callback' => 'BuildFollowingContext'
     ]);
     
@@ -124,6 +130,7 @@ function InitializeCharacterContextBuilders() {
         'header' => 'Survival Status',
         'description' => 'Character survival needs',
         'priority' => 70,
+        'enabled' => isset($GLOBALS['minai_context']['survival']) ? (bool)$GLOBALS['minai_context']['survival'] : true,
         'builder_callback' => 'BuildSurvivalContext'
     ]);
     
@@ -133,6 +140,7 @@ function InitializeCharacterContextBuilders() {
         'header' => 'Current Status',
         'description' => 'Current status of the player character',
         'priority' => 30,
+        'enabled' => isset($GLOBALS['minai_context']['player_status']) ? (bool)$GLOBALS['minai_context']['player_status'] : true,
         'builder_callback' => 'BuildPlayerStatusContext'
     ]);
     
@@ -142,6 +150,7 @@ function InitializeCharacterContextBuilders() {
         'header' => 'Bounty Status',
         'description' => 'Player bounty status',
         'priority' => 40,
+        'enabled' => isset($GLOBALS['minai_context']['bounty']) ? (bool)$GLOBALS['minai_context']['bounty'] : true,
         'builder_callback' => 'BuildBountyContext'
     ]);
     
@@ -151,6 +160,7 @@ function InitializeCharacterContextBuilders() {
         'header' => 'Mind State',
         'description' => 'Character mind influence state',
         'priority' => 80,
+        'enabled' => isset($GLOBALS['minai_context']['mind_influence']) ? (bool)$GLOBALS['minai_context']['mind_influence'] : true,
         'builder_callback' => 'BuildMindInfluenceContext'
     ]);
 }

@@ -21,6 +21,7 @@ function InitializeCoreContextBuilders() {
         'header' => 'Personality',
         'description' => 'Core personality description',
         'priority' => 10, // High priority - should be first in character section
+        'enabled' => isset($GLOBALS['minai_context']['personality']) ? (bool)$GLOBALS['minai_context']['personality'] : true,
         'builder_callback' => 'BuildPersonalityContext'
     ]);
     
@@ -29,6 +30,7 @@ function InitializeCoreContextBuilders() {
         'section' => 'interaction',
         'description' => 'Basic information about who the character is interacting with',
         'priority' => 10, // High priority - should be first in interaction section
+        'enabled' => isset($GLOBALS['minai_context']['interaction']) ? (bool)$GLOBALS['minai_context']['interaction'] : true,
         'builder_callback' => 'BuildInteractionContext'
     ]);
     
@@ -38,6 +40,7 @@ function InitializeCoreContextBuilders() {
         'header' => 'Background',
         'description' => 'Background information about the player',
         'priority' => 20,
+        'enabled' => isset($GLOBALS['minai_context']['player_background']) ? (bool)$GLOBALS['minai_context']['player_background'] : true,
         'builder_callback' => 'BuildPlayerBackgroundContext'
     ]);
 }

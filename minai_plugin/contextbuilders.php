@@ -2,7 +2,7 @@
 /**
  * Legacy Context Builders
  * 
- * This file contains the original context builder functions for backward compatibility.
+ * This file contains imports for all of the cont
  * New code should use the modular system in contextbuilders/system_prompt_context.php
  */
 

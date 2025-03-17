@@ -24,6 +24,7 @@ function InitializeRelationshipContextBuilders() {
         'header' => 'Relationship',
         'description' => 'Relationship between characters',
         'priority' => 50,
+        'enabled' => isset($GLOBALS['minai_context']['relationship']) ? (bool)$GLOBALS['minai_context']['relationship'] : true,
         'builder_callback' => 'BuildRelationshipContext'
     ]);
     
@@ -34,6 +35,7 @@ function InitializeRelationshipContextBuilders() {
         'description' => 'Devious follower special status',
         'priority' => 90,
         'is_nsfw' => true,
+        'enabled' => isset($GLOBALS['minai_context']['devious_follower']) ? (bool)$GLOBALS['minai_context']['devious_follower'] : true,
         'builder_callback' => 'BuildDeviousFollowerContext'
     ]);
     
@@ -44,6 +46,7 @@ function InitializeRelationshipContextBuilders() {
         'description' => 'Submissive lola mod status',
         'priority' => 95,
         'is_nsfw' => true,
+        'enabled' => isset($GLOBALS['minai_context']['submissive_lola']) ? (bool)$GLOBALS['minai_context']['submissive_lola'] : true,
         'builder_callback' => 'BuildSubmissiveLolaContext'
     ]);
 }

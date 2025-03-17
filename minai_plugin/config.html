@@ -1746,6 +1746,108 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                             </div>
                         </div>
                     </div>
+
+                    <!-- Context Builder Settings Section -->
+                    <div class="config-section">
+                        <div class="section-header collapsed" onclick="toggleSection(this)">
+                            Context Builder Settings
+                        </div>
+                        <div class="section-content collapsed">
+                            <div class="info-section">
+                                <p><strong>💡 Context Builder Settings</strong></p>
+                                <p>Configure which context sections are included in the system prompt. This lets you customize what information is provided to the AI.</p>
+                            </div>
+                            
+                            <!-- Character Context -->
+                            <div class="option-subgroup">
+                                <h3>Character Context</h3>
+                                <div class="checkbox-group">
+                                    <div class="checkbox-container">
+                                        <input type="checkbox" id="ctx-physical-description" name="minai_context[physical_description]">
+                                        <label for="ctx-physical-description">Physical Description</label>
+                                    </div>
+                                    <div class="checkbox-container">
+                                        <input type="checkbox" id="ctx-equipment" name="minai_context[equipment]">
+                                        <label for="ctx-equipment">Equipment</label>
+                                    </div>
+                                    <div class="checkbox-container">
+                                        <input type="checkbox" id="ctx-tattoos" name="minai_context[tattoos]">
+                                        <label for="ctx-tattoos">Tattoos</label>
+                                    </div>
+                                    <div class="checkbox-container">
+                                        <input type="checkbox" id="ctx-arousal" name="minai_context[arousal]">
+                                        <label for="ctx-arousal">Arousal</label>
+                                    </div>
+                                    <div class="checkbox-container">
+                                        <input type="checkbox" id="ctx-fertility" name="minai_context[fertility]">
+                                        <label for="ctx-fertility">Fertility</label>
+                                    </div>
+                                    <div class="checkbox-container">
+                                        <input type="checkbox" id="ctx-following" name="minai_context[following]">
+                                        <label for="ctx-following">Following Status</label>
+                                    </div>
+                                    <div class="checkbox-container">
+                                        <input type="checkbox" id="ctx-survival" name="minai_context[survival]">
+                                        <label for="ctx-survival">Survival</label>
+                                    </div>
+                                    <div class="checkbox-container">
+                                        <input type="checkbox" id="ctx-player-status" name="minai_context[player_status]">
+                                        <label for="ctx-player-status">Player Status</label>
+                                    </div>
+                                    <div class="checkbox-container">
+                                        <input type="checkbox" id="ctx-bounty" name="minai_context[bounty]">
+                                        <label for="ctx-bounty">Bounty</label>
+                                    </div>
+                                    <div class="checkbox-container">
+                                        <input type="checkbox" id="ctx-mind-influence" name="minai_context[mind_influence]">
+                                        <label for="ctx-mind-influence">Mind Influence</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Core Context -->
+                            <div class="option-subgroup">
+                                <h3>Core Context</h3>
+                                <div class="checkbox-group">
+                                    <div class="checkbox-container">
+                                        <input type="checkbox" id="ctx-personality" name="minai_context[personality]">
+                                        <label for="ctx-personality">Personality</label>
+                                    </div>
+                                    <div class="checkbox-container">
+                                        <input type="checkbox" id="ctx-interaction" name="minai_context[interaction]">
+                                        <label for="ctx-interaction">Interaction</label>
+                                    </div>
+                                    <div class="checkbox-container">
+                                        <input type="checkbox" id="ctx-player-background" name="minai_context[player_background]">
+                                        <label for="ctx-player-background">Player Background</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Environmental Context -->
+                            <div class="option-subgroup">
+                                <h3>Environmental Context</h3>
+                                <div class="checkbox-group">
+                                    <div class="checkbox-container">
+                                        <input type="checkbox" id="ctx-location" name="minai_context[location]">
+                                        <label for="ctx-location">Location</label>
+                                    </div>
+                                    <div class="checkbox-container">
+                                        <input type="checkbox" id="ctx-weather" name="minai_context[weather]">
+                                        <label for="ctx-weather">Weather</label>
+                                    </div>
+                                    <div class="checkbox-container">
+                                        <input type="checkbox" id="ctx-third-party" name="minai_context[third_party]">
+                                        <label for="ctx-third-party">Third Party</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="button-group">
+                                <button class="control-button" onclick="resetContextBuilderSettings()">Reset to Defaults</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1891,6 +1993,9 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 document.getElementById('config-form').style.display = 'block';
                 
                 await checkModifiedValues(); // Add this line
+                
+                // Load context builder settings
+                loadContextBuilderSettings(configData.minai_context);
             } catch (error) {
                 console.error('Error fetching config:', error);
                 showStatus('Failed to load configuration', 'error');
@@ -1956,7 +2061,10 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     roleplay_request_combat: document.getElementById('roleplay-request-combat').value,
 
                     sections: {}
-                }
+                },
+                
+                // Context builder settings
+                minai_context: getContextBuilderSettings()
             };
 
             // Add sections in their current order
@@ -2630,7 +2738,10 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                         roleplay_request_combat: document.getElementById('roleplay-request-combat').value,
 
                         sections: {}
-                    }
+                    },
+                    
+                    // Context builder settings
+                    minai_context: getContextBuilderSettings()
                 };
 
                 // Add sections in their current order
@@ -2643,6 +2754,9 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                         order: index
                     };
                 });
+
+                // Add context builder settings
+                config.minai_context = getContextBuilderSettings();
 
                 // Create file
                 const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
@@ -2798,6 +2912,11 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                                 // Reinitialize sortable sections
                                 initializeSortableSections();
                             }
+                        }
+
+                        // Handle context builder settings
+                        if (importedConfig.minai_context) {
+                            loadContextBuilderSettings(importedConfig.minai_context);
                         }
 
                         // Compare the imported config with the current server config
@@ -3226,6 +3345,54 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
 
             } catch (error) {
                 console.error('Error checking modified values:', error);
+            }
+        }
+
+        // Context Builder Settings functions
+        function loadContextBuilderSettings(minai_context) {
+            if (!minai_context) return;
+            
+            // Populate checkboxes based on current values
+            for (const [key, value] of Object.entries(minai_context)) {
+                const checkbox = document.getElementById(`ctx-${key.replace(/_/g, '-')}`);
+                if (checkbox) {
+                    checkbox.checked = value;
+                }
+            }
+            
+            // Add change listeners to all context checkboxes
+            document.querySelectorAll('input[name^="minai_context"]').forEach(checkbox => {
+                checkbox.addEventListener('change', () => markAsChanged());
+            });
+        }
+        
+        function getContextBuilderSettings() {
+            const contextSettings = {};
+            document.querySelectorAll('input[name^="minai_context"]').forEach(checkbox => {
+                // Extract key from name attribute which is in format minai_context[key]
+                const key = checkbox.name.match(/\[(.*?)\]/)[1];
+                contextSettings[key] = checkbox.checked;
+            });
+            return contextSettings;
+        }
+        
+        async function resetContextBuilderSettings() {
+            try {
+                const response = await fetch('api/config.php?defaults=true');
+                const defaultConfig = await response.json();
+                
+                if (!defaultConfig || defaultConfig.error) {
+                    throw new Error(defaultConfig.error || 'Failed to load default configuration');
+                }
+                
+                // Load default context builder settings
+                loadContextBuilderSettings(defaultConfig.minai_context);
+                
+                markAsChanged();
+                showStatus('Reset context builder settings to defaults', 'success');
+            } catch (error) {
+                console.error('Reset context builder settings error:', error);
+                showStatus('Failed to reset context builder settings: ' + error.message, 'error');
             }
         }
     </script>

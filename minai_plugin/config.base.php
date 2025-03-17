@@ -25,6 +25,40 @@ $GLOBALS['enforce_short_responses'] = false;
 $GLOBALS['use_llm_fallback'] = false;
 $GLOBALS['enforce_single_json'] = false;
 
+// Context Builder Configuration - controls which sections are included in the system prompt
+$GLOBALS['minai_context'] = array(
+    // Character context builders
+    'physical_description' => true,
+    'equipment' => true,
+    'tattoos' => true,
+    'arousal' => true,
+    'fertility' => true,
+    'following' => true,
+    'survival' => true,
+    'player_status' => true,
+    'bounty' => true,
+    'mind_influence' => true,
+    
+    // Core context builders
+    'personality' => true,
+    'interaction' => true,
+    'player_background' => true,
+    
+    // Environmental context builders
+    'location' => true,
+    'weather' => true,
+    'third_party' => true,
+    'nearby_characters' => true,
+    
+    // NSFW context builders
+    'nsfw_reputation' => true,
+    
+    // Relationship context builders
+    'relationship' => true,
+    'devious_follower' => true,
+    'submissive_lola' => true
+);
+
 // Inventory system configuration
 $GLOBALS['inventory_items_limit'] = 5; // Number of Items to expose to LLM from an actor's inventory
 $GLOBALS['use_item_relevancy_scoring'] = false; // Use relevancy scoring for items
