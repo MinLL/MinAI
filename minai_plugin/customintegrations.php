@@ -6,7 +6,7 @@ require_once("util.php");
 require_once(__DIR__.DIRECTORY_SEPARATOR."updateThreadsDB.php");
 require_once(__DIR__.DIRECTORY_SEPARATOR."dungeonmaster.php");
 require_once(__DIR__.DIRECTORY_SEPARATOR."items.php");
-
+require_once(__DIR__.DIRECTORY_SEPARATOR."utils/narrator_utils.php");
 
 
 function ProcessIntegrations() {
