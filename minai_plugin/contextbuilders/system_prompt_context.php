@@ -34,6 +34,14 @@ class ContextBuilderRegistry {
     }
     
     /**
+     * Reset the singleton instance
+     * Use this when you need a completely fresh registry
+     */
+    public static function resetInstance() {
+        self::$instance = null;
+    }
+    
+    /**
      * Register a new context builder
      * 
      * @param string $id Unique identifier for the builder
@@ -111,7 +119,6 @@ class ContextBuilderRegistry {
  * @return array System prompt content in the format expected for contextDataFull
  */
 function BuildSystemPrompt() {
- 
     // Access global variables needed for the system prompt
     $prompt_head = isset($GLOBALS["PROMPT_HEAD"]) ? $GLOBALS["PROMPT_HEAD"] : "";
     $herika_name = isset($GLOBALS["HERIKA_NAME"]) ? $GLOBALS["HERIKA_NAME"] : "";
@@ -122,6 +129,18 @@ function BuildSystemPrompt() {
     // Determine if NSFW context should be included
     $include_nsfw = !isset($GLOBALS["disable_nsfw"]) || !$GLOBALS["disable_nsfw"];
     
+    // Check for self_narrator mode (Narrator as player's subconscious)
+    $is_self_narrator = false;
+    if ($herika_name === "The Narrator" && isset($GLOBALS['self_narrator']) && $GLOBALS['self_narrator'] === true) {
+        $is_self_narrator = true;
+    }
+    
+    // Set the display name based on self_narrator mode
+    $display_name = $herika_name;
+    if ($is_self_narrator) {
+        $display_name = "{$player_name}'s subconscious";
+    }
+    
     // Initialize the system prompt
     $system_prompt = "";
     
@@ -130,36 +149,44 @@ function BuildSystemPrompt() {
     if (!empty($prompt_head)) {
         $system_prompt .= trim($prompt_head) . "\n\n";
     }
-    $system_prompt .= "You are roleplaying as {$herika_name} in a Skyrim adventure.\n";
-    $system_prompt .= "Respond in character as {$herika_name} at all times.\n\n";
+    $system_prompt .= "You are roleplaying as {$display_name} in a Skyrim adventure.\n";
+    $system_prompt .= "Respond in character as {$display_name} at all times.\n\n";
     
     // Get registry instance
     $registry = ContextBuilderRegistry::getInstance();
 
-    // Define the actors sections (primary character and target)
-    $actors = [
-        'primary' => $herika_name,
-        'target' => $target
-    ];
+    // Set up actors based on self_narrator mode
+    $actors = array();
+    if ($is_self_narrator) {
+        // Only include player in self_narrator mode
+        $actors['primary'] = "The Narrator";
+        
+    } else {
+        // Include both primary and target in normal mode
+        $actors['primary'] = $herika_name;
+        $actors['target'] = $target;
+    }
 
     // Common parameters to pass to all builders
-    $params = [
+    $params = array(
         'herika_name' => $herika_name,
         'player_name' => $player_name,
-        'target' => $target
-    ];
+        'target' => $target,
+        'is_self_narrator' => $is_self_narrator
+    );
 
     // Define the per-actor sections and their headers
-    $actor_sections = [
+    $actor_sections = array(
         'character' => "Character",
-        'status' => "Current Status"
-    ];
+        'status' => "Current Status",
+        'interaction' => "Interaction"
+    );
 
-    // Define the shared sections (apply to both/all actors or environment)
-    $shared_sections = [
+    // Define the shared sections
+    $shared_sections = array(
         'environment' => "# Environmental Context",
         'misc' => "# Additional Information"
-    ];
+    );
 
     // Process each actor
     foreach ($actors as $actor_role => $actor_name) {
@@ -173,9 +200,12 @@ function BuildSystemPrompt() {
         // Set up the actor parameters based on role
         $actor_params = $params;
         if ($actor_role === 'primary') {
-            // Primary character -is Herika/NPC - params already set up correctly
+            // For primary character in self_narrator mode, focus on player's variables
+            if ($is_self_narrator) {
+                $actor_params['herika_name'] = "The Narrator";
+            }
         } else {
-            // Target character (usually player) - swap the parameter roles
+            // For target (usually player), swap roles
             $actor_params['herika_name'] = $target;
             $actor_params['is_target'] = true;
         }
@@ -203,6 +233,7 @@ function BuildSystemPrompt() {
                     
                     // Add the sub-header if provided
                     if (!empty($builder['header'])) {
+                        $builder['header'] = str_replace("#player_name#", $player_name, $builder['header']);
                         $section_content .= "### " . $builder['header'] . "\n";
                     }
                     
@@ -246,7 +277,12 @@ function BuildSystemPrompt() {
         
         // Add the actor section to the system prompt if it has content
         if (!empty($actor_content)) {
-            $system_prompt .= "# " . $actor_name . "\n";
+            // Use appropriate display name for the header
+            $header_name = $actor_name;
+            if ($is_self_narrator && $actor_role === 'primary') {
+                $header_name = $display_name;
+            }
+            $system_prompt .= "# " . $header_name . "\n";
             $system_prompt .= $actor_content . "\n";
         }
     }
@@ -293,16 +329,16 @@ function BuildSystemPrompt() {
     
     // Add guidance for the LLM on how to format responses
     $system_prompt .= "# Response Guidelines\n";
-    $system_prompt .= "- Stay in character as {$herika_name} at all times\n";
+    $system_prompt .= "- Stay in character as {$display_name} at all times\n";
     $system_prompt .= "- Respond appropriately to the context of the conversation\n";
     $system_prompt .= "- Be concise and direct in your responses\n";
     $system_prompt .= "- Your response should reflect your personality and relationship with {$target}\n";
     $system_prompt .= "- Never break the fourth wall or reference that you are an AI\n";
     
-    return [
+    return array(
         'role' => 'system',
         'content' => $system_prompt
-    ];
+    );
 }
 
 /**
@@ -355,7 +391,6 @@ function callContextBuilder($builderId, $params = []) {
             minai_log("error", "Error calling context builder '{$builderId}': " . $e->getMessage());
         }
     }
-    
     return '';
 }
 

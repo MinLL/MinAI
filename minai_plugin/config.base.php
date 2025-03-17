@@ -38,6 +38,7 @@ $GLOBALS['minai_context'] = array(
     'player_status' => true,
     'bounty' => true,
     'mind_influence' => true,
+    'dynamic_state' => true,
     
     // Core context builders
     'personality' => true,
@@ -45,7 +46,7 @@ $GLOBALS['minai_context'] = array(
     'player_background' => true,
     
     // Environmental context builders
-    'location' => true,
+    'relative' => true,
     'weather' => true,
     'third_party' => true,
     'nearby_characters' => true,

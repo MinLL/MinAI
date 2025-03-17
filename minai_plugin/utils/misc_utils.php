@@ -67,6 +67,12 @@ class Utilities {
         $realBeings = [];
         $beingsInCloseRange = str_replace("(", "", $beingsInCloseRange);
         $beingsList = explode("|",$beingsInCloseRange);
+        if (empty($beingsList)) {
+            $nearbyActors = GetActorValue($GLOBALS["PLAYER_NAME"], "nearbyActors");
+            if (!empty($nearbyActors)) {
+                $beingsList = explode("|", $nearbyActors);
+            }
+        }
         $count = 0;
         foreach($beingsList as $bListItem) {
             if(strpos($bListItem, " ")===0) {

@@ -145,3 +145,11 @@ Function SetLLMFallbackProfile() {
     // Always set these after restoring cache
     // $_GET["profile"] = md5("LLMFallback");
 }
+
+Function GetActorConfigPath($actorName) {
+    // If use symlink, php code is actually in repo folder but included in wsl php server
+    // with just dirname((__FILE__)) it was getting directory of repo not php server 
+    $path = "/var/www/html/HerikaServer/";
+    $newConfFile=md5($actorName);
+    return $path . "conf".DIRECTORY_SEPARATOR."conf_$newConfFile.php";
+}

@@ -20,6 +20,12 @@ SetNarratorProfile();
 try {
     // Get player name from query param or use default
     $playerName = $_GET['player'] ?? $GLOBALS["PLAYER_NAME"] ?? "Player";
+    
+    // Get actor name from query param or use default
+    $actorName = $_GET['actor'] ?? "Brynjolf";
+
+    // Get second NPC name for NPC-to-NPC interaction
+    $secondNpcName = $_GET['secondnpc'] ?? "Brand-Shei";
 
     // Get player pronouns
     $playerPronouns = GetActorPronouns($playerName);
@@ -44,6 +50,7 @@ try {
     $contextDataWorld = DataLastInfoFor("", -2);
     $contextDataFull = array_merge($contextDataWorld, $contextDataHistoric);
     $mindState = GetMindInfluenceContext(GetMindInfluenceState($GLOBALS["PLAYER_NAME"]));
+    
     // Build the variable replacements as they would appear in the prompt
     $variableReplacements = [
         'PLAYER_NAME' => $playerName,
@@ -70,6 +77,57 @@ try {
 
     // Get sections from roleplay settings
     $sections = $GLOBALS['roleplay_settings']['sections'];
+    
+    // Get the complete system prompt (which respects minai_context settings)
+    // First perspective: Narrator (current settings)
+    $systemPromptData = BuildSystemPrompt();
+    $narratorSystemPrompt = $systemPromptData['content'] ?? "Error: Unable to generate system prompt";
+    
+    // Second perspective: Actor (using specified name)
+    // Store original values to restore later
+    $originalHerika = $GLOBALS["HERIKA_NAME"];
+    $originalTarget = $GLOBALS["target"] ?? "Player";
+    
+    // Set values for actor perspective
+    global $HERIKA_NAME;
+    global $HERIKA_PERS;
+    // this will be overridden by the actor profile
+    $GLOBALS["HERIKA_NAME"] = "Could not load actor profile";
+    $profilePath = GetActorConfigPath($actorName);
+    $includeSuccess = include($profilePath);
+    $GLOBALS["target"] = $GLOBALS["PLAYER_NAME"];
+    
+    // Reset context builder registry to ensure a clean state
+    ContextBuilderRegistry::resetInstance();
+    InitializeContextBuilders();
+    
+    // Generate system prompt from actor perspective
+    if ($includeSuccess) {
+        $actorSystemPromptData = BuildSystemPrompt();
+        $actorSystemPrompt = $actorSystemPromptData['content'] ?? "Error: Unable to generate system prompt";
+    } else {
+        $actorSystemPrompt = "Error: Unable to load actor profile";
+    }
+
+    // Third perspective: NPC-to-NPC interaction   
+    // Set values for NPC-to-NPC perspective
+    $GLOBALS["target"] = $secondNpcName; // Set target to second NPC
+    
+    // Reset context builder registry to ensure a clean state
+    ContextBuilderRegistry::resetInstance();
+    InitializeContextBuilders();
+    
+    // Generate system prompt for NPC-to-NPC interaction
+    if ($includeSuccess) {
+        $npcToNpcSystemPromptData = BuildSystemPrompt();
+        $npcToNpcSystemPrompt = $npcToNpcSystemPromptData['content'] ?? "Error: Unable to generate system prompt";
+    } else {
+        $npcToNpcSystemPrompt = "Error: Unable to load actor profile";
+    }
+    
+    // Restore original values
+    $GLOBALS["HERIKA_NAME"] = $originalHerika;
+    $GLOBALS["target"] = $originalTarget;
 
     // Build the preview data
     $preview = [
@@ -95,7 +153,12 @@ try {
             'roleplay_request' => replaceVariables($GLOBALS['roleplay_settings']['roleplay_request'], $variableReplacements),
             'roleplay_request_explicit' => replaceVariables($GLOBALS['roleplay_settings']['roleplay_request_explicit'], $variableReplacements),
             'roleplay_request_combat' => replaceVariables($GLOBALS['roleplay_settings']['roleplay_request_combat'], $variableReplacements)
-        ]
+        ],
+        'narrator_system_prompt' => $narratorSystemPrompt,
+        'actor_system_prompt' => $actorSystemPrompt,
+        'actor_name' => $actorName,
+        'npc_to_npc_system_prompt' => $npcToNpcSystemPrompt,
+        'second_npc_name' => $secondNpcName
     ];
 
     // Clear any previous output

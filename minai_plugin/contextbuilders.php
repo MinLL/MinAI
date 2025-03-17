@@ -22,3 +22,5 @@ require_once("contextbuilders/exposure_context.php");
 require_once("contextbuilders/fertilitymode_context.php");
 require_once("contextbuilders/equipment_context.php");
 require_once("contextbuilders/tattoos_context.php");
+require_once("utils/profile_utils.php");
+require_once("contextbuilders/crime_context.php");

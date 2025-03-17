@@ -59,21 +59,15 @@ function InitializeRelationshipContextBuilders() {
  */
 function BuildRelationshipContext($params) {
     // Determine which character's relationship we're describing
-    $source = isset($params['is_target']) && $params['is_target'] 
-              ? $params['target'] 
-              : $params['herika_name'];
-    
-    // The other character in the relationship
-    $other = isset($params['is_target']) && $params['is_target'] 
-             ? $params['herika_name'] 
-             : $params['target'];
-    
-    // Skip if narrator involved or if source and other are the same person
-    if ($source == "The Narrator" || $other == "The Narrator" || $source == $other) {
+    $target = $params['target'];
+    $herika_name = $params['herika_name'];
+    $player_name = $params['player_name'];
+    // Only show relationship context if the target is the player and not the narrator
+    if ($herika_name == "The Narrator" || $target != $player_name) {
         return "";
     }
     // Call the existing GetRelationshipContext function
-    return GetRelationshipContext($other);
+    return GetRelationshipContext($herika_name);
 }
 
 /**

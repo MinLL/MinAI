@@ -19,16 +19,16 @@ require_once(__DIR__ . "/../../contextbuilders/exposure_context.php");
 function InitializeEnvironmentalContextBuilders() {
     $registry = ContextBuilderRegistry::getInstance();
     
-    // Register location context builder
-    $registry->register('location', [
+    // Register relative context builder
+    $registry->register('relative', [
         'section' => 'environment',
-        'header' => 'Current Location',
-        'description' => 'Current location information',
+        'header' => 'Relative Context',
+        'description' => 'Relative Context information',
         'priority' => 10,
-        'enabled' => isset($GLOBALS['minai_context']['location']) ? (bool)$GLOBALS['minai_context']['location'] : true,
-        'builder_callback' => 'BuildLocationContext'
+        'enabled' => isset($GLOBALS['minai_context']['relative']) ? (bool)$GLOBALS['minai_context']['relative'] : true,
+        'builder_callback' => 'BuildRelativeContext'
     ]);
-    
+
     // Register weather context builder
     $registry->register('weather', [
         'section' => 'environment',
@@ -61,37 +61,6 @@ function InitializeEnvironmentalContextBuilders() {
 }
 
 /**
- * Build the location context
- * 
- * @param array $params Parameters including herika_name, player_name, target
- * @return string Formatted location context
- */
-function BuildLocationContext($params) {
-    $herika_name = $params['herika_name'];
-    $target = $params['target'];
-    
-    // Get environmental context for both characters
-    $herikaContext = GetEnvironmentalContext($herika_name);
-    $targetContext = "";
-    
-    // Only get target context if it's a different character
-    if ($target != $herika_name) {
-        $targetContext = GetEnvironmentalContext($target);
-    }
-    
-    // Combine the contexts
-    if (!empty($herikaContext) && !empty($targetContext)) {
-        return $targetContext . "\n" . $herikaContext;
-    } else if (!empty($herikaContext)) {
-        return $herikaContext;
-    } else if (!empty($targetContext)) {
-        return $targetContext;
-    }
-    
-    return "";
-}
-
-/**
  * Build the weather context
  * 
  * @param array $params Parameters including herika_name, player_name, target
@@ -121,19 +90,52 @@ function BuildThirdPartyContext($params) {
  */
 function BuildNearbyCharactersContext($params) {
     $utilities = new Utilities();
-    $localActors = $utilities->beingsInCloseRange();
+    $localActors = DataBeingsInRange();
     
-    if (empty($localActors) || !is_array($localActors)) {
+    if (empty($localActors)) {
         return "";
     }
     
-    $context = implode(", ", $localActors) . "\n";
+    // Clean and format the list of characters
+    $localActors = ltrim($localActors, "(");
+    $localActors = rtrim($localActors, ")");
+    $characters = explode("|", $localActors);
+    // Remove any empty entries and trim each character name
+    $characters = array_filter(array_map('trim', $characters), function($item) {
+        return !empty($item);
+    });
     
-    // Add dirt and blood information
-    $context .= GetDirtAndBloodContext($localActors);
+    // If we have characters after cleaning, create the formatted list
+    if (count($characters) > 0) {
+        $context = implode(", ", $characters) . "\n";
+        
+        // Add dirt and blood information
+        $context .= GetDirtAndBloodContext($localActors);
+        
+        // Add exposure information
+        $context .= GetExposureContext($localActors);
+        
+        return $context;
+    }
     
-    // Add exposure information
-    $context .= GetExposureContext($localActors);
-    
-    return $context;
+    return "";
 } 
+
+/**
+ * Build the location context
+ * 
+ * @param array $params Parameters including herika_name, player_name, target
+ * @return string Formatted location context
+ */
+function BuildRelativeContext($params) {
+    $herika_name = $params['herika_name'];
+    $target = $params['target'];
+    $player_name = $params['player_name'];
+    // relative context is only valid for the player at the moment because of how it's implemented in game
+    if ($target != $player_name) {
+        return "";
+    }
+    // Get environmental context for both characters
+    $herikaContext = GetEnvironmentalContext($herika_name);
+    return $herikaContext;
+}

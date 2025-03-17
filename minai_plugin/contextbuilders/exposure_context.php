@@ -68,8 +68,14 @@ function GetExposureContext($localActors) {
     // build lists
     $verbiage = "";
     if(!empty($isnaked)) {
-        // This doesn't respect non-cuirass clothing. Disable for now to avoid having to query the database for each actor.
-        // $verbiage .= expose::rollUpAList($isnaked) . "naked and exposed.\n";
+        // Create filtered list without player and Herika
+        $filteredNaked = array_filter($isnaked, function($name) {
+            // These are handled by the main equipment routines
+            return $name !== $GLOBALS["HERIKA_TARGET"] && $name !== $GLOBALS["HERIKA_NAME"] && $name !== $GLOBALS["PLAYER_NAME"];
+        });
+        if(!empty($filteredNaked)) {
+            $verbiage .= expose::rollUpAList($filteredNaked) . "naked and exposed.\n";
+        }
     }
     if(!empty($tngsize0)) {
         $verbiage .= expose::rollUpAList($tngsize0, true) . "an embarrassingly tiny prick.\n";

@@ -134,15 +134,6 @@ function InitializeCharacterContextBuilders() {
         'builder_callback' => 'BuildSurvivalContext'
     ]);
     
-    // Register player status context builder
-    $registry->register('player_status', [
-        'section' => 'interaction',
-        'header' => 'Current Status',
-        'description' => 'Current status of the player character',
-        'priority' => 30,
-        'enabled' => isset($GLOBALS['minai_context']['player_status']) ? (bool)$GLOBALS['minai_context']['player_status'] : true,
-        'builder_callback' => 'BuildPlayerStatusContext'
-    ]);
     
     // Register bounty context builder
     $registry->register('bounty', [
@@ -370,35 +361,6 @@ function BuildSurvivalContext($params) {
     return $ret;
 }
 
-/**
- * Build the player status context
- * 
- * @param array $params Parameters including herika_name, player_name, target
- * @return string Formatted player status context
- */
-function BuildPlayerStatusContext($params) {
-    $player_name = $params['player_name'];
-    $character = isset($params['is_target']) && $params['is_target'] 
-                ? $params['target'] 
-                : $params['herika_name'];
-    
-    // Only include player status when we're building context for the player specifically
-    if ($character != $player_name) {
-        return "";
-    }
-    
-    // Get the player background
-    $player_background = isset($GLOBALS["PLAYER_BACKGROUND"]) ? $GLOBALS["PLAYER_BACKGROUND"] : "";
-    
-    // Replace placeholder with actual player name if needed
-    $player_background = str_replace("#PLAYER_NAME#", $player_name, $player_background);
-    
-    if (empty($player_background)) {
-        $player_background = "I'm {$player_name}, the Dragonborn.";
-    }
-    
-    return $player_background;
-}
 
 /**
  * Build the bounty context
@@ -441,19 +403,10 @@ function BuildBountyContext($params) {
  */
 function BuildMindInfluenceContext($params) {
     // Check if herika_name is set in params, otherwise use a fallback
-    if (!isset($params['herika_name'])) {
-        // Fallback to GLOBALS if available
-        if (isset($GLOBALS["HERIKA_NAME"])) {
-            $herika_name = $GLOBALS["HERIKA_NAME"];
-            $character = $GLOBALS["HERIKA_NAME"];
-        } else {
-            // If we can't determine the character, return empty string
-            return "";
-        }
-    } else {
-        $herika_name = $params['herika_name'];
-        $character = $params['herika_name'];
-    }
+    error_log("WTF BuildMindInfluenceContext: " . json_encode($params));
+    $herika_name = $params['herika_name'];
+    $character = $params['herika_name'];
+    
     
     // Only include mind influence context for the narrator
     if ($herika_name != "The Narrator") {
@@ -468,3 +421,4 @@ function BuildMindInfluenceContext($params) {
     // This function would call the existing GetMindInfluenceContext function
     return GetMindInfluenceContext($mindState);
 } 
+
