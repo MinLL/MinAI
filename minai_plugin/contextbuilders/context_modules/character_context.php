@@ -173,6 +173,9 @@ function BuildPhysicalDescriptionContext($params) {
     $buttScore = GetActorValue($character, "buttScore");
     $isexposed = GetActorValue($character, "isexposed");
     
+    // Get proper pronouns for the character
+    $pronouns = GetActorPronouns($character);
+    
     $ret = "";
     $isWerewolf = false;
     
@@ -192,15 +195,80 @@ function BuildPhysicalDescriptionContext($params) {
         return $ret;
     }
     
-    if (!empty($beautyScore) && $beautyScore != "0" && !$isWerewolf) {
-        $beautyScore = ceil(intval($beautyScore)/10);
-        $ret .= ($gender == "female" ? "She" : "He") . " is a {$beautyScore}/10 in terms of beauty ";
+    // Beauty description using 0-10 scale
+    if (isset($beautyScore) && $beautyScore !== "" && !$isWerewolf) {
+        // Convert to 0-10 scale if needed
+        $beautyStage = min(10, ceil(intval($beautyScore)/10));
+        
+        $beautyDesc = "";
+        switch ($beautyStage) {
+            case 0: $beautyDesc = "Extremely Unattractive"; break;
+            case 1: $beautyDesc = "Very Unattractive"; break;
+            case 2: $beautyDesc = "Unattractive"; break;
+            case 3: $beautyDesc = "Below Average"; break;
+            case 4: $beautyDesc = "Plain"; break;
+            case 5: $beautyDesc = "Average with Charm"; break;
+            case 6: $beautyDesc = "Somewhat Alluring"; break;
+            case 7: $beautyDesc = "Naturally Sensual"; break;
+            case 8: $beautyDesc = "Captivating"; break;
+            case 9: $beautyDesc = "Strikingly Beautiful"; break;
+            case 10: $beautyDesc = "Exceptionally Gorgeous"; break;
+            default: $beautyDesc = "Unknown";
+        }
+        
+        // Add the numerical rating
+        $beautyDesc .= " ({$beautyStage}/10)";
+        
+        $ret .= ucfirst($pronouns['subject']) . " is {$beautyDesc} (appearance). ";
     }
     
-    if((!empty($breastsScore) && $breastsScore != "0") && (!empty($buttScore) && $buttScore != "0") && !$isWerewolf) {
-        $breastsScore = ceil(intval($breastsScore)/10);
-        $buttScore = ceil(intval($buttScore)/10);
-        $ret .= "with {$breastsScore}/10 tits and a {$buttScore}/10 ass. ";
+    // Breast and butt descriptions (if applicable)
+    if((isset($breastsScore) && $breastsScore !== "") && (isset($buttScore) && $buttScore !== "") && !$isWerewolf) {
+        // Convert to 0-10 scale
+        $breastsStage = min(10, ceil(intval($breastsScore)/10));
+        $buttStage = min(10, ceil(intval($buttScore)/10));
+        
+        // Breast description
+        $breastsDesc = "";
+        switch ($breastsStage) {
+            case 0: $breastsDesc = "Unappealing Breasts"; break;
+            case 1: $breastsDesc = "Very Plain Breasts"; break;
+            case 2: $breastsDesc = "Plain Breasts"; break;
+            case 3: $breastsDesc = "Unremarkable Breasts"; break;
+            case 4: $breastsDesc = "Decent Breasts"; break;
+            case 5: $breastsDesc = "Pleasing Breast Curves"; break;
+            case 6: $breastsDesc = "Attractive Breasts"; break;
+            case 7: $breastsDesc = "Very Attractive Breasts"; break;
+            case 8: $breastsDesc = "Striking Breast Curves"; break;
+            case 9: $breastsDesc = "Exceptionally Attractive Breasts"; break;
+            case 10: $breastsDesc = "Remarkably Beautiful Breasts"; break;
+            default: $breastsDesc = "Unknown";
+        }
+        
+        // Add the numerical rating
+        $breastsDesc .= " ({$breastsStage}/10)";
+        
+        // Butt description
+        $buttDesc = "";
+        switch ($buttStage) {
+            case 0: $buttDesc = "Unappealing Buttocks"; break;
+            case 1: $buttDesc = "Very Plain Buttocks"; break;
+            case 2: $buttDesc = "Plain Buttocks"; break;
+            case 3: $buttDesc = "Unremarkable Buttocks"; break;
+            case 4: $buttDesc = "Decent Buttocks"; break;
+            case 5: $buttDesc = "Nicely Formed Buttocks"; break;
+            case 6: $buttDesc = "Attractive Buttocks"; break;
+            case 7: $buttDesc = "Well-Curved Buttocks"; break;
+            case 8: $buttDesc = "Very Attractive Buttocks"; break;
+            case 9: $buttDesc = "Exceptionally Shapely Buttocks"; break;
+            case 10: $buttDesc = "Remarkably Well-Formed Buttocks"; break;
+            default: $buttDesc = "Unknown";
+        }
+        
+        // Add the numerical rating
+        $buttDesc .= " ({$buttStage}/10)";
+        
+        $ret .= ucfirst($pronouns['subject']) . " has {$breastsDesc} (chest) and {$buttDesc} (posterior). ";
     }
     
     if (IsEnabled($character, "isexposed")) {
@@ -218,26 +286,46 @@ function BuildPhysicalDescriptionContext($params) {
  */
 function GetPenisSize($name) {
     $tngsize = GetActorValue($name, "tngsize");
-    $sizeDescription = "";
+    
+    // Get the size stage (0-4 scale)
+    $sizeStage = 2; // Default to average
     
     if (HasKeyword($name, "TNG_XL") || ($tngsize == 4)) {
-        $sizeDescription = "one of the biggest cocks you've ever seen";
+        $sizeStage = 4;
     }
-    elseif(HasKeyword($name, "TNG_L") || ($tngsize == 3)) {
-        $sizeDescription = "a large cock";
+    elseif (HasKeyword($name, "TNG_L") || ($tngsize == 3)) {
+        $sizeStage = 3;
     }
     elseif (HasKeyword($name, "TNG_M") || HasKeyword($name, "TNG_DefaultSize") || ($tngsize == 2)) {
-        $sizeDescription = "an average sized cock";
+        $sizeStage = 2;
     }
     elseif (HasKeyword($name, "TNG_S") || ($tngsize == 1)) {
-        $sizeDescription = "a very small cock";
+        $sizeStage = 1;
     }        
     elseif (HasKeyword($name, "TNG_XS") || ($tngsize == 0)) {
-        $sizeDescription = "an embarrassingly tiny prick";
+        $sizeStage = 0;
+    }
+    
+    // Map stage to description
+    $sizeDescription = "";
+    switch ($sizeStage) {
+        case 0: $sizeDescription = "Embarrassingly Tiny Prick"; break;
+        case 1: $sizeDescription = "Small Cock"; break;
+        case 2: $sizeDescription = "Average Sized Cock"; break;
+        case 3: $sizeDescription = "Large Cock"; break;
+        case 4: $sizeDescription = "Impressively Huge Cock, one of the biggest you've ever seen"; break;
+        default: $sizeDescription = "Unknown";
+    }
+    
+    // Add the numerical rating for cases 0-3 (special case for 4 which has additional text)
+    if ($sizeStage >= 0 && $sizeStage < 4) {
+        $sizeDescription .= " ({$sizeStage}/4)";
+    } else if ($sizeStage == 4) {
+        $sizeDescription = "Impressively Huge Cock (4/4), one of the biggest you've ever seen";
     }
     
     if ($sizeDescription != "") {
-        return "{$name} has {$sizeDescription}. ";
+        return "{$name} has an {$sizeDescription}. ";
     }
     
     return "";
@@ -279,12 +367,36 @@ function BuildTattooContext($params) {
 function BuildArousalContext($params) {
     // Determine which character we're building context for
     $character = $params['herika_name'];
-    
+    if ($character == "The Narrator") {
+        $character = $params['player_name'];
+    }
     $arousal = GetActorValue($character, "arousal");
     
     $ret = "";
-    if (!empty($arousal)) {
-        $ret .= "{$character}'s sexual arousal level is {$arousal}/100, where 0 is not aroused at all, and 100 is desperate for sex.";
+    if (isset($arousal) && $arousal !== "") {
+        // Convert percentage (0-99) to stage (0-10)
+        $stage = min(10, floor(floatval($arousal) / 10));
+        
+        $arousalDesc = "";
+        switch ($stage) {
+            case 0: $arousalDesc = "Completely Satisfied and Content"; break;
+            case 1: $arousalDesc = "Fulfilled with No Desire"; break;
+            case 2: $arousalDesc = "Not Aroused"; break;
+            case 3: $arousalDesc = "Slightly Aroused and Curious"; break;
+            case 4: $arousalDesc = "Moderately Aroused and Interested"; break;
+            case 5: $arousalDesc = "Noticeably Aroused and Eager"; break;
+            case 6: $arousalDesc = "Quite Aroused and Desiring"; break;
+            case 7: $arousalDesc = "Very Horny and Wanting"; break;
+            case 8: $arousalDesc = "Intensely Horny and Needing"; break;
+            case 9: $arousalDesc = "Burning with Passionate Desire"; break;
+            case 10: $arousalDesc = "Overwhelmingly Horny and Desperate"; break;
+            default: $arousalDesc = "Unknown";
+        }
+        
+        // Add the numerical rating
+        $arousalDesc .= " ({$stage}/10)";
+        
+        $ret .= "{$character} is {$arousalDesc} (arousal).\n";
     }
     
     return $ret;
@@ -298,7 +410,9 @@ function BuildArousalContext($params) {
  */
 function BuildFertilityContext($params) {
     $character = $params['herika_name'];
-    
+    if ($character == "The Narrator") {
+        $character = $params['player_name'];
+    }
     // This function would call the existing GetFertilityContext function
     return GetFertilityContext($character);
 }
@@ -334,36 +448,101 @@ function BuildSurvivalContext($params) {
     if ($character == "The Narrator") {
         $character = $player_name;
     }
+    
+    // Initialize all stage variables
+    $hungerStage = null;
+    $thirstStage = null;
+    $fatigueStage = null;
+    $coldStage = null;
+
     if (IsModEnabled("Sunhelm")) {
-        // Stages for sunhelm are 0-4, where 4 is starving/dying of thirst/etc
-        $hunger = intval(GetActorValue($character, "hunger")) * 20; // Convert 0-5 scale to 0-100
-        $thirst = intval(GetActorValue($character, "thirst")) * 20; // Convert 0-5 scale to 0-100 
-        $fatigue = intval(GetActorValue($character, "fatigue")) * 20; // Convert 0-5 scale to 0-100
-        $cold = intval(GetActorValue($character, "cold")) * 20; // Convert 0-5 scale to 0-100
+        // Get stage values for Sunhelm (0-5 scale)
+        $hungerValue = GetActorValue($character, "hunger");
+        $thirstValue = GetActorValue($character, "thirst");
+        $fatigueValue = GetActorValue($character, "fatigue");
+        $coldValue = GetActorValue($character, "cold");
+        
+        // Check if the values exist (including zero values)
+        if (isset($hungerValue) && $hungerValue !== "") $hungerStage = intval($hungerValue);
+        if (isset($thirstValue) && $thirstValue !== "") $thirstStage = intval($thirstValue);
+        if (isset($fatigueValue) && $fatigueValue !== "") $fatigueStage = intval($fatigueValue);
+        if (isset($coldValue) && $coldValue !== "") $coldStage = intval($coldValue);
     }
     else {
-        $hunger = GetActorValue($character, "hunger");
-        $thirst = GetActorValue($character, "thirst");
-        $fatigue = GetActorValue($character, "fatigue");
-        $cold = GetActorValue($character, "cold");
+        // For other mods, try to convert percentage values to stages
+        $hungerPercent = GetActorValue($character, "hunger");
+        $thirstPercent = GetActorValue($character, "thirst");
+        $fatiguePercent = GetActorValue($character, "fatigue");
+        $coldPercent = GetActorValue($character, "cold");
+        
+        // Convert percentages to stages (0-5) if values exist (including zero values)
+        if (isset($hungerPercent) && $hungerPercent !== "") $hungerStage = min(5, floor(floatval($hungerPercent) / 20));
+        if (isset($thirstPercent) && $thirstPercent !== "") $thirstStage = min(5, floor(floatval($thirstPercent) / 20));
+        if (isset($fatiguePercent) && $fatiguePercent !== "") $fatigueStage = min(5, floor(floatval($fatiguePercent) / 20));
+        if (isset($coldPercent) && $coldPercent !== "") $coldStage = min(5, floor(floatval($coldPercent) / 20));
     }
     
     $ret = "";
+    $pronouns = GetActorPronouns($character);
     
-    if (!empty($hunger)) {
-        $ret .= "{$character}'s hunger level is at {$hunger}%, where 0 is not hungry at all, and 100 is starving. ";
+    // Hunger description
+    if ($hungerStage !== null) {
+        $hungerDesc = "";
+        switch ($hungerStage) {
+            case 0: $hungerDesc = "Well Fed"; break;
+            case 1: $hungerDesc = "Satisfied"; break;
+            case 2: $hungerDesc = "Peckish"; break;
+            case 3: $hungerDesc = "Hungry"; break;
+            case 4: $hungerDesc = "Ravenous"; break;
+            case 5: $hungerDesc = "Starving"; break;
+            default: $hungerDesc = "Unknown";
+        }
+        $ret .= "{$character} feels {$hungerDesc} (hunger).\n";
     }
     
-    if (!empty($thirst)) {
-        $ret .= "{$character}'s thirst level is at {$thirst}%, where 0 is not thirsty at all, and 100 is dying of thirst. ";
+    // Thirst description
+    if ($thirstStage !== null) {
+        $thirstDesc = "";
+        switch ($thirstStage) {
+            case 0: $thirstDesc = "Quenched"; break;
+            case 1: $thirstDesc = "Sated"; break;
+            case 2: $thirstDesc = "Thirsty"; break;
+            case 3: $thirstDesc = "Parched"; break;
+            case 4: $thirstDesc = "Dehydrated"; break;
+            case 5: $thirstDesc = "Severely Dehydrated"; break;
+            default: $thirstDesc = "Unknown";
+        }
+        $ret .= "{$character} is {$thirstDesc} (thirst).\n";
     }
     
-    if (!empty($fatigue)) {
-        $ret .= "{$character}'s fatigue level is at {$fatigue}%, where 0 is not tired at all, and 100 is exhausted. ";
+    // Fatigue description
+    if ($fatigueStage !== null) {
+        $fatigueDesc = "";
+        switch ($fatigueStage) {
+            case 0: $fatigueDesc = "Well Rested"; break;
+            case 1: $fatigueDesc = "Rested"; break;
+            case 2: $fatigueDesc = "Slightly Tired"; break;
+            case 3: $fatigueDesc = "Tired"; break;
+            case 4: $fatigueDesc = "Weary"; break;
+            case 5: $fatigueDesc = "Exhausted"; break;
+            default: $fatigueDesc = "Unknown";
+        }
+        $ret .= "{$character} is {$fatigueDesc} (energy).\n";
     }
     
-    if (!empty($cold)) {
-        $ret .= "{$character}'s cold level is at {$cold}%, where 0 is not cold at all, and 100 is freezing to death.";
+    // Cold description
+    if ($coldStage !== null) {
+        $coldDesc = "";
+        switch ($coldStage) {
+            case 0: $coldDesc = "Warm"; break;
+            case 1: $coldDesc = "Comfortable"; break;
+            case 2: $coldDesc = "Chilly"; break;
+            case 3: $coldDesc = "Cold"; break;
+            case 4: $coldDesc = "Freezing"; break;
+            case 5: $coldDesc = "Frigid"; break;
+            default: $coldDesc = "Unknown";
+        }
+        $ret .= "{$character} feels {$coldDesc} (temperature).\n";
     }
     
     return $ret;

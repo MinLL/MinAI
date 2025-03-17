@@ -434,6 +434,7 @@ Function SetContext(actor akTarget)
       aiff.SetActorVariable(playerRef, "hunger", sunhelmMain.Hunger.CurrentHungerStage)
       aiff.SetActorVariable(playerRef, "thirst", sunhelmMain.Thirst.CurrentThirstStage)
       aiff.SetActorVariable(playerRef, "fatigue", sunhelmMain.Fatigue.CurrentFatigueStage)
+      aiff.SetActorVariable(playerRef, "cold", sunhelmMain.Cold.CurrentColdStage)
     ElseIf bHasSurvivalMode && Survival_ModeEnabled.GetValueInt() == 1
       ; Convert needs to percentage values for consistency
       float hungerPercent = ((Survival_HungerNeedValue.GetValue() / Survival_HungerNeedMaxValue.GetValue())) * 100
