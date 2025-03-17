@@ -62,6 +62,9 @@ function BuildRelationshipContext($params) {
     $target = $params['target'];
     $herika_name = $params['herika_name'];
     $player_name = $params['player_name'];
+    $self_narrator = $params['self_narrator'];
+
+    
     // Only show relationship context if the target is the player and not the narrator
     if ($herika_name == "The Narrator" || $target != $player_name) {
         return "";

@@ -61,5 +61,5 @@ function GetRelationshipContext($targetActor) {
     $relationshipStatus = relation::rollUpRelationshipStatus($relationshipValue);
     $contextString = "$targetName is $relationshipStatus $playerName.";
 
-    return "\n". $contextString;
+    return $contextString;
 }

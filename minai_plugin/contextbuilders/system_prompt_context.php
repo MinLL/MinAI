@@ -263,30 +263,6 @@ function BuildSystemPrompt() {
             }
         }
         
-        // Add relationship information for this actor
-        $relationship_content = "";
-        $relationship_builders = $registry->getBuilders('interaction', $include_nsfw);
-        
-        foreach ($relationship_builders as $id => $builder) {
-            if ($id === 'relationship' && is_callable($builder['builder_callback'])) {
-                try {
-                    $context = call_user_func($builder['builder_callback'], $actor_params);
-                    
-                    if (!empty($context)) {
-                        $relationship_content .= "## Relationship\n";
-                        $relationship_content .= trim($context) . "\n\n";
-                    }
-                } catch (Exception $e) {
-                    minai_log("error", "Error in relationship builder for actor '{$actor_name}': " . $e->getMessage());
-                }
-            }
-        }
-        
-        // Add relationship to actor content if available
-        if (!empty($relationship_content)) {
-            $actor_content .= $relationship_content;
-        }
-        
         // Add the actor section to the system prompt if it has content
         if (!empty($actor_content)) {
             // Use appropriate display name for the header
