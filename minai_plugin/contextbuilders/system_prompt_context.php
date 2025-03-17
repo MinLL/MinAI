@@ -333,8 +333,10 @@ function BuildSystemPrompt() {
     $system_prompt .= "- Respond appropriately to the context of the conversation\n";
     $system_prompt .= "- Be concise and direct in your responses\n";
     $system_prompt .= "- Your response should reflect your personality and relationship with {$target}\n";
+    $system_prompt .= "- Prioritize responding to the most recent dialogue and events\n";
     $system_prompt .= "- Never break the fourth wall or reference that you are an AI\n";
-    
+    // Replace escaped quotes with regular quotes
+    $system_prompt = str_replace("\\'", "'", $system_prompt);
     return array(
         'role' => 'system',
         'content' => $system_prompt
