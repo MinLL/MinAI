@@ -286,11 +286,13 @@ function BuildPhysicalDescriptionContext($params) {
  */
 function GetPenisSize($name) {
     $tngsize = GetActorValue($name, "tngsize");
-    
+    $gender = strtolower(GetActorValue($name, "gender"));
     // Get the size stage (0-4 scale)
     $sizeStage = 2; // Default to average
-    
-    if (HasKeyword($name, "TNG_XL") || ($tngsize == 4)) {
+    if (!HasKeyword($name, "TNG_Gentlewoman") && $gender == "female") {
+        $sizeStage = null;
+    }
+    elseif (HasKeyword($name, "TNG_XL") || ($tngsize == 4)) {
         $sizeStage = 4;
     }
     elseif (HasKeyword($name, "TNG_L") || ($tngsize == 3)) {
