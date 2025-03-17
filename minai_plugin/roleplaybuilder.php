@@ -183,16 +183,17 @@ function interceptRoleplayInput() {
         $playerPronouns = GetActorPronouns($PLAYER_NAME);
         
         // Get contexts and convert to first person
-        $physDesc = convertToFirstPerson(callContextBuilder('physical_description', ['player_name' => $PLAYER_NAME]), $PLAYER_NAME, $playerPronouns);
-        $arousalStatus = convertToFirstPerson(callContextBuilder('arousal', ['player_name' => $PLAYER_NAME]), $PLAYER_NAME, $playerPronouns);
-        $survivalStatus = convertToFirstPerson(callContextBuilder('survival', ['player_name' => $PLAYER_NAME]), $PLAYER_NAME, $playerPronouns);
+        $params = ['herika_name' => "The Narrator", 'player_name' => $PLAYER_NAME];
+        $physDesc = convertToFirstPerson(callContextBuilder('physical_description', $params), $PLAYER_NAME, $playerPronouns);
+        $arousalStatus = convertToFirstPerson(callContextBuilder('arousal', $params), $PLAYER_NAME, $playerPronouns);
+        $survivalStatus = convertToFirstPerson(callContextBuilder('survival', $params), $PLAYER_NAME, $playerPronouns);
         $clothingStatus = convertToFirstPerson(GetUnifiedEquipmentContext($PLAYER_NAME, true), $PLAYER_NAME, $playerPronouns);
         
-        $fertilityStatus = convertToFirstPerson(callContextBuilder('fertility', ['player_name' => $PLAYER_NAME]), $PLAYER_NAME, $playerPronouns);
-        $mindState = convertToFirstPerson(callContextBuilder('mind_influence', ['player_name' => $PLAYER_NAME]), $PLAYER_NAME, $playerPronouns);
-        $tattooStatus = convertToFirstPerson(callContextBuilder('tattoos', ['player_name' => $PLAYER_NAME]), $PLAYER_NAME, $playerPronouns);
+        $fertilityStatus = convertToFirstPerson(callContextBuilder('fertility', $params), $PLAYER_NAME, $playerPronouns);
+        $mindState = convertToFirstPerson(callContextBuilder('mind_influence', $params), $PLAYER_NAME, $playerPronouns);
+        $tattooStatus = convertToFirstPerson(callContextBuilder('tattoos', $params), $PLAYER_NAME, $playerPronouns);
         // Add crime context
-        $bountyStatus = convertToFirstPerson(callContextBuilder('bounty', ['player_name' => $PLAYER_NAME]), $PLAYER_NAME, $playerPronouns);
+        $bountyStatus = convertToFirstPerson(callContextBuilder('bounty', $params), $PLAYER_NAME, $playerPronouns);
         
         // Replace variables in system prompt and request
         $variableReplacements = [

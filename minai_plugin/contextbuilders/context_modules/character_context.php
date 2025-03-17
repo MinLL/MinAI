@@ -164,9 +164,7 @@ function InitializeCharacterContextBuilders() {
  */
 function BuildPhysicalDescriptionContext($params) {
     // Determine which character we're building context for
-    $character = isset($params['is_target']) && $params['is_target'] 
-                ? $params['target'] 
-                : $params['herika_name'];
+    $character = $params['herika_name'];
     
     $gender = GetActorValue($character, "gender");
     $race = GetActorValue($character, "race");
@@ -253,9 +251,8 @@ function GetPenisSize($name) {
  */
 function BuildEquipmentContext($params) {
     // Determine which character we're building context for
-    $character = isset($params['is_target']) && $params['is_target'] 
-                ? $params['target'] 
-                : $params['herika_name'];
+    $herika_name = $params['herika_name'];
+    $character = $herika_name;
     
     // This function calls the existing GetUnifiedEquipmentContext function
     return GetUnifiedEquipmentContext($character);
@@ -331,14 +328,25 @@ function BuildFollowingContext($params) {
  */
 function BuildSurvivalContext($params) {
     // Determine which character we're building context for
-    $character = isset($params['is_target']) && $params['is_target'] 
-                ? $params['target'] 
-                : $params['herika_name'];
-    
-    $hunger = GetActorValue($character, "hunger");
-    $thirst = GetActorValue($character, "thirst");
-    $fatigue = GetActorValue($character, "fatigue");
-    $cold = GetActorValue($character, "cold");
+    $herika_name = $params['herika_name'];
+    $character = $herika_name;
+    $player_name = $params['player_name'];
+    if ($character == "The Narrator") {
+        $character = $player_name;
+    }
+    if (IsModEnabled("Sunhelm")) {
+        // Stages for sunhelm are 0-4, where 4 is starving/dying of thirst/etc
+        $hunger = intval(GetActorValue($character, "hunger")) * 20; // Convert 0-5 scale to 0-100
+        $thirst = intval(GetActorValue($character, "thirst")) * 20; // Convert 0-5 scale to 0-100 
+        $fatigue = intval(GetActorValue($character, "fatigue")) * 20; // Convert 0-5 scale to 0-100
+        $cold = intval(GetActorValue($character, "cold")) * 20; // Convert 0-5 scale to 0-100
+    }
+    else {
+        $hunger = GetActorValue($character, "hunger");
+        $thirst = GetActorValue($character, "thirst");
+        $fatigue = GetActorValue($character, "fatigue");
+        $cold = GetActorValue($character, "cold");
+    }
     
     $ret = "";
     

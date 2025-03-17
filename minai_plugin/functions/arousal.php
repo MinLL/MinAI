@@ -9,8 +9,8 @@ $GLOBALS["F_NAMES"]["ExtCmdIncreaseArousal"]="IncreaseArousal";
 $GLOBALS["F_NAMES"]["ExtCmdDecreaseArousal"]="DecreaseArousal";
 
 
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdIncreaseArousal"]="You must use this if you are getting more aroused, but you should prioritize other relevant ACTIONs first.";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdDecreaseArousal"]="You must use this if you are getting less aroused, but you should prioritize other relevant ACTIONs first.";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdIncreaseArousal"]="You must use this if you are getting more aroused, but you must prioritize other relevant ACTIONs first if they would more directly advance the scene.";
+$GLOBALS["F_TRANSLATIONS"]["ExtCmdDecreaseArousal"]="You must use this if you are getting less aroused, but you must prioritize other relevant ACTIONs first if they would more directly advance the scene.";
 
 
 

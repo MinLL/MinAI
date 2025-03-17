@@ -31,14 +31,15 @@ try {
     $playerPronouns = GetActorPronouns($playerName);
 
     // Get contexts and convert to first person
-    $physDesc = convertToFirstPerson(callContextBuilder('physical_description', ['player_name' => $playerName]), $playerName, $playerPronouns);
-    $arousalStatus = convertToFirstPerson(callContextBuilder('arousal', ['player_name' => $playerName]), $playerName, $playerPronouns);
-    $survivalStatus = convertToFirstPerson(callContextBuilder('survival', ['player_name' => $playerName]), $playerName, $playerPronouns);
+    $params = ['player_name' => $playerName, 'herika_name' => 'The Narrator'];
+    $physDesc = convertToFirstPerson(callContextBuilder('physical_description', $params), $playerName, $playerPronouns);
+    $arousalStatus = convertToFirstPerson(callContextBuilder('arousal', $params), $playerName, $playerPronouns);
+    $survivalStatus = convertToFirstPerson(callContextBuilder('survival', $params), $playerName, $playerPronouns);
     $clothingStatus = convertToFirstPerson(GetUnifiedEquipmentContext($playerName), $playerName, $playerPronouns);
-    $fertilityStatus = convertToFirstPerson(callContextBuilder('fertility', ['player_name' => $playerName]), $playerName, $playerPronouns);
-    $tattooStatus = convertToFirstPerson(callContextBuilder('tattoos', ['player_name' => $playerName]), $playerName, $playerPronouns);
+    $fertilityStatus = convertToFirstPerson(callContextBuilder('fertility', $params), $playerName, $playerPronouns);
+    $tattooStatus = convertToFirstPerson(callContextBuilder('tattoos', $params), $playerName, $playerPronouns);
     // Add bounty context
-    $bountyStatus = convertToFirstPerson(callContextBuilder('bounty', ['player_name' => $playerName]), $playerName, $playerPronouns);
+    $bountyStatus = convertToFirstPerson(callContextBuilder('bounty', $params), $playerName, $playerPronouns);
 
     // Get nearby actors and locations
     $nearbyActors = array_filter(array_map('trim', explode('|', DataBeingsInRange())));
@@ -49,7 +50,7 @@ try {
     $contextDataHistoric = DataLastDataExpandedFor("", $contextMessages * -1);
     $contextDataWorld = DataLastInfoFor("", -2);
     $contextDataFull = array_merge($contextDataWorld, $contextDataHistoric);
-    $mindState = GetMindInfluenceContext(GetMindInfluenceState($GLOBALS["PLAYER_NAME"]));
+    $mindState = convertToFirstPerson(callContextBuilder('mind_influence', $params), $playerName, $playerPronouns);
     
     // Build the variable replacements as they would appear in the prompt
     $variableReplacements = [

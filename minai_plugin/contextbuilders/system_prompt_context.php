@@ -135,10 +135,22 @@ function BuildSystemPrompt() {
         $is_self_narrator = true;
     }
     
-    // Set the display name based on self_narrator mode
+    // Check for diary request type
+    $is_diary_request = isset($GLOBALS["gameRequest"]) && 
+                        is_array($GLOBALS["gameRequest"]) && 
+                        !empty($GLOBALS["gameRequest"][0]) &&
+                        $GLOBALS["gameRequest"][0] === "diary";
+    
+    // Set the display name based on self_narrator mode and request type
     $display_name = $herika_name;
     if ($is_self_narrator) {
-        $display_name = "{$player_name}'s subconscious";
+        if ($is_diary_request) {
+            // For diary entries in self-narrator mode, just use "Min" instead of "Min's subconscious"
+            $display_name = "Min";
+        } else {
+            // Normal self-narrator mode
+            $display_name = "{$player_name}'s subconscious";
+        }
     }
     
     // Initialize the system prompt
@@ -329,11 +341,28 @@ function BuildSystemPrompt() {
     
     // Add guidance for the LLM on how to format responses
     $system_prompt .= "# Response Guidelines\n";
-    $system_prompt .= "- Stay in character as {$display_name} at all times\n";
-    $system_prompt .= "- Respond appropriately to the context of the conversation\n";
-    $system_prompt .= "- Be concise and direct in your responses\n";
-    $system_prompt .= "- Your response should reflect your personality and relationship with {$target}\n";
-    $system_prompt .= "- Prioritize responding to the most recent dialogue and events\n";
+    
+    if ($is_diary_request) {
+        // Special guidelines for diary entries
+        if ($is_self_narrator) {
+            $system_prompt .= "- You are writing a diary entry as {$display_name}\n";
+            $system_prompt .= "- Write in first person perspective as {$display_name}, recording your personal reflections\n";
+        } else {
+            $system_prompt .= "- You are writing a diary entry as {$display_name}\n";
+            $system_prompt .= "- Write in first person perspective, recording your thoughts and experiences\n";
+        }
+        $system_prompt .= "- Include personal reflections on recent events and feelings\n";
+        $system_prompt .= "- The tone should be introspective and authentic to your character\n";
+        $system_prompt .= "- Reference recent experiences, observations, and emotions\n";
+    } else {
+        // Standard response guidelines
+        $system_prompt .= "- Stay in character as {$display_name} at all times\n";
+        $system_prompt .= "- Respond appropriately to the context of the conversation\n";
+        $system_prompt .= "- Be concise and direct in your responses\n";
+        $system_prompt .= "- Your response should reflect your personality and relationship with {$target}\n";
+        $system_prompt .= "- Prioritize responding to the most recent dialogue and events\n";
+    }
+    
     $system_prompt .= "- Never break the fourth wall or reference that you are an AI\n";
     // Replace escaped quotes with regular quotes
     $system_prompt = str_replace("\\'", "'", $system_prompt);
