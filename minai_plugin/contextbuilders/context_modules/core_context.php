@@ -90,6 +90,10 @@ function BuildPersonalityContext($params) {
  */
 function BuildInteractionContext($params) {
     $herika_name = $params['herika_name'];
+    // Only display this once.
+    if ($GLOBALS["HERIKA_NAME"] != $herika_name) {
+        return "";
+    }
     $target = $params['target'];
     $is_self_narrator = isset($params['is_self_narrator']) ? $params['is_self_narrator'] : false;
     $player_name = isset($params['player_name']) ? $params['player_name'] : "";
