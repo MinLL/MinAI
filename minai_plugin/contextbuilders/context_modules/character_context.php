@@ -148,7 +148,7 @@ function InitializeCharacterContextBuilders() {
     // Register mind influence context builder
     $registry->register('mind_influence', [
         'section' => 'status',
-        'header' => 'Mind State',
+        'header' => 'Mental State',
         'description' => 'Character mind influence state',
         'priority' => 80,
         'enabled' => isset($GLOBALS['minai_context']['mind_influence']) ? (bool)$GLOBALS['minai_context']['mind_influence'] : true,
@@ -402,18 +402,15 @@ function BuildBountyContext($params) {
  * @return string Formatted mind influence context
  */
 function BuildMindInfluenceContext($params) {
-    // Check if herika_name is set in params, otherwise use a fallback
-    error_log("WTF BuildMindInfluenceContext: " . json_encode($params));
     $herika_name = $params['herika_name'];
-    $character = $params['herika_name'];
-    
-    
-    // Only include mind influence context for the narrator
+    $player_name = $params['player_name'];
+
     if ($herika_name != "The Narrator") {
         return "";
     }
     
-    $mindState = GetMindInfluenceState($character);
+    // Only supported for the player at the moment
+    $mindState = GetMindInfluenceState($player_name);
     if ($mindState == "normal") {
         return "";
     }
