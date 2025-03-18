@@ -22,6 +22,8 @@ require_once(__DIR__ . "/context_modules/nsfw_context.php");
 class ContextBuilderRegistry {
     private static $instance = null;
     private $builders = [];
+    private $decorators = [];
+    private $visitedDecorators = [];
     
     /**
      * Get the singleton instance
@@ -63,6 +65,116 @@ class ContextBuilderRegistry {
         if (isset($GLOBALS[$config_var])) {
             $this->builders[$id]['enabled'] = (bool)$GLOBALS[$config_var];
         }
+    }
+    
+    /**
+     * Register a decorator function for expanding hashtag objects
+     * 
+     * @param string $tag Hashtag to register (without # symbols)
+     * @param callable $callback Function to call to expand the tag
+     */
+    public function registerDecorator($tag, $callback) {
+        if (is_callable($callback)) {
+            $this->decorators[$tag] = $callback;
+        } else {
+            minai_log("warning", "Attempted to register non-callable decorator for '{$tag}'");
+        }
+    }
+    
+    /**
+     * Get all registered decorators
+     * 
+     * @return array Array of registered decorators
+     */
+    public function getDecorators() {
+        return $this->decorators;
+    }
+    
+    /**
+     * Get a specific decorator by tag
+     * 
+     * @param string $tag The tag to get decorator for
+     * @return callable|null The decorator callback or null if not found
+     */
+    public function getDecorator($tag) {
+        return isset($this->decorators[$tag]) ? $this->decorators[$tag] : null;
+    }
+    
+    /**
+     * Expand a hashtag in text with its decorated value
+     * 
+     * @param string $tag Tag to expand (without # symbols)
+     * @param array $params Parameters to pass to decorator
+     * @param int $maxDepth Maximum recursion depth to prevent infinite loops
+     * @return string The expanded value or original hashtag if not found
+     */
+    public function expandDecorator($tag, $params = [], $maxDepth = 10) {
+        // Prevent infinite recursion
+        if (in_array($tag, $this->visitedDecorators) || $maxDepth <= 0) {
+            minai_log("warning", "Possible recursive decoration detected for tag '{$tag}' or max depth reached");
+            return "#{$tag}#";
+        }
+        
+        $decorator = $this->getDecorator($tag);
+        if ($decorator) {
+            // Mark this tag as visited for recursion detection
+            $this->visitedDecorators[] = $tag;
+            
+            try {
+                $result = call_user_func($decorator, $params);
+                
+                // Further expand any hashtags in the result
+                $result = $this->expandAllDecorators($result, $params, $maxDepth - 1);
+                
+                // Remove this tag from visited list when done
+                array_pop($this->visitedDecorators);
+                
+                return $result;
+            } catch (Exception $e) {
+                minai_log("error", "Error expanding decorator '{$tag}': " . $e->getMessage());
+                
+                // Remove this tag from visited list on error
+                array_pop($this->visitedDecorators);
+                
+                return "#{$tag}#";
+            }
+        }
+        
+        return "#{$tag}#";
+    }
+    
+    /**
+     * Expand all hashtags in a text string
+     * 
+     * @param string $text Text to expand hashtags in
+     * @param array $params Parameters to pass to decorators
+     * @param int $maxDepth Maximum recursion depth to prevent infinite loops
+     * @return string Text with all hashtags expanded
+     */
+    public function expandAllDecorators($text, $params = [], $maxDepth = 10) {
+        if (empty($text) || $maxDepth <= 0) {
+            return $text;
+        }
+        
+        // Reset visited decorators if this is the top-level call
+        if (empty($this->visitedDecorators)) {
+            $this->visitedDecorators = [];
+        }
+        
+        // Find all hashtags in the text
+        preg_match_all('/#([a-zA-Z0-9_]+)#/', $text, $matches);
+        
+        if (empty($matches[1])) {
+            return $text;
+        }
+        
+        // Expand each hashtag
+        foreach ($matches[1] as $tag) {
+            $expanded = $this->expandDecorator($tag, $params, $maxDepth);
+            $text = str_replace("#{$tag}#", $expanded, $text);
+        }
+        
+        return $text;
     }
     
     /**
@@ -110,6 +222,124 @@ class ContextBuilderRegistry {
      */
     public function getBuilder($id) {
         return isset($this->builders[$id]) ? $this->builders[$id] : null;
+    }
+    
+    /**
+     * Format context content according to formatting rules
+     * 
+     * @param string $context The context string to format
+     * @return string Formatted context
+     */
+    public function formatContext($context) {
+        if (empty($context)) {
+            return '';
+        }
+        
+        // Check if it's already a list (starts with - or *) and format appropriately
+        if (preg_match('/^[\s]*[-*]/', $context)) {
+            // It's already a list, keep it as is
+            return $context;
+        }
+        
+        // Check if it has multiple lines that should be a list
+        if (strpos($context, "\n") !== false) {
+            $lines = explode("\n", $context);
+            $formatted = '';
+            
+            foreach ($lines as $line) {
+                $line = trim($line);
+                if (!empty($line)) {
+                    // Convert each line to a list item if it's not already
+                    if (!preg_match('/^[\s]*[-*]/', $line)) {
+                        $formatted .= "- " . $line . "\n";
+                    } else {
+                        $formatted .= $line . "\n";
+                    }
+                }
+            }
+            
+            return $formatted;
+        }
+        
+        // Single line text, make it a single list item
+        return "- " . $context;
+    }
+    
+    /**
+     * Get all hashtags used in the system prompt
+     * 
+     * @return array List of all unique hashtags used
+     */
+    public function getAllHashtags() {
+        $hashtags = [];
+        
+        // Build a sample prompt to identify hashtags
+        $prompt = $this->buildSamplePrompt();
+        
+        // Extract all hashtags
+        preg_match_all('/#([a-zA-Z0-9_]+)#/', $prompt, $matches);
+        
+        if (!empty($matches[1])) {
+            $hashtags = array_unique($matches[1]);
+        }
+        
+        return $hashtags;
+    }
+    
+    /**
+     * Get a mapping of hashtags to their resolved values
+     * 
+     * @param array $params Parameters to pass to decorators
+     * @return array Associative array of hashtags and their resolved values
+     */
+    public function getHashtagMap($params = []) {
+        $hashtags = $this->getAllHashtags();
+        $map = [];
+        
+        foreach ($hashtags as $tag) {
+            // Reset visited decorators for each expansion
+            $this->visitedDecorators = [];
+            
+            try {
+                $map[$tag] = $this->expandDecorator($tag, $params);
+            } catch (Exception $e) {
+                $map[$tag] = "Error: " . $e->getMessage();
+            }
+        }
+        
+        return $map;
+    }
+    
+    /**
+     * Builds a sample system prompt to extract hashtags
+     * This is a lightweight version of BuildSystemPrompt without formatting
+     * 
+     * @return string Sample system prompt content
+     */
+    private function buildSamplePrompt() {
+        $sample = "";
+        $params = [
+            'herika_name' => isset($GLOBALS["HERIKA_NAME"]) ? $GLOBALS["HERIKA_NAME"] : "Character",
+            'player_name' => isset($GLOBALS["PLAYER_NAME"]) ? $GLOBALS["PLAYER_NAME"] : "Player",
+            'target' => isset($GLOBALS["target"]) ? $GLOBALS["target"] : "Player",
+            'is_self_narrator' => false
+        ];
+        
+        // Call each builder to get content
+        foreach ($this->builders as $id => $builder) {
+            if ($builder['enabled'] && is_callable($builder['builder_callback'])) {
+                try {
+                    $content = call_user_func($builder['builder_callback'], $params);
+                    if (!empty($content)) {
+                        $sample .= $content . "\n";
+                    }
+                } catch (Exception $e) {
+                    // Skip on error
+                }
+            }
+        }
+        
+        return $sample;
     }
 }
 
@@ -243,6 +473,9 @@ function BuildSystemPrompt() {
                         continue;
                     }
                     
+                    // Format the context according to formatting rules
+                    $context = $registry->formatContext($context);
+                    
                     // Add the sub-header if provided
                     if (!empty($builder['header'])) {
                         $section_content .= "### " . $builder['header'] . "\n";
@@ -294,6 +527,9 @@ function BuildSystemPrompt() {
                 if (empty($context)) {
                     continue;
                 }
+                
+                // Format the context according to formatting rules
+                $context = $registry->formatContext($context);
                 
                 // Add the sub-header if provided
                 if (!empty($builder['header'])) {
@@ -359,8 +595,12 @@ function BuildSystemPrompt() {
     else {
         // Use defaults
         // no change required
-    }  
-    // Expand things like #player_name# to the actual player name across the system prompt
+    }
+    
+    // Expand decorators for all hashtags in the system prompt
+    $system_prompt = $registry->expandAllDecorators($system_prompt, $params);
+    
+    // Then expand any remaining variables (for backward compatibility)
     $system_prompt = ExpandPromptVariables($system_prompt);
     
     // Replace escaped quotes with regular quotes
@@ -422,6 +662,74 @@ function callContextBuilder($builderId, $params = []) {
         }
     }
     return '';
+}
+
+/**
+ * Helper function to register a decorator
+ * 
+ * @param string $tag Hashtag to register (without # symbols)
+ * @param callable $callback Function to call to expand the tag
+ */
+function registerDecorator($tag, $callback) {
+    $registry = ContextBuilderRegistry::getInstance();
+    $registry->registerDecorator($tag, $callback);
+}
+
+/**
+ * Helper function to get all hashtags used in the system prompt
+ * 
+ * @return array List of all unique hashtags used
+ */
+function getAllHashtags() {
+    $registry = ContextBuilderRegistry::getInstance();
+    return $registry->getAllHashtags();
+}
+
+/**
+ * Helper function to get a mapping of hashtags to their resolved values
+ * 
+ * @param array $params Optional parameters to pass to decorators
+ * @return array Associative array of hashtags and their resolved values
+ */
+function getHashtagMap($params = []) {
+    $registry = ContextBuilderRegistry::getInstance();
+    
+    // Set default values for missing parameters
+    if (!isset($params['herika_name']) || !isset($params['target']) || !isset($params['player_name'])) {
+        $defaultName = isset($GLOBALS["PLAYER_NAME"]) ? $GLOBALS["PLAYER_NAME"] : "Player";
+        $params = array_merge([
+            'herika_name' => isset($GLOBALS["HERIKA_NAME"]) ? $GLOBALS["HERIKA_NAME"] : "Character",
+            'target' => isset($GLOBALS["target"]) ? $GLOBALS["target"] : $defaultName,
+            'player_name' => $defaultName
+        ], $params);
+    }
+    
+    return $registry->getHashtagMap($params);
+}
+
+/**
+ * Helper function to expand a specific hashtag
+ * 
+ * @param string $tag Tag to expand (without # symbols)
+ * @param array $params Optional parameters to pass to the decorator
+ * @return string The expanded value
+ */
+function expandDecorator($tag, $params = []) {
+    $registry = ContextBuilderRegistry::getInstance();
+    
+    // Set default values for missing parameters
+    if (!isset($params['herika_name']) || !isset($params['target']) || !isset($params['player_name'])) {
+        $defaultName = isset($GLOBALS["PLAYER_NAME"]) ? $GLOBALS["PLAYER_NAME"] : "Player";
+        $params = array_merge([
+            'herika_name' => isset($GLOBALS["HERIKA_NAME"]) ? $GLOBALS["HERIKA_NAME"] : "Character",
+            'target' => isset($GLOBALS["target"]) ? $GLOBALS["target"] : $defaultName,
+            'player_name' => $defaultName
+        ], $params);
+    }
+    
+    // No need to reset visited decorators - the expandDecorator method handles this
+    
+    return $registry->expandDecorator($tag, $params);
 }
 
 // Initialize the registry with core builders
