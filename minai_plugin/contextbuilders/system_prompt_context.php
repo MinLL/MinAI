@@ -349,7 +349,7 @@ function BuildSystemPrompt() {
     if ($GLOBALS['minai_context']['action_enforcement']) {
         $GLOBALS["COMMAND_PROMPT"] = ""; # Kill don't narrate
         $GLOBALS["COMMAND_PROMPT_FUNCTIONS"]=""; # Handled by the system prompt
-        if ($GLOBALS["FUNCTIONS_ARE_ENABLED"]) {
+        if (isset($GLOBALS["FUNCTIONS_ARE_ENABLED"]) && $GLOBALS["FUNCTIONS_ARE_ENABLED"]) {
             $system_prompt .= "\n# AVAILABLE ACTIONS\n";
             $system_prompt .= " - This section defines actions that {$display_name} can perform to interact with the world.\n";
             $system_prompt .= " - Use these actions when they align with your character's intentions and the current situation.\n";
