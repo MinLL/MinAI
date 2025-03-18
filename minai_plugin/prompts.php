@@ -191,16 +191,19 @@ function GetCleanedMessage() {
 
 $cleanedMessage = GetCleanedMessage();
 $GLOBALS["PROMPTS"]["chatnf_minai_narrate"] = [
+    "cue"=>[
+        "Respond to the most recent dialogue or events"
+    ],
     "player_request"=>[
         "The Narrator: {$cleanedMessage}"
     ]
 ];
 
 $GLOBALS["PROMPTS"]["minai_narrate"] = [
-    "cue"=>[
+    "cue"=>[],
+    "player_request"=>[
         "The Narrator: {$cleanedMessage}"
-    ],
-    "player_request"=>[    ]
+    ]
 ];
 
 require_once("prompts/tntr_prompts.php");

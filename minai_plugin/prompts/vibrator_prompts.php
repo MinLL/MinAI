@@ -621,11 +621,11 @@ function get_vibrate_stop_prompt() {
 
 // Store the actual prompt strings in the PROMPTS global array
 $GLOBALS["PROMPTS"]["minai_vibrate_start"] = [
-    "cue"=>[get_vibrate_start_prompt()],
-    "player_request"=>[]
+    "cue"=>[],
+    "player_request"=>[get_vibrate_start_prompt()]
 ];
 
 $GLOBALS["PROMPTS"]["minai_vibrate_stop"] = [
-    "cue"=>[get_vibrate_stop_prompt()],
-    "player_request"=>[]
+    "cue"=>[],
+    "player_request"=>[get_vibrate_stop_prompt()]
 ];
