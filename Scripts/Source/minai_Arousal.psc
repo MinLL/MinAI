@@ -2,6 +2,7 @@ scriptname minai_Arousal extends Quest
 
 BaboDialogueConfigMenu baboConfigs
 slaUtilScr Aroused
+SexLabFramework slf
 
 Keyword Property ActorTypeNPC Auto
 
@@ -46,6 +47,7 @@ bool bHasAroused = False
 bool bHasArousedKeywords = False
 bool bHasBabo = False
 bool bHasTNG = False
+bool bHasSexlab = False
 int cuirassSlot = 0x00000004
 int helmetSlot = 0x00000001
 int glovesSlot = 0x00000008
@@ -63,6 +65,18 @@ function Maintenance(minai_MainQuestController _main)
   aiff = (Self as Quest) as minai_AIFF
   
   Main.Info("Initializing Arousal Module.")
+  
+  ; Check if SexLab is installed
+  if Game.GetModByName("SexLab.esm") != 255
+    Main.Info("Found SexLab")
+    bHasSexlab = True
+    slf = Game.GetFormFromFile(0xD62, "SexLab.esm") as SexLabFramework
+    if !slf
+      bHasSexlab = False
+      Main.Error("Could not fetch SexLabFramework object")
+    EndIf
+  EndIf
+  
   if Game.GetModByName("SexlabAroused.esm") != 255
     Main.Info("Found Sexlab Aroused")
     bHasAroused = True
@@ -555,11 +569,29 @@ Function SetContext(actor akTarget)
     aiff.SetActorVariable(akTarget, "breastsScore", baboConfigs.BreastsValue.GetValueInt())
     aiff.SetActorVariable(akTarget, "buttScore", baboConfigs.ButtocksValue.GetValueInt())
   EndIf
+  
   string gender = "male"
-  if akTarget.GetActorBase().GetSex() != 0
-    gender = "female"
+  int genderValue = 0
+  
+  if bHasSexlab && slf
+    ; Use SexLab gender if available (0 = male, 1 = female, 2 = other)
+    genderValue = slf.GetGender(akTarget)
+    if genderValue == 0
+      gender = "male"
+    elseif genderValue == 1
+      gender = "female"
+    else
+      gender = "futa"
+    EndIf
+  else
+    ; Fallback to vanilla gender
+    if akTarget.GetActorBase().GetSex() != 0
+      gender = "female"
+    EndIf
   EndIf
+  
   aiff.SetActorVariable(akTarget, "gender", gender)
+  
   if bHasTNG && akTarget.HasKeyword(ActorTypeNPC) && (gender == "male" || akTarget.HasKeyword(TNG_Gentlewoman))
     aiff.SetActorVariable(akTarget, "tngsize", TNG_PapyrusUtil.GetActorSize(akTarget))
   EndIf
