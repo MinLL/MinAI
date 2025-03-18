@@ -633,8 +633,6 @@ function BuildSystemPrompt() {
             $system_prompt .= "- Your response should reflect your personality and relationship with {$target}\n";
             $system_prompt .= "- Prioritize responding to the most recent dialogue and events\n";
         }
-        
-        $system_prompt .= "- Never break the fourth wall or reference that you are an AI\n";
     }
     if (!isset($GLOBALS['minai_context']['action_enforcement'])) {
         $GLOBALS['minai_context']['action_enforcement'] = true;
