@@ -71,7 +71,7 @@ function GetExposureContext($localActors) {
         // Create filtered list without player and Herika
         $filteredNaked = array_filter($isnaked, function($name) {
             // These are handled by the main equipment routines
-            return $name !== $GLOBALS["HERIKA_TARGET"] && $name !== $GLOBALS["HERIKA_NAME"] && $name !== $GLOBALS["PLAYER_NAME"];
+            return (isset($GLOBALS["target"]) && $name !== $GLOBALS["target"]) && $name !== $GLOBALS["HERIKA_NAME"] && $name !== $GLOBALS["PLAYER_NAME"];
         });
         if(!empty($filteredNaked)) {
             $verbiage .= expose::rollUpAList($filteredNaked) . "naked and exposed.\n";
