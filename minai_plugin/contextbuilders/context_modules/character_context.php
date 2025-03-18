@@ -290,7 +290,7 @@ function GetPenisSize($name) {
     // Get the size stage (0-4 scale)
     $sizeStage = 2; // Default to average
     if (!HasKeyword($name, "TNG_Gentlewoman") && $gender == "female") {
-        $sizeStage = null;
+        $sizeStage = -1;
     }
     elseif (HasKeyword($name, "TNG_XL") || ($tngsize == 4)) {
         $sizeStage = 4;
