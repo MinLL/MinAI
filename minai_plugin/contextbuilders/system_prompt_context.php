@@ -245,7 +245,6 @@ function BuildSystemPrompt() {
                     
                     // Add the sub-header if provided
                     if (!empty($builder['header'])) {
-                        $builder['header'] = str_replace("#player_name#", $player_name, $builder['header']);
                         $section_content .= "### " . $builder['header'] . "\n";
                     }
                     
@@ -316,32 +315,56 @@ function BuildSystemPrompt() {
     }
     
     // Add guidance for the LLM on how to format responses
-    $system_prompt .= "# Response Guidelines\n";
-    
-    if ($is_diary_request) {
-        // Special guidelines for diary entries
-        if ($is_self_narrator) {
-            $system_prompt .= "- You are writing a diary entry as {$display_name}\n";
-            $system_prompt .= "- Write in first person perspective as {$display_name}, recording your personal reflections\n";
-        } else {
-            $system_prompt .= "- You are writing a diary entry as {$display_name}\n";
-            $system_prompt .= "- Write in first person perspective, recording your thoughts and experiences\n";
-        }
-        $system_prompt .= "- Include personal reflections on recent events and feelings\n";
-        $system_prompt .= "- The tone should be introspective and authentic to your character\n";
-        $system_prompt .= "- Reference recent experiences, observations, and emotions\n";
-    } else {
-        // Standard response guidelines
-        $system_prompt .= "- Stay in character as {$display_name} at all times\n";
-        $system_prompt .= "- Respond appropriately to the context of the conversation\n";
-        $system_prompt .= "- Be concise and direct in your responses\n";
-        $system_prompt .= "- Your response should reflect your personality and relationship with {$target}\n";
-        $system_prompt .= "- Prioritize responding to the most recent dialogue and events\n";
+    if (!isset($GLOBALS['minai_context']['response_guidelines'])) {
+        $GLOBALS['minai_context']['response_guidelines'] = true;
     }
-    
-    $system_prompt .= "- Never break the fourth wall or reference that you are an AI\n";
+    if ($GLOBALS['minai_context']['response_guidelines']) {
+    $system_prompt .= "# Response Guidelines\n";        
+        if ($is_diary_request) {
+            // Special guidelines for diary entries
+            if ($is_self_narrator) {
+                $system_prompt .= "- You are writing a diary entry as {$display_name}\n";
+                $system_prompt .= "- Write in first person perspective as {$display_name}, recording your personal reflections\n";
+            } else {
+                $system_prompt .= "- You are writing a diary entry as {$display_name}\n";
+                $system_prompt .= "- Write in first person perspective, recording your thoughts and experiences\n";
+            }
+            $system_prompt .= "- Include personal reflections on recent events and feelings\n";
+            $system_prompt .= "- The tone should be introspective and authentic to your character\n";
+            $system_prompt .= "- Reference recent experiences, observations, and emotions\n";
+        } else {
+            // Standard response guidelines
+            $system_prompt .= "- Stay in character as {$display_name} at all times\n";
+            $system_prompt .= "- Respond appropriately to the context of the conversation\n";
+            $system_prompt .= "- Be concise and direct in your responses\n";
+            $system_prompt .= "- Your response should reflect your personality and relationship with {$target}\n";
+            $system_prompt .= "- Prioritize responding to the most recent dialogue and events\n";
+        }
+        
+        $system_prompt .= "- Never break the fourth wall or reference that you are an AI\n";
+    }
+    if (!isset($GLOBALS['minai_context']['action_enforcement'])) {
+        $GLOBALS['minai_context']['action_enforcement'] = true;
+    }
+    if ($GLOBALS['minai_context']['action_enforcement']) {
+        $GLOBALS["COMMAND_PROMPT"] = ""; # Kill don't narrate
+        $GLOBALS["COMMAND_PROMPT_FUNCTIONS"]=""; # Handled by the system prompt
+        if ($GLOBALS["FUNCTIONS_ARE_ENABLED"]) {
+            $system_prompt .= "\n# AVAILABLE ACTIONS\n";
+            $system_prompt .= " - This section defines actions that {$display_name} can perform to interact with the world.\n";
+            $system_prompt .= " - Use these actions when they align with your character's intentions and the current situation.\n";
+            $system_prompt .= " - While Talk is an available action for dialogue, prioritize other contextually appropriate actions when possible.\n";
+        }
+    }
+    else {
+        // Use defaults
+        // no change required
+    }
     // Replace escaped quotes with regular quotes
     $system_prompt = str_replace("\\'", "'", $system_prompt);
+    
+    // Expand things like #player_name# to the actual player name across the system prompt
+    $system_prompt = ExpandPromptVariables($system_prompt);
     return array(
         'role' => 'system',
         'content' => $system_prompt

@@ -57,7 +57,9 @@ $GLOBALS['minai_context'] = array(
     // Relationship context builders
     'relationship' => true,
     'devious_follower' => true,
-    'submissive_lola' => true
+    'submissive_lola' => true,
+    'response_guidelines' => true,
+    'action_enforcement' => true
 );
 
 // Inventory system configuration
@@ -72,9 +74,9 @@ $GLOBALS['action_prompts'] = Array(
     
     "self_narrator_normal" => "Respond as #player_name#, thinking privately to #player_object#self about the current situation and recent events. Stay in first person, capturing #player_possessive# genuine thoughts, emotions, and internal conflicts. Focus on #player_possessive# personal perspective, biases, and feelings rather than an objective summary of events. Keep the response introspective and true to how #player_name# would process and react internally.",
 
-    "explicit_scene" => "Select the most contextually appropriate ACTION to respond to #target#, focusing on #herika_name#'s immediate physical and emotional reactions. Prioritize actions that directly address the most recent interactions and events. Vividly convey #herika_name#'s sensations and feelings while maintaining their personality. You MUST act according to their character traits and current emotional state, enhancing the intimate nature of the scene while maintaining realistic reactions and dialogue progression.",
+    "explicit_scene" => "Respond to #target# as #herika_name# would in this intimate situation. Choose an appropriate action that reflects #herika_name#'s desires and the scene context. Express #herika_name#'s reactions and feelings naturally, then use an action that advances the intimate nature of the scene in a meaningful way.",
     
-    "normal_scene" => "Select the most contextually appropriate ACTION to respond to #target#. Prioritize actions that directly address the most recent interactions and events. You MUST act according to their personality and profession first, respond meaningfully to what just happened, and incorporate actions that naturally progress dialogue and scene continuity.",
+    "normal_scene" => "Respond to #target# as #herika_name# would in this situation. Express your thoughts or dialogue naturally, then consider boldly using an appropriate action that aligns with your character's personality and objectives. Your response should feel authentic and progress the scene or conversation naturally.",
 
     // Diary prompts
     "player_diary" => "#player_name# regularly keeps a diary, which you are now tasked to update. Please write a several page story of #player_name#'s recent thoughts, feelings, and adventures. Respond as if you are writing this into a private diary, including completely unfiltered thoughts and feelings. WRITE AS IF YOU ARE #player_name# WRITING INTO A PRIVATE DIARY.",

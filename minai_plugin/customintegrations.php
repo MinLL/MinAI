@@ -589,25 +589,12 @@ function RegisterThirdPartyActions() {
             $targetDesc = $row["targetdescription"];
             $targetEnum = explode(",", $row["targetenum"]);
             minai_log("info", "Inserting third-party action: {$actionName} ({$actionPrompt})");
-            $GLOBALS["F_NAMES"][$cmdName]=$actionName;
-            $GLOBALS["F_TRANSLATIONS"][$cmdName]=$actionPrompt;
-            $GLOBALS["FUNCTIONS"][] = [
-                "name" => $GLOBALS["F_NAMES"][$cmdName],
-                "description" => $GLOBALS["F_TRANSLATIONS"][$cmdName],
-                "parameters" => [
-                    "type" => "object",
-                    "properties" => [
-                        "target" => [
-                            "type" => "string",
-                            "description" => $targetDesc,
-                            "enum" => $targetEnum
-                        ]
-                    ],
-                    "required" => ["target"],
-                ],
-            ];
-            $GLOBALS["FUNCRET"][$cmdName]=$GLOBALS["GenericFuncRet"];
-            RegisterAction($cmdName);
+            
+            registerMinAIAction($cmdName, $actionName)
+                ->withDescription($actionPrompt)
+                ->withParameter("target", "string", $targetDesc, $targetEnum, true)
+                ->withReturnFunction($GLOBALS["GenericFuncRet"])
+                ->register();
         }
     }
 }

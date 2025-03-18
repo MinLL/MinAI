@@ -1,5 +1,7 @@
 <?php
 
+require_once("action_builder.php");
+
 // Global cache for form ID lookups
 $GLOBALS['formIdCache'] = [];
 
@@ -238,7 +240,7 @@ function BuildInventoryListString($items, $limit = null) {
     return $result;
 }
 
-// Register the new item commands only if target is the player
+// Only register item commands if target is the player
 if (IsPlayer(GetTargetActor())) {
     // Get target and player inventories for command descriptions
     $targetName = $GLOBALS["HERIKA_NAME"];
@@ -248,66 +250,39 @@ if (IsPlayer(GetTargetActor())) {
     
     $targetItemsStr = BuildInventoryListString($targetInventory);
     $playerItemsStr = BuildInventoryListString($playerInventory);
+        
+    // Register give item action
+    registerMinAIAction("ExtCmdGiveItem", "GiveItem")
+        ->withDescription("(Must be used when giving items or gold to {$playerName}. Target MUST be specified as itemName:count) Give an item or items to {$playerName} (for gifting, payment, quest items, rewards, trading). Available items: {$targetItemsStr}.")
+        ->withParameter("parameter", "string", "The item name and optionally the count in format 'ItemName:Count'. Use this for giving gifts, payments, quest items, or rewards. Examples: 'Gold:100' (payment), 'Iron Sword' (gift), 'Health Potion:5' (supplies), 'Septim:50' (payment)", [], true)
+        ->withReturnFunction($GLOBALS["GenericFuncRet"])
+        ->register();
+        
+    // Register take item action
+    registerMinAIAction("ExtCmdTakeItem", "TakeItem")
+        ->withDescription("(Must be used when receiving items or gold from {$playerName}. Target MUST be specified as itemName:count) Take/receive an item or items from {$playerName} (Accepting or receiving payment, gifts, collecting items, quest requirements, trading). Available items: {$playerItemsStr}.")
+        ->withParameter("parameter", "string", "The item name and optionally the count in format 'ItemName:Count'. Use this for requesting payments, collecting quest items, or receiving goods. Examples: 'Gold:75' (collect payment), 'Iron Ore:10' (purchase resources), 'Health Potion' (request healing supply)", [], true)
+        ->withReturnFunction($GLOBALS["GenericFuncRet"])
+        ->register();
     
-    RegisterAction("ExtCmdGiveItem");
-    RegisterAction("ExtCmdTakeItem");
-    // Temporarily disable trade item command
-    // RegisterAction("ExtCmdTradeItem");
-
-    // Define GiveItem command
-    $GLOBALS["F_NAMES"]["ExtCmdGiveItem"] = "GiveItem";
-    $GLOBALS["F_TRANSLATIONS"]["ExtCmdGiveItem"] = "(Must be used when giving items or gold to {$GLOBALS["PLAYER_NAME"]}. Target MUST be specified as itemName:count) Give an item or items to {$GLOBALS["PLAYER_NAME"]} (for gifting, payment, quest items, rewards, trading). Available items: {$targetItemsStr}.";
-    $GLOBALS["FUNCTIONS"][] = [
-        "name" => $GLOBALS["F_NAMES"]["ExtCmdGiveItem"],
-        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdGiveItem"],
-        "parameters" => [
-            "type" => "object",
-            "properties" => [
-                "parameter" => [
-                    "type" => "string",
-                    "description" => "The item name and optionally the count in format 'ItemName:Count'. Use this for giving gifts, payments, quest items, or rewards. Examples: 'Gold:100' (payment), 'Iron Sword' (gift), 'Health Potion:5' (supplies), 'Septim:50' (payment)"
-                ]
-            ],
-            "required" => ["parameter"],
-        ],
-    ];
-    $GLOBALS["FUNCRET"]["ExtCmdGiveItem"] = $GLOBALS["GenericFuncRet"];
-
-    // Define TakeItem command
-    $GLOBALS["F_NAMES"]["ExtCmdTakeItem"] = "TakeItem";
-    $GLOBALS["F_TRANSLATIONS"]["ExtCmdTakeItem"] = "(Must be used when receiving items or gold from {$GLOBALS["PLAYER_NAME"]}. Target MUST be specified as itemName:count) Take/receive an item or items from {$GLOBALS["PLAYER_NAME"]} (Accepting or receiving payment, gifts, collecting items, quest requirements, trading). Available items: {$playerItemsStr}.";
-    $GLOBALS["FUNCTIONS"][] = [
-        "name" => $GLOBALS["F_NAMES"]["ExtCmdTakeItem"],
-        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdTakeItem"],
-        "parameters" => [
-            "type" => "object",
-            "properties" => [
-                "parameter" => [
-                    "type" => "string",
-                    "description" => "The item name and optionally the count in format 'ItemName:Count'. Use this for requesting payments, collecting quest items, or receiving goods. Examples: 'Gold:75' (collect payment), 'Iron Ore:10' (purchase resources), 'Health Potion' (request healing supply)"
-                ]
-            ],
-            "required" => ["parameter"],
-        ],
-    ];
-    $GLOBALS["FUNCRET"]["ExtCmdTakeItem"] = $GLOBALS["GenericFuncRet"];
-
-    // Define TradeItem command
-    $GLOBALS["F_NAMES"]["ExtCmdTradeItem"] = "TradeItem";
-    $GLOBALS["F_TRANSLATIONS"]["ExtCmdTradeItem"] = "Trade items with {$GLOBALS["PLAYER_NAME"]} (for bartering, exchanging goods, selling/buying, fair trades). {$targetName} has: {$targetItemsStr}. {$playerName} has: {$playerItemsStr}";
-    $GLOBALS["FUNCTIONS"][] = [
-        "name" => $GLOBALS["F_NAMES"]["ExtCmdTradeItem"],
-        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdTradeItem"],
-        "parameters" => [
-            "type" => "object",
-            "properties" => [
-                "parameter" => [
-                    "type" => "string",
-                    "description" => "The items to trade in format 'GiveItem:TakeItem' or with counts 'GiveItem:GiveCount:TakeItem:TakeCount'. Use for balanced exchanges. Examples: 'Health Potion:2:Gold:50' (sell potions), 'Iron Sword:1:Septim:100' (sell weapon), 'Leather:5:Iron Ingot:3' (material exchange)"
-                ]
-            ],
-            "required" => ["parameter"],
-        ],
-    ];
-    $GLOBALS["FUNCRET"]["ExtCmdTradeItem"] = $GLOBALS["GenericFuncRet"];
+    // Register equipment-related actions
+    /*
+    registerMinAIAction("ExtCmdEquipItem", "EquipItem")
+        ->withDescription("Command the target to equip a specific item they are carrying - useful to prepare for combat or roleplay")
+        ->withParameter("parameter", "string", "The name of the item to equip. Examples: 'Iron Sword', 'Leather Armor', 'Amulet of Mara'", [], true)
+        ->withReturnFunction($GLOBALS["GenericFuncRet"])
+        ->register();
+        
+    registerMinAIAction("ExtCmdUnequipItem", "UnequipItem")
+        ->withDescription("Command the target to unequip a specific item they are wearing - useful for changing outfits or roleplay")
+        ->withParameter("parameter", "string", "The name of the item to unequip. Examples: 'Helmet', 'Weapon', 'All Armor'", [], true)
+        ->withReturnFunction($GLOBALS["GenericFuncRet"])
+        ->register();
+        
+    registerMinAIAction("ExtCmdDropItem", "DropItem")
+        ->withDescription("Command the target to drop a specific item on the ground - useful for getting rid of items or sharing with multiple people")
+        ->withParameter("parameter", "string", "The name of the item to drop and optionally the count in format 'ItemName:Count'. Examples: 'Iron Ore:5', 'Stolen Goods', 'Useless Junk'", [], true)
+        ->withReturnFunction($GLOBALS["GenericFuncRet"])
+        ->register();
+    */
 } 

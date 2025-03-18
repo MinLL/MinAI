@@ -1,83 +1,37 @@
 <?php
 
+require_once("action_builder.php");
 
-$GLOBALS["F_NAMES"]["ExtCmdHug"]="Hug";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdHug"]="Hug the target";
+// Hug Action
+registerMinAIAction("ExtCmdHug", "Hug")
+    ->withDescription("Embrace #target_object# in a warm hug - shows affection, comfort, or friendship")
+    ->withParameter("target", "string", "Target NPC, Actor, or being", isset($GLOBALS["nearby"]) ? $GLOBALS["nearby"] : [], true)
+    ->withEnableCondition(function() {
+        return ShouldEnableHarassFunctions($GLOBALS['HERIKA_NAME']);
+    })
+    ->withReturnFunction($GLOBALS["GenericFuncRet"])
+    ->register();
 
-$GLOBALS["FUNCTIONS"][] = [
-        "name" => $GLOBALS["F_NAMES"]["ExtCmdHug"],
-        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdHug"],
-        "parameters" => [
-            "type" => "object",
-            "properties" => [
-                "target" => [
-                    "type" => "string",
-                    "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["nearby"]
+// Kiss Action
+registerMinAIAction("ExtCmdKiss", "Kiss")
+    ->withDescription("Kiss #target_object# on the lips - expresses romantic or sexual interest")
+    ->withParameter("target", "string", "Target NPC, Actor, or being", isset($GLOBALS["nearby"]) ? $GLOBALS["nearby"] : [], true)
+    ->isNSFW()
+    ->withEnableCondition(function() {
+        return ShouldEnableHarassFunctions($GLOBALS['HERIKA_NAME']);
+    })
+    ->withReturnFunction($GLOBALS["GenericFuncRet"])
+    ->register();
 
-                ]
-            ],
-            "required" => ["target"],
-        ],
-    ];
-
-
-
-
-
-$GLOBALS["FUNCRET"]["ExtCmdHug"]=$GLOBALS["GenericFuncRet"];
-
-
-
-$GLOBALS["F_NAMES"]["ExtCmdKiss"]="Kiss";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdKiss"]="Kiss the target";
-
-$GLOBALS["FUNCTIONS"][] = [
-        "name" => $GLOBALS["F_NAMES"]["ExtCmdKiss"],
-        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdKiss"],
-        "parameters" => [
-            "type" => "object",
-            "properties" => [
-                "target" => [
-                    "type" => "string",
-                    "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["nearby"]
-
-                ]
-            ],
-            "required" => ["target"],
-        ],
-    ];
-
-
-
-
-
-$GLOBALS["FUNCRET"]["ExtCmdKiss"]=$GLOBALS["GenericFuncRet"];
-
-
-
-
-$GLOBALS["F_NAMES"]["ExtCmdMolest"]="Molest";
-$GLOBALS["F_TRANSLATIONS"]["ExtCmdMolest"]="Force yourself on the target sexually";
-
-$GLOBALS["FUNCTIONS"][] = [
-        "name" => $GLOBALS["F_NAMES"]["ExtCmdMolest"],
-        "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdMolest"],
-        "parameters" => [
-            "type" => "object",
-            "properties" => [
-                "target" => [
-                    "type" => "string",
-                    "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["nearby"]
-
-                ]
-            ],
-            "required" => ["target"],
-        ],
-    ];
-
-$GLOBALS["FUNCRET"]["ExtCmdMolest"]=$GLOBALS["GenericFuncRet"];
+// Molest Action
+registerMinAIAction("ExtCmdMolest", "Molest")
+    ->withDescription("Force unwanted sexual contact on #target_object# - a criminal act of assault (use with caution)")
+    ->withParameter("target", "string", "Target NPC, Actor, or being", isset($GLOBALS["nearby"]) ? $GLOBALS["nearby"] : [], true)
+    ->isNSFW()
+    ->withEnableCondition(function() {
+        return ShouldEnableHarassFunctions($GLOBALS['HERIKA_NAME']);
+    })
+    ->withReturnFunction($GLOBALS["GenericFuncRet"])
+    ->register();
 
 // actions registered in deviousfollowers_context.php

@@ -86,25 +86,11 @@ function GetDeviousFollowerContext($name) {
         if (str_contains($rule, "daily skooma")) {
             $ret .= "{$playerName} has agreed to be take drugs that {$dfName} will provide daily. {$dfName} should provide {$playerName} with drugs if they ask. {$dfName} should also feel free, on their own initiative, to drug the player. {$dfName} wants to get {$playerName} addicted to drugs so that they can use them as an additional means of controlling {$playerName}.\n";
             // Enable drugs command
-            $GLOBALS["F_NAMES"]["ExtCmdGiveDrugs"]="GiveDrugs";
-            $GLOBALS["F_TRANSLATIONS"]["ExtCmdGiveDrugs"]="Give drugs/skooma to {$GLOBALS["PLAYER_NAME"]}";
-            $GLOBALS["FUNCTIONS"][] = [
-                "name" => $GLOBALS["F_NAMES"]["ExtCmdGiveDrugs"],
-                "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdGiveDrugs"],
-                "parameters" => [
-                    "type" => "object",
-                    "properties" => [
-                        "target" => [
-                            "type" => "string",
-                            "description" => "Target NPC, Actor, or being",
-                            "enum" => $GLOBALS["nearby"]
-                        ]
-                    ],
-                    "required" => ["target"],
-                ],
-            ];
-            $GLOBALS["FUNCRET"]["ExtCmdGiveDrugs"]=$GLOBALS["GenericFuncRet"];
-            $GLOBALS["ENABLED_FUNCTIONS"][]="ExtCmdGiveDrugs";
+            registerMinAIAction("ExtCmdGiveDrugs", "GiveDrugs")
+                ->withDescription("Provide narcotics to {$GLOBALS["PLAYER_NAME"]} - induces altered state and builds addiction")
+                ->withParameter("target", "string", "Target NPC, Actor, or being", $GLOBALS["nearby"], true)
+                ->withReturnFunction($GLOBALS["GenericFuncRet"])
+                ->register();
         }
         if (str_contains($rule, "chastity")) {
             // Special Chastity Handling
@@ -123,25 +109,11 @@ function GetDeviousFollowerContext($name) {
     }
     if ($dfDebt > $dfEnslaveDebt) {
         $ret .= "{$dfName} is very concerned about {$playerName}'s current debt level. Talking about this is the highest possible priority. {$dfName} wants to discuss a new rule, and get {$playerName} to agree to it in exchange for reducing the debt {$playerName} owes. The new rule is: {$dfNewRuleDesc} ";
-        $GLOBALS["F_NAMES"]["ExtCmdAcceptDeal"]="AcceptDeal";
-        $GLOBALS["F_TRANSLATIONS"]["ExtCmdAcceptDeal"]="Use this if {$GLOBALS["PLAYER_NAME"]} has agreed to the deal you are offering.";
-        $GLOBALS["FUNCTIONS"][] = [
-            "name" => $GLOBALS["F_NAMES"]["ExtCmdAcceptDeal"],
-            "description" => $GLOBALS["F_TRANSLATIONS"]["ExtCmdAcceptDeal"],
-            "parameters" => [
-                "type" => "object",
-                "properties" => [
-                    "target" => [
-                        "type" => "string",
-                        "description" => "Target NPC, Actor, or being",
-                        "enum" => $GLOBALS["nearby"]
-                    ]
-                ],
-                "required" => ["target"],
-            ],
-        ];
-        $GLOBALS["FUNCRET"]["ExtCmdAcceptDeal"]=$GLOBALS["GenericFuncRet"];
-        RegisterAction("ExtCmdAcceptDeal");
+        registerMinAIAction("ExtCmdAcceptDeal", "AcceptDeal")
+            ->withDescription("Confirm that {$GLOBALS["PLAYER_NAME"]} has accepted your deal - use after they clearly agree to your proposed rules")
+            ->withParameter("target", "string", "Target NPC, Actor, or being", $GLOBALS["nearby"], true)
+            ->withReturnFunction($GLOBALS["GenericFuncRet"])
+            ->register();
     }
 
 
@@ -154,11 +126,25 @@ function GetDeviousFollowerContext($name) {
 
 
 if (IsModEnabled("SLAPP") && !IsDeviousFollower($GLOBALS['HERIKA_NAME'])) {
-    RegisterAction("ExtCmdHug");
-    RegisterAction("ExtCmdKiss");
+    registerMinAIAction("ExtCmdHug", "Hug")
+        ->withDescription("Give #target_object# a friendly hug - shows affection and comfort")
+        ->withParameter("target", "string", "Target NPC, Actor, or being", isset($GLOBALS["nearby"]) ? $GLOBALS["nearby"] : [])
+        ->withReturnFunction($GLOBALS["GenericFuncRet"])
+        ->register();
+    
+    registerMinAIAction("ExtCmdKiss", "Kiss")
+        ->withDescription("Kiss #target_object# - expresses romantic affection")
+        ->withParameter("target", "string", "Target NPC, Actor, or being", isset($GLOBALS["nearby"]) ? $GLOBALS["nearby"] : [])
+        ->withReturnFunction($GLOBALS["GenericFuncRet"])
+        ->register();
 }
 if (IsModEnabled("SLHH") && !IsDeviousFollower($GLOBALS['HERIKA_NAME'])) {
-    RegisterAction("ExtCmdMolest");
+    registerMinAIAction("ExtCmdMolest", "Molest")
+        ->withDescription("Inappropriately touch #target_object# - a lewd act of dominance")
+        ->withParameter("target", "string", "Target NPC, Actor, or being", isset($GLOBALS["nearby"]) ? $GLOBALS["nearby"] : [])
+        ->isNSFW()
+        ->withReturnFunction($GLOBALS["GenericFuncRet"])
+        ->register();
 }
 
 

@@ -266,12 +266,16 @@ Function IsActionEnabled($actionName) {
 
 
 Function RegisterAction($actionName) {
-    if (IsActionEnabled($actionName)) {
+    $checkName = $actionName;
+    if (str_contains(strtolower($actionName), 'stimulatewith') || str_contains(strtolower($actionName), 'teasewith')) {
+        $checkName = 'MinaiGlobalVibrator';
+    }
+    if (IsActionEnabled($checkName)) {
         $GLOBALS["ENABLED_FUNCTIONS"][]=$actionName;
-        // minai_log("info", "Registering {$actionName}");
+        minai_log("info", "Registering {$actionName}");
     }
     else {
-        // minai_log("info", "Not Registering {$actionName}");
+        minai_log("info", "Not Registering {$actionName}");
     }
 }
 

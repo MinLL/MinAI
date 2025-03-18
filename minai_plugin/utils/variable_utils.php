@@ -72,7 +72,9 @@ function ExpandPromptVariables($prompt) {
     $variables = array(
         '#target#' => $GLOBALS["target"],
         '#player_name#' => $GLOBALS["PLAYER_NAME"],
+        '#PLAYER_NAME#' => $GLOBALS["PLAYER_NAME"],
         '#herika_name#' => $GLOBALS["HERIKA_NAME"],
+        '#HERIKA_NAME#' => $GLOBALS["HERIKA_NAME"],
         // Add target pronoun variables
         '#target_subject#' => $targetPronouns["subject"],
         '#target_object#' => $targetPronouns["object"], 

@@ -103,24 +103,10 @@ function GetSubmissiveLolaContext($name) {
 }
 
 function RegisterSubLolaAction($command, $name, $description) {
-    $GLOBALS["F_NAMES"][$command]=$name;
-    $GLOBALS["F_TRANSLATIONS"][$command]=$description;
-    $GLOBALS["FUNCTIONS"][] = [
-        "name" => $GLOBALS["F_NAMES"][$command],
-        "description" => $GLOBALS["F_TRANSLATIONS"][$command],
-        "parameters" => [
-            "type" => "object",
-            "properties" => [
-                "target" => [
-                    "type" => "string",
-                    "description" => "Target NPC, Actor, or being",
-                    "enum" => $GLOBALS["nearby"]
-                ]
-            ],
-            "required" => ["target"],
-        ],
-    ];
-    $GLOBALS["FUNCRET"][$command]=$GLOBALS["GenericFuncRet"];
-    RegisterAction($command);
+    registerMinAIAction($command, $name)
+        ->withDescription($description)
+        ->withParameter("target", "string", "Target NPC, Actor, or being", $GLOBALS["nearby"], true)
+        ->withReturnFunction($GLOBALS["GenericFuncRet"])
+        ->register();
 }
 

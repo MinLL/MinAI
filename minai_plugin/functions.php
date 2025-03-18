@@ -43,6 +43,8 @@ require_once("util.php");
 require_once("customintegrations.php");
 require_once("deviousnarrator.php");
 require_once("items.php");
+require_once("functions/action_builder.php");
+
 if ($GLOBALS["force_voice_type"]) {
     require "fix_xtts.php";
 }
