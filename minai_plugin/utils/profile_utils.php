@@ -24,7 +24,7 @@ Function SetNarratorProfile() {
         // If we haven't loaded the narrator profile yet, load it from file
         if ($narratorProfileCache === null) {
             // First time load - get the profile from file
-            global $HERIKA_NAME;
+            // global $HERIKA_NAME; // Don't let users overwrite narrator profile name
             global $PROMPT_HEAD;
             global $PLAYER_BIOS;
             global $HERIKA_PERS;
