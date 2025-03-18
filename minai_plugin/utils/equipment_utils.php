@@ -22,14 +22,14 @@ function GetEroticDeviceDescription($deviceType, $bodyArea, $category) {
         "blindfold" => "a blindfold that completely blocks vision, preventing the wearer from seeing",
         
         // Restraints - Arms and upper body
-        "arm cuffs" => "decorative metal arm cuffs worn around the wrists with rings for potential attachment of bindings",
+        "arm cuffs" => "decorative arm cuffs worn around the wrists with rings for potential attachment of bindings",
         "armbinder" => "a leather armbinder that binds both arms together behind the back from wrists to shoulders",
         "restraining yoke" => "a metal restraining yoke that locks around the neck with attachments that secure the wrists away from the body",
         "elbow tie" => "an elbow tie made of ropes or straps that bind the elbows together behind the back",
         "locking gloves" => "gloves that are locked onto the hands",
         
         // Restraints - Lower body
-        "leg cuffs" => "decorative metal leg cuffs worn around the ankles with rings for potential attachment of bindings",
+        "leg cuffs" => "decorative leg cuffs worn around the ankles with rings for potential attachment of bindings",
         "ankle shackles" => "heavy metal ankle shackles connected by a chain between the ankles, limiting the wearer's stride",
         "hobble skirt" => "a tight hobble skirt that keeps the legs close together, allowing only small steps",
         
@@ -546,7 +546,7 @@ Function GetDevicesContext($name, $vibratingOnly = false) {
         
         // Upper body restraints
         if (HasKeyword($name, "zad_DeviousArmCuffs")) {
-            $addToLayer("arm cuffs", false, false, true, 2);
+            $addToLayer("arm cuffs", false, false, false, 2);
         }
         
         if (HasKeyword($name, "zad_DeviousArmbinder")) {
@@ -567,7 +567,7 @@ Function GetDevicesContext($name, $vibratingOnly = false) {
         
         // Lower body restraints
         if (HasKeyword($name, "zad_DeviousLegCuffs")) {
-            $addToLayer("leg cuffs", false, false, true, 2);
+            $addToLayer("leg cuffs", false, false, false, 2);
         }
         
         if (HasKeyword($name, "zad_DeviousAnkleShackles")) {

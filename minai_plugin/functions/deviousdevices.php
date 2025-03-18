@@ -18,11 +18,6 @@ function canUseVibrations() {
     return $canVibrate;
 }
 
-// Set prompt templates for return message generation
-$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdShock"] = "{$GLOBALS["HERIKA_NAME"]} comments on remotely shocking {$target}. {$GLOBALS["TEMPLATE_DIALOG"]}";
-$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdForceOrgasm"] = "{$GLOBALS["HERIKA_NAME"]} comments on remotely forcing {$target} to have an orgasm. {$GLOBALS["TEMPLATE_DIALOG"]}";
-$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdTurnOffVibrator"] = "{$GLOBALS["HERIKA_NAME"]} comments on turning off {$target}'s vibrator. {$GLOBALS["TEMPLATE_DIALOG"]}";
-
 // Basic vibration control actions
 $basicVibratorActions = [
     "ExtCmdShock" => [
@@ -59,10 +54,7 @@ foreach ($vibSettings as $strength) {
     $actionName = "ExtCmdTeaseWithVibrator" . $cleanStrength;
     $displayName = "TeaseWithVibrator" . $cleanStrength;
     $description = "Tease #target_object# with $strength vibrations that build arousal without allowing climax - perfect for control";
-    
-    // Set prompt template for this tease action
-    $GLOBALS["PROMPTS"]["afterfunc"]["cue"][$actionName] = "{$GLOBALS["HERIKA_NAME"]} comments on remotely teasing {$target} with a $strength vibration. {$GLOBALS["TEMPLATE_DIALOG"]}";
-    
+        
     registerMinAIAction($actionName, $displayName)
         ->withDescription($description)
         ->withParameter("target", "string", "Target NPC, Actor, or being", isset($GLOBALS["nearby"]) ? $GLOBALS["nearby"] : [])
@@ -78,9 +70,6 @@ foreach ($vibSettings as $strength) {
     $actionName = "ExtCmdStimulateWithVibrator" . $cleanStrength;
     $displayName = "StimulateWithVibrator" . $cleanStrength;
     $description = "Stimulate #target_object# with $strength vibrations that can lead to climax - use for gratification or reward";
-    
-    // Set prompt template for this stimulate action
-    $GLOBALS["PROMPTS"]["afterfunc"]["cue"][$actionName] = "{$GLOBALS["HERIKA_NAME"]} comments on remotely stimulating {$target} with a $strength vibration. {$GLOBALS["TEMPLATE_DIALOG"]}";
     
     registerMinAIAction($actionName, $displayName)
         ->withDescription($description)

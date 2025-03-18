@@ -163,17 +163,96 @@ function GetMindInfluenceContext($state) {
         return $simpleContexts[$state];
     }
 
-    $rules ="You know this to be absolutely true: Good girls wear their collars and are filled with their master's seed. Bad girls are never satisfied and cannot cum. Very bad girls are punished with extreme arousal and can never cum";
-    $contexts = [
+    // Define the core rules that apply in all states
+    $rules = "You know this to be absolutely true: Good girls wear their collars and are filled with their master's seed. Bad girls are never satisfied and cannot cum. Very bad girls are punished with extreme arousal and can never cum.";
+    
+    // Get player's name and arousal level
+    $playerName = $GLOBALS["PLAYER_NAME"] ?? "the player";
+    $arousal = 0;
+    if (isset($GLOBALS["PLAYER_NAME"])) {
+        $arousal = GetActorValue($GLOBALS["PLAYER_NAME"], "arousal");
+    }
+    
+    // Set state-specific context first (these are the first-person perspectives)
+    $stateContexts = [
         "normal" => "",
-        "goodgirl" => "You have been hypnotized and cursed by Brillius Tiredius, who is your master. Having satisfied him by wearing your collar and being filled with his seed, your mind is currently relatively clear, though you know that this will only last so long as you follow his rules. $rules. You know with certainty that you are a good girl. You are currently filled with your master's seed and wearing your master's collar.",
-        "badgirl" => "You have been hypnotized and cursed by Brillius Tiredius, who is your master. You feel an overwhelmingly strong compulsion to be fucked and to wear your collar. $rules. You know with certainty that you are a bad girl, and feel an overwhelming need to both wear your collar and be filled with your master's seed.",
-        "verybadgirl" => "You have been hypnotized and cursed by Brillius Tiredius, who is your master. You feel a desperate overwhelming compulsion to be fucked by anyone at all and to wear your collar. $rules. You know with certainty that you are a very bad girl, and feel an overwhelming need to both wear your collar and be filled with your master's seed. You are absolutely desparate to be fucked.",
-        "punishment" => "You have been hypnotized and cursed by Brillius Tiredius, who is your master. Your mind is currently under a punishing influence that makes you feel ashamed and remorseful. You feel strong regret for your misbehavior. $rules. You know with certainty that you are a very bad girl, and feel an overwhelming need to both wear your collar and be filled with your master's seed. You are absolutely desparate to be fucked.",
-        "post" => "Your mind is experiencing lingering effects from recent mental influences. Your thoughts feel slightly fuzzy and uncertain."
+        "goodgirl" => "You have been hypnotized by Brillius Tiredius, who is your master. Your mind is currently clearer than usual, as you've satisfied him by wearing your collar and being filled with his seed. $rules You are a good girl who has followed the rules.",
+        "badgirl" => "You have been hypnotized by Brillius Tiredius, who is your master. You feel a strong compulsion to be fucked and to wear your collar. $rules You are a bad girl who needs to wear your collar and be filled with your master's seed to find relief.",
+        "verybadgirl" => "You have been hypnotized by Brillius Tiredius, who is your master. You feel a desperate overwhelming compulsion to be fucked and to wear your collar. $rules You are a very bad girl who is absolutely desperate to wear your collar and be filled with seed.",
+        "punishment" => "You have been hypnotized by Brillius Tiredius, who is your master. Your mind is under a punishing influence that makes you feel ashamed and remorseful. $rules You have broken the rules and are being punished for your disobedience.",
+        "post" => "Your mind is experiencing lingering effects from recent mental influences, leaving your thoughts slightly fuzzy and uncertain."
     ];
     
-    return $contexts[$state] ?? "";
+    // Get arousal-based obedience level (third-person narrative)
+    // This varies based on arousal for additional context but doesn't contradict the state
+    $narrativeContext = "";
+    
+    // Only add the arousal-based context if we're in a mind control state
+    if (in_array($state, ["normal", "goodgirl", "badgirl", "verybadgirl", "punishment", "post"])) {
+        if ($state == "goodgirl") {
+            // For goodgirl state, arousal affects how much freedom she has
+            if ($arousal <= 0) {
+                $narrativeContext = "$playerName maintains some independence from Brillius's influence when following his rules. While respectful of the specific rules, she retains her own will in most matters.";
+            } else if ($arousal < 50) {
+                $narrativeContext = "$playerName retains partial independence while following Brillius's rules, balancing obedience with her own autonomy.";
+            } else {
+                $narrativeContext = "$playerName feels a gentle pull to follow Brillius's wishes, though she has more mental freedom now than when disobedient.";
+            }
+        } else if ($state == "badgirl") {
+            // For badgirl state, arousal enhances the effect
+            if ($arousal <= 25) {
+                $narrativeContext = "$playerName feels a subtle desire to please Brillius, though she can still exercise her own judgment in most situations.";
+            } else if ($arousal < 75) {
+                $narrativeContext = "$playerName feels a moderate urge to obey Brillius, with her independence somewhat diminished.";
+            } else {
+                $narrativeContext = "$playerName feels a strong urge to obey Brillius, finding her thoughts increasingly focused on pleasing him.";
+            }
+        } else if ($state == "verybadgirl") {
+            // For verybadgirl state, arousal greatly enhances the effect
+            if ($arousal < 50) {
+                $narrativeContext = "$playerName feels a strong pull toward submission to Brillius, with her independence becoming harder to maintain.";
+            } else {
+                $narrativeContext = "$playerName feels an overwhelming pull toward submission to Brillius, her thoughts increasingly dominated by the need to please him.";
+            }
+        } else if ($state == "punishment") {
+            // For punishment state, resistance is always minimal regardless of arousal
+            $narrativeContext = "$playerName's will is completely subordinate to Brillius's influence, with her thoughts consumed by remorse and the need for forgiveness.";
+        } else if ($state == "normal" || $state == "post") {
+            // For normal or post states, use standard arousal-based modifiers
+            if ($arousal <= 0) {
+                $narrativeContext = "$playerName maintains strong independence from Brillius's hypnotic influence.";
+            } else if ($arousal < 25) {
+                $narrativeContext = "$playerName feels a subtle influence from Brillius's hypnosis, though she maintains most of her independence.";
+            } else if ($arousal < 50) {
+                $narrativeContext = "$playerName feels a moderate influence from Brillius's hypnosis, with some effect on her thoughts and desires.";
+            } else if ($arousal < 75) {
+                $narrativeContext = "$playerName feels a strong influence from Brillius's hypnosis, with her thoughts increasingly drawn to his wishes.";
+            } else if ($arousal < 100) {
+                $narrativeContext = "$playerName feels an intense influence from Brillius's hypnosis, with her independence significantly diminished.";
+            } else {
+                $narrativeContext = "$playerName feels overwhelmed by Brillius's hypnotic influence, her thoughts increasingly focused on submission.";
+            }
+        }
+    }
+
+    // Add information about the curse that applies the hypnosis 
+    if (!empty($narrativeContext)) {
+        $narrativeContext .= " $playerName has a curse on her abdomen (the Welkynd Slave Curse) that applies this hypnosis.";
+    }
+    
+    // Get the first-person perspective based on state
+    $stateContext = $stateContexts[$state] ?? "";
+    
+    // Combine the perspectives if both exist
+    if (!empty($stateContext) && !empty($narrativeContext)) {
+        return $stateContext . " " . $narrativeContext;
+    } else if (!empty($stateContext)) {
+        return $stateContext;
+    } else if (!empty($narrativeContext)) {
+        return $narrativeContext;
+    }
+    
+    return "";
 }
 
 function GetMindInfluenceRequestFormat($state, $promptType = "default") {
