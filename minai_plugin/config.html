@@ -2016,6 +2016,10 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                                         <input type="checkbox" id="ctx-mind-influence" name="minai_context[mind_influence]">
                                         <label for="ctx-mind-influence">Mind Influence</label>
                                     </div>
+                                    <div class="checkbox-container">
+                                        <input type="checkbox" id="ctx-dynamic-state" name="minai_context[dynamic_state]">
+                                        <label for="ctx-dynamic-state">Dynamic State</label>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -2043,16 +2047,43 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                                 <h3>Environmental Context</h3>
                                 <div class="checkbox-group">
                                     <div class="checkbox-container">
-                                        <input type="checkbox" id="ctx-location" name="minai_context[location]">
-                                        <label for="ctx-location">Location</label>
-                                    </div>
-                                    <div class="checkbox-container">
                                         <input type="checkbox" id="ctx-weather" name="minai_context[weather]">
                                         <label for="ctx-weather">Weather</label>
                                     </div>
                                     <div class="checkbox-container">
                                         <input type="checkbox" id="ctx-third-party" name="minai_context[third_party]">
                                         <label for="ctx-third-party">Third Party</label>
+                                    </div>
+                                    <div class="checkbox-container">
+                                        <input type="checkbox" id="ctx-nearby-characters" name="minai_context[nearby_characters]">
+                                        <label for="ctx-nearby-characters">Nearby Characters</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Relationship Context -->
+                            <div class="option-subgroup">
+                                <h3>Relationship Context</h3>
+                                <div class="checkbox-group">
+                                    <div class="checkbox-container">
+                                        <input type="checkbox" id="ctx-relationship" name="minai_context[relationship]">
+                                        <label for="ctx-relationship">Relationship</label>
+                                    </div>
+                                    <div class="checkbox-container">
+                                        <input type="checkbox" id="ctx-devious-follower" name="minai_context[devious_follower]">
+                                        <label for="ctx-devious-follower">Devious Follower</label>
+                                    </div>
+                                    <div class="checkbox-container">
+                                        <input type="checkbox" id="ctx-submissive-lola" name="minai_context[submissive_lola]">
+                                        <label for="ctx-submissive-lola">Submissive Lola</label>
+                                    </div>
+                                    <div class="checkbox-container">
+                                        <input type="checkbox" id="ctx-response-guidelines" name="minai_context[response_guidelines]">
+                                        <label for="ctx-response-guidelines">Response Guidelines</label>
+                                    </div>
+                                    <div class="checkbox-container">
+                                        <input type="checkbox" id="ctx-action-enforcement" name="minai_context[action_enforcement]">
+                                        <label for="ctx-action-enforcement">Action Enforcement</label>
                                     </div>
                                 </div>
                             </div>
