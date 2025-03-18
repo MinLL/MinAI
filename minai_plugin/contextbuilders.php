@@ -10,6 +10,7 @@ require_once("config.php");
 require_once("util.php");
 
 // Include dependencies
+require_once("functions/action_builder.php");
 require_once("contextbuilders/deviousfollower_context.php");
 require_once("contextbuilders/system_prompt_context.php");
 require_once("customintegrations.php");
