@@ -359,12 +359,12 @@ function BuildSystemPrompt() {
     else {
         // Use defaults
         // no change required
-    }
-    // Replace escaped quotes with regular quotes
-    $system_prompt = str_replace("\\'", "'", $system_prompt);
-    
+    }  
     // Expand things like #player_name# to the actual player name across the system prompt
     $system_prompt = ExpandPromptVariables($system_prompt);
+    
+    // Replace escaped quotes with regular quotes
+    $system_prompt = str_replace("\\'", "'", $system_prompt);
     return array(
         'role' => 'system',
         'content' => $system_prompt
