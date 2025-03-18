@@ -26,23 +26,14 @@ if (IsEnabled($GLOBALS["PLAYER_NAME"], "isSinging")) {
 }
 else*/
 if (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"] && $GLOBALS["HERIKA_NAME"] == "The Narrator") {
-    $moods=explode(",",$GLOBALS["EMOTEMOODS"]);
-    shuffle($moods);
     $pronouns = GetActorPronouns($GLOBALS["PLAYER_NAME"]);
-    $GLOBALS["responseTemplate"] = [
-        "character"=>IsExplicitScene() ? $GLOBALS["PLAYER_NAME"] . "'s body" : $GLOBALS["PLAYER_NAME"] . "'s subconscious",
-        "listener"=>IsExplicitScene() ? 
-            "{$GLOBALS['PLAYER_NAME']} is reacting to physical sensations" : 
-            "{$GLOBALS['PLAYER_NAME']} is thinking to {$pronouns['object']}self",
-        "message"=>"lines of dialogue",
-        "mood"=>implode("|",$moods),
-        "action"=>implode("|",$GLOBALS["FUNC_LIST"]),
-        "target"=>"action's target|destination name",
-        "lang"=>"en|es",
-    ];
+	$GLOBALS["responseTemplate"]["character"] = IsExplicitScene() ? $GLOBALS["PLAYER_NAME"] . "'s body" : $GLOBALS["PLAYER_NAME"] . "'s subconscious";
+	$GLOBALS["responseTemplate"]["listener"] = IsExplicitScene()
+		? "{$GLOBALS['PLAYER_NAME']} is reacting to physical sensations"
+		: "{$GLOBALS['PLAYER_NAME']} is thinking to {$pronouns['object']}self";
     
     // Only include response tones if TTSFUNCTION is zonos_gradio
-    if (isset($GLOBALS["TTSFUNCTION"]) && $GLOBALS["TTSFUNCTION"] == "zonos_gradio") {
+    if (zonosIsActive()) {
         $GLOBALS["responseTemplate"]["response_tone_happiness"] = "Value from 0-1";
         $GLOBALS["responseTemplate"]["response_tone_sadness"] = "Value from 0-1";
         $GLOBALS["responseTemplate"]["response_tone_disgust"] = "Value from 0-1";
