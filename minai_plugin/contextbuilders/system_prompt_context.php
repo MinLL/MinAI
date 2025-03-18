@@ -306,7 +306,11 @@ class ContextBuilderRegistry {
                 // If it doesn't match any bullet pattern, make it a standard list item
                 // Also terminates any key points section
                 $in_key_points = false;
-                $result[] = "- " . trim($line);
+                if (count($lines) > 1) {
+                    $result[] = "- " . trim($line);
+                } else {
+                    $result[] = trim($line);
+                }
             }
         }
         
