@@ -378,7 +378,7 @@ Event OnVibrateStop(string eventName, string actorName, float vibStrength, Form 
   string strength = getVibStrength(vibStrength)
   Main.Info("OnVibrateStop: " + strength)
   ; Use the new custom prompt for vibration stop and pass the intensity
-  Main.RequestLLMResponseFromActor(strength, "minai_vibrate_stop", actorName, "both")
+  Main.RegisterEvent(strength, "minai_vibrate_stop")
 EndEvent
 
 

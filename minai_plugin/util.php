@@ -388,6 +388,7 @@ if (IsChildActor($GLOBALS['HERIKA_NAME']) || IsChildActor($GLOBALS["target"])) {
     $GLOBALS["disable_nsfw"] = true;
 }
 
+require_once("utils/guard_utils.php");
 require_once("utils/misc_utils.php");
 require_once("utils/sex_utils.php");
 require_once("utils/llm_utils.php");

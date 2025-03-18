@@ -208,9 +208,10 @@ Function RequestLLMResponseFromActor(string eventLine, string eventType, string 
           minAIFF.AIRequestMessageForActor(eventLine, eventType, "The Narrator")
         elseif (responseTarget == "both")
           ; Request response from player ("The Narrator" is used for player internalization)
-          ; Info("Requesting response from LLM (both) " + name + ": " + eventLine)
-          ; minAIFF.AIRequestMessageForActor(eventLine, eventType, "The Narrator")
+          Info("Requesting response from LLM (narrator) " + name + ": " + eventLine)
+          minAIFF.AIRequestMessageForActor(eventLine, eventType, "The Narrator")
           ; Request response from NPC
+          Info("Requesting response from LLM (npc) " + name + ": " + eventLine)
           minAIFF.AIRequestMessageForActor(eventLine, eventType, name)
         else
           ; Handle "npc" and others

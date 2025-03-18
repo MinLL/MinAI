@@ -566,7 +566,7 @@ function BuildBountyContext($params) {
         $showBounty = true;
     }
     // Condition 2: Player is in conversation AND target is a guard
-    else if ($player_name == $target && (HasKeyword($target, "GuardFaction")) || HasKeyword($target, "Guard Faction")) {
+    else if ($herika_name == $player_name && isGuardTargetingPlayer()) {
         $showBounty = true;
     }
     

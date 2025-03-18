@@ -51,7 +51,7 @@ try {
     $contextDataWorld = DataLastInfoFor("", -2);
     $contextDataFull = array_merge($contextDataWorld, $contextDataHistoric);
     $mindState = convertToFirstPerson(callContextBuilder('mind_influence', $params), $playerName, $playerPronouns);
-    
+    $relationshipStatus = convertRelationshipStatus($actorName);
     // Build the variable replacements as they would appear in the prompt
     $variableReplacements = [
         'PLAYER_NAME' => $playerName,
@@ -74,6 +74,7 @@ try {
         'BOUNTY_STATUS' => $bountyStatus,
         'HERIKA_PERS' => $GLOBALS["HERIKA_PERS"] ?? "",
         'MIND_STATE' => $mindState,
+        'RELATIONSHIP_STATUS' => $relationshipStatus,
         'DEVICE_STATUS' => '' // Remove old device status string
     ];
 

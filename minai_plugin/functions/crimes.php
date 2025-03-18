@@ -17,13 +17,6 @@ $crimeCommands = [
     "ClearBounty" => "Clear all bounty for {$GLOBALS['PLAYER_NAME']} in the current hold (after paying fines or through official pardons)"
 ];
 
-// Function to check if crime actions should be enabled
-function isGuardTargetingPlayer() {
-    return (IsInFaction($GLOBALS["HERIKA_NAME"], "GuardFaction") || 
-            IsInFaction($GLOBALS["HERIKA_NAME"], "Guard Faction")) && 
-           GetTargetActor() == $GLOBALS["PLAYER_NAME"];
-}
-
 // Register crime actions using the builder
 foreach ($crimeCommands as $command => $description) {
     registerMinAIAction("ExtCmd".$command, $command)

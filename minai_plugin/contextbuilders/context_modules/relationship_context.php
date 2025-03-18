@@ -62,6 +62,7 @@ function BuildRelationshipContext($params) {
     $target = $params['target'];
     $herika_name = $params['herika_name'];
     $player_name = $params['player_name'];
+    $force_show_relationship = isset($params['force_relationship']) ? $params['force_relationship'] : false;
     
     // Only show relationship context if the target is the player and not the narrator
     if ($herika_name == "The Narrator" || $target != $player_name) {
@@ -69,7 +70,7 @@ function BuildRelationshipContext($params) {
     }
 
     // Only show this for the primary actor
-    if ($GLOBALS["HERIKA_NAME"] != $herika_name) {
+    if ($GLOBALS["HERIKA_NAME"] != $herika_name && !$force_show_relationship) {
         return "";
     }
     // Call the existing GetRelationshipContext function

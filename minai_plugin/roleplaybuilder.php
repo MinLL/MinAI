@@ -3,6 +3,17 @@ require_once("/var/www/html/HerikaServer/lib/data_functions.php");
 // Add the system prompt context builder include
 require_once(__DIR__ . "/contextbuilders/system_prompt_context.php");
 
+function convertRelationshipStatus($targetActor) {
+    $relationshipRank = GetActorValue($targetActor, "relationshipRank");
+    if ($relationshipRank == 0) {
+        return "a stranger";
+    } else if ($relationshipRank < 1) {
+        return "someone you dislike";
+    } else {
+        return "someone you are fond of";
+    }
+}
+
 function convertToFirstPerson($text, $name, $pronouns) {
     if (empty($text)) {
         return "";
@@ -194,7 +205,7 @@ function interceptRoleplayInput() {
         $tattooStatus = convertToFirstPerson(callContextBuilder('tattoos', $params), $PLAYER_NAME, $playerPronouns);
         // Add crime context
         $bountyStatus = convertToFirstPerson(callContextBuilder('bounty', $params), $PLAYER_NAME, $playerPronouns);
-        
+        $relationshipStatus = convertRelationshipStatus($HERIKA_NAME);
         // Replace variables in system prompt and request
         $variableReplacements = [
             'PLAYER_NAME' => $PLAYER_NAME,
@@ -219,6 +230,7 @@ function interceptRoleplayInput() {
             'HERIKA_NAME' => $HERIKA_NAME,
             'HERIKA_PERS' => $HERIKA_PERS,
             'MIND_STATE' => $mindState,
+            'RELATIONSHIP_STATUS' => $relationshipStatus,
             'DEVICE_STATUS' => '' // Remove old device status string
         ];
 

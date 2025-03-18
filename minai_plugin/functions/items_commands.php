@@ -253,14 +253,14 @@ if (IsPlayer(GetTargetActor())) {
         
     // Register give item action
     registerMinAIAction("ExtCmdGiveItem", "GiveItem")
-        ->withDescription("(Must be used when giving items or gold to {$playerName}. Target MUST be specified as itemName:count) Give an item or items to {$playerName} (for gifting, payment, quest items, rewards, trading). Available items: {$targetItemsStr}.")
+        ->withDescription("Used when {$targetName} needs to give or hand over an item to {$playerName}. The target MUST be specified as 'ItemName:Count', representing the item and quantity. This action should be used for all scenarios where {$targetName} is the giver and {$playerName} is the receiver - including gifting, paying, rewarding, or trading items. Available items that can be given: {$targetItemsStr}.")
         ->withParameter("parameter", "string", "The item name and optionally the count in format 'ItemName:Count'. Use this for giving gifts, payments, quest items, or rewards. Examples: 'Gold:100' (payment), 'Iron Sword' (gift), 'Health Potion:5' (supplies), 'Septim:50' (payment)", [], true)
         ->withReturnFunction($GLOBALS["GenericFuncRet"])
         ->register();
         
     // Register take item action
     registerMinAIAction("ExtCmdTakeItem", "TakeItem")
-        ->withDescription("(Must be used when receiving items or gold from {$playerName}. Target MUST be specified as itemName:count) Take/receive an item or items from {$playerName} (Accepting or receiving payment, gifts, collecting items, quest requirements, trading). Available items: {$playerItemsStr}.")
+        ->withDescription("Used when {$targetName} needs to take or receive an item from {$playerName}. The target MUST be specified as 'ItemName:Count', representing the item and quantity. This action should be used for all scenarios where {$playerName} is the giver and {$targetName} is the receiver - including when {$playerName} offers something, during trade exchanges, when collecting quest items, or accepting payments. Available items that can be received: {$playerItemsStr}.")
         ->withParameter("parameter", "string", "The item name and optionally the count in format 'ItemName:Count'. Use this for requesting payments, collecting quest items, or receiving goods. Examples: 'Gold:75' (collect payment), 'Iron Ore:10' (purchase resources), 'Health Potion' (request healing supply)", [], true)
         ->withReturnFunction($GLOBALS["GenericFuncRet"])
         ->register();
