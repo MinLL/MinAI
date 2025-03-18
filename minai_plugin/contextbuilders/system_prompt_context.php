@@ -235,34 +235,87 @@ class ContextBuilderRegistry {
             return '';
         }
         
-        // Check if it's already a list (starts with - or *) and format appropriately
-        if (preg_match('/^[\s]*[-*]/', $context)) {
-            // It's already a list, keep it as is
-            return $context;
-        }
+        // Add debug logging
+        minai_log("debug", "Original context: " . str_replace("\n", "\\n", $context));
         
-        // Check if it has multiple lines that should be a list
-        if (strpos($context, "\n") !== false) {
-            $lines = explode("\n", $context);
-            $formatted = '';
+        // Split into lines for processing
+        $lines = explode("\n", $context);
+        $result = [];
+        $in_key_points = false;
+        
+        foreach ($lines as $line) {
+            $line = rtrim($line);  // Keep left indentation but remove trailing whitespace
             
-            foreach ($lines as $line) {
-                $line = trim($line);
-                if (!empty($line)) {
-                    // Convert each line to a list item if it's not already
-                    if (!preg_match('/^[\s]*[-*]/', $line)) {
-                        $formatted .= "- " . $line . "\n";
-                    } else {
-                        $formatted .= $line . "\n";
-                    }
-                }
+            // Skip empty lines
+            if (empty(trim($line))) {
+                continue;
             }
             
-            return $formatted;
+            // Special case for "Key Points:" - exact pattern match
+            if (preg_match('/^(?:[-•*]\s*)?Key\s+Points:$/', trim($line))) {
+                $in_key_points = true;
+                $result[] = "- Key Points:";
+                continue;
+            }
+            
+            // Handle bullet points with "•" character - key points section
+            if ($in_key_points && preg_match('/^(?:[-•*]\s*)?\s*[•]\s+(.+)$/', trim($line), $matches)) {
+                $result[] = "  - " . $matches[1];
+                continue;
+            }
+            
+            // Handle normal bullet points (any level) - key points section
+            if ($in_key_points && preg_match('/^(?:[-•*]\s*)+(.+)$/', trim($line), $matches)) {
+                $result[] = "  - " . $matches[1];
+                continue;
+            }
+            
+            // Regular bullet point handling (outside key points)
+            if (preg_match('/^(\s*)(?:[-•*]\s+)(.+)$/', $line, $matches)) {
+                $indent = $matches[1];
+                $content = $matches[2];
+                
+                // Calculate indentation level
+                $level = floor(strlen($indent) / 2);
+                $prefix = str_repeat("  ", $level);
+                
+                $result[] = $prefix . "- " . $content;
+                
+                // End key points section if we're processing regular items
+                if ($level === 0) {
+                    $in_key_points = false;
+                }
+                continue;
+            }
+            
+            // Ensure any line starting with # has at least 4 of them
+            // But don't modify hashtag objects like #player_name#
+            if (preg_match('/^#(?![a-zA-Z0-9_]+#)/', $line)) {
+                // Count existing # at start
+                preg_match('/^#+/', $line, $matches);
+                $hashCount = strlen($matches[0]);
+                
+                if ($hashCount < 4) {
+                    // Add additional # to reach minimum of 4
+                    $line = str_repeat('#', 4 - $hashCount) . $line;
+                }
+                $result[] = trim($line);
+                $in_key_points = false;
+            }
+            else {
+                // If it doesn't match any bullet pattern, make it a standard list item
+                // Also terminates any key points section
+                $in_key_points = false;
+                $result[] = "- " . trim($line);
+            }
         }
         
-        // Single line text, make it a single list item
-        return "- " . $context;
+        $formatted = implode("\n", $result);
+        
+        // Add debug logging for the result
+        minai_log("debug", "Formatted context: " . str_replace("\n", "\\n", $formatted));
+        
+        return $formatted;
     }
     
     /**

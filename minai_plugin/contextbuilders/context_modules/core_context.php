@@ -165,6 +165,23 @@ function BuildDynamicStateContext($params) {
     if (empty($dynamic_state)) {
         return "";
     }
+    // Strip out any excluded dynamic state entries
+    $exclusions = [
+        "Updated Character Profile",
+        "Updated Character Sheet",
+        "Updated Character Sheet"
+    ];
     
+    // Split into lines and filter out any containing excluded phrases
+    $lines = explode("\n", $dynamic_state);
+    $filtered_lines = array_filter($lines, function($line) use ($exclusions) {
+        foreach ($exclusions as $exclude) {
+            if (stripos($line, $exclude) !== false) {
+                return false;
+            }
+        }
+        return true;
+    });
+    $dynamic_state = implode("\n", $filtered_lines);
     return trim($dynamic_state);
 } 
