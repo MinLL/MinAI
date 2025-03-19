@@ -2047,6 +2047,10 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                                 <h3>Environmental Context</h3>
                                 <div class="checkbox-group">
                                     <div class="checkbox-container">
+                                        <input type="checkbox" id="ctx-relative" name="minai_context[relative]">
+                                        <label for="ctx-relative">Relative</label>
+                                    </div>
+                                    <div class="checkbox-container">
                                         <input type="checkbox" id="ctx-weather" name="minai_context[weather]">
                                         <label for="ctx-weather">Weather</label>
                                     </div>
@@ -2057,6 +2061,17 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                                     <div class="checkbox-container">
                                         <input type="checkbox" id="ctx-nearby-characters" name="minai_context[nearby_characters]">
                                         <label for="ctx-nearby-characters">Nearby Characters</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- NSFW Context -->
+                            <div class="option-subgroup">
+                                <h3>NSFW Context</h3>
+                                <div class="checkbox-group">
+                                    <div class="checkbox-container">
+                                        <input type="checkbox" id="ctx-nsfw-reputation" name="minai_context[nsfw_reputation]">
+                                        <label for="ctx-nsfw-reputation">NSFW Reputation</label>
                                     </div>
                                 </div>
                             </div>
