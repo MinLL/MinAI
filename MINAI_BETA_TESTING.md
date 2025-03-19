@@ -5,11 +5,11 @@
 1. **CHIM DEV Launcher**
    - Download the DEV version of the launcher from the #minai-testing-downloads channel
    - This version allows switching to the Dev branch of the CHIM server via the debugging menu
-   - [Screenshot placeholder for launcher dev branch selection]
+   ![image](https://github.com/user-attachments/assets/b632f4c9-dd00-4620-9477-71997b6e959e)
    - After switching to the Dev branch, update the server.
 
 2. **CHIM DEV Skyrim Mod**
-   - Install the DEV version of the CHIM Skyrim mod
+   - Install the DEV version of the CHIM Skyrim mod.
 
 3. **AIAgent Debug Version**
    - Follow the installation instructions in the [CHIM Beta Testing Guide](CHIM_BETA_TESTING.md)
@@ -27,7 +27,8 @@ The correct load order is crucial for beta testing:
 2. AIAgent-Debug
 3. MinAI DEV
 
-[Screenshot placeholder for load order]
+![image](https://github.com/user-attachments/assets/42690c3a-559a-4e81-ad3f-b49b5ffdbe6e)
+
 
 ## Issue Reporting
 
