@@ -337,7 +337,9 @@ function BuildEquipmentContext($params) {
     // Determine which character we're building context for
     $herika_name = $params['herika_name'];
     $character = $herika_name;
-    
+    if ($herika_name == "The Narrator") {
+        $character = $params['player_name'];
+    }
     // This function calls the existing GetUnifiedEquipmentContext function
     return GetUnifiedEquipmentContext($character);
 }
