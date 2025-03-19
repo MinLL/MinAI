@@ -143,6 +143,11 @@ function UpdateItem($id, $data) {
             $updates[] = "is_available = {$is_available}";
         }
         
+        if (isset($data['is_hidden'])) {
+            $is_hidden = $data['is_hidden'] ? 'TRUE' : 'FALSE';
+            $updates[] = "is_hidden = {$is_hidden}";
+        }
+
         if (isset($data['category'])) {
             $category = $data['category'] ? "'" . $db->escape($data['category']) . "'" : 'NULL';
             $updates[] = "category = {$category}";
@@ -407,3 +412,29 @@ function AddItemWithModIndex($item_id, $file_name, $name, $description, $mod_ind
         return false;
     }
 }
+
+/**
+ * Ensure the database schema is up to date by adding missing columns if needed
+ */
+function ensureDatabaseSchema() {
+    $db = $GLOBALS['db'];
+    
+    try {
+        // For PostgreSQL, use information_schema to check if column exists
+        $query = "SELECT column_name FROM information_schema.columns 
+                 WHERE table_name = 'minai_items' AND column_name = 'is_hidden'";
+        $result = $db->fetchAll($query);
+        
+        // If is_hidden column doesn't exist, add it
+        if (empty($result)) {
+            minai_log("info", "Adding is_hidden column to minai_items table");
+            $db->execQuery("ALTER TABLE minai_items ADD COLUMN is_hidden BOOLEAN DEFAULT FALSE");
+        }
+        
+        return true;
+    } catch (Exception $e) {
+        minai_log("error", "Failed to update database schema: " . $e->getMessage());
+        return false;
+    }
+}
+

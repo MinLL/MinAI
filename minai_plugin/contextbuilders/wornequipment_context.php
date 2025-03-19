@@ -104,26 +104,38 @@ function EnrichEquipmentDataFromDb(&$parsedData)
   }
 
   foreach ($parsedData as &$segment) {
-      $baseFormId = $db -> escape($segment['baseFormId']);
+      $baseFormId = $db->escape($segment['baseFormId']);
       $modName = $db->escape($segment['modName']);
-      $name = $db -> escape($segment['name']);
-    $description = '';  // Placeholder description
+      $name = $db->escape($segment['name']);
+      $description = '';  // Placeholder description
+      $segment["is_hidden"] = false;  // Default to not hidden
 
-    // Check if the row exists
-    $result = $db->fetchAll(
-      "SELECT * FROM equipment_description WHERE lower(baseFormId) = lower('{$baseFormId}') AND lower(modName) = lower('{$modName}')"
-    );
+      // Check if the row exists, including the is_hidden flag
+      $result = $db->fetchAll(
+        "SELECT * FROM equipment_description WHERE lower(baseFormId) = lower('{$baseFormId}') AND lower(modName) = lower('{$modName}')"
+      );
 
-    if (count($result) > 0) {
-      // Row exists, enrich the segment with the description
-      $segment["description"] = $result[0]["description"];
-    } else {
-      // Row doesn't exist, perform an insert
-      $insertQuery = "INSERT INTO equipment_description (baseFormId, modName, name, description)
-                            VALUES ('{$baseFormId}', '{$modName}', '{$name}', '{$description}')";
-      $db->execQuery($insertQuery);
-      $segment["description"] = '';
-    }
+      if (count($result) > 0) {
+        // Row exists, enrich the segment with the description and hidden state
+        $segment["description"] = $result[0]["description"];
+        
+        // Check if the is_hidden column exists and is set to true
+        if (isset($result[0]["is_hidden"])) {
+          // Convert PostgreSQL boolean to PHP boolean
+          $isHidden = ($result[0]["is_hidden"] === true || 
+                      $result[0]["is_hidden"] === 't' || 
+                      $result[0]["is_hidden"] === 1 || 
+                      $result[0]["is_hidden"] === '1');
+          
+          $segment["is_hidden"] = $isHidden;
+        }
+      } else {
+        // Row doesn't exist, perform an insert with is_hidden = FALSE
+        $insertQuery = "INSERT INTO equipment_description (baseFormId, modName, name, description, is_hidden)
+                            VALUES ('{$baseFormId}', '{$modName}', '{$name}', '{$description}', FALSE)";
+        $db->execQuery($insertQuery);
+        $segment["description"] = '';
+      }
   }
 }
 
@@ -132,6 +144,11 @@ function GetEquipmentContext(&$parsedData)
   $context = "";
   $skipKeywords = [];
   foreach ($parsedData as $segment) {
+    // Skip hidden equipment
+    if (isset($segment['is_hidden']) && $segment['is_hidden'] === true) {
+      continue;
+    }
+    
     $name = $segment['name'];
     $description = $segment['description'];
 
@@ -162,6 +179,7 @@ function GetEquipmentContext(&$parsedData)
     'skipKeywords' => $skipKeywords
   ];
 }
+
 
 function GetAllEquipmentContext($actorName)
 {

@@ -14,6 +14,9 @@ require_once("$pluginPath/db_utils.php");
 // Ensure required tables exist
 CreateItemsTableIfNotExists();
 
+// Ensure database schema is up to date with the is_hidden column
+ensureDatabaseSchema();
+
 // Get the request method
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -190,18 +193,45 @@ function handlePutRequest() {
     // Get the request body
     $data = json_decode(file_get_contents('php://input'), true);
     
+    // Log incoming data for debugging
+    minai_log("debug", "PUT request data: " . print_r($data, true));
+    
     // Check if we have an ID
     if (isset($_GET['id'])) {
+        $id = $_GET['id'];
+        
+        // If this is a visibility toggle, log it specifically
+        if (isset($data['is_hidden'])) {
+            minai_log("debug", "Toggling visibility for item {$id} to " . ($data['is_hidden'] ? 'HIDDEN' : 'VISIBLE'));
+        }
+        
         // Update the item
-        if (UpdateItem($_GET['id'], $data)) {
-            sendResponse(200, ['message' => 'Item updated successfully']);
+        if (UpdateItem($id, $data)) {
+            // Get the updated item to return in response
+            $updatedItem = GetItemById($id);
+            
+            if ($updatedItem) {
+                minai_log("debug", "Item updated successfully. New state: " . print_r($updatedItem, true));
+                sendResponse(200, [
+                    'success' => true,
+                    'message' => 'Item updated successfully',
+                    'item' => $updatedItem
+                ]);
+            } else {
+                sendResponse(200, [
+                    'success' => true,
+                    'message' => 'Item updated successfully, but could not retrieve updated data'
+                ]);
+            }
         } else {
-            sendResponse(400, ['error' => 'Failed to update item']);
+            minai_log("error", "Failed to update item {$id}");
+            sendResponse(400, ['success' => false, 'error' => 'Failed to update item']);
         }
     } else {
-        sendResponse(400, ['error' => 'Missing item ID']);
+        sendResponse(400, ['success' => false, 'error' => 'Missing item ID']);
     }
 }
+
 
 /**
  * Handle DELETE requests

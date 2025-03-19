@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MinAI Items Management</title>
@@ -144,47 +145,82 @@
             transform: scale(1.2);
             accent-color: var(--primary-color);
         }
+		
+		/* Ultra-compact icon buttons */
+button.icon-button {
+    padding: 0;
+    width: 24px;  /* Further reduced to 24px */
+    height: 24px; /* Further reduced to 24px */
+    background: var(--bg-color-lighter);
+    border: 1px solid var(--border-color);
+    border-radius: 3px; /* Smaller radius */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 2px;  /* Further reduced to 2px */
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
 
-        button {
-            display: inline-block;
-            color: var(--text-color);
-            text-decoration: none;
-            font-size: 1.1rem;
-            padding: 10px 20px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            background: linear-gradient(135deg,
-                rgba(76, 175, 80, 0.1) 0%,
-                rgba(76, 175, 80, 0.2) 100%
-            );
-            border: 1px solid rgba(76, 175, 80, 0.3);
-            cursor: pointer;
-            margin-right: 10px;
-        }
+button.icon-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
 
-        button:hover {
-            transform: translateY(-2px);
-            background: linear-gradient(135deg,
-                rgba(76, 175, 80, 0.2) 0%,
-                rgba(76, 175, 80, 0.3) 100%
-            );
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
+button.icon-button i {
+    font-size: 12px;  /* Further reduced to 12px */
+}
 
-        button.delete {
-            background: linear-gradient(135deg,
-                rgba(244, 67, 54, 0.1) 0%,
-                rgba(244, 67, 54, 0.2) 100%
-            );
-            border: 1px solid rgba(244, 67, 54, 0.3);
-        }
+/* Visibility toggle button with gray color scheme */
+button.visibility-button[data-hidden="0"] {
+    color: #aaaaaa;  /* Light gray for visible items */
+    background: rgba(170, 170, 170, 0.1);
+    border-color: rgba(170, 170, 170, 0.3);
+}
 
-        button.delete:hover {
-            background: linear-gradient(135deg,
-                rgba(244, 67, 54, 0.2) 0%,
-                rgba(244, 67, 54, 0.3) 100%
-            );
-        }
+button.visibility-button[data-hidden="1"] {
+    color: #555555;  /* Dark gray for hidden items */
+    background: rgba(85, 85, 85, 0.1);
+    border-color: rgba(85, 85, 85, 0.3);
+}
+
+/* Edit button specific styling - simplified */
+button.edit-button {
+    color: #2196F3;  /* Blue for edit */
+    background: rgba(33, 150, 243, 0.1);
+    border-color: rgba(33, 150, 243, 0.3);
+}
+
+button.edit-button:hover {
+    background: rgba(33, 150, 243, 0.2);
+}
+
+/* Delete button specific styling - simplified */
+button.delete-button {
+    color: #F44336;  /* Red for delete */
+    background: rgba(244, 67, 54, 0.1);
+    border-color: rgba(244, 67, 54, 0.3);
+}
+
+button.delete-button:hover {
+    background: rgba(244, 67, 54, 0.2);
+}
+
+/* Minimize the button cell width */
+.button-cell {
+    white-space: nowrap;
+    min-width: 80px; /* Further reduced */
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+/* Container for buttons to ensure proper spacing */
+.button-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 2px; /* Consistent spacing */
+}
 
         .table-container {
             overflow-x: auto;
@@ -326,6 +362,8 @@
                 padding: 15px;
             }
         }
+
+
     </style>
 </head>
 <body>
@@ -460,6 +498,11 @@
                     <div class="form-group checkbox-group">
                         <input type="checkbox" id="is-available" name="is_available" checked>
                         <label for="is-available">Available for use</label>
+                    </div>
+                    
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="is-hidden" name="is_hidden">
+                        <label for="is-hidden">Hidden</label>
                     </div>
                     
                     <button type="submit">Add Item</button>

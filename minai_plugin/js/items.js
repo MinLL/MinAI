@@ -180,6 +180,9 @@ function loadItems() {
     params.append('sort_by', sortBySelect.value);
     params.append('sort_order', sortOrderSelect.value);
     
+    // Add cache-busting to ensure we get fresh data
+    params.append('_cache', new Date().getTime());
+    
     // Make API request
     fetch(`api/items_api.php?${params.toString()}`)
         .then(response => {
@@ -190,13 +193,26 @@ function loadItems() {
         })
         .then(data => {
             currentItems = data;
+            console.log("Loaded items data:", currentItems);
+            
+            // Debug check a few items' is_hidden values
+            if (currentItems.length > 0) {
+                console.log("Sample item is_hidden values:");
+                for (let i = 0; i < Math.min(3, currentItems.length); i++) {
+                    console.log(`Item ${currentItems[i].id}: is_hidden =`, currentItems[i].is_hidden, 
+                                `(${typeof currentItems[i].is_hidden})`);
+                }
+            }
+            
             filterAndDisplayItems();
             hideMessage();
         })
         .catch(error => {
+            console.error('Error loading items:', error);
             showMessage(error.message, 'error');
         });
 }
+
 
 // Filter and display items based on search term
 function filterAndDisplayItems() {
@@ -244,6 +260,16 @@ function filterAndDisplayItems() {
         // Create table row
         const row = document.createElement('tr');
         
+        // Evaluate is_hidden value correctly to fix visibility icon issue
+        const isHidden = item.is_hidden === true || 
+                         item.is_hidden === 't' || 
+                         item.is_hidden === 1 || 
+                         item.is_hidden === '1' || 
+                         item.is_hidden === 'true';
+        
+        console.log(`Item ${item.id} is_hidden:`, item.is_hidden, 
+                    `(${typeof item.is_hidden}), evaluated as: ${isHidden}`);
+        
         // Add cells
         row.innerHTML = `
             <td>${item.id}</td>
@@ -257,9 +283,19 @@ function filterAndDisplayItems() {
             <td>${item.is_available ? 'Yes' : 'No'}</td>
             <td>${formatDate(item.last_seen)}</td>
             <td>${formatDate(item.created_at)}</td>
-            <td>
-                <button class="edit-button" data-id="${item.id}">Edit</button>
-                <button class="delete-button delete" data-id="${item.id}">Delete</button>
+            <td class="button-cell">
+                <div class="button-container">
+                    <button class="visibility-button icon-button" data-id="${item.id}" data-hidden="${isHidden ? '1' : '0'}" 
+                            title="${isHidden ? 'Make visible' : 'Hide item'}">
+                        <i class="fas ${isHidden ? 'fa-eye-slash' : 'fa-eye'}"></i>
+                    </button>
+                    <button class="edit-button icon-button" data-id="${item.id}" title="Edit item">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="delete-button icon-button delete" data-id="${item.id}" title="Delete item">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
             </td>
         `;
         
@@ -281,7 +317,18 @@ function filterAndDisplayItems() {
             deleteItem(id);
         });
     });
+    
+    // After populating the table in filterAndDisplayItems
+    document.querySelectorAll('.visibility-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            const currentHidden = this.getAttribute('data-hidden');
+            console.log(`Visibility button clicked for item ${id}, current state: ${currentHidden}`);
+            toggleItemHidden(id, currentHidden);
+        });
+    });
 }
+
 
 // Load categories from the API
 function loadCategories() {
@@ -381,6 +428,11 @@ function addItem() {
         data.is_available = false;
     }
     
+    // If is_hidden checkbox is not checked, set it to false
+    if (!formData.has('is_hidden')) {
+        data.is_hidden = false;
+    }
+    
     // Make API request
     fetch('api/items_api.php', {
         method: 'POST',
@@ -467,6 +519,11 @@ function editItem(id) {
                     <label for="edit-is-available">Available for use</label>
                 </div>
                 
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="edit-is-hidden" name="is_hidden" ${item.is_hidden ? 'checked' : ''}>
+                    <label for="edit-is-hidden">Hidden</label>
+                </div>
+                
                 <button type="submit">Update Item</button>
                 <button type="button" class="cancel">Cancel</button>
             </form>
@@ -509,6 +566,11 @@ function editItem(id) {
         // If is_available checkbox is not checked, set it to false
         if (!formData.has('is_available')) {
             data.is_available = false;
+        }
+        
+        // If is_hidden checkbox is not checked, set it to false
+        if (!formData.has('is_hidden')) {
+            data.is_hidden = false;
         }
         
         // Make API request
@@ -735,4 +797,64 @@ function resetDatabase() {
         .catch(error => {
             showMessage(error.message, 'error');
         });
-} 
+}
+
+function toggleItemHidden(id, currentState) {
+    // Convert currentState string to boolean
+    const isCurrentlyHidden = currentState === '1';
+    
+    console.log(`Toggling item ${id} - Current hidden state: ${currentState} (${isCurrentlyHidden})`);
+    
+    // The new state should be the opposite
+    const newHiddenState = !isCurrentlyHidden;
+    console.log(`Setting new hidden state to: ${newHiddenState}`);
+    
+    // Show loading message
+    showMessage('Updating visibility...', 'info');
+    
+    fetch(`api/items_api.php?id=${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            is_hidden: newHiddenState
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('API response:', data);
+        
+        if (data.success) {
+            showMessage('Item visibility updated', 'success');
+            
+            // Update the button
+            const button = document.querySelector(`.visibility-button[data-id="${id}"]`);
+            if (button) {
+                // Update the button state
+                button.setAttribute('data-hidden', newHiddenState ? '1' : '0');
+                
+                // Update the icon - fix the icon logic
+                const icon = button.querySelector('i');
+                if (icon) {
+                    icon.className = `fas ${newHiddenState ? 'fa-eye-slash' : 'fa-eye'}`;
+                }
+                
+                // Update the tooltip
+                button.setAttribute('title', newHiddenState ? 'Make visible' : 'Hide item');
+            }
+            
+            // Update the in-memory data
+            const itemToUpdate = currentItems.find(item => item.id == id);
+            if (itemToUpdate) {
+                itemToUpdate.is_hidden = newHiddenState;
+            }
+        } else {
+            showMessage(data.error || 'Failed to update item', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error updating item visibility:', error);
+        showMessage('Error updating visibility', 'error');
+    });
+}
