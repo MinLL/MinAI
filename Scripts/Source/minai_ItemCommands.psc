@@ -254,7 +254,8 @@ Function TakeItemFromPlayer(Actor akSpeaker, String parameter)
   EndIf
   
   ; Register the event for event tracking
-  Main.RegisterEvent(speakerName + " took " + countStr + actualItemName + " from " + playerName + ".", "info_item_taken")
+  Main.RequestLLMResponseFromActor(speakerName + " took " + countStr + actualItemName + " from " + playerName + ".", "chatnf_minai_narrate", speakerName, "npc")
+  
 EndFunction
 
 ; Trade items between NPC and player
