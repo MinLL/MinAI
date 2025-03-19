@@ -1,6 +1,8 @@
 <?php
 require_once("config.php");
 require_once("util.php");
+require_once("contextbuilders.php");
+require_once("prompts/info_prompts.php");
 $GLOBALS["speaker"] = $GLOBALS["HERIKA_NAME"];
 $GLOBALS["minai_processing_input"] = false;
 

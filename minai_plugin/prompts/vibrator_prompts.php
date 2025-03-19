@@ -282,22 +282,22 @@ function get_vibrate_start_prompt() {
     // Create three different types of prompts - all narrated by The Narrator
     
     // 1. Narrator Prompt (omniscient view with full information)
-    $narratorPrompt = "#SEX_INFO {$target}'s {$narratorDeviceDescription} {$intensityWord} begin to vibrate {$intensity}, sending waves of pleasure through their {$arousalDesc} body{$helplessnessAddition}!" . 
+    $narratorPrompt = "{$target}'s {$narratorDeviceDescription} {$intensityWord} begin to vibrate {$intensity}, sending waves of pleasure through their {$arousalDesc} body{$helplessnessAddition}!" . 
                      (!empty($accessibilityContext) ? " $accessibilityContext" : "");
     
     // 2. Self Prompt (from the perspective of the person wearing the devices)
-    $selfPrompt = "#SEX_INFO {$target} {$reactionWord} as their {$wearerDeviceList} spring to life {$intensityWord}, {$intensity} stimulating " . 
+    $selfPrompt = "{$target} {$reactionWord} as their {$wearerDeviceList} spring to life {$intensityWord}, {$intensity} stimulating " . 
                    $bodyPartReaction . (!empty($helplessness) ? ", while they remain $helplessness" : "") . "!" .
                    (!empty($accessibilityContext) ? " $accessibilityContext" : "");
     
     // 3. Other Prompt (what others can see, which may not include the actual devices)
     if ($visibleToOthers) {
         // Observers can see the devices
-        $otherPrompt = "#SEX_INFO {$target} is caught by surprise as their visible {$otherDeviceList} begin to {$intensity} vibrate" . 
+        $otherPrompt = "{$target} is caught by surprise as their visible {$otherDeviceList} begin to {$intensity} vibrate" . 
                        ", causing them to " . $reactionWord . "!";
     } else {
         // Devices hidden - describe only the reactions
-        $otherPrompt = "#SEX_INFO {$target} {$intensityWord} " . $reactionWord . ", " . $observerDesc . 
+        $otherPrompt = "{$target} {$intensityWord} " . $reactionWord . ", " . $observerDesc . 
                        ", hinting at unseen stimulation" . (!empty($helplessness) ? " while $helplessness" : "") . "!";
     }
     
@@ -305,7 +305,7 @@ function get_vibrate_start_prompt() {
     $selectedPrompt = "";
     $perspective = GetPromptPerspective($target);
     
-    minai_log("debug", "Vibrator prompts - perspective: " . $perspective);
+    // minai_log("debug", "Vibrator prompts - perspective: " . $perspective);
     if ($perspective == "narrator") {
         // Narrator perspective - omniscient view
         $selectedPrompt = "The Narrator: " . $narratorPrompt;
@@ -579,22 +579,22 @@ function get_vibrate_stop_prompt() {
     // Create three different types of prompts - all narrated by The Narrator
     
     // 1. Narrator Prompt (omniscient view with full information)
-    $narratorPrompt = "#SEX_INFO The vibrations from {$target}'s {$narratorDeviceDescription} gradually come to a stop, " . 
+    $narratorPrompt = "The vibrations from {$target}'s {$narratorDeviceDescription} gradually come to a stop, " . 
                      $afterEffectWord . (!empty($helplessness) ? ", as they remain $helplessness" : "") . "." . $lingering;
     
     // 2. Self Prompt (from the perspective of the person wearing the devices)
-    $selfPrompt = "#SEX_INFO The stimulation from {$target}'s {$wearerDeviceList} gradually subsides, " . 
+    $selfPrompt = "The stimulation from {$target}'s {$wearerDeviceList} gradually subsides, " . 
                   $afterEffectWord . ". The sensations in " . $bodyPartReaction . 
                   " slowly fade away" . (!empty($helplessness) ? ", while they remain $helplessness" : "") . "." . $lingering;
     
     // 3. Other Prompt (what others can see, which may not include the actual devices)
     if ($visibleToOthers) {
         // Observers can see the devices
-        $otherPrompt = "#SEX_INFO The visible vibrations from {$target}'s {$otherDeviceList} come to a stop, " . 
+        $otherPrompt = "The visible vibrations from {$target}'s {$otherDeviceList} come to a stop, " . 
                        $afterEffectWord . ".";
     } else {
         // Devices hidden - describe only the reactions
-        $otherPrompt = "#SEX_INFO {$target}'s unusual behavior subsides as " . $observerDesc . 
+        $otherPrompt = "{$target}'s unusual behavior subsides as " . $observerDesc . 
                        ", suggesting the hidden stimulation has ended" . 
                        (!empty($helplessness) ? ", though they remain $helplessness" : "") . ".";
     }
@@ -619,13 +619,43 @@ function get_vibrate_stop_prompt() {
     return $selectedPrompt;
 }
 
-// Store the actual prompt strings in the PROMPTS global array
-$GLOBALS["PROMPTS"]["minai_vibrate_start"] = [
-    "cue"=>[],
-    "player_request"=>[get_vibrate_start_prompt()]
-];
+// Register prompts only if specifically requested
+if ($GLOBALS["gameRequest"][0] == "minai_vibrate_start" || $GLOBALS["gameRequest"][0] == "info_minai_vibrate_start") {
+    $vibrateStartPrompt = get_vibrate_start_prompt();
+    
+    if ($GLOBALS["gameRequest"][0] == "minai_vibrate_start") {
+        $GLOBALS["PROMPTS"]["minai_vibrate_start"] = [
+            "cue"=>[],
+            "player_request"=>[$vibrateStartPrompt]
+        ];
+        OverrideGameRequestPrompt($vibrateStartPrompt);
+    }
+    
+    if ($GLOBALS["gameRequest"][0] == "info_minai_vibrate_start") {
+        $GLOBALS["PROMPTS"]["info_minai_vibrate_start"] = [
+            "cue"=>[],
+            "player_request"=>[$vibrateStartPrompt]
+        ];
+        OverrideGameRequestPrompt($vibrateStartPrompt);
+    }
+}
 
-$GLOBALS["PROMPTS"]["minai_vibrate_stop"] = [
-    "cue"=>[],
-    "player_request"=>[get_vibrate_stop_prompt()]
-];
+if ($GLOBALS["gameRequest"][0] == "minai_vibrate_stop" || $GLOBALS["gameRequest"][0] == "info_minai_vibrate_stop") {
+    $vibrateStopPrompt = get_vibrate_stop_prompt();
+    
+    if ($GLOBALS["gameRequest"][0] == "minai_vibrate_stop") {
+        $GLOBALS["PROMPTS"]["minai_vibrate_stop"] = [
+            "cue"=>[],
+            "player_request"=>[$vibrateStopPrompt]
+        ];
+        OverrideGameRequestPrompt($vibrateStopPrompt);
+    }
+    
+    if ($GLOBALS["gameRequest"][0] == "info_minai_vibrate_stop") {
+        $GLOBALS["PROMPTS"]["info_minai_vibrate_stop"] = [
+            "cue"=>[],
+            "player_request"=>[$vibrateStopPrompt]
+        ];
+        OverrideGameRequestPrompt($vibrateStopPrompt);
+    }
+}

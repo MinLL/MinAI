@@ -371,7 +371,7 @@ Function ProcessArousal(actor akActor)
   if devious.HasDD()
     float currentTime = Utility.GetCurrentRealTime()
     if currentTime - lastMoanTime > 8
-      Main.RegisterEvent(Main.GetActorName(akActor) + " moaned due to being touched")
+      Main.RegisterEvent(Main.GetActorName(akActor) + " moaned due to being touched", "info_touch_moan")
       lastMoanTime = currentTime
       devious.libs.Moan(akActor)
     EndIf

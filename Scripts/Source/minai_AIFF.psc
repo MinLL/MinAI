@@ -437,7 +437,7 @@ Function SetContext(actor akTarget)
 
   ; Update high-frequency states (every update)
   Main.Debug("CHIM - SetContext(" + actorName + ") - Setting high-frequency states")
-  arousal.SetContext(akTarget)
+  arousal.SetContextHighFrequency(akTarget)
   envAwareness.SetContext(akTarget)
   combat.SetContext(akTarget)
   PersistInventory(akTarget)
@@ -462,6 +462,7 @@ Function SetContext(actor akTarget)
     StoreKeywords(akTarget)
     StoreFactions(akTarget)
     crimeController.SetContext(akTarget)
+    arousal.SetContext(akTarget)
     JMap.setFlt(updateTracker, actorKey + "_low", currentGameTime)
   endif
 

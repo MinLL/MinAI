@@ -510,14 +510,20 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   if command == "ExtCmdIncreaseArousal"
     UpdateArousal(akSpeaker, 6)
     Debug.Notification(Main.GetActorName(akSpeaker) + " is getting more turned on.")
-    Main.RegisterEvent(""+speakerName+"'s arousal level increased.")
+    Main.RegisterEvent(""+speakerName+"'s arousal level increased.", "info_arousal_increase")
   EndIf
   if command == "ExtCmdDecreaseArousal"
     UpdateArousal(akSpeaker, -12)
     Debug.Notification(Main.GetActorName(akSpeaker) + " is getting less turned on.")
-    Main.RegisterEvent(""+speakerName+"'s arousal level decreased.")
+    Main.RegisterEvent(""+speakerName+"'s arousal level decreased.", "info_arousal_decrease")
   EndIf
 EndEvent
+
+Function SetContextHighFrequency(actor akTarget)
+  Main.Debug("SetContextHighFrequency(" + main.GetActorName(akTarget) + ")")
+  aiff.SetActorVariable(akTarget, "arousal", GetActorArousal(akTarget))
+EndFunction
+
 
 Function SetContext(actor akTarget)
   Main.Debug("SetContext Arousal(" + main.GetActorName(akTarget) + ")")
@@ -531,7 +537,6 @@ Function SetContext(actor akTarget)
   Armor boots = akTarget.GetWornForm(bootsSlot) as Armor
   
   aiff.SetActorVariable(akTarget, "isnaked", !cuirass)
-  aiff.SetActorVariable(akTarget, "arousal", GetActorArousal(akTarget))
   aiff.SetActorVariable(akTarget, "isexposed", IsTNGExposed(akTarget))
   
   if cuirass == None
