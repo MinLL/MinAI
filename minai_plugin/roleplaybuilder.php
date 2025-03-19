@@ -315,7 +315,7 @@ function interceptRoleplayInput() {
             }, $text);
         }
 
-        $systemPrompt = inflatePrompt($systemPrompt, $variableReplacements);
+        $systemPrompt = replaceVariables(inflatePrompt($systemPrompt, $variableReplacements), $variableReplacements);
 
         // Sort sections by their order if it exists
         $sections = $settings['sections'];
