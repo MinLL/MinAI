@@ -166,45 +166,28 @@ else {
 }
 
 
-function GetCleanedMessage() {
-    $cleanedMessage = $GLOBALS["gameRequest"][3];
-    if (preg_match('/^.*?:\s*(.*)$/i', $cleanedMessage, $matches)) {
-        $cleanedMessage = $matches[1];
-        
-        // Get player name for regex pattern
-        $playerName = preg_quote($GLOBALS["PLAYER_NAME"], '/');
-        
-        // Clean location information (typically at the beginning before "PlayerName:")
-        $cleanedMessage = preg_replace('/^(.*?Hold:.*?\))' . $playerName . ':/i', '', $cleanedMessage);
-        
-        // Clean any parenthetical context at the end
-        $cleanedMessage = preg_replace('/\s*\([^)]*\)\s*$/', '', $cleanedMessage);
-        
-        // If just "PlayerName:" remains at the start, remove it too
-        $cleanedMessage = preg_replace('/^' . $playerName . ':\s*/i', '', $cleanedMessage);
-        
-        // Trim any extra spaces
-        $cleanedMessage = trim($cleanedMessage);
-    } 
-    return $cleanedMessage;
+$cleanedMessage = GetCleanedMessage();
+
+// Register prompts only if specifically requested
+if ($GLOBALS["gameRequest"][0] == "chatnf_minai_narrate") {
+    $narratePrompt = "The Narrator: {$cleanedMessage}";
+    $GLOBALS["PROMPTS"]["chatnf_minai_narrate"] = [
+        "cue"=>[
+            "Respond to the most recent dialogue or events"
+        ],
+        "player_request"=>[$narratePrompt]
+    ];
+    OverrideGameRequestPrompt($narratePrompt);
 }
 
-$cleanedMessage = GetCleanedMessage();
-$GLOBALS["PROMPTS"]["chatnf_minai_narrate"] = [
-    "cue"=>[
-        "Respond to the most recent dialogue or events"
-    ],
-    "player_request"=>[
-        "The Narrator: {$cleanedMessage}"
-    ]
-];
-
-$GLOBALS["PROMPTS"]["minai_narrate"] = [
-    "cue"=>[],
-    "player_request"=>[
-        "The Narrator: {$cleanedMessage}"
-    ]
-];
+if ($GLOBALS["gameRequest"][0] == "minai_narrate") {
+    $narratePrompt = "The Narrator: {$cleanedMessage}";
+    $GLOBALS["PROMPTS"]["minai_narrate"] = [
+        "cue"=>[],
+        "player_request"=>[$narratePrompt]
+    ];
+    OverrideGameRequestPrompt($narratePrompt);
+}
 
 require_once("prompts/tntr_prompts.php");
 require_once("prompts/fillherup_prompts.php");

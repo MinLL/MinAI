@@ -279,7 +279,21 @@ Function RegisterAction($actionName) {
     }
 }
 
-
+/**
+ * Override the game request prompt with the provided text
+ * 
+ * @param string $promptText The prompt text to set
+ * @return string The same prompt text (for convenience)
+ */
+Function OverrideGameRequestPrompt($promptText) {   
+    // Update the database record for this request
+    minai_log("info", "Overriding game player_request prompt to: {$promptText}");
+    $db = $GLOBALS["db"];
+    $gameRequest = $GLOBALS["gameRequest"];
+    // Set the game request to the provided prompt text
+    $GLOBALS["gameRequest"][3] = $promptText;
+    return $promptText;
+}
 
 // Override player name
 if (isset($GLOBALS["force_aiff_name_to_ingame_name"]) && $GLOBALS["force_aiff_name_to_ingame_name"]) {
@@ -386,6 +400,29 @@ $GLOBALS["target"] = GetTargetActor();
 $GLOBALS["nearby"] = explode(",", GetActorValue("PLAYER", "nearbyActors"));
 if (IsChildActor($GLOBALS['HERIKA_NAME']) || IsChildActor($GLOBALS["target"])) {
     $GLOBALS["disable_nsfw"] = true;
+}
+
+function GetCleanedMessage() {
+    $cleanedMessage = $GLOBALS["gameRequest"][3];
+    if (preg_match('/^.*?:\s*(.*)$/i', $cleanedMessage, $matches)) {
+        $cleanedMessage = $matches[1];
+        
+        // Get player name for regex pattern
+        $playerName = preg_quote($GLOBALS["PLAYER_NAME"], '/');
+        
+        // Clean location information (typically at the beginning before "PlayerName:")
+        $cleanedMessage = preg_replace('/^(.*?Hold:.*?\))' . $playerName . ':/i', '', $cleanedMessage);
+        
+        // Clean any parenthetical context at the end
+        $cleanedMessage = preg_replace('/\s*\([^)]*\)\s*$/', '', $cleanedMessage);
+        
+        // If just "PlayerName:" remains at the start, remove it too
+        $cleanedMessage = preg_replace('/^' . $playerName . ':\s*/i', '', $cleanedMessage);
+        
+        // Trim any extra spaces
+        $cleanedMessage = trim($cleanedMessage);
+    } 
+    return $cleanedMessage;
 }
 
 require_once("utils/guard_utils.php");

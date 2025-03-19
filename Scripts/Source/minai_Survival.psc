@@ -292,7 +292,7 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
     EndIf
     if stringutil.Find(sayLine, "-trade-") != -1
       akSpeaker.showbartermenu()
-      main.RegisterEvent(main.GetActorName(player) + " began to trade with " + Main.GetActorName(akSpeaker))
+      main.RegisterEvent(main.GetActorName(player) + " began to trade with " + Main.GetActorName(akSpeaker), "info_trade")
     EndIf
     if stringutil.Find(sayLine, "-gift-") != -1
       akSpeaker.ShowGiftMenu(true)
@@ -324,33 +324,33 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   if command == "ExtCmdServeFood"
     Main.Debug("Feeding Player")
     FeedPlayer(akSpeaker, PlayerRef)
-    Main.RegisterEvent(""+speakerName+" served " + targetName + " a meal.")
+    Main.RegisterEvent(""+speakerName+" served " + targetName + " a meal.", "info_meal_served")
   EndIf
   ; Vanilla functionality
   if command == "ExtCmdRentRoom"
     Main.Debug("Renting Room")
     if playerRef.GetItemCount(Gold) < (DialogueGeneric as DialogueGenericScript).RoomRentalCost.GetValue() as Int
       Debug.Notification("AI: Player does not have enough gold to rent room.")
-      Main.RegisterEvent("" + targetName + " did not have enough gold for the room.")
+      Main.RegisterEvent("" + targetName + " did not have enough gold for the room.", "info_room_denied")
     Else
       (akSpeaker as RentRoomScript).RentRoom(DialogueGeneric as DialogueGenericScript)
-      Main.RegisterEvent(""+speakerName+" provided " + targetName + " a room for the night.")
+      Main.RegisterEvent(""+speakerName+" provided " + targetName + " a room for the night.", "info_room_rented")
     EndIf
   EndIf
   if command == "ExtCmdTrade"
     akSpeaker.showbartermenu()
-    Main.RegisterEvent(""+speakerName+" started trading goods with " + targetName + ".")
+    Main.RegisterEvent(""+speakerName+" started trading goods with " + targetName + ".", "info_trade")
   EndIf
   if command == "ExtCmdCarriageRide"
     ; Parameter has destination
     int destination = GetDestination(parameter)
     carriageScript.Travel(destination, akSpeaker)
-    Main.RegisterEvent(""+speakerName+" gave " + targetName + " a ride in a carriage to " + destination + ".")
+    Main.RegisterEvent(""+speakerName+" gave " + targetName + " a ride in a carriage to " + destination + ".", "info_carriage_ride")
   EndIf
     if command == "ExtCmdTrainSkill"
     Main.Debug(speakerName + " is training the player")
     Game.ShowTrainingMenu(akSpeaker)
-    Main.RegisterEvent(""+speakerName+" gave " + targetName + " some training.")
+    Main.RegisterEvent(""+speakerName+" gave " + targetName + " some training.", "info_training")
   EndIf
 EndEvent
 

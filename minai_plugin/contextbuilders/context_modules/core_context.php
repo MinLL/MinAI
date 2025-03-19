@@ -117,7 +117,7 @@ function BuildPlayerBackgroundContext($params) {
     $is_self_narrator = isset($params['is_self_narrator']) ? $params['is_self_narrator'] : false;
     
     // Include player background if interacting with the player or in self_narrator mode
-    if ($herika_name != $player_name && !$is_self_narrator) {
+    if ($herika_name != $player_name && $GLOBALS["HERIKA_NAME"] != "The Narrator") {
         return "";
     }
     
@@ -184,4 +184,4 @@ function BuildDynamicStateContext($params) {
     });
     $dynamic_state = implode("\n", $filtered_lines);
     return trim($dynamic_state);
-} 
+}

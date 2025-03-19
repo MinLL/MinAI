@@ -8,7 +8,6 @@ require_once(__DIR__.DIRECTORY_SEPARATOR."dungeonmaster.php");
 require_once(__DIR__.DIRECTORY_SEPARATOR."items.php");
 require_once(__DIR__.DIRECTORY_SEPARATOR."utils/narrator_utils.php");
 
-
 function ProcessIntegrations() {
     if (isset($GLOBALS["gameRequest"])) {
         minai_log("info", "Processing request: " . json_encode($GLOBALS["gameRequest"]));

@@ -254,7 +254,8 @@ Function TakeItemFromPlayer(Actor akSpeaker, String parameter)
   EndIf
   
   ; Register the event for event tracking
-  Main.RegisterEvent(speakerName + " took " + countStr + actualItemName + " from " + playerName + ".")
+  Main.RequestLLMResponseFromActor(speakerName + " took " + countStr + actualItemName + " from " + playerName + ".", "chatnf_minai_narrate", speakerName, "npc")
+  
 EndFunction
 
 ; Trade items between NPC and player
@@ -343,5 +344,5 @@ Function TradeItemWithPlayer(Actor akSpeaker, String parameter)
   main.RequestLLMResponseFromActor(speakerName + " traded " + giveCountStr + actualGiveItemName + " for " + playerName + "'s " + takeCountStr + actualTakeItemName + ".", "chatnf_minai_narrate", speakerName, "npc")
   
   ; Register the event for event tracking
-  Main.RegisterEvent(speakerName + " traded " + giveCountStr + actualGiveItemName + " for " + takeCountStr + actualTakeItemName + " with " + playerName + ".")
+  Main.RegisterEvent(speakerName + " traded " + giveCountStr + actualGiveItemName + " for " + takeCountStr + actualTakeItemName + " with " + playerName + ".", "info_item_traded")
 EndFunction 

@@ -108,7 +108,7 @@ function callLLM($messages, $model = null, $options = []) {
         $timestamp = date('Y-m-d\TH:i:sP');
         $promptLog = $timestamp . "\n";
         foreach ($messages as $message) {
-            $promptLog .= "Role: " . $message['role'] . "\nContent: " . $message['content'] . "\n";
+            $promptLog .= $message['content'] . "\n\n";
         }
         $promptLog .= "\n";
         file_put_contents('/var/www/html/HerikaServer/log/minai_context_sent_to_llm.log', $promptLog, FILE_APPEND);

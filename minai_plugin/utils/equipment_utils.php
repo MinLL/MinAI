@@ -4,15 +4,15 @@ function GetEroticDeviceDescription($deviceType, $bodyArea, $category) {
     // Mapping of basic device types to their erotic descriptions
     $descriptions = [
         // Piercings
-        "nipple piercings" => "metal rings inserted through the nipples with embedded soulgem fragments that can vibrate remotely",
-        "clitoral ring" => "small metal ring pierced through the clitoris with a soulgem fragment that can vibrate remotely",
-        "clitoral piercing" => "small metal piercing through the clitoris with a soulgem fragment that can vibrate remotely",
-        "labia piercings" => "metal jewelry pierced through the labia with soulgem fragments that can vibrate remotely",
+        "nipple piercings" => "metal rings inserted through the nipples with embedded soulgem fragments",
+        "clitoral ring" => "small metal ring pierced through the clitoris with a soulgem fragment",
+        "clitoral piercing" => "small metal piercing through the clitoris with a soulgem fragment",
+        "labia piercings" => "metal jewelry pierced through the labia with soulgem fragments",
         "navel piercing" => "decorative jewelry inserted through the belly button",
         
         // Plugs and vibrators
-        "vaginal plug" => "a vaginal plug inserted into the vagina with embedded soulgems that allow remote-controlled vibration",
-        "anal plug" => "an anal plug inserted into the anus with embedded soulgems that allow remote-controlled vibration",
+        "vaginal plug" => "a sleek plug nestled deep inside the vagina with embedded soulgems",
+        "anal plug" => "a firm plug inserted into the anus with embedded soulgems",
         
         // Restraints - Head
         "hood" => "a leather hood that completely covers the head, restricting vision, hearing, and speech",
@@ -101,6 +101,8 @@ Function GetDevicesContext($name, $vibratingOnly = false) {
     $arousal = $vibratingOnly ? GetActorArousal($name) : 0;
     $hasChastityBelt = HasKeyword($name, "zad_DeviousBelt");
     $hasChastityBra = HasKeyword($name, "zad_DeviousBra");
+    $hasNipplePiercings = HasKeyword($name, "zad_DeviousPiercingsNipple");
+    $hasVaginalPiercings = HasKeyword($name, "zad_DeviousPiercingsVaginal");
     $hasHarness = HasKeyword($name, "zad_DeviousHarness");
     $hasGag = HasKeyword($name, "zad_DeviousGag");
     
@@ -672,15 +674,16 @@ Function GetDevicesContext($name, $vibratingOnly = false) {
         "pronouns" => $pronouns
     ];
     
-    // Add vibration-specific data if in vibrating mode
-    if ($vibratingOnly) {
-        $returnData["arousal"] = $arousal;
-        $returnData["arousalDesc"] = $arousalDesc;
-        $returnData["hasChastityBelt"] = $hasChastityBelt;
-        $returnData["hasChastityBra"] = $hasChastityBra;
-        $returnData["hasHarness"] = $hasHarness;
-        $returnData["hasGag"] = $hasGag;
-    }
+    // Add vibration-specific data
+    $returnData["arousal"] = $arousal;
+    $returnData["arousalDesc"] = $arousalDesc;
+    $returnData["hasChastityBelt"] = $hasChastityBelt;
+    $returnData["hasChastityBra"] = $hasChastityBra;
+    $returnData["hasHarness"] = $hasHarness;
+    $returnData["hasGag"] = $hasGag;
+    $returnData["hasNipplePiercings"] = $hasNipplePiercings;
+    $returnData["hasVaginalPiercings"] = $hasVaginalPiercings;
+
     
     return $returnData;
 }
