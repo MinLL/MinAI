@@ -674,17 +674,16 @@ Function GetDevicesContext($name, $vibratingOnly = false) {
         "pronouns" => $pronouns
     ];
     
-    // Add vibration-specific data if in vibrating mode
-    if ($vibratingOnly) {
-        $returnData["arousal"] = $arousal;
-        $returnData["arousalDesc"] = $arousalDesc;
-        $returnData["hasChastityBelt"] = $hasChastityBelt;
-        $returnData["hasChastityBra"] = $hasChastityBra;
-        $returnData["hasHarness"] = $hasHarness;
-        $returnData["hasGag"] = $hasGag;
-        $returnData["hasNipplePiercings"] = $hasNipplePiercings;
-        $returnData["hasVaginalPiercings"] = $hasVaginalPiercings;
-    }
+    // Add vibration-specific data
+    $returnData["arousal"] = $arousal;
+    $returnData["arousalDesc"] = $arousalDesc;
+    $returnData["hasChastityBelt"] = $hasChastityBelt;
+    $returnData["hasChastityBra"] = $hasChastityBra;
+    $returnData["hasHarness"] = $hasHarness;
+    $returnData["hasGag"] = $hasGag;
+    $returnData["hasNipplePiercings"] = $hasNipplePiercings;
+    $returnData["hasVaginalPiercings"] = $hasVaginalPiercings;
+
     
     return $returnData;
 }

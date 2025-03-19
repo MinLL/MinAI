@@ -2,6 +2,7 @@
 require_once("/var/www/html/HerikaServer/lib/data_functions.php");
 // Add the system prompt context builder include
 require_once(__DIR__ . "/contextbuilders/system_prompt_context.php");
+require_once(__DIR__ . "/util/format_util.php");
 
 function convertRelationshipStatus($targetActor) {
     $relationshipRank = GetActorValue($targetActor, "relationshipRank");
@@ -206,6 +207,7 @@ function interceptRoleplayInput() {
         // Add crime context
         $bountyStatus = convertToFirstPerson(callContextBuilder('bounty', $params), $PLAYER_NAME, $playerPronouns);
         $relationshipStatus = convertRelationshipStatus($HERIKA_NAME);
+        $weather = convertToFirstPerson(callContextBuilder('weather', $params), $PLAYER_NAME, $playerPronouns);
         // Replace variables in system prompt and request
         $variableReplacements = [
             'PLAYER_NAME' => $PLAYER_NAME,
@@ -231,6 +233,7 @@ function interceptRoleplayInput() {
             'HERIKA_PERS' => $HERIKA_PERS,
             'MIND_STATE' => $mindState,
             'RELATIONSHIP_STATUS' => $relationshipStatus,
+            'WEATHER' => $weather,
             'DEVICE_STATUS' => '' // Remove old device status string
         ];
 
@@ -279,7 +282,40 @@ function interceptRoleplayInput() {
         }
 
         // Apply variable replacements to the selected prompts
-        $systemPrompt = replaceVariables($systemPrompt, $variableReplacements);
+        $sectionMap = [
+            "HERIKA_PERS" => "## PERSONALITY",
+            "DYNAMIC_STATE" => "## CURRENT STATE",
+            "PHYSICAL_DESCRIPTION" => "## PHYSICAL APPEARANCE",
+            "CLOTHING_STATUS" => "## EQUIPMENT",
+            "TATTOO_STATUS" => "## TATTOOS",
+            "AROUSAL_STATUS" => "## AROUSAL STATUS",
+            "FERTILITY_STATUS" => "## FERTILITY STATUS",
+            "SURVIVAL_STATUS" => "## SURVIVAL STATUS",
+            "MIND_STATE" => "## MENTAL STATE",
+            "WEATHER" => "## WEATHER",
+            "NEARBY_ACTORS" => "## NEARBY CHARACTERS",
+            "PLAYER_BIOS" => "## YOUR BACKGROUND",
+            "BOUNTY_STATUS" => "## BOUNTY STATUS"
+        ];
+
+        // Helper function to replace variables with section headers
+        function inflatePrompt($text, $replacements) {
+            global $sectionMap;
+            return preg_replace_callback('/\{([^}]+)\}/', function($matches) use ($replacements, $sectionMap) {
+                $key = $matches[1];
+                if (isset($replacements[$key])) {
+                    // If the key exists in sectionMap, prepend the section header
+                    $value = $replacements[$key];
+                    if (isset($sectionMap[$key])) {
+                        return $sectionMap[$key] . "\n" . $value;
+                    }
+                    return $value;
+                }
+                return $matches[0];
+            }, $text);
+        }
+
+        $systemPrompt = inflatePrompt($systemPrompt, $variableReplacements);
 
         // Sort sections by their order if it exists
         $sections = $settings['sections'];
@@ -300,6 +336,9 @@ function interceptRoleplayInput() {
 
             $content = $section['header'] . "\n";
             $content .= replaceVariables($section['content'], $variableReplacements);
+            
+            // Format the section content using the shared formatter
+            $content = FormatUtil::formatContext($content);
 
             $contextMessage .= $content;
         }
@@ -309,7 +348,7 @@ function interceptRoleplayInput() {
         $messages = [
             ['role' => 'system', 'content' => $systemPrompt . "\n\n"],
             ['role' => 'system', 'content' => replaceVariables($contextMessage, $variableReplacements)],
-            ['role' => 'user', 'content' => "\n" . replaceVariables($requestFormat, $variableReplacements)]
+            ['role' => 'user', 'content' => "\n\n" . replaceVariables($requestFormat, $variableReplacements)]
         ];
 
         // Debug log the messages being sent to LLM

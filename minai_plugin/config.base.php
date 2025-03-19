@@ -103,31 +103,31 @@ $GLOBALS['roleplay_settings'] = Array(
     "sections" => Array(
         "CHARACTER_BACKGROUND" => Array(
             "enabled" => true,
-            "header" => "=== YOUR BACKGROUND ===",
-            "content" => "#PLAYER_BIOS#\nPronouns: #PLAYER_SUBJECT#/#PLAYER_OBJECT#/#PLAYER_POSSESSIVE#\n\nCurrent State: #HERIKA_DYNAMIC#\n\nPhysical Description: #PHYSICAL_DESCRIPTION#\n\Mental State: #MIND_STATE#",
+            "header" => "## YOUR DESCRIPTION AND PERSONALITY",
+            "content" => "#PLAYER_BIOS#\n#HERIKA_PERS#\nPronouns: #PLAYER_SUBJECT#/#PLAYER_OBJECT#/#PLAYER_POSSESSIVE#\nCurrent State: #HERIKA_DYNAMIC#\nPhysical Description: #PHYSICAL_DESCRIPTION#\nMental State: #MIND_STATE#",
             "order" => 0
         ),
         "CHARACTER_STATUS" => Array(
             "enabled" => true,
-            "header" => "=== YOUR CURRENT STATUS ===",
+            "header" => "## YOUR CURRENT STATUS",
             "content" => "#AROUSAL_STATUS#\n#SURVIVAL_STATUS#\n#CLOTHING_STATUS#\n#FERTILITY_STATUS#\n#TATTOO_STATUS#\n#BOUNTY_STATUS#",
             "order" => 1
         ),
         "NEARBY_ENTITIES" => Array(
             "enabled" => true,
-            "header" => "=== NEARBY ENTITIES ===",
+            "header" => "## NEARBY ENTITIES",
             "content" => "Characters: #NEARBY_ACTORS#\nLocations: #NEARBY_LOCATIONS#",
             "order" => 2
         ),
         "RECENT_EVENTS" => Array(
             "enabled" => true,
-            "header" => "=== RECENT EVENTS ===",
+            "header" => "## RECENT EVENTS",
             "content" => "#RECENT_EVENTS#",
             "order" => 3
         ),
         "INSTRUCTIONS" => Array(
             "enabled" => true,
-            "header" => "=== INSTRUCTIONS ===",
+            "header" => "## INSTRUCTIONS",
             "content" => "1. Correct any misheard names using the nearby names list\n2. Keep responses brief and true to the original meaning\n3. Do not add character name prefixes to your response\n4. Provide only the translated dialogue\n5. Emphasize recent events and dialogue in your response.",
             "order" => 4
         )
