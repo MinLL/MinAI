@@ -32,7 +32,7 @@ require_once(dirname(__FILE__) . "/info_touch_grope.php");
 require_once(dirname(__FILE__) . "/info_touch_moan.php");
 require_once(dirname(__FILE__) . "/info_touch_pinch.php");
 require_once(dirname(__FILE__) . "/info_turn_off.php");
-
+require_once(dirname(__FILE__) . "/info_vibrate.php");
 // For any code that directly accesses the old prompts, we can map them here
 // But new code should use the PromptRegistry methods:
 // - PromptRegistry::get($id)
