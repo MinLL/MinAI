@@ -26,17 +26,10 @@ function SetDungeonMasterPrompts($message = "") {
     
     // Add player_request with the message if provided
     if (!empty($message)) {
-        if ($isNarratorTarget) {
-            // For The Narrator, we use a different format
-            $dungeonMasterPrompt["player_request"] = [
-                "The Player asks you to narrate: {$message}"
-            ];
-        } else {
-            // For NPCs, we use the standard format
-            $dungeonMasterPrompt["player_request"] = [
-                "The Narrator: {$message}"
-            ];
-        }
+        // For NPCs, we use the standard format
+        $dungeonMasterPrompt["player_request"] = [
+            "The Narrator: {$message}"
+        ];
     } else {
         
     }
