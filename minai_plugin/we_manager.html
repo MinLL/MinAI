@@ -5,6 +5,7 @@
     <title>Equipment Description Management</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <style>
+        /* Variables */
         :root {
             --primary-color: #4CAF50;
             --secondary-color: #2196F3;
@@ -14,10 +15,10 @@
             --border-color: #404040;
             --success-color: #40c057;
             --error-color: #f44336;
-            --warning-color: #ffc107;
             --info-color: #4dabf7;
         }
 
+        /* Base Styles */
         body {
             margin: 0;
             padding: 0;
@@ -28,6 +29,15 @@
             line-height: 1.6;
         }
 
+        h1 {
+            text-align: center;
+            color: var(--text-color);
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Layout */
         .container {
             max-width: 1200px;
             margin: 40px auto;
@@ -39,14 +49,7 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
-        h1 {
-            text-align: center;
-            color: var(--text-color);
-            margin-bottom: 30px;
-            font-size: 2.5rem;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
+        /* Navigation */
         .nav-panel {
             background-color: var(--background-light);
             padding: 15px;
@@ -66,22 +69,59 @@
             padding: 10px 20px;
             border-radius: 8px;
             transition: all 0.3s ease;
-            background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.1) 0%,
-                rgba(255, 255, 255, 0.05) 100%
-            );
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
             border: 1px solid var(--border-color);
         }
 
         .nav-panel a:hover {
             transform: translateY(-2px);
-            background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.15) 0%,
-                rgba(255, 255, 255, 0.08) 100%
-            );
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
+        /* Forms */
+        .add-equipment {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(45, 45, 45, 0.4);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .add-equipment h3 {
+            color: var(--text-color);
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--background-dark);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+
+        /* Equipment Grid */
         .equipment-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -103,6 +143,17 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
+        .equipment-card[data-hidden="1"] {
+            opacity: 0.6;
+            border-left: 3px solid #555555;
+        }
+
+        .equipment-card.editing {
+            border-left: 3px solid var(--info-color);
+            background: rgba(33, 150, 243, 0.1);
+        }
+
+        /* Equipment Card Header */
         .equipment-header {
             display: flex;
             justify-content: space-between;
@@ -118,67 +169,7 @@
             color: var(--primary-color);
         }
 
-        .equipment-controls {
-            display: flex;
-            gap: 10px;
-        }
-
-        button {
-            padding: 8px 16px;
-            background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.1) 0%,
-                rgba(255, 255, 255, 0.05) 100%
-            );
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.15) 0%,
-                rgba(255, 255, 255, 0.08) 100%
-            );
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        button.primary {
-            background: linear-gradient(135deg,
-                rgba(76, 175, 80, 0.2) 0%,
-                rgba(76, 175, 80, 0.3) 100%
-            );
-            border-color: var(--primary-color);
-        }
-
-        .add-equipment {
-            margin: 20px 0;
-            padding: 20px;
-            background: rgba(45, 45, 45, 0.4);
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-        }
-
-        input[type="text"], textarea {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--background-dark);
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        input[type="text"]:focus, textarea:focus {
-            border-color: var(--primary-color);
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
-        }
-
+        /* Equipment Details */
         .equipment-details {
             margin-top: 15px;
         }
@@ -201,25 +192,89 @@
             flex: 1;
         }
 
-        .status-message {
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            display: none;
+        /* Buttons */
+        button {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        .status-message.success {
-            background-color: rgba(64, 192, 87, 0.2);
-            color: var(--success-color);
-            border: 1px solid var(--success-color);
+        button:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
-        .status-message.error {
-            background-color: rgba(244, 67, 54, 0.2);
+        button.primary {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(76, 175, 80, 0.3) 100%);
+            border-color: var(--primary-color);
+        }
+
+        /* Icon Buttons */
+        .equipment-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        button.icon-button {
+            width: 24px;
+            height: 24px;
+            padding: 0;
+            background: rgba(45, 45, 45, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            margin-right: 5px;
+        }
+
+        button.icon-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        button.icon-button i {
+            font-size: 12px;
+        }
+
+        .delete-button {
             color: var(--error-color);
-            border: 1px solid var(--error-color);
         }
 
+        .edit-button {
+            color: var(--info-color);
+        }
+
+        .edit-button[title="Save changes"] {
+            color: var(--success-color);
+        }
+
+        .visibility-button[data-hidden="0"] {
+            color: #aaaaaa;
+            background: rgba(170, 170, 170, 0.1);
+            border-color: rgba(170, 170, 170, 0.3);
+        }
+
+        .visibility-button[data-hidden="1"] {
+            color: #555555;
+            background: rgba(85, 85, 85, 0.1);
+            border-color: rgba(85, 85, 85, 0.3);
+        }
+
+        .clearBtn {
+            background: linear-gradient(135deg, rgba(244, 67, 54, 0.1) 0%, rgba(244, 67, 54, 0.2) 100%);
+            border-color: var(--error-color);
+            padding: 4px 8px;
+            font-size: 0.9rem;
+        }
+
+        /* Media Queries */
         @media (max-width: 768px) {
             .container {
                 margin: 20px;
@@ -238,141 +293,6 @@
             h1 {
                 font-size: 2rem;
             }
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .add-equipment h3 {
-            color: var(--text-color);
-            margin-top: 0;
-            margin-bottom: 20px;
-            font-size: 1.2rem;
-            opacity: 0.9;
-        }
-
-        .deleteBtn {
-            background: linear-gradient(135deg,
-                rgba(244, 67, 54, 0.2) 0%,
-                rgba(244, 67, 54, 0.3) 100%
-            );
-            border-color: var(--error-color);
-        }
-
-        .editBtn {
-            background: linear-gradient(135deg,
-                rgba(33, 150, 243, 0.2) 0%,
-                rgba(33, 150, 243, 0.3) 100%
-            );
-            border-color: var(--info-color);
-        }
-		
-		/* Style for icon buttons */
-button.icon-button {
-    width: 24px;
-    height: 24px;
-    padding: 0;
-    background: rgba(45, 45, 45, 0.4);
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    margin-right: 5px;
-}
-
-button.icon-button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-button.icon-button i {
-    font-size: 12px;
-}
-
-/* Visibility toggle button with gray color scheme */
-button.visibility-button[data-hidden="0"] {
-    color: #aaaaaa;  /* Light gray for visible items */
-    background: rgba(170, 170, 170, 0.1);
-    border-color: rgba(170, 170, 170, 0.3);
-}
-
-button.visibility-button[data-hidden="1"] {
-    color: #555555;  /* Dark gray for hidden items */
-    background: rgba(85, 85, 85, 0.1);
-    border-color: rgba(85, 85, 85, 0.3);
-}
-
-/* Hidden equipment cards */
-.equipment-card[data-hidden="1"] {
-    opacity: 0.6;
-    border-left: 3px solid #555555;
-}
-
-.delete-button {
-    color: var(--error-color);
-}
-
-.edit-button {
-    color: var(--info-color);
-}
-
-.edit-button[title="Save changes"] {
-    color: var(--success-color);
-}
-
-.equipment-card.editing {
-    border-left: 3px solid var(--info-color);
-    background: rgba(33, 150, 243, 0.1);
-}
-
-        .equipment-card.editing {
-            background: linear-gradient(135deg,
-                rgba(76, 175, 80, 0.1) 0%,
-                rgba(76, 175, 80, 0.2) 100%
-            );
-            border-color: var(--primary-color);
-        }
-
-        .sort {
-            color: var(--text-color);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .sort:hover {
-            color: var(--primary-color);
-        }
-
-        .sort::after {
-            content: '↕';
-            font-size: 0.8em;
-        }
-
-        .sort.asc::after {
-            content: '↑';
-        }
-
-        .sort.desc::after {
-            content: '↓';
-        }
-
-        .clearBtn {
-            background: linear-gradient(135deg,
-                rgba(244, 67, 54, 0.1) 0%,
-                rgba(244, 67, 54, 0.2) 100%
-            );
-            border-color: var(--error-color);
-            padding: 4px 8px;
-            font-size: 0.9rem;
         }
     </style>
 </head>

@@ -333,7 +333,6 @@ function GetAvailableItems() {
     }
 }
 
-
 /**
  * Add a new item to the database with mod index support
  * 

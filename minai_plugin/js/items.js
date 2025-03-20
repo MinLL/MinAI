@@ -1,32 +1,202 @@
-// Global variables
-let currentPage = 1;
-let itemsPerPage = 10;
-let totalPages = 1;
-let currentItems = [];
-let categories = [];
-let itemTypes = [];
+// Constants
+const ITEMS_PER_PAGE = 10;
+const DEBOUNCE_DELAY = 300;
 
-// DOM elements
-const messageElement = document.getElementById('message');
-const itemsTableBody = document.getElementById('items-table-body');
-const categoryFilter = document.getElementById('category-filter');
-const typeFilter = document.getElementById('type-filter');
-const availabilityFilter = document.getElementById('availability-filter');
-const sortBySelect = document.getElementById('sort-by');
-const sortOrderSelect = document.getElementById('sort-order');
-const searchInput = document.getElementById('search-input');
-const searchButton = document.getElementById('search-button');
-const resetButton = document.getElementById('reset-button');
-const prevPageButton = document.getElementById('prev-page');
-const nextPageButton = document.getElementById('next-page');
-const pageInfoElement = document.getElementById('page-info');
-const addItemForm = document.getElementById('add-item-form');
-const importForm = document.getElementById('import-form');
-const exportButton = document.getElementById('export-button');
-const exportCategorySelect = document.getElementById('export-category');
-const exportTypeSelect = document.getElementById('export-type');
-const tabs = document.querySelectorAll('.tab');
-const tabContents = document.querySelectorAll('.tab-content');
+// State Management
+const State = {
+    items: [],
+    currentPage: 1,
+    totalPages: 1,
+    categories: [],
+    itemTypes: [],
+    filters: {
+        category: '',
+        type: '',
+        availability: '',
+        search: ''
+    },
+    
+    updateFilters(newFilters) {
+        this.filters = { ...this.filters, ...newFilters };
+        this.currentPage = 1;
+    }
+};
+
+// API Service
+const API = {
+    baseUrl: 'api/items_api.php',
+    
+    async getItems(params) {
+        const response = await fetch(`${this.baseUrl}?${params.toString()}`);
+        if (!response.ok) throw new Error('Failed to load items');
+        return response.json();
+    },
+    
+    async getCategories() {
+        const response = await fetch(`${this.baseUrl}?action=categories`);
+        if (!response.ok) throw new Error('Failed to load categories');
+        return response.json();
+    },
+    
+    async getItemTypes() {
+        const response = await fetch(`${this.baseUrl}?action=types`);
+        if (!response.ok) throw new Error('Failed to load item types');
+        return response.json();
+    },
+    
+    async updateItem(id, data) {
+        const response = await fetch(`${this.baseUrl}?id=${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) throw new Error('Failed to update item');
+        return response.json();
+    },
+    
+    async deleteItem(id) {
+        const response = await fetch(`${this.baseUrl}?id=${id}`, {
+            method: 'DELETE'
+        });
+        if (!response.ok) throw new Error('Failed to delete item');
+        return response.json();
+    },
+    
+    async importItems(formData) {
+        const response = await fetch(`${this.baseUrl}?action=import`, {
+            method: 'POST',
+            body: formData
+        });
+        if (!response.ok) throw new Error('Failed to import items');
+        return response.json();
+    },
+    
+    async resetDatabase() {
+        const response = await fetch(`${this.baseUrl}?action=reset`);
+        if (!response.ok) throw new Error('Failed to reset database');
+        return response.json();
+    }
+};
+
+// Utility Functions
+const Utils = {
+    formatDate(dateString) {
+        if (!dateString) return 'Never';
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return 'Invalid Date';
+        
+        return date.toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric',
+            hour: '2-digit', 
+            minute: '2-digit'
+        });
+    },
+    
+    debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    },
+    
+    getFormData(form) {
+        const formData = new FormData(form);
+        const data = {};
+        
+        for (const [key, value] of formData.entries()) {
+            data[key] = key.endsWith('_available') || key.endsWith('_hidden') 
+                ? formData.has(key) 
+                : value;
+        }
+        
+        return data;
+    }
+};
+
+// UI Management
+const UI = {
+    elements: {
+        messageElement: document.getElementById('message'),
+        itemsTableBody: document.getElementById('items-table-body'),
+        categoryFilter: document.getElementById('category-filter'),
+        typeFilter: document.getElementById('type-filter'),
+        availabilityFilter: document.getElementById('availability-filter'),
+        sortBySelect: document.getElementById('sort-by'),
+        sortOrderSelect: document.getElementById('sort-order'),
+        searchInput: document.getElementById('search-input'),
+        searchButton: document.getElementById('search-button'),
+        resetButton: document.getElementById('reset-button'),
+        prevPageButton: document.getElementById('prev-page'),
+        nextPageButton: document.getElementById('next-page'),
+        pageInfoElement: document.getElementById('page-info'),
+        addItemForm: document.getElementById('add-item-form'),
+        importForm: document.getElementById('import-form'),
+        exportButton: document.getElementById('export-button'),
+        exportCategorySelect: document.getElementById('export-category'),
+        exportTypeSelect: document.getElementById('export-type'),
+        tabs: document.querySelectorAll('.tab'),
+        tabContents: document.querySelectorAll('.tab-content')
+    },
+
+    showMessage(message, type) {
+        this.elements.messageElement.textContent = message;
+        this.elements.messageElement.className = `message ${type}`;
+        this.elements.messageElement.style.display = 'block';
+    },
+
+    hideMessage() {
+        this.elements.messageElement.style.display = 'none';
+    },
+
+    updatePagination() {
+        this.elements.pageInfoElement.textContent = `Page ${State.currentPage} of ${State.totalPages || 1}`;
+        this.elements.prevPageButton.disabled = State.currentPage === 1;
+        this.elements.nextPageButton.disabled = State.currentPage >= State.totalPages;
+    },
+
+    createModal(content) {
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.innerHTML = content;
+        document.body.appendChild(modal);
+        modal.style.display = 'block';
+        return modal;
+    }
+};
+
+// Event Handlers
+const EventHandlers = {
+    onSearch: Utils.debounce(function() {
+        State.currentPage = 1;
+        filterAndDisplayItems();
+    }, DEBOUNCE_DELAY),
+    
+    onFilterChange: function() {
+        State.currentPage = 1;
+        loadItems();
+    },
+    
+    onTabClick: function(event) {
+        const tabId = event.target.getAttribute('data-tab');
+        UI.elements.tabs.forEach(t => t.classList.remove('active'));
+        UI.elements.tabContents.forEach(c => c.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById(tabId).classList.add('active');
+    }
+};
+
+// Error Handler
+function handleApiError(error, customMessage) {
+    console.error(customMessage, error);
+    UI.showMessage(`${customMessage}: ${error.message}`, 'error');
+}
 
 // Initialize the page
 document.addEventListener('DOMContentLoaded', function() {
@@ -153,73 +323,54 @@ function setupEventListeners() {
     }
 }
 
-// Load items from the API
-function loadItems() {
-    // Show loading message
-    showMessage('Loading items...', 'info');
-    
-    // Build query parameters
-    const params = new URLSearchParams();
-    
-    // Add category filter if selected
-    if (categoryFilter.value) {
-        params.append('category', categoryFilter.value);
-    }
-    
-    // Add type filter if selected
-    if (typeFilter.value) {
-        params.append('item_type', typeFilter.value);
-    }
-    
-    // Add availability filter if selected
-    if (availabilityFilter.value) {
-        params.append('is_available', availabilityFilter.value);
-    }
-    
-    // Add sorting
-    params.append('sort_by', sortBySelect.value);
-    params.append('sort_order', sortOrderSelect.value);
-    
-    // Add cache-busting to ensure we get fresh data
-    params.append('_cache', new Date().getTime());
-    
-    // Make API request
-    fetch(`api/items_api.php?${params.toString()}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to load items');
+// Main functionality
+async function loadItems() {
+    try {
+        UI.showMessage('Loading items...', 'info');
+        
+        // Build query parameters
+        const params = new URLSearchParams();
+        
+        if (UI.elements.categoryFilter.value) {
+            params.append('category', UI.elements.categoryFilter.value);
+        }
+        
+        if (UI.elements.typeFilter.value) {
+            params.append('item_type', UI.elements.typeFilter.value);
+        }
+        
+        if (UI.elements.availabilityFilter.value) {
+            params.append('is_available', UI.elements.availabilityFilter.value);
+        }
+        
+        params.append('sort_by', UI.elements.sortBySelect.value);
+        params.append('sort_order', UI.elements.sortOrderSelect.value);
+        params.append('_cache', new Date().getTime());
+        
+        const data = await API.getItems(params);
+        State.items = data;
+        console.log("Loaded items data:", State.items);
+        
+        if (State.items.length > 0) {
+            console.log("Sample item is_hidden values:");
+            for (let i = 0; i < Math.min(3, State.items.length); i++) {
+                console.log(`Item ${State.items[i].id}: is_hidden =`, State.items[i].is_hidden,
+                            `(${typeof State.items[i].is_hidden})`);
             }
-            return response.json();
-        })
-        .then(data => {
-            currentItems = data;
-            console.log("Loaded items data:", currentItems);
-            
-            // Debug check a few items' is_hidden values
-            if (currentItems.length > 0) {
-                console.log("Sample item is_hidden values:");
-                for (let i = 0; i < Math.min(3, currentItems.length); i++) {
-                    console.log(`Item ${currentItems[i].id}: is_hidden =`, currentItems[i].is_hidden, 
-                                `(${typeof currentItems[i].is_hidden})`);
-                }
-            }
-            
-            filterAndDisplayItems();
-            hideMessage();
-        })
-        .catch(error => {
-            console.error('Error loading items:', error);
-            showMessage(error.message, 'error');
-        });
+        }
+        
+        filterAndDisplayItems();
+        UI.hideMessage();
+    } catch (error) {
+        handleApiError(error, 'Error loading items');
+    }
 }
 
-
-// Filter and display items based on search term
 function filterAndDisplayItems() {
-    let filteredItems = [...currentItems];
+    let filteredItems = [...State.items];
     
     // Apply search filter if there's a search term
-    const searchTerm = searchInput.value.trim().toLowerCase();
+    const searchTerm = UI.elements.searchInput.value.trim().toLowerCase();
     if (searchTerm) {
         filteredItems = filteredItems.filter(item => {
             return (
@@ -234,247 +385,98 @@ function filterAndDisplayItems() {
         });
     }
     
-    // Update pagination for filtered results
-    totalPages = Math.ceil(filteredItems.length / itemsPerPage);
-    currentPage = Math.min(currentPage, totalPages);
-    if (currentPage < 1) currentPage = 1;
+    // Update pagination
+    State.totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
+    State.currentPage = Math.min(State.currentPage, State.totalPages);
+    if (State.currentPage < 1) State.currentPage = 1;
     
-    // Calculate pagination
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = Math.min(startIndex + itemsPerPage, filteredItems.length);
+    // Calculate pagination indices
+    const startIndex = (State.currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, filteredItems.length);
     
-    // Update page info
-    pageInfoElement.textContent = `Page ${currentPage} of ${totalPages || 1}`;
-    
-    // Enable/disable pagination buttons
-    prevPageButton.disabled = currentPage === 1;
-    nextPageButton.disabled = currentPage >= totalPages;
+    // Update UI pagination
+    UI.updatePagination();
     
     // Clear the table
-    itemsTableBody.innerHTML = '';
+    UI.elements.itemsTableBody.innerHTML = '';
     
     // Display filtered items for current page
     for (let i = startIndex; i < endIndex; i++) {
         const item = filteredItems[i];
-        
-        // Create table row
-        const row = document.createElement('tr');
-        
-        // Evaluate is_hidden value correctly to fix visibility icon issue
-        const isHidden = item.is_hidden === true || 
-                         item.is_hidden === 't' || 
-                         item.is_hidden === 1 || 
-                         item.is_hidden === '1' || 
-                         item.is_hidden === 'true';
-        
-        console.log(`Item ${item.id} is_hidden:`, item.is_hidden, 
-                    `(${typeof item.is_hidden}), evaluated as: ${isHidden}`);
-        
-        // Add cells
-        row.innerHTML = `
-            <td>${item.id}</td>
-            <td>${item.item_id}</td>
-            <td>${item.file_name}</td>
-            <td>${item.name}</td>
-            <td>${item.description || ''}</td>
-            <td>${item.item_type || 'Item'}</td>
-            <td>${item.category || ''}</td>
-            <td>${item.mod_index || ''}</td>
-            <td>${item.is_available ? 'Yes' : 'No'}</td>
-            <td>${formatDate(item.last_seen)}</td>
-            <td>${formatDate(item.created_at)}</td>
-            <td class="button-cell">
-                <div class="button-container">
-                    <button class="visibility-button icon-button" data-id="${item.id}" data-hidden="${isHidden ? '1' : '0'}" 
-                            title="${isHidden ? 'Make visible' : 'Hide item'}">
-                        <i class="fas ${isHidden ? 'fa-eye-slash' : 'fa-eye'}"></i>
-                    </button>
-                    <button class="edit-button icon-button" data-id="${item.id}" title="Edit item">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="delete-button icon-button delete" data-id="${item.id}" title="Delete item">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </div>
-            </td>
-        `;
-        
-        // Add row to table
-        itemsTableBody.appendChild(row);
+        displayItem(item);
     }
-    
-    // Add event listeners to edit and delete buttons
-    document.querySelectorAll('.edit-button').forEach(button => {
-        button.addEventListener('click', function() {
-            const id = this.getAttribute('data-id');
-            editItem(id);
-        });
-    });
-    
-    document.querySelectorAll('.delete-button').forEach(button => {
-        button.addEventListener('click', function() {
-            const id = this.getAttribute('data-id');
-            deleteItem(id);
-        });
-    });
-    
-    // After populating the table in filterAndDisplayItems
-    document.querySelectorAll('.visibility-button').forEach(button => {
-        button.addEventListener('click', function() {
-            const id = this.getAttribute('data-id');
-            const currentHidden = this.getAttribute('data-hidden');
-            console.log(`Visibility button clicked for item ${id}, current state: ${currentHidden}`);
-            toggleItemHidden(id, currentHidden);
-        });
-    });
 }
 
-
-// Load categories from the API
-function loadCategories() {
-    fetch('api/items_api.php?action=categories')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to load categories');
-            }
-            return response.json();
-        })
-        .then(data => {
-            categories = data;
-            
-            // Clear existing options (except the first one)
-            while (categoryFilter.options.length > 1) {
-                categoryFilter.remove(1);
-            }
-            
-            while (exportCategorySelect.options.length > 1) {
-                exportCategorySelect.remove(1);
-            }
-            
-            // Add categories to filters
-            categories.forEach(category => {
-                const option1 = document.createElement('option');
-                option1.value = category.category;
-                option1.textContent = `${category.category} (${category.count})`;
-                categoryFilter.appendChild(option1);
-                
-                const option2 = document.createElement('option');
-                option2.value = category.category;
-                option2.textContent = `${category.category} (${category.count})`;
-                exportCategorySelect.appendChild(option2);
-            });
-        })
-        .catch(error => {
-            showMessage(error.message, 'error');
-        });
+function displayItem(item) {
+    const row = document.createElement('tr');
+    
+    const isHidden = item.is_hidden === true || 
+                     item.is_hidden === 't' || 
+                     item.is_hidden === 1 || 
+                     item.is_hidden === '1' || 
+                     item.is_hidden === 'true';
+    
+    row.innerHTML = `
+        <td>${item.id}</td>
+        <td>${item.item_id}</td>
+        <td>${item.file_name}</td>
+        <td>${item.name}</td>
+        <td>${item.description || ''}</td>
+        <td>${item.item_type || 'Item'}</td>
+        <td>${item.category || ''}</td>
+        <td>${item.mod_index || ''}</td>
+        <td>${item.is_available ? 'Yes' : 'No'}</td>
+        <td>${Utils.formatDate(item.last_seen)}</td>
+        <td>${Utils.formatDate(item.created_at)}</td>
+        <td class="button-cell">
+            <div class="button-container">
+                <button class="visibility-button icon-button" data-id="${item.id}" data-hidden="${isHidden ? '1' : '0'}" 
+                        title="${isHidden ? 'Make visible' : 'Hide item'}">
+                    <i class="fas ${isHidden ? 'fa-eye-slash' : 'fa-eye'}"></i>
+                </button>
+                <button class="edit-button icon-button" data-id="${item.id}" title="Edit item">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="delete-button icon-button delete" data-id="${item.id}" title="Delete item">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+        </td>
+    `;
+    
+    UI.elements.itemsTableBody.appendChild(row);
 }
 
-// Load item types from the API
-function loadItemTypes() {
-    fetch('api/items_api.php?action=types')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to load item types');
-            }
-            return response.json();
-        })
-        .then(data => {
-            itemTypes = data;
-            
-            // Clear existing options (except the first one)
-            while (typeFilter.options.length > 1) {
-                typeFilter.remove(1);
-            }
-            
-            while (exportTypeSelect.options.length > 1) {
-                exportTypeSelect.remove(1);
-            }
-            
-            // Add item types to filters
-            itemTypes.forEach(type => {
-                const option1 = document.createElement('option');
-                option1.value = type.item_type;
-                option1.textContent = type.item_type;
-                typeFilter.appendChild(option1);
-                
-                const option2 = document.createElement('option');
-                option2.value = type.item_type;
-                option2.textContent = type.item_type;
-                exportTypeSelect.appendChild(option2);
-            });
-        })
-        .catch(error => {
-            showMessage(error.message, 'error');
-        });
+async function addItem() {
+    try {
+        const data = Utils.getFormData(UI.elements.addItemForm);
+        
+        // Make API request
+        const response = await API.updateItem('new', data);
+        UI.showMessage(response.message, 'success');
+        UI.elements.addItemForm.reset();
+        document.getElementById('item-type').value = 'Item';
+        
+        // Reload data
+        await Promise.all([
+            loadItems(),
+            loadCategories(),
+            loadItemTypes()
+        ]);
+    } catch (error) {
+        handleApiError(error, 'Failed to add item');
+    }
 }
 
-// Add a new item
-function addItem() {
-    // Get form data
-    const formData = new FormData(addItemForm);
-    const data = {};
-    
-    // Convert FormData to object
-    for (const [key, value] of formData.entries()) {
-        if (key === 'is_available') {
-            data[key] = true;
-        } else {
-            data[key] = value;
-        }
-    }
-    
-    // If is_available checkbox is not checked, set it to false
-    if (!formData.has('is_available')) {
-        data.is_available = false;
-    }
-    
-    // If is_hidden checkbox is not checked, set it to false
-    if (!formData.has('is_hidden')) {
-        data.is_hidden = false;
-    }
-    
-    // Make API request
-    fetch('api/items_api.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to add item');
-            }
-            return response.json();
-        })
-        .then(data => {
-            showMessage(data.message, 'success');
-            addItemForm.reset();
-            // Set default value for item_type back to "Item"
-            document.getElementById('item-type').value = 'Item';
-            loadItems();
-            loadCategories();
-            loadItemTypes();
-        })
-        .catch(error => {
-            showMessage(error.message, 'error');
-        });
-}
-
-// Edit an item
-function editItem(id) {
-    // Find the item
-    const item = currentItems.find(item => item.id == id);
+async function editItem(id) {
+    const item = State.items.find(item => item.id == id);
     
     if (!item) {
-        showMessage('Item not found', 'error');
+        UI.showMessage('Item not found', 'error');
         return;
     }
     
-    // Create a modal dialog for editing
-    const modal = document.createElement('div');
-    modal.className = 'modal';
-    modal.innerHTML = `
+    const modalContent = `
         <div class="modal-content">
             <span class="close">&times;</span>
             <h2>Edit Item</h2>
@@ -530,210 +532,236 @@ function editItem(id) {
         </div>
     `;
     
-    // Add modal to the page
-    document.body.appendChild(modal);
-    
-    // Show the modal
-    modal.style.display = 'block';
+    const modal = UI.createModal(modalContent);
     
     // Close button functionality
-    modal.querySelector('.close').addEventListener('click', function() {
-        document.body.removeChild(modal);
-    });
-    
-    // Cancel button functionality
-    modal.querySelector('.cancel').addEventListener('click', function() {
-        document.body.removeChild(modal);
-    });
+    modal.querySelector('.close').addEventListener('click', () => document.body.removeChild(modal));
+    modal.querySelector('.cancel').addEventListener('click', () => document.body.removeChild(modal));
     
     // Form submission
-    modal.querySelector('#edit-item-form').addEventListener('submit', function(e) {
+    modal.querySelector('#edit-item-form').addEventListener('submit', async function(e) {
         e.preventDefault();
-        
-        // Get form data
-        const formData = new FormData(this);
-        const data = {};
-        
-        // Convert FormData to object
-        for (const [key, value] of formData.entries()) {
-            if (key === 'is_available') {
-                data[key] = true;
-            } else {
-                data[key] = value;
-            }
+        try {
+            const data = Utils.getFormData(this);
+            const response = await API.updateItem(id, data);
+            UI.showMessage(response.message, 'success');
+            document.body.removeChild(modal);
+            
+            // Reload data
+            await Promise.all([
+                loadItems(),
+                loadCategories(),
+                loadItemTypes()
+            ]);
+        } catch (error) {
+            handleApiError(error, 'Failed to update item');
         }
-        
-        // If is_available checkbox is not checked, set it to false
-        if (!formData.has('is_available')) {
-            data.is_available = false;
-        }
-        
-        // If is_hidden checkbox is not checked, set it to false
-        if (!formData.has('is_hidden')) {
-            data.is_hidden = false;
-        }
-        
-        // Make API request
-        fetch(`api/items_api.php?id=${id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed to update item');
-                }
-                return response.json();
-            })
-            .then(data => {
-                showMessage(data.message, 'success');
-                document.body.removeChild(modal);
-                loadItems();
-                loadCategories();
-                loadItemTypes();
-            })
-            .catch(error => {
-                showMessage(error.message, 'error');
-            });
     });
 }
 
-// Delete an item
-function deleteItem(id) {
-    // Confirm deletion
+async function deleteItem(id) {
     if (!confirm('Are you sure you want to delete this item?')) {
         return;
     }
     
-    // Make API request
-    fetch(`api/items_api.php?id=${id}`, {
-        method: 'DELETE'
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to delete item');
-            }
-            return response.json();
-        })
-        .then(data => {
-            showMessage(data.message, 'success');
-            loadItems();
-            loadCategories();
-            loadItemTypes();
-        })
-        .catch(error => {
-            showMessage(error.message, 'error');
-        });
+    try {
+        const response = await API.deleteItem(id);
+        UI.showMessage(response.message, 'success');
+        
+        // Reload data
+        await Promise.all([
+            loadItems(),
+            loadCategories(),
+            loadItemTypes()
+        ]);
+    } catch (error) {
+        handleApiError(error, 'Failed to delete item');
+    }
 }
 
-// Import items
-function importItems() {
-    // Get file input
+async function importItems() {
     const fileInput = document.getElementById('import-file');
     
     if (!fileInput.files.length) {
-        showMessage('Please select a file to import', 'error');
+        UI.showMessage('Please select a file to import', 'error');
         return;
     }
     
-    // Create FormData
-    const formData = new FormData();
-    formData.append('import_file', fileInput.files[0]);
-    
-    // Make API request
-    fetch('api/items_api.php?action=import', {
-        method: 'POST',
-        body: formData
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to import items');
-            }
-            return response.json();
-        })
-        .then(data => {
-            showMessage(data.message, 'success');
-            loadItems();
-            loadCategories();
-            loadItemTypes();
-            fileInput.value = '';
-        })
-        .catch(error => {
-            showMessage(error.message, 'error');
-        });
+    try {
+        const formData = new FormData();
+        formData.append('import_file', fileInput.files[0]);
+        
+        const response = await API.importItems(formData);
+        UI.showMessage(response.message, 'success');
+        fileInput.value = '';
+        
+        // Reload data
+        await Promise.all([
+            loadItems(),
+            loadCategories(),
+            loadItemTypes()
+        ]);
+    } catch (error) {
+        handleApiError(error, 'Failed to import items');
+    }
 }
 
-// Export items
-function exportItems() {
-    // Build query parameters
-    const params = new URLSearchParams();
-    
-    // Add category filter if selected
-    if (exportCategorySelect.value) {
-        params.append('category', exportCategorySelect.value);
+async function exportItems() {
+    try {
+        const params = new URLSearchParams();
+        
+        if (UI.elements.exportCategorySelect.value) {
+            params.append('category', UI.elements.exportCategorySelect.value);
+        }
+        
+        if (UI.elements.exportTypeSelect.value) {
+            params.append('item_type', UI.elements.exportTypeSelect.value);
+        }
+        
+        const data = await API.getItems(params);
+        
+        // Create a JSON file
+        const json = JSON.stringify(data, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        // Create a download link
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'minai_items.json';
+        a.click();
+        
+        // Clean up
+        URL.revokeObjectURL(url);
+    } catch (error) {
+        handleApiError(error, 'Failed to export items');
+    }
+}
+
+async function resetDatabase() {
+    if (!confirm('WARNING: This will delete ALL items from the database. This action CANNOT be undone. Are you absolutely sure?')) {
+        return;
     }
     
-    // Add type filter if selected
-    if (exportTypeSelect.value) {
-        params.append('item_type', exportTypeSelect.value);
+    try {
+        const response = await API.resetDatabase();
+        UI.showMessage(response.message, 'success');
+        
+        // Reload data
+        await Promise.all([
+            loadItems(),
+            loadCategories(),
+            loadItemTypes()
+        ]);
+    } catch (error) {
+        handleApiError(error, 'Failed to reset database');
     }
+}
+
+async function toggleItemHidden(id, currentState) {
+    const isCurrentlyHidden = currentState === '1';
+    const newHiddenState = !isCurrentlyHidden;
     
-    // Make API request
-    fetch(`api/items_api.php?${params.toString()}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to export items');
+    console.log(`Toggling item ${id} - Current hidden state: ${currentState} (${isCurrentlyHidden})`);
+    console.log(`Setting new hidden state to: ${newHiddenState}`);
+    
+    try {
+        UI.showMessage('Updating visibility...', 'info');
+        
+        const response = await API.updateItem(id, { is_hidden: newHiddenState });
+        console.log('API response:', response);
+        
+        if (response.success) {
+            UI.showMessage('Item visibility updated', 'success');
+            
+            // Update the button
+            const button = document.querySelector(`.visibility-button[data-id="${id}"]`);
+            if (button) {
+                button.setAttribute('data-hidden', newHiddenState ? '1' : '0');
+                
+                const icon = button.querySelector('i');
+                if (icon) {
+                    icon.className = `fas ${newHiddenState ? 'fa-eye-slash' : 'fa-eye'}`;
+                }
+                
+                button.setAttribute('title', newHiddenState ? 'Make visible' : 'Hide item');
             }
-            return response.json();
-        })
-        .then(data => {
-            // Create a JSON file
-            const json = JSON.stringify(data, null, 2);
-            const blob = new Blob([json], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
             
-            // Create a download link
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'minai_items.json';
-            a.click();
+            // Update the in-memory data
+            const itemToUpdate = State.items.find(item => item.id == id);
+            if (itemToUpdate) {
+                itemToUpdate.is_hidden = newHiddenState;
+            }
+        } else {
+            UI.showMessage(response.error || 'Failed to update item', 'error');
+        }
+    } catch (error) {
+        handleApiError(error, 'Error updating item visibility');
+    }
+}
+
+// Load categories from the API
+async function loadCategories() {
+    try {
+        const data = await API.getCategories();
+        State.categories = data;
+        
+        // Clear existing options (except the first one)
+        while (UI.elements.categoryFilter.options.length > 1) {
+            UI.elements.categoryFilter.remove(1);
+        }
+        
+        while (UI.elements.exportCategorySelect.options.length > 1) {
+            UI.elements.exportCategorySelect.remove(1);
+        }
+        
+        // Add categories to filters
+        State.categories.forEach(category => {
+            const option1 = document.createElement('option');
+            option1.value = category.category;
+            option1.textContent = `${category.category} (${category.count})`;
+            UI.elements.categoryFilter.appendChild(option1);
             
-            // Clean up
-            URL.revokeObjectURL(url);
-        })
-        .catch(error => {
-            showMessage(error.message, 'error');
+            const option2 = document.createElement('option');
+            option2.value = category.category;
+            option2.textContent = `${category.category} (${category.count})`;
+            UI.elements.exportCategorySelect.appendChild(option2);
         });
+    } catch (error) {
+        handleApiError(error, 'Failed to load categories');
+    }
 }
 
-// Format date to a more readable format
-function formatDate(dateString) {
-    if (!dateString) return 'Never';
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return 'Invalid Date';
-    
-    const options = { 
-        year: 'numeric', 
-        month: 'short', 
-        day: 'numeric',
-        hour: '2-digit', 
-        minute: '2-digit'
-    };
-    return date.toLocaleDateString('en-US', options);
-}
-
-// Show a message
-function showMessage(message, type) {
-    messageElement.textContent = message;
-    messageElement.className = `message ${type}`;
-    messageElement.style.display = 'block';
-}
-
-// Hide the message
-function hideMessage() {
-    messageElement.style.display = 'none';
+// Load item types from the API
+async function loadItemTypes() {
+    try {
+        const data = await API.getItemTypes();
+        State.itemTypes = data;
+        
+        // Clear existing options (except the first one)
+        while (UI.elements.typeFilter.options.length > 1) {
+            UI.elements.typeFilter.remove(1);
+        }
+        
+        while (UI.elements.exportTypeSelect.options.length > 1) {
+            UI.elements.exportTypeSelect.remove(1);
+        }
+        
+        // Add item types to filters
+        State.itemTypes.forEach(type => {
+            const option1 = document.createElement('option');
+            option1.value = type.item_type;
+            option1.textContent = type.item_type;
+            UI.elements.typeFilter.appendChild(option1);
+            
+            const option2 = document.createElement('option');
+            option2.value = type.item_type;
+            option2.textContent = type.item_type;
+            UI.elements.exportTypeSelect.appendChild(option2);
+        });
+    } catch (error) {
+        handleApiError(error, 'Failed to load item types');
+    }
 }
 
 // Add CSS for the modal
@@ -771,90 +799,3 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
-
-// Reset database function
-function resetDatabase() {
-    // Confirm reset
-    if (!confirm('WARNING: This will delete ALL items from the database. This action CANNOT be undone. Are you absolutely sure?')) {
-        return;
-    }
-    
-    // Make API request
-    fetch(`api/items_api.php?action=reset`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to reset database');
-            }
-            return response.json();
-        })
-        .then(data => {
-            showMessage(data.message, 'success');
-            // Reload items and filters
-            loadItems();
-            loadCategories();
-            loadItemTypes();
-        })
-        .catch(error => {
-            showMessage(error.message, 'error');
-        });
-}
-
-function toggleItemHidden(id, currentState) {
-    // Convert currentState string to boolean
-    const isCurrentlyHidden = currentState === '1';
-    
-    console.log(`Toggling item ${id} - Current hidden state: ${currentState} (${isCurrentlyHidden})`);
-    
-    // The new state should be the opposite
-    const newHiddenState = !isCurrentlyHidden;
-    console.log(`Setting new hidden state to: ${newHiddenState}`);
-    
-    // Show loading message
-    showMessage('Updating visibility...', 'info');
-    
-    fetch(`api/items_api.php?id=${id}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            is_hidden: newHiddenState
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('API response:', data);
-        
-        if (data.success) {
-            showMessage('Item visibility updated', 'success');
-            
-            // Update the button
-            const button = document.querySelector(`.visibility-button[data-id="${id}"]`);
-            if (button) {
-                // Update the button state
-                button.setAttribute('data-hidden', newHiddenState ? '1' : '0');
-                
-                // Update the icon - fix the icon logic
-                const icon = button.querySelector('i');
-                if (icon) {
-                    icon.className = `fas ${newHiddenState ? 'fa-eye-slash' : 'fa-eye'}`;
-                }
-                
-                // Update the tooltip
-                button.setAttribute('title', newHiddenState ? 'Make visible' : 'Hide item');
-            }
-            
-            // Update the in-memory data
-            const itemToUpdate = currentItems.find(item => item.id == id);
-            if (itemToUpdate) {
-                itemToUpdate.is_hidden = newHiddenState;
-            }
-        } else {
-            showMessage(data.error || 'Failed to update item', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error updating item visibility:', error);
-        showMessage('Error updating visibility', 'error');
-    });
-}
