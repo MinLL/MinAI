@@ -220,7 +220,7 @@ Function RequestLLMResponseFromActor(string eventLine, string eventType, string 
         EndIf
       else
         ; Just prompt as normal if not using the config option
-        Info("Requesting response from LLM: " + eventLine)
+        Info("Requesting response from LLM: " + eventLine + "(" + eventType + ") for " + name)
         minAIFF.AIRequestMessageForActor(eventLine, eventType, name)
       endif
     Else

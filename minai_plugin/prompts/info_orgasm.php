@@ -116,7 +116,7 @@ function get_info_orgasm_prompt() {
 }
 
 // Register the prompt only if this specific prompt is requested
-if ($GLOBALS["gameRequest"][0] == "info_orgasm") {
+if ($GLOBALS["gameRequest"][0] == "info_orgasm" || $GLOBALS["gameRequest"][0] == "minai_orgasm") {
     $promptText = OverrideGameRequestPrompt(get_info_orgasm_prompt());
     $GLOBALS["PROMPTS"]["info_orgasm"] = [
         "cue"=>[],

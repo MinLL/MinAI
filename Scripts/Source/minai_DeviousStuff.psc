@@ -329,11 +329,123 @@ EndFunction
 Event OnDeviceEquipped(Form inventoryDevice, Form deviceKeyword, form akActor)
   Main.Info("Equipped Device: " + (inventoryDevice as Armor).GetName() + " on " + main.GetActorName(akActor as Actor))
   SetContext(akActor as Actor)
+  Keyword asKeyword = deviceKeyword as Keyword
+  ; Map device keywords to info event names
+  string infoEvent = "minai_equip_device"
+  if asKeyword == libs.zad_DeviousCollar
+    infoEvent = "minai_equip_collar"
+  elseif asKeyword == libs.zad_DeviousGag || asKeyword == libs.zad_DeviousGagPanel || asKeyword == libs.zad_DeviousGagLarge
+    infoEvent = "minai_equip_gag"
+  elseif asKeyword == libs.zad_DeviousBelt
+    infoEvent = "minai_equip_belt"
+  elseif asKeyword == libs.zad_DeviousArmbinder
+    infoEvent = "minai_equip_armbinder"
+  elseif asKeyword == libs.zad_DeviousYoke
+    infoEvent = "minai_equip_yoke"
+  elseif asKeyword == libs.zad_DeviousElbowTie
+    infoEvent = "minai_equip_elbowtie"
+  elseif asKeyword == libs.zad_DeviousStraitJacket
+    infoEvent = "minai_equip_straitjacket"
+  elseif asKeyword == libs.zad_DeviousCorset
+    infoEvent = "minai_equip_corset"
+  elseif asKeyword == libs.zad_DeviousHood
+    infoEvent = "minai_equip_hood"
+  elseif asKeyword == libs.zad_DeviousHobbleSkirt
+    infoEvent = "minai_equip_hobbleskirt"
+  elseif asKeyword == libs.zad_DeviousGloves
+    infoEvent = "minai_equip_gloves"
+  elseif asKeyword == libs.zad_DeviousSuit
+    infoEvent = "minai_equip_suit"
+  elseif asKeyword == libs.zad_DeviousHarness
+    infoEvent = "minai_equip_harness"
+  elseif asKeyword == libs.zad_DeviousBlindfold
+    infoEvent = "minai_equip_blindfold"
+  elseif asKeyword == libs.zad_DeviousAnkleShackles
+    infoEvent = "minai_equip_ankleshackles"
+  elseif asKeyword == libs.zad_DeviousClamps
+    infoEvent = "minai_equip_clamps"
+  elseif asKeyword == libs.zad_DeviousPlugVaginal
+    infoEvent = "minai_equip_plugvaginal"
+  elseif asKeyword == libs.zad_DeviousPlugAnal
+    infoEvent = "minai_equip_pluganal"
+  elseif asKeyword == libs.zad_DeviousPiercingsNipple
+    infoEvent = "minai_equip_piercingsnipple"
+  elseif asKeyword == libs.zad_DeviousPiercingsVaginal
+    infoEvent = "minai_equip_piercingsvaginal"
+  elseif asKeyword == libs.zad_DeviousArmCuffs
+    infoEvent = "minai_equip_armcuffs"
+  elseif asKeyword == libs.zad_DeviousLegCuffs
+    infoEvent = "minai_equip_legcuffs"
+  elseif asKeyword == libs.zad_DeviousBra
+    infoEvent = "minai_equip_bra"
+  elseif asKeyword == libs.zad_DeviousPetSuit
+    infoEvent = "minai_equip_petsuit"
+  endif
+
+  if infoEvent != ""
+    Main.RequestLLMResponseFromActor("Equipped Device: " + (inventoryDevice as Armor).GetName() + " on " + main.GetActorName(akActor as Actor), infoEvent, main.GetActorName(akActor as Actor), "both")
+  endif
 EndEvent
 
 Event OnDeviceRemoved(Form inventoryDevice, Form deviceKeyword, form akActor)
-  Main.Info("Removed Device: " + (inventoryDevice as Armor).GetName() + " on " + main.GetActorName(akActor as Actor))
+  Main.Info("Removed Device: " + (inventoryDevice as Armor).GetName() + " from " + main.GetActorName(akActor as Actor))
   SetContext(akActor as Actor)
+  Keyword asKeyword = deviceKeyword as Keyword
+  ; Map device keywords to info event names
+  string infoEvent = "minai_unequip_device"
+  if asKeyword == libs.zad_DeviousCollar
+    infoEvent = "minai_unequip_collar"
+  elseif asKeyword == libs.zad_DeviousGag || asKeyword == libs.zad_DeviousGagPanel || asKeyword == libs.zad_DeviousGagLarge
+    infoEvent = "minai_unequip_gag"
+  elseif asKeyword == libs.zad_DeviousBelt
+    infoEvent = "minai_unequip_belt"
+  elseif asKeyword == libs.zad_DeviousArmbinder
+    infoEvent = "minai_unequip_armbinder"
+  elseif asKeyword == libs.zad_DeviousYoke
+    infoEvent = "minai_unequip_yoke"
+  elseif asKeyword == libs.zad_DeviousElbowTie
+    infoEvent = "minai_unequip_elbowtie"
+  elseif asKeyword == libs.zad_DeviousStraitJacket
+    infoEvent = "minai_unequip_straitjacket"
+  elseif asKeyword == libs.zad_DeviousCorset
+    infoEvent = "minai_unequip_corset"
+  elseif asKeyword == libs.zad_DeviousHood
+    infoEvent = "minai_unequip_hood"
+  elseif asKeyword == libs.zad_DeviousHobbleSkirt
+    infoEvent = "minai_unequip_hobbleskirt"
+  elseif asKeyword == libs.zad_DeviousGloves
+    infoEvent = "minai_unequip_gloves"
+  elseif asKeyword == libs.zad_DeviousSuit
+    infoEvent = "minai_unequip_suit"
+  elseif asKeyword == libs.zad_DeviousHarness
+    infoEvent = "minai_unequip_harness"
+  elseif asKeyword == libs.zad_DeviousBlindfold
+    infoEvent = "minai_unequip_blindfold"
+  elseif asKeyword == libs.zad_DeviousAnkleShackles
+    infoEvent = "minai_unequip_ankleshackles"
+  elseif asKeyword == libs.zad_DeviousClamps
+    infoEvent = "minai_unequip_clamps"
+  elseif asKeyword == libs.zad_DeviousPlugVaginal
+    infoEvent = "minai_unequip_plugvaginal"
+  elseif asKeyword == libs.zad_DeviousPlugAnal
+    infoEvent = "minai_unequip_pluganal"
+  elseif asKeyword == libs.zad_DeviousPiercingsNipple
+    infoEvent = "minai_unequip_piercingsnipple"
+  elseif asKeyword == libs.zad_DeviousPiercingsVaginal
+    infoEvent = "minai_unequip_piercingsvaginal"
+  elseif asKeyword == libs.zad_DeviousArmCuffs
+    infoEvent = "minai_unequip_armcuffs"
+  elseif asKeyword == libs.zad_DeviousLegCuffs
+    infoEvent = "minai_unequip_legcuffs"
+  elseif asKeyword == libs.zad_DeviousBra
+    infoEvent = "minai_unequip_bra"
+  elseif asKeyword == libs.zad_DeviousPetSuit
+    infoEvent = "minai_unequip_petsuit"
+  endif
+
+  if infoEvent != ""
+    Main.RequestLLMResponseFromActor("Removed Device: " + (inventoryDevice as Armor).GetName() + " from " + main.GetActorName(akActor as Actor), infoEvent, main.GetActorName(akActor as Actor), "both")
+  endif
 EndEvent
 
 ; Function ReceiveFunction(Form akSource,Form akFormActor,Int aiSetArousal)

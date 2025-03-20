@@ -101,11 +101,13 @@ Function GetDevicesContext($name, $vibratingOnly = false) {
     $arousal = $vibratingOnly ? GetActorArousal($name) : 0;
     $hasChastityBelt = HasKeyword($name, "zad_DeviousBelt");
     $hasChastityBra = HasKeyword($name, "zad_DeviousBra");
-    $hasNipplePiercings = HasKeyword($name, "zad_DeviousPiercingsNipple");
-    $hasVaginalPiercings = HasKeyword($name, "zad_DeviousPiercingsVaginal");
+    $hasNipplePiercing = HasKeyword($name, "zad_DeviousPiercingsNipple") || HasKeyword($name, "SLA_PiercingNipple");
+    $hasVaginalPiercing = HasKeyword($name, "zad_DeviousPiercingsVaginal") || HasKeyword($name, "SLA_PiercingClit");
     $hasHarness = HasKeyword($name, "zad_DeviousHarness");
     $hasGag = HasKeyword($name, "zad_DeviousGag");
-    
+    $hasVaginalPlug = HasKeyword($name, "zad_DeviousPlugVaginal");
+    $hasAnalPlug = HasKeyword($name, "zad_DeviousPlugAnal");
+
     // Get the correct pronouns for this actor
     $pronouns = GetActorPronouns($name);
     $their = $pronouns["possessive"];
@@ -450,19 +452,19 @@ Function GetDevicesContext($name, $vibratingOnly = false) {
     
     // Chastity items (restraints but on underwear layer)
     if (HasKeyword($name, "zad_DeviousBelt")) {
-        $addToLayer("chastity belt", false, true, true, 1);
+        $addToLayer("chastity belt", false, true, false, 1);
     }
     
     if (HasKeyword($name, "zad_DeviousBra")) {
-        $addToLayer("chastity bra", true, false, true, 1);
+        $addToLayer("chastity bra", true, false, false, 1);
     }
     
     if (HasKeyword($name, "zad_DeviousCorset")) {
-        $addToLayer("corset", false, false, true, 1);
+        $addToLayer("corset", false, false, false, 1);
     }
     
     if (HasKeyword($name, "zad_DeviousHarness")) {
-        $addToLayer("harness", false, false, true, 1);
+        $addToLayer("harness", false, false, false, 1);
     }
     
     // Layer 2: Main clothing layer
@@ -531,15 +533,15 @@ Function GetDevicesContext($name, $vibratingOnly = false) {
         }
         
         if (HasKeyword($name, "zad_DeviousGag")) {
-            $addToLayer("mouth gag", false, false, true, 2);
+            $addToLayer("mouth gag", false, false, false, 2);
         }
         
         if (HasKeyword($name, "zad_DeviousGagPanel")) {
-            $addToLayer("panel gag", false, false, true, 2);
+            $addToLayer("panel gag", false, false, false, 2);
         }
         
         if (HasKeyword($name, "zad_DeviousGagLarge")) {
-            $addToLayer("large gag", false, false, true, 2);
+            $addToLayer("large gag", false, false, false, 2);
         }
         
         if (HasKeyword($name, "zad_DeviousBlindfold")) {
@@ -564,7 +566,7 @@ Function GetDevicesContext($name, $vibratingOnly = false) {
         }
         
         if (HasKeyword($name, "zad_DeviousGloves")) {
-            $addToLayer("locking gloves", false, false, true, 2);
+            $addToLayer("locking gloves", false, false, false, 2);
         }
         
         // Lower body restraints
@@ -595,11 +597,11 @@ Function GetDevicesContext($name, $vibratingOnly = false) {
         
         // Collar (always visible, even with clothing)
         if (HasKeyword($name, "zad_DeviousCollar")) {
-            $addToLayer("collar", false, false, true, 2);
+            $addToLayer("collar", false, false, false, 2);
         }
     } else if ($hasGag) {
         // In vibrating-only mode, still track gags
-        $addToLayer("mouth gag", false, false, true, 2);
+        $addToLayer("mouth gag", false, false, false, 2);
     }
     
     // Layer 3: Outerwear (not currently used much but could be expanded)
@@ -681,9 +683,10 @@ Function GetDevicesContext($name, $vibratingOnly = false) {
     $returnData["hasChastityBra"] = $hasChastityBra;
     $returnData["hasHarness"] = $hasHarness;
     $returnData["hasGag"] = $hasGag;
-    $returnData["hasNipplePiercings"] = $hasNipplePiercings;
-    $returnData["hasVaginalPiercings"] = $hasVaginalPiercings;
-
+    $returnData["hasNipplePiercing"] = $hasNipplePiercing;
+    $returnData["hasVaginalPiercing"] = $hasVaginalPiercing;
+    $returnData["hasAnalPlug"] = $hasAnalPlug;
+    $returnData["hasVaginalPlug"] = $hasVaginalPlug;
     
     return $returnData;
 }

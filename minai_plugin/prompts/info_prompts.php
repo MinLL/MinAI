@@ -14,25 +14,17 @@
 // are registered through the PromptRegistry system.
 
 // Require all prompt files
-require_once(dirname(__FILE__) . "/info_device_utils.php");
-require_once(dirname(__FILE__) . "/info_arousal_increase.php");
-require_once(dirname(__FILE__) . "/info_device_equip_collar.php");
-require_once(dirname(__FILE__) . "/info_device_equip_gag.php");
-require_once(dirname(__FILE__) . "/info_device_remove_fail.php");
-require_once(dirname(__FILE__) . "/info_device_remove_gag.php");
-require_once(dirname(__FILE__) . "/info_edged.php");
-require_once(dirname(__FILE__) . "/info_kiss.php");
-require_once(dirname(__FILE__) . "/info_orgasm.php");
-require_once(dirname(__FILE__) . "/info_shock.php");
-require_once(dirname(__FILE__) . "/info_spank_ass.php");
-require_once(dirname(__FILE__) . "/info_spank_breast.php");
-require_once(dirname(__FILE__) . "/info_stimulate.php");
-require_once(dirname(__FILE__) . "/info_tease.php");
-require_once(dirname(__FILE__) . "/info_touch_grope.php");
-require_once(dirname(__FILE__) . "/info_touch_moan.php");
-require_once(dirname(__FILE__) . "/info_touch_pinch.php");
-require_once(dirname(__FILE__) . "/info_turn_off.php");
-require_once(dirname(__FILE__) . "/info_vibrate.php");
+// Get all PHP files in current directory
+$files = glob(dirname(__FILE__) . "/info_*.php");
+
+// Import all info_*.php files except this one
+foreach ($files as $file) {
+    $basename = basename($file);
+    if ($basename !== "info_prompts.php") {
+        require_once($file);
+    }
+}
+
 // For any code that directly accesses the old prompts, we can map them here
 // But new code should use the PromptRegistry methods:
 // - PromptRegistry::get($id)
