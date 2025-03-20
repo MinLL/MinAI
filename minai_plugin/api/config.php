@@ -75,6 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         "restrict_nonfollower_functions" => $GLOBALS["restrict_nonfollower_functions"],
         "always_enable_functions" => $GLOBALS["always_enable_functions"],
         "force_aiff_name_to_ingame_name" => $GLOBALS["force_aiff_name_to_ingame_name"],
+        "enable_prompt_slop_cleanup" => $GLOBALS["enable_prompt_slop_cleanup"],
         
         // Arrays
         "commands_to_purge" => $GLOBALS["commands_to_purge"],
@@ -160,6 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $newConfig .= "\$GLOBALS['restrict_nonfollower_functions'] = " . ($input['restrict_nonfollower_functions'] ? 'true' : 'false') . ";\n";
         $newConfig .= "\$GLOBALS['always_enable_functions'] = " . ($input['always_enable_functions'] ? 'true' : 'false') . ";\n";
         $newConfig .= "\$GLOBALS['force_aiff_name_to_ingame_name'] = " . ($input['force_aiff_name_to_ingame_name'] ? 'true' : 'false') . ";\n";
+        $newConfig .= "\$GLOBALS['enable_prompt_slop_cleanup'] = " . ($input['enable_prompt_slop_cleanup'] ? 'true' : 'false') . ";\n";
         
         // Arrays
         $newConfig .= "\$GLOBALS['commands_to_purge'] = " . buildArrayString($input['commands_to_purge']) . ";\n";

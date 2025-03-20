@@ -94,7 +94,9 @@ if ($GLOBALS["minai_processing_input"]) {
 }
 
 // Clean up slop text patterns
-$GLOBALS["contextDataFull"] = cleanupSlop($GLOBALS["contextDataFull"]);
+if (isset($GLOBALS["enable_prompt_slop_cleanup"]) && $GLOBALS["enable_prompt_slop_cleanup"]) {
+    $GLOBALS["contextDataFull"] = cleanupSlop($GLOBALS["contextDataFull"]);
+}
 
 // Re-index the array after removing elements
 $GLOBALS["contextDataFull"] = array_values($GLOBALS["contextDataFull"]);
