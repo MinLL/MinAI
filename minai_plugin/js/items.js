@@ -201,13 +201,13 @@ function handleApiError(error, customMessage) {
 // Initialize the page
 document.addEventListener('DOMContentLoaded', function() {
     // Set up tab switching
-    tabs.forEach(tab => {
+    UI.elements.tabs.forEach(tab => {
         tab.addEventListener('click', function() {
             const tabId = this.getAttribute('data-tab');
             
             // Remove active class from all tabs and contents
-            tabs.forEach(t => t.classList.remove('active'));
-            tabContents.forEach(c => c.classList.remove('active'));
+            UI.elements.tabs.forEach(t => t.classList.remove('active'));
+            UI.elements.tabContents.forEach(c => c.classList.remove('active'));
             
             // Add active class to current tab and content
             this.classList.add('active');
