@@ -5,6 +5,7 @@ require_once("contextbuilders.php");
 require_once("mind_influence.php");
 require_once("environmentalContext.php");
 require_once("contextbuilders/system_prompt_context.php");
+require_once("utils/prompt_slop_cleanup.php");
 
 // Clean up context
 $locaLastElement=[];
@@ -91,6 +92,9 @@ if ($GLOBALS["minai_processing_input"]) {
     minai_log("info", "Cleaning up player input");
     DeleteLastPlayerInput();
 }
+
+// Clean up slop text patterns
+$GLOBALS["contextDataFull"] = cleanupSlop($GLOBALS["contextDataFull"]);
 
 // Re-index the array after removing elements
 $GLOBALS["contextDataFull"] = array_values($GLOBALS["contextDataFull"]);

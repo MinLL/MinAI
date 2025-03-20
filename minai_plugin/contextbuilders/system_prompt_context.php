@@ -8,7 +8,7 @@
 
 require_once(__DIR__ . "/../config.php");
 require_once(__DIR__ . "/../util.php");
-require_once(__DIR__ . "/../util/format_util.php");
+require_once(__DIR__ . "/../utils/format_util.php");
 
 // Include all context builder modules
 require_once(__DIR__ . "/context_modules/core_context.php");
