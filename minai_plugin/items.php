@@ -357,7 +357,6 @@ function AddItemWithModIndex($item_id, $file_name, $name, $description, $mod_ind
     // If form ID is 8 digits (after 0x prefix), extract just the last 6 digits
     if (strlen($item_id) == 10) { // "0x" + 8 hex digits
         $item_id = '0x' . substr($item_id, 4, 6); // Keep just the last 6 digits with 0x prefix
-        // minai_log("info", "Truncated form ID to 6 digits: " . $item_id);
     }
     
     // Validate item_id format (0x??012345 or 0x012345)
@@ -374,65 +373,35 @@ function AddItemWithModIndex($item_id, $file_name, $name, $description, $mod_ind
         return false;
     }
     
-    // Log incoming data for debugging
-    // minai_log("debug", "AddItemWithModIndex - Processing: ID={$item_id}, File={$file_name}, Name={$name}, ModIdx={$mod_index}, Category={$category}");
-    
     try {
-        // Escape inputs
-        $item_id = $db->escape($item_id);
-        $file_name = $db->escape($file_name);
-        $name = $db->escape($name);
-        $description = $db->escape($description);
-        $mod_index = $db->escape($mod_index);
-        $is_available = $is_available ? 'TRUE' : 'FALSE';
-        $category = $category ? "'" . $db->escape($category) . "'" : 'NULL';
-        
         // Check if item already exists
-        $result = $db->fetchAll("SELECT id FROM minai_items WHERE item_id = '{$item_id}' AND file_name = '{$file_name}'");
+        $result = $db->fetchAll("SELECT id FROM minai_items WHERE item_id = '" . $db->escape($item_id) . "' AND file_name = '" . $db->escape($file_name) . "'");
         
         if (count($result) > 0) {
             // Don't delete items that users may have customized.   
-            // minai_log("debug", "Skipping deletion of item: " . $item_id . " from " . $file_name . " because it has been customized.");
             return true;
         }
-        else {
-            // Item doesn't exist, insert it
-            $query = "INSERT INTO minai_items 
-                    (item_id, file_name, name, description, is_available, category, mod_index) 
-                    VALUES 
-                    ('{$item_id}', '{$file_name}', '{$name}', '{$description}', {$is_available}, {$category}, '{$mod_index}')";
         
-        $db->execQuery($query);
-            minai_log("debug", "Successfully stored item: " . $name . " (" . $item_id . ")");
-            return true; // If we get here, the query was successful
-        }
+        // Item doesn't exist, insert it using db->insert()
+        $db->insert(
+            'minai_items',
+            array(
+                'item_id' => $item_id,
+                'file_name' => $file_name,
+                'name' => $name,
+                'description' => $description,
+                'is_available' => $is_available,
+                'category' => $category,
+                'mod_index' => $mod_index,
+                'item_type' => 'Item' // Set default item type
+            )
+        );
+        
+        minai_log("debug", "Successfully stored item: " . $name . " (" . $item_id . ")");
+        return true;
+        
     } catch (Exception $e) {
         minai_log("error", "Error in AddItemWithModIndex: " . $e->getMessage() . " for item: " . $item_id . " from " . $file_name);
-        return false;
-    }
-}
-
-/**
- * Ensure the database schema is up to date by adding missing columns if needed
- */
-function ensureDatabaseSchema() {
-    $db = $GLOBALS['db'];
-    
-    try {
-        // For PostgreSQL, use information_schema to check if column exists
-        $query = "SELECT column_name FROM information_schema.columns 
-                 WHERE table_name = 'minai_items' AND column_name = 'is_hidden'";
-        $result = $db->fetchAll($query);
-        
-        // If is_hidden column doesn't exist, add it
-        if (empty($result)) {
-            minai_log("info", "Adding is_hidden column to minai_items table");
-            $db->execQuery("ALTER TABLE minai_items ADD COLUMN is_hidden BOOLEAN DEFAULT FALSE");
-        }
-        
-        return true;
-    } catch (Exception $e) {
-        minai_log("error", "Failed to update database schema: " . $e->getMessage());
         return false;
     }
 }
