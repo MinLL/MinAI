@@ -1,7 +1,9 @@
 <?php
+$pluginPath = "/var/www/html/HerikaServer/ext/minai_plugin";
+
 // require_once("config.php");
-require_once("util.php");
-require_once("db_utils.php");
+require_once($pluginPath . DIRECTORY_SEPARATOR . "util.php");
+require_once($pluginPath . DIRECTORY_SEPARATOR . "db_utils.php");
 
 /**
  * Add a new item to the database
@@ -277,10 +279,10 @@ function GetItems($filters = [], $sort_by = 'name', $sort_order = 'ASC') {
 }
 
 /**
- * Get a single item by ID
+ * Get a single item by its ID
  * 
- * @param int $id The ID of the item to get
- * @return array|null The item data or null if not found or on error
+ * @param int $id The ID of the item to retrieve
+ * @return array|null The item data, or null if not found
  */
 function GetItemById($id) {
     $db = $GLOBALS['db'];
@@ -290,7 +292,11 @@ function GetItemById($id) {
         $id = intval($id);
         $query = "SELECT * FROM minai_items WHERE id = {$id}";
         $result = $db->fetchAll($query);
-        return count($result) > 0 ? $result[0] : null;
+        
+        if (!empty($result)) {
+            return $result[0];
+        }
+        return null;
     } catch (Exception $e) {
         error_log("Error in GetItemById: " . $e->getMessage());
         return null;

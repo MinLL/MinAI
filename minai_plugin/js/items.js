@@ -230,87 +230,87 @@ document.addEventListener('DOMContentLoaded', function() {
 function setupEventListeners() {
     // Search input (with debounce)
     let searchTimeout;
-    searchInput.addEventListener('input', function() {
+    UI.elements.searchInput.addEventListener('input', function() {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
-            currentPage = 1;
+            State.currentPage = 1;
             filterAndDisplayItems();
         }, 300); // Wait 300ms after user stops typing
     });
     
     // Search button
-    searchButton.addEventListener('click', function() {
-        currentPage = 1;
+    UI.elements.searchButton.addEventListener('click', function() {
+        State.currentPage = 1;
         filterAndDisplayItems();
     });
     
     // Reset button
-    resetButton.addEventListener('click', function() {
-        searchInput.value = '';
-        categoryFilter.value = '';
-        typeFilter.value = '';
-        availabilityFilter.value = '';
-        sortBySelect.value = 'name';
-        sortOrderSelect.value = 'ASC';
-        currentPage = 1;
+    UI.elements.resetButton.addEventListener('click', function() {
+        UI.elements.searchInput.value = '';
+        UI.elements.categoryFilter.value = '';
+        UI.elements.typeFilter.value = '';
+        UI.elements.availabilityFilter.value = '';
+        UI.elements.sortBySelect.value = 'name';
+        UI.elements.sortOrderSelect.value = 'ASC';
+        State.currentPage = 1;
         loadItems();
     });
     
     // Filters and sorting
-    categoryFilter.addEventListener('change', function() {
-        currentPage = 1;
+    UI.elements.categoryFilter.addEventListener('change', function() {
+        State.currentPage = 1;
         loadItems();
     });
     
-    typeFilter.addEventListener('change', function() {
-        currentPage = 1;
+    UI.elements.typeFilter.addEventListener('change', function() {
+        State.currentPage = 1;
         loadItems();
     });
     
-    availabilityFilter.addEventListener('change', function() {
-        currentPage = 1;
+    UI.elements.availabilityFilter.addEventListener('change', function() {
+        State.currentPage = 1;
         loadItems();
     });
     
-    sortBySelect.addEventListener('change', function() {
-        currentPage = 1;
+    UI.elements.sortBySelect.addEventListener('change', function() {
+        State.currentPage = 1;
         loadItems();
     });
     
-    sortOrderSelect.addEventListener('change', function() {
-        currentPage = 1;
+    UI.elements.sortOrderSelect.addEventListener('change', function() {
+        State.currentPage = 1;
         loadItems();
     });
     
     // Pagination
-    prevPageButton.addEventListener('click', function() {
-        if (currentPage > 1) {
-            currentPage--;
+    UI.elements.prevPageButton.addEventListener('click', function() {
+        if (State.currentPage > 1) {
+            State.currentPage--;
             filterAndDisplayItems();
         }
     });
     
-    nextPageButton.addEventListener('click', function() {
-        if (currentPage < totalPages) {
-            currentPage++;
+    UI.elements.nextPageButton.addEventListener('click', function() {
+        if (State.currentPage < State.totalPages) {
+            State.currentPage++;
             filterAndDisplayItems();
         }
     });
     
     // Add item form
-    addItemForm.addEventListener('submit', function(e) {
+    UI.elements.addItemForm.addEventListener('submit', function(e) {
         e.preventDefault();
         addItem();
     });
     
     // Import form
-    importForm.addEventListener('submit', function(e) {
+    UI.elements.importForm.addEventListener('submit', function(e) {
         e.preventDefault();
         importItems();
     });
     
     // Export button
-    exportButton.addEventListener('click', function() {
+    UI.elements.exportButton.addEventListener('click', function() {
         exportItems();
     });
     
@@ -445,6 +445,27 @@ function displayItem(item) {
     `;
     
     UI.elements.itemsTableBody.appendChild(row);
+
+    // Add event listeners to the buttons
+    const visibilityButton = row.querySelector('.visibility-button');
+    const editButton = row.querySelector('.edit-button');
+    const deleteButton = row.querySelector('.delete-button');
+
+    visibilityButton.addEventListener('click', function() {
+        const id = this.getAttribute('data-id');
+        const currentState = this.getAttribute('data-hidden');
+        toggleItemHidden(id, currentState);
+    });
+
+    editButton.addEventListener('click', function() {
+        const id = this.getAttribute('data-id');
+        editItem(id);
+    });
+
+    deleteButton.addEventListener('click', function() {
+        const id = this.getAttribute('data-id');
+        deleteItem(id);
+    });
 }
 
 async function addItem() {
@@ -671,7 +692,7 @@ async function toggleItemHidden(id, currentState) {
         const response = await API.updateItem(id, { is_hidden: newHiddenState });
         console.log('API response:', response);
         
-        if (response.success) {
+        if (response.status === 'success' || response.success) {
             UI.showMessage('Item visibility updated', 'success');
             
             // Update the button
@@ -692,8 +713,11 @@ async function toggleItemHidden(id, currentState) {
             if (itemToUpdate) {
                 itemToUpdate.is_hidden = newHiddenState;
             }
+            
+            // Refresh the items list to ensure we have the latest data
+            await loadItems();
         } else {
-            UI.showMessage(response.error || 'Failed to update item', 'error');
+            UI.showMessage(response.error || response.message || 'Failed to update item', 'error');
         }
     } catch (error) {
         handleApiError(error, 'Error updating item visibility');

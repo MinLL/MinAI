@@ -2,17 +2,20 @@
 // Set headers first
 header('Content-Type: application/json');
 
-$pluginPath = "/var/www/html/HerikaServer/ext/minai_plugin";
+// Path to configuration and database library
 $path = ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR;
-
 require_once($path . "conf" . DIRECTORY_SEPARATOR . "conf.php");
-require_once($path . "lib" . DIRECTORY_SEPARATOR . "{$GLOBALS["DBDRIVER"]}.class.php");
-require_once("$pluginPath/logger.php");
+require_once($path . "lib" . DIRECTORY_SEPARATOR . "{$GLOBALS['DBDRIVER']}.class.php");
+
+// Initialize database first
+$db = new sql();
+$GLOBALS["db"] = $db;
+
+// Now include other files that need database access
+require_once("../logger.php");
+require_once("../db_utils.php");
 require_once("../util.php");
 require_once("../items.php");
-require_once("$pluginPath/db_utils.php");
-
-$GLOBALS["db"] = new sql();
 
 // Initialize database schema
 CreateItemsTableIfNotExists();
@@ -98,6 +101,30 @@ function handleGetAction() {
             } catch (Exception $e) {
                 minai_log("error", "Failed to retrieve item types: " . $e->getMessage());
                 sendResponse(500, ['error' => 'Failed to retrieve item types']);
+            }
+            break;
+
+        case 'toggle_visibility':
+            try {
+                if (!isset($_GET['id'])) {
+                    sendResponse(400, ['error' => 'Missing item ID']);
+                }
+                
+                $id = $db->escape($_GET['id']);
+                $currentState = $db->fetchAll("SELECT is_available FROM minai_items WHERE id = '{$id}'");
+                
+                if (empty($currentState)) {
+                    sendResponse(404, ['error' => 'Item not found']);
+                }
+                
+                $newState = !($currentState[0]['is_available'] == 't' || $currentState[0]['is_available'] == '1' || $currentState[0]['is_available'] === true);
+                
+                $db->execQuery("UPDATE minai_items SET is_available = " . ($newState ? 'TRUE' : 'FALSE') . " WHERE id = '{$id}'");
+                
+                sendResponse(200, ['status' => 'success', 'is_available' => $newState]);
+            } catch (Exception $e) {
+                minai_log("error", "Failed to toggle visibility: " . $e->getMessage());
+                sendResponse(500, ['error' => 'Failed to toggle visibility']);
             }
             break;
 

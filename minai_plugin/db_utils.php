@@ -57,12 +57,12 @@ function CreateEquipmentDescriptionTableIfNotExist() {
     $db = $GLOBALS['db'];
     $db->execQuery(
       "CREATE TABLE IF NOT EXISTS equipment_description (
-        baseFormId TEXT NOT NULL,
-        modName TEXT NOT NULL,
+        baseformid TEXT NOT NULL,
+        modname TEXT NOT NULL,
         name TEXT NOT NULL,
         description TEXT,
         is_hidden BOOLEAN DEFAULT FALSE,
-        PRIMARY KEY (baseFormId, modName)
+        PRIMARY KEY (baseformid, modname)
       )"
     );
 }

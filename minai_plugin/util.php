@@ -1,9 +1,11 @@
 <?php
-require_once("logger.php");
+$pluginPath = "/var/www/html/HerikaServer/ext/minai_plugin";
+
+require_once($pluginPath . DIRECTORY_SEPARATOR . "logger.php");
 define("MINAI_ACTOR_VALUE_CACHE", "minai_actor_value_cache");
-require_once("db_utils.php");
-require_once("importDataToDB.php");
-require_once("mind_influence.php");
+require_once($pluginPath . DIRECTORY_SEPARATOR . "db_utils.php");
+require_once($pluginPath . DIRECTORY_SEPARATOR . "importDataToDB.php");
+require_once($pluginPath . DIRECTORY_SEPARATOR . "mind_influence.php");
 
 $GLOBALS[MINAI_ACTOR_VALUE_CACHE] = [];
 $targetOverride = null;
@@ -425,10 +427,10 @@ function GetCleanedMessage() {
     return $cleanedMessage;
 }
 
-require_once("utils/guard_utils.php");
-require_once("utils/misc_utils.php");
-require_once("utils/sex_utils.php");
-require_once("utils/llm_utils.php");
-require_once("utils/profile_utils.php");
-require_once("utils/variable_utils.php");
-require_once("utils/equipment_utils.php");
+require_once($pluginPath . DIRECTORY_SEPARATOR . "utils/guard_utils.php");
+require_once($pluginPath . DIRECTORY_SEPARATOR . "utils/misc_utils.php");
+require_once($pluginPath . DIRECTORY_SEPARATOR . "utils/sex_utils.php");
+require_once($pluginPath . DIRECTORY_SEPARATOR . "utils/llm_utils.php");
+require_once($pluginPath . DIRECTORY_SEPARATOR . "utils/profile_utils.php");
+require_once($pluginPath . DIRECTORY_SEPARATOR . "utils/variable_utils.php");
+require_once($pluginPath . DIRECTORY_SEPARATOR . "utils/equipment_utils.php");

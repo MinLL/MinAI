@@ -15,6 +15,7 @@
             --border-color: #404040;
             --success-color: #40c057;
             --error-color: #f44336;
+            --warning-color: #ffc107;
             --info-color: #4dabf7;
         }
 
@@ -398,101 +399,99 @@
 			}
 
 			function renderEquipmentCards(data) {
-    const container = document.getElementById('dataTable');
-    container.innerHTML = ''; // Clear existing cards
+				const container = document.getElementById('dataTable');
+				container.innerHTML = ''; // Clear existing cards
     
-    // Sort data if needed (existing code)
+				const template = document.getElementById('equipment-template');
     
-    const template = document.getElementById('equipment-template');
-    
-    data.forEach(item => {
-        const card = template.content.cloneNode(true);
-        const cardElement = card.querySelector('.equipment-card');
-        
-        // Add data attributes for targeting
-        cardElement.dataset.baseformid = item.baseFormId;
-        cardElement.dataset.modname = item.modName;
-        
-        // Handle visibility state
-        const isHidden = item.is_hidden === true || 
-                           item.is_hidden === 't' || 
-                           item.is_hidden === 1 || 
-                           item.is_hidden === '1' || 
-                           item.is_hidden === 'true';
-        
-        // Set hidden attribute on card
-        if (isHidden) {
-            cardElement.setAttribute('data-hidden', '1');
-        } else {
-            cardElement.setAttribute('data-hidden', '0');
-        }
-        
-        // Set visibility button state
-        const visibilityBtn = card.querySelector('.visibility-button');
-        visibilityBtn.setAttribute('data-hidden', isHidden ? '1' : '0');
-        visibilityBtn.setAttribute('title', isHidden ? 'Make visible' : 'Hide equipment');
-        visibilityBtn.querySelector('i').className = `fas ${isHidden ? 'fa-eye-slash' : 'fa-eye'}`;
-        
-        // Set card content
-        card.querySelector('.equipment-name').textContent = item.name || 'Unnamed Equipment';
-        card.querySelector('.baseFormId').textContent = item.baseFormId;
-        card.querySelector('.modName').textContent = item.modName;
-        card.querySelector('.description').textContent = item.description || 'No description';
+				data.forEach(item => {
+					const card = template.content.cloneNode(true);
+					const cardElement = card.querySelector('.equipment-card');
+					
+					// Add data attributes for targeting
+					cardElement.dataset.baseFormId = item.baseFormId;
+					cardElement.dataset.modName = item.modName;
+					
+					// Handle visibility state
+					const isHidden = item.isHidden === true || 
+							   item.isHidden === 't' || 
+							   item.isHidden === 1 || 
+							   item.isHidden === '1' || 
+							   item.isHidden === 'true';
+					
+					// Set hidden attribute on card
+					if (isHidden) {
+						cardElement.setAttribute('data-hidden', '1');
+					} else {
+						cardElement.setAttribute('data-hidden', '0');
+					}
+					
+					// Set visibility button state
+					const visibilityBtn = card.querySelector('.visibility-button');
+					visibilityBtn.setAttribute('data-hidden', isHidden ? '1' : '0');
+					visibilityBtn.setAttribute('title', isHidden ? 'Make visible' : 'Hide equipment');
+					visibilityBtn.querySelector('i').className = `fas ${isHidden ? 'fa-eye-slash' : 'fa-eye'}`;
+					
+					// Set card content
+					card.querySelector('.equipment-name').textContent = item.name || 'Unnamed Equipment';
+					card.querySelector('.baseFormId').textContent = item.baseFormId;
+					card.querySelector('.modName').textContent = item.modName;
+					card.querySelector('.description').textContent = item.description || 'No description';
 
-        // Add visibility toggle functionality
-        visibilityBtn.addEventListener('click', () => {
-            toggleEquipmentVisibility(item.baseFormId, item.modName, isHidden ? '1' : '0', visibilityBtn, cardElement);
-        });
+					// Add visibility toggle functionality
+					visibilityBtn.addEventListener('click', () => {
+						toggleEquipmentVisibility(item.baseFormId, item.modName, isHidden ? '1' : '0', visibilityBtn, cardElement);
+					});
 
-        // Add edit functionality
-        const editBtn = card.querySelector('.edit-button');
-        editBtn.addEventListener('click', () => {
-            if (cardElement.classList.contains('editing')) {
-                // Save changes
-                const updatedData = {
-                    baseFormId: item.baseFormId,
-                    modName: item.modName,
-                    name: cardElement.querySelector('.equipment-name').textContent,
-                    description: cardElement.querySelector('.description').textContent || ''
-                };
-                
-                // Remove clear button
-                const clearBtn = cardElement.querySelector('.clearBtn');
-                if (clearBtn) {
-                    clearBtn.remove();
-                }
-                
-                // Remove editable state
-                cardElement.querySelector('.description').contentEditable = false;
-                cardElement.querySelector('.description').style = '';
-                cardElement.querySelector('.equipment-name').contentEditable = false;
-                cardElement.querySelector('.equipment-name').style = '';
-                
-                updateEquipment(updatedData);
-                cardElement.classList.remove('editing');
-                editBtn.querySelector('i').className = 'fas fa-edit';
-                editBtn.setAttribute('title', 'Edit equipment');
-            } else {
-                // Enable editing
-                makeEditable(cardElement.querySelector('.equipment-name'));
-                makeEditable(cardElement.querySelector('.description'));
-                cardElement.classList.add('editing');
-                editBtn.querySelector('i').className = 'fas fa-save';
-                editBtn.setAttribute('title', 'Save changes');
-            }
-        });
+					// Add edit functionality
+					const editBtn = card.querySelector('.edit-button');
+					editBtn.addEventListener('click', () => {
+						if (cardElement.classList.contains('editing')) {
+							// Save changes
+							const updatedData = {
+								baseFormId: item.baseFormId,
+								modName: item.modName,
+								name: cardElement.querySelector('.equipment-name').textContent,
+								description: cardElement.querySelector('.description').textContent || ''
+							};
+							
+							// Remove clear button
+							const clearBtn = cardElement.querySelector('.clearBtn');
+							if (clearBtn) {
+								clearBtn.remove();
+							}
+							
+							// Remove editable state
+							cardElement.querySelector('.description').contentEditable = false;
+							cardElement.querySelector('.description').style = '';
+							cardElement.querySelector('.equipment-name').contentEditable = false;
+							cardElement.querySelector('.equipment-name').style = '';
+							
+							updateEquipment(updatedData);
+							cardElement.classList.remove('editing');
+							editBtn.querySelector('i').className = 'fas fa-edit';
+							editBtn.setAttribute('title', 'Edit equipment');
+						} else {
+							// Enable editing
+							makeEditable(cardElement.querySelector('.equipment-name'));
+							makeEditable(cardElement.querySelector('.description'));
+							cardElement.classList.add('editing');
+							editBtn.querySelector('i').className = 'fas fa-save';
+							editBtn.setAttribute('title', 'Save changes');
+						}
+					});
 
-        // Add delete functionality
-        const deleteBtn = card.querySelector('.delete-button');
-        deleteBtn.addEventListener('click', () => {
-            if (confirm('Are you sure you want to delete this equipment?')) {
-                deleteEquipment(item.baseFormId, item.modName);
-            }
-        });
+					// Add delete functionality
+					const deleteBtn = card.querySelector('.delete-button');
+					deleteBtn.addEventListener('click', () => {
+						if (confirm('Are you sure you want to delete this equipment?')) {
+							deleteEquipment(item.baseFormId, item.modName);
+						}
+					});
 
-        container.appendChild(card);
-    });
-}
+					container.appendChild(card);
+				});
+			}
 			
 			// New function for toggling visibility
 			function toggleEquipmentVisibility(baseFormId, modName, currentHidden, button, cardElement) {
@@ -626,7 +625,7 @@
                 };
 
                 // Add visual feedback
-                const cardElement = document.querySelector(`.equipment-card[data-baseformid="${data.baseFormId}"][data-modname="${data.modName}"]`);
+                const cardElement = document.querySelector(`.equipment-card[data-baseFormId="${data.baseFormId}"][data-modName="${data.modName}"]`);
                 if (cardElement) {
                     const descriptionElement = cardElement.querySelector('.description');
                     const originalText = descriptionElement.textContent;
@@ -670,7 +669,7 @@
                     }
                 });
             }
-        });
-    </script>
+		});
+	</script>
 </body>
 </html>
