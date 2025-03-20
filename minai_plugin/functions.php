@@ -79,7 +79,7 @@ if (!IsInFaction($GLOBALS["HERIKA_NAME"], "NoActionsFaction")) {
     require "functions/survival.php";
     require "functions/crimes.php"; 
 
-    if (!$GLOBALS["disable_nsfw"] && !IsInFaction($GLOBALS["HERIKA_NAME"], "NoNSFWActionsFaction")) {
+    if (!IsInFaction($GLOBALS["HERIKA_NAME"], "NoNSFWActionsFaction")) {
         // NSFW comands
         require "functions/arousal.php";
         if (!IsInFaction($GLOBALS["HERIKA_NAME"], "NoSexActionsFaction")) {
