@@ -1,13 +1,6 @@
 // Constants
 const ITEMS_PER_PAGE = 10;
 const DEBOUNCE_DELAY = 300;
-const API_BASE_URL = 'api/items_api.php';
-const API_ENDPOINTS = {
-    items: `${API_BASE_URL}`,
-    categories: `${API_BASE_URL}?action=categories`,
-    types: `${API_BASE_URL}?action=types`,
-    reset: `${API_BASE_URL}?action=reset`
-};
 
 // State Management
 const State = {
@@ -26,106 +19,62 @@ const State = {
     updateFilters(newFilters) {
         this.filters = { ...this.filters, ...newFilters };
         this.currentPage = 1;
-    },
-    
-    resetFilters() {
-        this.filters = {
-            category: '',
-            type: '',
-            availability: '',
-            search: ''
-        };
-        this.currentPage = 1;
     }
 };
 
 // API Service
 const API = {
-    async handleResponse(response) {
-        if (!response.ok) {
-            const error = await response.json().catch(() => ({ error: 'Network response was not ok' }));
-            throw new Error(error.error || 'API request failed');
-        }
-        return response.json();
-    },
-
+    baseUrl: 'api/items_api.php',
+    
     async getItems(params) {
-        try {
-            const response = await fetch(`${API_ENDPOINTS.items}?${params.toString()}`);
-            return this.handleResponse(response);
-        } catch (error) {
-            console.error('Error fetching items:', error);
-            throw error;
-        }
+        const response = await fetch(`${this.baseUrl}?${params.toString()}`);
+        if (!response.ok) throw new Error('Failed to load items');
+        return response.json();
     },
     
     async getCategories() {
-        try {
-            const response = await fetch(API_ENDPOINTS.categories);
-            return this.handleResponse(response);
-        } catch (error) {
-            console.error('Error fetching categories:', error);
-            throw error;
-        }
+        const response = await fetch(`${this.baseUrl}?action=categories`);
+        if (!response.ok) throw new Error('Failed to load categories');
+        return response.json();
     },
     
     async getItemTypes() {
-        try {
-            const response = await fetch(API_ENDPOINTS.types);
-            return this.handleResponse(response);
-        } catch (error) {
-            console.error('Error fetching item types:', error);
-            throw error;
-        }
+        const response = await fetch(`${this.baseUrl}?action=types`);
+        if (!response.ok) throw new Error('Failed to load item types');
+        return response.json();
     },
     
     async updateItem(id, data) {
-        try {
-            const response = await fetch(`${API_ENDPOINTS.items}?id=${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            return this.handleResponse(response);
-        } catch (error) {
-            console.error('Error updating item:', error);
-            throw error;
-        }
+        const response = await fetch(`${this.baseUrl}?id=${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) throw new Error('Failed to update item');
+        return response.json();
     },
     
     async deleteItem(id) {
-        try {
-            const response = await fetch(`${API_ENDPOINTS.items}?id=${id}`, {
-                method: 'DELETE'
-            });
-            return this.handleResponse(response);
-        } catch (error) {
-            console.error('Error deleting item:', error);
-            throw error;
-        }
+        const response = await fetch(`${this.baseUrl}?id=${id}`, {
+            method: 'DELETE'
+        });
+        if (!response.ok) throw new Error('Failed to delete item');
+        return response.json();
     },
     
     async importItems(formData) {
-        try {
-            const response = await fetch(`${API_ENDPOINTS.items}?action=import`, {
-                method: 'POST',
-                body: formData
-            });
-            return this.handleResponse(response);
-        } catch (error) {
-            console.error('Error importing items:', error);
-            throw error;
-        }
+        const response = await fetch(`${this.baseUrl}?action=import`, {
+            method: 'POST',
+            body: formData
+        });
+        if (!response.ok) throw new Error('Failed to import items');
+        return response.json();
     },
     
     async resetDatabase() {
-        try {
-            const response = await fetch(API_ENDPOINTS.reset);
-            return this.handleResponse(response);
-        } catch (error) {
-            console.error('Error resetting database:', error);
-            throw error;
-        }
+        const response = await fetch(`${this.baseUrl}?action=reset`);
+        if (!response.ok) throw new Error('Failed to reset database');
+        return response.json();
     }
 };
 
@@ -137,12 +86,13 @@ const Utils = {
         if (isNaN(date.getTime())) return 'Invalid Date';
         
         return date.toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'short', 
+            year: '2-digit',
+            month: 'numeric',
             day: 'numeric',
-            hour: '2-digit', 
-            minute: '2-digit'
-        });
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        }).replace(',', '');
     },
     
     debounce(func, wait) {
@@ -475,10 +425,10 @@ function displayItem(item) {
         <td>${item.description || ''}</td>
         <td>${item.item_type || 'Item'}</td>
         <td>${item.category || ''}</td>
-        <td>${item.mod_index || ''}</td>
-        <td>${item.is_available ? 'Yes' : 'No'}</td>
-        <td>${Utils.formatDate(item.last_seen)}</td>
-        <td>${Utils.formatDate(item.created_at)}</td>
+        <td class="narrow-column">${item.mod_index || ''}</td>
+        <td class="narrow-column">${item.is_available ? 'Yes' : 'No'}</td>
+        <td class="date-column">${Utils.formatDate(item.last_seen)}</td>
+        <td class="date-column">${Utils.formatDate(item.created_at)}</td>
         <td class="button-cell">
             <div class="button-container">
                 <button class="visibility-button icon-button" data-id="${item.id}" data-hidden="${isHidden ? '1' : '0'}" 
@@ -838,39 +788,3 @@ async function loadItemTypes() {
         handleApiError(error, 'Failed to load item types');
     }
 }
-
-// Add CSS for the modal
-const style = document.createElement('style');
-style.textContent = `
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.7);
-    }
-    
-    .modal-content {
-        background-color: var(--background-light);
-        margin: 10% auto;
-        padding: 20px;
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        width: 80%;
-        max-width: 600px;
-        position: relative;
-    }
-    
-    .close {
-        position: absolute;
-        right: 20px;
-        top: 10px;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-`;
-document.head.appendChild(style);
