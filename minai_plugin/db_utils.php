@@ -120,12 +120,16 @@ function CreateItemsTableIfNotExists() {
 }
 
 function InitiateDBTables() {
+    // Create base tables
     CreateThreadsTableIfNotExists();
     CreateActionsTableIfNotExists();
     CreateContextTableIfNotExists();
     CreateEquipmentDescriptionTableIfNotExist();
     CreateTattooDescriptionTableIfNotExists();
     CreateItemsTableIfNotExists();
+    
+    // Ensure all schemas are up to date
+    ensureAllDatabaseSchemas();
     
     // Seed default items
     SeedDefaultItems();

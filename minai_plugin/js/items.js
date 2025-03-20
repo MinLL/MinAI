@@ -1,6 +1,13 @@
 // Constants
 const ITEMS_PER_PAGE = 10;
 const DEBOUNCE_DELAY = 300;
+const API_BASE_URL = 'api/items_api.php';
+const API_ENDPOINTS = {
+    items: `${API_BASE_URL}`,
+    categories: `${API_BASE_URL}?action=categories`,
+    types: `${API_BASE_URL}?action=types`,
+    reset: `${API_BASE_URL}?action=reset`
+};
 
 // State Management
 const State = {
@@ -19,62 +26,106 @@ const State = {
     updateFilters(newFilters) {
         this.filters = { ...this.filters, ...newFilters };
         this.currentPage = 1;
+    },
+    
+    resetFilters() {
+        this.filters = {
+            category: '',
+            type: '',
+            availability: '',
+            search: ''
+        };
+        this.currentPage = 1;
     }
 };
 
 // API Service
 const API = {
-    baseUrl: 'api/items_api.php',
-    
-    async getItems(params) {
-        const response = await fetch(`${this.baseUrl}?${params.toString()}`);
-        if (!response.ok) throw new Error('Failed to load items');
+    async handleResponse(response) {
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({ error: 'Network response was not ok' }));
+            throw new Error(error.error || 'API request failed');
+        }
         return response.json();
+    },
+
+    async getItems(params) {
+        try {
+            const response = await fetch(`${API_ENDPOINTS.items}?${params.toString()}`);
+            return this.handleResponse(response);
+        } catch (error) {
+            console.error('Error fetching items:', error);
+            throw error;
+        }
     },
     
     async getCategories() {
-        const response = await fetch(`${this.baseUrl}?action=categories`);
-        if (!response.ok) throw new Error('Failed to load categories');
-        return response.json();
+        try {
+            const response = await fetch(API_ENDPOINTS.categories);
+            return this.handleResponse(response);
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+            throw error;
+        }
     },
     
     async getItemTypes() {
-        const response = await fetch(`${this.baseUrl}?action=types`);
-        if (!response.ok) throw new Error('Failed to load item types');
-        return response.json();
+        try {
+            const response = await fetch(API_ENDPOINTS.types);
+            return this.handleResponse(response);
+        } catch (error) {
+            console.error('Error fetching item types:', error);
+            throw error;
+        }
     },
     
     async updateItem(id, data) {
-        const response = await fetch(`${this.baseUrl}?id=${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
-        if (!response.ok) throw new Error('Failed to update item');
-        return response.json();
+        try {
+            const response = await fetch(`${API_ENDPOINTS.items}?id=${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            return this.handleResponse(response);
+        } catch (error) {
+            console.error('Error updating item:', error);
+            throw error;
+        }
     },
     
     async deleteItem(id) {
-        const response = await fetch(`${this.baseUrl}?id=${id}`, {
-            method: 'DELETE'
-        });
-        if (!response.ok) throw new Error('Failed to delete item');
-        return response.json();
+        try {
+            const response = await fetch(`${API_ENDPOINTS.items}?id=${id}`, {
+                method: 'DELETE'
+            });
+            return this.handleResponse(response);
+        } catch (error) {
+            console.error('Error deleting item:', error);
+            throw error;
+        }
     },
     
     async importItems(formData) {
-        const response = await fetch(`${this.baseUrl}?action=import`, {
-            method: 'POST',
-            body: formData
-        });
-        if (!response.ok) throw new Error('Failed to import items');
-        return response.json();
+        try {
+            const response = await fetch(`${API_ENDPOINTS.items}?action=import`, {
+                method: 'POST',
+                body: formData
+            });
+            return this.handleResponse(response);
+        } catch (error) {
+            console.error('Error importing items:', error);
+            throw error;
+        }
     },
     
     async resetDatabase() {
-        const response = await fetch(`${this.baseUrl}?action=reset`);
-        if (!response.ok) throw new Error('Failed to reset database');
-        return response.json();
+        try {
+            const response = await fetch(API_ENDPOINTS.reset);
+            return this.handleResponse(response);
+        } catch (error) {
+            console.error('Error resetting database:', error);
+            throw error;
+        }
     }
 };
 

@@ -1,9 +1,9 @@
 <?php
-$pluginPath = "/var/www/html/HerikaServer/ext/minai_plugin";
+$pluginPath = '/var/www/html/HerikaServer/ext/minai_plugin';
 
 // require_once("config.php");
-require_once($pluginPath . DIRECTORY_SEPARATOR . "util.php");
-require_once($pluginPath . DIRECTORY_SEPARATOR . "db_utils.php");
+require_once($pluginPath . DIRECTORY_SEPARATOR . 'util.php');
+require_once($pluginPath . DIRECTORY_SEPARATOR . 'db_utils.php');
 
 /**
  * Add a new item to the database
@@ -26,14 +26,14 @@ function AddItem($item_id, $file_name, $name, $description, $is_available = true
     }
     
     // If form ID is 8 digits (after 0x prefix), extract just the last 6 digits
-    if (strlen($item_id) == 10) { // "0x" + 8 hex digits
+    if (strlen($item_id) == 10) { // '0x' + 8 hex digits
         $item_id = '0x' . substr($item_id, 4, 6); // Keep just the last 6 digits with 0x prefix
-        minai_log("info", "Truncated form ID to 6 digits: " . $item_id);
+        minai_log('info', 'Truncated form ID to 6 digits: ' . $item_id);
     }
     
     // Validate item_id format (0x??012345 or 0x012345)
     if (!preg_match('/^0x[0-9A-Fa-f]{6,8}$/', $item_id)) {
-        minai_log("error", "Invalid form ID format: " . $item_id);
+        minai_log('error', 'Invalid form ID format: ' . $item_id);
         return false;
     }
     
@@ -108,7 +108,7 @@ function UpdateItem($id, $data) {
             }
             
             // If form ID is 8 digits (after 0x prefix), extract just the last 6 digits
-            if (strlen($item_id) == 10) { // "0x" + 8 hex digits
+            if (strlen($item_id) == 10) { // '0x' + 8 hex digits
                 $item_id = '0x' . substr($item_id, 4, 6); // Keep just the last 6 digits with 0x prefix
                 minai_log("info", "Truncated form ID to 6 digits: " . $item_id);
             }
@@ -361,7 +361,7 @@ function AddItemWithModIndex($item_id, $file_name, $name, $description, $mod_ind
     }
     
     // If form ID is 8 digits (after 0x prefix), extract just the last 6 digits
-    if (strlen($item_id) == 10) { // "0x" + 8 hex digits
+    if (strlen($item_id) == 10) { // '0x' + 8 hex digits
         $item_id = '0x' . substr($item_id, 4, 6); // Keep just the last 6 digits with 0x prefix
     }
     

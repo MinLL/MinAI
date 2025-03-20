@@ -18,8 +18,7 @@ require_once("../util.php");
 require_once("../items.php");
 
 // Initialize database schema
-CreateItemsTableIfNotExists();
-ensureAllDatabaseSchemas();
+InitiateDBTables();
 
 // Handle request based on method
 $method = $_SERVER['REQUEST_METHOD'];

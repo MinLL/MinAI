@@ -6,377 +6,216 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MinAI Items Management</title>
     <style>
-        /* Variables */
+        /* Design System Variables */
         :root {
-            --primary-color: #4CAF50;
-            --secondary-color: #2196F3;
-            --background-dark: #1a1a1a;
-            --background-light: #2d2d2d;
-            --text-color: #e0e0e0;
-            --border-color: #404040;
-            --success-color: #40c057;
-            --error-color: #f44336;
-            --warning-color: #ffc107;
-            --info-color: #4dabf7;
+            /* Colors */
+            --color-primary: #4CAF50;
+            --color-secondary: #2196F3;
+            --color-background-dark: #1a1a1a;
+            --color-background-light: #2d2d2d;
+            --color-text: #e0e0e0;
+            --color-border: #404040;
+            --color-success: #40c057;
+            --color-error: #f44336;
+            --color-warning: #ffc107;
+            --color-info: #4dabf7;
+            
+            /* Typography */
+            --font-family-base: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --font-size-sm: 0.875rem;
+            --font-size-base: 1rem;
+            --font-size-lg: 1.25rem;
+            --font-size-xl: 1.5rem;
+            --font-size-2xl: 2rem;
+            --font-size-3xl: 2.5rem;
+            
+            /* Spacing */
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 15px;
+            --space-lg: 20px;
+            --space-xl: 30px;
+            
+            /* Border Radius */
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+            
+            /* Transitions */
+            --transition-base: all 0.3s ease;
+            
+            /* Shadows */
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
-        /* Base Styles */
+        /* Reset & Base Styles */
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: radial-gradient(circle at center, var(--background-light) 0%, var(--background-dark) 100%);
-            color: var(--text-color);
+            font-family: var(--font-family-base);
+            background: radial-gradient(circle at center, var(--color-background-light) 0%, var(--color-background-dark) 100%);
+            color: var(--color-text);
             margin: 0;
             padding: 0;
             line-height: 1.6;
             min-height: 100vh;
         }
 
-        /* Typography */
-        h1 {
-            text-align: center;
-            color: var(--text-color);
-            margin-bottom: 30px;
-            font-size: 2.5rem;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        h2 {
-            color: var(--text-color);
-            margin-top: 30px;
-            margin-bottom: 20px;
-            font-size: 1.8rem;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
-        }
-
-        /* Layout */
-        .container {
+        /* Layout Components */
+        .app-container {
             max-width: 1400px;
-            margin: 40px auto;
-            padding: 30px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 16px;
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border-color);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-
-        .section {
-            margin-bottom: 40px;
-            padding: 20px;
+            margin: var(--space-xl) auto;
+            padding: var(--space-xl);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
             background-color: rgba(45, 45, 45, 0.4);
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--color-border);
             backdrop-filter: blur(4px);
         }
 
-        /* Navigation */
+        .app-section {
+            margin-bottom: var(--space-xl);
+            padding: var(--space-lg);
+            border-radius: var(--radius-lg);
+            background-color: rgba(45, 45, 45, 0.4);
+            border: 1px solid var(--color-border);
+        }
+
         .nav-panel {
-            background-color: var(--background-light);
-            padding: 15px;
+            padding: var(--space-md);
             text-align: center;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            border: 1px solid var(--border-color);
-            backdrop-filter: blur(4px);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-xl);
+            background-color: rgba(45, 45, 45, 0.4);
+            border: 1px solid var(--color-border);
         }
 
-        .nav-panel a {
-            display: inline-block;
-            color: var(--text-color);
-            text-decoration: none;
-            font-size: 1.1rem;
-            margin: 0 20px;
-            padding: 10px 20px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-            border: 1px solid var(--border-color);
+        /* Typography */
+        .app-title {
+            text-align: center;
+            font-size: var(--font-size-3xl);
+            margin-bottom: var(--space-xl);
+            text-shadow: var(--shadow-sm);
         }
 
-        .nav-panel a:hover {
-            transform: translateY(-2px);
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        .section-title {
+            font-size: var(--font-size-2xl);
+            margin-bottom: var(--space-xl);
+            border-bottom: 1px solid var(--color-border);
+            padding-bottom: var(--space-sm);
         }
 
         /* Forms */
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: var(--space-lg);
         }
 
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-
-        input[type="text"],
-        input[type="file"],
-        textarea,
-        select {
+        .form-control {
             width: 100%;
-            padding: 12px;
-            background-color: var(--background-dark);
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
+            padding: var(--space-md);
+            background-color: var(--color-background-dark);
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+            border-radius: var(--radius-md);
+            font-size: var(--font-size-base);
+            transition: var(--transition-base);
         }
 
-        input[type="text"]:focus,
-        input[type="file"]:focus,
-        textarea:focus,
-        select:focus {
-            border-color: var(--primary-color);
+        .form-control:focus {
+            border-color: var(--color-primary);
             outline: none;
             box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
         }
 
-        .checkbox-group {
-            display: flex;
-            align-items: center;
+        /* Buttons */
+        .btn {
+            padding: var(--space-sm) var(--space-md);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            color: var(--color-text);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition-base);
         }
 
-        .checkbox-group input[type="checkbox"] {
-            margin-right: 10px;
-            transform: scale(1.2);
-            accent-color: var(--primary-color);
+        .btn:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%);
+            box-shadow: var(--shadow-md);
         }
 
-        /* Search and Filters */
-        .search-container {
-            display: flex;
-            margin-bottom: 20px;
-            gap: 10px;
+        .btn-danger {
+            background: linear-gradient(135deg, var(--color-error) 0%, color-mix(in srgb, var(--color-error) 80%, black) 100%);
         }
 
-        .search-container input {
-            flex: 1;
-        }
-
-        .filter-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .filter-container select {
-            flex: 1;
-            min-width: 150px;
-        }
-
-        /* Table Styles */
-        .table-container {
+        /* Tables */
+        .table-responsive {
             overflow-x: auto;
-            margin-top: 20px;
+            margin-top: var(--space-lg);
         }
 
-        table {
+        .table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: var(--space-lg);
         }
 
-        th, td {
-            padding: 12px 15px;
+        .table th,
+        .table td {
+            padding: var(--space-md);
             text-align: left;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--color-border);
         }
 
-        th {
+        .table th {
             background-color: rgba(0, 0, 0, 0.2);
             font-weight: 600;
         }
 
-        tr:hover {
+        .table tr:hover {
             background-color: rgba(255, 255, 255, 0.05);
         }
 
-        /* Button Styles */
-        button.icon-button {
-            padding: 0;
-            width: 24px;
-            height: 24px;
-            background: var(--background-light);
-            border: 1px solid var(--border-color);
-            border-radius: 3px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 2px;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-
-        button.icon-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        button.icon-button i {
-            font-size: 12px;
-        }
-
-        .button-cell {
-            white-space: nowrap;
-            min-width: 80px;
-            padding-left: 4px;
-            padding-right: 4px;
-        }
-
-        .button-container {
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            gap: 2px;
-        }
-
-        /* Button States */
-        .visibility-button[data-hidden="0"] {
-            color: #aaaaaa;
-            background: rgba(170, 170, 170, 0.1);
-            border-color: rgba(170, 170, 170, 0.3);
-        }
-
-        .visibility-button[data-hidden="1"] {
-            color: #555555;
-            background: rgba(85, 85, 85, 0.1);
-            border-color: rgba(85, 85, 85, 0.3);
-        }
-
-        .edit-button {
-            color: var(--secondary-color);
-            background: rgba(33, 150, 243, 0.1);
-            border-color: rgba(33, 150, 243, 0.3);
-        }
-
-        .edit-button:hover {
-            background: rgba(33, 150, 243, 0.2);
-        }
-
-        .delete-button {
-            color: var(--error-color);
-            background: rgba(244, 67, 54, 0.1);
-            border-color: rgba(244, 67, 54, 0.3);
-        }
-
-        .delete-button:hover {
-            background: rgba(244, 67, 54, 0.2);
-        }
-
-        /* Tabs */
-        .tabs {
-            display: flex;
-            margin-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .tab {
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 8px 8px 0 0;
-            background-color: rgba(45, 45, 45, 0.4);
-            margin-right: 5px;
-            transition: all 0.3s ease;
-        }
-
-        .tab.active {
-            background-color: rgba(76, 175, 80, 0.2);
-            border-bottom: 2px solid var(--primary-color);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Messages */
-        .message {
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            display: none;
-        }
-
-        .message.success {
-            background-color: rgba(64, 192, 87, 0.2);
-            border: 1px solid var(--success-color);
-            color: var(--success-color);
-        }
-
-        .message.error {
-            background-color: rgba(244, 67, 54, 0.2);
-            border: 1px solid var(--error-color);
-            color: var(--error-color);
-        }
-
-        .message.info {
-            background-color: rgba(33, 150, 243, 0.2);
-            border: 1px solid var(--info-color);
-            color: var(--info-color);
-        }
-
-        /* Pagination */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
-        .pagination button {
-            margin: 0 5px;
-            padding: 8px 15px;
-            font-size: 0.9rem;
-        }
-
-        /* Utility Classes */
-        .warning-text {
-            color: var(--error-color);
-            font-size: 0.9rem;
-            margin-top: 10px;
-            font-style: italic;
-        }
-
-        /* Media Queries */
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-                margin: 20px 10px;
+            :root {
+                --space-xl: 20px;
+                --space-lg: 15px;
+                --space-md: 10px;
+            }
+
+            .app-container {
+                margin: var(--space-lg);
+            }
+
+            .app-title {
+                font-size: var(--font-size-2xl);
             }
 
             .nav-panel a {
-                margin: 0 10px;
-                padding: 8px 15px;
-                font-size: 1rem;
+                display: block;
+                margin: var(--space-sm) 0;
             }
 
-            h1 {
-                font-size: 2rem;
-            }
-
-            .section {
-                padding: 15px;
+            .table-responsive {
+                margin: 0 calc(-1 * var(--space-md));
+                width: calc(100% + (2 * var(--space-md)));
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="nav-panel">
+    <div class="app-container">
+        <nav class="nav-panel">
             <a href="index.html">Home</a>
             <a href="config.html">Configuration</a>
             <a href="items.html">Items</a>
             <a href="personalities.html">Personalities</a>
             <a href="scene_descriptions.html">Scene Descriptions</a>
-        </div>
+        </nav>
 
-        <h1>MinAI Items Management</h1>
+        <h1 class="app-title">MinAI Items Management</h1>
 
         <div class="tabs">
             <div class="tab active" data-tab="items-list">Items List</div>
