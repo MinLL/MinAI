@@ -835,12 +835,14 @@ Function OnDiaryKeyPressed()
         if (isSneaking)
             ; When crouching: Update only narrator's diary
             Info("Player is crouching - updating narrator diary only")
+            minAIFF.UpdateProfile("The Narrator")
             minAIFF.UpdateDiary("The Narrator")
             Debug.Notification("Updating narrator's diary")
         elseif (targetActor != None)
             ; When looking at an NPC: Update that NPC's diary
             string targetName = GetActorName(targetActor)
             Info("Player is looking at " + targetName + " - updating their diary")
+            minAIFF.UpdateProfile(targetName)
             minAIFF.UpdateDiary(targetName)
             Debug.Notification("Updating " + targetName + "'s diary")
         else

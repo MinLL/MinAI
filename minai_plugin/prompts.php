@@ -173,7 +173,6 @@ if ($GLOBALS["gameRequest"][0] == "chatnf_minai_narrate") {
     $narratePrompt = "The Narrator: {$cleanedMessage}";
     $GLOBALS["PROMPTS"]["chatnf_minai_narrate"] = [
         "cue"=>[
-            "Respond to the most recent dialogue or events"
         ],
         "player_request"=>[$narratePrompt]
     ];

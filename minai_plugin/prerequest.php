@@ -42,6 +42,7 @@ if (IsEnabled($GLOBALS["PLAYER_NAME"], "isSinging")) {
     // SetNarratorProfile();
 }
 
+
 require_once("deviousnarrator.php");
 if (ShouldUseDeviousNarrator()) {
     SetDeviousNarrator();
@@ -272,5 +273,9 @@ if (isset($GLOBALS['use_llm_fallback']) && $GLOBALS['use_llm_fallback']) {
     CreateFallbackConfig();
 }
 
+// Clean up dungeon master input
+if (IsEnabled($GLOBALS["PLAYER_NAME"], "isDungeonMaster")) {
+    SetEnabled($GLOBALS["PLAYER_NAME"], "isDungeonMaster", false);
+}
 // Incompatible with new context system
 $GLOBALS["ADD_PLAYER_BIOS"]  = false;

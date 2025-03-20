@@ -22,10 +22,18 @@ function cleanupSlop($contextData) {
         $content = str_replace('))', ')', $content);
         $content = str_replace('((', '(', $content);
 
-        // Pattern 1: Handle "thinking to herself" pattern
-        if (preg_match('/The Narrator:\s*(.*?)\s*\(talking to Min is thinking to herself\)/', $content, $matches)) {
+        // Pattern 1: Handle "thinking to self" pattern
+        if (preg_match('/The Narrator:\s*(.*?)\s*\(talking to (.*?) is thinking to (him|her|them)self\)/', $content, $matches)) {
             $thought = $matches[1];
-            $content = "Min: $thought (Min is thinking to herself)";
+            $character = $matches[2];
+            $pronoun = $matches[3];
+            $content = "$character: $thought ($character is thinking to $pronoun" . "self)";
+        }
+        // Pattern 1b: Handle "reacting to physical sensations" pattern
+        else if (preg_match('/The Narrator:\s*(.*?)\s*\(talking to (.*?) is reacting to physical sensations\)/', $content, $matches)) {
+            $thought = $matches[1];
+            $character = $matches[2];
+            $content = "$character: $thought ($character is thinking to herself, reacting to physical sensations)";
         }
 
         // Pattern 2: Remove "(Talking to The Narrator)" from any character dialogue
