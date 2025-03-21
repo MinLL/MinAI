@@ -136,7 +136,7 @@ Function GetActorValue($name, $key, $preserveCase=false, $skipCache=false) {
 
 Function IsEnabled($name, $key) {
     $name = strtolower($GLOBALS["db"]->escape($name));
-    return $GLOBALS["db"]->fetchAll("select 1 from conf_opts where LOWER(id)=LOWER('_minai_{$name}//$key}') and LOWER(value)=LOWER('TRUE')");
+    return $GLOBALS["db"]->fetchAll("select 1 from conf_opts where LOWER(id)=LOWER('_minai_{$name}//{$key}') and LOWER(value)=LOWER('TRUE')");
 }
 
 Function SetEnabled($name, $key, $enabled) {
