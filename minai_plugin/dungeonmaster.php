@@ -14,16 +14,21 @@ require_once("util.php");
 function SetDungeonMasterPrompts($message = "") {
     minai_log("info", "Setting up dungeon master prompts: {$message}");
     
-    // Check if we're targeting The Narrator
-    $isNarratorTarget = ($GLOBALS["HERIKA_NAME"] == "The Narrator");
-    
     // Base prompt for the dungeon master
-    $dungeonMasterPrompt = [
-        "cue" => [
-            "The Narrator: You feel as if you should respond to the latest dialogue or events. {$GLOBALS["TEMPLATE_DIALOG"]}"
-        ]
-    ];
-    
+    if (isset($GLOBALS['enable_prompt_slop_cleanup']) && $GLOBALS['enable_prompt_slop_cleanup']) {        
+        $dungeonMasterPrompt = [
+            "cue" => [
+            ]
+        ];
+    }
+    else {
+        $dungeonMasterPrompt = [
+            "cue" => [
+                "The Narrator: You feel as if you should respond to the latest dialogue or events. {$GLOBALS["TEMPLATE_DIALOG"]}"
+            ]
+        ];
+    }
+
     // Add player_request with the message if provided
     if (!empty($message)) {
         // For NPCs, we use the standard format

@@ -9,7 +9,8 @@ function cleanupSlop($contextData) {
     if (!is_array($contextData)) {
         return $contextData;
     }
-
+    $playerPronouns = GetActorPronouns($GLOBALS["PLAYER_NAME"]);
+    $pronounSelf = "{$playerPronouns['object']}self";
     $cleaned = [];
     foreach ($contextData as $entry) {
         if (!isset($entry['content'])) {
@@ -33,7 +34,13 @@ function cleanupSlop($contextData) {
         else if (preg_match('/The Narrator:\s*(.*?)\s*\(talking to (.*?) is reacting to physical sensations\)/', $content, $matches)) {
             $thought = $matches[1];
             $character = $matches[2];
-            $content = "$character: $thought ($character is thinking to herself, reacting to physical sensations)";
+            $content = "$character: $thought ($character is thinking to $pronounSelf, reacting to physical sensations)";
+        }
+        // Pattern 1c: Handle "Narrator talking to player" pattern
+        else if (preg_match('/The Narrator:\s*(.*?)\s*\(talking to (.*?)\)/', $content, $matches)) {
+            $thought = $matches[1];
+            $playerName = $matches[2];
+            $content = "$playerName thinks to $pronounSelf: $thought";
         }
 
         // Pattern 2: Remove "(Talking to The Narrator)" from any character dialogue
@@ -81,11 +88,11 @@ function cleanupSlop($contextData) {
         $content = trim($content);
         // Log original and replaced content if they differ
         if ($content !== $originalContent) {
-            error_log("Cleaned up context - Original: " . $originalContent);
-            error_log("Cleaned up context - Replaced: " . $content); 
+            //error_log("Cleaned up context - Original: " . $originalContent);
+            //error_log("Cleaned up context - Replaced: " . $content); 
         }
         else {
-            error_log("No changes made to content: " . $content);
+            //error_log("No changes made to content: " . $content);
         }
         $entry['content'] = $content;
         $cleaned[] = $entry;

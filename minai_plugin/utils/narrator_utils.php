@@ -7,7 +7,7 @@ Function SetNarratorPrompts($isFirstPerson = false) {
         if (IsExplicitScene()) {
             $narratorPrompt = [
                 "cue" => [
-                    "write a first-person erotic narrative response as {$GLOBALS["PLAYER_NAME"]}, focusing entirely on your immediate physical sensations and emotional state. Describe in vivid detail exactly what you are feeling in this moment, both physically and mentally."
+                    "write a first-person erotic narrative response as {$GLOBALS["PLAYER_NAME"]} in response to the #SEX_SCENARIO, focusing entirely on your immediate physical sensations and emotional state. Describe in vivid detail exactly what you are feeling in this moment, both physically and mentally."
                 ],
                 "player_request"=>[    
                     "{$GLOBALS["PLAYER_NAME"]} thinks to herself about the current situation.",

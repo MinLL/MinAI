@@ -3,57 +3,57 @@
 // Early Mimic events - pure fear/resistance
 $GLOBALS["PROMPTS"]["minai_tntr_mimic_triggervoreinstant"] = [
     "player_request"=>[
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} is being assaulted by a Mimic Chest): The Mimic chest suddenly engulfs {$GLOBALS["target"]} into its dark interior! They scream in terror, desperately thrashing and fighting to escape!) {$GLOBALS["TEMPLATE_DIALOG"]}",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} is being assaulted by a Mimic Chest): Without warning, the chest springs its trap, dragging {$GLOBALS["target"]} inside! Their panicked cries echo as they struggle against its iron grip!) {$GLOBALS["TEMPLATE_DIALOG"]}",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} is being assaulted by a Mimic Chest): {$GLOBALS["target"]} is yanked into the Mimic's maw! They kick and fight in blind panic, their heart pounding with pure terror!) {$GLOBALS["TEMPLATE_DIALOG"]}"
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} is being assaulted by a Mimic Chest): The Mimic chest suddenly engulfs {$GLOBALS["target"]} into its dark interior! They scream in terror, desperately thrashing and fighting to escape!) {$GLOBALS["TEMPLATE_DIALOG"]}",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} is being assaulted by a Mimic Chest): Without warning, the chest springs its trap, dragging {$GLOBALS["target"]} inside! Their panicked cries echo as they struggle against its iron grip!) {$GLOBALS["TEMPLATE_DIALOG"]}",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} is being assaulted by a Mimic Chest): {$GLOBALS["target"]} is yanked into the Mimic's maw! They kick and fight in blind panic, their heart pounding with pure terror!) {$GLOBALS["TEMPLATE_DIALOG"]}"
     ]
 ];
 
 $GLOBALS["PROMPTS"]["minai_tntr_mimic_triggervorestart"] = [
     "player_request"=>[
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} is being assaulted by a Mimic Chest): Tentacles quickly extend from the chest, wrapping around {$GLOBALS["target"]}, pulling them closer! This chest is not what it seems! {$GLOBALS["target"]} struggles frantically, their eyes wide with fear!) {$GLOBALS["TEMPLATE_DIALOG"]}",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} is being assaulted by a Mimic Chest):Slick tentacles emerge from the chest, coiling tightly around {$GLOBALS["target"]}'s limbs! They thrash wildly, trying desperately to break free from the creature's grasp!",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} is being assaulted by a Mimic Chest):{$GLOBALS["target"]} recoils in horror as the chest reveals its true nature, tentacles wrapping around their struggling form! Their heart pounds with terror as they're drawn closer!"
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} is being assaulted by a Mimic Chest): Tentacles quickly extend from the chest, wrapping around {$GLOBALS["target"]}, pulling them closer! This chest is not what it seems! {$GLOBALS["target"]} struggles frantically, their eyes wide with fear!) {$GLOBALS["TEMPLATE_DIALOG"]}",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} is being assaulted by a Mimic Chest):Slick tentacles emerge from the chest, coiling tightly around {$GLOBALS["target"]}'s limbs! They thrash wildly, trying desperately to break free from the creature's grasp!",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} is being assaulted by a Mimic Chest):{$GLOBALS["target"]} recoils in horror as the chest reveals its true nature, tentacles wrapping around their struggling form! Their heart pounds with terror as they're drawn closer!"
     ]
 ];
 
 $GLOBALS["PROMPTS"]["minai_tntr_mimic_transvorelooptosuccess"] = [
     "player_request"=>[
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} is bound and trapped by a Mimic Chest): The lid of the Mimic slams shut, trapping {$GLOBALS["target"]}'s upper body inside! They struggle frantically in the darkness, desperate to break free!) {$GLOBALS["TEMPLATE_DIALOG"]}",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} is bound and trapped by a Mimic Chest): {$GLOBALS["target"]} finds themselves trapped waist-deep in the creature's grasp! They thrash wildly, fighting against the tight confines with all their strength!) {$GLOBALS["TEMPLATE_DIALOG"]}",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} is bound and trapped by a Mimic Chest): The Mimic holds {$GLOBALS["target"]} firmly bent over its edge! Their muffled cries of fear echo inside as they desperately try to push themselves out!) {$GLOBALS["TEMPLATE_DIALOG"]}"
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} is bound and trapped by a Mimic Chest): The lid of the Mimic slams shut, trapping {$GLOBALS["target"]}'s upper body inside! They struggle frantically in the darkness, desperate to break free!) {$GLOBALS["TEMPLATE_DIALOG"]}",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} is bound and trapped by a Mimic Chest): {$GLOBALS["target"]} finds themselves trapped waist-deep in the creature's grasp! They thrash wildly, fighting against the tight confines with all their strength!) {$GLOBALS["TEMPLATE_DIALOG"]}",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} is bound and trapped by a Mimic Chest): The Mimic holds {$GLOBALS["target"]} firmly bent over its edge! Their muffled cries of fear echo inside as they desperately try to push themselves out!) {$GLOBALS["TEMPLATE_DIALOG"]}"
     ]
 ];
 
 $GLOBALS["PROMPTS"]["minai_tntr_mimic_triggervorestage02fail"] = [
     "player_request"=>[
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} has just escaped from the Mimic Chest): {$GLOBALS["target"]} manages to tear free from the Mimic's grasp, scrambling away from the creature!",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} has just escaped from the Mimic Chest): With a desperate surge of strength, {$GLOBALS["target"]} breaks loose from the Mimic's hold!",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} has just escaped from the Mimic Chest): {$GLOBALS["target"]}'s fierce struggle pays off as they wrench themselves free from the Mimic's grip!"
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} has just escaped from the Mimic Chest): {$GLOBALS["target"]} manages to tear free from the Mimic's grasp, scrambling away from the creature!",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} has just escaped from the Mimic Chest): With a desperate surge of strength, {$GLOBALS["target"]} breaks loose from the Mimic's hold!",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} has just escaped from the Mimic Chest): {$GLOBALS["target"]}'s fierce struggle pays off as they wrench themselves free from the Mimic's grip!"
     ]
 ];
 
 $GLOBALS["PROMPTS"]["minai_tntr_mimic_triggervorespit"] = [
     "player_request"=>[
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} has just released by the Mimic Chest after being thoroughly raped): {$GLOBALS["target"]} gasps for air as the Mimic finally releases them, collapsing to the ground with their body trembling from the intense ordeal!",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} has just released by the Mimic Chest after being thoroughly raped): The Mimic expels {$GLOBALS["target"]}, who falls weakly to their knees, still shaking from their unwilling submission!",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} has just released by the Mimic Chest after being thoroughly raped): {$GLOBALS["target"]} is released from the Mimic's grasp, their defeated form quivering as they try to recover from the experience!"
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} has just released by the Mimic Chest after being thoroughly raped): {$GLOBALS["target"]} gasps for air as the Mimic finally releases them, collapsing to the ground with their body trembling from the intense ordeal!",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} has just released by the Mimic Chest after being thoroughly raped): The Mimic expels {$GLOBALS["target"]}, who falls weakly to their knees, still shaking from their unwilling submission!",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} has just released by the Mimic Chest after being thoroughly raped): {$GLOBALS["target"]} is released from the Mimic's grasp, their defeated form quivering as they try to recover from the experience!"
     ]
 ];
 
 $GLOBALS["PROMPTS"]["minai_tntr_mimic_transvoreendsuccessloop"] = [
     "player_request"=>[
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} has been completely swallowed by the Mimic, which begins to rape her): {$GLOBALS["target"]} has been completely swallowed by the Mimic! As tentacles begin slithering over their body, their fierce resistance starts to weaken against their will!",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} has been completely swallowed by the Mimic, which begins to rape her): Deep within the Mimic's interior, {$GLOBALS["target"]} continues to struggle, though the constant caress of tentacles begins to affect their senses!",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} has been completely swallowed by the Mimic, which begins to rape her): The Mimic's tentacles wrap tighter around {$GLOBALS["target"]}'s trapped form! Their determined struggles slowly give way to involuntary shivers!"
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} has been completely swallowed by the Mimic, which begins to rape her): {$GLOBALS["target"]} has been completely swallowed by the Mimic! As tentacles begin slithering over their body, their fierce resistance starts to weaken against their will!",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} has been completely swallowed by the Mimic, which begins to rape her): Deep within the Mimic's interior, {$GLOBALS["target"]} continues to struggle, though the constant caress of tentacles begins to affect their senses!",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} has been completely swallowed by the Mimic, which begins to rape her): The Mimic's tentacles wrap tighter around {$GLOBALS["target"]}'s trapped form! Their determined struggles slowly give way to involuntary shivers!"
     ]
 ];
 
 $GLOBALS["PROMPTS"]["minai_tntr_mimic_triggermimicthrowup"] = [
     "player_request"=>[
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} has been completely swallowed by the Mimic, which begins to rape her, and dose her with an aphrodisiac): The Mimic strips away {$GLOBALS["target"]}'s clothing! They gasp as strange fluids seep into their skin, making their body tingle against their will!",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} has been completely swallowed by the Mimic, which begins to rape her, and dose her with an aphrodisiac): {$GLOBALS["target"]}'s armor and clothing are torn away by the Mimic! An alien warmth spreads through them as the creature's secretions take effect!",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} has been completely swallowed by the Mimic, which begins to rape her, and dose her with an aphrodisiac): The Mimic efficiently disarms and strips {$GLOBALS["target"]} bare! They try to resist as the creature's fluids begin affecting their exposed skin!"
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} has been completely swallowed by the Mimic, which begins to rape her, and dose her with an aphrodisiac): The Mimic strips away {$GLOBALS["target"]}'s clothing! They gasp as strange fluids seep into their skin, making their body tingle against their will!",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} has been completely swallowed by the Mimic, which begins to rape her, and dose her with an aphrodisiac): {$GLOBALS["target"]}'s armor and clothing are torn away by the Mimic! An alien warmth spreads through them as the creature's secretions take effect!",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} has been completely swallowed by the Mimic, which begins to rape her, and dose her with an aphrodisiac): The Mimic efficiently disarms and strips {$GLOBALS["target"]} bare! They try to resist as the creature's fluids begin affecting their exposed skin!"
     ]
 ];
 
@@ -67,25 +67,25 @@ $GLOBALS["PROMPTS"]["minai_tntr_mimic_triggermimicburp"] = [
 
 $GLOBALS["PROMPTS"]["minai_tntr_mimic_triggervorestage02start"] = [
     "player_request"=>[
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} has been completely bound by the Mimics tentacles as it rapes her. The Mimic's lid is currently open. {$GLOBALS["PLAYER_NAME"]} is helplessly bound and unable to move with her ass up in the air, and has been dosed with an aphrodisiac):  The Mimic shifts its grip on {$GLOBALS["target"]}, tentacles sliding between their legs, and relentlessly stimulating their most sensitive spots! Their defiant struggles weaken as unwanted pleasure begins to build!",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} has been completely bound by the Mimics tentacles as it rapes her. The Mimic's lid is currently open. {$GLOBALS["PLAYER_NAME"]} is helplessly bound and unable to move with her ass up in the air, and has been dosed with an aphrodisiac): {$GLOBALS["target"]} gasps as tentacles find their most sensitive spots, and begin to vigorously stimulate them! Though they try to resist, their body begins responding to the intimate touches!",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} has been completely bound by the Mimics tentacles as it rapes her. The Mimic's lid is currently open. {$GLOBALS["PLAYER_NAME"]} is helplessly bound and unable to move with her ass up in the air, and has been dosed with an aphrodisiac):  Despite {$GLOBALS["target"]}'s continued resistance, they can't help but moan as the Mimic's tentacles explore their vulnerable form, rubbing against their most sensitive spots in a highly stimulating manner!"
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} has been completely bound by the Mimics tentacles as it rapes her. The Mimic's lid is currently open. {$GLOBALS["PLAYER_NAME"]} is helplessly bound and unable to move with her ass up in the air, and has been dosed with an aphrodisiac):  The Mimic shifts its grip on {$GLOBALS["target"]}, tentacles sliding between their legs, and relentlessly stimulating their most sensitive spots! Their defiant struggles weaken as unwanted pleasure begins to build!",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} has been completely bound by the Mimics tentacles as it rapes her. The Mimic's lid is currently open. {$GLOBALS["PLAYER_NAME"]} is helplessly bound and unable to move with her ass up in the air, and has been dosed with an aphrodisiac): {$GLOBALS["target"]} gasps as tentacles find their most sensitive spots, and begin to vigorously stimulate them! Though they try to resist, their body begins responding to the intimate touches!",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} has been completely bound by the Mimics tentacles as it rapes her. The Mimic's lid is currently open. {$GLOBALS["PLAYER_NAME"]} is helplessly bound and unable to move with her ass up in the air, and has been dosed with an aphrodisiac):  Despite {$GLOBALS["target"]}'s continued resistance, they can't help but moan as the Mimic's tentacles explore their vulnerable form, rubbing against their most sensitive spots in a highly stimulating manner!"
     ]
 ];
 
 $GLOBALS["PROMPTS"]["minai_tntr_mimic_triggervorestage02success"] = [
     "player_request"=>[
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} has been completely bound by the Mimics tentacles as it rapes her. The Mimic's lid is currently open. {$GLOBALS["PLAYER_NAME"]} is helplessly bound and unable to move on her back with her legs spread, and has been dosed with an aphrodisiac): The Mimic forces {$GLOBALS["target"]} onto their back, roughly fucking their bound and helpless body! Their last resistance crumbles as pleasure overwhelms their senses!",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} has been completely bound by the Mimics tentacles as it rapes her. The Mimic's lid is currently open. {$GLOBALS["PLAYER_NAME"]} is helplessly bound and unable to move on her back with her legs spread, and has been dosed with an aphrodisiac): {$GLOBALS["target"]}'s will finally breaks as the Mimic takes full control, tentacles plunging deep inside their bound and helpless form!",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} has been completely bound by the Mimics tentacles as it rapes her. The Mimic's lid is currently open. {$GLOBALS["PLAYER_NAME"]} is helplessly bound and unable to move on her back with her legs spread, and has been dosed with an aphrodisiac): Unable to fight any longer, {$GLOBALS["target"]} surrenders completely as the Mimic's tentacles roughly plunge into them and fuck their bound and helpless body!"
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} has been completely bound by the Mimics tentacles as it rapes her. The Mimic's lid is currently open. {$GLOBALS["PLAYER_NAME"]} is helplessly bound and unable to move on her back with her legs spread, and has been dosed with an aphrodisiac): The Mimic forces {$GLOBALS["target"]} onto their back, roughly fucking their bound and helpless body! Their last resistance crumbles as pleasure overwhelms their senses!",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} has been completely bound by the Mimics tentacles as it rapes her. The Mimic's lid is currently open. {$GLOBALS["PLAYER_NAME"]} is helplessly bound and unable to move on her back with her legs spread, and has been dosed with an aphrodisiac): {$GLOBALS["target"]}'s will finally breaks as the Mimic takes full control, tentacles plunging deep inside their bound and helpless form!",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} has been completely bound by the Mimics tentacles as it rapes her. The Mimic's lid is currently open. {$GLOBALS["PLAYER_NAME"]} is helplessly bound and unable to move on her back with her legs spread, and has been dosed with an aphrodisiac): Unable to fight any longer, {$GLOBALS["target"]} surrenders completely as the Mimic's tentacles roughly plunge into them and fuck their bound and helpless body!"
     ]
 ];
 
 $GLOBALS["PROMPTS"]["minai_tntr_mimic_transvorestage02successloop"] = [
     "player_request"=>[
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} has been completely bound by the Mimics tentacles as it rapes her. The Mimic's lid is currently open. {$GLOBALS["PLAYER_NAME"]} is helplessly bound and unable to move on her back with her legs spread, and has been dosed with an aphrodisiac): Despite their best efforts to resist, {$GLOBALS["target"]}'s exhausted body finally surrenders to a powerful climax as the Mimic's tentacles continue their relentless assault!",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} has been completely bound by the Mimics tentacles as it rapes her. The Mimic's lid is currently open. {$GLOBALS["PLAYER_NAME"]} is helplessly bound and unable to move on her back with her legs spread, and has been dosed with an aphrodisiac): {$GLOBALS["target"]}'s last defenses crumble as the Mimic forces them over the edge, their body convulsing in unwilling pleasure!",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} has been completely bound by the Mimics tentacles as it rapes her. The Mimic's lid is currently open. {$GLOBALS["PLAYER_NAME"]} is helplessly bound and unable to move on her back with her legs spread, and has been dosed with an aphrodisiac): Unable to fight any longer, {$GLOBALS["target"]} succumbs completely as the Mimic's tentacles drive them to an overwhelming peak!"
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} has been completely bound by the Mimics tentacles as it rapes her. The Mimic's lid is currently open. {$GLOBALS["PLAYER_NAME"]} is helplessly bound and unable to move on her back with her legs spread, and has been dosed with an aphrodisiac): Despite their best efforts to resist, {$GLOBALS["target"]}'s exhausted body finally surrenders to a powerful climax as the Mimic's tentacles continue their relentless assault!",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} has been completely bound by the Mimics tentacles as it rapes her. The Mimic's lid is currently open. {$GLOBALS["PLAYER_NAME"]} is helplessly bound and unable to move on her back with her legs spread, and has been dosed with an aphrodisiac): {$GLOBALS["target"]}'s last defenses crumble as the Mimic forces them over the edge, their body convulsing in unwilling pleasure!",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} has been completely bound by the Mimics tentacles as it rapes her. The Mimic's lid is currently open. {$GLOBALS["PLAYER_NAME"]} is helplessly bound and unable to move on her back with her legs spread, and has been dosed with an aphrodisiac): Unable to fight any longer, {$GLOBALS["target"]} succumbs completely as the Mimic's tentacles drive them to an overwhelming peak!"
     ]
 ];
 
@@ -108,57 +108,57 @@ $GLOBALS["PROMPTS"]["minai_tntr_mimic_transopenidle"] = [
 // Death Worm Events - Complete List
 $GLOBALS["PROMPTS"]["minai_tntr_deathwormvore_trigger01"] = [
     "player_request"=>[
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} encounters a Death Worm): A massive Death Worm erupts from the earth beneath {$GLOBALS["target"]}, its enormous form blocking out the light!",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} encounters a Death Worm): The ground trembles violently before a Death Worm bursts forth, its massive body coiling menacingly around {$GLOBALS["target"]}!",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} encounters a Death Worm): {$GLOBALS["target"]} barely has time to scream as a Death Worm explodes from the ground, its huge form rising up before them!"
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} encounters a Death Worm): A massive Death Worm erupts from the earth beneath {$GLOBALS["target"]}, its enormous form blocking out the light!",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} encounters a Death Worm): The ground trembles violently before a Death Worm bursts forth, its massive body coiling menacingly around {$GLOBALS["target"]}!",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} encounters a Death Worm): {$GLOBALS["target"]} barely has time to scream as a Death Worm explodes from the ground, its huge form rising up before them!"
     ]
 ];
 
 $GLOBALS["PROMPTS"]["minai_tntr_deathwormvore_trigger02"] = [
     "player_request"=>[
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} is suddenly attacked by a Death Worm): The Death Worm's coils surge upward, wrapping tightly around {$GLOBALS["target"]}'s waist and legs as it prepares to swallow them whole!",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} is suddenly attacked by a Death Worm): The massive Death Worm coils menacingly around {$GLOBALS["target"]}, its jaws unhinging as it readies to devour them!",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} is suddenly attacked by a Death Worm): The Death Worm's enormous body wraps around {$GLOBALS["target"]}, preparing to consume them entirely!"
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} is suddenly attacked by a Death Worm): The Death Worm's coils surge upward, wrapping tightly around {$GLOBALS["target"]}'s waist and legs as it prepares to swallow them whole!",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} is suddenly attacked by a Death Worm): The massive Death Worm coils menacingly around {$GLOBALS["target"]}, its jaws unhinging as it readies to devour them!",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} is suddenly attacked by a Death Worm): The Death Worm's enormous body wraps around {$GLOBALS["target"]}, preparing to consume them entirely!"
     ]
 ];
 
 $GLOBALS["PROMPTS"]["minai_tntr_deathwormvore_trigger02gulp"] = [
     "player_request"=>[
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} is being swallowed by a Death Worm): The Death Worm's massive jaws unhinge as it begins to swallow {$GLOBALS["target"]} whole!",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} is being swallowed by a Death Worm): {$GLOBALS["target"]} watches in horror as the Death Worm's maw opens impossibly wide to devour them!",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} is being swallowed by a Death Worm): The Death Worm's jaws stretch open, ready to engulf {$GLOBALS["target"]} entirely!"
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} is being swallowed by a Death Worm): The Death Worm's massive jaws unhinge as it begins to swallow {$GLOBALS["target"]} whole!",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} is being swallowed by a Death Worm): {$GLOBALS["target"]} watches in horror as the Death Worm's maw opens impossibly wide to devour them!",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} is being swallowed by a Death Worm): The Death Worm's jaws stretch open, ready to engulf {$GLOBALS["target"]} entirely!"
     ]
 ];
 
 $GLOBALS["PROMPTS"]["minai_tntr_deathwormvore_trans02gulpdone"] = [
     "player_request"=>[
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} is released from the Death Worm's gullet): The Death Worm suddenly releases {$GLOBALS["target"]} from its gullet, leaving them shaken but alive!",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} is released from the Death Worm's gullet): {$GLOBALS["target"]} is expelled from the Death Worm's maw, gasping for air as they're freed!",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} is released from the Death Worm's gullet): The Death Worm spits out {$GLOBALS["target"]}, who collapses to the ground in relief!"
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} is released from the Death Worm's gullet): The Death Worm suddenly releases {$GLOBALS["target"]} from its gullet, leaving them shaken but alive!",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} is released from the Death Worm's gullet): {$GLOBALS["target"]} is expelled from the Death Worm's maw, gasping for air as they're freed!",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} is released from the Death Worm's gullet): The Death Worm spits out {$GLOBALS["target"]}, who collapses to the ground in relief!"
     ]
 ];
 
 $GLOBALS["PROMPTS"]["minai_tntr_deathwormvore_trigger02spit"] = [
     "player_request"=>[
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} watches as the Death Worm retreats): The Death Worm retreats back into the sand, disappearing beneath the surface!",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} watches as the Death Worm retreats): With a final rumble, the Death Worm burrows back into the earth!",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} watches as the Death Worm retreats): The Death Worm slides away, vanishing into the sandy depths!"
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} watches as the Death Worm retreats): The Death Worm retreats back into the sand, disappearing beneath the surface!",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} watches as the Death Worm retreats): With a final rumble, the Death Worm burrows back into the earth!",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} watches as the Death Worm retreats): The Death Worm slides away, vanishing into the sandy depths!"
     ]
 ];
 
 $GLOBALS["PROMPTS"]["minai_tntr_deathwormvore_trigger03"] = [
     "player_request"=>[
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} is instantly devoured by a Death Worm): The Death Worm suddenly lunges forward, instantly devouring {$GLOBALS["target"]} whole!",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} is instantly devoured by a Death Worm): Without warning, the Death Worm strikes, swallowing {$GLOBALS["target"]} in one swift motion!",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} is instantly devoured by a Death Worm): The Death Worm attacks with lightning speed, consuming {$GLOBALS["target"]} before they can react!"
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} is instantly devoured by a Death Worm): The Death Worm suddenly lunges forward, instantly devouring {$GLOBALS["target"]} whole!",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} is instantly devoured by a Death Worm): Without warning, the Death Worm strikes, swallowing {$GLOBALS["target"]} in one swift motion!",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} is instantly devoured by a Death Worm): The Death Worm attacks with lightning speed, consuming {$GLOBALS["target"]} before they can react!"
     ]
 ];
 
 $GLOBALS["PROMPTS"]["minai_tntr_deathwormvore_reset"] = [
     "player_request"=>[
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} observes the Death Worm's departure): The Death Worm returns to its waiting position beneath the sand.",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} observes the Death Worm's departure): The massive creature settles back into its sandy lair.",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} observes the Death Worm's departure): The Death Worm retreats to its hiding spot under the surface."
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} observes the Death Worm's departure): The Death Worm returns to its waiting position beneath the sand.",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} observes the Death Worm's departure): The massive creature settles back into its sandy lair.",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} observes the Death Worm's departure): The Death Worm retreats to its hiding spot under the surface."
     ]
 ];
 
@@ -278,8 +278,8 @@ $GLOBALS["PROMPTS"]["minai_tntr_snare_transtrapkill"] = [
 
 $GLOBALS["PROMPTS"]["minai_tntr_deathworm_trigger01"] = [
     "player_request"=>[
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} notices something strange about the ground): {$GLOBALS["target"]} feels a faint vibration beneath their feet. The ground seems to pulse with an unnatural rhythm!) {$GLOBALS["TEMPLATE_DIALOG"]}",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} notices something strange about the ground): A subtle tremor runs through the earth, causing {$GLOBALS["target"]} to pause mid-step. Something feels wrong!) {$GLOBALS["TEMPLATE_DIALOG"]}",
-        "The Narrator: #SEX_INFO (Scenario: {$GLOBALS["PLAYER_NAME"]} notices something strange about the ground): {$GLOBALS["target"]} notices small pebbles starting to shift and roll across the ground. An odd stillness fills the air!) {$GLOBALS["TEMPLATE_DIALOG"]}"
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} notices something strange about the ground): {$GLOBALS["target"]} feels a faint vibration beneath their feet. The ground seems to pulse with an unnatural rhythm!) {$GLOBALS["TEMPLATE_DIALOG"]}",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} notices something strange about the ground): A subtle tremor runs through the earth, causing {$GLOBALS["target"]} to pause mid-step. Something feels wrong!) {$GLOBALS["TEMPLATE_DIALOG"]}",
+        "The Narrator: #SEX_INFO (#SEX_SCENARIO {$GLOBALS["PLAYER_NAME"]} notices something strange about the ground): {$GLOBALS["target"]} notices small pebbles starting to shift and roll across the ground. An odd stillness fills the air!) {$GLOBALS["TEMPLATE_DIALOG"]}"
     ]
 ];
