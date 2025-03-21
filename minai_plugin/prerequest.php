@@ -24,6 +24,7 @@ if (IsEnabled($GLOBALS["PLAYER_NAME"], "isTalkingToNarrator") && isPlayerInput()
     SetEnabled($GLOBALS["PLAYER_NAME"], "isTalkingToNarrator", false);
     $GLOBALS["HERIKA_NAME"] = "The Narrator";
     $GLOBALS["minai_processing_input"] = true;
+    $GLOBALS["using_self_narrator"] = true;
     SetNarratorProfile();
     if ($GLOBALS["self_narrator"]) {
         $pronouns = GetActorPronouns($GLOBALS["PLAYER_NAME"]);

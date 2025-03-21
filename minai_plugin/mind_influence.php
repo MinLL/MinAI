@@ -313,7 +313,7 @@ function GetMindInfluenceRequestFormat($state, $promptType = "default") {
             case "explicit":
                 return $subtleExplicitFormats[$state] ?? $subtleFormats[$state];
             case "combat":
-                return $subtleCombatFormats[$state] ?? $subtleFormats[$state];
+                return ""; // return $subtleCombatFormats[$state] ?? $subtleFormats[$state];
             default:
                 return $subtleFormats[$state];
         }
@@ -350,7 +350,7 @@ function GetMindInfluenceRequestFormat($state, $promptType = "default") {
         case "explicit":
             return $explicitFormats[$state] ?? $baseFormats[$state];
         case "combat":
-            return $combatFormats[$state] ?? $baseFormats[$state];
+            return ""; // return $combatFormats[$state] ?? $baseFormats[$state];
         default:
             return $baseFormats[$state];
     }
