@@ -194,7 +194,7 @@ if (isset($GLOBALS["minai_processing_input"]) && $GLOBALS["minai_processing_inpu
 
     if ($GLOBALS["using_self_narrator"]) {
         $pronouns = GetActorPronouns($GLOBALS["PLAYER_NAME"]);
-        $cue[] = "Write a response as {$GLOBALS["PLAYER_NAME"]} thinking to {$GLOBALS["PLAYER_OBJECT"]}self about {$pronouns["object"]} most recent thought.";
+        $cue[] = "Write a response as {$GLOBALS["PLAYER_NAME"]} thinking to {$pronouns["object"]}self about {$pronouns["object"]} most recent thought.";
     }
     $GLOBALS["PROMPTS"]["inputtext"] = [
         "cue"=>$cue,
