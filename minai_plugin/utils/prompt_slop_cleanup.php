@@ -23,6 +23,21 @@ function cleanupSlop($contextData) {
         $content = str_replace('))', ')', $content);
         $content = str_replace('((', '(', $content);
 
+        // Pattern: Handle Waterskin messages
+        $content = preg_replace_callback('/([^\n]+?) found 1 Waterskin (\d)\/3/', function($matches) use ($playerPronouns) {
+            $name = $matches[1];
+            $level = $matches[2];
+            
+            if ($level == 3) {
+                return "$name refilled {$playerPronouns['possessive']} Waterskin to full";
+            } else {
+                return "$name took a drink from {$playerPronouns['possessive']} Waterskin";
+            }
+        }, $content);
+
+        // Remove form[] indicator messages
+        $content = preg_replace('/[^\n]+? found 1 used in a form\[\] to indicate true\n?/', '', $content);
+
         // Pattern 1: Handle "thinking to self" pattern
         if (preg_match('/The Narrator:\s*(.*?)\s*\(talking to (.*?) is thinking to (him|her|them)self\)/', $content, $matches)) {
             $thought = $matches[1];

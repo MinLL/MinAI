@@ -190,15 +190,22 @@ if ($GLOBALS["gameRequest"][0] == "minai_narrate") {
 
 if (isset($GLOBALS["minai_processing_input"]) && $GLOBALS["minai_processing_input"]) {
     error_log("PROCESSING INPUT");
+    $cue = [];
+
+    if ($GLOBALS["using_self_narrator"]) {
+        $pronouns = GetActorPronouns($GLOBALS["PLAYER_NAME"]);
+        $cue[] = "Write a response as {$GLOBALS["PLAYER_NAME"]} thinking to {$GLOBALS["PLAYER_OBJECT"]}self about {$pronouns["object"]} most recent thought.";
+    }
     $GLOBALS["PROMPTS"]["inputtext"] = [
-        "cue"=>[],
+        "cue"=>$cue,
         // Prompt is implicit
     ];
     $GLOBALS["PROMPTS"]["inputtext_s"] = [
-        "cue"=>[],
+        "cue"=>$cue,
         // Prompt is implicit
     ];
 }
+
 require_once("prompts/tntr_prompts.php");
 require_once("prompts/fillherup_prompts.php");
 require_once("prompts/vibrator_prompts.php");
