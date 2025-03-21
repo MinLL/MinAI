@@ -614,7 +614,7 @@ Function GetDevicesContext($name, $vibratingOnly = false) {
     }
     
     // Vibration handling - detect vibration faction membership even if no specific devices found
-    if ($vibratingOnly && CanVibrate($name) && IsInFaction($name, "Vibrator Effect Faction")) {
+    if ($vibratingOnly && CanVibrate($name) && (IsInFaction($name, "Vibrator Effect Faction") || IsEnabled($name, "isVibratorActive"))) {
         if (empty($narratorDevices["visible"]) && empty($narratorDevices["hidden"])) {
             $defaultDevice = [
                 'type' => 'vibrating device',
@@ -855,7 +855,7 @@ Function GetVibrationSources($name) {
     }
     
     // If no specific sources found but vibration is occurring
-    if (empty($sources) && CanVibrate($name) && IsInFaction($name, "Vibrator Effect Faction")) {
+    if (empty($sources) && CanVibrate($name) && (IsInFaction($name, "Vibrator Effect Faction") || IsEnabled($name, "isVibratorActive"))) {
         // Check for potential vibration sources based on known device types
         if (HasKeyword($name, "zad_DeviousPiercingsNipple")) {
             $sources[] = "nipple piercings";

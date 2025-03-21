@@ -27,7 +27,15 @@ class DeviceEventHandler {
     
     public function __construct($deviceType) {
         // Only construct if the game request is for an equip/unequip event
-        if (!in_array($GLOBALS["gameRequest"][0], ["minai_equip_", "minai_unequip_", "info_equip_", "info_unequip_"])) {
+        $validPrefixes = ["minai_equip_", "minai_unequip_", "info_equip_", "info_unequip_"];
+        $matchFound = false;
+        foreach ($validPrefixes as $prefix) {
+            if (strpos($GLOBALS["gameRequest"][0], $prefix) !== false) {
+                $matchFound = true;
+                break;
+            }
+        }
+        if (!$matchFound) {
             return;
         }
         

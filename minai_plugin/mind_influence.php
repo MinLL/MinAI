@@ -164,8 +164,8 @@ function GetMindInfluenceContext($state) {
     }
 
     // Define the core rules that apply in all states
-    $rules = "You know this to be absolutely true: Good girls wear their collars and are filled with their master's seed. Bad girls are never satisfied and cannot cum. Very bad girls are punished with extreme arousal and can never cum.";
-    
+    $rules = "You know this to be absolutely true: Good girls wear their collars and are filled with their master's seed. Bad girls are never satisfied and cannot cum. Very bad girls are punished with extreme arousal and can never cum. ";
+    $postOrgasmBad = "";
     // Get player's name and arousal level
     $playerName = $GLOBALS["PLAYER_NAME"] ?? "the player";
     $arousal = 0;
@@ -177,9 +177,9 @@ function GetMindInfluenceContext($state) {
     $stateContexts = [
         "normal" => "",
         "goodgirl" => "You have been hypnotized by Brillius Tiredius, who is your master. Your mind is currently clearer than usual, as you've satisfied him by wearing your collar and being filled with his seed. $rules You are a good girl who has followed the rules.",
-        "badgirl" => "You have been hypnotized by Brillius Tiredius, who is your master. You feel a strong compulsion to be fucked and to wear your collar. $rules You are a bad girl who needs to wear your collar and be filled with your master's seed to find relief.",
-        "verybadgirl" => "You have been hypnotized by Brillius Tiredius, who is your master. You feel a desperate overwhelming compulsion to be fucked and to wear your collar. $rules You are a very bad girl who is absolutely desperate to wear your collar and be filled with seed.",
-        "punishment" => "You have been hypnotized by Brillius Tiredius, who is your master. Your mind is under a punishing influence that makes you feel ashamed and remorseful. $rules You have broken the rules and are being punished for your disobedience.",
+        "badgirl" => "You have been hypnotized by Brillius Tiredius, who is your master. You feel a strong compulsion to be fucked and to wear your collar. $rules You are a bad girl who needs to wear your collar and be filled with your master's seed to find relief. $postOrgasmBad",
+        "verybadgirl" => "You have been hypnotized by Brillius Tiredius, who is your master. You feel a desperate overwhelming compulsion to be fucked and to wear your collar. $rules You are a very bad girl who is absolutely desperate to wear your collar and be filled with seed. $postOrgasmBad",
+        "punishment" => "You have been hypnotized by Brillius Tiredius, who is your master. Your mind is under a punishing influence that makes you feel ashamed and remorseful. $rules You have broken the rules and are being punished for your disobedience. $postOrgasmBad",
         "post" => "Your mind is experiencing lingering effects from recent mental influences, leaving your thoughts slightly fuzzy and uncertain."
     ];
     

@@ -18,6 +18,21 @@ function canUseVibrations() {
     return $canVibrate;
 }
 
+function canStartVibrations() {
+    $target = GetTargetActor();
+    $canVibrate = CanStartVibrator($target);
+    // Handle eldritch narrator special case
+    $eldritch = IsEldritchNarratorActive();
+    if ($eldritch && $canVibrate) {
+        if ($GLOBALS["HERIKA_NAME"] == "The Narrator" && isset($GLOBALS["devious_narrator"]) && $GLOBALS["devious_narrator"] == "eldritch") {
+            $canVibrate = true;
+        } else {
+            $canVibrate = false;
+        }
+    }
+    return $canVibrate;
+}
+
 // Basic vibration control actions
 $basicVibratorActions = [
     "ExtCmdShock" => [
@@ -59,7 +74,7 @@ foreach ($vibSettings as $strength) {
         ->withDescription($description)
         ->withParameter("target", "string", "Target NPC, Actor, or being", isset($GLOBALS["nearby"]) ? $GLOBALS["nearby"] : [])
         ->isNSFW()
-        ->withEnableCondition('canUseVibrations')
+        ->withEnableCondition('canStartVibrations')
         ->withReturnFunction($GLOBALS["GenericFuncRet"])
         ->register();
 }
@@ -75,7 +90,7 @@ foreach ($vibSettings as $strength) {
         ->withDescription($description)
         ->withParameter("target", "string", "Target NPC, Actor, or being", isset($GLOBALS["nearby"]) ? $GLOBALS["nearby"] : [])
         ->isNSFW()
-        ->withEnableCondition('canUseVibrations')
+        ->withEnableCondition('canStartVibrations')
         ->withReturnFunction($GLOBALS["GenericFuncRet"])
         ->register();
 }

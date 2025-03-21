@@ -479,16 +479,33 @@ String Function getVibStrength(float vibStrength)
   return strength
 endFunction
 
+Actor Function getVibratingActorName(string actorName)
+  if actorName == main.GetActorName(playerRef) || actorName == "The Narrator"
+    return playerRef
+  else
+    return aiff.AIGetAgentByName(actorName)
+  endif
+  return None
+endFunction
+
 Event OnVibrateStart(string eventName, string actorName, float vibStrength, Form sender)
   string strength = getVibStrength(vibStrength)
   Main.Info("OnVibrateStart: " + strength)
   ; Both player and npc's should react to vibrations starting
+  Actor vibratorActor = getVibratingActorName(actorName)
+  if vibratorActor
+    aiff.SetActorVariable(vibratorActor, "isVibratorActive", True)
+  endif
   Main.RequestLLMResponseFromActor(strength, "minai_vibrate_start", actorName, "both")
 EndEvent
 
 Event OnVibrateStop(string eventName, string actorName, float vibStrength, Form sender)
   string strength = getVibStrength(vibStrength)
   Main.Info("OnVibrateStop: " + strength)
+  Actor vibratorActor = getVibratingActorName(actorName)
+  if vibratorActor
+    aiff.SetActorVariable(vibratorActor, "isVibratorActive", False)
+  endif
   if config.includePromptSelf
     Main.RequestLLMResponseFromActor(strength, "minai_vibrate_stop", actorName, "player")
   else
@@ -1101,6 +1118,7 @@ Function SetContext(actor akTarget)
   EndIf
   string actorName = main.GetActorName(akTarget)
   aiff.SetActorVariable(akTarget, "canVibrate", CanVibrate(akTarget))
+  aiff.SetActorVariable(akTarget, "isVibratorActive", libs.isVibrating(akTarget))
   if bHasDeviousFollowers && akTarget == PlayerRef
     Actor deviousFollower = (Quest.GetQuest("_Dflow") as QF__Gift_09000D62).Alias__DMaster.GetRef() as Actor
     if deviousFollower

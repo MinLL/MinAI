@@ -64,7 +64,23 @@ function CanVibrate($name) {
     return IsEnabled($name, "CanVibrate") && IsActionEnabled("MinaiGlobalVibrator");
 }
 
+function CanStartVibrator($name) {
+    return CanVibrate($name) && !IsEnabled($name, "isVibratorActive") && !IsInFaction($name, "Vibrator Effect Faction");
+}
 
+function ActorCanOrgasm($name) {
+    // For now, just check to see if they're not a badgirl/verybadgirl/punishment
+    $state = GetMindInfluenceState($name);
+    if (is_array($state)) {
+        foreach ($state as $s) {
+            if (in_array($s, ["badgirl", "verybadgirl", "punishment"])) {
+                return false;
+            }
+        }
+        return true;
+    }
+    return !in_array($state, ["badgirl", "verybadgirl", "punishment"]);
+}
 /**
  * Set an actor value in the database
  * 

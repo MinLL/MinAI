@@ -1,5 +1,6 @@
 <?php
 require_once(dirname(__FILE__) . "/info_device_utils.php");
+require_once(dirname(__FILE__) . "/../util.php");
 
 // Function to handle orgasm information prompts
 function get_info_orgasm_prompt() {
@@ -10,6 +11,10 @@ function get_info_orgasm_prompt() {
     $targetName = $GLOBALS["target"];
     
     $target = $GLOBALS["target"];
+    
+    // Check if actor can orgasm
+    $canOrgasm = ActorCanOrgasm($target);
+    
     $deviceContext = GetInfoDeviceContext($target);
     
     // Get specific device description
@@ -20,6 +25,51 @@ function get_info_orgasm_prompt() {
     $intensity = GetReactionIntensity($arousal);
     $helplessness = isset($deviceContext["helplessness"]) ? $deviceContext["helplessness"] : "";
     $hasGag = isset($deviceContext["hasGag"]) ? $deviceContext["hasGag"] : false;
+    
+    if (!$canOrgasm) {
+        // Create denial variations when orgasm is not allowed
+        $denialIntros = [
+            "The intensity of $targetName's $deviceDescription surges to an impossible peak, threatening to shatter their sanity",
+            "$targetName's $deviceDescription unleashes its full devastating power, pushing them beyond all limits",
+            "Overwhelming waves of pleasure from $targetName's $deviceDescription build to a maddening crescendo",
+            "The relentless stimulation from $targetName's $deviceDescription drives them to the very brink of consciousness"
+        ];
+        
+        $denialReactions = [];
+        if ($hasGag) {
+            $denialReactions = [
+                "their body convulses violently as primal, desperate screams are reduced to helpless whimpers behind their gag",
+                "they thrash with such force their restraints creak ominously, their gag barely containing their desperate animal sounds",
+                "their eyes roll back as they arch off the ground, muffled howls of desperate need echoing through their gag",
+                "they writhe with such intensity their bonds dig deep, their gagged pleas becoming increasingly incoherent and frantic"
+            ];
+        } else {
+            $denialReactions = [
+                "their body spasms uncontrollably as they wail in desperate frustration, pleasure building far past what they thought possible",
+                "they scream themselves hoarse begging for mercy as their body remains trapped at the peak of pleasure",
+                "broken sounds of desperate need escape their lips as they're held suspended in an endless moment of almost-release",
+                "they thrash wildly, their mind unraveling as they're forced to endure pleasure beyond their limits without relief"
+            ];
+        }
+        
+        $denialFinales = [
+            "Their body remains locked in this exquisite agony, forced to endure pleasure so intense it borders on torture.",
+            "The devastating stimulation continues relentlessly, proving that even the most powerful climax can be denied.",
+            "Their consciousness fragments under the assault of sensation, yet release remains forever just out of reach.",
+            "The endless peak of pleasure becomes both paradise and hell, a reminder that their body is no longer their own."
+        ];
+        
+        $promptText = $denialIntros[array_rand($denialIntros)] . ", but something deep within prevents them from finding release. ";
+        $promptText .= $denialReactions[array_rand($denialReactions)];
+        
+        if (!empty($helplessness)) {
+            $promptText .= ", while remaining completely $helplessness";
+        }
+        
+        $promptText .= ". " . $denialFinales[array_rand($denialFinales)];
+        
+        return "The Narrator: " . $promptText;
+    }
     
     // Create intro variations for orgasm control - reworded to work without a speaker
     $orgasmIntros = [
