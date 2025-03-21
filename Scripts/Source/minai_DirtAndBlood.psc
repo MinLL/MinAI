@@ -189,46 +189,51 @@ string Function GetStringForActor(actor currentActor)
   EndIf  
   string msg = ""
   bool isProfessional = False;
+  
   If (bDirty_Effect_Clean)
-    msg = actorName + " is clean and well groomed. "
+    msg = actorName + " appears immaculately clean and well-groomed, with not a speck of dirt or grime to be seen on their person. Their skin glows with health, and their attire has been meticulously maintained. "
   ElseIf (bDirty_Effect_Dirt1)
-    msg = actorName + " is barely dirty and fits right in with the people of Skyrim. "
+    msg = actorName + " has a light dusting of dirt on their clothes and skin, the kind that comes from a normal day of travel or work in Skyrim. Nothing unusual or particularly noticeable by local standards. "
   ElseIf (bDirty_Effect_Dirt2 || bDirty_NPCEffect_Dirt2_Bandits_Fix || bDirty_NPCEffect_Dirt2_Professional) 
-    msg = actorName + " is looking a bit dirty and could use a bath. "
+    msg = actorName + " shows visible signs of dirt and grime accumulated across their clothing and exposed skin. Their appearance suggests it's been several days since they've had a proper bath or cleaned their garments. "
   ElseIf (bDirty_Effect_Dirt3 || bDirty_NPCEffect_Dirt3_Professional || bDirty_NPCEffect_Dirt3_Bandits_Fix)
-    msg = actorName + " is dirty, if they get any worse they will be gross. "
+    msg = actorName + " is heavily soiled with thick layers of dirt and grime covering much of their body and clothing. A noticeable earthy smell emanates from them, and their fingernails are blackened with embedded dirt. "
   ElseIf (bDirty_Effect_Dirt4 || bDirty_NPCEffect_Dirt4_Bandits_Fix)
-    msg = actorName + " is disgustingly filthy.  " + actorName + " reeks like rotting garbage. "
+    msg = actorName + " is absolutely caked in layers of thick, encrusted filth from head to toe. Their features are barely distinguishable beneath the grime, and they emit a powerful stench of rot, sweat, and decay that causes people nearby to wrinkle their noses in disgust. "
   ElseIf (bDirty_Effect_Blood1 || bDirty_NPCEffect_Blood1)
-    msg = actorName + " has light blotches of blood on themselves. "
+    msg = actorName + " bears scattered bloodstains across their garments and possibly their skin - spatter marks and small patches that suggest recent violence or perhaps tending to wounds. Though noticeable, the blood is minimal and has begun to dry in places. "
   ElseIf (bDirty_Effect_Blood2 || bDirty_NPCEffect_Blood2) 
-    msg = actorName + " has blotches of blood on themselves. "
+    msg = actorName + " displays prominent large bloodstains spread across their clothing and armor. Dark crimson patches and streaks suggest they've been in a serious confrontation recently. The metallic scent of blood lingers around them. "
   ElseIf (bDirty_Effect_Blood3 || bDirty_NPCEffect_Blood3)
-    msg = actorName + " is covered in blood from battle. "
+    msg = actorName + " is quite bloody, with gore liberally splashed across their person. Their hands and forearms are particularly stained with half-dried blood, and numerous spatters mark their face and clothing. They look as though they've just walked away from intense combat. "
   ElseIf (bDirty_Effect_Blood4 || bDirty_NPCEffect_Blood4 || bDirty_NPCEffect_Blood5)
-    msg = actorName + " is seeping with blood from battle, it drips off every bit of them, and pools in crevices of their armor. "
+    msg = actorName + " is covered in blood to a horrifying degree. They are drenched in crimson from head to toe, with blood soaking their clothing and armor, pooling in crevices, and still glistening wetly in places. Bloody footprints mark their path, and the overwhelming metallic smell of fresh gore surrounds them like an aura. "
   EndIf
+  
   If(bDirty_NPCEffect_Dirt2_Professional || bDirty_NPCEffect_Dirt3_Professional)
-    msg += actorName + " wears the dirt of their profession. "
+    msg += actorName + "'s dirt appears to be related to their profession. The specific pattern of staining and residue suggests the honorable grime of their daily work rather than simple neglect. "
+  EndIf
+  If(bDirty_NPCEffect_Dirt2_Bandits_Fix || bDirty_NPCEffect_Dirt3_Bandits_Fix || bDirty_NPCEffect_Dirt4_Bandits_Fix)
+    msg += "The particular pattern of grime on " + actorName + " is characteristic of bandits and outlaws who live rough in the wilderness, with distinctive weathering and staining from campfire smoke, forest debris, and extended time without proper facilities. "
   EndIf
   If(bHasMoreSoaps)
     if(bSoapLavenderSoapEffect)
-      msg = actorName + " looks clean and well groomed. " + actorName + " smells pleasantly of Lavender."  
+      msg = actorName + " appears freshly bathed and impeccably clean. Their skin and clothing emit a soothing, delicate aroma of lavender that wafts pleasantly through the air around them. "  
     EndIf
     if(bSoapBlueMountainSoapEffect)
-      msg = actorName + " looks clean and well groomed. " + actorName + " smells pleasantly of Blue Mountain Flowers."
+      msg = actorName + " is exceptionally clean, with a refreshing fragrance of blue mountain flowers emanating from their person. The sweet, slightly crisp scent suggests a recent thorough bathing with fine-quality soap. "
     EndIf
     if(bSoapDragonsTongueSoapEffect)
-      msg = actorName + " looks clean and well groomed. " + actorName + " smells pleasantly of Dragons Tongue Flowers."
+      msg = actorName + " presents themselves in an immaculately clean state, surrounded by the exotic and slightly spicy aroma of dragon's tongue flowers. The distinctive scent speaks of luxury and attention to personal hygiene. "
     EndIf
     if(bSoapPurpleMountainFlowerSoapEffect)
-      msg = actorName + " looks clean and well groomed. " + actorName + " smells pleasantly of Purple Mountain Flowers."
+      msg = actorName + " exhibits pristine cleanliness, carrying with them the rich, enchanting fragrance of purple mountain flowers. The rare and sought-after scent indicates both wealth and fastidious grooming habits. "
     EndIf
     if(bSoapRedMountainFlowerSoapEffect)
-      msg = actorName + " looks clean and well groomed. " + actorName + " smells pleasantly of Red Mountain Flowers."
+      msg = actorName + " shows evidence of recent and thorough bathing, with the warm, comforting scent of red mountain flowers clinging to their skin and clothes. The pleasantly floral aroma is unmistakable to those familiar with fine soaps. "
     EndIf
     if(bSoapSuperiorMountainFlowerSoapEffect)
-      msg = actorName + " looks clean and well groomed. " + actorName + " smells pleasantly of a complex Mountain Flowers bouquet."
+      msg = actorName + " presents a picture of perfect cleanliness, surrounded by an intoxicating, complex bouquet of various mountain flowers. The layered, sophisticated fragrance suggests use of the finest and most expensive bathing products available in Skyrim. "
     EndIf
   EndIf
   return msg
@@ -270,6 +275,7 @@ string Function GetTagsForActor(actor currentActor)
   EndIf  
   string msg = ""
   bool isProfessional = False;
+  
   If (bDirty_Effect_Clean)
     msg += "Clean,"
   ElseIf (bDirty_Effect_Dirt1)
@@ -289,10 +295,11 @@ string Function GetTagsForActor(actor currentActor)
   ElseIf (bDirty_Effect_Blood4 || bDirty_NPCEffect_Blood4 || bDirty_NPCEffect_Blood5)
     msg += "Blood4,"
   EndIf
+  
   If(bDirty_NPCEffect_Dirt2_Professional || bDirty_NPCEffect_Dirt3_Professional)
     msg += "Professional,"
   EndIf
-  If(Dirty_NPCEffect_Dirt2_Bandits_Fix || Dirty_NPCEffect_Dirt3_Bandits_Fix || Dirty_NPCEffect_Dirt4_Bandits_Fix)
+  If(bDirty_NPCEffect_Dirt2_Bandits_Fix || bDirty_NPCEffect_Dirt3_Bandits_Fix || bDirty_NPCEffect_Dirt4_Bandits_Fix)
     msg += "Bandit,"
   EndIf
   If(bHasMoreSoaps)

@@ -92,6 +92,16 @@ function InitializeCharacterContextBuilders() {
         'builder_callback' => 'BuildTattooContext'
     ]);
     
+    // Register dirt and blood context builder
+    $registry->register('dirt_and_blood', [
+        'section' => 'status',
+        'header' => 'Cleanliness',
+        'description' => 'Character dirt and blood status',
+        'priority' => 35,
+        'enabled' => isset($GLOBALS['minai_context']['dirt_and_blood']) ? (bool)$GLOBALS['minai_context']['dirt_and_blood'] : true,
+        'builder_callback' => 'BuildDirtAndBloodContext'
+    ]);
+    
     // Register arousal context builder
     $registry->register('arousal', [
         'section' => 'status',
@@ -602,5 +612,24 @@ function BuildMindInfluenceContext($params) {
     
     // This function would call the existing GetMindInfluenceContext function
     return GetMindInfluenceContext($mindState);
+}
+
+/**
+ * Build the dirt and blood context
+ * 
+ * @param array $params Parameters including herika_name, player_name, target
+ * @return string Formatted dirt and blood context
+ */
+function BuildDirtAndBloodContext($params) {
+    $validated = ValidateContextParams($params);
+    $character = $validated['herika_name'];
+    
+    // If this is the narrator, show the player's dirt and blood status instead
+    if ($character == "The Narrator") {
+        $character = $validated['player_name'];
+    }
+    
+    // Use the single actor dirt and blood context function we created
+    return GetSingleActorDirtAndBloodContext($character);
 } 
 

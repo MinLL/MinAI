@@ -89,6 +89,9 @@ function BuildThirdPartyContext($params) {
  * @return string Formatted nearby characters context
  */
 function BuildNearbyCharactersContext($params) {
+    $herika_name = $params['herika_name'];
+    $player_name = $params['player_name'];
+    $target = $params['target'];
     $utilities = new Utilities();
     $localActors = DataBeingsInRange();
     
@@ -104,7 +107,14 @@ function BuildNearbyCharactersContext($params) {
     $characters = array_filter(array_map('trim', $characters), function($item) {
         return !empty($item);
     });
-    
+    // Remove Herika, player and target names from the list
+    $characters = array_filter($characters, function($name) use ($herika_name, $player_name, $target) {
+        return !in_array(strtolower($name), [
+            strtolower($herika_name),
+            strtolower($player_name), 
+            strtolower($target)
+        ]);
+    });
     // If we have characters after cleaning, create the formatted list
     if (count($characters) > 0) {
         $context = implode(", ", $characters) . "\n";
