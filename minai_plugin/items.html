@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MinAI Items Management</title>
     <style>
+        /* Variables */
         :root {
             --primary-color: #4CAF50;
             --secondary-color: #2196F3;
@@ -18,17 +20,36 @@
             --info-color: #4dabf7;
         }
 
+        /* Base Styles */
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: var(--background-dark);
+            background: radial-gradient(circle at center, var(--background-light) 0%, var(--background-dark) 100%);
             color: var(--text-color);
             margin: 0;
             padding: 0;
             line-height: 1.6;
-            background: radial-gradient(circle at center, var(--background-light) 0%, var(--background-dark) 100%);
             min-height: 100vh;
         }
 
+        /* Typography */
+        h1 {
+            text-align: center;
+            color: var(--text-color);
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+            color: var(--text-color);
+            margin-top: 30px;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        /* Layout */
         .container {
             max-width: 1400px;
             margin: 40px auto;
@@ -38,8 +59,24 @@
             backdrop-filter: blur(10px);
             border: 1px solid var(--border-color);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            box-sizing: border-box;
+            width: 95%;
         }
 
+        .section {
+            margin-bottom: 40px;
+            padding: 20px;
+            background-color: rgba(45, 45, 45, 0.4);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(4px);
+            box-sizing: border-box;
+            width: 100%;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Navigation */
         .nav-panel {
             background-color: var(--background-light);
             padding: 15px;
@@ -59,50 +96,21 @@
             padding: 10px 20px;
             border-radius: 8px;
             transition: all 0.3s ease;
-            background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.1) 0%,
-                rgba(255, 255, 255, 0.05) 100%
-            );
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
             border: 1px solid var(--border-color);
         }
 
         .nav-panel a:hover {
             transform: translateY(-2px);
-            background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.15) 0%,
-                rgba(255, 255, 255, 0.08) 100%
-            );
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
-        h1 {
-            text-align: center;
-            color: var(--text-color);
-            margin-bottom: 30px;
-            font-size: 2.5rem;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        h2 {
-            color: var(--text-color);
-            margin-top: 30px;
-            margin-bottom: 20px;
-            font-size: 1.8rem;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
-        }
-
-        .section {
-            margin-bottom: 40px;
-            padding: 20px;
-            background-color: rgba(45, 45, 45, 0.4);
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            backdrop-filter: blur(4px);
-        }
-
+        /* Forms */
         .form-group {
             margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         label {
@@ -123,6 +131,7 @@
             border-radius: 8px;
             font-size: 1rem;
             transition: all 0.3s ease;
+            box-sizing: border-box;
         }
 
         input[type="text"]:focus,
@@ -145,73 +154,7 @@
             accent-color: var(--primary-color);
         }
 
-        button {
-            display: inline-block;
-            color: var(--text-color);
-            text-decoration: none;
-            font-size: 1.1rem;
-            padding: 10px 20px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            background: linear-gradient(135deg,
-                rgba(76, 175, 80, 0.1) 0%,
-                rgba(76, 175, 80, 0.2) 100%
-            );
-            border: 1px solid rgba(76, 175, 80, 0.3);
-            cursor: pointer;
-            margin-right: 10px;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            background: linear-gradient(135deg,
-                rgba(76, 175, 80, 0.2) 0%,
-                rgba(76, 175, 80, 0.3) 100%
-            );
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        button.delete {
-            background: linear-gradient(135deg,
-                rgba(244, 67, 54, 0.1) 0%,
-                rgba(244, 67, 54, 0.2) 100%
-            );
-            border: 1px solid rgba(244, 67, 54, 0.3);
-        }
-
-        button.delete:hover {
-            background: linear-gradient(135deg,
-                rgba(244, 67, 54, 0.2) 0%,
-                rgba(244, 67, 54, 0.3) 100%
-            );
-        }
-
-        .table-container {
-            overflow-x: auto;
-            margin-top: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        th {
-            background-color: rgba(0, 0, 0, 0.2);
-            font-weight: 600;
-        }
-
-        tr:hover {
-            background-color: rgba(255, 255, 255, 0.05);
-        }
-
+        /* Search and Filters */
         .search-container {
             display: flex;
             margin-bottom: 20px;
@@ -234,31 +177,175 @@
             min-width: 150px;
         }
 
-        .message {
-            padding: 15px;
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
             margin-bottom: 20px;
-            border-radius: 8px;
-            display: none;
+            table-layout: fixed;
         }
 
-        .message.success {
-            background-color: rgba(64, 192, 87, 0.2);
-            border: 1px solid var(--success-color);
-            color: var(--success-color);
+        th, td {
+            padding: 8px 6px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
-        .message.error {
-            background-color: rgba(244, 67, 54, 0.2);
-            border: 1px solid var(--error-color);
+        th {
+            background-color: rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        td {
+            font-size: 0.9rem;
+        }
+
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        /* ID Column Styles */
+        .id-column, .id-column-header {
+            width: 40px;
+            min-width: 40px;
+            max-width: 40px;
+            text-align: right;
+            padding-right: 8px;
+        }
+
+        /* Item ID Column Styles */
+        .itemid-column, .itemid-column-header {
+            width: 80px;
+            min-width: 80px;
+            max-width: 80px;
+            text-align: left;
+        }
+
+        /* Category and Type Column Styles */
+        .category-column, .category-column-header {
+            width: 80px;
+            min-width: 80px;
+            max-width: 80px;
+            text-align: center;
+        }
+
+        .type-column, .type-column-header {
+            width: 60px;
+            min-width: 60px;
+            max-width: 60px;
+            text-align: center;
+        }
+
+        /* Date Column Styles */
+        .date-column, .date-column-header {
+            width: 120px;
+            min-width: 120px;
+            max-width: 120px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: center;
+        }
+
+        /* Narrow Column Styles */
+        .narrow-column, .narrow-column-header {
+            width: 50px;
+            min-width: 50px;
+            max-width: 50px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: center;
+            padding: 8px 2px;
+        }
+
+        /* Button Styles */
+        button.icon-button {
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            background: var(--background-light);
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        button.icon-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        button.icon-button i {
+            font-size: 12px;
+        }
+
+        .button-cell {
+            width: 90px;
+            min-width: 90px;
+            max-width: 90px;
+            white-space: nowrap;
+            padding: 4px 2px;
+            text-align: center;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 3px;
+        }
+
+        /* Button States */
+        .visibility-button[data-hidden="0"] {
+            color: #ffc107;
+            background: rgba(170, 170, 170, 0.1);
+            border-color: rgba(170, 170, 170, 0.3);
+        }
+
+        .visibility-button[data-hidden="0"]:hover {
+            background: rgba(255, 193, 7, 0.2); /* Yellow background on hover */
+        }
+
+        .visibility-button[data-hidden="1"] {
+            color: #555555;
+            background: rgba(85, 85, 85, 0.1);
+            border-color: rgba(85, 85, 85, 0.3);
+        }
+
+        .visibility-button[data-hidden="1"]:hover {
+            background: rgba(85, 85, 85, 0.2); /* Darker grey background on hover */
+        }
+
+        .edit-button {
+            color: var(--secondary-color);
+        }
+
+        .edit-button:hover {
+            background: rgba(33, 150, 243, 0.2);
+        }
+
+        .delete-button {
             color: var(--error-color);
         }
 
-        .message.info {
-            background-color: rgba(33, 150, 243, 0.2);
-            border: 1px solid var(--info-color);
-            color: var(--info-color);
+        .delete-button:hover {
+            background: rgba(244, 67, 54, 0.2);
         }
 
+        /* Tabs */
         .tabs {
             display: flex;
             margin-bottom: 20px;
@@ -281,12 +368,52 @@
 
         .tab-content {
             display: none;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .tab-content.active {
             display: block;
         }
 
+        /* Messages */
+        .message {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: auto;
+            min-width: 200px;
+            max-width: 400px;
+            z-index: 1000;
+            text-align: center;
+            padding: 25px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            margin-top: 20px;
+        }
+
+        .message.success {
+            background-color: rgba(64, 192, 87, 0.2);
+            border: 1px solid var(--success-color);
+            color: var(--success-color);
+        }
+
+        .message.error {
+            background-color: rgba(244, 67, 54, 0.2);
+            border: 1px solid var(--error-color);
+            color: var(--error-color);
+        }
+
+        .message.info {
+            background-color: rgba(33, 150, 243, 0.2);
+            border: 1px solid var(--info-color);
+            color: var(--info-color);
+            backdrop-filter: blur(4px);
+        }
+
+        /* Pagination */
         .pagination {
             display: flex;
             justify-content: center;
@@ -299,6 +426,7 @@
             font-size: 0.9rem;
         }
 
+        /* Utility Classes */
         .warning-text {
             color: var(--error-color);
             font-size: 0.9rem;
@@ -306,10 +434,51 @@
             font-style: italic;
         }
 
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            overflow-y: auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .modal-content {
+            background-color: var(--background-light);
+            margin: 40px auto;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            position: relative;
+            box-sizing: border-box;
+            max-height: calc(100vh - 80px);
+            overflow-y: auto;
+        }
+
+        /* Media Queries */
         @media (max-width: 768px) {
             .container {
                 padding: 15px;
-                margin: 20px 10px;
+                margin: 20px auto;
+                width: 95%;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 20px auto;
+                padding: 15px;
+            }
+
+            .section {
+                padding: 15px;
             }
 
             .nav-panel a {
@@ -321,10 +490,48 @@
             h1 {
                 font-size: 2rem;
             }
+        }
 
-            .section {
-                padding: 15px;
-            }
+        /* Add these new styles */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .section-header h2 {
+            margin: 0;
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-top: 0;
+        }
+
+        .items-per-page-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 2px;
+        }
+
+        .items-per-page-container label {
+            color: var(--text-color);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .items-per-page-container select {
+            width: auto;
+            padding: 4px 8px;
+            font-size: 0.9rem;
+            min-width: 70px;
+        }
+
+        /* Hide pagination during loading */
+        .loading .pagination {
+            visibility: hidden;
         }
     </style>
 </head>
@@ -346,12 +553,22 @@
             <div class="tab" data-tab="import-export">Import/Export</div>
         </div>
 
-        <div id="message" class="message"></div>
-
         <!-- Items List Tab -->
         <div id="items-list" class="tab-content active">
             <div class="section">
-                <h2>Items List</h2>
+                <div class="section-header">
+                    <h2>Items List</h2>
+                    <div class="items-per-page-container">
+                        <label for="items-per-page">Items per page:</label>
+                        <select id="items-per-page">
+                            <option value="10">10</option>
+                            <option value="20" selected>20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="message" class="message"></div>
                 
                 <div class="search-container">
                     <input type="text" id="search-input" placeholder="Search items...">
@@ -388,18 +605,18 @@
                     <table id="items-table">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Item ID</th>
+                                <th class="id-column-header">ID</th>
+                                <th class="itemid-column-header">Item ID</th>
                                 <th>File Name</th>
                                 <th>Name</th>
                                 <th>Description</th>
-                                <th>Type</th>
-                                <th>Category</th>
-                                <th>Mod Index</th>
-                                <th>Available</th>
-                                <th>Last Seen</th>
-                                <th>Created At</th>
-                                <th>Actions</th>
+                                <th class="type-column-header">Type</th>
+                                <th class="category-column-header">Category</th>
+                                <th class="narrow-column-header">Mod#</th>
+                                <th class="narrow-column-header">Avail.</th>
+                                <th class="date-column-header">Last Seen</th>
+                                <th class="date-column-header">Created</th>
+                                <th class="button-cell">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="items-table-body">
@@ -460,6 +677,11 @@
                     <div class="form-group checkbox-group">
                         <input type="checkbox" id="is-available" name="is_available" checked>
                         <label for="is-available">Available for use</label>
+                    </div>
+                    
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="is-hidden" name="is_hidden">
+                        <label for="is-hidden">Hidden</label>
                     </div>
                     
                     <button type="submit">Add Item</button>

@@ -1,7 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Equipment Description Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <style>
         :root {
@@ -28,7 +31,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 40px auto;
             padding: 30px;
             background: rgba(0, 0, 0, 0.2);
@@ -36,6 +39,8 @@
             backdrop-filter: blur(10px);
             border: 1px solid var(--border-color);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            box-sizing: border-box;
+            width: 95%;
         }
 
         h1 {
@@ -65,25 +70,19 @@
             padding: 10px 20px;
             border-radius: 8px;
             transition: all 0.3s ease;
-            background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.1) 0%,
-                rgba(255, 255, 255, 0.05) 100%
-            );
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
             border: 1px solid var(--border-color);
         }
 
         .nav-panel a:hover {
             transform: translateY(-2px);
-            background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.15) 0%,
-                rgba(255, 255, 255, 0.08) 100%
-            );
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .equipment-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 20px;
             margin-top: 20px;
         }
@@ -119,60 +118,145 @@
 
         .equipment-controls {
             display: flex;
-            gap: 10px;
+            gap: 5px;
         }
 
-        button {
-            padding: 8px 16px;
-            background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.1) 0%,
-                rgba(255, 255, 255, 0.05) 100%
-            );
-            color: var(--text-color);
+        button.icon-button {
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            background: var(--background-light);
             border: 1px solid var(--border-color);
-            border-radius: 6px;
+            border-radius: 3px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
             cursor: pointer;
-            transition: all 0.3s ease;
         }
 
-        button:hover {
-            transform: translateY(-2px);
-            background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.15) 0%,
-                rgba(255, 255, 255, 0.08) 100%
-            );
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        button.icon-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
-        button.primary {
-            background: linear-gradient(135deg,
-                rgba(76, 175, 80, 0.2) 0%,
-                rgba(76, 175, 80, 0.3) 100%
-            );
+        button.icon-button i {
+            font-size: 12px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .visibility-button {
+            color: #ffc107;
+            background: rgba(170, 170, 170, 0.1);
+            border-color: rgba(170, 170, 170, 0.3);
+        }
+
+        .visibility-button:hover {
+            background: rgba(255, 193, 7, 0.2); /* Yellow background on hover */
+        }
+
+        .visibility-button[data-hidden="true"] {
+            color: #555555;
+            background: rgba(85, 85, 85, 0.1);
+            border-color: rgba(85, 85, 85, 0.3);
+        }
+
+        .visibility-button[data-hidden="true"]:hover {
+            background: rgba(85, 85, 85, 0.2); /* Darker grey background on hover */
+        }
+
+        .edit-button {
+            color: var(--secondary-color);
+        }
+
+        .edit-button:hover {
+            background: rgba(33, 150, 243, 0.2);
+        }
+
+        .delete-button {
+            color: var(--error-color);
+        }
+
+        .delete-button:hover {
+            background: rgba(244, 67, 54, 0.2);
+        }
+
+        button.icon-button.primary {
+            background: var(--background-light);
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+            color: var(--text-color);
+            width: auto;
+            padding: 8px 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        button.icon-button.primary:hover {
+            transform: scale(1.02);
+            background: rgba(76, 175, 80, 0.2);
             border-color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        button.icon-button.primary i {
+            margin-right: 8px;
+            font-size: 12px;
         }
 
         .add-equipment {
             margin: 20px 0;
-            padding: 20px;
+            padding: 20px 20px 15px;
             background: rgba(45, 45, 45, 0.4);
             border-radius: 12px;
             border: 1px solid var(--border-color);
+            position: relative;
         }
 
-        input[type="text"], textarea {
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 0;
+        }
+
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .form-header h3 {
+            margin: 0;
+            color: var(--text-color);
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        input[type="text"] {
             width: 100%;
             padding: 12px;
             background-color: var(--background-dark);
             border: 1px solid var(--border-color);
             color: var(--text-color);
             border-radius: 8px;
-            margin-bottom: 15px;
             font-size: 1rem;
             transition: all 0.3s ease;
+            box-sizing: border-box;
+            margin: 0;
         }
 
-        input[type="text"]:focus, textarea:focus {
+        input[type="text"]:focus {
             border-color: var(--primary-color);
             outline: none;
             box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
@@ -194,10 +278,12 @@
             flex: 0 0 120px;
             color: var(--text-color);
             opacity: 0.8;
+            font-size: 0.9rem;
         }
 
         .detail-value {
             flex: 1;
+            font-size: 0.9rem;
         }
 
         .status-message {
@@ -219,62 +305,8 @@
             border: 1px solid var(--error-color);
         }
 
-        @media (max-width: 768px) {
-            .container {
-                margin: 20px;
-                padding: 20px;
-            }
-
-            .nav-panel a {
-                display: block;
-                margin: 10px 0;
-            }
-
-            .equipment-grid {
-                grid-template-columns: 1fr;
-            }
-
-            h1 {
-                font-size: 2rem;
-            }
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .add-equipment h3 {
-            color: var(--text-color);
-            margin-top: 0;
-            margin-bottom: 20px;
-            font-size: 1.2rem;
-            opacity: 0.9;
-        }
-
-        .deleteBtn {
-            background: linear-gradient(135deg,
-                rgba(244, 67, 54, 0.2) 0%,
-                rgba(244, 67, 54, 0.3) 100%
-            );
-            border-color: var(--error-color);
-        }
-
-        .editBtn {
-            background: linear-gradient(135deg,
-                rgba(33, 150, 243, 0.2) 0%,
-                rgba(33, 150, 243, 0.3) 100%
-            );
-            border-color: var(--info-color);
-        }
-
         .equipment-card.editing {
-            background: linear-gradient(135deg,
-                rgba(76, 175, 80, 0.1) 0%,
-                rgba(76, 175, 80, 0.2) 100%
-            );
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(76, 175, 80, 0.2) 100%);
             border-color: var(--primary-color);
         }
 
@@ -304,28 +336,56 @@
         }
 
         .clearBtn {
-            background: linear-gradient(135deg,
-                rgba(244, 67, 54, 0.1) 0%,
-                rgba(244, 67, 54, 0.2) 100%
-            );
+            background: linear-gradient(135deg, rgba(244, 67, 54, 0.1) 0%, rgba(244, 67, 54, 0.2) 100%);
             border-color: var(--error-color);
             padding: 4px 8px;
             font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px auto;
+                padding: 15px;
+                width: 95%;
+            }
+
+            .nav-panel a {
+                display: block;
+                margin: 10px 0;
+            }
+
+            .equipment-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Equipment Description Management</h1>
-        
         <div class="nav-panel">
             <a href="index.html">Return to Home</a>
             <a href="https://github.com/MinLL/MinAI">Documentation</a>
         </div>
 
+        <h1>Equipment Description Management</h1>
+
         <!-- Filter Form -->
         <div class="add-equipment">
-            <h3>Filter Equipment</h3>
+            <div class="form-header">
+                <h3>Filter Equipment</h3>
+                <div>
+                    <button type="button" class="icon-button primary" id="apply-filter">
+                        <i class="fas fa-search"></i> Apply Filter
+                    </button>
+                    <button type="button" class="icon-button primary" id="reset-filter">
+                        <i class="fas fa-undo"></i> Reset
+                    </button>
+                </div>
+            </div>
             <form id="filterForm">
                 <div class="form-grid">
                     <input type="text" id="filterBaseFormId" placeholder="Filter by BaseFormID">
@@ -333,13 +393,17 @@
                     <input type="text" id="filterName" placeholder="Filter by Name">
                     <input type="text" id="filterDescription" placeholder="Filter by Description">
                 </div>
-                <button type="submit" class="primary">Apply Filter</button>
             </form>
         </div>
 
         <!-- Add New Row Form -->
         <div class="add-equipment">
-            <h3>Add New Equipment</h3>
+            <div class="form-header">
+                <h3>Add New Equipment</h3>
+                <button type="button" class="icon-button primary" onclick="document.getElementById('addForm').submit();">
+                    <i class="fas fa-plus"></i> Add Equipment
+                </button>
+            </div>
             <form id="addForm">
                 <div class="form-grid">
                     <input type="text" id="newBaseFormId" placeholder="BaseFormID" required>
@@ -347,7 +411,6 @@
                     <input type="text" id="newName" placeholder="Name">
                     <input type="text" id="newDescription" placeholder="Description">
                 </div>
-                <button type="submit" class="primary">Add Equipment</button>
             </form>
         </div>
 
@@ -362,9 +425,16 @@
         <div class="equipment-card">
             <div class="equipment-header">
                 <span class="equipment-name"></span>
-                <div class="equipment-controls">
-                    <button class="editBtn">Edit</button>
-                    <button class="deleteBtn">Delete</button>
+                <div class="button-container">
+                    <button class="icon-button visibility-button" title="Toggle Visibility">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="icon-button edit-button" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="icon-button delete-button" title="Delete">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
                 </div>
             </div>
             <div class="equipment-details">
@@ -387,9 +457,103 @@
     <script>
         $(document).ready(function() {
             let currentSort = { column: null, direction: null };
+            let allEquipmentData = [];
+            let filteredData = [];
+            let currentPage = 1;
+            const itemsPerPage = 20;
+            let isLoading = false;
+            let hasMoreItems = true;
+            let scrollTimeout;
             
             // Load table data initially
             loadTableData();
+
+            // Debounced scroll handler
+            $(window).on('scroll', function() {
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
+                        if (!isLoading && hasMoreItems) {
+                            loadMoreItems();
+                        }
+                    }
+                }, 150);
+            });
+
+            // Cleanup on page unload
+            $(window).on('unload', function() {
+                clearTimeout(scrollTimeout);
+                $(window).off('scroll');
+                cleanupCards();
+            });
+
+            function cleanupCards() {
+                $('#dataTable .equipment-card').each(function() {
+                    $(this).find('button').off();
+                });
+            }
+
+            function loadMoreItems() {
+                if (!isLoading) {
+                    isLoading = true;
+                    updateLoadingState(true);
+                    
+                    const startIndex = (currentPage - 1) * itemsPerPage;
+                    const endIndex = startIndex + itemsPerPage;
+                    
+                    // Check if any filters are active
+                    const hasActiveFilters = Object.values({
+                        baseFormId: $('#filterBaseFormId').val(),
+                        modName: $('#filterModName').val(),
+                        name: $('#filterName').val(),
+                        description: $('#filterDescription').val()
+                    }).some(value => value && value.trim() !== '');
+                    
+                    // Use filtered data if we have filters active, otherwise use all data
+                    const dataSource = hasActiveFilters ? filteredData : allEquipmentData;
+                    const itemsToRender = dataSource.slice(startIndex, endIndex);
+                    
+                    if (itemsToRender.length > 0) {
+                        // Reset container to grid display if it was changed
+                        const container = document.querySelector('.equipment-grid');
+                        container.style.display = 'grid';
+                        renderEquipmentCards(itemsToRender, true);
+                        currentPage++;
+                        hasMoreItems = endIndex < dataSource.length;
+                    } else {
+                        hasMoreItems = false;
+                        if (startIndex === 0) {
+                            // Show "No results found" message when there are no items to display
+                            const container = document.querySelector('.equipment-grid');
+                            container.innerHTML = ''; // Clear existing content
+                            container.style.display = 'block'; // Change to block display
+                            
+                            const noResults = document.createElement('div');
+                            noResults.className = 'no-results';
+                            noResults.textContent = 'No matching equipment found';
+                            noResults.style.textAlign = 'center';
+                            noResults.style.margin = '40px auto';
+                            noResults.style.padding = '20px';
+                            noResults.style.color = 'var(--text-color)';
+                            noResults.style.backgroundColor = 'rgba(45, 45, 45, 0.4)';
+                            noResults.style.borderRadius = '8px';
+                            noResults.style.maxWidth = '400px';
+                            
+                            container.appendChild(noResults);
+                        }
+                    }
+                    
+                    updateLoadingState(false);
+                }
+            }
+
+            function updateLoadingState(loading) {
+                isLoading = loading;
+                if ($('#loading-indicator').length === 0) {
+                    $('.equipment-grid').after('<div id="loading-indicator" class="loading-indicator">Loading more items...</div>');
+                }
+                $('#loading-indicator').toggle(hasMoreItems && !loading);
+            }
 
             function loadTableData() {
                 $.ajax({
@@ -397,7 +561,16 @@
                     method: 'GET',
                     success: function(response) {
                         if (response.status === 'success') {
-                            renderEquipmentCards(response.data);
+                            allEquipmentData = response.data;
+                            filteredData = [];
+                            currentPage = 1;
+                            hasMoreItems = true;
+                            
+                            // Clear existing cards
+                            $('#dataTable').empty();
+                            
+                            // Load initial batch
+                            loadMoreItems();
                         } else {
                             console.error('Error loading data:', response.message);
                         }
@@ -408,9 +581,13 @@
                 });
             }
 
-            function renderEquipmentCards(data) {
+            function renderEquipmentCards(data, append = false) {
                 const container = document.getElementById('dataTable');
-                container.innerHTML = ''; // Clear existing cards
+                
+                if (!append) {
+                    cleanupCards();
+                    container.innerHTML = '';
+                }
                 
                 // Sort data if needed
                 if (currentSort.column) {
@@ -439,12 +616,43 @@
                     card.querySelector('.modName').textContent = item.modName;
                     card.querySelector('.description').textContent = item.description || 'No description';
 
+                    // Set visibility state
+                    const visibilityBtn = card.querySelector('.visibility-button');
+                    const visibilityIcon = visibilityBtn.querySelector('i');
+                    visibilityBtn.dataset.hidden = item.is_hidden ? 'true' : 'false';
+                    visibilityIcon.className = item.is_hidden ? 'fas fa-eye-slash' : 'fas fa-eye';
+                    
+                    visibilityBtn.addEventListener('click', () => {
+                        const isHidden = visibilityBtn.dataset.hidden === 'true';
+                        const updatedData = {
+                            action: 'edit',
+                            baseFormId: item.baseFormId,
+                            modName: item.modName,
+                            is_hidden: !isHidden
+                        };
+                        
+                        $.ajax({
+                            url: 'we_manager.php',
+                            method: 'POST',
+                            data: updatedData,
+                            success: function(response) {
+                                if (response.status === 'success') {
+                                    visibilityBtn.dataset.hidden = (!isHidden).toString();
+                                    visibilityIcon.className = !isHidden ? 'fas fa-eye-slash' : 'fas fa-eye';
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Error updating visibility:', error);
+                            }
+                        });
+                    });
+
                     // Add edit functionality
-                    const editBtn = card.querySelector('.editBtn');
+                    const editBtn = card.querySelector('.edit-button');
                     editBtn.addEventListener('click', () => {
                         const cardElement = editBtn.closest('.equipment-card');
                         if (cardElement.classList.contains('editing')) {
-                            // Save changesG
+                            // Save changes
                             const updatedData = {
                                 baseFormId: item.baseFormId,
                                 modName: item.modName,
@@ -466,18 +674,20 @@
                             
                             updateEquipment(updatedData);
                             cardElement.classList.remove('editing');
-                            editBtn.textContent = 'Edit';
+                            editBtn.innerHTML = '<i class="fas fa-edit"></i>';
+                            editBtn.title = 'Edit';
                         } else {
                             // Enable editing
                             makeEditable(cardElement.querySelector('.equipment-name'));
                             makeEditable(cardElement.querySelector('.description'));
                             cardElement.classList.add('editing');
-                            editBtn.textContent = 'Save';
+                            editBtn.innerHTML = '<i class="fas fa-save"></i>';
+                            editBtn.title = 'Save';
                         }
                     });
 
                     // Add delete functionality
-                    card.querySelector('.deleteBtn').addEventListener('click', () => {
+                    card.querySelector('.delete-button').addEventListener('click', () => {
                         if (confirm('Are you sure you want to delete this equipment?')) {
                             deleteEquipment(item.baseFormId, item.modName);
                         }
@@ -497,8 +707,9 @@
                 // Only add clear button for description fields
                 if (element.classList.contains('description')) {
                     const clearBtn = document.createElement('button');
-                    clearBtn.className = 'clearBtn';
-                    clearBtn.textContent = 'Clear';
+                    clearBtn.className = 'icon-button clearBtn';
+                    clearBtn.innerHTML = '<i class="fas fa-times"></i>';
+                    clearBtn.title = 'Clear';
                     clearBtn.style.marginLeft = '8px';
                     
                     // Insert clear button after the description element
@@ -512,27 +723,73 @@
             }
 
             // Filter form submission
-            $('#filterForm').submit(function(e) {
+            $('#filterForm').on('submit', function(e) {
                 e.preventDefault();
+                applyFilters();
+            });
+
+            // Apply filter button click
+            $('#apply-filter').on('click', function() {
+                applyFilters();
+            });
+
+            // Reset filter button click
+            $('#reset-filter').on('click', function() {
+                resetFilters();
+            });
+
+            // Add event listener for Enter key on filter inputs
+            $('#filterForm input').on('keypress', function(e) {
+                if (e.which === 13) { // Enter key
+                    e.preventDefault();
+                    applyFilters();
+                }
+            });
+
+            function applyFilters() {
                 const filters = {
-                    action: 'load',
-                    baseFormId: $('#filterBaseFormId').val(),
-                    modName: $('#filterModName').val(),
-                    name: $('#filterName').val(),
-                    description: $('#filterDescription').val()
+                    baseFormId: $('#filterBaseFormId').val().toLowerCase(),
+                    modName: $('#filterModName').val().toLowerCase(),
+                    name: $('#filterName').val().toLowerCase(),
+                    description: $('#filterDescription').val().toLowerCase()
                 };
 
-                $.ajax({
-                    url: 'we_manager.php',
-                    method: 'GET',
-                    data: filters,
-                    success: function(response) {
-                        if (response.status === 'success') {
-                            renderEquipmentCards(response.data);
-                        }
-                    }
+                // Apply filters to allEquipmentData
+                filteredData = allEquipmentData.filter(item => {
+                    return (!filters.baseFormId || (item.baseFormId || '').toLowerCase().includes(filters.baseFormId)) &&
+                           (!filters.modName || (item.modName || '').toLowerCase().includes(filters.modName)) &&
+                           (!filters.name || (item.name || '').toLowerCase().includes(filters.name)) &&
+                           (!filters.description || (item.description || '').toLowerCase().includes(filters.description));
                 });
-            });
+
+                // Reset pagination and render filtered results
+                currentPage = 1;
+                hasMoreItems = true;
+                const container = document.getElementById('dataTable');
+                container.innerHTML = ''; // Clear existing content
+                loadMoreItems();
+            }
+
+            // Add this function to handle filter reset
+            function resetFilters() {
+                // Clear all filter inputs
+                $('#filterBaseFormId').val('');
+                $('#filterModName').val('');
+                $('#filterName').val('');
+                $('#filterDescription').val('');
+                
+                // Reset filtered data
+                filteredData = [];
+                
+                // Reset pagination
+                currentPage = 1;
+                hasMoreItems = true;
+                
+                // Clear and reload the table
+                const container = document.getElementById('dataTable');
+                container.innerHTML = '';
+                loadMoreItems();
+            }
 
             // Add new equipment form submission
             $('#addForm').submit(function(e) {
@@ -613,6 +870,24 @@
                         console.error('Error deleting equipment:', error);
                     }
                 });
+            }
+
+            // Add loading indicator styles if not already present
+            if (!document.getElementById('loading-indicator-styles')) {
+                const style = document.createElement('style');
+                style.id = 'loading-indicator-styles';
+                style.textContent = `
+                    .loading-indicator {
+                        text-align: center;
+                        padding: 20px;
+                        color: var(--text-color);
+                        background: rgba(45, 45, 45, 0.4);
+                        border-radius: 8px;
+                        margin-top: 20px;
+                        display: none;
+                    }
+                `;
+                document.head.appendChild(style);
             }
         });
     </script>

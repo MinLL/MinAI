@@ -61,6 +61,7 @@ function CreateEquipmentDescriptionTableIfNotExist() {
         modName TEXT NOT NULL,
         name TEXT NOT NULL,
         description TEXT,
+        is_hidden BOOLEAN DEFAULT FALSE,
         PRIMARY KEY (baseFormId, modName)
       )"
     );
@@ -108,6 +109,7 @@ function CreateItemsTableIfNotExists() {
                 mod_index TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                is_hidden BOOLEAN DEFAULT FALSE,
                 UNIQUE(item_id, file_name)
               )"
             );
@@ -119,6 +121,7 @@ function CreateItemsTableIfNotExists() {
 }
 
 function InitiateDBTables() {
+    // Create base tables
     CreateThreadsTableIfNotExists();
     CreateActionsTableIfNotExists();
     CreateContextTableIfNotExists();
@@ -126,14 +129,15 @@ function InitiateDBTables() {
     CreateTattooDescriptionTableIfNotExists();
     CreateItemsTableIfNotExists();
     
+    // Ensure all schemas are up to date
+    EnsureAllDatabaseSchemas();
+    
     // Seed default items
     SeedDefaultItems();
 }
 
 function ResetDBTables() {
     DropThreadsTableIfExists();
-    // DropItemRelevanceTableIfExists();
-    //DropScenariosTableIfExists();
     DropItemsTableIfExists();
     CreateThreadsTableIfNotExists();
     CreateActionsTableIfNotExists();
@@ -197,4 +201,36 @@ function SeedDefaultItems() {
     }
     
     return $inserted_count;
+}
+
+/**
+ * Ensures all database schemas are up to date by adding missing columns
+ */
+function EnsureAllDatabaseSchemas() {
+    $db = $GLOBALS['db'];
+    
+    try {
+        // Add is_hidden to minai_items if needed
+        $query = "SELECT column_name FROM information_schema.columns 
+                 WHERE table_name = 'minai_items' AND column_name = 'is_hidden'";
+        $result = $db->fetchAll($query);
+        if (empty($result)) {
+            minai_log("info", "Adding is_hidden column to minai_items table");
+            $db->execQuery("ALTER TABLE minai_items ADD COLUMN is_hidden BOOLEAN DEFAULT FALSE");
+        }
+        
+        // Add is_hidden to equipment_description if needed
+        $query = "SELECT column_name FROM information_schema.columns 
+                 WHERE table_name = 'equipment_description' AND column_name = 'is_hidden'";
+        $result = $db->fetchAll($query);
+        if (empty($result)) {
+            minai_log("info", "Adding is_hidden column to equipment_description table");
+            $db->execQuery("ALTER TABLE equipment_description ADD COLUMN IF NOT EXISTS is_hidden BOOLEAN DEFAULT FALSE");
+        }
+        
+        return true;
+    } catch (Exception $e) {
+        minai_log("error", "Failed to update database schemas: " . $e->getMessage());
+        return false;
+    }
 }
