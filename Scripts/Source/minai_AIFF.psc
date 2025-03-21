@@ -1013,8 +1013,9 @@ Function CleanupSapientActors()
       Main.Warn("SAPIENCE: Could not validate that " + actorNames[i] + " is unloaded: Actor is none")
       RemoveActorAI(actorNames[i])
     EndIf
-    bool loaded = akActor.Is3DLoaded()
-    if !loaded || !nearbyActors.Find(akActor)
+    if followers.IsFollower(akActor)
+      Main.Debug("SAPIENCE: Actor " + actorNames[i] + " is a follower. Skipping cleanup.")
+    elseif !akActor.Is3DLoaded() || !nearbyActors.Find(akActor)
       Main.Debug("SAPIENCE: Actor " + actorNames[i] + " is no longer active.")
       RemoveActorAI(actorNames[i])
     else
