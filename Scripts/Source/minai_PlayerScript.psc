@@ -11,7 +11,8 @@ GlobalVariable minai_DynamicSapienceToggleStealth
 minai_SapienceController Property sapience Auto
 Form gold
 bool trackingEnabled = False
-
+bool equipRunning = False
+bool unequipRunning = False
 Function StartTrackingPlayer()
   if playerRef.HasSpell(minai_PlayerStateTracker)
     playerRef.RemoveSpell(minai_PlayerStateTracker)
@@ -79,6 +80,8 @@ Event OnPlayerLoadGame()
   RegisterForSleep()
   gold = Game.GetFormFromFile(0x00000F, "Skyrim.esm") as Form
   bHasAIFF = (Game.GetModByName("AIAgent.esp") != 255)
+  equipRunning = False
+  unequipRunning = False
   if (bHasAIFF)
     aiff = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_AIFF
   endif
@@ -184,4 +187,30 @@ event EnableInventoryTracking()
   endif
   RemoveInventoryEventFilter(gold)
   aiff.TrackActorInventory(playerRef)
+endEvent
+
+event OnObjectEquipped(Form akBaseItem, ObjectReference akReference)
+  MainQuestController.Info("Player 'OnItemEquipped()")
+  if (equipRunning)
+    return
+  EndIf
+  equipRunning = True
+  utility.Wait(2) ; Wait 2 seconds to catch bursts of equips
+  aiff.SetContext(playerRef)
+  equipRunning = False
+endEvent
+
+event OnObjectUnequipped(Form akBaseItem, ObjectReference akReference)
+  MainQuestController.Info("Player OnItemUnequipped()")
+  if (unequipRunning)
+    return
+  EndIf
+  unequipRunning = True
+  utility.Wait(2) ; Wait 2 seconds to catch bursts of unequips
+  if equipRunning
+    unequipRunning = False
+    return
+  EndIf 
+  aiff.SetContext(playerRef)
+  unequipRunning = False
 endEvent
