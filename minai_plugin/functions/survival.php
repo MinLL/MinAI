@@ -17,6 +17,37 @@ function IsInRole($role) {
     }
 }
 
+$destinations = array();
+$destinations[] = "Whiterun";
+$destinations[] = "Solitude";
+$destinations[] = "Markarth";
+$destinations[] = "Riften";
+$destinations[] = "Windhelm";
+$destinations[] = "Morthal";
+$destinations[] = "Dawnstar";
+$destinations[] = "Falkreath";
+$destinations[] = "Winterhold";
+$destinations[] = "Darkwater Crossing";
+$destinations[] = "Dragon Bridge";
+$destinations[] = "Ivarstead";
+$destinations[] = "Karthwasten";
+$destinations[] = "Kynesgrove";
+$destinations[] = "Old Hroldan";
+$destinations[] = "Riverwood";
+$destinations[] = "Rorikstead";
+$destinations[] = "Shor's Stone";
+$destinations[] = "Stonehills";
+if (IsModEnabled("BetterFastTravel")) {
+    $destinations[] = "HalfMoonMill";
+    $destinations[] = "HeartwoodMill";
+    $destinations[] = "AngasMill";
+    $destinations[] = "LakeviewManor";
+    $destinations[] = "WindstadManor";
+    $destinations[] = "HeljarchenHall";
+    $destinations[] = "DayspringCanyon";
+    $destinations[] = "Helgen";
+}
+
 // Condition functions for different action types
 
 // Checks if actor can serve food
@@ -67,7 +98,7 @@ registerMinAIAction("ExtCmdRentRoom", "RentRoom")
 
 // Register CarriageRide action
 registerMinAIAction("ExtCmdCarriageRide", "CarriageRide")
-    ->withDescription("Transport {$GLOBALS["PLAYER_NAME"]} to another settlement - faster than walking but costs gold")
+    ->withDescription("Transport {$GLOBALS["PLAYER_NAME"]} to another settlement - faster than walking but costs gold. Must specify target as the destination. Available destinations: " . implode(", ", $destinations))
     ->withEnableCondition('canOfferCarriageRide')
     ->withReturnFunction($GLOBALS["GenericFuncRet"])
     ->register();

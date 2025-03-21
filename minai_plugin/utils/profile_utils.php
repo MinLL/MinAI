@@ -41,6 +41,7 @@ Function SetNarratorProfile() {
             global $LANG_LLM_XTTS;
             global $HERIKA_ANIMATIONS;
             global $EMOTEMOODS;
+            global $CURRENT_CONNECTOR;
             global $CONNECTORS;
             global $CONNECTORS_DIARY;
             global $CONNECTOR;

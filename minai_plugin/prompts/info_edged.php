@@ -1,26 +1,82 @@
 <?php
 require_once(dirname(__FILE__) . "/info_device_utils.php");
+require_once(dirname(__FILE__) . "/../util.php");
 
 // Function to handle edging information prompts
 function get_info_edged_prompt() {
     $cleanedMessage = GetCleanedMessage();
     
     // Extract names from the message if possible
-    // Removed speaker name as it's no longer needed
     $targetName = $GLOBALS["target"];
-    
     $target = $GLOBALS["target"];
+    
+    // Check if actor can orgasm
+    $canOrgasm = ActorCanOrgasm($target);
+    
     $deviceContext = GetInfoDeviceContext($target);
     
     // Get specific device description
     $deviceDescription = GetDeviceDescription($target);
     
     // Get additional context
-    $arousal = isset($deviceContext["arousal"]) ? $deviceContext["arousal"] : 90; // Default to very high arousal for edging
+    $arousal = isset($deviceContext["arousal"]) ? $deviceContext["arousal"] : 90;
     $intensity = GetReactionIntensity($arousal);
     $helplessness = isset($deviceContext["helplessness"]) ? $deviceContext["helplessness"] : "";
     $hasGag = isset($deviceContext["hasGag"]) ? $deviceContext["hasGag"] : false;
+
+    // Enhance the denial aspect if orgasm is not allowed
+    if (!$canOrgasm) {
+        $denialIntros = [
+            "The cruel programming of $targetName's $deviceDescription knows they're forbidden release",
+            "$targetName's $deviceDescription seems to delight in their inability to climax",
+            "Despite their desperate state, $targetName's $deviceDescription maintains perfect control",
+            "The merciless intelligence controlling $targetName's $deviceDescription knows exactly how far to push"
+        ];
+        
+        $denialBuildups = [
+            "methodically building the pleasure far beyond what they could normally endure",
+            "pushing their arousal to heights that would normally trigger an immediate climax",
+            "forcing them to experience sensations that dance on the razor's edge of release",
+            "driving their need to levels that would usually guarantee an explosive orgasm"
+        ];
+        
+        $denialReactions = [];
+        if ($hasGag) {
+            $denialReactions = [
+                "their muffled screams of frustration betray their knowledge that relief will never come",
+                "their gagged pleas grow increasingly desperate as they realize release is impossible",
+                "tears of desperation leak from their eyes as their gag stifles their begging",
+                "their body writhes helplessly as gagged sobs of denial fill the air"
+            ];
+        } else {
+            $denialReactions = [
+                "they wail in anguish as they realize their peak will remain forever out of reach",
+                "broken promises and desperate bargaining spill from their lips",
+                "they alternate between begging for mercy and pleading for the impossible release",
+                "their voice cracks with need as they acknowledge their complete helplessness"
+            ];
+        }
+        
+        $denialFinales = [
+            "Their current state ensures this torment can continue indefinitely, each edge more devastating than the last.",
+            "The perfect denial serves as an exquisite reminder of their inability to achieve release.",
+            "Their punishment is made sweeter by knowing this desperate edge could last forever.",
+            "The endless cycle of denial becomes both heaven and hell, exactly as designed."
+        ];
+        
+        $promptText = $denialIntros[array_rand($denialIntros)] . ", " . $denialBuildups[array_rand($denialBuildups)] . ". ";
+        $promptText .= $denialReactions[array_rand($denialReactions)];
+        
+        if (!empty($helplessness)) {
+            $promptText .= ", while remaining completely $helplessness";
+        }
+        
+        $promptText .= ". " . $denialFinales[array_rand($denialFinales)];
+        
+        return "The Narrator: " . $promptText;
+    }
     
+    // Original edging text continues below for when orgasm is allowed
     // Create intro variations for edging - reworded to work without a speaker
     $edgingIntros = [
         "The intensity of $targetName's $deviceDescription rises and falls with perfect control, bringing them to the very edge",
@@ -115,7 +171,7 @@ function get_info_edged_prompt() {
 }
 
 // Register the prompt only if this specific prompt is requested
-if ($GLOBALS["gameRequest"][0] == "info_edged") {
+if ($GLOBALS["gameRequest"][0] == "info_edged" || $GLOBALS["gameRequest"][0] == "minai_edged" ) {
     $promptText = OverrideGameRequestPrompt(get_info_edged_prompt());
     $GLOBALS["PROMPTS"]["info_edged"] = [
         "cue"=>[],

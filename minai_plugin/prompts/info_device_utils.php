@@ -127,16 +127,9 @@ function FormatDeviceType($devices, $type) {
 
 // Function to get reaction intensity based on arousal level
 function GetReactionIntensity($arousal) {
-    if ($arousal < 30) {
-        return "low";
-    } 
-    elseif ($arousal < 60) {
-        return "medium";
-    }
-    elseif ($arousal < 80) {
-        return "high";
-    }
-    else {
-        return "very_high";
-    }
+    if ($arousal < 25) return "low";
+    if ($arousal < 50) return "medium";
+    if ($arousal < 75) return "high";
+    return "very_high";
 }
+

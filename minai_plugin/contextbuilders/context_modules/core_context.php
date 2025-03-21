@@ -43,6 +43,8 @@ function InitializeCoreContextBuilders() {
         'enabled' => isset($GLOBALS['minai_context']['interaction']) ? (bool)$GLOBALS['minai_context']['interaction'] : true,
         'builder_callback' => 'BuildInteractionContext'
     ]);
+
+    
     
     // Register player background context builder
     $registry->register('player_background', [
@@ -52,6 +54,16 @@ function InitializeCoreContextBuilders() {
         'priority' => 20,
         'enabled' => isset($GLOBALS['minai_context']['player_background']) ? (bool)$GLOBALS['minai_context']['player_background'] : true,
         'builder_callback' => 'BuildPlayerBackgroundContext'
+    ]);
+
+    // Register current task context builder
+    $registry->register('current_task', [
+        'section' => 'interaction',
+        'header' => 'Current Task',
+        'description' => 'Information about the current task or objective',
+        'priority' => 25,
+        'enabled' => isset($GLOBALS['minai_context']['current_task']) ? (bool)$GLOBALS['minai_context']['current_task'] : true,
+        'builder_callback' => 'BuildCurrentTaskContext'
     ]);
 }
 
@@ -184,4 +196,40 @@ function BuildDynamicStateContext($params) {
     });
     $dynamic_state = implode("\n", $filtered_lines);
     return trim($dynamic_state);
+}
+
+/**
+ * Build the current task context
+ * 
+ * @param array $params Parameters including herika_name, player_name, target
+ * @return string Formatted current task context
+ */
+function BuildCurrentTaskContext($params) {
+    $herika_name = $params['herika_name'];
+    $target = isset($params['target']) ? $params['target'] : "";
+    // Only show current task for the character speaking
+    if ($herika_name == $target) {
+        return "";
+    }
+    $current_task = null;
+    if (isset($GLOBALS["CURRENT_TASK"]) && $GLOBALS["CURRENT_TASK"] && $GLOBALS["gameRequest"][0] != "diary") {
+        if (IsFollower($herika_name) || $GLOBALS["HERIKA_NAME"]=="The Narrator") {
+            $current_task=DataGetCurrentTask();
+            if (empty($current_task)) {
+                $current_task="No active quests right now.";
+            }
+            if (!is_array($current_task)) {
+                $current_task = explode(".", $current_task);
+            }
+            $current_task = array_map('trim', $current_task);
+        } else {
+            error_log("Task avoided {$GLOBALS["IS_NPC"]} ");
+        }
+    }
+    
+    if (!$current_task) {
+        return "";
+    }
+    
+    return implode("\n", $current_task);
 }

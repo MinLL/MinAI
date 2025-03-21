@@ -2,7 +2,7 @@
 require_once("/var/www/html/HerikaServer/lib/data_functions.php");
 // Add the system prompt context builder include
 require_once(__DIR__ . "/contextbuilders/system_prompt_context.php");
-require_once(__DIR__ . "/util/format_util.php");
+require_once(__DIR__ . "/utils/format_util.php");
 
 function convertRelationshipStatus($targetActor) {
     $relationshipRank = GetActorValue($targetActor, "relationshipRank");

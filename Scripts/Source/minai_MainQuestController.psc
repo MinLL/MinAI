@@ -220,7 +220,7 @@ Function RequestLLMResponseFromActor(string eventLine, string eventType, string 
         EndIf
       else
         ; Just prompt as normal if not using the config option
-        Info("Requesting response from LLM: " + eventLine)
+        Info("Requesting response from LLM: " + eventLine + "(" + eventType + ") for " + name)
         minAIFF.AIRequestMessageForActor(eventLine, eventType, name)
       endif
     Else
@@ -573,28 +573,28 @@ Event OnKeyDown(int keyCode)
         minAiff.ToggleSapience()
     ElseIf(keyCode == config.singKey)
         OnSingKeyPressed()
-        sapience.ResetAndStartNextUpdate()
+        sapience.ResetAndStartNextUpdate(60.0)
     ElseIf(keyCode == config.narratorKey)
         OnNarratorKeyPressed()
-        sapience.ResetAndStartNextUpdate()
+        sapience.ResetAndStartNextUpdate(60.0)
     ElseIf(keyCode == config.narratorTextKey)
         OnNarratorTextKeyPressed()
-        sapience.ResetAndStartNextUpdate()
+        sapience.ResetAndStartNextUpdate(60.0)
     ElseIf(keyCode == config.roleplayKey)
         OnRoleplayKeyPressed()
-        sapience.ResetAndStartNextUpdate()
+        sapience.ResetAndStartNextUpdate(60.0)
     ElseIf(keyCode == config.roleplayTextKey)
         OnRoleplayTextKeyPressed()
-        sapience.ResetAndStartNextUpdate()
+        sapience.ResetAndStartNextUpdate(60.0)
     ElseIf(keyCode == config.diaryKey)
         OnDiaryKeyPressed()
-        sapience.ResetAndStartNextUpdate()
+        sapience.ResetAndStartNextUpdate(60.0)
     ElseIf(keyCode == config.dungeonMasterKey)
         OnDungeonMasterKeyPressed()
-        sapience.ResetAndStartNextUpdate()
+        sapience.ResetAndStartNextUpdate(60.0)
     ElseIf(keyCode == config.dungeonMasterTextKey)
         OnDungeonMasterTextKeyPressed()
-        sapience.ResetAndStartNextUpdate()
+        sapience.ResetAndStartNextUpdate(60.0)
     EndIf
 EndEvent
 
@@ -607,16 +607,16 @@ Event OnKeyUp(int keyCode, float holdTime)
     
     If(keyCode == config.singKey)
         OnSingKeyReleased(holdTime)
-        sapience.ResetAndStartNextUpdate()
+        sapience.ResetAndStartNextUpdate(60.0)
     ElseIf(keyCode == config.narratorKey)
         OnNarratorKeyReleased(holdTime)
-        sapience.ResetAndStartNextUpdate()
+        sapience.ResetAndStartNextUpdate(60.0)
     ElseIf(keyCode == config.roleplayKey)
         OnRoleplayKeyReleased(holdTime)
-        sapience.ResetAndStartNextUpdate()
+        sapience.ResetAndStartNextUpdate(60.0)
     ElseIf(keyCode == config.dungeonMasterKey)
         OnDungeonMasterKeyReleased(holdTime)
-        sapience.ResetAndStartNextUpdate()
+        sapience.ResetAndStartNextUpdate(60.0)
     EndIf
 EndEvent
 
@@ -835,12 +835,14 @@ Function OnDiaryKeyPressed()
         if (isSneaking)
             ; When crouching: Update only narrator's diary
             Info("Player is crouching - updating narrator diary only")
+            minAIFF.UpdateProfile("The Narrator")
             minAIFF.UpdateDiary("The Narrator")
             Debug.Notification("Updating narrator's diary")
         elseif (targetActor != None)
             ; When looking at an NPC: Update that NPC's diary
             string targetName = GetActorName(targetActor)
             Info("Player is looking at " + targetName + " - updating their diary")
+            minAIFF.UpdateProfile(targetName)
             minAIFF.UpdateDiary(targetName)
             Debug.Notification("Updating " + targetName + "'s diary")
         else

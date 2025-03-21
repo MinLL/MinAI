@@ -10,6 +10,7 @@ $GLOBALS['disable_nsfw'] = false;
 $GLOBALS['restrict_nonfollower_functions'] = true;
 $GLOBALS['always_enable_functions'] = true;
 $GLOBALS['force_aiff_name_to_ingame_name'] = true;
+$GLOBALS['enable_prompt_slop_cleanup'] = false;
 $GLOBALS['commands_to_purge'] = Array("TakeASeat", "Folow");
 $GLOBALS['events_to_ignore'] = Array("rpg_lvlup");
 $GLOBALS['use_defeat'] = false;

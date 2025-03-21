@@ -61,6 +61,9 @@ Function GetUnifiedEquipmentContext($name, $forceNarrator = false) {
     // Get device context - this gives us keyword-based detection of devices and clothing
     $deviceContext = GetAllDevicesContext($name);
     
+    // Check if vibration effects are active
+    $isVibratorActive = IsInFaction($name, "Vibrator Effect Faction") || IsEnabled($name, "isVibratorActive");
+    
     // Choose which device array to use based on perspective
     $devices = [];
     
@@ -107,6 +110,7 @@ Function GetUnifiedEquipmentContext($name, $forceNarrator = false) {
     $accessories = [];
     $innerWear = [];
     $otherHidden = [];
+    $vibratingDevices = ["visible" => [], "hidden" => []]; // New array for tracking vibrating devices
     
     // Define categories for organizing items with visibility already handled
     $categories = [
@@ -179,6 +183,47 @@ Function GetUnifiedEquipmentContext($name, $forceNarrator = false) {
         $deviceName = $formatDevice($name, $device, $isNaked);
         $isRestraint = isset($device["isRestraint"]) && $device["isRestraint"];
         
+        // For non-narrator views, check if this should be hidden based on layer
+        $shouldBeHidden = false;
+        $layer = isset($device["layer"]) ? (int)$device["layer"] : 2;
+        
+        // Layer 0 and 1 items (body layer, underwear) should be hidden if wearing clothing
+        if ($layer <= 1) {
+            if (($wearingTop && isset($device["coversTop"])) || 
+                ($wearingBottom && isset($device["coversBottom"]))) {
+                $shouldBeHidden = true;
+            }
+        }
+
+        // For non-narrator views, move covered items to hidden
+        // For narrator views, respect the original hidden state
+        if ($shouldBeHidden || (isset($device["hidden"]) && $device["hidden"])) {
+            if (isset($device["category"])) {
+                $category = $device["category"];
+                if (isset($categories[$category])) {
+                    $categories[$category]["hidden"][] = $deviceName;
+                } else {
+                    $categories["other"]["hidden"][] = $deviceName;
+                }
+            }
+            continue;
+        }
+        
+        // Check if this is a device that can vibrate
+        $canVibrate = false;
+        if (isset($device["type"])) {
+            $deviceType = strtolower($device["type"]);
+            $canVibrate = (strpos($deviceType, "vaginal piercing") !== false) ||
+                         (strpos($deviceType, "nipple piercing") !== false) ||
+                         (strpos($deviceType, "vaginal plug") !== false) ||
+                         (strpos($deviceType, "anal plug") !== false);
+        }
+        
+        // Track vibrating devices if they can vibrate and vibration is active
+        if ($canVibrate && $isVibratorActive) {
+            $vibratingDevices["visible"][] = $deviceName;
+        }
+        
         // Categorize visible devices
         if ($isRestraint) {
             $restraints[] = $deviceName;
@@ -201,6 +246,22 @@ Function GetUnifiedEquipmentContext($name, $forceNarrator = false) {
             foreach ($devices["hidden"] as $device) {
                 $deviceName = $formatDevice($name, $device, $isNaked);
                 $isRestraint = isset($device["isRestraint"]) && $device["isRestraint"];
+                
+                // Check if this is a device that can vibrate
+                $canVibrate = false;
+                if (isset($device["type"])) {
+                    $deviceType = strtolower($device["type"]);
+                    $canVibrate = (strpos($deviceType, "vaginal piercing") !== false) ||
+                                 (strpos($deviceType, "nipple piercing") !== false) ||
+                                 (strpos($deviceType, "vaginal plug") !== false) ||
+                                 (strpos($deviceType, "anal plug") !== false);
+                }
+                
+                // Track vibrating devices if they can vibrate and vibration is active
+                if ($canVibrate && $isVibratorActive) {
+                    $vibratingDevices["hidden"][] = $deviceName;
+                }
+                
                 $layer = isset($device["layer"]) ? (int)$device["layer"] : 2;
                 
                 // Categorize hidden items for narrator view
@@ -289,6 +350,14 @@ Function GetUnifiedEquipmentContext($name, $forceNarrator = false) {
         $categories["armor"]["visible"]
     );
     
+    // Remove duplicates and any items that are also in hidden categories
+    $visibleClothing = array_unique($visibleClothing);
+    $hiddenClothing = array_merge(
+        $categories["clothing"]["hidden"],
+        $categories["armor"]["hidden"]
+    );
+    $visibleClothing = array_diff($visibleClothing, $hiddenClothing);
+    
     if (!empty($visibleClothing)) {
         $ret .= "{$name} is wearing " . implode(", ", $visibleClothing) . ".\n";
     } elseif (!$isNaked && !empty($cuirass)) {
@@ -346,6 +415,12 @@ Function GetUnifiedEquipmentContext($name, $forceNarrator = false) {
     $visiblePiercings = $categories["piercings"]["visible"];
     $hiddenPiercings = $categories["piercings"]["hidden"];
     
+    // For non-narrator views, all piercings should be hidden if covered by clothing
+    if (!$isNarrator) {
+        $hiddenPiercings = array_merge($visiblePiercings, $hiddenPiercings);
+        $visiblePiercings = [];
+    }
+    
     if (!empty($visiblePiercings)) {
         $ret .= "{$name}'s body is adorned with " . implode(", ", $visiblePiercings) . ".\n";
     }
@@ -363,6 +438,12 @@ Function GetUnifiedEquipmentContext($name, $forceNarrator = false) {
     // Handle plugs/vibrators grouped by visibility
     $visiblePlugs = $categories["plugs"]["visible"];
     $hiddenPlugs = $categories["plugs"]["hidden"];
+    
+    // For non-narrator views, all plugs should be hidden
+    if (!$isNarrator) {
+        $hiddenPlugs = array_merge($visiblePlugs, $hiddenPlugs);
+        $visiblePlugs = [];
+    }
     
     if (!empty($visiblePlugs)) {
         $ret .= "{$name} has " . implode(" and ", $visiblePlugs) . " inserted.\n";
@@ -418,6 +499,58 @@ Function GetUnifiedEquipmentContext($name, $forceNarrator = false) {
             // If we detected rigid objects under clothing
             if (in_array('rigid object', $inferredDevices)) {
                 $ret .= "The outline of something rigid is visible beneath " . $their . " clothing.\n";
+            }
+        }
+    }
+    
+    // Handle vibrating devices status
+    $hasVibratingDevices = false;
+    foreach ($devices as $visibility => $deviceList) {
+        foreach ($deviceList as $device) {
+            if (isset($device["type"])) {
+                $deviceType = strtolower($device["type"]);
+                if (strpos($deviceType, "vaginal piercing") !== false ||
+                    strpos($deviceType, "nipple piercing") !== false ||
+                    strpos($deviceType, "vaginal plug") !== false ||
+                    strpos($deviceType, "anal plug") !== false) {
+                    $hasVibratingDevices = true;
+                    break 2;
+                }
+            }
+        }
+    }
+
+    if ($hasVibratingDevices) {
+        if ($isVibratorActive) {
+            // Handle visible vibrating devices
+            if (!empty($vibratingDevices["visible"])) {
+                $ret .= implode(" and ", $vibratingDevices["visible"]) . " " . 
+                        (count($vibratingDevices["visible"]) > 1 ? "are" : "is") . " actively vibrating.\n";
+            }
+            
+            // Handle hidden vibrating devices based on perspective
+            if (!empty($vibratingDevices["hidden"])) {
+                if ($isNarrator) {
+                    $ret .= "Hidden from view, " . implode(" and ", $vibratingDevices["hidden"]) . " " . 
+                            (count($vibratingDevices["hidden"]) > 1 ? "are" : "is") . " also vibrating, stimulating their body.\n";
+                } elseif ($name != $GLOBALS["PLAYER_NAME"]) {
+                    // Wearer can feel their own vibrating devices
+                    $ret .= "{$name} can feel " . implode(" and ", $vibratingDevices["hidden"]) . " vibrating beneath " . 
+                            $their . " clothing.\n";
+                } else {
+                    // For others observing, add subtle hints about vibrating devices
+                    $ret .= $name . " occasionally " . 
+                           (count($vibratingDevices["hidden"]) > 1 ? 
+                            "shudders and squirms" : "shudders slightly") . 
+                           ", suggesting the presence of something hidden that is stimulating their body.\n";
+                }
+            }
+        } else {
+            // Devices present but not active
+            if ($isNarrator) {
+                $ret .= "The vibrating devices are currently inactive.\n";
+            } elseif ($name != $GLOBALS["PLAYER_NAME"]) {
+                $ret .= "{$name} can feel " . $their . " vibrating devices, though they are currently inactive.\n";
             }
         }
     }

@@ -173,7 +173,6 @@ if ($GLOBALS["gameRequest"][0] == "chatnf_minai_narrate") {
     $narratePrompt = "The Narrator: {$cleanedMessage}";
     $GLOBALS["PROMPTS"]["chatnf_minai_narrate"] = [
         "cue"=>[
-            "Respond to the most recent dialogue or events"
         ],
         "player_request"=>[$narratePrompt]
     ];
@@ -189,6 +188,17 @@ if ($GLOBALS["gameRequest"][0] == "minai_narrate") {
     OverrideGameRequestPrompt($narratePrompt);
 }
 
+if (isset($GLOBALS["minai_processing_input"]) && $GLOBALS["minai_processing_input"]) {
+    error_log("PROCESSING INPUT");
+    $GLOBALS["PROMPTS"]["inputtext"] = [
+        "cue"=>[],
+        // Prompt is implicit
+    ];
+    $GLOBALS["PROMPTS"]["inputtext_s"] = [
+        "cue"=>[],
+        // Prompt is implicit
+    ];
+}
 require_once("prompts/tntr_prompts.php");
 require_once("prompts/fillherup_prompts.php");
 require_once("prompts/vibrator_prompts.php");

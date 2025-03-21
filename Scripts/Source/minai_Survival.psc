@@ -324,7 +324,7 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   if command == "ExtCmdServeFood"
     Main.Debug("Feeding Player")
     FeedPlayer(akSpeaker, PlayerRef)
-    Main.RegisterEvent(""+speakerName+" served " + targetName + " a meal.", "info_meal_served")
+    Main.RegisterEvent("" + targetName + " paid for a meal, which "+speakerName+" then served to them.", "info_meal_served")
   EndIf
   ; Vanilla functionality
   if command == "ExtCmdRentRoom"
@@ -334,7 +334,7 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
       Main.RegisterEvent("" + targetName + " did not have enough gold for the room.", "info_room_denied")
     Else
       (akSpeaker as RentRoomScript).RentRoom(DialogueGeneric as DialogueGenericScript)
-      Main.RegisterEvent(""+speakerName+" provided " + targetName + " a room for the night.", "info_room_rented")
+      Main.RegisterEvent(""+targetName + " paid for a room, which "+speakerName+" then provided to them.", "info_room_rented")
     EndIf
   EndIf
   if command == "ExtCmdTrade"

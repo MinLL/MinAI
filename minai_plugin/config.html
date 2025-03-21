@@ -1272,8 +1272,18 @@
                                     <label class="option-label" for="enforce-short-responses">Enforce Short Responses</label>
                                     <button class="reset-button" onclick="resetOptionToDefault('enforce-short-responses')">Reset to Default</button>
                                 </div>
-                                <p>Attempt to enforce short 2-3 sentence responses from the LLM. This is "best effort", and does not always work.</p>
+                                <p>Force the LLM to provide shorter responses.</p>
                                 <input type="checkbox" id="enforce-short-responses">
+                            </div>
+
+                            <!-- enable_prompt_slop_cleanup -->
+                            <div class="option-group checkbox-group">
+                                <div class="option-label-container">
+                                    <label class="option-label" for="enable-prompt-slop-cleanup">Enable Prompt Slop Cleanup</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('enable-prompt-slop-cleanup')">Reset to Default</button>
+                                </div>
+                                <p>Clean up and optimize prompts before sending to the LLM.</p>
+                                <input type="checkbox" id="enable-prompt-slop-cleanup">
                             </div>
 
                             <!-- use_llm_fallback -->
@@ -2187,6 +2197,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 document.getElementById('prompt-head-override').value = configData.PROMPT_HEAD_OVERRIDE;
                 document.getElementById('use-narrator-profile').checked = configData.use_narrator_profile;
                 document.getElementById('enforce-short-responses').checked = configData.enforce_short_responses;
+                document.getElementById('enable-prompt-slop-cleanup').checked = configData.enable_prompt_slop_cleanup;
                 document.getElementById('stop-narrator-context-leak').checked = configData.stop_narrator_context_leak;
                 document.getElementById('eldritch-voice').value = configData.devious_narrator_eldritch_voice;
                 document.getElementById('telvanni-voice').value = configData.devious_narrator_telvanni_voice;
@@ -2327,6 +2338,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 PROMPT_HEAD_OVERRIDE: document.getElementById('prompt-head-override').value,
                 use_narrator_profile: document.getElementById('use-narrator-profile').checked,
                 enforce_short_responses: document.getElementById('enforce-short-responses').checked,
+                enable_prompt_slop_cleanup: document.getElementById('enable-prompt-slop-cleanup').checked,
                 stop_narrator_context_leak: document.getElementById('stop-narrator-context-leak').checked,
                 devious_narrator_eldritch_voice: document.getElementById('eldritch-voice').value,
                 devious_narrator_telvanni_voice: document.getElementById('telvanni-voice').value,
@@ -3141,6 +3153,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     PROMPT_HEAD_OVERRIDE: document.getElementById('prompt-head-override').value,
                     use_narrator_profile: document.getElementById('use-narrator-profile').checked,
                     enforce_short_responses: document.getElementById('enforce-short-responses').checked,
+                    enable_prompt_slop_cleanup: document.getElementById('enable-prompt-slop-cleanup').checked,
                     stop_narrator_context_leak: document.getElementById('stop-narrator-context-leak').checked,
                     devious_narrator_eldritch_voice: document.getElementById('eldritch-voice').value,
                     devious_narrator_telvanni_voice: document.getElementById('telvanni-voice').value,
@@ -3253,6 +3266,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                         document.getElementById('prompt-head-override').value = importedConfig.PROMPT_HEAD_OVERRIDE ?? baseConfig.PROMPT_HEAD_OVERRIDE;
                         document.getElementById('use-narrator-profile').checked = importedConfig.use_narrator_profile ?? baseConfig.use_narrator_profile;
                         document.getElementById('enforce-short-responses').checked = importedConfig.enforce_short_responses ?? baseConfig.enforce_short_responses;
+                        document.getElementById('enable-prompt-slop-cleanup').checked = importedConfig.enable_prompt_slop_cleanup ?? baseConfig.enable_prompt_slop_cleanup;
                         document.getElementById('stop-narrator-context-leak').checked = importedConfig.stop_narrator_context_leak ?? baseConfig.stop_narrator_context_leak;
                         document.getElementById('eldritch-voice').value = importedConfig.devious_narrator_eldritch_voice ?? baseConfig.devious_narrator_eldritch_voice;
                         document.getElementById('telvanni-voice').value = importedConfig.devious_narrator_telvanni_voice ?? baseConfig.devious_narrator_telvanni_voice;
@@ -3566,6 +3580,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 'prompt-head-override': 'PROMPT_HEAD_OVERRIDE',
                 'use-narrator-profile': 'use_narrator_profile',
                 'enforce-short-responses': 'enforce_short_responses',
+                'enable-prompt-slop-cleanup': 'enable_prompt_slop_cleanup',
                 'stop-narrator-context-leak': 'stop_narrator_context_leak',
                 'eldritch-voice': 'devious_narrator_eldritch_voice',
                 'telvanni-voice': 'devious_narrator_telvanni_voice',
@@ -3693,6 +3708,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     'prompt-head-override': 'PROMPT_HEAD_OVERRIDE',
                     'use-narrator-profile': 'use_narrator_profile',
                     'enforce-short-responses': 'enforce_short_responses',
+                    'enable-prompt-slop-cleanup': 'enable_prompt_slop_cleanup',
                     'stop-narrator-context-leak': 'stop_narrator_context_leak',
                     'eldritch-voice': 'devious_narrator_eldritch_voice',
                     'telvanni-voice': 'devious_narrator_telvanni_voice',
