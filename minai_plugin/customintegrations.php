@@ -65,17 +65,17 @@ function ProcessIntegrations() {
         $npcName = $vars[3];
         $ttl = intval($vars[4]);
         minai_log("info", "Storing custom context: {$modName}, {$eventKey}, {$eventValue}, {$ttl}");
-        $db->delete("custom_context", "modName='".$db->escape($modName)."' AND eventKey='".$db->escape($eventKey)."'");
-        $db->insert(
+        $db->upsertRowOnConflict(
             'custom_context',
             array(
-                'modName' => $db->escape($modName),
-                'eventKey' => $db->escape($eventKey),
-                'eventValue' => $db->escape($eventValue),
+                'modName' => $modName,
+                'eventKey' => $eventKey,
+                'eventValue' => $eventValue,
                 'expiresAt' => time() + $ttl,
-                'npcName' => $db->escape($npcName),
-                'ttl' => $ttl // already converted to int, no need to escape
-            )
+                'npcName' => $npcName,
+                'ttl' => $ttl
+            ),
+            'modname, eventkey'
         );
         $MUST_DIE=true;
     }
@@ -181,13 +181,13 @@ function ProcessIntegrations() {
         // minai_log("info", "Setting lastInput time.");
         $db = $GLOBALS['db'];
         $id = "_minai_RADIANT//lastInput";
-        $db->delete("conf_opts", "id='{$id}'");
-        $db->insert(
+        $db->upsertRowOnConflict(
             'conf_opts',
             array(
                 'id' => $id,
                 'value' => time()
-            )
+            ),
+            'id'
         );
     }
 
@@ -489,13 +489,13 @@ function ProcessIntegrations() {
         // Store the defeat timestamp
         $db = $GLOBALS['db'];
         $id = "_minai_PLAYER//lastDefeat";
-        $db->delete("conf_opts", "id='{$id}'");
-        $db->insert(
+        $db->upsertRowOnConflict(
             'conf_opts',
             array(
                 'id' => $id,
                 'value' => time()
-            )
+            ),
+            'id'
         );
         minai_log("info", "Player was defeated in combat, blocking Attack command for 300 seconds");
         $MUST_DIE=true;
@@ -549,20 +549,20 @@ function GetThirdpartyContext() {
     $ret = "";
     $currentTime = time();
     
-	$npcName = $GLOBALS["db"]->escape($GLOBALS["HERIKA_NAME"]);
-	$npcName = $GLOBALS["db"]->escape($npcName); // we need to escape twice to catch names with ' in then, like most Khajit names. Probably because the names are escaped before inserting.
-	$npcNameLower = strtolower($npcName); // added the same name but in lowercase to be safe, since sometimes Skyrim returns NPC names in all lowercase and those get put into the DB.
-	
-	$inArray = array("everyone", $npcName, $npcNameLower);
-	
-	// Add the player name if its not an NPC to NPC conversation
-	if (!IsRadiant()) {
-		array_push($inArray, $GLOBALS["PLAYER_NAME"]);
-	}
-	
+    $npcName = $GLOBALS["db"]->escape($GLOBALS["HERIKA_NAME"]);
+    $npcName = $GLOBALS["db"]->escape($npcName); // we need to escape twice to catch names with ' in then, like most Khajit names. Probably because the names are escaped before inserting.
+    $npcNameLower = strtolower($npcName); // added the same name but in lowercase to be safe, since sometimes Skyrim returns NPC names in all lowercase and those get put into the DB.
+    
+    $inArray = array("everyone", $npcName, $npcNameLower);
+    
+    // Add the player name if its not an NPC to NPC conversation
+    if (!IsRadiant()) {
+        array_push($inArray, $GLOBALS["PLAYER_NAME"]);
+    }
+    
     $rows = $db->fetchAll(
-		"SELECT * FROM custom_context WHERE expiresAt > {$currentTime} AND npcname IN ('" . implode("', '", $inArray) . "')"
-	);
+        "SELECT * FROM custom_context WHERE expiresAt > {$currentTime} AND npcname IN ('" . implode("', '", $inArray) . "')"
+    );
     foreach ($rows as $row) {
         minai_log("info", "Inserting third-party context: {$row["eventvalue"]}");
         $ret .= $row["eventvalue"] . "\n";
@@ -648,17 +648,15 @@ function StoreTattooData($actorName, $tattooData) {
             PRIMARY KEY (actor_name)
         )");
         
-        // Delete any existing data for this actor
-        $db->delete("actor_tattoos", "actor_name='" . $db->escape($actorName) . "'");
-        
-        // Insert the new data
-        $db->insert(
+        // Upsert the new data
+        $db->upsertRowOnConflict(
             'actor_tattoos',
             array(
-                'actor_name' => $db->escape($actorName),
-                'tattoo_data' => $db->escape($tattooData),
+                'actor_name' => $actorName,
+                'tattoo_data' => $tattooData,
                 'updated_at' => time()
-            )
+            ),
+            'actor_name'
         );
         
         // minai_log("info", "Successfully stored tattoo data for " . $actorName . ": " . substr($tattooData, 0, 100) . "...");

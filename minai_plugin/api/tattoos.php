@@ -168,22 +168,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
     try {
-        // Delete any existing tattoo with the same section and name
-        $deleteResult = $db->delete(
-            'tattoo_description',
-            "section='" . $db->escape($data['section']) . "' AND name='" . $db->escape($data['name']) . "'"
-        );
-        error_log("Delete result: " . json_encode($deleteResult));
-        
-        // Insert the tattoo (whether it existed before or not)
-        $insertResult = $db->insert(
+        // Upsert the tattoo
+        $insertResult = $db->upsertRowOnConflict(
             'tattoo_description',
             [
-                'section' => $db->escape($data['section']),
-                'name' => $db->escape($data['name']),
-                'description' => $db->escape($data['description'] ?? ''),
-                'hidden_by' => $db->escape($data['hidden_by'] ?? '')
-            ]
+                'section' => $data['section'],
+                'name' => $data['name'],
+                'description' => $data['description'] ?? '',
+                'hidden_by' => $data['hidden_by'] ?? ''
+            ],
+            'section, name'
         );
         error_log("Insert result: " . json_encode($insertResult));
         
@@ -250,41 +244,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT' && isset($_GET['action']) && $_GET['act
             if (!isset($tattoo['section']) || !isset($tattoo['name'])) {
                 continue;
             }
-            
-            // Check if the tattoo already exists
-            $exists = $db->fetchOne(
-                "SELECT COUNT(*) FROM tattoo_description WHERE section='" . $db->escape($tattoo['section']) . "' AND name='" . $db->escape($tattoo['name']) . "'"
+
+            // Upsert the tattoo
+            $db->upsertRowOnConflict(
+                'tattoo_description',
+                [
+                    'section' => $tattoo['section'],
+                    'name' => $tattoo['name'],
+                    'description' => $tattoo['description'] ?? '',
+                    'hidden_by' => $tattoo['hidden_by'] ?? ''
+                ],
+                'section, name'
             );
-            
-            if ($exists) {
-                // Update the existing tattoo
-                $db->delete(
-                    'tattoo_description',
-                    "section='" . $db->escape($tattoo['section']) . "' AND name='" . $db->escape($tattoo['name']) . "'"
-                );
-                
-                // Insert the tattoo with updated values
-                $db->insert(
-                    'tattoo_description',
-                    [
-                        'section' => $db->escape($tattoo['section']),
-                        'name' => $db->escape($tattoo['name']),
-                        'description' => $db->escape($tattoo['description'] ?? ''),
-                        'hidden_by' => $db->escape($tattoo['hidden_by'] ?? '')
-                    ]
-                );
-            } else {
-                // Insert a new tattoo
-                $db->insert(
-                    'tattoo_description',
-                    [
-                        'section' => $db->escape($tattoo['section']),
-                        'name' => $db->escape($tattoo['name']),
-                        'description' => $db->escape($tattoo['description'] ?? ''),
-                        'hidden_by' => $db->escape($tattoo['hidden_by'] ?? '')
-                    ]
-                );
-            }
         }
         
         echo json_encode([
@@ -385,29 +356,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT' && isset($_GET['action']) && $_GET['act
     
     try {
         // Update all tattoos in the specified section
-        // First, get all tattoos in the section
-        $tattoos = $db->fetchAll(
-            "SELECT * FROM tattoo_description WHERE section='" . $db->escape($data['section']) . "'"
-        );
-        
-        // Delete all tattoos in the section
-        $db->delete(
-            'tattoo_description',
-            "section='" . $db->escape($data['section']) . "'"
-        );
-        
-        // Reinsert all tattoos with the new hidden_by value
-        foreach ($tattoos as $tattoo) {
-            $db->insert(
-                'tattoo_description',
-                [
-                    'section' => $db->escape($tattoo['section']),
-                    'name' => $db->escape($tattoo['name']),
-                    'description' => $db->escape($tattoo['description'] ?? ''),
-                    'hidden_by' => $db->escape($data['hidden_by'])
-                ]
-            );
-        }
+        $section = $db->escape($data['section']);
+        $hiddenBy = $db->escape($data['hidden_by']);
+        $db->execQuery("UPDATE tattoo_description SET hidden_by = '$hiddenBy' WHERE section = '$section'");
         
         // Get the count of updated rows
         $updatedCount = $db->fetchOne(
@@ -468,17 +419,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['add_test_data'])) {
         ];
         
         foreach ($sampleActors as $actor => $tattooData) {
-            // Delete any existing data
-            $db->delete("actor_tattoos", "actor_name='" . $db->escape($actor) . "'");
-            
-            // Insert new data
-            $db->insert(
+            // Upsert new data
+            $db->upsertRowOnConflict(
                 'actor_tattoos',
                 [
-                    'actor_name' => $db->escape($actor),
-                    'tattoo_data' => $db->escape($tattooData),
+                    'actor_name' => $actor,
+                    'tattoo_data' => $tattooData,
                     'updated_at' => time()
-                ]
+                ],
+                'actor_name'
             );
         }
         
@@ -600,45 +549,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['debug_save_description'
         $name = isset($_GET['name']) ? $_GET['name'] : 'War Paint';
         $description = isset($_GET['description']) ? $_GET['description'] : 'A fierce war paint design across the face';
         $hiddenBy = isset($_GET['hidden_by']) ? $_GET['hidden_by'] : 'full_body,hood,helmet';
-        
-        // Check if the tattoo already exists
-        $exists = $db->fetchOne(
-            "SELECT COUNT(*) FROM tattoo_description WHERE section='" . $db->escape($section) . "' AND name='" . $db->escape($name) . "'"
+
+        // Upsert a tattoo
+        $result = $db->upsertRowOnConflict(
+            'tattoo_description',
+            [
+                'section' => $section,
+                'name' => $name,
+                'description' => $description,
+                'hidden_by' => $hiddenBy
+            ]
         );
         
-        if ($exists) {
-            // Update the existing tattoo
-            $result = $db->delete(
-                'tattoo_description',
-                "section='" . $db->escape($section) . "' AND name='" . $db->escape($name) . "'"
-            );
-            
-            // Insert with updated values
-            $result = $db->insert(
-                'tattoo_description',
-                [
-                    'section' => $db->escape($section),
-                    'name' => $db->escape($name),
-                    'description' => $db->escape($description),
-                    'hidden_by' => $db->escape($hiddenBy)
-                ]
-            );
-            
-            $message = "Updated existing tattoo description";
-        } else {
-            // Insert a new tattoo
-            $result = $db->insert(
-                'tattoo_description',
-                [
-                    'section' => $db->escape($section),
-                    'name' => $db->escape($name),
-                    'description' => $db->escape($description),
-                    'hidden_by' => $db->escape($hiddenBy)
-                ]
-            );
-            
-            $message = "Added new tattoo description";
-        }
+        $message = "Inserted/updated tattoo description";
         
         // Get the current description to verify
         $currentDesc = $db->fetchAll(

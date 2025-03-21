@@ -90,20 +90,14 @@ function ActorCanOrgasm($name) {
  * @return bool True if successful
  */
 function SetActorValue($name, $key, $value) {
-    $db = $GLOBALS['db'];
-    //$value = $db->escape($value);
-    $id = "_minai_{$name}//{$key}";
-    
-    // Delete existing value
-    $db->delete("conf_opts", "id='{$db->escape($id)}'");
-    
-    // Insert new value
-    return $db->insert(
+    // Upsert new value
+    return $GLOBALS['db']->upsertRowOnConflict(
         'conf_opts',
         array(
-            'id' => $id,
+            'id' => "_minai_{$name}//{$key}",
             'value' => $value
-        )
+        ),
+        'id'
     );
 }
 
@@ -323,31 +317,31 @@ if (isset($GLOBALS["force_aiff_name_to_ingame_name"]) && $GLOBALS["force_aiff_na
 Function StoreRadiantActors($actor1, $actor2) {
     $db = $GLOBALS['db'];
     $id = "_minai_RADIANT//actor1";
-    $db->delete("conf_opts", "id='{$id}'");
-    $db->insert(
+    $db->upsertRowOnConflict(
         'conf_opts',
         array(
             'id' => $id,
             'value' => $actor1
-        )
+        ),
+        'id'
     );
     $id = "_minai_RADIANT//actor2";
-    $db->delete("conf_opts", "id='{$id}'");
-    $db->insert(
+    $db->upsertRowOnConflict(
         'conf_opts',
         array(
             'id' => $id,
             'value' => $actor2
-        )
+        ),
+        'id'
     );
     $id = "_minai_RADIANT//initial";
-    $db->delete("conf_opts", "id='{$id}'");
-    $db->insert(
+    $db->upsertRowOnConflict(
         'conf_opts',
         array(
             'id' => $id,
             'value' => 'TRUE'
-        )
+        ),
+        'id'
     );
     minai_log("info", "Storing Radiant Actors");
 }

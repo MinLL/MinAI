@@ -77,7 +77,6 @@ function updateThreadsDB() {
                     $db->update('minai_threads', "prev_scene_id = '$currSceneId', curr_scene_id = '$scene', fallback = '{$db->escape($fallback)}'", "thread_id = $threadId");
                     minai_log("info", "Updated existing thread $threadId with new scene: $scene");
                 } else {
-                    $db->delete('minai_threads', "thread_id='{$threadId}'");
                     // Ensure victimActors is properly formatted for DB storage
                     $victimActors = !empty($victimActors) ? $victimActors : null;
                     
@@ -91,7 +90,7 @@ function updateThreadsDB() {
                         "fallback" => $fallback
                     ];
                     
-                    $db->insert('minai_threads', $insertData);
+                    $db->upsertRowOnConflict('minai_threads', $insertData, 'thread_id');
                     minai_log("info", "Inserted new thread with data: " . json_encode($insertData));
                 }
                 $scene = getScene("", $threadId);
