@@ -183,6 +183,32 @@ Function GetUnifiedEquipmentContext($name, $forceNarrator = false) {
         $deviceName = $formatDevice($name, $device, $isNaked);
         $isRestraint = isset($device["isRestraint"]) && $device["isRestraint"];
         
+        // For non-narrator views, check if this should be hidden based on layer
+        $shouldBeHidden = false;
+        $layer = isset($device["layer"]) ? (int)$device["layer"] : 2;
+        
+        // Layer 0 and 1 items (body layer, underwear) should be hidden if wearing clothing
+        if ($layer <= 1) {
+            if (($wearingTop && isset($device["coversTop"])) || 
+                ($wearingBottom && isset($device["coversBottom"]))) {
+                $shouldBeHidden = true;
+            }
+        }
+
+        // For non-narrator views, move covered items to hidden
+        // For narrator views, respect the original hidden state
+        if ($shouldBeHidden || (isset($device["hidden"]) && $device["hidden"])) {
+            if (isset($device["category"])) {
+                $category = $device["category"];
+                if (isset($categories[$category])) {
+                    $categories[$category]["hidden"][] = $deviceName;
+                } else {
+                    $categories["other"]["hidden"][] = $deviceName;
+                }
+            }
+            continue;
+        }
+        
         // Check if this is a device that can vibrate
         $canVibrate = false;
         if (isset($device["type"])) {
@@ -324,6 +350,14 @@ Function GetUnifiedEquipmentContext($name, $forceNarrator = false) {
         $categories["armor"]["visible"]
     );
     
+    // Remove duplicates and any items that are also in hidden categories
+    $visibleClothing = array_unique($visibleClothing);
+    $hiddenClothing = array_merge(
+        $categories["clothing"]["hidden"],
+        $categories["armor"]["hidden"]
+    );
+    $visibleClothing = array_diff($visibleClothing, $hiddenClothing);
+    
     if (!empty($visibleClothing)) {
         $ret .= "{$name} is wearing " . implode(", ", $visibleClothing) . ".\n";
     } elseif (!$isNaked && !empty($cuirass)) {
@@ -381,6 +415,12 @@ Function GetUnifiedEquipmentContext($name, $forceNarrator = false) {
     $visiblePiercings = $categories["piercings"]["visible"];
     $hiddenPiercings = $categories["piercings"]["hidden"];
     
+    // For non-narrator views, all piercings should be hidden if covered by clothing
+    if (!$isNarrator) {
+        $hiddenPiercings = array_merge($visiblePiercings, $hiddenPiercings);
+        $visiblePiercings = [];
+    }
+    
     if (!empty($visiblePiercings)) {
         $ret .= "{$name}'s body is adorned with " . implode(", ", $visiblePiercings) . ".\n";
     }
@@ -398,6 +438,12 @@ Function GetUnifiedEquipmentContext($name, $forceNarrator = false) {
     // Handle plugs/vibrators grouped by visibility
     $visiblePlugs = $categories["plugs"]["visible"];
     $hiddenPlugs = $categories["plugs"]["hidden"];
+    
+    // For non-narrator views, all plugs should be hidden
+    if (!$isNarrator) {
+        $hiddenPlugs = array_merge($visiblePlugs, $hiddenPlugs);
+        $visiblePlugs = [];
+    }
     
     if (!empty($visiblePlugs)) {
         $ret .= "{$name} has " . implode(" and ", $visiblePlugs) . " inserted.\n";

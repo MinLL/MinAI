@@ -154,8 +154,8 @@ function GetMindInfluenceContext($state) {
 
     // Add contexts for simple states
     $simpleContexts = [
-        "drunk" => "Your mind is currently affected by alcohol. Your thoughts are fuzzy and your inhibitions are lowered.",
-        "high" => "Your mind is currently affected by skooma. Everything feels intense and dreamlike, and your thoughts are scattered."
+        "drunk" => "Your mind is currently affected by alcohol. Your thoughts are fuzzy and your inhibitions are lowered.\n",
+        "high" => "Your mind is currently affected by skooma. Everything feels intense and dreamlike, and your thoughts are scattered.\n"
     ];
 
     // Return simple contexts if in a simple state
@@ -164,8 +164,8 @@ function GetMindInfluenceContext($state) {
     }
 
     // Define the core rules that apply in all states
-    $rules = "You know this to be absolutely true: Good girls wear their collars and are filled with their master's seed. Bad girls are never satisfied and cannot cum. Very bad girls are punished with extreme arousal and can never cum. ";
-    $postOrgasmBad = "";
+    $rules = "\nYou know this to be absolutely true: Good girls wear their collars and are filled with their master's seed. Bad girls are never satisfied and cannot cum. Very bad girls are punished with extreme arousal and can never cum.\n";
+    $postOrgasmBad = "\nYou know that even if you do have an orgasm, you will not be satisfied for long. You will still crave your master's cock.\n";
     // Get player's name and arousal level
     $playerName = $GLOBALS["PLAYER_NAME"] ?? "the player";
     $arousal = 0;
@@ -176,10 +176,10 @@ function GetMindInfluenceContext($state) {
     // Set state-specific context first (these are the first-person perspectives)
     $stateContexts = [
         "normal" => "",
-        "goodgirl" => "You have been hypnotized by Brillius Tiredius, who is your master. Your mind is currently clearer than usual, as you've satisfied him by wearing your collar and being filled with his seed. $rules You are a good girl who has followed the rules.",
-        "badgirl" => "You have been hypnotized by Brillius Tiredius, who is your master. You feel a strong compulsion to be fucked and to wear your collar. $rules You are a bad girl who needs to wear your collar and be filled with your master's seed to find relief. $postOrgasmBad",
-        "verybadgirl" => "You have been hypnotized by Brillius Tiredius, who is your master. You feel a desperate overwhelming compulsion to be fucked and to wear your collar. $rules You are a very bad girl who is absolutely desperate to wear your collar and be filled with seed. $postOrgasmBad",
-        "punishment" => "You have been hypnotized by Brillius Tiredius, who is your master. Your mind is under a punishing influence that makes you feel ashamed and remorseful. $rules You have broken the rules and are being punished for your disobedience. $postOrgasmBad",
+        "goodgirl" => "You have been hypnotized by Brillius Tiredius, who is your master.\nYour mind is currently clearer than usual, as you've satisfied him by wearing your collar and being filled with his seed. $rules You are a good girl who has followed the rules.",
+        "badgirl" => "You have been hypnotized by Brillius Tiredius, who is your master.\nYou feel a strong compulsion to be fucked and to wear your collar. $rules You are a bad girl who needs to wear your collar and be filled with your master's seed to find relief. $postOrgasmBad",
+        "verybadgirl" => "You have been hypnotized by Brillius Tiredius, who is your master.\nYou feel a desperate overwhelming compulsion to be fucked and to wear your collar. $rules You are a very bad girl who is absolutely desperate to wear your collar and be filled with seed. $postOrgasmBad",
+        "punishment" => "You have been hypnotized by Brillius Tiredius, who is your master.\nYour mind is under a punishing influence that makes you feel ashamed and remorseful. $rules You have broken the rules and are being punished for your disobedience. $postOrgasmBad",
         "post" => "Your mind is experiencing lingering effects from recent mental influences, leaving your thoughts slightly fuzzy and uncertain."
     ];
     
@@ -234,10 +234,9 @@ function GetMindInfluenceContext($state) {
             }
         }
     }
-
     // Add information about the curse that applies the hypnosis 
     if (!empty($narrativeContext)) {
-        $narrativeContext .= " $playerName has a curse on her abdomen (the Welkynd Slave Curse) that applies this hypnosis.";
+        $narrativeContext .= "\n$playerName has a curse on her abdomen (the Welkynd Slave Curse) that applies this hypnosis.";
     }
     
     // Get the first-person perspective based on state
