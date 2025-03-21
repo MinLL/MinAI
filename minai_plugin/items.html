@@ -73,6 +73,7 @@
             box-sizing: border-box;
             width: 100%;
             overflow-x: hidden;
+            position: relative;
         }
 
         /* Navigation */
@@ -335,27 +336,36 @@
 
         /* Messages */
         .message {
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 8px;
+            padding: 12px 15px;
+            margin: 0;
+            border-radius: 6px;
             display: none;
+            font-size: 0.95rem;
+            border-width: 1px;
+            border-style: solid;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 20%;
+            min-width: 140px;
+            z-index: 10;
         }
 
         .message.success {
-            background-color: rgba(64, 192, 87, 0.2);
-            border: 1px solid var(--success-color);
+            background-color: rgba(64, 192, 87, 0.1);
+            border-color: var(--success-color);
             color: var(--success-color);
         }
 
         .message.error {
-            background-color: rgba(244, 67, 54, 0.2);
-            border: 1px solid var(--error-color);
+            background-color: rgba(244, 67, 54, 0.1);
+            border-color: var(--error-color);
             color: var(--error-color);
         }
 
         .message.info {
-            background-color: rgba(33, 150, 243, 0.2);
-            border: 1px solid var(--info-color);
+            background-color: rgba(33, 150, 243, 0.1);
+            border-color: var(--info-color);
             color: var(--info-color);
         }
 
@@ -457,11 +467,10 @@
             <div class="tab" data-tab="import-export">Import/Export</div>
         </div>
 
-        <div id="message" class="message"></div>
-
         <!-- Items List Tab -->
         <div id="items-list" class="tab-content active">
             <div class="section">
+                <div id="message" class="message"></div>
                 <h2>Items List</h2>
                 
                 <div class="search-container">
