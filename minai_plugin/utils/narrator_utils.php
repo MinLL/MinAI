@@ -4,7 +4,18 @@ Function SetNarratorPrompts($isFirstPerson = false) {
     $playerInput = isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"] != "" ? $GLOBALS["gameRequest"][3] : "";
     
     if ($isFirstPerson) {
-        if (IsExplicitScene()) {
+        if (IsEnabled($GLOBALS["PLAYER_NAME"], "inCombat")) {
+            $narratorPrompt = [
+                "cue" => [
+                    "write an intense first-person combat narrative response as {$GLOBALS["PLAYER_NAME"]}, focusing on the immediate action, adrenaline, and combat sensations. Describe the visceral feelings of battle, your tactical awareness, and split-second decisions."
+                ],
+                "player_request"=>[    
+                    "{$GLOBALS["PLAYER_NAME"]} reacts to the combat situation.",
+                ]
+            ];
+            
+            $templateDialog = "Respond in first-person perspective as {$GLOBALS["PLAYER_NAME"]} during combat. Focus on immediate combat actions, sensations, and tactical thoughts. Emphasize the intensity and urgency of battle.";
+        } else if (IsExplicitScene()) {
             $narratorPrompt = [
                 "cue" => [
                     "write a first-person erotic narrative response as {$GLOBALS["PLAYER_NAME"]} in response to the #SEX_SCENARIO, focusing entirely on your immediate physical sensations and emotional state. Describe in vivid detail exactly what you are feeling in this moment, both physically and mentally."
@@ -28,7 +39,15 @@ Function SetNarratorPrompts($isFirstPerson = false) {
             $templateDialog = "Respond in first-person perspective as {$GLOBALS["PLAYER_NAME"]}, sharing your personal thoughts and feelings.";
         }
     } else {
-        if (IsExplicitScene()) {
+        if (IsEnabled($GLOBALS["PLAYER_NAME"], "inCombat")) {
+            $narratorPrompt = [
+                "cue" => [
+                    "write a response as The Narrator, describing the intense combat situation {$GLOBALS["PLAYER_NAME"]} is engaged in. Focus on the immediate action, tactical developments, and the raw energy of battle. Detail the ebb and flow of combat, strategic movements, and the immediate threats and opportunities."
+                ]
+            ];
+            
+            $templateDialog = "You are The Narrator. Describe the ongoing battle with intensity and tactical detail, focusing on the immediate combat situation and its dramatic unfolding.";
+        } else if (IsExplicitScene()) {
             $narratorPrompt = [
                 "cue" => [
                     "write a response as The Narrator, describing {$GLOBALS["PLAYER_NAME"]}'s immediate physical and emotional experiences in vivid sensual detail. Focus entirely on what she is feeling in this exact moment."
