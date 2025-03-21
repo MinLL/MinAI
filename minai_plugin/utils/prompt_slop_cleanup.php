@@ -39,6 +39,11 @@ function cleanupSlop($contextData) {
         // Pattern 2: Remove "(Talking to The Narrator)" from any character dialogue
         $content = preg_replace('/\s*\(Talking to The Narrator\)/', '', $content);
 
+        // Pattern 3: Remove "(Talking to everyone)" only from self-thinking lines
+        if (preg_match('/^[^:]+\s+thinks to (?:him|her|she|them)self:/', $content)) {
+            $content = preg_replace('/\s*\(Talking to everyone\)/', '', $content);
+        }
+
         // Pattern 5: Handle context messages that already have parentheses
         if (preg_match('/^The Narrator:\((.*?)\)$/', $content, $matches)) {
             $content = "($matches[1])";

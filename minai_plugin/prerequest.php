@@ -25,6 +25,10 @@ if (IsEnabled($GLOBALS["PLAYER_NAME"], "isTalkingToNarrator") && isPlayerInput()
     $GLOBALS["HERIKA_NAME"] = "The Narrator";
     $GLOBALS["minai_processing_input"] = true;
     SetNarratorProfile();
+    if ($GLOBALS["self_narrator"]) {
+        $pronouns = GetActorPronouns($GLOBALS["PLAYER_NAME"]);
+        OverrideGameRequestPrompt($GLOBALS["PLAYER_NAME"] . " thinks to " . $pronouns["object"] . "self: " . GetCleanedMessage());
+    }
 }
 
 // If using dungeon master, set appropriate state
