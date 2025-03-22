@@ -760,7 +760,7 @@ function BuildLevelContext($params) {
     $level = $utilities->GetActorValue($character, "level");
     if (!empty($level)) {
         $levelDesc = GetLevelDescription($level);
-        $context .= $character . " is " . $levelDesc . " (in terms of power and might). ";
+        $context .= $character . " is " . $levelDesc . " (in terms of combat prowess). ";
     }
     
     return $context;

@@ -597,19 +597,37 @@ function GetWeatherContext() {
     ];
     
     $returnText = "";
+    
+    $weatherClassification = GetActorValue($playerName, "weatherClassification");
 
-    $bWeatherChange = false;
-    $bIsRainingPresently = str_icontains($envAwarenessWeather, "is raining outside");
-    $bIsSnowingPresently = str_icontains($envAwarenessWeather, "is snowing outside");
-    $bIsOvercast = str_icontains($envAwarenessWeather, "The sky is overcast.");
-
+    $bIsRainingPresently = $weatherClassification == 2;
+    $bIsSnowingPresently = $weatherClassification == 3;
+    $bIsOvercast = $weatherClassification == 1;
 
     $weatherCode = strtolower(GetActorValue($playerName, "weather"));
-    if (!$weatherCode) return "";
+    
+    // Generate a basic weather description based on weatherClassification
+    $basicWeatherDesc = "";
+    if ($bIsRainingPresently) {
+        $basicWeatherDesc = "Rain falls from the cloudy sky above.";
+    } elseif ($bIsSnowingPresently) {
+        $basicWeatherDesc = "Snow falls gently from the gray sky above.";
+    } elseif ($bIsOvercast) {
+        $basicWeatherDesc = "The sky is overcast with thick clouds.";
+    }
+    
+    // If no weather code, return the basic description
+    if (!$weatherCode) {
+        if ($basicWeatherDesc) {
+            return $basicWeatherDesc . "\n";
+        }
+        return "";
+    }
+    
     $wc = substr($weatherCode, (stripos($weatherCode, "(") + 1), 8);
     
     // Try exact match first
-    $weather = $weatherDictionary[$wc];
+    $weather = $weatherDictionary[$wc] ?? null;
     
     // If no exact match, try matching with wildcard
     if (!$weather) {
@@ -620,11 +638,15 @@ function GetWeatherContext() {
 
     if (!$weather) {
         error_log("minai: Unknown Weather type: " . $weatherCode);
-        // if nothing fall back to this
+        // Return basic weather description if available
+        if ($basicWeatherDesc) {
+            return $basicWeatherDesc . "\n";
+        }
         return "";
     }
+    
     // currentWeather as opposed to "outgoing weather" which will overlay current weather for a time
-    $currentWeather = $weather["descriptionPresent"];
+    $currentWeather = $weather["descriptionPresent"] ?? "";
     $bCurrentWeatherSnow = str_icontains($currentWeather, "snow");
     $bCurrentWeatherRain = str_icontains($currentWeather, "rain");
 
@@ -637,22 +659,13 @@ function GetWeatherContext() {
                                                 || (!$bIsRainingPresently && $bCurrentWeatherRain)
                                                 || (!$bIsOvercast && $bCurrentWeatherOvercast);
 
-    if($bIsOvercast && $bCurrentWeatherOvercast){
-        $envAwarenessWeather = str_ireplace("The sky is overcast. ", "", $envAwarenessWeather);
-    }
-
-    if($bIsRainingPresently && $bCurrentWeatherRain){
-        $envAwarenessWeather = str_ireplace("It is raining outside. ", "", $envAwarenessWeather);
-    }
-
-    if($bIsSnowingPresently && $bCurrentWeatherSnow){
-        $envAwarenessWeather = str_ireplace("It is snowing outside. ", "", $envAwarenessWeather);
-    }
-
     $futureOrPresent = $bCurrentWeatherIsHiddenByOutgoingWeather ? "descriptionFuture" : "descriptionPresent";
-    $weatherSentence = $weather[$futureOrPresent];
+    $weatherSentence = $weather[$futureOrPresent] ?? $weather["descriptionPresent"] ?? "";
 
-    $returnText .= $envAwarenessWeather . " " . $weatherSentence;
+    if ($weatherSentence) {
+        $returnText .= $weatherSentence;
+    }
+    
     $currentGameHour = intval(GetActorValue($playerName, "currentGameHour"));
 
     if ($currentGameHour <= 5 || $currentGameHour > 21 && str_icontains($weather["name"], "_A")) {
