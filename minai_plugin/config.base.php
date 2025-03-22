@@ -40,25 +40,38 @@ $GLOBALS['minai_context'] = array(
     'bounty' => true,
     'mind_influence' => true,
     'dynamic_state' => true,
+    'career' => true,
+    'dirt_and_blood' => true,
+    'level' => true,
+    'family_status' => true,
     
     // Core context builders
     'personality' => true,
     'interaction' => true,
     'player_background' => true,
+    'current_task' => true,
     
     // Environmental context builders
-    'relative' => true,
+    'day_night_state' => true,
     'weather' => true,
-    'third_party' => true,
+    'moon_phase' => true,
+    'location' => true,
+    'frostfall' => true,
+    'character_state' => true,
     'nearby_characters' => true,
+    'npc_relationships' => true,
+    'third_party' => true,
+    
+    // Relationship context builders
+    'relationship' => true,
+    'relative_power' => true,
+    'devious_follower' => true,
+    'submissive_lola' => true,
     
     // NSFW context builders
     'nsfw_reputation' => true,
     
-    // Relationship context builders
-    'relationship' => true,
-    'devious_follower' => true,
-    'submissive_lola' => true,
+    // System prompt settings
     'response_guidelines' => true,
     'action_enforcement' => true
 );

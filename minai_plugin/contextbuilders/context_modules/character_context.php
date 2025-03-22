@@ -5,12 +5,6 @@
  * This file contains context builders related to character status and attributes
  */
 
-require_once(__DIR__ . "/../../config.php");
-require_once(__DIR__ . "/../../util.php");
-require_once(__DIR__ . "/../system_prompt_context.php");
-require_once(__DIR__ . "/../../contextbuilders/dirtandblood_context.php");
-require_once(__DIR__ . "/../../contextbuilders/exposure_context.php");
-require_once(__DIR__ . "/../../contextbuilders/fertilitymode_context.php");
 
 /**
  * Helper function to validate and sanitize parameters for context builders
@@ -72,6 +66,16 @@ function InitializeCharacterContextBuilders() {
         'builder_callback' => 'BuildPhysicalDescriptionContext'
     ]);
     
+    // Register career context builder
+    $registry->register('career', [
+        'section' => 'status',
+        'header' => 'Career',
+        'description' => 'Character class/career information',
+        'priority' => 3,
+        'enabled' => isset($GLOBALS['minai_context']['career']) ? (bool)$GLOBALS['minai_context']['career'] : true,
+        'builder_callback' => 'BuildCareerContext'
+    ]);
+    
     // Register equipment context builder
     $registry->register('equipment', [
         'section' => 'status',
@@ -90,6 +94,16 @@ function InitializeCharacterContextBuilders() {
         'priority' => 30,
         'enabled' => isset($GLOBALS['minai_context']['tattoos']) ? (bool)$GLOBALS['minai_context']['tattoos'] : true,
         'builder_callback' => 'BuildTattooContext'
+    ]);
+    
+    // Register dirt and blood context builder
+    $registry->register('dirt_and_blood', [
+        'section' => 'status',
+        'header' => 'Cleanliness',
+        'description' => 'Character dirt and blood status',
+        'priority' => 35,
+        'enabled' => isset($GLOBALS['minai_context']['dirt_and_blood']) ? (bool)$GLOBALS['minai_context']['dirt_and_blood'] : true,
+        'builder_callback' => 'BuildDirtAndBloodContext'
     ]);
     
     // Register arousal context builder
@@ -153,6 +167,46 @@ function InitializeCharacterContextBuilders() {
         'priority' => 80,
         'enabled' => isset($GLOBALS['minai_context']['mind_influence']) ? (bool)$GLOBALS['minai_context']['mind_influence'] : true,
         'builder_callback' => 'BuildMindInfluenceContext'
+    ]);
+    
+    // Register level context builder
+    $registry->register('level', [
+        'section' => 'status',
+        'header' => 'Power Level',
+        'description' => 'Character level and power description',
+        'priority' => 4,
+        'enabled' => isset($GLOBALS['minai_context']['level']) ? (bool)$GLOBALS['minai_context']['level'] : true,
+        'builder_callback' => 'BuildLevelContext'
+    ]);
+    
+    // Register family status context builder
+    $registry->register('family_status', [
+        'section' => 'status',
+        'header' => 'Family Status',
+        'description' => 'Character family information',
+        'priority' => 6,
+        'enabled' => isset($GLOBALS['minai_context']['family_status']) ? (bool)$GLOBALS['minai_context']['family_status'] : true,
+        'builder_callback' => 'BuildFamilyStatusContext'
+    ]);
+    
+    // Register third party context builder for character-specific info
+    $registry->register('third_party_info', [
+        'section' => 'status',
+        'header' => 'Additional Character Information',
+        'description' => 'Additional character information from third party mods',
+        'priority' => 90,
+        'enabled' => isset($GLOBALS['minai_context']['third_party']) ? (bool)$GLOBALS['minai_context']['third_party'] : true,
+        'builder_callback' => 'BuildThirdPartyContext'
+    ]);
+    
+    // Register third party context builder for everyone info
+    $registry->register('third_party_global_info', [
+        'section' => 'misc',
+        'header' => 'General Information',
+        'description' => 'General information from third parties not tied to a specific character',
+        'priority' => 10,
+        'enabled' => isset($GLOBALS['minai_context']['third_party']) ? (bool)$GLOBALS['minai_context']['third_party'] : true,
+        'builder_callback' => 'BuildThirdPartyGlobalContext'
     ]);
 }
 
@@ -602,5 +656,287 @@ function BuildMindInfluenceContext($params) {
     
     // This function would call the existing GetMindInfluenceContext function
     return GetMindInfluenceContext($mindState);
+}
+
+/**
+ * Build the dirt and blood context
+ * 
+ * @param array $params Parameters including herika_name, player_name, target
+ * @return string Formatted dirt and blood context
+ */
+function BuildDirtAndBloodContext($params) {
+    $validated = ValidateContextParams($params);
+    $character = $validated['herika_name'];
+    
+    // If this is the narrator, show the player's dirt and blood status instead
+    if ($character == "The Narrator") {
+        $character = $validated['player_name'];
+    }
+    
+    // Use the single actor dirt and blood context function we created
+    return GetSingleActorDirtAndBloodContext($character);
+}
+
+/**
+ * Utility function to convert a numeric level to a descriptive power level text
+ * 
+ * @param int $level The numeric level (1-100)
+ * @return string A descriptive text representing the character's power level
+ */
+function GetLevelDescription($level) {
+    // Ensure level is within valid range
+    $level = max(1, min(100, intval($level)));
+    
+    // Determine which 5-level interval the level falls into
+    $interval = ceil($level / 5);
+    
+    // Map interval to description
+    switch ($interval) {
+        case 1: // Levels 1-5
+            return "barely able to defend themselves";
+        case 2: // Levels 6-10
+            return "a novice adventurer";
+        case 3: // Levels 11-15
+            return "somewhat experienced";
+        case 4: // Levels 16-20
+            return "capable and battle-tested";
+        case 5: // Levels 21-25
+            return "skilled and respected";
+        case 6: // Levels 26-30
+            return "a veteran fighter";
+        case 7: // Levels 31-35
+            return "highly proficient";
+        case 8: // Levels 36-40
+            return "quite formidable";
+        case 9: // Levels 41-45
+            return "a local legend";
+        case 10: // Levels 46-50
+            return "a regional hero";
+        case 11: // Levels 51-55
+            return "renowned throughout the province";
+        case 12: // Levels 56-60
+            return "feared by most common foes";
+        case 13: // Levels 61-65
+            return "a mighty warrior that few dare challenge";
+        case 14: // Levels 66-70
+            return "powerful enough to face dragons";
+        case 15: // Levels 71-75
+            return "among the strongest in Skyrim";
+        case 16: // Levels 76-80
+            return "nearly unstoppable in battle";
+        case 17: // Levels 81-85
+            return "of legendary might";
+        case 18: // Levels 86-90
+            return "approaching godlike power";
+        case 19: // Levels 91-95
+            return "possessing otherworldly strength";
+        case 20: // Levels 96-100
+            return "of impossible might, rivaling the power of Daedric Princes";
+        default:
+            return "of unknown power";
+    }
+}
+
+/**
+ * Build the level context
+ * 
+ * @param array $params Parameters including herika_name, player_name, target
+ * @return string Formatted level context
+ */
+function BuildLevelContext($params) {
+    $params = ValidateContextParams($params, ['herika_name', 'player_name', 'target']);
+    $character = $params['herika_name'];
+    $player_name = $params['player_name'];
+    
+    // If this is the narrator, show info for the target or player
+    if ($character == "The Narrator") {
+        $character = $params['target'] ? $params['target'] : $player_name;
+    }
+    
+    $utilities = new Utilities();
+    $context = "";
+    
+    // Level information with descriptive power text
+    $level = $utilities->GetActorValue($character, "level");
+    if (!empty($level)) {
+        $levelDesc = GetLevelDescription($level);
+        $context .= $character . " is " . $levelDesc . " (in terms of power and might). ";
+    }
+    
+    return $context;
+}
+
+/**
+ * Build the family status context
+ * 
+ * @param array $params Parameters including herika_name, player_name, target
+ * @return string Formatted family status context
+ */
+function BuildFamilyStatusContext($params) {
+    $params = ValidateContextParams($params, ['herika_name', 'player_name', 'target']);
+    $character = $params['herika_name'];
+    $player_name = $params['player_name'];
+    
+    // If this is the narrator, show info for the target or player
+    if ($character == "The Narrator") {
+        $character = $params['target'] ? $params['target'] : $player_name;
+    }
+    
+    // These are all NPC only
+    if ($character == $player_name) {
+        return "";
+    }
+    
+    $context = "";
+    
+    // Family status description - build from raw boolean values
+    $isChild = IsEnabled($character, "isChild");
+    $hasFamily = IsEnabled($character, "hasFamily");
+    
+    $familyStatus = "";
+    if ($isChild && !$hasFamily) {
+        $familyStatus = "an orphan child";
+    } elseif ($isChild) {
+        $familyStatus = "a child with family nearby";
+    } elseif ($hasFamily) {
+        $familyStatus = "an adult who has family";
+    } else {
+        $familyStatus = "an adult";
+    }
+    
+    $context .= $character . " is " . $familyStatus . ". ";
+    
+    return $context;
+}
+
+/**
+ * Build the career context
+ * 
+ * @param array $params Parameters including herika_name, player_name, target
+ * @return string Formatted career context
+ */
+function BuildCareerContext($params) {
+    $params = ValidateContextParams($params, ['herika_name', 'player_name', 'target']);
+    $character = $params['herika_name'];
+    $player_name = $params['player_name'];
+    $target = $params['target'];
+    
+    // Not relevant for the narrator or the player
+    if ($character == "The Narrator" || $character == $player_name) {
+        return "";
+    }
+    
+    // Get the character's career
+    $career = GetActorValue($character, "career");
+    if (empty($career)) {
+        return "";
+    }
+    
+    // Check if this is a secretive career
+    $secretiveCareers = [
+        "Assassin", "Thief", "Bandit Archer", "Bandit", 
+        "Bandit Wizard", "Blade", "Vampire", "Werewolf", "dremora"
+    ];
+    
+    $isSecretive = in_array($career, $secretiveCareers);
+    
+    // Determine if this is public or private knowledge
+    if ($isSecretive) {
+        // Private knowledge - shown when the character is the target
+        if ($character == $target) {
+            return "{$character} is a {$career} but is secretive about that unless in select company - like with other {$career}s or close friends.";
+        } else {
+            // Public knowledge - shown to others
+            return "{$character} has an air of mystery about them.";
+        }
+    } else {
+        // Regular career - always public
+        return "{$character} is a {$career}.";
+    }
+}
+
+/**
+ * Build the character-specific third party context
+ * 
+ * @param array $params Parameters including herika_name, player_name, target
+ * @return string Formatted third party context for a specific character
+ */
+function BuildThirdPartyContext($params) {
+    $params = ValidateContextParams($params, ['herika_name', 'player_name', 'target']);
+    $character = $params['herika_name'];
+    $player_name = $params['player_name'];
+    
+    // If this is the narrator, show info for the target or player
+    if ($character == "The Narrator") {
+        $character = $player_name;
+    }
+    
+    // Also include player context if it's not an NPC conversation (as in the original function)
+    $includePlayer = ($character != $player_name && !IsRadiant());
+    
+    // Get third party context specifically for this character (excluding "everyone")
+    $context = GetCharacterSpecificThirdPartyContext($character);
+    return $context;
+}
+
+/**
+ * Build the global third party context (for "everyone")
+ * 
+ * @param array $params Parameters including herika_name, player_name, target
+ * @return string Formatted global third party context
+ */
+function BuildThirdPartyGlobalContext($params) {
+    // Get only the "everyone" context entries
+    return GetGlobalThirdPartyContext();
+}
+
+/**
+ * Get third party context specifically for a character
+ * 
+ * @param string $character Character name
+ * @return string Formatted character-specific third party context
+ */
+function GetCharacterSpecificThirdPartyContext($character) {
+    $db = $GLOBALS['db'];
+    $ret = "";
+    $currentTime = time();
+    
+    $charName = $db->escape($character);
+    $charNameLower = strtolower($charName);
+    
+    // Get only character-specific entries (not "everyone")
+    $rows = $db->fetchAll(
+        "SELECT * FROM custom_context WHERE expiresAt > {$currentTime} AND npcname IN ('{$charName}', '{$charNameLower}') AND npcname != 'everyone'"
+    );
+    
+    foreach ($rows as $row) {
+        minai_log("info", "Inserting character-specific third-party context for {$character}: {$row["eventvalue"]}");
+        $ret .= $row["eventvalue"] . "\n";
+    }
+    
+    return $ret;
+}
+
+/**
+ * Get global third party context (for "everyone")
+ * 
+ * @return string Formatted global third party context
+ */
+function GetGlobalThirdPartyContext() {
+    $db = $GLOBALS['db'];
+    $ret = "";
+    $currentTime = time();
+    
+    // Get only "everyone" entries
+    $rows = $db->fetchAll(
+        "SELECT * FROM custom_context WHERE expiresAt > {$currentTime} AND npcname = 'everyone'"
+    );
+    
+    foreach ($rows as $row) {
+        minai_log("info", "Inserting global third-party context: {$row["eventvalue"]}");
+        $ret .= $row["eventvalue"] . "\n";
+    }
+    
+    return $ret;
 } 
 

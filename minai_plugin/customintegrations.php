@@ -544,32 +544,6 @@ function translateFormTypeToCategory($formTypeId) {
     }
 }
 
-function GetThirdpartyContext() {
-    $db = $GLOBALS['db'];
-    $ret = "";
-    $currentTime = time();
-    
-    $npcName = $GLOBALS["db"]->escape($GLOBALS["HERIKA_NAME"]);
-    $npcName = $GLOBALS["db"]->escape($npcName); // we need to escape twice to catch names with ' in then, like most Khajit names. Probably because the names are escaped before inserting.
-    $npcNameLower = strtolower($npcName); // added the same name but in lowercase to be safe, since sometimes Skyrim returns NPC names in all lowercase and those get put into the DB.
-    
-    $inArray = array("everyone", $npcName, $npcNameLower);
-    
-    // Add the player name if its not an NPC to NPC conversation
-    if (!IsRadiant()) {
-        array_push($inArray, $GLOBALS["PLAYER_NAME"]);
-    }
-    
-    $rows = $db->fetchAll(
-        "SELECT * FROM custom_context WHERE expiresAt > {$currentTime} AND npcname IN ('" . implode("', '", $inArray) . "')"
-    );
-    foreach ($rows as $row) {
-        minai_log("info", "Inserting third-party context: {$row["eventvalue"]}");
-        $ret .= $row["eventvalue"] . "\n";
-    }
-    return $ret;
-}
-
 
 function RegisterThirdPartyActions() {
     $db = $GLOBALS['db'];

@@ -755,6 +755,8 @@ Function TrackContext(actor akActor)
   if !akActor.HasSpell(ContextSpell)
     Main.Info("Adding Context Spell to " + Main.GetActorName(akActor))
     akActor.AddSpell(ContextSpell)
+  else
+    Main.Debug("Context Spell already added to " + Main.GetActorName(akActor))
   EndIf
 EndFunction
 
@@ -957,9 +959,7 @@ Event OnAIActorChange(string npcName, string actionName)
       Main.Error("OnAIActorChange: Could not find NPC to add context spell to")
       return
     EndIf
-    if minai_SapienceEnabled.GetValueInt() != 1
-      TrackContext(agent)
-    EndIf
+    TrackContext(agent)
   EndIf
   ; Can't process spell removal here, since the actor will already be gone from the CHIM system at this point. The context script will clean that up instead. 
 EndEvent
@@ -1013,8 +1013,9 @@ Function CleanupSapientActors()
       Main.Warn("SAPIENCE: Could not validate that " + actorNames[i] + " is unloaded: Actor is none")
       RemoveActorAI(actorNames[i])
     EndIf
-    bool loaded = akActor.Is3DLoaded()
-    if !loaded || !nearbyActors.Find(akActor)
+    if followers.IsFollower(akActor)
+      Main.Debug("SAPIENCE: Actor " + actorNames[i] + " is a follower. Skipping cleanup.")
+    elseif !akActor.Is3DLoaded() || !nearbyActors.Find(akActor)
       Main.Debug("SAPIENCE: Actor " + actorNames[i] + " is no longer active.")
       RemoveActorAI(actorNames[i])
     else
