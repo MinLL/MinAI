@@ -5,12 +5,6 @@
  * This file contains context builders related to character status and attributes
  */
 
-require_once(__DIR__ . "/../../config.php");
-require_once(__DIR__ . "/../../util.php");
-require_once(__DIR__ . "/../system_prompt_context.php");
-require_once(__DIR__ . "/../../contextbuilders/dirtandblood_context.php");
-require_once(__DIR__ . "/../../contextbuilders/exposure_context.php");
-require_once(__DIR__ . "/../../contextbuilders/fertilitymode_context.php");
 
 /**
  * Helper function to validate and sanitize parameters for context builders
@@ -193,6 +187,26 @@ function InitializeCharacterContextBuilders() {
         'priority' => 6,
         'enabled' => isset($GLOBALS['minai_context']['family_status']) ? (bool)$GLOBALS['minai_context']['family_status'] : true,
         'builder_callback' => 'BuildFamilyStatusContext'
+    ]);
+    
+    // Register third party context builder for character-specific info
+    $registry->register('third_party_info', [
+        'section' => 'status',
+        'header' => 'Additional Character Information',
+        'description' => 'Additional character information from third party mods',
+        'priority' => 90,
+        'enabled' => isset($GLOBALS['minai_context']['third_party']) ? (bool)$GLOBALS['minai_context']['third_party'] : true,
+        'builder_callback' => 'BuildThirdPartyContext'
+    ]);
+    
+    // Register third party context builder for everyone info
+    $registry->register('third_party_global_info', [
+        'section' => 'misc',
+        'header' => 'General Information',
+        'description' => 'General information from third parties not tied to a specific character',
+        'priority' => 10,
+        'enabled' => isset($GLOBALS['minai_context']['third_party']) ? (bool)$GLOBALS['minai_context']['third_party'] : true,
+        'builder_callback' => 'BuildThirdPartyGlobalContext'
     ]);
 }
 
@@ -839,5 +853,90 @@ function BuildCareerContext($params) {
         // Regular career - always public
         return "{$character} is a {$career}.";
     }
+}
+
+/**
+ * Build the character-specific third party context
+ * 
+ * @param array $params Parameters including herika_name, player_name, target
+ * @return string Formatted third party context for a specific character
+ */
+function BuildThirdPartyContext($params) {
+    $params = ValidateContextParams($params, ['herika_name', 'player_name', 'target']);
+    $character = $params['herika_name'];
+    $player_name = $params['player_name'];
+    
+    // If this is the narrator, show info for the target or player
+    if ($character == "The Narrator") {
+        $character = $player_name;
+    }
+    
+    // Also include player context if it's not an NPC conversation (as in the original function)
+    $includePlayer = ($character != $player_name && !IsRadiant());
+    
+    // Get third party context specifically for this character (excluding "everyone")
+    $context = GetCharacterSpecificThirdPartyContext($character);
+    return $context;
+}
+
+/**
+ * Build the global third party context (for "everyone")
+ * 
+ * @param array $params Parameters including herika_name, player_name, target
+ * @return string Formatted global third party context
+ */
+function BuildThirdPartyGlobalContext($params) {
+    // Get only the "everyone" context entries
+    return GetGlobalThirdPartyContext();
+}
+
+/**
+ * Get third party context specifically for a character
+ * 
+ * @param string $character Character name
+ * @return string Formatted character-specific third party context
+ */
+function GetCharacterSpecificThirdPartyContext($character) {
+    $db = $GLOBALS['db'];
+    $ret = "";
+    $currentTime = time();
+    
+    $charName = $db->escape($character);
+    $charNameLower = strtolower($charName);
+    
+    // Get only character-specific entries (not "everyone")
+    $rows = $db->fetchAll(
+        "SELECT * FROM custom_context WHERE expiresAt > {$currentTime} AND npcname IN ('{$charName}', '{$charNameLower}') AND npcname != 'everyone'"
+    );
+    
+    foreach ($rows as $row) {
+        minai_log("info", "Inserting character-specific third-party context for {$character}: {$row["eventvalue"]}");
+        $ret .= $row["eventvalue"] . "\n";
+    }
+    
+    return $ret;
+}
+
+/**
+ * Get global third party context (for "everyone")
+ * 
+ * @return string Formatted global third party context
+ */
+function GetGlobalThirdPartyContext() {
+    $db = $GLOBALS['db'];
+    $ret = "";
+    $currentTime = time();
+    
+    // Get only "everyone" entries
+    $rows = $db->fetchAll(
+        "SELECT * FROM custom_context WHERE expiresAt > {$currentTime} AND npcname = 'everyone'"
+    );
+    
+    foreach ($rows as $row) {
+        minai_log("info", "Inserting global third-party context: {$row["eventvalue"]}");
+        $ret .= $row["eventvalue"] . "\n";
+    }
+    
+    return $ret;
 } 
 
