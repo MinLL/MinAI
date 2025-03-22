@@ -823,6 +823,7 @@
                     action: 'edit',
                     baseFormId: data.baseFormId,
                     modName: data.modName,
+                    name: data.name || '',
                     description: data.description || ''
                 };
 
@@ -838,7 +839,33 @@
                         data: updateData,
                         success: function(response) {
                             if (response.status === 'success') {
-                                loadTableData();
+                                // Update the item in allEquipmentData
+                                const index = allEquipmentData.findIndex(item => 
+                                    item.baseFormId === data.baseFormId && item.modName === data.modName
+                                );
+                                if (index !== -1) {
+                                    allEquipmentData[index] = {
+                                        ...allEquipmentData[index],
+                                        name: data.name,
+                                        description: data.description
+                                    };
+                                }
+
+                                // If filters are active, update filteredData and re-render
+                                const hasActiveFilters = Object.values({
+                                    baseFormId: $('#filterBaseFormId').val(),
+                                    modName: $('#filterModName').val(),
+                                    name: $('#filterName').val(),
+                                    description: $('#filterDescription').val()
+                                }).some(value => value && value.trim() !== '');
+
+                                if (hasActiveFilters) {
+                                    // Re-apply current filters
+                                    applyFilters();
+                                } else {
+                                    // Just reload the table normally
+                                    loadTableData();
+                                }
                             }
                         },
                         error: function(xhr, status, error) {
