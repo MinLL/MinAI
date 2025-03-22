@@ -598,7 +598,6 @@ function GetWeatherContext() {
     
     $returnText = "";
 
-    $envAwarenessWeather = $utilities->GetActorValue($playerName, "EnviromentalAwarenessPlayerEnviroment");
     $bWeatherChange = false;
     $bIsRainingPresently = str_icontains($envAwarenessWeather, "is raining outside");
     $bIsSnowingPresently = str_icontains($envAwarenessWeather, "is snowing outside");
@@ -606,7 +605,7 @@ function GetWeatherContext() {
 
 
     $weatherCode = strtolower(GetActorValue($playerName, "weather"));
-    if (!$weatherCode) return $envAwarenessWeather;
+    if (!$weatherCode) return "";
     $wc = substr($weatherCode, (stripos($weatherCode, "(") + 1), 8);
     
     // Try exact match first
@@ -622,7 +621,7 @@ function GetWeatherContext() {
     if (!$weather) {
         error_log("minai: Unknown Weather type: " . $weatherCode);
         // if nothing fall back to this
-        return $envAwarenessWeather;
+        return "";
     }
     // currentWeather as opposed to "outgoing weather" which will overlay current weather for a time
     $currentWeather = $weather["descriptionPresent"];

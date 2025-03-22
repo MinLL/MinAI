@@ -28,6 +28,16 @@ function InitializeRelationshipContextBuilders() {
         'builder_callback' => 'BuildRelationshipContext'
     ]);
     
+    // Register relative power context builder
+    $registry->register('relative_power', [
+        'section' => 'interaction',
+        'header' => 'Relative Strength',
+        'description' => 'Relative power level between characters',
+        'priority' => 45,
+        'enabled' => isset($GLOBALS['minai_context']['relative_power']) ? (bool)$GLOBALS['minai_context']['relative_power'] : true,
+        'builder_callback' => 'BuildRelativePowerContext'
+    ]);
+    
     // Register devious follower context builder
     $registry->register('devious_follower', [
         'section' => 'status',
@@ -113,4 +123,78 @@ function BuildSubmissiveLolaContext($params) {
     
     // Call the existing GetSubmissiveLolaContext function
     return GetSubmissiveLolaContext($character);
+}
+
+/**
+ * Get a description of the relative power level between two characters
+ *
+ * @param int $level1 Level of the first character
+ * @param int $level2 Level of the second character
+ * @return string Description of the power difference
+ */
+function GetRelativePowerDescription($level1, $level2) {
+    // Calculate the difference in levels
+    $diff = $level1 - $level2;
+    
+    // Define thresholds for different descriptions
+    if ($diff >= 30) {
+        return "vastly more powerful than";
+    } elseif ($diff >= 20) {
+        return "much stronger than";
+    } elseif ($diff >= 10) {
+        return "significantly stronger than";
+    } elseif ($diff >= 5) {
+        return "stronger than";
+    } elseif ($diff > 0) {
+        return "slightly stronger than";
+    } elseif ($diff == 0) {
+        return "evenly matched with";
+    } elseif ($diff >= -5) {
+        return "slightly weaker than";
+    } elseif ($diff >= -10) {
+        return "weaker than";
+    } elseif ($diff >= -20) {
+        return "significantly weaker than";
+    } elseif ($diff >= -30) {
+        return "much weaker than";
+    } else {
+        return "vastly outmatched by";
+    }
+}
+
+/**
+ * Build the relative power context between characters
+ * 
+ * @param array $params Parameters including herika_name, player_name, target
+ * @return string Formatted relative power context
+ */
+function BuildRelativePowerContext($params) {
+    // Get character information
+    $character = $params['herika_name'];
+    $player_name = $params['player_name'];
+    $target = $params['target'];
+    
+    if ($character == "The Narrator") {
+        $target = $player_name;
+    }
+    
+    // Skip if there's no target or if target is the same as character
+    if (empty($target) || $target == $character) {
+        return "";
+    }
+    
+    // Get level information for both characters
+    $character_level = intval(GetActorValue($character, "level"));
+    $target_level = intval(GetActorValue($target, "level"));
+    
+    // If we can't get level info for either character, return empty string
+    if (empty($character_level) || empty($target_level)) {
+        return "";
+    }
+    
+    // Get the description of the power difference
+    $power_relation = GetRelativePowerDescription($character_level, $target_level);
+    
+    // Format the output
+    return "{$character} is {$power_relation} {$target} in combat ability.";
 } 
