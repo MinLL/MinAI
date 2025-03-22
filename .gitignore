@@ -16,3 +16,5 @@ minai_plugin/xPersonalitiesDBImport/imported.txt
 .vs/
 
 *.php#
+
+minai_plugin/.stfolder/

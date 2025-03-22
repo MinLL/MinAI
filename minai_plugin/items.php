@@ -47,7 +47,7 @@ function AddItem($item_id, $file_name, $name, $description, $is_available = true
     $file_name = $db->escape($file_name);
     $name = $db->escape($name);
     $description = $db->escape($description);
-    $is_available = $is_available ? 'TRUE' : 'FALSE';
+    $is_available = StandardizeBoolean($is_available) ? 'TRUE' : 'FALSE';
     $category = $category ? "'" . $db->escape($category) . "'" : 'NULL';
     
     // Check if item already exists
@@ -139,8 +139,14 @@ function UpdateItem($id, $data) {
         }
         
         if (isset($data['is_available'])) {
-            $is_available = $data['is_available'] ? 'TRUE' : 'FALSE';
+            $is_available = StandardizeBoolean($data['is_available']) ? 'TRUE' : 'FALSE';
+            minai_log("debug", "Setting is_available to: " . $is_available);
             $updates[] = "is_available = {$is_available}";
+        }
+        
+        if (isset($data['is_hidden'])) {
+            $is_hidden = StandardizeBoolean($data['is_hidden']) ? 'TRUE' : 'FALSE';
+            $updates[] = "is_hidden = {$is_hidden}";
         }
         
         if (isset($data['category'])) {
@@ -380,7 +386,7 @@ function AddItemWithModIndex($item_id, $file_name, $name, $description, $mod_ind
         $name = $db->escape($name);
         $description = $db->escape($description);
         $mod_index = $db->escape($mod_index);
-        $is_available = $is_available ? 'TRUE' : 'FALSE';
+        $is_available = StandardizeBoolean($is_available) ? 'TRUE' : 'FALSE';
         $category = $category ? "'" . $db->escape($category) . "'" : 'NULL';
         
         // Check if item already exists

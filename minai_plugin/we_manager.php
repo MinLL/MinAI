@@ -39,13 +39,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Edit existing row
         $baseFormId = $db->escape($_POST['baseFormId']);
         $modName = $db->escape($_POST['modName']);
-        //$name = $db->escape($_POST['name']);
-        $description = $db->escape($_POST['description']);
-
-        // Update existing record
-        $updateQuery = "UPDATE equipment_description SET description = '{$description}' WHERE baseFormId = '{$baseFormId}' AND modName = '{$modName}'";
-        minai_log("info", 'update query: ' . $updateQuery);
-        $db->execQuery($updateQuery);
+        
+        $updateFields = [];
+        
+        if (isset($_POST['description'])) {
+            $description = $db->escape($_POST['description']);
+            $updateFields[] = "description = '{$description}'";
+        }
+        
+        if (isset($_POST['is_hidden'])) {
+            // Ensure boolean fields are properly typed
+            $isHidden = filter_var($_POST['is_hidden'], FILTER_VALIDATE_BOOLEAN);
+            $updateFields[] = "is_hidden = " . ($isHidden ? 'true' : 'false');
+        }
+        
+        if (!empty($updateFields)) {
+            $updateQuery = "UPDATE equipment_description SET " . implode(", ", $updateFields) . " WHERE baseFormId = '{$baseFormId}' AND modName = '{$modName}'";
+            minai_log("info", 'update query: ' . $updateQuery);
+            $db->execQuery($updateQuery);
+        }
 
     } elseif ($action === 'delete') {
         // Delete existing row
@@ -96,7 +108,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['act
             'baseFormId' => $row['baseformid'],
             'modName' => $row['modname'],
             'name' => $row['name'],
-            'description' => $row['description']
+            'description' => $row['description'],
+            'is_hidden' => $row['is_hidden'] === 't' || $row['is_hidden'] === true
         ];
     }
 

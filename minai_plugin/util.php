@@ -402,13 +402,13 @@ Function IsRadiant() {
 
 
 // in case when we want to change target from radiant options and directly tell npc whom they need to talk to
-function overrideTargetToTalk($name) {
+function OverrideTargetToTalk($name) {
     global $targetOverride;
     $targetOverride = $name;
 }
 
-function isPlayerInput() {
-    return  in_array($GLOBALS["gameRequest"][0],["inputtext","inputtext_s","ginputtext","ginputtext_s","instruction","init"]);
+function IsPlayerInput() {
+    return in_array($GLOBALS["gameRequest"][0], ["inputtext","inputtext_s","ginputtext","ginputtext_s","instruction","init"]);
 }
 
 
@@ -448,3 +448,14 @@ require_once("utils/llm_utils.php");
 require_once("utils/profile_utils.php");
 require_once("utils/variable_utils.php");
 require_once("utils/equipment_utils.php");
+
+/**
+ * Standardize boolean value conversion from various database formats
+ * 
+ * @param mixed $value The value to convert
+ * @return bool The standardized boolean value
+ */
+function StandardizeBoolean($value) {
+    if (is_bool($value)) return $value;
+    return ($value === 't' || $value === true || $value === '1' || $value === 1);
+}

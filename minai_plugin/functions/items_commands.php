@@ -121,7 +121,8 @@ function GetActorInventoryItems($actorName) {
                     $inventory[] = [
                         'formId' => $originalFormId,
                         'name' => $item['name'],
-                        'count' => $data['count']
+                        'count' => $data['count'],
+                        'is_hidden' => isset($item['is_hidden']) ? StandardizeBoolean($item['is_hidden']) : false
                     ];
                     
                     // minai_log("debug", "Added item to inventory: " . $item['name'] . " x" . $data['count']);
@@ -143,7 +144,8 @@ function GetActorInventoryItems($actorName) {
         $inventory[] = [
             'formId' => $originalFormId,
             'name' => $item['name'],
-            'count' => $count
+            'count' => $count,
+            'is_hidden' => isset($item['is_hidden']) ? StandardizeBoolean($item['is_hidden']) : false
         ];
         
         minai_log("debug", "Added cached item to inventory: " . $item['name'] . " x" . $count);
@@ -206,13 +208,22 @@ function BuildInventoryListString($items, $limit = null) {
         return "no items";
     }
     
+    // Filter out hidden items
+    $visibleItems = array_filter($items, function($item) {
+        return !isset($item['is_hidden']) || !$item['is_hidden'];
+    });
+    
+    if (empty($visibleItems)) {
+        return "no visible items";
+    }
+    
     // Use the global configuration setting if no explicit limit is provided
     if ($limit === null) {
         $limit = isset($GLOBALS['inventory_items_limit']) ? $GLOBALS['inventory_items_limit'] : 5;
     }
     
     // Sort by count descending
-    usort($items, function($a, $b) {
+    usort($visibleItems, function($a, $b) {
         return $b['count'] - $a['count'];
     });
     
@@ -223,7 +234,7 @@ function BuildInventoryListString($items, $limit = null) {
     // }
     
     // Limit items to display
-    $displayItems = array_slice($items, 0, $limit);
+    $displayItems = array_slice($visibleItems, 0, $limit);
     
     $itemStrings = [];
     foreach ($displayItems as $item) {
@@ -233,8 +244,8 @@ function BuildInventoryListString($items, $limit = null) {
     $result = implode(", ", $itemStrings);
     
     // Add "and more" if there are more items
-    if (count($items) > $limit) {
-        $result .= ", and " . (count($items) - $limit) . " more items";
+    if (count($visibleItems) > $limit) {
+        $result .= ", and " . (count($visibleItems) - $limit) . " more items";
     }
     
     return $result;

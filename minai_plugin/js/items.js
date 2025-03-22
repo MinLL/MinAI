@@ -1,10 +1,11 @@
 // Global variables
 let currentPage = 1;
-let itemsPerPage = 10;
+let itemsPerPage = 20; // Default to 20 items per page
 let totalPages = 1;
 let currentItems = [];
 let categories = [];
 let itemTypes = [];
+let isLoading = false;
 
 // DOM elements
 const messageElement = document.getElementById('message');
@@ -12,6 +13,7 @@ const itemsTableBody = document.getElementById('items-table-body');
 const categoryFilter = document.getElementById('category-filter');
 const typeFilter = document.getElementById('type-filter');
 const availabilityFilter = document.getElementById('availability-filter');
+const itemsPerPageSelect = document.getElementById('items-per-page');
 const sortBySelect = document.getElementById('sort-by');
 const sortOrderSelect = document.getElementById('sort-order');
 const searchInput = document.getElementById('search-input');
@@ -151,12 +153,19 @@ function setupEventListeners() {
             resetDatabase();
         });
     }
+
+    // Items per page selector
+    itemsPerPageSelect.addEventListener('change', function() {
+        itemsPerPage = parseInt(this.value);
+        currentPage = 1;
+        filterAndDisplayItems();
+    });
 }
 
 // Load items from the API
 function loadItems() {
     // Show loading message
-    showMessage('Loading items...', 'info');
+    updateLoadingState(true);
     
     // Build query parameters
     const params = new URLSearchParams();
@@ -191,10 +200,11 @@ function loadItems() {
         .then(data => {
             currentItems = data;
             filterAndDisplayItems();
-            hideMessage();
+            updateLoadingState(false);
         })
         .catch(error => {
             showMessage(error.message, 'error');
+            updateLoadingState(false);
         });
 }
 
@@ -246,20 +256,29 @@ function filterAndDisplayItems() {
         
         // Add cells
         row.innerHTML = `
-            <td>${item.id}</td>
-            <td>${item.item_id}</td>
+            <td class="id-column">${item.id}</td>
+            <td class="itemid-column">${item.item_id}</td>
             <td>${item.file_name}</td>
             <td>${item.name}</td>
             <td>${item.description || ''}</td>
-            <td>${item.item_type || 'Item'}</td>
-            <td>${item.category || ''}</td>
-            <td>${item.mod_index || ''}</td>
-            <td>${item.is_available ? 'Yes' : 'No'}</td>
-            <td>${formatDate(item.last_seen)}</td>
-            <td>${formatDate(item.created_at)}</td>
-            <td>
-                <button class="edit-button" data-id="${item.id}">Edit</button>
-                <button class="delete-button delete" data-id="${item.id}">Delete</button>
+            <td class="type-column">${item.item_type || 'Item'}</td>
+            <td class="category-column">${item.category || ''}</td>
+            <td class="narrow-column">${item.mod_index || ''}</td>
+            <td class="narrow-column">${item.is_available ? 'Yes' : 'No'}</td>
+            <td class="date-column">${formatDate(item.last_seen)}</td>
+            <td class="date-column">${formatDate(item.created_at)}</td>
+            <td class="button-cell">
+                <div class="button-container">
+                    <button class="icon-button visibility-button" data-id="${item.id}" data-hidden="${item.is_hidden ? 1 : 0}" title="${item.is_hidden ? 'Show' : 'Hide'}">
+                        <i class="fas ${item.is_hidden ? 'fa-eye-slash' : 'fa-eye'}"></i>
+                    </button>
+                    <button class="icon-button edit-button" data-id="${item.id}" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="icon-button delete-button" data-id="${item.id}" title="Delete">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
             </td>
         `;
         
@@ -267,7 +286,15 @@ function filterAndDisplayItems() {
         itemsTableBody.appendChild(row);
     }
     
-    // Add event listeners to edit and delete buttons
+    // Add event listeners to buttons
+    document.querySelectorAll('.visibility-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            const isHidden = this.getAttribute('data-hidden') === '1';
+            toggleItemVisibility(id, !isHidden);
+        });
+    });
+    
     document.querySelectorAll('.edit-button').forEach(button => {
         button.addEventListener('click', function() {
             const id = this.getAttribute('data-id');
@@ -424,7 +451,9 @@ function editItem(id) {
     modal.className = 'modal';
     modal.innerHTML = `
         <div class="modal-content">
-            <span class="close">&times;</span>
+            <button class="icon-button close" style="position: absolute; right: 10px; top: 10px;" title="Close">
+                <i class="fas fa-times"></i>
+            </button>
             <h2>Edit Item</h2>
             <form id="edit-item-form">
                 <div class="form-group">
@@ -467,8 +496,19 @@ function editItem(id) {
                     <label for="edit-is-available">Available for use</label>
                 </div>
                 
-                <button type="submit">Update Item</button>
-                <button type="button" class="cancel">Cancel</button>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="edit-is-hidden" name="is_hidden" ${item.is_hidden ? 'checked' : ''}>
+                    <label for="edit-is-hidden">Hidden from context</label>
+                </div>
+                
+                <div class="button-container" style="justify-content: flex-end; margin-top: 20px; gap: 8px;">
+                    <button type="submit" class="icon-button" style="width: auto; padding: 8px 10px; color: var(--primary-color);">
+                        <i class="fas fa-save" style="margin-right: 8px;"></i>Save Changes
+                    </button>
+                    <button type="button" class="icon-button delete-button" style="width: auto; padding: 8px 10px;">
+                        <i class="fas fa-times" style="margin-right: 8px;"></i>Cancel
+                    </button>
+                </div>
             </form>
         </div>
     `;
@@ -485,7 +525,7 @@ function editItem(id) {
     });
     
     // Cancel button functionality
-    modal.querySelector('.cancel').addEventListener('click', function() {
+    modal.querySelector('.delete-button').addEventListener('click', function() {
         document.body.removeChild(modal);
     });
     
@@ -496,19 +536,29 @@ function editItem(id) {
         // Get form data
         const formData = new FormData(this);
         const data = {};
+        const originalItem = currentItems.find(item => item.id == id);
         
-        // Convert FormData to object
+        // Convert FormData to object, only including changed fields
         for (const [key, value] of formData.entries()) {
-            if (key === 'is_available') {
-                data[key] = true;
-            } else {
-                data[key] = value;
+            if (key !== 'is_available' && key !== 'is_hidden') {
+                if (value !== originalItem[key]) {
+                    data[key] = value;
+                }
             }
         }
         
-        // If is_available checkbox is not checked, set it to false
-        if (!formData.has('is_available')) {
-            data.is_available = false;
+        // Handle checkboxes independently
+        const currentIsAvailable = formData.has('is_available');
+        const currentIsHidden = formData.has('is_hidden');
+        
+        // Only include is_available if it changed
+        if (currentIsAvailable !== originalItem.is_available) {
+            data.is_available = currentIsAvailable;
+        }
+        
+        // Only include is_hidden if it changed
+        if (currentIsHidden !== originalItem.is_hidden) {
+            data.is_hidden = currentIsHidden;
         }
         
         // Make API request
@@ -528,6 +578,13 @@ function editItem(id) {
             .then(data => {
                 showMessage(data.message, 'success');
                 document.body.removeChild(modal);
+                // Update the item in currentItems array
+                if (data.item) {
+                    const index = currentItems.findIndex(item => item.id == id);
+                    if (index !== -1) {
+                        currentItems[index] = data.item;
+                    }
+                }
                 loadItems();
                 loadCategories();
                 loadItemTypes();
@@ -654,10 +711,11 @@ function formatDate(dateString) {
     
     const options = { 
         year: 'numeric', 
-        month: 'short', 
-        day: 'numeric',
+        month: '2-digit', 
+        day: '2-digit',
         hour: '2-digit', 
-        minute: '2-digit'
+        minute: '2-digit',
+        hour12: false
     };
     return date.toLocaleDateString('en-US', options);
 }
@@ -674,7 +732,7 @@ function hideMessage() {
     messageElement.style.display = 'none';
 }
 
-// Add CSS for the modal
+// Add CSS for the modal and messages
 const style = document.createElement('style');
 style.textContent = `
     .modal {
@@ -707,6 +765,22 @@ style.textContent = `
         font-weight: bold;
         cursor: pointer;
     }
+
+    .section {
+        position: relative;
+    }
+
+    .message {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 120px;
+        z-index: 100;
+        text-align: center;
+        padding: 8px;
+        border-radius: 4px;
+        font-size: 0.9rem;
+    }
 `;
 document.head.appendChild(style);
 
@@ -735,4 +809,45 @@ function resetDatabase() {
         .catch(error => {
             showMessage(error.message, 'error');
         });
+}
+
+// Add function to toggle item visibility
+function toggleItemVisibility(id, hidden) {
+    const data = {
+        is_hidden: hidden
+    };
+    
+    // Make API request
+    fetch(`api/items_api.php?id=${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to update item visibility');
+            }
+            return response.json();
+        })
+        .then(data => {
+            showMessage(data.message, 'success');
+            loadItems();
+        })
+        .catch(error => {
+            showMessage(error.message, 'error');
+        });
+}
+
+function updateLoadingState(loading) {
+    isLoading = loading;
+    const section = document.querySelector('#items-list .section');
+    if (loading) {
+        section.classList.add('loading');
+        showMessage('Loading items...', 'info');
+    } else {
+        section.classList.remove('loading');
+        hideMessage();
+    }
 } 
