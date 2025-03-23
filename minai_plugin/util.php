@@ -522,8 +522,54 @@ function IsInParty($characterName) {
 
 function GetRecentContext($actor, $contextMessages) {
     if (!isset($GLOBALS["gameRequest"])) {
-        // Dummy values for the roleplay builder  and preview pages to mute warnings
+        // Dummy values for the roleplay builder and preview pages to mute warnings
         $GLOBALS["gameRequest"] = ["", 0, 0];
     }
     return DataLastDataExpandedFor($actor, $contextMessages * -1);
+}
+
+/**
+ * Gets the current location information from recent context
+ * 
+ * @param string $actor The actor name to check context for
+ * @return array Location data containing current, hold, and full location string
+ */
+function GetCurrentLocationContext($actor) {
+    global $db;
+    
+    // Query to fetch recent context data with focus on location information
+    $query = "SELECT location 
+              FROM eventlog 
+              WHERE location IS NOT NULL AND location != ''
+              ORDER BY gamets DESC, ts DESC, rowid DESC 
+              LIMIT 10";
+    
+    $results = $db->fetchAll($query);
+    
+    $locationData = [
+        'current' => '',
+        'hold' => '',
+        'full' => ''
+    ];
+    
+    // Process results to extract location information
+    foreach ($results as $row) {
+        $locationString = $row["location"];
+        preg_match('/Context\s*(new\s*)?location:\s*([^$,]+)/', $locationString, $locationMatch);
+        preg_match('/Hold:\s*([^$,\)]+)/', $locationString, $holdMatch);
+        
+        if (isset($locationMatch[2]) && isset($holdMatch[1])) {
+            $location = trim($locationMatch[2]);
+            $hold = trim($holdMatch[1]);
+            
+            $locationData['current'] = $location;
+            $locationData['hold'] = $hold;
+            $locationData['full'] = "$location, hold: $hold";
+            
+            // We found valid location data, return it
+            return $locationData;
+        }
+    }
+    
+    return $locationData;
 }

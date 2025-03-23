@@ -258,12 +258,17 @@ function BuildMoonPhaseContext($params) {
 function BuildLocationContext($params) {
     $player_name = $params['player_name'];
     $utilities = new Utilities();
-    
+    $locationContext = GetCurrentLocationContext($player_name);
+    $ret = "";
+    if (!empty($locationContext)) {
+        $ret .= "Current Hold: " . $locationContext['hold'] . ".\n";
+        $ret .= "Current Location: " . $locationContext['current'] . ".\n";
+    }
     if (IsEnabled($player_name, "isInterior")) {
-        return "We are indoors, out of the weather and elements.";
+        $ret .= "We are indoors, out of the weather and elements.";
     }
     
-    return "";
+    return $ret;
 }
 
 /**
