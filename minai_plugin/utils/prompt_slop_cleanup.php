@@ -297,7 +297,12 @@ function cleanupSlop($contextData) {
             }
             // Pattern 6: Handle context messages without parentheses
             else if (strpos($content, 'The Narrator:') === 0) {
-                $content = preg_replace('/^The Narrator:\s*(.*)$/', '($1)', $content);
+                // Handle specific "The Narrator: someText (Talking to Eldawyn)" pattern
+                if (preg_match('/^The Narrator:\s*(.*?)\s*\(Talking to Eldawyn\)$/', $content, $matches)) {
+                    $content = "($matches[1])";
+                } else {
+                    $content = preg_replace('/^The Narrator:\s*(.*)$/', '($1)', $content);
+                }
             }
 
             // Clean up any remaining double parentheses that might have been created
