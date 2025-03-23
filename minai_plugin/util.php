@@ -189,14 +189,16 @@ Function IsConfigEnabled($configKey) {
 }
 
 Function IsFollower($name) {
-    return (
+    /*return (
         IsInFaction($name, "Framework Follower Faction") ||
         IsInFaction($name, "Follower Role Faction") ||
         IsInFaction($name, "PotentialFollowerFaction") ||
         IsInFaction($name, "CurrentFollowerFaction") ||
         IsInFaction($name, "DLC1SeranaFaction") ||
         IsInFaction($name, "Potential Follower")
-    );
+    );*/
+    
+    return IsInParty($name);
 }
 
 // Check if the specified actor is following (not follower)
@@ -442,3 +444,71 @@ require_once("utils/llm_utils.php");
 require_once("utils/profile_utils.php");
 require_once("utils/variable_utils.php");
 require_once("utils/equipment_utils.php");
+
+/**
+ * Get current party members from the database
+ * 
+ * @return array An array with two elements:
+ *               - 'members': Array of party member data with name, level, race, etc.
+ *               - 'names': Simple array of just the member names for easy access
+ */
+function GetCurrentPartyMembers() {
+    // Initialize return structure
+    $result = [
+        'members' => [],
+        'names' => []
+    ];
+    
+    // Check if CurrentParty data exists in the database
+    $query = "SELECT value FROM conf_opts WHERE id='CurrentParty'";
+    $dbResult = $GLOBALS["db"]->fetchAll($query);
+    
+    if (!$dbResult || empty($dbResult[0]['value'])) {
+        return $result;
+    }
+    
+    $rawData = $dbResult[0]['value'];
+    
+    // Remove potential trailing comma
+    $rawData = rtrim($rawData, ',');
+    
+    // Wrap with array brackets to make it valid JSON
+    $rawData = '[' . $rawData . ']';
+    
+    // Parse the JSON data
+    $partyData = json_decode($rawData, true);
+    
+    // If parsing failed, return empty result
+    if (!is_array($partyData)) {
+        return $result;
+    }
+    
+    // Store member data and names
+    foreach ($partyData as $member) {
+        if (isset($member['name'])) {
+            $result['members'][] = $member;
+            $result['names'][] = $member['name'];
+        }
+    }
+    
+    return $result;
+}
+
+/**
+ * Check if a character is in the player's current party
+ *
+ * @param string $characterName The name of the character to check
+ * @return bool True if the character is in the party, false otherwise
+ */
+function IsInParty($characterName) {
+    $partyInfo = GetCurrentPartyMembers();
+    
+    // Check if character name exists in party member names (case insensitive)
+    foreach ($partyInfo['names'] as $memberName) {
+        if (strtolower($memberName) === strtolower($characterName)) {
+            return true;
+        }
+    }
+    
+    return false;
+}

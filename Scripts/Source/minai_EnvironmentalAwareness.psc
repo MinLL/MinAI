@@ -251,7 +251,9 @@ function SetContext(actor akActor)
     if (dayState != "")
       aiff.SetActorVariable(akActor, "dayState", dayState)
     endif
-  
+
+    ;  Snow is 3, Rain is 2, Cloudy is 1, Clear is 0, and -1 is used 
+    aiff.SetActorVariable(akActor, "weatherClassification", Weather.GetCurrentWeather().GetClassification() as string)
     ; Store moon data
     StoreMoonData(akActor)
   

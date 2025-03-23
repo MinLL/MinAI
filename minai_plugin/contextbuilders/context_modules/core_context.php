@@ -212,7 +212,7 @@ function BuildCurrentTaskContext($params) {
         return "";
     }
     $current_task = null;
-    if (isset($GLOBALS["CURRENT_TASK"]) && $GLOBALS["CURRENT_TASK"] && $GLOBALS["gameRequest"][0] != "diary") {
+    if (isset($GLOBALS["CURRENT_TASK"]) && $GLOBALS["CURRENT_TASK"]) {
         if (IsFollower($herika_name) || $GLOBALS["HERIKA_NAME"]=="The Narrator") {
             $current_task=DataGetCurrentTask();
             if (empty($current_task)) {

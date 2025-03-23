@@ -38,6 +38,16 @@ function InitializeRelationshipContextBuilders() {
         'builder_callback' => 'BuildRelativePowerContext'
     ]);
     
+    // Register party membership context builder
+    $registry->register('party_membership', [
+        'section' => 'interaction',
+        'header' => 'Adventuring Party Membership',
+        'description' => 'Information about character party membership',
+        'priority' => 48,
+        'enabled' => isset($GLOBALS['minai_context']['party_membership']) ? (bool)$GLOBALS['minai_context']['party_membership'] : true,
+        'builder_callback' => 'BuildPartyMembershipContext'
+    ]);
+    
     // Register devious follower context builder
     $registry->register('devious_follower', [
         'section' => 'status',
@@ -197,4 +207,73 @@ function BuildRelativePowerContext($params) {
     
     // Format the output
     return "{$character} is {$power_relation} {$target} in combat ability.";
+}
+
+/**
+ * Build the party membership context
+ * 
+ * @param array $params Parameters including herika_name, player_name, target
+ * @return string Formatted party membership context
+ */
+function BuildPartyMembershipContext($params) {
+    // Get character information
+    $character = $params['herika_name'];
+    $player_name = $params['player_name'];
+    
+    // Get party members using the utility function
+    $partyInfo = GetCurrentPartyMembers();
+    
+    // If party is empty, return appropriate message
+    if (empty($partyInfo['members'])) {
+        if ($character == "The Narrator" || strtolower($character) == strtolower($player_name)) {
+            return "{$player_name} is not currently traveling with any companions.";
+        }
+        return "{$character} is not currently in {$player_name}'s adventuring party.";
+    }
+    
+    // Special case for Narrator or Player: display all party members
+    if ($character == "The Narrator" || strtolower($character) == strtolower($player_name)) {
+        $partyMemberNames = [];
+        foreach ($partyInfo['members'] as $member) {
+            if (strtolower($member['name']) !== strtolower($player_name)) {
+                $partyMemberNames[] = $member['name'];
+            }
+        }
+        
+        if (empty($partyMemberNames)) {
+            return "{$player_name} is not currently traveling with any companions.";
+        } else {
+            $companions = implode(', ', $partyMemberNames);
+            return "{$player_name} is currently traveling with {$companions}.";
+        }
+    }
+    
+    // Regular case for NPCs: check if character is in the party
+    $characterInParty = IsInParty($character);
+    $otherPartyMembers = [];
+    
+    // Get other party members (not the player, not the current character)
+    foreach ($partyInfo['members'] as $member) {
+        if (strtolower($member['name']) !== strtolower($character) && 
+            strtolower($member['name']) !== strtolower($player_name)) {
+            $otherPartyMembers[] = $member['name'];
+        }
+    }
+    
+    // Format the output based on party membership
+    if ($characterInParty) {
+        if (empty($otherPartyMembers)) {
+            return "{$character} is currently in an adventuring party with {$player_name}.";
+        } else {
+            $otherMembers = implode(', ', $otherPartyMembers);
+            return "{$character} is currently in an adventuring party with {$player_name} and {$otherMembers}.";
+        }
+    } else {
+        if (empty($otherPartyMembers)) {
+            return "{$character} is not currently in an adventuring party with {$player_name}.";
+        } else {
+            $otherMembers = implode(', ', $otherPartyMembers);
+            return "{$character} is not currently in an adventuring party with {$player_name}, who is traveling with {$otherMembers}.";
+        }
+    }
 } 

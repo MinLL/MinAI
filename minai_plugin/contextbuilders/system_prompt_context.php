@@ -346,7 +346,7 @@ function BuildSystemPrompt() {
     if ($is_self_narrator) {
         if ($is_diary_request) {
             // For diary entries in self-narrator mode, just use "Min" instead of "Min's subconscious"
-            $display_name = "Min";
+            $display_name = $player_name;
         } else {
             // Normal self-narrator mode
             $display_name = "{$player_name}'s subconscious";

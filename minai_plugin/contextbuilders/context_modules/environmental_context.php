@@ -170,8 +170,17 @@ function BuildDayNightStateContext($params) {
  * @return string Formatted weather context
  */
 function BuildWeatherContext($params) {
-    // Call the existing GetWeatherContext function
-    return GetWeatherContext();
+    $player_name = $params['player_name'];
+    
+    // Get the weather context
+    $weatherContext = GetWeatherContext();
+    
+    // Check if character is indoors
+    if (IsEnabled($player_name, "isInterior") && !empty($weatherContext)) {
+        return "Outside, the weather is: " . $weatherContext;
+    }
+    
+    return $weatherContext;
 }
 
 /**
@@ -247,12 +256,11 @@ function BuildMoonPhaseContext($params) {
  * @return string Formatted location context
  */
 function BuildLocationContext($params) {
-    $params = ValidateEnvironmentParams($params);
-    $character = $params['target'];
+    $player_name = $params['player_name'];
     $utilities = new Utilities();
     
-    if (IsEnabled($character, "isInterior")) {
-        return "We are indoors.";
+    if (IsEnabled($player_name, "isInterior")) {
+        return "We are indoors, out of the weather and elements.";
     }
     
     return "";
