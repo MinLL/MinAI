@@ -406,8 +406,8 @@ Function RenderGeneralPage()
   narratorKeyOID = AddKeyMapOption("Talk to Narrator", narratorKey)  ; New keybind option
   narratorTextKeyOID = AddKeyMapOption("Type to Narrator", narratorTextKey)
   diaryKeyOID = AddKeyMapOption("Diary Hotkey", diaryKey)  ; New diary hotkey option
-  dungeonMasterKeyOID = AddKeyMapOption("Dungeon Master Voice", dungeonMasterKey)  ; New dungeon master voice hotkey
-  dungeonMasterTextKeyOID = AddKeyMapOption("Dungeon Master Text", dungeonMasterTextKey)  ; New dungeon master text hotkey
+  dungeonMasterKeyOID = AddKeyMapOption("Direct Prompting Voice", dungeonMasterKey)  ; New dungeon master voice hotkey
+  dungeonMasterTextKeyOID = AddKeyMapOption("Direct Prompting Text", dungeonMasterTextKey)  ; New dungeon master text hotkey
   disableAIAnimationsOID = AddToggleOption("Disable AI-FF Animations", disableAIAnimations)
   AddHeaderOption("Debug")
   logLevelOID = AddSliderOption("Log Level", logLevel, "{0}")
@@ -1269,9 +1269,9 @@ Event OnOptionHighlight(int oid)
   elseif oid == diaryKeyOID
     SetInfoText("Hotkey to update diaries. When crouching: updates narrator diary. When standing: updates all diaries. When looking at an NPC: updates that NPC's diary.")
   elseif oid == dungeonMasterKeyOID
-    SetInfoText("Hotkey to speak as the dungeon master")
+    SetInfoText("Hotkey to directly prompt the LLM")
   elseif oid == dungeonMasterTextKeyOID
-    SetInfoText("Hotkey to type as the dungeon master")
+    SetInfoText("Hotkey to directly type relevant information to the LLM")
   elseif oid == smallBountyAmountOID
     SetInfoText("Amount of gold given for minor infractions (trespassing, petty theft, etc.)")
   elseif oid == mediumBountyAmountOID

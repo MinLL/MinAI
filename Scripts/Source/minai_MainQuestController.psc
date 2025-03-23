@@ -862,7 +862,7 @@ Function SetDungeonMasterKey(bool showNotification = false)
     if (config.dungeonMasterKey != -1)
         RegisterForKey(config.dungeonMasterKey)
         if showNotification
-            Debug.Notification("Dungeon Master voice key mapped to " + config.dungeonMasterKey)
+            Debug.Notification("Direct Prompting voice key mapped to " + config.dungeonMasterKey)
         endif
     endIf
 EndFunction
@@ -872,7 +872,7 @@ Function SetDungeonMasterTextKey(bool showNotification = false)
     if (config.dungeonMasterTextKey != -1)
         RegisterForKey(config.dungeonMasterTextKey)
         if showNotification
-            Debug.Notification("Dungeon Master text key mapped to " + config.dungeonMasterTextKey)
+            Debug.Notification("Direct Prompting text key mapped to " + config.dungeonMasterTextKey)
         endif
     endIf
 EndFunction
@@ -888,12 +888,12 @@ Function OnDungeonMasterKeyPressed()
             targetName = GetActorName(targetActor)
         endif
         
-        Info("Starting dungeon master recording for " + targetName)
+        Info("Starting direct prompting recording for " + targetName)
         minAIFF.SetActorVariable(playerRef, "isDungeonMaster", true)
         minAIFF.AIRecordSoundEx(config.dungeonMasterKey)
         Debug.Notification("Hold to record message for " + targetName + ", release quickly to send generic event")
     Else
-        Debug.Notification("CHIM not installed - dungeon master requires CHIM")
+        Debug.Notification("CHIM not installed - direct prompting requires CHIM")
     EndIf
 EndFunction
 
@@ -901,7 +901,7 @@ Function OnDungeonMasterKeyReleased(float holdTime)
     If(bHasAIFF)
         ; Reset the last request time to prevent immediate response from other systems
         lastRequestTime = Utility.GetCurrentRealTime()
-        Info("Stopping dungeon master recording")
+        Info("Stopping direct prompting recording")
         minAIFF.AIStopRecording(config.dungeonMasterKey)
         
         ; Get actor under crosshair
@@ -915,9 +915,9 @@ Function OnDungeonMasterKeyReleased(float holdTime)
         
         ; Only send message if key was held for less than 1 second
         if holdTime < 1.0
-            Info("Sending dungeon master event to " + targetName)
+            Info("Sending direct prompting event to " + targetName)
             minAIFF.AIRequestMessageForActor("The dungeon master has triggered an event", "minai_dungeon_master", targetName)
-            Debug.Notification("Dungeon master event sent to " + targetName)
+            Debug.Notification("Direct prompting event sent to " + targetName)
         else
             Debug.Notification("Recording stopped - message will be sent to " + targetName)
         EndIf
@@ -935,7 +935,7 @@ Function OnDungeonMasterTextKeyPressed()
             targetName = GetActorName(targetActor)
         endif
         
-        Info("Opening dungeon master text input for " + targetName)
+        Info("Opening direct prompting text input for " + targetName)
         minAIFF.SetActorVariable(playerRef, "isDungeonMaster", true)
         
         ; Open text input menu
@@ -946,14 +946,14 @@ Function OnDungeonMasterTextKeyPressed()
             ; Reset the last request time to prevent immediate response
             lastRequestTime = Utility.GetCurrentRealTime()
             
-            Info("Sending dungeon master text to " + targetName + ": " + messageText)
+            Info("Sending direct prompting text to " + targetName + ": " + messageText)
             minAIFF.AIRequestMessageForActor("The dungeon master says: " + messageText, "minai_dungeon_master", targetName)
-            Debug.Notification("Dungeon master message sent to " + targetName)
+            Debug.Notification("Direct prompting message sent to " + targetName)
         Else
             Debug.Notification("No message entered - cancelled")
             minAIFF.SetActorVariable(playerRef, "isDungeonMaster", false)
         EndIf
     Else
-        Debug.Notification("CHIM not installed - dungeon master requires CHIM")
+        Debug.Notification("CHIM not installed - direct prompting requires CHIM")
     EndIf
 EndFunction
