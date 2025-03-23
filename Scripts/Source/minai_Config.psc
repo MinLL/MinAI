@@ -44,6 +44,7 @@ int allowSexTransitionsOID
 int allowActorsToJoinSexOID
 int aOIDMap ; Jmap for storing action oid's
 int aCategoryMap ; Jmap for storing action categories
+int useOstimOID ; New OID for Ostim preference
 
 int actionEnabledOID
 int actionIntervalOID
@@ -87,6 +88,9 @@ GlobalVariable minai_SapienceEnabled
 
 bool Property enableCBPC = false Auto
 bool enableCBPCDefault = false
+
+bool Property useOstim = true Auto
+bool useOstimDefault = true
 
 string currentAction
 string currentCategory
@@ -450,6 +454,7 @@ Function RenderSexPage()
   trackVictimAwarenessOID = AddToggleOption("Track Victim Actor Awareness", trackVictimAwareness)
   AddHeaderOption("NPC Sex Settings")
   enableAISexOID = AddToggleOption("Enable NPC -> NPC Sex", enableAISex)
+  useOstimOID = AddToggleOption("Use Ostim as Preferred Framework", useOstim) ; Add new toggle option
   ; right column
   SetCursorPosition(1)
   AddHeaderOption("Comments during sex")
@@ -876,6 +881,15 @@ Event OnOptionSelect(int oid)
   elseif oid == includePromptSelfOID
     includePromptSelf = !includePromptSelf
     SetToggleOptionValue(oid, includePromptSelf)
+  elseif oid == useOstimOID
+    useOstim = !useOstim
+    SetToggleOptionValue(oid, useOstim)
+    if (useOstim)
+      minai_UseOstim.SetValue(1)
+    else
+      minai_UseOstim.SetValue(0)
+    endif
+    Debug.Notification("Sex framework preference changed.")
   EndIf
   int i = 0
   string[] categories = JMap.allKeysPArray(aCategoryMap)
@@ -1096,6 +1110,14 @@ Event OnOptionDefault(int oid)
     LargeBountyAmount = LargeBountyAmountDefault
     SetSliderOptionValue(oid, LargeBountyAmount, "{0} gold")
     crimeController.StoreCrimeVariables()
+  elseif oid == useOstimOID
+    useOstim = useOstimDefault
+    SetToggleOptionValue(oid, useOstim)
+    if (useOstim)
+      minai_UseOstim.SetValue(1)
+    else
+      minai_UseOstim.SetValue(0)
+    endif
   EndIf
 EndEvent
 
@@ -1258,6 +1280,8 @@ Event OnOptionHighlight(int oid)
     SetInfoText("Amount of gold given for serious crimes (murder, grievous assault, etc.)")
   elseif oid == includePromptSelfOID
     SetInfoText("When enabled, prompts the player/narrator to respond to in-game events in addition to or instead of a nearby NPC. Disable to reduce interruptions.")
+  elseif oid == useOstimOID
+    SetInfoText("When enabled, Ostim will be used as the preferred sex animation framework. When disabled, the mod will default to using Sexlab.")
   EndIf
   int i = 0
   string[] actions = JMap.allKeysPArray(aiff.actionRegistry)
