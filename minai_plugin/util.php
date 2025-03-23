@@ -518,3 +518,12 @@ function IsInParty($characterName) {
     
     return false;
 }
+
+
+function GetRecentContext($actor, $contextMessages) {
+    if (!isset($GLOBALS["gameRequest"])) {
+        // Dummy values for the roleplay builder  and preview pages to mute warnings
+        $GLOBALS["gameRequest"] = ["", 0, 0];
+    }
+    return DataLastDataExpandedFor($actor, $contextMessages * -1);
+}
