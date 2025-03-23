@@ -12,6 +12,8 @@ function cleanupSlop($contextData) {
     $playerPronouns = GetActorPronouns($GLOBALS["PLAYER_NAME"]);
     $pronounSelf = "{$playerPronouns['object']}self";
     $cleaned = [];
+    $lastTimePassIndex = -1; // Track index of the last "Time passes" message
+    
     foreach ($contextData as $entry) {
         if (!isset($entry['content'])) {
             continue;
@@ -77,23 +79,39 @@ function cleanupSlop($contextData) {
 
         // Post-processing: Remove lines containing only character names
         if (preg_match('/^[^:]+:\s*$/', $content)) {
-            $content = '';
+            continue;
         }
 
         // Post-processing: Remove character stat lines
         if (preg_match('/^level:\d+,name:"[^"]+",race:"[^"]+"/', $content)) {
-            $content = '';
+           continue;
         }
 
         // Post-processing: Remove standalone weapon/item references
         if (preg_match('/^\(with\s+[^)]+\)$/', $content)) {
-            $content = '';
+            continue;
         }
 
         // Post-processing: Remove "Current followers" line
-        if (preg_match('/^Current followers:\[\]$/', $content)) {
-            $content = '';
+        if (preg_match('/^Current followers:/', $content)) {
+            continue;
         }
+
+        // Post-processing: Remove "beings in range" lines
+        if (stripos($content, 'beings in range:') !== false) {
+            continue;
+        }
+
+        // Pattern: Replace combat engagement messages
+        $content = preg_replace_callback('/The party engages combat with\s+(.+?)(?:\s|$)/i', function($matches) {
+            $characterName = trim($matches[1]);
+            
+            if (strtolower($characterName) === strtolower($GLOBALS["PLAYER_NAME"])) {
+                return "Combat breaks out and a battle begins";
+            } else {
+                return "Combat breaks out and a battle begins with $characterName";
+            }
+        }, $content);
 
         // Clean up any remaining double parentheses that might have been created
         $content = str_replace('))', ')', $content);
@@ -109,9 +127,33 @@ function cleanupSlop($contextData) {
         else {
             //error_log("No changes made to content: " . $content);
         }
+
+        // Check if this is a "Time passes" message
+        $isTimePassMessage = (stripos($content, 'Time passes without anyone in the group talking') !== false);
+
+        // Skip consecutive "Time passes" messages and only keep the first one
+        if ($isTimePassMessage && $lastTimePassIndex >= 0) {
+            continue; // Skip adding this as a new entry
+        }
+
         $entry['content'] = $content;
         $cleaned[] = $entry;
+        
+        // Update the index if this was a time pass message
+        if ($isTimePassMessage) {
+            $lastTimePassIndex = count($cleaned) - 1;
+        } else {
+            // Reset the index if we've added a non-time pass message
+            $lastTimePassIndex = -1;
+        }
     }
 
+    // Only prune if original context history was set
+    if (isset($GLOBALS["ORIGINAL_CONTEXT_HISTORY"])) {
+        error_log("DEBUG: Pruning context history to " . $GLOBALS["ORIGINAL_CONTEXT_HISTORY"]);
+        $n = $GLOBALS["ORIGINAL_CONTEXT_HISTORY"];
+        return array_slice($cleaned, -$n);
+    }
+    
     return $cleaned;
 } 
