@@ -835,10 +835,20 @@ function BuildCareerContext($params) {
     // Check if this is a secretive career
     $secretiveCareers = [
         "Assassin", "Thief", "Bandit Archer", "Bandit", 
-        "Bandit Wizard", "Blade", "Vampire", "Werewolf", "dremora"
+        "Bandit Wizard", "Blade", "Vampire", "Werewolf"
+    ];
+    
+    // List of careers that shouldn't have their information displayed at all
+    $excludedCareers = [
+        "Dremora"
     ];
     
     $isSecretive = in_array($career, $secretiveCareers);
+    
+    // Skip displaying career information for excluded careers
+    if (in_array(strtolower($career), array_map('strtolower', $excludedCareers))) {
+        return "";
+    }
     
     // Determine if this is public or private knowledge
     if ($isSecretive) {

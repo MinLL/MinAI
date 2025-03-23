@@ -222,8 +222,6 @@ function BuildCurrentTaskContext($params) {
                 $current_task = explode(".", $current_task);
             }
             $current_task = array_map('trim', $current_task);
-        } else {
-            error_log("Task avoided {$GLOBALS["IS_NPC"]} ");
         }
     }
     
