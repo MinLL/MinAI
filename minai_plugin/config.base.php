@@ -62,6 +62,7 @@ $GLOBALS['minai_context'] = array(
     'nearby_characters' => true,
     'npc_relationships' => true,
     'third_party' => true,
+    'nearby_buildings' => true,
     
     // Relationship context builders
     'relationship' => true,

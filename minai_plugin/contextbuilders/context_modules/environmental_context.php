@@ -103,6 +103,16 @@ function InitializeEnvironmentalContextBuilders() {
         'builder_callback' => 'BuildLocationContext'
     ]);
     
+    // Register nearby buildings context builder
+    $registry->register('nearby_buildings', [
+        'section' => 'environment',
+        'header' => 'Nearby Buildings and Passages',
+        'description' => 'Doors and passages in the vicinity',
+        'priority' => 22,
+        'enabled' => isset($GLOBALS['minai_context']['nearby_buildings']) ? (bool)$GLOBALS['minai_context']['nearby_buildings'] : true,
+        'builder_callback' => 'BuildNearbyBuildingsContext'
+    ]);
+    
     // Register frostfall context builder (if the mod is enabled)
     $registry->register('frostfall', [
         'section' => 'environment',
@@ -151,11 +161,16 @@ function InitializeEnvironmentalContextBuilders() {
  * @return string Formatted day/night context
  */
 function BuildDayNightStateContext($params) {
-    $params = ValidateEnvironmentParams($params);
-    $character = $params['target'];
-    $utilities = new Utilities();
+    $character = $params['player_name'];
     
-    $dayState = $utilities->GetActorValue($character, "dayState");
+    // Try to get detailed date information first
+    $locationContext = GetCurrentLocationContext($character);
+    if (!empty($locationContext['date'])) {
+        return "The current time in Skyrim is " . $locationContext['date'] . ".";
+    }
+    
+    // Fall back to basic day state if detailed date isn't available
+    $dayState = GetActorValue($character, "dayState");
     if (empty($dayState)) {
         return "";
     }
@@ -581,6 +596,38 @@ function BuildNPCRelationshipsContext($params) {
     // Check if NPC is intimidated
     if (IsEnabled($character, "isIntimidated")) {
         $context .= $character . " seems anxious and a little frightened around " . $player_name . ". ";
+    }
+    
+    return $context;
+}
+
+/**
+ * Build the nearby buildings context
+ * 
+ * @param array $params Parameters including herika_name, player_name, target
+ * @return string Formatted nearby buildings context
+ */
+function BuildNearbyBuildingsContext($params) {
+    $player_name = $params['player_name'];
+    $locationContext = GetCurrentLocationContext($player_name);
+    
+    // Check if we have buildings information
+    if (empty($locationContext['buildings']) || count($locationContext['buildings']) == 0) {
+        return "";
+    }
+    
+    $context = "";
+    
+    foreach ($locationContext['buildings'] as $building) {
+        if (!empty($building['name'])) {
+            $context .= "- " . $building['name'];
+            
+            if (!empty($building['destination'])) {
+                $context .= " (" . $building['destination'] . ")";
+            }
+            
+            $context .= "\n";
+        }
     }
     
     return $context;
