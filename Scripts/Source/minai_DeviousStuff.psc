@@ -456,12 +456,12 @@ EndEvent
 
 
 Event OnOrgasm(string eventName, string actorName, float numArg, Form sender)
-  Main.RequestLLMResponseFromActor("I just had an orgasm!", "minai_orgasm", "everyone", "both")
+  Main.RequestLLMResponseFromActor(actorName + " just had an orgasm!", "minai_orgasm", "everyone", "both")
 EndEvent
 
 
 Event OnEdged(string eventName, string actorName, float numArg, Form sender)
-  Main.RequestLLMResponseFromActor("I was brought right to the edge of orgasm but the vibrations stopped before I could cum!", "minai_edged", "everyone", "both")
+  Main.RequestLLMResponseFromActor(actorName + " was brought right to the edge of orgasm but the vibrations stopped before I could cum!", "minai_edged", "everyone", "both")
 EndEvent
 
 
@@ -496,7 +496,7 @@ Event OnVibrateStart(string eventName, string actorName, float vibStrength, Form
   if vibratorActor
     aiff.SetActorVariable(vibratorActor, "isVibratorActive", True)
   endif
-  Main.RequestLLMResponseFromActor(strength, "minai_vibrate_start", actorName, "both")
+  Main.RequestLLMResponseFromActor(actorName + " is vibrating: " + strength, "minai_vibrate_start", actorName, "both")
 EndEvent
 
 Event OnVibrateStop(string eventName, string actorName, float vibStrength, Form sender)
@@ -506,10 +506,11 @@ Event OnVibrateStop(string eventName, string actorName, float vibStrength, Form 
   if vibratorActor
     aiff.SetActorVariable(vibratorActor, "isVibratorActive", False)
   endif
+  string vibString = actorName + " is no longer vibrating: " + strength
   if config.includePromptSelf
-    Main.RequestLLMResponseFromActor(strength, "minai_vibrate_stop", actorName, "player")
+    Main.RequestLLMResponseFromActor(vibString, "minai_vibrate_stop", actorName, "player")
   else
-    Main.RegisterEvent(strength, "info_minai_vibrate_stop")
+    Main.RegisterEvent(vibString, "info_minai_vibrate_stop")
   endif
 EndEvent
 

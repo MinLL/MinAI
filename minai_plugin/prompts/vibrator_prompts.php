@@ -1,8 +1,23 @@
 <?php
+function get_vibrate_target() {
+    // Main.RequestLLMResponseFromActor(actorName + " is vibrating: " + strength, "minai_vibrate_start", actorName, "both")
+    // Main.RequestLLMResponseFromActor(actorName + " is no longer vibrating: " + strength, "minai_vibrate_stop", actorName, "player")
+    // Extract target from message like "PlayerName is vibrating: strongly"
+    $target = "";
+    if (isset($GLOBALS["gameRequest"]) && isset($GLOBALS["gameRequest"][3])) {
+        $message = $GLOBALS["gameRequest"][3];
+        // Extract everything before " is vibrating" or " is no longer vibrating"
+        if (preg_match('/^(.*?)\s+is\s+(?:no longer\s+)?vibrating/', $message, $matches)) {
+            $target = $matches[1];
+        }
+    }
+    return $target;
+}
+
 
 // Function to get vibrate start prompt
 function get_vibrate_start_prompt() {
-    $target = $GLOBALS["target"];
+    $target = get_vibrate_target();
     
     // Better intensity extraction
     $intensity = "strongly"; // Default
@@ -324,7 +339,7 @@ function get_vibrate_start_prompt() {
 
 // Function to get vibrate stop prompt
 function get_vibrate_stop_prompt() {
-    $target = $GLOBALS["target"];
+    $target = get_vibrate_target();
     
     // Better intensity extraction
     $intensity = "strongly"; // Default
