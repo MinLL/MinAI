@@ -284,3 +284,18 @@ if (IsEnabled($GLOBALS["PLAYER_NAME"], "isDungeonMaster")) {
 }
 // Incompatible with new context system
 $GLOBALS["ADD_PLAYER_BIOS"]  = false;
+
+
+// Entries will be removed from the context history while cleanining up slop. 
+// To avoid having too few, we will overfetch the context history and later reduce it.
+if (isset($GLOBALS["enable_prompt_slop_cleanup"]) && $GLOBALS["enable_prompt_slop_cleanup"]) {
+    // Store original context history setting
+    $nDataForContext = intval(isset($GLOBALS["CONTEXT_HISTORY"]) ? $GLOBALS["CONTEXT_HISTORY"] : 50);
+    $GLOBALS["ORIGINAL_CONTEXT_HISTORY"] = $nDataForContext;
+
+    // Triple the original context history setting
+    $GLOBALS["CONTEXT_HISTORY"] = $nDataForContext * 3;
+    error_log("DEBUG: Context history set to " . $GLOBALS["CONTEXT_HISTORY"]);
+}
+
+

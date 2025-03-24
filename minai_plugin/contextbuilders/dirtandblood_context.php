@@ -165,7 +165,7 @@ function GetDirtAndBloodContext($localActors) {
     $red = [];
     $superior = [];
     
-    $actorList = explode("|",$localActors);
+    $actorList = is_array($localActors) ? $localActors : explode("|", $localActors);
     $actorList[] = $GLOBALS["PLAYER_NAME"]; 
     foreach($actorList as $name) {
         $name = str_replace("(", "", $name);
@@ -198,9 +198,9 @@ function GetDirtAndBloodContext($localActors) {
         
         // Only add to fallback arrays if no primary state is present
         if(!$hasPrimaryState) {
-            if(dnb::includes("Professional", $listOfTags)) $professional[] = $name;
+            // if(dnb::includes("Professional", $listOfTags)) $professional[] = $name;
             // Only add to bandit if not already in professional
-            else if(dnb::includes("Bandit", $listOfTags)) $bandit[] = $name;
+            // else if(dnb::includes("Bandit", $listOfTags)) $bandit[] = $name;
         }
         
         // Scent tags can always apply

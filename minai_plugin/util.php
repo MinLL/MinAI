@@ -512,3 +512,101 @@ function IsInParty($characterName) {
     
     return false;
 }
+
+
+function GetRecentContext($actor, $contextMessages) {
+    if (!isset($GLOBALS["gameRequest"])) {
+        // Dummy values for the roleplay builder and preview pages to mute warnings
+        $GLOBALS["gameRequest"] = ["", 0, 0];
+    }
+    return DataLastDataExpandedFor($actor, $contextMessages * -1);
+}
+
+/**
+ * Gets the current location information from recent context
+ * 
+ * @param string $actor The actor name to check context for
+ * @return array Location data containing current, hold, full location string, date information, and buildings
+ */
+function GetCurrentLocationContext($actor) {
+    global $db;
+    
+    // Query to fetch recent context data with focus on location information
+    $query = "SELECT location 
+              FROM eventlog 
+              WHERE location IS NOT NULL AND location != ''
+              AND type = 'infoloc'
+              ORDER BY gamets DESC, ts DESC, rowid DESC 
+              LIMIT 3";
+    
+    $results = $db->fetchAll($query);
+    
+    $locationData = [
+        'current' => '',
+        'hold' => '',
+        'full' => '',
+        'date' => '',
+        'buildings' => []
+    ];
+    
+    // Process results to extract location information
+    foreach ($results as $row) {
+        $locationString = $row["location"];
+        preg_match('/Context\s*(new\s*)?location:\s*([^$,]+)/', $locationString, $locationMatch);
+        preg_match('/Hold:\s*([^$,\)]+)/', $locationString, $holdMatch);
+        
+        // Match date information in format like "Current Date in Skyrim World: Turdas, 15:50, 3rd Day of Winter"
+        preg_match('/Current Date in Skyrim World:\s*([^$]+)/', $locationString, $dateMatch);
+        
+        // Match buildings/passages information
+        preg_match('/buildings to go:(.+), Current/', $locationString, $buildingsMatch);
+        
+        if (isset($locationMatch[2]) && isset($holdMatch[1])) {
+            $location = trim($locationMatch[2]);
+            $hold = trim($holdMatch[1]);
+            
+            $locationData['current'] = $location;
+            $locationData['hold'] = $hold;
+            $locationData['full'] = "$location, hold: $hold";
+            
+            // Add date information if available
+            if (isset($dateMatch[1])) {
+                $locationData['date'] = rtrim(trim($dateMatch[1]), ')');
+            }
+            
+            // Add buildings information if available
+            if (isset($buildingsMatch[1])) {
+                $buildingsString = trim($buildingsMatch[1]);
+                // Parse the buildings string into an array
+                $buildingsList = explode(',', $buildingsString);
+                $buildings = [];
+                
+                foreach ($buildingsList as $building) {
+                    $building = trim($building);
+                    if (!empty($building)) {
+                        // Extract the door/passage name and destination
+                        if (preg_match('/^([^(]+)\(([^)]+)\)$/', $building, $parts)) {
+                            $buildings[] = [
+                                'name' => trim($parts[1]),
+                                'destination' => trim($parts[2])
+                            ];
+                        } else {
+                            // If it doesn't match the pattern, just add the full string
+                            $buildings[] = [
+                                'name' => $building,
+                                'destination' => ''
+                            ];
+                        }
+                    }
+                }
+                
+                $locationData['buildings'] = $buildings;
+            }
+            
+            // We found valid location data, return it
+            return $locationData;
+        }
+    }
+    
+    return $locationData;
+}

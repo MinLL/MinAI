@@ -50,7 +50,7 @@ function GetExposureContext($localActors) {
     $tngsize4 = [];
 
 
-    $actorList = explode("|",$localActors);
+    $actorList = is_array($localActors) ? $localActors : explode("|", $localActors);
     $actorList[] = $GLOBALS["PLAYER_NAME"]; 
     foreach($actorList as $name) {
         $naked = $utilities->GetActorValue($name, "isexposed");

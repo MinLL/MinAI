@@ -176,7 +176,7 @@ function interceptRoleplayInput() {
 
         // Get recent context - use configured value for context messages
         $contextMessages = $settings['context_messages'];
-        $contextDataHistoric = DataLastDataExpandedFor("", $contextMessages * -1);
+        $contextDataHistoric = GetRecentContext("", $contextMessages);
         
         // Get info about location and NPCs
         $contextDataWorld = DataLastInfoFor("", -2);
@@ -377,7 +377,7 @@ function interceptRoleplayInput() {
             if ($GLOBALS["gameRequest"][0] == "minai_roleplay") {
                 // rewrite as player input
                 $GLOBALS["gameRequest"][0] = "inputtext";
-                $GLOBALS["gameRequest"][3] = $response;
+                $GLOBALS["gameRequest"][3] = $PLAYER_NAME . ": " . $response;
             }
             else {
                 // Format the response with a single character name prefix

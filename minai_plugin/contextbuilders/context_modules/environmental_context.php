@@ -103,6 +103,16 @@ function InitializeEnvironmentalContextBuilders() {
         'builder_callback' => 'BuildLocationContext'
     ]);
     
+    // Register nearby buildings context builder
+    $registry->register('nearby_buildings', [
+        'section' => 'environment',
+        'header' => 'Nearby Buildings and Passages',
+        'description' => 'Doors and passages in the vicinity',
+        'priority' => 22,
+        'enabled' => isset($GLOBALS['minai_context']['nearby_buildings']) ? (bool)$GLOBALS['minai_context']['nearby_buildings'] : true,
+        'builder_callback' => 'BuildNearbyBuildingsContext'
+    ]);
+    
     // Register frostfall context builder (if the mod is enabled)
     $registry->register('frostfall', [
         'section' => 'environment',
@@ -151,11 +161,16 @@ function InitializeEnvironmentalContextBuilders() {
  * @return string Formatted day/night context
  */
 function BuildDayNightStateContext($params) {
-    $params = ValidateEnvironmentParams($params);
-    $character = $params['target'];
-    $utilities = new Utilities();
+    $character = $params['player_name'];
     
-    $dayState = $utilities->GetActorValue($character, "dayState");
+    // Try to get detailed date information first
+    $locationContext = GetCurrentLocationContext($character);
+    if (!empty($locationContext['date'])) {
+        return "The current time in Skyrim is " . $locationContext['date'] . ".";
+    }
+    
+    // Fall back to basic day state if detailed date isn't available
+    $dayState = GetActorValue($character, "dayState");
     if (empty($dayState)) {
         return "";
     }
@@ -258,12 +273,17 @@ function BuildMoonPhaseContext($params) {
 function BuildLocationContext($params) {
     $player_name = $params['player_name'];
     $utilities = new Utilities();
-    
+    $locationContext = GetCurrentLocationContext($player_name);
+    $ret = "";
+    if (!empty($locationContext)) {
+        $ret .= "Current Hold: " . $locationContext['hold'] . ".\n";
+        $ret .= "Current Location: " . $locationContext['current'] . ".\n";
+    }
     if (IsEnabled($player_name, "isInterior")) {
-        return "We are indoors, out of the weather and elements.";
+        $ret .= "We are indoors, out of the weather and elements.";
     }
     
-    return "";
+    return $ret;
 }
 
 /**
@@ -411,7 +431,9 @@ function BuildNearbyCharactersContext($params) {
     $herika_name = $params['herika_name'];
     $player_name = $params['player_name'];
     $target = $params['target'];
-    $utilities = new Utilities();
+    if ($herika_name == "The Narrator") {
+        $herika_name = $player_name;
+    }
     $localActors = DataBeingsInRange();
     
     if (empty($localActors)) {
@@ -426,23 +448,120 @@ function BuildNearbyCharactersContext($params) {
     $characters = array_filter(array_map('trim', $characters), function($item) {
         return !empty($item);
     });
-    // Remove Herika, player and target names from the list
-    $characters = array_filter($characters, function($name) use ($herika_name, $player_name, $target) {
-        return !in_array(strtolower($name), [
-            strtolower($herika_name),
-            strtolower($player_name), 
-            strtolower($target)
-        ]);
-    });
+    // Ensure herika_name, player_name and target are included without duplicates
+    $characters = array_unique(array_merge($characters, array_filter([$herika_name, $player_name, $target])));
+
+
     // If we have characters after cleaning, create the formatted list
     if (count($characters) > 0) {
-        $context = implode(", ", $characters) . "\n";
+        $context = "";
+        $utilities = new Utilities();
         
-        // Add dirt and blood information
-        $context .= GetDirtAndBloodContext($localActors);
-        
-        // Add exposure information
-        $context .= GetExposureContext($localActors);
+        foreach ($characters as $character) {
+            // Basic character info
+            $context .= $character;
+            
+            // Get race if available
+            $race = $utilities->GetActorValue($character, "race");
+            if (!empty($race)) {
+                $context .= " (" . $race;
+                
+                // Get gender if available
+                $gender = $utilities->GetActorValue($character, "gender");
+                if (!empty($gender)) {
+                    $context .= " " . $gender;
+                }
+                
+                $context .= ")";
+            }
+            
+            // Add faction info if available
+            $faction = $utilities->GetActorValue($character, "faction");
+            if (!empty($faction)) {
+                $context .= " - " . $faction;
+            }
+            
+            
+            // Add character state
+            $sitStateValue = $utilities->GetActorValue($character, "sitState");
+            if (!empty($sitStateValue) && intval($sitStateValue) == 3) {
+                $context .= " - sitting";
+            }
+            
+            // Check if character is sleeping
+            $sleepState = $utilities->GetActorValue($character, "sleepState");
+            if (!empty($sleepState) && $sleepState != "awake") {
+                $context .= " - " . $sleepState;
+            }
+            
+            // Movement and combat states
+            if (IsEnabled($character, "isSneaking")) {
+                $context .= " - sneaking";
+            }
+            
+            if (IsEnabled($character, "isSwimming")) {
+                $context .= " - swimming";
+            }
+            
+            if (IsEnabled($character, "isOnMount")) {
+                $context .= " - on horseback";
+            }
+            
+            if (IsEnabled($character, "isInCombat")) {
+                $context .= " - in combat";
+            }
+            
+            if (IsEnabled($character, "isEncumbered")) {
+                $context .= " - encumbered";
+            }
+            
+            // Add hostility flag
+            if (IsEnabled($character, "hostileToPlayer")) {
+                $context .= " - hostile to outsiders";
+            }
+            
+            // Add hygiene information
+            $hygiene = $utilities->GetActorValue($character, "dirtAndBlood");
+            if (!empty($hygiene)) {
+                if (stripos($hygiene, "Clean") !== false) {
+                    $context .= " - clean";
+                } elseif (stripos($hygiene, "Dirt4") !== false) {
+                    $context .= " - filthy";
+                } elseif (stripos($hygiene, "Dirt3") !== false) {
+                    $context .= " - very dirty";
+                } elseif (stripos($hygiene, "Dirt2") !== false) {
+                    $context .= " - dirty";
+                } elseif (stripos($hygiene, "Dirt1") !== false) {
+                    $context .= " - slightly dirty";
+                } elseif (stripos($hygiene, "Blood4") !== false) {
+                    $context .= " - covered in blood";
+                } elseif (stripos($hygiene, "Blood3") !== false) {
+                    $context .= " - bloody";
+                } elseif (stripos($hygiene, "Blood2") !== false) {
+                    $context .= " - blood-spattered";
+                } elseif (stripos($hygiene, "Blood1") !== false) {
+                    $context .= " - blood-stained";
+                } elseif (stripos($hygiene, "Bathing") !== false) {
+                    $context .= " - bathing";
+                }
+                
+                // Add scent information
+                if (stripos($hygiene, "Lavender") !== false) {
+                    $context .= " - lavender scented";
+                } elseif (stripos($hygiene, "Blue") !== false) {
+                    $context .= " - fresh scented";
+                } elseif (stripos($hygiene, "Red") !== false) {
+                    $context .= " - rose scented";
+                } elseif (stripos($hygiene, "DragonsTongue") !== false) {
+                    $context .= " - spicy scented";
+                } elseif (stripos($hygiene, "Purple") !== false) {
+                    $context .= " - jazbay scented";
+                } elseif (stripos($hygiene, "Superior") !== false) {
+                    $context .= " - luxuriously scented";
+                }
+            }
+            $context .= "\n";
+        }
         
         return $context;
     }
@@ -477,6 +596,38 @@ function BuildNPCRelationshipsContext($params) {
     // Check if NPC is intimidated
     if (IsEnabled($character, "isIntimidated")) {
         $context .= $character . " seems anxious and a little frightened around " . $player_name . ". ";
+    }
+    
+    return $context;
+}
+
+/**
+ * Build the nearby buildings context
+ * 
+ * @param array $params Parameters including herika_name, player_name, target
+ * @return string Formatted nearby buildings context
+ */
+function BuildNearbyBuildingsContext($params) {
+    $player_name = $params['player_name'];
+    $locationContext = GetCurrentLocationContext($player_name);
+    
+    // Check if we have buildings information
+    if (empty($locationContext['buildings']) || count($locationContext['buildings']) == 0) {
+        return "";
+    }
+    
+    $context = "";
+    
+    foreach ($locationContext['buildings'] as $building) {
+        if (!empty($building['name'])) {
+            $context .= "- " . $building['name'];
+            
+            if (!empty($building['destination'])) {
+                $context .= " (" . $building['destination'] . ")";
+            }
+            
+            $context .= "\n";
+        }
     }
     
     return $context;

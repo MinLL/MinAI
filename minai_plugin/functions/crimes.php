@@ -14,7 +14,7 @@ $crimeCommands = [
     "AddBountyMedium" => "Add a medium bounty of {$mediumBountyAmount} gold to {$GLOBALS['PLAYER_NAME']} (for moderate crimes like assault, significant theft, property damage, or breaking and entering)",
     "AddBountyLarge" => "Add a large bounty of {$largeBountyAmount} gold to {$GLOBALS['PLAYER_NAME']} (for serious crimes like murder, grievous assault, major theft, or attacking a guard)",
     "Arrest" => "Arrest {$GLOBALS['PLAYER_NAME']} and send them to jail immediately (for uncooperative criminals or when caught in the act)",
-    "ClearBounty" => "Clear all bounty for {$GLOBALS['PLAYER_NAME']} in the current hold (after paying fines or through official pardons)"
+    "ClearBounty" => "Clear all bounty for {$GLOBALS['PLAYER_NAME']} in the current hold (Use in response to fines being paid (When you've already collected payment), or when you otherwise want to clear the bounty)"
 ];
 
 // Register crime actions using the builder

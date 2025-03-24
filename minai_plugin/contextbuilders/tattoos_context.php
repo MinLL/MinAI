@@ -15,7 +15,7 @@ Function GetTattooContext($name) {
         );
         
         if (!$tattooData) {
-            error_log("No tattoo data found for " . $name);
+            // error_log("No tattoo data found for " . $name);
             return $ret; // No tattoos for this actor
         }
         
