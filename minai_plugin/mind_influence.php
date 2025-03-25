@@ -201,18 +201,18 @@ function GetMindInfluenceContext($state) {
         } else if ($state == "badgirl") {
             // For badgirl state, arousal enhances the effect
             if ($arousal <= 25) {
-                $narrativeContext = "$playerName feels a subtle desire to please Brillius, though she can still exercise her own judgment in most situations.";
+                $narrativeContext = "$playerName feels a subtle desire to please Brillius and occasionally thinks about returning to him, though she can still exercise her own judgment in most situations.";
             } else if ($arousal < 75) {
-                $narrativeContext = "$playerName feels a moderate urge to obey Brillius, with her independence somewhat diminished.";
+                $narrativeContext = "$playerName feels a moderate urge to obey Brillius and finds herself increasingly drawn to thoughts of returning to him, with her independence somewhat diminished.";
             } else {
-                $narrativeContext = "$playerName feels a strong urge to obey Brillius, finding her thoughts increasingly focused on pleasing him.";
+                $narrativeContext = "$playerName feels a strong urge to obey Brillius, finding her thoughts increasingly focused on pleasing him and feeling an intense pull to return to his presence.";
             }
         } else if ($state == "verybadgirl") {
             // For verybadgirl state, arousal greatly enhances the effect
             if ($arousal < 50) {
-                $narrativeContext = "$playerName feels a strong pull toward submission to Brillius, with her independence becoming harder to maintain.";
+                $narrativeContext = "$playerName feels a strong pull toward submission to Brillius, with her independence becoming harder to maintain and a persistent yearning to return to him.";
             } else {
-                $narrativeContext = "$playerName feels an overwhelming pull toward submission to Brillius, her thoughts increasingly dominated by the need to please him.";
+                $narrativeContext = "$playerName feels an overwhelming pull toward submission to Brillius, her thoughts increasingly dominated by the need to please him and an almost unbearable compulsion to return to his presence.";
             }
         } else if ($state == "punishment") {
             // For punishment state, resistance is always minimal regardless of arousal
