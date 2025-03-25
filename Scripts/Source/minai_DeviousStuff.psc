@@ -1118,8 +1118,10 @@ Function SetContext(actor akTarget)
     return
   EndIf
   string actorName = main.GetActorName(akTarget)
-  aiff.SetActorVariable(akTarget, "canVibrate", CanVibrate(akTarget))
-  aiff.SetActorVariable(akTarget, "isVibratorActive", libs.isVibrating(akTarget))
+  if bHasDD
+    aiff.SetActorVariable(akTarget, "canVibrate", CanVibrate(akTarget))
+    aiff.SetActorVariable(akTarget, "isVibratorActive", libs.isVibrating(akTarget))
+  endif
   if bHasDeviousFollowers && akTarget == PlayerRef
     Actor deviousFollower = (Quest.GetQuest("_Dflow") as QF__Gift_09000D62).Alias__DMaster.GetRef() as Actor
     if deviousFollower
