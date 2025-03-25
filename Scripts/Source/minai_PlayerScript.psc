@@ -76,6 +76,18 @@ Function UpdateStealthFeatureState(bool enabled)
 EndFunction
 
 Event OnPlayerLoadGame()
+  ; Duplicate check for Papyrus Tweaks in OnPlayerLoadGame
+  ; It may fail to progress past here if this is missing.
+  Debug.Trace("[MinAI] OnPlayerLoadGame()")
+  int[] pTweaksVersion = PapyrusTweaks.GetPapyrusTweaksVersion()
+  if !pTweaksVersion
+    Debug.MessageBox("Papyrus Tweaks NG is not installed. This is a critical dependency. Revert to a prior save and install the mod before continuing.")
+    Debug.Trace("[FATAL] Papyrus Tweaks NG is not installed. This is a critical dependency. Revert to a prior save and install the mod before continuing.")
+    ; We may not be able to call MinaiUtil if the dependency is not installed, so raise the message manually here.
+    ; Fatal("Papyrus Tweaks NG is not installed. This is a critical dependency. Revert to a prior save and install the mod before continuing.")
+  Else
+    MainQuestController.Info("Papyrus Tweaks NG detected: " + pTweaksVersion[0] + "." + pTweaksVersion[1] + "." + pTweaksVersion[2])
+  EndIf
   playerRef = game.GetPlayer()
   RegisterForSleep()
   gold = Game.GetFormFromFile(0x00000F, "Skyrim.esm") as Form

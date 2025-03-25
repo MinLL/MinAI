@@ -440,9 +440,6 @@ function BuildNearbyCharactersContext($params) {
         return "";
     }
     
-    // Clean and format the list of characters
-    $localActors = ltrim($localActors, "(");
-    $localActors = rtrim($localActors, ")");
     $characters = explode("|", $localActors);
     // Remove any empty entries and trim each character name
     $characters = array_filter(array_map('trim', $characters), function($item) {
@@ -450,7 +447,10 @@ function BuildNearbyCharactersContext($params) {
     });
     // Ensure herika_name, player_name and target are included without duplicates
     $characters = array_unique(array_merge($characters, array_filter([$herika_name, $player_name, $target])));
-
+    // Remove parentheses from character names
+    $characters = array_map(function($name) {
+        return trim(trim($name, '()'));
+    }, $characters);
 
     // If we have characters after cleaning, create the formatted list
     if (count($characters) > 0) {

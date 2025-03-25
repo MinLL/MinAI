@@ -7,8 +7,14 @@ function get_info_edged_prompt() {
     $cleanedMessage = GetCleanedMessage();
     
     // Extract names from the message if possible
+    // Extract actor name from message like "X was brought right to the edge of orgasm..."
     $targetName = $GLOBALS["target"];
     $target = $GLOBALS["target"];
+    if (preg_match('/^(.*?) was brought right to the edge/', $cleanedMessage, $matches)) {
+        $target = $matches[1];
+        $targetName = $target;
+    }
+
     
     // Check if actor can orgasm
     $canOrgasm = ActorCanOrgasm($target);

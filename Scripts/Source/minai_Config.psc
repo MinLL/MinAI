@@ -306,11 +306,13 @@ bool Property includePromptSelf = True Auto
 int includePromptSelfOID
 
 Event OnConfigInit()
-  main.Info("Building mcm menu.")
+  Debug.Trace("[MinAI] OnConfigInit()")
   InitializeMCM()
+  main.Info("Built mcm menu.")
 EndEvent
 
 Function InitializeMCM()
+  Debug.Trace("[MinAI] InitializeMCM()")
   minai_UseOStim = Game.GetFormFromFile(0x0906, "MinAI.esp") as GlobalVariable
   aiff = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_AIFF
   crimeController = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_Crime

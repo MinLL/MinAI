@@ -332,8 +332,8 @@ function cleanupSlop($contextData) {
             if ($isTimePassMessage && $lastTimePassIndex >= 0) {
                 continue; // Skip adding this as a new entry
             }
-            error_log("DEBUG: Original content: " . $originalContent);
-            error_log("DEBUG: Joined content: " . $joinedContent);
+            ///error_log("DEBUG: Original content: " . $originalContent);
+            ///error_log("DEBUG: Joined content: " . $joinedContent);
             $entry['content'] = $joinedContent;
             $cleaned[] = $entry;
             

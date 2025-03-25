@@ -295,7 +295,7 @@ if (isset($GLOBALS["enable_prompt_slop_cleanup"]) && $GLOBALS["enable_prompt_slo
 
     // Triple the original context history setting
     $GLOBALS["CONTEXT_HISTORY"] = $nDataForContext * 3;
-    error_log("DEBUG: Context history set to " . $GLOBALS["CONTEXT_HISTORY"]);
+    // error_log("DEBUG: Context history set to " . $GLOBALS["CONTEXT_HISTORY"]);
 }
 
 

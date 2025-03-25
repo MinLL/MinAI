@@ -263,38 +263,51 @@ function ProcessIntegrations() {
 
     // Add handling for minai_storeitem and minai_storeitem_batch
     if (isset($GLOBALS["gameRequest"]) && ($GLOBALS["gameRequest"][0] == "minai_storeitem" || $GLOBALS["gameRequest"][0] == "minai_storeitem_batch")) {
+        $start_time = microtime(true);
         minai_log("info", "Processing " . $GLOBALS["gameRequest"][0] . " event");
         
         $data = $GLOBALS["gameRequest"][3];
         $success = true;
 
         if ($GLOBALS["gameRequest"][0] == "minai_storeitem_batch") {
-            // First, check if this is an inventory batch (which includes actor name)
-            $actorName = null;
-            $batchStatus = null;
-            $inventoryData = "";
+            // Add batch size limit
+            $MAX_BATCH_SIZE = 1024 * 1024; // 1MB
+            $MAX_ITEMS_PER_BATCH = 1000;
             
-            // Check if the data contains actor name and batch status
-            $parts = explode("@", $data, 3);
-            if (count($parts) == 3) {
-                $actorName = $parts[0];
-                $batchStatus = $parts[1]; // New: extract batch status
-                $data = $parts[2]; // Remove actor name and status from data for processing
-                
-                // minai_log("info", "Processing inventory batch for {$actorName} with status: {$batchStatus}");
-            } else {
-                minai_log("warn", "Invalid batch format - expected actor@status@data but got: " . substr($data, 0, 50) . "...");
+            $dataSize = strlen($data);
+            if ($dataSize > $MAX_BATCH_SIZE) {
+                minai_log("error", "Batch size ({$dataSize} bytes) exceeds maximum allowed size ({$MAX_BATCH_SIZE} bytes)");
+                die('X-CUSTOM-CLOSE');
             }
             
+            // First, check if this is an inventory batch
+            $parts = explode("@", $data, 3);
+            if (count($parts) != 3) {
+                minai_log("error", "Invalid batch format");
+                die('X-CUSTOM-CLOSE');
+            }
+            
+            $actorName = $parts[0];
+            $batchStatus = $parts[1];
+            $data = $parts[2];
+            
             // Process batched items
-            $items = explode("~", $data);  // Changed from | to ~ as separator
+            $items = explode("~", $data);
+            $itemCount = count($items);
+            
+            if ($itemCount > $MAX_ITEMS_PER_BATCH) {
+                minai_log("error", "Batch item count ({$itemCount}) exceeds maximum allowed items ({$MAX_ITEMS_PER_BATCH})");
+                die('X-CUSTOM-CLOSE');
+            }
+            
+            minai_log("info", "Processing batch: {$itemCount} items, {$dataSize} bytes");
+            
             $processedItemsCount = 0;
             $skippedItemsCount = 0;
             $invalidItemsCount = 0;
+            $inventoryItems = array();
             
-            // Debug log the raw data length
-            $dataLength = strlen($data);
-            // minai_log("debug", "Raw batch data length: {$dataLength} bytes with status: {$batchStatus}");
+            $batch_start = microtime(true);
             
             // For inventory tracking, build a formatted string in the old format
             if ($actorName) {
@@ -411,32 +424,41 @@ function ProcessIntegrations() {
                 }
             }
             
-            // If this was an inventory batch, store the actor's inventory
+            $batch_end = microtime(true);
+            $batch_duration = $batch_end - $batch_start;
+            
+            // Log performance metrics
+            minai_log("info", "Batch processing metrics:");
+            minai_log("info", "- Total items: {$itemCount}");
+            minai_log("info", "- Processed: {$processedItemsCount}");
+            minai_log("info", "- Skipped: {$skippedItemsCount}");
+            minai_log("info", "- Invalid: {$invalidItemsCount}");
+            minai_log("info", "- Processing time: {$batch_duration} seconds");
+            minai_log("info", "- Average time per item: " . ($batch_duration / max(1, $processedItemsCount)) . " seconds");
+            
             if ($actorName && !empty($inventoryItems)) {
-                // Convert to the format expected by the database (formId&count~formId&count...)
-                $inventoryStr = "";
-                foreach ($inventoryItems as $formId => $count) {
-                    if (!empty($inventoryStr)) {
-                        $inventoryStr .= "~";
-                    }
-                    $inventoryStr .= $formId . "&" . $count;
-                }
+                $inv_start = microtime(true);
+                
+                // Convert to the format expected by the database
+                $inventoryStr = implode("~", array_map(
+                    function($formId, $count) { 
+                        return $formId . "&" . $count; 
+                    },
+                    array_keys($inventoryItems),
+                    $inventoryItems
+                ));
                 
                 // Store to appropriate location based on batch status
                 if ($batchStatus == "final") {
-                    // Final batch - store to permanent inventory and clear temporary
                     SetActorValue($actorName, "Inventory", $inventoryStr);
                     SetActorValue($actorName, "Inventory2", "");
-                    // minai_log("info", "Stored FINAL inventory for " . $actorName . " with " . count($inventoryItems) . " items");
                 } else {
-                    // Non-final batch - store to temporary inventory
                     SetActorValue($actorName, "Inventory2", $inventoryStr);
-                    //minai_log("info", "Stored temporary inventory for " . $actorName . " with " . count($inventoryItems) . " items (batch status: " . $batchStatus . ")");
                 }
+                
+                $inv_duration = microtime(true) - $inv_start;
+                minai_log("info", "Inventory storage time: {$inv_duration} seconds");
             }
-            
-            // Log detailed statistics
-            // minai_log("info", "Batch processing complete - Processed: {$processedItemsCount}, Skipped: {$skippedItemsCount}, Invalid: {$invalidItemsCount}");
         } else {
             // Process single item
             $itemData = explode("@", $data);
@@ -457,6 +479,9 @@ function ProcessIntegrations() {
                 minai_log("error", "Invalid item data format, missing required fields");
             }
         }
+        
+        $total_duration = microtime(true) - $start_time;
+        minai_log("info", "Total batch processing time: {$total_duration} seconds");
         
         if (!$success) {
             minai_log("error", "One or more items failed to store");

@@ -693,47 +693,59 @@ function GetLevelDescription($level) {
     // Map interval to description
     switch ($interval) {
         case 1: // Levels 1-5
-            return "barely able to defend themselves";
+            if ($level == 1) return "completely untrained in combat";
+            if ($level == 2) return "just beginning to learn basic combat";
+            if ($level == 3) return "starting to grasp basic self-defense";
+            if ($level == 4) return "learning the fundamentals of combat";
+            return "beginning to understand basic combat techniques";
         case 2: // Levels 6-10
-            return "a novice adventurer";
+            if ($level == 6) return "showing basic combat competence";
+            if ($level == 7) return "developing their novice combat skills";
+            if ($level == 8) return "gaining confidence as a novice fighter";
+            if ($level == 9) return "becoming a capable novice adventurer";
+            return "ready to take on greater challenges as an adventurer";
         case 3: // Levels 11-15
-            return "somewhat experienced";
+            if ($level == 11) return "a fledgling adventurer showing promise";
+            if ($level == 12) return "developing steadily as an adventurer";
+            if ($level == 13) return "growing more confident in their abilities";
+            if ($level == 14) return "showing skill as a developing adventurer";
+            return "progressing well in their combat training";
         case 4: // Levels 16-20
-            return "capable and battle-tested";
+            return "becoming a competent adventurer";
         case 5: // Levels 21-25
-            return "skilled and respected";
+            return "an experienced adventurer with proven skill";
         case 6: // Levels 26-30
-            return "a veteran fighter";
+            return "a seasoned adventurer with considerable experience";
         case 7: // Levels 31-35
-            return "highly proficient";
+            return "a skilled warrior capable of handling serious threats";
         case 8: // Levels 36-40
-            return "quite formidable";
+            return "a veteran fighter respected for their abilities";
         case 9: // Levels 41-45
-            return "a local legend";
+            return "a formidable warrior of considerable renown";
         case 10: // Levels 46-50
-            return "a regional hero";
+            return "known throughout the region for their combat prowess";
         case 11: // Levels 51-55
-            return "renowned throughout the province";
+            return "one of the more accomplished warriors in Skyrim";
         case 12: // Levels 56-60
-            return "feared by most common foes";
+            return "among the notable fighters in the province";
         case 13: // Levels 61-65
-            return "a mighty warrior that few dare challenge";
+            return "recognized as one of Skyrim's elite warriors";
         case 14: // Levels 66-70
-            return "powerful enough to face dragons";
+            return "renowned throughout Skyrim for their combat mastery";
         case 15: // Levels 71-75
-            return "among the strongest in Skyrim";
+            return "one of the most dangerous warriors in the province";
         case 16: // Levels 76-80
-            return "nearly unstoppable in battle";
+            return "possessing combat skills that few can match";
         case 17: // Levels 81-85
-            return "of legendary might";
+            return "wielding power that approaches legendary status";
         case 18: // Levels 86-90
-            return "approaching godlike power";
+            return "displaying might that matches ancient heroes";
         case 19: // Levels 91-95
-            return "possessing otherworldly strength";
+            return "possessing power that few mortals have ever achieved";
         case 20: // Levels 96-100
-            return "of impossible might, rivaling the power of Daedric Princes";
+            return "wielding nearly mythical levels of combat prowess";
         default:
-            return "of unknown power";
+            return "of unknown combat ability";
     }
 }
 
