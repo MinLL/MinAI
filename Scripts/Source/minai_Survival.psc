@@ -496,8 +496,9 @@ Function SetContext(actor akTarget)
         aiff.SetActorVariable(playerRef, "isOnSkooma", false)
       EndIf
     EndIf
-    
-    aiff.SetActorVariable(playerRef, "weather", Weather.GetCurrentWeather())
+    Weather currentWeather = Weather.GetCurrentWeather()
+    aiff.SetActorVariable(playerRef, "weather", currentWeather)
+    aiff.SetActorVariable(playerRef, "windSpeed", PO3_SKSEFunctions.GetWindSpeedAsFloat(currentWeather))
     aiff.SetActorVariable(playerRef, "skyMode", Weather.GetSkyMode())
     aiff.SetActorVariable(playerRef, "currentGameHour", GetCurrentHourOfDay())
   EndIf

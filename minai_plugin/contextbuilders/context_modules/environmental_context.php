@@ -265,25 +265,176 @@ function BuildMoonPhaseContext($params) {
 }
 
 /**
+ * Get description for a location keyword
+ * 
+ * @param string $keyword The location keyword
+ * @return string Description of the location type
+ */
+function GetLocationKeywordDescription($keyword) {
+    $descriptions = [
+        // Settlement Types
+        'city' => 'a major urban center',
+        'town' => 'a smaller urban settlement',
+        'village' => 'a small rural settlement',
+        'settlement' => 'a populated area',
+        
+        // Military & Defensive
+        'fort' => 'a fortified military structure',
+        'castle' => 'a large fortified residence',
+        'keep' => 'a fortified tower or stronghold',
+        'tower' => 'a tall defensive structure',
+        'barracks' => 'military housing quarters',
+        'palace' => 'a grand residence of nobility',
+        
+        // Religious
+        'temple' => 'a place of worship',
+        'temple_of_kynareth' => 'a temple dedicated to Kynareth',
+        'temple_of_talos' => 'a temple dedicated to Talos',
+        'temple_of_arkay' => 'a temple dedicated to Arkay',
+        'temple_of_dibella' => 'a temple dedicated to Dibella',
+        'temple_of_mara' => 'a temple dedicated to Mara',
+        'temple_of_zenithar' => 'a temple dedicated to Zenithar',
+        'temple_of_stendarr' => 'a temple dedicated to Stendarr',
+        'temple_of_julianos' => 'a temple dedicated to Julianos',
+        'temple_of_akatosh' => 'a temple dedicated to Akatosh',
+        
+        // Commercial
+        'tavern' => 'a drinking establishment',
+        'shop' => 'a general store',
+        'general_store' => 'a general goods store',
+        'clothing_store' => 'a clothing and apparel shop',
+        'jewelry_store' => 'a jewelry and gems shop',
+        'book_store' => 'a bookstore',
+        'potion_store' => 'an alchemy shop',
+        'scroll_store' => 'a scroll and spell shop',
+        'weapon_store' => 'a weapons shop',
+        'armor_store' => 'an armor shop',
+        'food_store' => 'a food and provisions shop',
+        'furniture_store' => 'a furniture shop',
+        'black_market' => 'an illicit trading location',
+        
+        // Residential
+        'house' => 'a residential dwelling',
+        'farm' => 'an agricultural property',
+        'mill' => 'a grain processing facility',
+        'stable' => 'a horse stable',
+        'smithy' => 'a blacksmith workshop',
+        'forge' => 'a metalworking facility',
+        'smelter' => 'a metal smelting facility',
+        'tannery' => 'a leather working facility',
+        'fishery' => 'a fishing facility',
+        'brewery' => 'a beer brewing facility',
+        'winery' => 'a wine production facility',
+        'meadery' => 'a mead brewing facility',
+        'bakery' => 'a bread baking facility',
+        'butcher_shop' => 'a meat processing shop',
+        
+        // Guild & Faction
+        'thieves_guild' => 'the Thieves Guild headquarters',
+        'dark_brotherhood' => 'the Dark Brotherhood sanctuary',
+        'companions_guild' => 'the Companions headquarters',
+        'college_of_winterhold' => 'the College of Winterhold',
+        
+        // Dungeon Types
+        'dungeon' => 'an underground complex',
+        'ruin' => 'an ancient ruined structure',
+        'nordic_ruin' => 'an ancient Nordic ruin',
+        'dwemer_ruin' => 'an ancient Dwemer ruin',
+        'cave' => 'a natural cave system',
+        'tomb' => 'an ancient burial site',
+        'crypt' => 'an underground burial chamber',
+        'barrow' => 'an ancient Nordic burial mound',
+        
+        // Enemy Lairs
+        'dragon_lair' => 'a dragon\'s territory',
+        'giant_camp' => 'a giant\'s encampment',
+        'vampire_lair' => 'a vampire\'s lair',
+        'werewolf_lair' => 'a werewolf\'s lair',
+        'falmer_lair' => 'a Falmer settlement',
+        'bandit_camp' => 'a bandit encampment',
+        'military_camp' => 'a military encampment',
+        
+        // Industrial
+        'mine' => 'a mining facility',
+        
+        // Law Enforcement
+        'prison' => 'a prison facility',
+        'jail' => 'a local jail',
+        
+        // Navigation
+        'lighthouse' => 'a coastal navigation aid'
+    ];
+    
+    return isset($descriptions[$keyword]) ? $descriptions[$keyword] : 'a location';
+}
+
+/**
  * Build the location context
  * 
  * @param array $params Parameters including herika_name, player_name, target
  * @return string Formatted location context
  */
 function BuildLocationContext($params) {
-    $player_name = $params['player_name'];
+    $params = ValidateEnvironmentParams($params);
+    $character = $params['player_name'];
     $utilities = new Utilities();
-    $locationContext = GetCurrentLocationContext($player_name);
-    $ret = "";
-    if (!empty($locationContext)) {
-        $ret .= "Current Hold: " . $locationContext['hold'] . ".\n";
-        $ret .= "Current Location: " . $locationContext['current'] . ".\n";
-    }
-    if (IsEnabled($player_name, "isInterior")) {
-        $ret .= "We are indoors, out of the weather and elements.";
+    
+    $context = "";
+    
+    // Get hold information
+    $currentHold = ucwords($utilities->GetActorValue($character, "currentHold"));
+    $hasHold = false;
+    if (!empty($currentHold)) {
+        $context .= "Current Hold: " . $currentHold . ".\n";
+        $hasHold = true;
     }
     
-    return $ret;
+    // Get location information - prefer location over cell
+    $currentLocation = ucwords($utilities->GetActorValue($character, "currentLocation"));
+    $hasLocation = false;
+    if (!empty($currentLocation)) {
+        $context .= "Current Location: " . $currentLocation . ".\n";
+        $hasLocation = true;
+    } else {
+        // Try cell if no location
+        $currentCell = ucwords($utilities->GetActorValue($character, "CurrentCell"));
+        if (!empty($currentCell)) {
+            $context .= "Current Location: " . $currentCell . ".\n";
+            $hasLocation = true;
+        } else {
+            // Last resort: try GetCurrentLocationContext
+            $locationContext = GetCurrentLocationContext($character);
+            if (!empty($locationContext['current'])) {
+                $context .= "Current Location: " . ucwords($locationContext['current']) . ".\n";
+                $hasLocation = true;
+                
+                // Add hold from locationContext if we don't have it
+                if (!$hasHold && !empty($locationContext['hold'])) {
+                    $context = "Current Hold: " . ucwords($locationContext['hold']) . ".\n" . $context;
+                }
+            }
+        }
+    }
+    
+    // Get location keywords and format them
+    $locationKeywords = $utilities->GetActorValue($character, "locationKeywords");
+    if (!empty($locationKeywords)) {
+        $keywords = explode("~", $locationKeywords);
+        $keywords = array_filter($keywords); // Remove empty entries
+        if (count($keywords) > 0) {
+            $descriptions = array_map(function($keyword) {
+                return GetLocationKeywordDescription($keyword);
+            }, $keywords);
+            $context .= "This is " . implode(", ", $descriptions) . ".\n";
+        }
+    }
+    
+    // Check if interior
+    if (IsEnabled($character, "isInterior")) {
+        $context .= "We are indoors, out of the weather and elements.";
+    }
+    
+    return $context;
 }
 
 /**

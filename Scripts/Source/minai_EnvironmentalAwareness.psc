@@ -209,6 +209,7 @@ EndFunction
 function Maintenance(minai_MainQuestController _main)  
   main = _main
   main.Info("Environmental Awareness Initializing")
+  
   aiff = (Self as Quest) as minai_AIFF
   MinaiUtil = (self as Quest) as minai_Util
   bHasFrostfall = False
@@ -219,6 +220,8 @@ function Maintenance(minai_MainQuestController _main)
   endif
   
   playerRef = Game.GetPlayer()
+  ; Store location data
+  SetLocationData(playerRef)
   playerName = main.GetActorName(playerRef)
   If Game.GetModByName("Frostfall.esp") != 255
     GlobalVariable FrostfallRunning = Game.GetFormFromFile(0x06DCFB, "Frostfall.esp") as GlobalVariable
@@ -245,7 +248,7 @@ function SetContext(actor akActor)
   Main.Debug("SetContext EnvironmentalAwareness(" + Main.GetActorName(akActor) + ")")
   string actorName = Main.GetActorName(akActor)
   ; Some variables are only relevant for the player
-  if (akActor == playerRef)
+  if (akActor == playerRef)   
     ; Store day state
     string dayState = GetDayState()
     if (dayState != "")
@@ -256,9 +259,6 @@ function SetContext(actor akActor)
     aiff.SetActorVariable(akActor, "weatherClassification", Weather.GetCurrentWeather().GetClassification() as string)
     ; Store moon data
     StoreMoonData(akActor)
-  
-    ; Store interior status - using direct boolean
-    aiff.SetActorVariable(akActor, "isInterior", akActor.IsInInterior())
   
     ; Weather data
     int weatherInt = Weather.GetCurrentWeather().GetClassification()
@@ -391,3 +391,292 @@ string Function GetCurrentMoonSync()
   endif
   return " moon"
 EndFunction
+
+; New function to handle location data
+function SetLocationData(actor whoCares)
+  actor akActor = playerRef
+  Location currentLoc = akActor.GetCurrentLocation()
+  
+  ; Try alternative methods if GetCurrentLocation returns None
+  if (!currentLoc)
+    ; Try getting location from parent cell
+    Cell parentCell = akActor.GetParentCell()
+    if (parentCell)
+      ; If cell location is None, try getting location directly from cell refs
+      int numRefs = parentCell.GetNumRefs(0) ; 0 to get all refs
+      int i = 0
+      while (!currentLoc && i < numRefs && i < 20)
+        ObjectReference ref = parentCell.GetNthRef(i, 0)
+        currentLoc = ref.GetCurrentLocation()
+        i += 1
+      endwhile
+    endif
+    
+    ; If still no location, try getting from nearby references
+    if (!currentLoc)
+      ObjectReference nearbyRef = PO3_SKSEFunctions.GetObjectUnderFeet(akActor)
+      if (nearbyRef)
+        currentLoc = nearbyRef.GetCurrentLocation()
+      endif
+    endif
+  endif
+  
+  if (currentLoc)
+    ; Store current location name
+    aiff.SetActorVariable(akActor, "currentLocation", currentLoc.GetName())
+    
+    ; Store hold information if available
+    Location holdLoc = PO3_SKSEFunctions.GetParentLocation(currentLoc)
+    if (holdLoc)
+      aiff.SetActorVariable(akActor, "currentHold", holdLoc.GetName())
+    else
+      ; We will use the last known hold if we can't find the current hold
+      ; aiff.SetActorVariable(akActor, "currentHold", "")
+    endif
+  else
+    aiff.SetActorVariable(akActor, "currentLocation", "")
+  EndIf
+  ; Store interior/exterior status
+  aiff.SetActorVariable(akActor, "isInterior", akActor.IsInInterior())
+  
+  ; Store worldspace information
+  WorldSpace currentWorld = playerRef.GetWorldSpace()
+  if (currentWorld)
+    aiff.SetActorVariable(akActor, "currentWorldspace", currentWorld.GetName())
+  else
+    aiff.SetActorVariable(akActor, "currentWorldspace", "")
+  endif
+  
+  ; Store cell information
+  Cell currentCell = akActor.GetParentCell()
+  if (currentCell)
+    aiff.SetActorVariable(akActor, "currentCell", currentCell.GetName())
+  else
+    aiff.SetActorVariable(akActor, "currentCell", "")
+  endif
+  
+  ; Build location keywords string
+  string locationKeywords = ""
+  if (currentLoc)
+    ; Add each keyword if present
+    if (currentLoc.HasKeywordString("LocTypeCity"))
+      locationKeywords += "city~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTown"))
+      locationKeywords += "town~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeVillage"))
+      locationKeywords += "village~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeSettlement"))
+      locationKeywords += "settlement~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeDungeon"))
+      locationKeywords += "dungeon~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeRuin"))
+      locationKeywords += "ruin~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeFort"))
+      locationKeywords += "fort~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTemple"))
+      locationKeywords += "temple~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTavern"))
+      locationKeywords += "tavern~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeShop"))
+      locationKeywords += "shop~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeHouse"))
+      locationKeywords += "house~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeFarm"))
+      locationKeywords += "farm~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeMine"))
+      locationKeywords += "mine~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeCamp"))
+      locationKeywords += "camp~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeMilitaryCamp"))
+      locationKeywords += "military_camp~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeBanditCamp"))
+      locationKeywords += "bandit_camp~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeDragonLair"))
+      locationKeywords += "dragon_lair~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeGiantCamp"))
+      locationKeywords += "giant_camp~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeVampireLair"))
+      locationKeywords += "vampire_lair~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeWerewolfLair"))
+      locationKeywords += "werewolf_lair~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeCave"))
+      locationKeywords += "cave~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTomb"))
+      locationKeywords += "tomb~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeCrypt"))
+      locationKeywords += "crypt~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeBarrow"))
+      locationKeywords += "barrow~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeNordicRuin"))
+      locationKeywords += "nordic_ruin~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeDwemerRuin"))
+      locationKeywords += "dwemer_ruin~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeFalmerLair"))
+      locationKeywords += "falmer_lair~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypePrison"))
+      locationKeywords += "prison~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeJail"))
+      locationKeywords += "jail~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeBarracks"))
+      locationKeywords += "barracks~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypePalace"))
+      locationKeywords += "palace~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeCastle"))
+      locationKeywords += "castle~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeKeep"))
+      locationKeywords += "keep~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTower"))
+      locationKeywords += "tower~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeLighthouse"))
+      locationKeywords += "lighthouse~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeMill"))
+      locationKeywords += "mill~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeStable"))
+      locationKeywords += "stable~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeSmithy"))
+      locationKeywords += "smithy~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeForge"))
+      locationKeywords += "forge~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeSmelter"))
+      locationKeywords += "smelter~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTannery"))
+      locationKeywords += "tannery~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeFishery"))
+      locationKeywords += "fishery~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeBrewery"))
+      locationKeywords += "brewery~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeWinery"))
+      locationKeywords += "winery~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeMeadery"))
+      locationKeywords += "meadery~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeBakery"))
+      locationKeywords += "bakery~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeButcherShop"))
+      locationKeywords += "butcher_shop~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeGeneralStore"))
+      locationKeywords += "general_store~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeClothingStore"))
+      locationKeywords += "clothing_store~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeJewelryStore"))
+      locationKeywords += "jewelry_store~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeBookStore"))
+      locationKeywords += "book_store~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypePotionStore"))
+      locationKeywords += "potion_store~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeScrollStore"))
+      locationKeywords += "scroll_store~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeWeaponStore"))
+      locationKeywords += "weapon_store~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeArmorStore"))
+      locationKeywords += "armor_store~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeFoodStore"))
+      locationKeywords += "food_store~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeFurnitureStore"))
+      locationKeywords += "furniture_store~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeBlackMarket"))
+      locationKeywords += "black_market~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeThievesGuild"))
+      locationKeywords += "thieves_guild~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeDarkBrotherhood"))
+      locationKeywords += "dark_brotherhood~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeCompanionsGuild"))
+      locationKeywords += "companions_guild~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeCollegeOfWinterhold"))
+      locationKeywords += "college_of_winterhold~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTempleOfKynareth"))
+      locationKeywords += "temple_of_kynareth~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTempleOfTalos"))
+      locationKeywords += "temple_of_talos~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTempleOfArkay"))
+      locationKeywords += "temple_of_arkay~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTempleOfDibella"))
+      locationKeywords += "temple_of_dibella~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTempleOfMara"))
+      locationKeywords += "temple_of_mara~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTempleOfZenithar"))
+      locationKeywords += "temple_of_zenithar~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTempleOfStendarr"))
+      locationKeywords += "temple_of_stendarr~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTempleOfJulianos"))
+      locationKeywords += "temple_of_julianos~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTempleOfAkatosh"))
+      locationKeywords += "temple_of_akatosh~"
+    endif
+  EndIf
+  
+  ; Store the location keywords string
+  aiff.SetActorVariable(akActor, "locationKeywords", locationKeywords)
+  aiff.SetActorVariable(akActor, "isTrespassing", playerRef.IsTrespassing())
+  main.Info("Set location data")
+
+endfunction
