@@ -1,5 +1,23 @@
 <?php
+$fast_commands = ["addnpc","updateprofile","diary","_quest","setconf","request","_speech","infoloc","infonpc","infonpc_close",
+"infoaction","status_msg","delete_event","itemfound","_questdata","_uquest","location","_questreset","chat"];
+if (isset($GLOBALS["external_fast_commands"])) {
+    $fast_commands = array_merge($fast_commands, $GLOBALS["external_fast_commands"]);
+}
+// $fast_commands = [];
+// Check for exact matches against fast commands
+if (isset($GLOBALS["gameRequest"]) && in_array($GLOBALS["gameRequest"][0], $fast_commands)) {
+    $GLOBALS["minai_skip_processing"] = true;
+}
+else {
+    error_log("Processing Non-Fast request: " . $GLOBALS["gameRequest"][0]);
+}
 
+
+// Avoid processing for fast / storage events
+if (isset($GLOBALS["minai_skip_processing"]) && $GLOBALS["minai_skip_processing"]) {
+    return;
+}
 require_once("util.php");
 require_once("contextbuilders.php");
 require_once("roleplaybuilder.php");

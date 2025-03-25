@@ -52,3 +52,4 @@ $GLOBALS["external_fast_commands"] = [
     // "minai_storeitem_batch"  // Store multiple items
     // "minai_clearinventory"    // Clear inventory
 ];
+

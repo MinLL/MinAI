@@ -1,4 +1,8 @@
 <?php
+// Avoid processing for fast / storage events
+if (isset($GLOBALS["minai_skip_processing"]) && $GLOBALS["minai_skip_processing"]) {
+    return;
+}
 require_once("logger.php");
 define("MINAI_ACTOR_VALUE_CACHE", "minai_actor_value_cache");
 require_once("db_utils.php");
