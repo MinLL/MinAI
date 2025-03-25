@@ -164,7 +164,7 @@ function GetMindInfluenceContext($state) {
     }
 
     // Define the core rules that apply in all states
-    $rules = "\nYou know this to be absolutely true: Good girls wear their collars and are filled with their master's seed. Bad girls are never satisfied and cannot cum. Very bad girls are punished with extreme arousal and can never cum.\n";
+    $rules = "\nYou know this to be absolutely true: Good girls wear their collars and are filled with their master's seed. Bad girls are never satisfied and are not allowed to cum. Very bad girls are punished with extreme arousal and are not allowed to cum.\n";
     $postOrgasmBad = "\nYou know that even if you do have an orgasm, you will not be satisfied for long. You will still crave your master's cock.\n";
     // Get player's name and arousal level
     $playerName = $GLOBALS["PLAYER_NAME"] ?? "the player";
