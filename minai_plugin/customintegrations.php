@@ -65,17 +65,17 @@ function ProcessIntegrations() {
         $npcName = $vars[3];
         $ttl = intval($vars[4]);
         minai_log("info", "Storing custom context: {$modName}, {$eventKey}, {$eventValue}, {$ttl}");
-        $db->delete("custom_context", "modName='".$db->escape($modName)."' AND eventKey='".$db->escape($eventKey)."'");
-        $db->insert(
+        $db->upsertRowOnConflict(
             'custom_context',
             array(
-                'modName' => $db->escape($modName),
-                'eventKey' => $db->escape($eventKey),
-                'eventValue' => $db->escape($eventValue),
+                'modName' => $modName,
+                'eventKey' => $eventKey,
+                'eventValue' => $eventValue,
                 'expiresAt' => time() + $ttl,
-                'npcName' => $db->escape($npcName),
-                'ttl' => $ttl // already converted to int, no need to escape
-            )
+                'npcName' => $npcName,
+                'ttl' => $ttl
+            ),
+            'modname, eventkey'
         );
         $MUST_DIE=true;
     }
@@ -181,13 +181,13 @@ function ProcessIntegrations() {
         // minai_log("info", "Setting lastInput time.");
         $db = $GLOBALS['db'];
         $id = "_minai_RADIANT//lastInput";
-        $db->delete("conf_opts", "id='{$id}'");
-        $db->insert(
+        $db->upsertRowOnConflict(
             'conf_opts',
             array(
                 'id' => $id,
                 'value' => time()
-            )
+            ),
+            'id'
         );
     }
 
@@ -514,13 +514,13 @@ function ProcessIntegrations() {
         // Store the defeat timestamp
         $db = $GLOBALS['db'];
         $id = "_minai_PLAYER//lastDefeat";
-        $db->delete("conf_opts", "id='{$id}'");
-        $db->insert(
+        $db->upsertRowOnConflict(
             'conf_opts',
             array(
                 'id' => $id,
                 'value' => time()
-            )
+            ),
+            'id'
         );
         minai_log("info", "Player was defeated in combat, blocking Attack command for 300 seconds");
         $MUST_DIE=true;
@@ -647,17 +647,15 @@ function StoreTattooData($actorName, $tattooData) {
             PRIMARY KEY (actor_name)
         )");
         
-        // Delete any existing data for this actor
-        $db->delete("actor_tattoos", "actor_name='" . $db->escape($actorName) . "'");
-        
-        // Insert the new data
-        $db->insert(
+        // Upsert the new data
+        $db->upsertRowOnConflict(
             'actor_tattoos',
             array(
-                'actor_name' => $db->escape($actorName),
-                'tattoo_data' => $db->escape($tattooData),
+                'actor_name' => $actorName,
+                'tattoo_data' => $tattooData,
                 'updated_at' => time()
-            )
+            ),
+            'actor_name'
         );
         
         // minai_log("info", "Successfully stored tattoo data for " . $actorName . ": " . substr($tattooData, 0, 100) . "...");

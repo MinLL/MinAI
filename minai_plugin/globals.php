@@ -18,8 +18,10 @@ $GLOBALS["TTS_FALLBACK_FNCT"] = function($responseTextUnmooded, $mood, $response
         $GLOBALS["speaker"] = $GLOBALS["HERIKA_NAME"];
     $race = str_replace(" ", "", strtolower(GetActorValue($GLOBALS["speaker"], "Race")));
     $gender = strtolower(GetActorValue($GLOBALS["speaker"], "Gender"));
-    $fallback = $GLOBALS["voicetype_fallbacks"][$gender.$race];
-    if (!$fallback) {
+    if ($gender.$race) {
+        $fallback = $GLOBALS["voicetype_fallbacks"][$gender.$race];
+    }
+    if (!isset($fallback)) {
         minai_log("info", "Warning: Could not find fallback for {$GLOBALS["speaker"]}: {$gender}{$race}. Using last resort fallback: malecommoner");
         $fallback = "malecommoner";
     }

@@ -142,8 +142,8 @@ function replaceActorsNamesInSceneDesc($actors, $sceneDesc) {
 }
 
 function getXPersonality($currentName) {
-    $codename=strtr(strtolower(trim($currentName)),[" "=>"_","'"=>"+"]);
-    $queryRet = $GLOBALS["db"]->fetchAll("SELECT * from minai_x_personalities WHERE LOWER(id) = LOWER('$currentName')");
+    $codename=strtr(strtolower(trim($GLOBALS["db"]->escape($currentName))),[" "=>"_","'"=>"+"]);
+    $queryRet = $GLOBALS["db"]->fetchAll("SELECT * from minai_x_personalities WHERE LOWER(id) = LOWER('$codename')");
     $jsonXPersonality = null;
     if ($queryRet)
         $jsonXPersonality =  $queryRet[0]["x_personality"];

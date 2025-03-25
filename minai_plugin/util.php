@@ -90,28 +90,21 @@ function ActorCanOrgasm($name) {
  * @return bool True if successful
  */
 function SetActorValue($name, $key, $value) {
-    $db = $GLOBALS['db'];
-    $name = $db->escape($name);
-    $key = $db->escape($key);
-    $value = $db->escape($value);
-    $id = "_minai_{$name}//{$key}";
-    
-    // Delete existing value
-    $db->delete("conf_opts", "id='{$id}'");
-    
-    // Insert new value
-    return $db->insert(
+    // Upsert new value
+    return $GLOBALS['db']->upsertRowOnConflict(
         'conf_opts',
         array(
-            'id' => $id,
+            'id' => "_minai_{$name}//{$key}",
             'value' => $value
-        )
+        ),
+        'id'
     );
 }
 
 // Return the specified actor value.
 // Caches the results of several queries that are repeatedly referenced.
 Function GetActorValue($name, $key, $preserveCase=false, $skipCache=false) {
+    $db = $GLOBALS['db'];
     // minai_log("info", "Looking up $name: $key");
     If (!$preserveCase && !$skipCache) {
         $name = strtolower($name);
@@ -126,10 +119,11 @@ Function GetActorValue($name, $key, $preserveCase=false, $skipCache=false) {
     }
 
     // return strtolower("JobInnkeeper,Whiterun,,,,Bannered Mare Services,,Whiterun Bannered Mare Faction,,SLA TimeRate,sla_Arousal,sla_Exposure,slapp_HaveSeenBody,slapp_IsAnimatingWKidFaction,");
-    $query = "select * from conf_opts where LOWER(id)=LOWER('_minai_{$name}//{$key}')";
+    $name = $db->escape($name);
+    $query = "select * from conf_opts where LOWER(id)=LOWER('_minai_{$db->escape($name)}//{$db->escape($key)}')";
     if ($preserveCase) {
         $tmp = strtolower($name);
-        $query = "select * from conf_opts where LOWER(id)='_minai_{$tmp}//{$key}'";
+        $query = "select * from conf_opts where LOWER(id)='_minai_{$db->escape($tmp)}//{$db->escape($key)}'";
     }
     $ret = $GLOBALS["db"]->fetchAll($query);
     if (!$ret) {
@@ -325,31 +319,31 @@ if (isset($GLOBALS["force_aiff_name_to_ingame_name"]) && $GLOBALS["force_aiff_na
 Function StoreRadiantActors($actor1, $actor2) {
     $db = $GLOBALS['db'];
     $id = "_minai_RADIANT//actor1";
-    $db->delete("conf_opts", "id='{$id}'");
-    $db->insert(
+    $db->upsertRowOnConflict(
         'conf_opts',
         array(
             'id' => $id,
             'value' => $actor1
-        )
+        ),
+        'id'
     );
     $id = "_minai_RADIANT//actor2";
-    $db->delete("conf_opts", "id='{$id}'");
-    $db->insert(
+    $db->upsertRowOnConflict(
         'conf_opts',
         array(
             'id' => $id,
             'value' => $actor2
-        )
+        ),
+        'id'
     );
     $id = "_minai_RADIANT//initial";
-    $db->delete("conf_opts", "id='{$id}'");
-    $db->insert(
+    $db->upsertRowOnConflict(
         'conf_opts',
         array(
             'id' => $id,
             'value' => 'TRUE'
-        )
+        ),
+        'id'
     );
     minai_log("info", "Storing Radiant Actors");
 }
