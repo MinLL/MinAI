@@ -110,11 +110,21 @@ function BuildInteractionContext($params) {
     $is_self_narrator = isset($params['is_self_narrator']) ? $params['is_self_narrator'] : false;
     $player_name = isset($params['player_name']) ? $params['player_name'] : "";
     
-    if ($is_self_narrator) {
-        return "You are {$player_name}'s inner voice, providing thoughts, perspective, and advice directly to them.";
+    $ret = "";
+    // Only check trespassing for player, follower, or narrator interactions
+    if ($target === $player_name || $GLOBALS["HERIKA_NAME"] === "The Narrator" || IsFollower($target)) {
+        if (IsEnabled($player_name, "isTrespassing")) {
+            $ret .= "{$target} is currently trespassing in this location.\n";
+        }
     }
-    
-    return "You are currently interacting with {$target}.";
+    if ($is_self_narrator) {
+        $ret .= "You are {$player_name}'s inner voice, providing thoughts, perspective, and advice directly to them.";
+    }
+    else {
+        $ret .= "You are currently interacting with {$target}.";
+    }
+
+    return $ret;
 }
 
 /**
