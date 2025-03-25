@@ -1,4 +1,9 @@
 <?php
+// Avoid processing for fast / storage events
+if (isset($GLOBALS["minai_skip_processing"]) && $GLOBALS["minai_skip_processing"]) {
+    return;
+}
+
 require_once("config.php");
 require_once("util.php");
 require_once("sexPrompts.php");

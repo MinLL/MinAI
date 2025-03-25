@@ -1,4 +1,9 @@
 <?php
+// Avoid processing for fast / storage events
+if (isset($GLOBALS["minai_skip_processing"]) && $GLOBALS["minai_skip_processing"]) {
+    return;
+}
+
 require_once("util.php");
 $GLOBALS["PATCH_PROMPT_ENFORCE_ACTIONS"] = true;
 $target = GetTargetActor();
