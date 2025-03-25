@@ -552,7 +552,11 @@ function GetCurrentLocationContext($actor) {
     // Process results to extract location information
     foreach ($results as $row) {
         $locationString = $row["location"];
-        preg_match('/Context\s*(new\s*)?location:\s*([^$,]+)/', $locationString, $locationMatch);
+        
+        // Match location with optional "Context" prefix, optional "new" keyword, and optional "outdoors" as part of location
+        preg_match('/Context\s*(new\s*)?location:\s*([^$]+?(?:\s*,\s*outdoors)?(?=\s*[,$]))/', $locationString, $locationMatch);
+        
+        // Match hold information if present
         preg_match('/Hold:\s*([^$,\)]+)/', $locationString, $holdMatch);
         
         // Match date information in format like "Current Date in Skyrim World: Turdas, 15:50, 3rd Day of Winter"
@@ -561,13 +565,20 @@ function GetCurrentLocationContext($actor) {
         // Match buildings/passages information
         preg_match('/buildings to go:(.+), Current/', $locationString, $buildingsMatch);
         
-        if (isset($locationMatch[2]) && isset($holdMatch[1])) {
+        // Process location if we found it
+        if (isset($locationMatch[2])) {
             $location = trim($locationMatch[2]);
-            $hold = trim($holdMatch[1]);
-            
             $locationData['current'] = $location;
-            $locationData['hold'] = $hold;
-            $locationData['full'] = "$location, hold: $hold";
+            
+            // Process hold if present
+            if (isset($holdMatch[1])) {
+                $hold = trim($holdMatch[1]);
+                $locationData['hold'] = $hold;
+                $locationData['full'] = "$location, hold: $hold";
+            } else {
+                // If no hold, just use the location as the full string
+                $locationData['full'] = $location;
+            }
             
             // Add date information if available
             if (isset($dateMatch[1])) {
