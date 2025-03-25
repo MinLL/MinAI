@@ -41,7 +41,7 @@ if (!file_exists("$pluginPath/config.php")) {
 require_once("config.php");
 require_once("util.php");
 require_once("customintegrations.php");
-require_once("deviousnarrator.php");
+require_once("functions/deviousnarrator.php");
 require_once("items.php");
 require_once("functions/action_builder.php");
 
@@ -90,7 +90,7 @@ if (!IsInFaction($GLOBALS["HERIKA_NAME"], "NoActionsFaction")) {
                 require "functions/slapp.php";
             }
         }
-        require_once("deviousnarrator.php");
+        require_once("functions/deviousnarrator.php");
         if (ShouldUseDeviousNarrator()) {
             // Anything loaded after this will have functions enabled for the narrator
             EnableDeviousNarratorActions();

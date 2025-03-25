@@ -48,7 +48,7 @@ if (IsEnabled($GLOBALS["PLAYER_NAME"], "isSinging")) {
 }
 
 
-require_once("deviousnarrator.php");
+require_once("functions/deviousnarrator.php");
 if (ShouldUseDeviousNarrator()) {
     SetDeviousNarrator();
 }
