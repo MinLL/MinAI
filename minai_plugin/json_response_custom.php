@@ -27,10 +27,10 @@ if (IsEnabled($GLOBALS["PLAYER_NAME"], "isSinging")) {
 else*/
 if (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"] && $GLOBALS["HERIKA_NAME"] == "The Narrator") {
     $pronouns = GetActorPronouns($GLOBALS["PLAYER_NAME"]);
-	$GLOBALS["responseTemplate"]["character"] = IsExplicitScene() ? $GLOBALS["PLAYER_NAME"] . "'s body" : $GLOBALS["PLAYER_NAME"] . "'s subconscious";
-	$GLOBALS["responseTemplate"]["listener"] = IsExplicitScene()
-		? "{$GLOBALS['PLAYER_NAME']} is reacting to physical sensations"
-		: "{$GLOBALS['PLAYER_NAME']} is thinking to {$pronouns['object']}self";
+    $GLOBALS["responseTemplate"]["character"] = IsExplicitScene() ? $GLOBALS["PLAYER_NAME"] . "'s body" : $GLOBALS["PLAYER_NAME"] . "'s subconscious";
+    $GLOBALS["responseTemplate"]["listener"] = IsExplicitScene()
+        ? "{$GLOBALS['PLAYER_NAME']} is reacting to physical sensations"
+        : "{$GLOBALS['PLAYER_NAME']} is thinking to {$pronouns['object']}self";
     
     // Only include response tones if TTSFUNCTION is zonos_gradio
     if (zonosIsActive()) {
