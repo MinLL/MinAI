@@ -123,16 +123,6 @@ function InitializeEnvironmentalContextBuilders() {
         'builder_callback' => 'BuildFrostfallContext'
     ]);
     
-    // Register character state context builder
-    $registry->register('character_state', [
-        'section' => 'environment',
-        'header' => 'Character State',
-        'description' => 'Sitting, sleeping, swimming, etc.',
-        'priority' => 30,
-        'enabled' => isset($GLOBALS['minai_context']['character_state']) ? (bool)$GLOBALS['minai_context']['character_state'] : true,
-        'builder_callback' => 'BuildCharacterStateContext'
-    ]);
-    
     // Register nearby characters context builder
     $registry->register('nearby_characters', [
         'section' => 'environment',
@@ -499,73 +489,6 @@ function BuildFrostfallContext($params) {
     $coverageRating = $utilities->GetActorValue($character, "coverageRating");
     if (!empty($coverageRating)) {
         $context .= $character . " " . $coverageRating . " ";
-    }
-    
-    return $context;
-}
-
-/**
- * Build the character state context
- * 
- * @param array $params Parameters including herika_name, player_name, target
- * @return string Formatted character state context
- */
-function BuildCharacterStateContext($params) {
-    $params = ValidateEnvironmentParams($params);
-    $character = $params['target'];
-    $utilities = new Utilities();
-    
-    $context = "";
-    
-    // Sitting state - interpret the raw sit state value
-    $sitStateValue = $utilities->GetActorValue($character, "sitState");
-    if (!empty($sitStateValue)) {
-        $sitStateDesc = "";
-        switch (intval($sitStateValue)) {
-            case 4: 
-                $sitStateDesc = "sitting but wants to stand";
-                break;
-            case 3: 
-                $sitStateDesc = "sitting";
-                break;
-            case 2: 
-                $sitStateDesc = "wants to sit";
-                break;
-            case 0: 
-            default:
-                $sitStateDesc = "";
-                break;
-        }
-        
-        if (!empty($sitStateDesc)) {
-            $context .= $character . " is " . $sitStateDesc . ". ";
-        }
-    }
-    
-    // Sleep state
-    $sleepState = $utilities->GetActorValue($character, "sleepState");
-    if (!empty($sleepState)) {
-        $context .= $character . " is " . $sleepState . ". ";
-    }
-    
-    // Encumbrance
-    if (IsEnabled($character, "isEncumbered")) {
-        $context .= $character . " is overly encumbered and slow to move, carrying exhausting weight. ";
-    }
-    
-    // Mount status
-    if (IsEnabled($character, "isOnMount")) {
-        $context .= $character . " is riding a horse. ";
-    }
-    
-    // Swimming status
-    if (IsEnabled($character, "isSwimming")) {
-        $context .= $character . " is swimming. ";
-    }
-    
-    // Sneaking status
-    if (IsEnabled($character, "isSneaking")) {
-        $context .= $character . " is sneaking. ";
     }
     
     return $context;
