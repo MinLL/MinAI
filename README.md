@@ -5,20 +5,41 @@ Documentation for modders can be found [here](https://github.com/MinLL/MinAI/blo
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/S6S51B7MJA)
  
- ## Description
+## Description
 
-This mod serves as an interface bridging Large Language Models (LLM)'s with a number of Skyrim's mods, as well as a number of vanilla features. This mod's goal is to enable seamless AI interaction with any NPC in the world and provide completely unscripted, dynamically generated, fully voiced roleplay scenarios that integrate with in-game mechanics and features with supported mods.
+MinAI is a comprehensive enhancement to CHIM that transforms Skyrim into a living, breathing world where every NPC possesses true artificial intelligence. This mod serves as a sophisticated interface between Large Language Models (LLMs) and Skyrim's vast ecosystem of mods and vanilla features, enabling unprecedented levels of dynamic interaction and roleplay.
 
-Due to this utilizing an LLM, the results can be unpredictable. Sometimes the AI can be uncooperative or unreasonable. It works pretty well most of the time though. There are absolutely no predefined scenarios in this mod - Anything you encounter is generated based off of the circumstances in your world, the NPC's personality you're interacting with, and the LLM's whims.
+### Core Features
+* **Universal NPC Intelligence**: Every NPC in the world can be interacted with naturally through conversation
+* **Dynamic Roleplay Scenarios**: Completely unscripted, AI-generated interactions that adapt to your character, the world state, and NPC personalities
+* **Seamless Integration**: Deep integration with popular Skyrim mods and vanilla features
+* **Contextual Awareness**: NPCs understand and react to their environment, relationships, and world state
+* **Natural Dialogue**: Fully voiced conversations that feel natural and contextual
+* **Dungeon Master Tools**: Create custom scenarios and guide NPC behavior through voice or text input
+* **Smart Diary System**: Dynamic diary updates that reflect your adventures and relationships
 
-This release should be considered a beta. It may be janky, have bugs, or strange NPC behavior from the LLM. I have tested this quite a bit over several play-throughs and it's been working well. I am looking for additional feedback on potential integrations. Due to the nature of this mod's integration, it is extremely unlikely to break your savegame in future updates, which will most likely always be backwards compatible.
+### Technical Highlights
+* **Modular Architecture**: Highly maintainable and extensible codebase
+* **Enhanced Context System**: Sophisticated context management that provides rich, relevant information to the LLM
+* **Action Framework**: Flexible system for registering and managing NPC actions
+* **Configurable Integration**: Each feature can be enabled/disabled through the MCM menu
 
-This mod requires you to fund an openrouter.ai account, or run a model locally. The costs for leveraging the LLM are quite cheap - in 4 days of play while developing this mod, I spent less than $1.00 USD in credits - you should expect to pay a few cents for a given play-session. I highly recommend using openrouter instead of trying to run a model locally, as it requires a prohibitive amount of hardware to run locally. I had worse results using an rtx 3090 exclusively dedicated to the AI than just leveraging openrouter.
+### World Integration
+* **Environmental Awareness**: NPCs understand weather, time of day, location, and surroundings
+* **Relationship Dynamics**: Complex relationship tracking between NPCs and the player
+* **Crime System**: Sophisticated bounty and crime tracking across all holds
+* **Item Management**: Natural item exchange and trading through conversation
+* **Survival Systems**: Integration with popular survival mods for realistic needs
+
+### NSFW
+* This mod enables a number of optional [nsfw](https://github.com/MinLL/MinAI/blob/main/nsfw.md) integrations that are disabled by default. These will not effect your game unless you have the nsfw mods installed.
+
+
+Due to utilizing an LLM, interactions can be unpredictable at times. The AI may occasionally be uncooperative or unreasonable, but it generally provides engaging and immersive experiences. There are no predefined scenarios - everything is generated dynamically based on your world state, NPC personalities, and the LLM's contextual understanding.
+
+This mod requires an openrouter.ai account or local model setup. We recommend using openrouter over local models, as it provides better results even compared to dedicated hardware setups.
 
 ## Features and Currently Supported Integrations
-
-### Mantella or CHIM
-* Mantella and CHIM are both supported. However, this mod's capabilities are much, much more advanced for CHIM than Mantella. Mantella's feature-set is effectively frozen, and new development is focused around CHIM.
 
 ## CHIM Extensions
 * This mod contains a number of quality of life improvements for CHIM.
@@ -37,7 +58,8 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
   * "Min: That's awesome!" → "Min: By Ysmir, that's incredible!"
 
 ### Sapience
-* This mod exposes an option allowing you to dynamically enable / disable AI for all actors near the player. This generally means that you can just walk up to any NPC in the world, and start interacting with them seamlessly. This also implements radiant dialogue (Similar to the mantella feature), except more powerful / less buggy.
+* This mod exposes an option allowing you to dynamically enable / disable AI for all actors near the player. This generally means that you can just walk up to any NPC in the world, and start interacting with them seamlessly. This also implements radiant dialogue, except more powerful / less buggy.
+
 ### CHIM-Specific Configuration Options:
 (found in File Explorer: \\wsl.localhost\DwemerAI4Skyrim3\var\www\html\HerikaServer\ext\minai_plugin\config.php)
 (You can easily access this folder by running the tools/AI-FF Plugins Folder file in your DwemerAI4Skyrim3 directory)
@@ -234,32 +256,20 @@ Here are some examples of how you can use the dungeon master feature:
 - **Set Up Scenarios**: "A hidden treasure chest is visible behind the waterfall."
 - **Create Atmosphere**: "The tavern is unusually crowded tonight, with many patrons celebrating."
 
-### NSFW
-This mod enables a number of optional [nsfw](https://github.com/MinLL/MinAI/blob/main/nsfw.md) integrations that are disabled by default. These will not effect your game unless you have the nsfw mods installed.
-
 # Installation
 ## Requirements
-* This mod requires a functional installation of either [CHIM](https://www.nexusmods.com/skyrimspecialedition/mods/126330), [Mantella](https://www.nexusmods.com/skyrimspecialedition/mods/98631), or both (and their respective dependencies). DO THIS FIRST and seek assistance in those forums. When you are up and running well, return here and continue installation as follows:
+* This mod requires a functional installation of [CHIM](https://www.nexusmods.com/skyrimspecialedition/mods/126330) and its dependencies. DO THIS FIRST and seek assistance in those forums. When you are up and running well, return here and continue installation as follows:
 * [Papyrus Tweaks NG](https://www.nexusmods.com/skyrimspecialedition/mods/77779).
 * [JContainers SE](https://www.nexusmods.com/skyrimspecialedition/mods/16495).
 * [powerofthree's Papyrus Extender](https://www.nexusmods.com/skyrimspecialedition/mods/22854). (VR: also install [Papyrus Extender VR](https://www.nexusmods.com/skyrimspecialedition/mods/58296))
 * [Spell Perk Item Distributor (SPID)](https://www.nexusmods.com/skyrimspecialedition/mods/36869), if using MinAI's Sapience feature. (VR: [Spell Perk Item Distributor (SPID) VR](https://www.nexusmods.com/skyrimspecialedition/mods/59121))
 * See the features section. All supported mods are soft requirements. 
 
-## Installation Steps (CHIM)
+## Installation Steps
 * Download and install this mod through your mod organizer of choice.
 * Use the CHIM plugin manager to install the plugin (Server Plugins -> Plugin Manager)
 * Navigate to the configuration page for MinAI (From the plugins page), and configure the mod to your liking.
 
-## Installation Steps (MANTELLA)
-* Download and install this mod's archive through your mod organizer of choice.
-* Use the Mantella Web Interface to configure the prompts for this mod (main, multi-npc, and radiant). I ship two sets of prompts: A very kinky set for submissive female characters in the example configuration, and a more vanilla set in vanilla_prompts.txt. If you're not sure which to use, I'd suggest using the vanilla prompts. Replace the skyrim, multi-npc, and radiant prompts with the ones provided by this mod.
-* In the Mantella Web Interface under Other, set the "Max Count Events" setting to a minimum of 15. I use 50 with the full set of integrations.
-* (Recommended, Optional) Enable Radiant Dialogue in Mantella's MCM setting. This has a lot of very good and fun interactions when combined with this mod.
-* (Optional) If you want a specific character to roleplay in a specific manner, or have a specific personality, edit the skyrim_characters.csv file that ships with Mantella to update that character's bio.
-* (Optional) Change the language model that's being used. I am using nousresearch/hermes-3-llama-3.1-70b, and have had good results with it. Feel free to try other models though, and share your experience!
-
 # Known Issues
 * The AI can be unpredictable at times. This is due to the nature of using an LLM. Refining the prompt, or customizing the personality of the npc you're interacting with can help with this.
-* Sometimes the AI refuses to use the keywords that trigger events (Such as -teaseweak-). If this happens, remind the NPC to use the keywords. This is much more of an issue with Mantella than CHIM, where this issue does not really happen much.
 
