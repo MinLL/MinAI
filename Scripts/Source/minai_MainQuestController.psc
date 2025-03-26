@@ -166,6 +166,11 @@ EndFunction
 
 
 Function RegisterEvent(String eventLine, string eventType = "")
+  ; Check to see if eventType starts with info_. Since this is intended to be informational only, we will enforce this.
+  if eventType != "" && StringUtil.Find(eventType, "info_") != 0
+    eventType = "info_" + eventType
+  endif
+  
   Debug("Main - RegisterEvent(" + eventLine + ", " + eventType + ")")
   if bHasMantella
     minMantella.RegisterEvent(eventLine)
@@ -260,10 +265,17 @@ string Function GetYouYour(actor akCaster)
 EndFunction
 
 int function CountMatch(string sayLine, string lineToMatch)
+  if !sayLine || !lineToMatch
+    return 0
+  endif
+  
   int count = 0
-  int index = 0
-  while index != -1 && count < 30
-    index = StringUtil.Find(sayLine, lineToMatch, index+1)
+  int index = -1
+  while count < 30
+    index = StringUtil.Find(sayLine, lineToMatch, index + 1)
+    if index == -1
+      return count
+    endif
     count += 1
   endWhile
   return count

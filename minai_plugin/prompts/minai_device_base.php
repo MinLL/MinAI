@@ -135,6 +135,11 @@ function RegisterDeviceEvents($deviceType, $handler) {
             "cue" => [],
             "player_request" => [$prompt]
         ];
+        // register info variant
+        $GLOBALS["PROMPTS"]["info_minai_equip_" . $deviceType] = [
+            "cue" => [],
+            "player_request" => [$prompt]
+        ];
     } elseif ($GLOBALS["gameRequest"][0] == "minai_unequip_" . $deviceType) {
         $prompt = $handler->getUnequipPrompt();
         $GLOBALS["PROMPTS"]["minai_unequip_" . $deviceType] = [
@@ -143,6 +148,11 @@ function RegisterDeviceEvents($deviceType, $handler) {
         ];
         // register info variant
         $GLOBALS["PROMPTS"]["info_unequip_" . $deviceType] = [
+            "cue" => [],
+            "player_request" => [$prompt]
+        ];
+        // register info variant
+        $GLOBALS["PROMPTS"]["info_minai_unequip_" . $deviceType] = [
             "cue" => [],
             "player_request" => [$prompt]
         ];

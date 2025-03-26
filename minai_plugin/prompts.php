@@ -173,25 +173,7 @@ else {
 
 $cleanedMessage = GetCleanedMessage();
 
-// Register prompts only if specifically requested
-if ($GLOBALS["gameRequest"][0] == "chatnf_minai_narrate") {
-    $narratePrompt = "The Narrator: {$cleanedMessage}";
-    $GLOBALS["PROMPTS"]["chatnf_minai_narrate"] = [
-        "cue"=>[
-        ],
-        "player_request"=>[$narratePrompt]
-    ];
-    OverrideGameRequestPrompt($narratePrompt);
-}
 
-if ($GLOBALS["gameRequest"][0] == "minai_narrate") {
-    $narratePrompt = "The Narrator: {$cleanedMessage}";
-    $GLOBALS["PROMPTS"]["minai_narrate"] = [
-        "cue"=>[],
-        "player_request"=>[$narratePrompt]
-    ];
-    OverrideGameRequestPrompt($narratePrompt);
-}
 
 if (isset($GLOBALS["minai_processing_input"]) && $GLOBALS["minai_processing_input"]) {
     error_log("PROCESSING INPUT");
@@ -214,3 +196,4 @@ if (isset($GLOBALS["minai_processing_input"]) && $GLOBALS["minai_processing_inpu
 require_once("prompts/tntr_prompts.php");
 require_once("prompts/fillherup_prompts.php");
 require_once("prompts/vibrator_prompts.php");
+require_once("prompts/info_narrate.php");
