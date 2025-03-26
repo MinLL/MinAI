@@ -60,7 +60,7 @@ float property inventoryBurstWindow = 1.0 auto hidden
 bool property useInventoryBurstProtection = true auto hidden
 
 ; Maximum number of items to send in a single batch
-int property maxInventoryBatchSize = 30 auto hidden
+int property maxInventoryBatchSize = 120 auto hidden
 
 ; Add new property to track last dialogue time for actors
 int Property lastDialogueTimes Auto  ; JMap of actor names to timestamps
@@ -440,7 +440,6 @@ Function SetContext(actor akTarget)
   arousal.SetContextHighFrequency(akTarget)
   envAwareness.SetContext(akTarget)
   combat.SetContext(akTarget)
-  PersistInventory(akTarget)
   
   ; Update medium-frequency states
   if !JMap.hasKey(updateTracker, actorKey + "_med") || (currentGameTime - JMap.getFlt(updateTracker, actorKey + "_med")) * 24 * 3600 >= config.mediumFrequencyUpdateInterval
@@ -470,6 +469,7 @@ Function SetContext(actor akTarget)
     SetAnimationBusy(1, Main.GetActorName(akTarget))
   EndIf
   
+  PersistInventory(akTarget)
   ; Release mutex for this actor
   JMap.setInt(contextMutexMap, actorName, 0)
   
@@ -1350,6 +1350,7 @@ EndFunction
 
 Function PersistInventory(actor akActor)
   ; Skip if actor is None or we're not using this system
+  Main.Info("PersistInventory - Actor: " + Main.GetActorName(akActor))
   if !akActor || !bHasAIFF
     return
   EndIf
@@ -1370,10 +1371,16 @@ Function PersistInventory(actor akActor)
     return
   EndIf
   
+  ; Set a temporary update time to prevent concurrent updates while processing
+  float tempUpdateTime = currentTime + 600.0 ; Set far in future to prevent concurrent updates
+  SetActorInventoryLastUpdate(akActor, tempUpdateTime)
+  
   ; Get actor's inventory array
   int actorInventory = JMap.getObj(inventoryTracker, actorName)
   if !actorInventory
     Main.Debug("PersistInventory - No inventory tracking object found for " + actorName)
+    ; Reset the update time since we didn't process anything
+    SetActorInventoryLastUpdate(akActor, currentTime)
     return
   EndIf
   
@@ -1381,11 +1388,10 @@ Function PersistInventory(actor akActor)
   int itemCount = JArray.count(actorInventory)
   if itemCount == 0
     Main.Debug("PersistInventory - Inventory tracking empty for " + actorName)
+    ; Reset the update time since we didn't process anything
+    SetActorInventoryLastUpdate(akActor, currentTime)
     return
   EndIf
-  
-  ; Update the last inventory time
-  SetActorInventoryLastUpdate(akActor, currentTime)
   
   ; Process inventory as batches if needed
   int totalItems = itemCount
@@ -1489,7 +1495,7 @@ Function PersistInventory(actor akActor)
       
       ; Add a small delay between batches to avoid overwhelming the server
       if needsBatching && processedItems < totalItems
-        Utility.Wait(0.1)
+        Utility.Wait(2.5)
       EndIf
       
       batchCount += 1
@@ -1499,6 +1505,9 @@ Function PersistInventory(actor akActor)
   if totalItems == 0
     Main.Debug("PersistInventory - No items to persist for " + actorName)
   EndIf
+  
+  ; Set the real update time after processing is complete
+  SetActorInventoryLastUpdate(akActor, Utility.GetCurrentRealTime())
 EndFunction
 
 ; Function to check if an actor's inventory events are currently being throttled

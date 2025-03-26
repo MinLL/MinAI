@@ -1,6 +1,6 @@
 <?php
-$fast_commands = ["addnpc","updateprofile","diary","_quest","setconf","request","_speech","infoloc","infonpc","infonpc_close",
-"infoaction","status_msg","delete_event","itemfound","_questdata","_uquest","location","_questreset","chat"];
+$fast_commands = ["addnpc","_quest","setconf","request","_speech","infoloc","infonpc","infonpc_close",
+"infoaction","status_msg","delete_event","itemfound","_questdata","_uquest","location","_questreset"];
 
 // $fast_commands = [];
 // Check for exact matches against fast commands

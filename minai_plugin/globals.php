@@ -47,9 +47,9 @@ $GLOBALS["external_fast_commands"] = [
     "storecontext",           // Store custom context
     "registeraction",         // Register custom action
     "updatethreadsdb",        // Update threads database
-    "storetattoodesc"        // Store tattoo description
-    // "minai_storeitem",        // Store single item
-    // "minai_storeitem_batch"  // Store multiple items
+    "storetattoodesc",        // Store tattoo description
+    "minai_storeitem",        // Store single item
+    "minai_storeitem_batch"  // Store multiple items
     // "minai_clearinventory"    // Clear inventory
 ];
 
