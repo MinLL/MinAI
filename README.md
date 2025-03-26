@@ -105,6 +105,10 @@ This mod requires an openrouter.ai account or local model setup. We recommend us
 * The NPCs know if you are near a fire, and if you need to be due to the cold. 
 * NPCs know if someone is nearing frostbite or has it, or if someone is nearing death in the cold.
 
+### Intoxication Detection
+* Gourmet is supported for the detection of actors having consumed Alcohol or Skooma.
+* Requiem is supported for the detection of actors having consumed Alcohol or Skooma.
+
 ### Environmental Awareness
 * NPCs know if they have been or could be intimidated by the player. They'll remember the player having used intimidation against them. Maybe they keep it a secret. 
 * NPCs know each other's occupations, except that shady occupations disguise themselves. Who is a merchant or a blacksmith is obvious from clear social cues to the people who live there.
