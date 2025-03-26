@@ -60,7 +60,7 @@ float property inventoryBurstWindow = 1.0 auto hidden
 bool property useInventoryBurstProtection = true auto hidden
 
 ; Maximum number of items to send in a single batch
-int property maxInventoryBatchSize = 120 auto hidden
+int property maxInventoryBatchSize = 30 auto hidden ; Set in the maintenance function
 
 ; Add new property to track last dialogue time for actors
 int Property lastDialogueTimes Auto  ; JMap of actor names to timestamps
@@ -82,6 +82,7 @@ Function InitFollow()
 EndFunction
 
 Function Maintenance(minai_MainQuestController _main)
+  maxInventoryBatchSize = 120
   inventoryMutex = False
   if (main.GetVersion() != main.CurrentVersion)
     Main.Info("CHIM - Maintenance: Version update detected. Resetting action registry.")
