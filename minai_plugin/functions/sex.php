@@ -53,8 +53,7 @@ function shouldEnableFollowTarget() {
     return ShouldEnableSexFunctions($GLOBALS['HERIKA_NAME']) && 
            !IsFollower($GLOBALS['HERIKA_NAME']) && 
            !IsRadiant() && 
-           !IsFollowing($GLOBALS['HERIKA_NAME']) && 
-           !IsInScene($GLOBALS['HERIKA_NAME']);
+           !IsFollowing($GLOBALS['HERIKA_NAME']);
 }
 
 // Map actions to their appropriate enable conditions based on gender requirements

@@ -225,7 +225,7 @@ Function CleanupStates()
     SetActorVariable(akTarget, "hostileToPlayer", akTarget.IsHostileToActor(player))
     SetActorVariable(akTarget, "isBleedingOut", akTarget.isBleedingOut())
     SetActorVariable(akTarget, "scene", akTarget.GetCurrentScene())
-    EndFollowTarget(actors[i], true)
+    ; EndFollowTarget(actors[i], true)
     i += 1
   EndWhile
   
@@ -1350,7 +1350,7 @@ EndFunction
 
 Function PersistInventory(actor akActor)
   ; Skip if actor is None or we're not using this system
-  Main.Info("PersistInventory - Actor: " + Main.GetActorName(akActor))
+  Main.Info("PersistInventory - Actor: " + Main.GetActorName(akActor) + " using batch size: " + maxInventoryBatchSize)
   if !akActor || !bHasAIFF
     return
   EndIf
