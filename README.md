@@ -113,6 +113,38 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
   * Arranging for carriage rides to any location
   * Receiving training in skills from NPC's
 
+### Enhanced Context System
+* Completely overhauled context system with modular and maintainable architecture
+* New system for registering context elements that can be individually enabled/disabled
+* Context sections are logically organized with clear headers for LLM clarity
+* Strategic context distribution to avoid inappropriate RP from strangers
+* New context preview feature in config.html for narrator, NPC->player, and NPC->NPC perspectives
+* Context sections include:
+  * Physical descriptions and equipment
+  * Character states (arousal, fertility, following status)
+  * Survival metrics (hunger, thirst, temperature)
+  * Environmental details (weather, location, time)
+  * Relationship dynamics and power structures
+  * Crime and bounty information
+  * Mental states and influences
+
+### Performance Improvements
+* Reduced CHIM server/database load by 50-80%
+* Optimized context system for better LLM processing
+* Added context slop cleanup feature (experimental)
+* Improved action usage across all models
+
+### Item Management System
+* NPCs can dynamically give items or gold to the player through natural conversation
+* NPCs can request and take items from the player's inventory
+* The system intelligently handles cases where NPCs don't have enough of an item to give or when players don't have requested items
+* NPCs are aware of both their own inventory contents and the player's inventory (with reasonable limits)
+* Common uses include:
+  * NPCs giving payment, rewards, or gifts to the player
+  * NPCs requesting payment, paying bounties, or supplies from the player
+  * Trading specific items between NPCs and the player
+  * Merchants, vendors, and general NPCs can all participate in item exchanges
+  
 ### Crime System
 * Guards throughout Skyrim are aware of the player's bounties in their hold and sometimes in other holds
 * Higher-ranking guards (captains, commanders, officers) are more likely to know about bounties in other holds
@@ -124,35 +156,6 @@ This mod requires you to fund an openrouter.ai account, or run a model locally. 
   * Clear the player's bounty in their hold (through persuasion, bribery, or other means)
 * The Narrator / Self Narrator has detailed bounty information showing all holds where the player is wanted
 * The system automatically detects which hold's jurisdiction the guard belongs to
-
-### NSFW
-This mod enables a number of optional [nsfw](https://github.com/MinLL/MinAI/blob/main/nsfw.md) integrations that are disabled by default. These will not effect your game unless you have the nsfw mods installed.
-
-# Installation
-## Requirements
-* This mod requires a functional installation of either [CHIM](https://www.nexusmods.com/skyrimspecialedition/mods/126330), [Mantella](https://www.nexusmods.com/skyrimspecialedition/mods/98631), or both (and their respective dependencies). DO THIS FIRST and seek assistance in those forums. When you are up and running well, return here and continue installation as follows:
-* [Papyrus Tweaks NG](https://www.nexusmods.com/skyrimspecialedition/mods/77779).
-* [JContainers SE](https://www.nexusmods.com/skyrimspecialedition/mods/16495).
-* [powerofthree's Papyrus Extender](https://www.nexusmods.com/skyrimspecialedition/mods/22854). (VR: also install [Papyrus Extender VR](https://www.nexusmods.com/skyrimspecialedition/mods/58296))
-* [Spell Perk Item Distributor (SPID)](https://www.nexusmods.com/skyrimspecialedition/mods/36869), if using MinAI's Sapience feature. (VR: [Spell Perk Item Distributor (SPID) VR](https://www.nexusmods.com/skyrimspecialedition/mods/59121))
-* See the features section. All supported mods are soft requirements. 
-
-## Installation Steps (CHIM)
-* Download and install this mod through your mod organizer of choice.
-* Use the CHIM plugin manager to install the plugin (Server Plugins -> Plugin Manager)
-* Navigate to the configuration page for MinAI (From the plugins page), and configure the mod to your liking.
-
-## Installation Steps (MANTELLA)
-* Download and install this mod's archive through your mod organizer of choice.
-* Use the Mantella Web Interface to configure the prompts for this mod (main, multi-npc, and radiant). I ship two sets of prompts: A very kinky set for submissive female characters in the example configuration, and a more vanilla set in vanilla_prompts.txt. If you're not sure which to use, I'd suggest using the vanilla prompts. Replace the skyrim, multi-npc, and radiant prompts with the ones provided by this mod.
-* In the Mantella Web Interface under Other, set the "Max Count Events" setting to a minimum of 15. I use 50 with the full set of integrations.
-* (Recommended, Optional) Enable Radiant Dialogue in Mantella's MCM setting. This has a lot of very good and fun interactions when combined with this mod.
-* (Optional) If you want a specific character to roleplay in a specific manner, or have a specific personality, edit the skyrim_characters.csv file that ships with Mantella to update that character's bio.
-* (Optional) Change the language model that's being used. I am using nousresearch/hermes-3-llama-3.1-70b, and have had good results with it. Feel free to try other models though, and share your experience!
-
-# Known Issues
-* The AI can be unpredictable at times. This is due to the nature of using an LLM. Refining the prompt, or customizing the personality of the npc you're interacting with can help with this.
-* Sometimes the AI refuses to use the keywords that trigger events (Such as -teaseweak-). If this happens, remind the NPC to use the keywords. This is much more of an issue with Mantella than CHIM, where this issue does not really happen much.
 
 # MinAI Diary Hotkey Feature
 
@@ -230,3 +233,33 @@ Here are some examples of how you can use the dungeon master feature:
 - **Introduce NPCs**: "A group of bandits appears on the road ahead."
 - **Set Up Scenarios**: "A hidden treasure chest is visible behind the waterfall."
 - **Create Atmosphere**: "The tavern is unusually crowded tonight, with many patrons celebrating."
+
+### NSFW
+This mod enables a number of optional [nsfw](https://github.com/MinLL/MinAI/blob/main/nsfw.md) integrations that are disabled by default. These will not effect your game unless you have the nsfw mods installed.
+
+# Installation
+## Requirements
+* This mod requires a functional installation of either [CHIM](https://www.nexusmods.com/skyrimspecialedition/mods/126330), [Mantella](https://www.nexusmods.com/skyrimspecialedition/mods/98631), or both (and their respective dependencies). DO THIS FIRST and seek assistance in those forums. When you are up and running well, return here and continue installation as follows:
+* [Papyrus Tweaks NG](https://www.nexusmods.com/skyrimspecialedition/mods/77779).
+* [JContainers SE](https://www.nexusmods.com/skyrimspecialedition/mods/16495).
+* [powerofthree's Papyrus Extender](https://www.nexusmods.com/skyrimspecialedition/mods/22854). (VR: also install [Papyrus Extender VR](https://www.nexusmods.com/skyrimspecialedition/mods/58296))
+* [Spell Perk Item Distributor (SPID)](https://www.nexusmods.com/skyrimspecialedition/mods/36869), if using MinAI's Sapience feature. (VR: [Spell Perk Item Distributor (SPID) VR](https://www.nexusmods.com/skyrimspecialedition/mods/59121))
+* See the features section. All supported mods are soft requirements. 
+
+## Installation Steps (CHIM)
+* Download and install this mod through your mod organizer of choice.
+* Use the CHIM plugin manager to install the plugin (Server Plugins -> Plugin Manager)
+* Navigate to the configuration page for MinAI (From the plugins page), and configure the mod to your liking.
+
+## Installation Steps (MANTELLA)
+* Download and install this mod's archive through your mod organizer of choice.
+* Use the Mantella Web Interface to configure the prompts for this mod (main, multi-npc, and radiant). I ship two sets of prompts: A very kinky set for submissive female characters in the example configuration, and a more vanilla set in vanilla_prompts.txt. If you're not sure which to use, I'd suggest using the vanilla prompts. Replace the skyrim, multi-npc, and radiant prompts with the ones provided by this mod.
+* In the Mantella Web Interface under Other, set the "Max Count Events" setting to a minimum of 15. I use 50 with the full set of integrations.
+* (Recommended, Optional) Enable Radiant Dialogue in Mantella's MCM setting. This has a lot of very good and fun interactions when combined with this mod.
+* (Optional) If you want a specific character to roleplay in a specific manner, or have a specific personality, edit the skyrim_characters.csv file that ships with Mantella to update that character's bio.
+* (Optional) Change the language model that's being used. I am using nousresearch/hermes-3-llama-3.1-70b, and have had good results with it. Feel free to try other models though, and share your experience!
+
+# Known Issues
+* The AI can be unpredictable at times. This is due to the nature of using an LLM. Refining the prompt, or customizing the personality of the npc you're interacting with can help with this.
+* Sometimes the AI refuses to use the keywords that trigger events (Such as -teaseweak-). If this happens, remind the NPC to use the keywords. This is much more of an issue with Mantella than CHIM, where this issue does not really happen much.
+

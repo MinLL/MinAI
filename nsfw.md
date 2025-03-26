@@ -113,3 +113,31 @@ MinAI includes 3467 ostim/sexlab scene descriptions (as of 10/24/2024) for bette
 * Includes support for impregnation states from Fill Her Up
 * The AI will acknowledge when events from Fill Her Up occur.
 * Provides detailed contextual descriptions of belly size and other physical changes
+
+### Enhanced NSFW Context
+* Improved prompts for NSFW events and interactions
+* Better context awareness during sex scenes
+* Enhanced device awareness and interactions
+* More natural dialogue during intimate encounters
+* Better handling of complex NSFW scenarios
+
+### Devious Devices Improvements
+* Enhanced device awareness and interactions
+* Better context for device events (equip/unequip, vibrations)
+* Improved prompts for device-related actions
+* More natural responses to device events
+* Better integration with other NSFW systems
+
+### Scene Descriptions
+* Updated scene descriptions for better context
+* More accurate and detailed descriptions of intimate encounters
+* Better integration with animation frameworks
+* Improved support for both OStim and Sexlab scenes
+* Enhanced awareness of scene transitions and positions
+
+### SlaveTats
+* Added support for SlaveTats with:
+  * Visibility rules based on clothing and equipment
+  * Custom descriptions per tattoo
+  * Alpha value support for tattoo visibility
+  * Hidden tattoo tracking for narrator
