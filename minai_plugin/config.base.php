@@ -90,7 +90,7 @@ $GLOBALS['action_prompts'] = Array(
     
     "self_narrator_normal" => "Respond as #player_name#, thinking privately to #player_object#self about the current situation and recent events. Stay in first person, capturing #player_possessive# genuine thoughts, emotions, and internal conflicts. Focus on #player_possessive# personal perspective, biases, and feelings rather than an objective summary of events. Keep the response introspective and true to how #player_name# would process and react internally.",
 
-    "explicit_scene" => "Respond to #target# as #herika_name# would in this intimate situation. Choose an appropriate action that reflects #herika_name#'s desires and the scene context. Express #herika_name#'s reactions and feelings naturally, then use an action that advances the intimate nature of the scene in a meaningful way.",
+    "explicit_scene" => "Respond to #target# as #herika_name# would in this intimate situation. Choose an appropriate action that reflects #herika_name#'s desires and the scene context. Express #herika_name#'s reactions and feelings naturally emphasizing the #SEX_SCENARIO, then use an action that advances the intimate nature of the scene in a meaningful way.",
     
     "normal_scene" => "Respond to #target# as #herika_name# would in this situation. Express your thoughts or dialogue naturally, then consider boldly using an appropriate action that aligns with your character's personality and objectives. Your response should feel authentic and progress the scene or conversation naturally.",
 
