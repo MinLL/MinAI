@@ -8,13 +8,17 @@ bool bHasAIFF
 Spell minai_PlayerStateTracker
 actor playerRef
 GlobalVariable minai_DynamicSapienceToggleStealth
+minai_EnvironmentalAwareness environmentalAwareness
 minai_SapienceController Property sapience Auto
-
+Form gold
+bool trackingEnabled = False
+bool equipRunning = False
+bool unequipRunning = False
 Function StartTrackingPlayer()
   if playerRef.HasSpell(minai_PlayerStateTracker)
     playerRef.RemoveSpell(minai_PlayerStateTracker)
   EndIf
-  
+  aiff.SetActorVariable(playerRef, "inCombat", playerRef.GetCombatState() >= 1)
   minai_DynamicSapienceToggleStealth = Game.GetFormFromFile(0x0E97, "MinAI.esp") as GlobalVariable
   if (!minai_DynamicSapienceToggleStealth)
     MainQuestController.Error("Could not retrieve minai_DynamicSapienceToggleStealth from esp")
@@ -53,6 +57,8 @@ Function UnregisterStealthAnimEvents()
   UnregisterForAnimationEvent(playerRef, "tailCombatLocomotion")
 EndFunction
 
+
+
 Function UpdateStealthFeatureState(bool enabled)
   ; Called when the feature is toggled in MCM
   if enabled
@@ -71,12 +77,31 @@ Function UpdateStealthFeatureState(bool enabled)
 EndFunction
 
 Event OnPlayerLoadGame()
+  ; Duplicate check for Papyrus Tweaks in OnPlayerLoadGame
+  ; It may fail to progress past here if this is missing.
+  Debug.Trace("[MinAI] OnPlayerLoadGame()")
+  int[] pTweaksVersion = PapyrusTweaks.GetPapyrusTweaksVersion()
+  if !pTweaksVersion
+    Debug.MessageBox("Papyrus Tweaks NG is not installed. This is a critical dependency. Revert to a prior save and install the mod before continuing.")
+    Debug.Trace("[FATAL] Papyrus Tweaks NG is not installed. This is a critical dependency. Revert to a prior save and install the mod before continuing.")
+    ; We may not be able to call MinaiUtil if the dependency is not installed, so raise the message manually here.
+    ; Fatal("Papyrus Tweaks NG is not installed. This is a critical dependency. Revert to a prior save and install the mod before continuing.")
+  Else
+    MainQuestController.Info("Papyrus Tweaks NG detected: " + pTweaksVersion[0] + "." + pTweaksVersion[1] + "." + pTweaksVersion[2])
+  EndIf
   playerRef = game.GetPlayer()
   RegisterForSleep()
+  gold = Game.GetFormFromFile(0x00000F, "Skyrim.esm") as Form
   bHasAIFF = (Game.GetModByName("AIAgent.esp") != 255)
+  equipRunning = False
+  unequipRunning = False
   if (bHasAIFF)
     aiff = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_AIFF
   endif
+  environmentalAwareness = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_EnvironmentalAwareness
+  if (!environmentalAwareness)
+    MainQuestController.Error("Could not retrieve minai_EnvironmentalAwareness from esp")
+  EndIf
   followers = Game.GetFormFromFile(0x0913, "MinAI.esp") as minai_Followers
   config = Game.GetFormFromFile(0x0912, "MinAI.esp") as minai_Config
   minai_PlayerStateTracker = Game.GetFormFromFile(0x0921, "MinAI.esp") as Spell
@@ -87,15 +112,18 @@ Event OnPlayerLoadGame()
     MainQuestController.Info("Re-enabling sapience on load as stealth feature is disabled")
     minai_DynamicSapienceToggleStealth.SetValue(1.0)
   EndIf
-  
   StartTrackingPlayer()
   MainQuestController.Maintenance()
+  EnableInventoryTracking()
 EndEvent
 
 Event OnLocationChange(Location akOldLoc, Location akNewLoc)
+  environmentalAwareness.SetLocationData(playerRef)
   if (bHasAIFF)
     aiff.CleanupSapientActors()
+    ; MainQuestController.RegisterEvent("minai_LocationChange", "")
   EndIf
+  EnableInventoryTracking()
 endEvent
 
 
@@ -107,6 +135,7 @@ Event OnSleepStart(float afSleepStartTime, float afDesiredSleepEndTime)
   if config.updateNarratorProfile && bHasAIFF
     aiff.UpdateProfile("The Narrator")
   EndIf
+  EnableInventoryTracking()
 EndEvent
 
 ; Add new event handler for animation events
@@ -125,3 +154,82 @@ Event OnAnimationEvent(ObjectReference akSource, string asEventName)
     endif
   endif
 EndEvent
+
+; Add event handler for item added
+Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
+  if !bHasAIFF || !aiff
+    return
+  EndIf
+  if !trackingEnabled
+    return
+  endif
+  MainQuestController.Debug("Player OnItemAdded - Form: " + akBaseItem + ", Count: " + aiItemCount)
+  if aiff.OnInventoryChanged(playerRef, akBaseItem, aiItemCount, true)
+    DisableInventoryTracking()
+  endif
+EndEvent
+
+; Add event handler for item removed
+Event OnItemRemoved(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akDestContainer)
+  if !bHasAIFF || !aiff
+    return
+  EndIf
+  if !trackingEnabled
+    return
+  endif
+  
+  MainQuestController.Debug("Player OnItemRemoved - Form: " + akBaseItem + ", Count: " + aiItemCount)
+  if aiff.OnInventoryChanged(playerRef, akBaseItem, aiItemCount, false)
+    DisableInventoryTracking()
+  endif
+EndEvent
+
+
+event DisableInventoryTracking()
+  ; Filter out everything except gold to neuter the item change events
+  MainQuestController.Info("Disabling inventory tracking for player")
+  if (!gold)
+    gold = Game.GetFormFromFile(0x00000F, "Skyrim.esm") as Form
+  endif
+  trackingEnabled = False
+  AddInventoryEventFilter(gold)
+  
+endEvent
+
+
+event EnableInventoryTracking()
+  ; Remove the filter to allow all item changes again
+  MainQuestController.Info("Enabling inventory tracking for player")
+  trackingEnabled = True
+  if (!gold)
+    gold = Game.GetFormFromFile(0x00000F, "Skyrim.esm") as Form
+  endif
+  RemoveInventoryEventFilter(gold)
+  aiff.TrackActorInventory(playerRef)
+endEvent
+
+event OnObjectEquipped(Form akBaseItem, ObjectReference akReference)
+  MainQuestController.Info("Player 'OnItemEquipped()")
+  if (equipRunning)
+    return
+  EndIf
+  equipRunning = True
+  utility.Wait(2) ; Wait 2 seconds to catch bursts of equips
+  aiff.SetContext(playerRef)
+  equipRunning = False
+endEvent
+
+event OnObjectUnequipped(Form akBaseItem, ObjectReference akReference)
+  MainQuestController.Info("Player OnItemUnequipped()")
+  if (unequipRunning)
+    return
+  EndIf
+  unequipRunning = True
+  utility.Wait(2) ; Wait 2 seconds to catch bursts of unequips
+  if equipRunning
+    unequipRunning = False
+    return
+  EndIf 
+  aiff.SetContext(playerRef)
+  unequipRunning = False
+endEvent

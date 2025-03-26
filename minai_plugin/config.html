@@ -292,6 +292,30 @@
             font-weight: bold;
             color: var(--primary-color);
             margin-bottom: 5px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .preview-label:after {
+            content: '▼';
+            font-size: 12px;
+            transition: transform 0.3s ease;
+        }
+        
+        .preview-label.collapsed:after {
+            transform: rotate(-90deg);
+        }
+        
+        .preview-content-wrapper {
+            max-height: unset;
+            padding: 15px;
+            transition: max-height 0.3s ease;
+        }
+        
+        .preview-content-wrapper.collapsed {
+            max-height: 0;
         }
         
         .preview-content {
@@ -992,6 +1016,215 @@
             50% { opacity: 1; }
             100% { opacity: 0.5; }
         }
+
+        .preview-item h3 {
+            margin: 10px 0 5px 0;
+            color: var(--primary-color);
+            font-size: 1.3em;
+            border-bottom: 1px solid rgba(33, 150, 243, 0.3);
+            padding-bottom: 5px;
+        }
+        
+        .system-prompt-preview {
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+        
+        .system-prompt-preview .preview-content {
+            max-height: 600px;
+            overflow-y: auto;
+            padding: 15px;
+            background-color: rgba(30, 30, 30, 0.7);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .preview-description {
+            color: var(--text-color);
+            font-style: italic;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: rgba(76, 175, 80, 0.1);
+            border-radius: 5px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .actor-name-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .actor-name-input label {
+            font-weight: bold;
+            min-width: 150px;
+        }
+        
+        .actor-name-input input {
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background-color: var(--background-light);
+            color: var(--text-color);
+            font-size: 14px;
+            width: 250px;
+        }
+        
+        .actor-name-input input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.3);
+        }
+
+        /* Adjust variable entry styles for better visibility */
+        .variable-entry .preview-content {
+            max-height: 400px; /* Increased from 200px */
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            background-color: rgba(0, 0, 0, 0.1);
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .variable-entry {
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .variable-entry code {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        /* Improve section preview styling */
+        .section-preview {
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        .section-preview h3 {
+            margin-bottom: 10px;
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .section-preview .preview-content {
+            white-space: pre-wrap;
+            word-break: break-word;
+            background-color: rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            border-radius: 4px;
+            max-height: 500px; /* Increased from 300px */
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Make preview sections and content more visible */
+        .preview-content-wrapper {
+            max-height: unset; /* Remove max-height restriction */
+            padding: 15px;
+            transition: max-height 0.3s ease;
+        }
+
+        /* Improve scrollbars for better visibility */
+        .preview-content::-webkit-scrollbar, 
+        .variable-entry .preview-content::-webkit-scrollbar, 
+        .system-prompt-preview .preview-content::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .preview-content::-webkit-scrollbar-track, 
+        .variable-entry .preview-content::-webkit-scrollbar-track, 
+        .system-prompt-preview .preview-content::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+        }
+
+        .preview-content::-webkit-scrollbar-thumb, 
+        .variable-entry .preview-content::-webkit-scrollbar-thumb, 
+        .system-prompt-preview .preview-content::-webkit-scrollbar-thumb {
+            background: rgba(76, 175, 80, 0.5);
+            border-radius: 4px;
+        }
+
+        .preview-content::-webkit-scrollbar-thumb:hover, 
+        .variable-entry .preview-content::-webkit-scrollbar-thumb:hover, 
+        .system-prompt-preview .preview-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(76, 175, 80, 0.8);
+        }
+
+        /* Add an expand button for long content */
+        .expand-content-btn {
+            display: block;
+            margin: 5px auto;
+            padding: 4px 10px;
+            background-color: rgba(76, 175, 80, 0.2);
+            color: var(--text-color);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .expand-content-btn:hover {
+            background-color: rgba(76, 175, 80, 0.4);
+        }
+
+        /* Fix collapsed preview wrapper to handle content better */
+        .preview-content-wrapper.collapsed {
+            max-height: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        /* Make sure preview panel has appropriate spacing */
+        .preview-panel {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Add more space between preview items */
+        .preview-item {
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            padding-bottom: 20px;
+        }
+
+        /* Apply subtle hover effect to expandable sections */
+        .preview-label {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .preview-label:hover {
+            background-color: rgba(76, 175, 80, 0.1);
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
 </head>
@@ -1039,8 +1272,18 @@
                                     <label class="option-label" for="enforce-short-responses">Enforce Short Responses</label>
                                     <button class="reset-button" onclick="resetOptionToDefault('enforce-short-responses')">Reset to Default</button>
                                 </div>
-                                <p>Attempt to enforce short 2-3 sentence responses from the LLM. This is "best effort", and does not always work.</p>
+                                <p>Force the LLM to provide shorter responses.</p>
                                 <input type="checkbox" id="enforce-short-responses">
+                            </div>
+
+                            <!-- enable_prompt_slop_cleanup -->
+                            <div class="option-group checkbox-group">
+                                <div class="option-label-container">
+                                    <label class="option-label" for="enable-prompt-slop-cleanup">Enable Prompt Slop Cleanup</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('enable-prompt-slop-cleanup')">Reset to Default</button>
+                                </div>
+                                <p>Clean up and optimize prompts before sending to the LLM.</p>
+                                <input type="checkbox" id="enable-prompt-slop-cleanup">
                             </div>
 
                             <!-- use_llm_fallback -->
@@ -1153,6 +1396,31 @@
                                 </div>
                                 <p>Automatically seed NPC profiles that are renamed via Realnames Extended...</p>
                                 <input type="checkbox" id="realnames-support">
+                            </div>
+                            
+                            <!-- Inventory Settings Header -->
+                            <div class="option-group">
+                                <h4>Inventory Settings</h4>
+                                
+                                <!-- inventory_items_limit -->
+                                <div class="option-group">
+                                    <div class="option-label-container">
+                                        <label class="option-label" for="inventory-items-limit">Inventory Items Limit</label>
+                                        <button class="reset-button" onclick="resetOptionToDefault('inventory-items-limit')">Reset to Default</button>
+                                    </div>
+                                    <p>Number of items to expose to the LLM from an actor's inventory. Higher values give the LLM more options but use more context.</p>
+                                    <input type="number" id="inventory-items-limit" min="1" max="20">
+                                </div>
+                                
+                                <!-- use_item_relevancy_scoring -->
+                                <div class="option-group checkbox-group">
+                                    <div class="option-label-container">
+                                        <label class="option-label" for="use-item-relevancy-scoring">Use Item Relevancy Scoring</label>
+                                        <button class="reset-button" onclick="resetOptionToDefault('use-item-relevancy-scoring')">Reset to Default</button>
+                                    </div>
+                                    <p>Use relevancy scoring for inventory items (Future implementation - Currently unavailable)</p>
+                                    <input type="checkbox" id="use-item-relevancy-scoring">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1700,24 +1968,62 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
 
-                            <!-- Preview Section -->
+                    <!-- Context Builder Settings Section -->
+                    <div class="config-section">
+                        <div class="section-header collapsed" onclick="toggleSection(this)">
+                            Context Builder Settings
+                        </div>
+                        <div class="section-content collapsed">
+                            <div class="info-section">
+                                <p><strong>💡 Context Builder Settings</strong></p>
+                                <p>Configure which context sections are included in the system prompt. This lets you customize what information is provided to the AI.</p>
+                            </div>
+                            
+                            <!-- Context Builder Groups - This section will be dynamically populated -->
+                            <div id="context-builder-groups"></div>
+                            
+                            <div class="button-group">
+                                <button class="control-button" onclick="resetContextBuilderSettings()">Reset to Defaults</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Context Preview Section (moved to its own top-level section) -->
+                    <div class="config-section">
+                        <div class="section-header collapsed" onclick="toggleSection(this)">
+                            Context Preview
+                        </div>
+                        <div class="section-content collapsed">
+                            <div class="info-section">
+                                <p><strong>💡 Context Preview</strong></p>
+                                <p>This shows how your configuration affects the system prompt and available variables. The preview shows how your context settings will be applied when generating AI responses.</p>
+                            </div>
+                            <p class="option-description">Variables like PLAYER_BIOS are pulled from the <b>Narrator profile</b> if using it, or the <b>default profile</b> otherwise.</p>
+                            <p class="option-description" style="color: #ff5555; font-weight: bold; padding: 10px; background: rgba(255,85,85,0.1); border: 2px solid #ff5555; border-radius: 4px; margin: 15px 0;">⚠️ IMPORTANT: The preview will not update until you save settings!</p>
+                            
                             <div class="option-group">
-                                <div class="section-header collapsed" onclick="toggleSection(this)">
-                                    Context Preview
+                                <div class="actor-name-input">
+                                    <label for="test-actor-name">Test Actor Name:</label>
+                                    <input type="text" id="test-actor-name" value="Brynjolf" placeholder="Enter test actor name">
                                 </div>
-                                <div class="section-content collapsed">
-                                    <p class="option-description">This shows how the context variables will appear in the roleplay prompt. Note, that things like PLAYER_BIOS are pulled from the <b>Narrator profile</b> if using it, or the <b>default profile</b> otherwise.</p>
-                                    <p class="option-description" style="color: #ff5555; font-weight: bold; padding: 10px; background: rgba(255,85,85,0.1); border: 2px solid #ff5555; border-radius: 4px; margin: 15px 0;">⚠️ IMPORTANT: The preview will not update until you save settings!</p>
-                                    
-                                    <button onclick="refreshPreview()" class="refresh-button">
-                                        Refresh Preview
-                                    </button>
-                                    
-                                    <div class="preview-panel" id="preview-content">
-                                        Loading preview...
-                                    </div>
+                                <p class="option-description">This name will be used for displaying the actor perspective system prompt.</p>
+                                
+                                <div class="actor-name-input">
+                                    <label for="test-second-npc-name">Second NPC Name:</label>
+                                    <input type="text" id="test-second-npc-name" value="Brand-Shei" placeholder="Enter second NPC name">
                                 </div>
+                                <p class="option-description">This name will be used for displaying the NPC-to-NPC interaction system prompt.</p>
+                            </div>
+                            
+                            <button onclick="refreshPreview()" class="refresh-button">
+                                Refresh Preview
+                            </button>
+                            
+                            <div class="preview-panel" id="preview-content">
+                                Loading preview...
                             </div>
                         </div>
                     </div>
@@ -1763,6 +2069,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 document.getElementById('prompt-head-override').value = configData.PROMPT_HEAD_OVERRIDE;
                 document.getElementById('use-narrator-profile').checked = configData.use_narrator_profile;
                 document.getElementById('enforce-short-responses').checked = configData.enforce_short_responses;
+                document.getElementById('enable-prompt-slop-cleanup').checked = configData.enable_prompt_slop_cleanup;
                 document.getElementById('stop-narrator-context-leak').checked = configData.stop_narrator_context_leak;
                 document.getElementById('eldritch-voice').value = configData.devious_narrator_eldritch_voice;
                 document.getElementById('telvanni-voice').value = configData.devious_narrator_telvanni_voice;
@@ -1781,6 +2088,11 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 document.getElementById('strip-emotes').checked = configData.strip_emotes_from_output;
                 document.getElementById('use-defeat').checked = configData.use_defeat;
                 document.getElementById('realnames-support').checked = configData.realnames_support;
+                
+                // Load inventory settings
+                document.getElementById('inventory-items-limit').value = configData.inventory_items_limit;
+                document.getElementById('use-item-relevancy-scoring').checked = configData.use_item_relevancy_scoring;
+                
                 populateVoiceTypeFallbacks(configData.voicetype_fallbacks);
                 document.getElementById('singing-prompt').value = configData.action_prompts.singing;
                 document.getElementById('self-narrator-explicit').value = configData.action_prompts.self_narrator_explicit;
@@ -1861,6 +2173,31 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 document.getElementById('config-form').style.display = 'block';
                 
                 await checkModifiedValues(); // Add this line
+                
+                // Load context builder settings
+                loadContextBuilderSettings(configData.minai_context);
+
+                // Make all sections start collapsed except for Context Preview
+                document.querySelectorAll('.config-section').forEach(section => {
+                    const header = section.querySelector('.section-header');
+                    const content = section.querySelector('.section-content');
+                    
+                    // Check if this is the Context Preview section
+                    if (header && header.textContent.trim() === 'Context Preview') {
+                        // Make sure Context Preview is expanded
+                        header.classList.remove('collapsed');
+                        content.classList.remove('collapsed');
+                        
+                        // Make sure all preview items inside are also expanded
+                        content.querySelectorAll('.preview-label, .preview-content-wrapper').forEach(element => {
+                            element.classList.remove('collapsed');
+                        });
+                    } else {
+                        // Collapse all other sections
+                        header.classList.add('collapsed');
+                        content.classList.add('collapsed');
+                    }
+                });
             } catch (error) {
                 console.error('Error fetching config:', error);
                 showStatus('Failed to load configuration', 'error');
@@ -1873,6 +2210,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 PROMPT_HEAD_OVERRIDE: document.getElementById('prompt-head-override').value,
                 use_narrator_profile: document.getElementById('use-narrator-profile').checked,
                 enforce_short_responses: document.getElementById('enforce-short-responses').checked,
+                enable_prompt_slop_cleanup: document.getElementById('enable-prompt-slop-cleanup').checked,
                 stop_narrator_context_leak: document.getElementById('stop-narrator-context-leak').checked,
                 devious_narrator_eldritch_voice: document.getElementById('eldritch-voice').value,
                 devious_narrator_telvanni_voice: document.getElementById('telvanni-voice').value,
@@ -1891,6 +2229,11 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 strip_emotes_from_output: document.getElementById('strip-emotes').checked,
                 use_defeat: document.getElementById('use-defeat').checked,
                 realnames_support: document.getElementById('realnames-support').checked,
+                
+                // Inventory settings
+                inventory_items_limit: document.getElementById('inventory-items-limit').value,
+                use_item_relevancy_scoring: document.getElementById('use-item-relevancy-scoring').checked,
+                
                 voicetype_fallbacks: getVoiceTypeFallbacks(),
                 action_prompts: {
                     singing: document.getElementById('singing-prompt').value,
@@ -1921,7 +2264,10 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     roleplay_request_combat: document.getElementById('roleplay-request-combat').value,
 
                     sections: {}
-                }
+                },
+                
+                // Context builder settings
+                minai_context: getContextBuilderSettings()
             };
 
             // Add sections in their current order
@@ -1999,8 +2345,8 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     const oldValue = oldConfig[key];
                     let newValue = newConfig[key];
                     
-                    // Special handling for input_delay_for_radiance
-                    if (key === 'input_delay_for_radiance') {
+                    // Special handling for numeric inputs
+                    if (key === 'input_delay_for_radiance' || key === 'inventory_items_limit') {
                         // Convert both to integers for comparison
                         const oldInt = parseInt(oldValue);
                         const newInt = parseInt(newValue);
@@ -2237,9 +2583,24 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
             document.querySelectorAll('.section-header').forEach(header => {
                 if (header && header.nextElementSibling) {  // Check if header and content exist
                     const content = header.nextElementSibling;
-                    if (expand) {
+                    
+                    // If collapsing all, still keep Context Preview expanded
+                    if (!expand && header.textContent.trim() === 'Context Preview') {
                         header.classList.remove('collapsed');
                         content.classList.remove('collapsed');
+                        
+                        // When collapsing all, we still want the preview items to be collapsed
+                        // So we don't remove their collapsed class here
+                    } else if (expand) {
+                        header.classList.remove('collapsed');
+                        content.classList.remove('collapsed');
+                        
+                        // Only if expanding all, also expand all preview items
+                        if (header.textContent.trim() === 'Context Preview') {
+                            content.querySelectorAll('.preview-label, .preview-content-wrapper').forEach(element => {
+                                element.classList.remove('collapsed');
+                            });
+                        }
                     } else {
                         header.classList.add('collapsed');
                         content.classList.add('collapsed');
@@ -2274,50 +2635,69 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
 
         async function refreshPreview() {
             try {
-                const response = await fetch('api/preview.php');
+                // Get the test actor name from the input
+                const testActorName = document.getElementById('test-actor-name').value || 'Brynjolf';
+                
+                // Get the second NPC name from the input
+                const testSecondNpcName = document.getElementById('test-second-npc-name').value || 'Brand-Shei';
+                
+                // Show loading state
+                document.getElementById('preview-content').innerHTML = '<div class="loading">Loading preview...</div>';
+                
+                // Fetch preview data with the actor names as parameters
+                const response = await fetch(`api/preview.php?actor=${encodeURIComponent(testActorName)}&secondnpc=${encodeURIComponent(testSecondNpcName)}`);
                 const text = await response.text(); // Get raw response text
                 
                 try {
                     const data = JSON.parse(text);
                     
+                    // Add an expand all button at the top
+                    let expandAllButton = '<div style="text-align: right; margin-bottom: 15px;"><button class="button" onclick="expandAllPreviewContent()">Expand All Content</button></div>';
+                    
                     // Build variables preview
-                    let variablesHtml = '<div class="preview-item"><div class="preview-label">Available Variables:</div>';
+                    let variablesHtml = '<div class="preview-item"><div class="preview-label collapsed" onclick="togglePreviewSection(this)">Available Variables</div><div class="preview-content-wrapper collapsed">';
                     if (data && data.variables) {
                         for (const [key, value] of Object.entries(data.variables)) {
                             const displayValue = value === null ? '(null)' : 
                                                value === '' ? '(empty)' : 
-                                               value;
+                                               value.length > 500 ? escapeHtml(value.substring(0, 500)) + '... (truncated)' : 
+                                               formatWithLineBreaks(value);
+                            const needsExpand = value && value.length > 200;
                             variablesHtml += `
                                 <div class="variable-entry">
                                     <code>#${key.toUpperCase()}#</code>: 
                                     <div class="preview-content">${displayValue}</div>
+                                    ${needsExpand ? `<button class="expand-content-btn" onclick="expandContent(this)">Show Full Content</button>` : ''}
                                 </div>`;
                         }
                     } else {
                         variablesHtml += '<div class="error">No variables available</div>';
                     }
-                    variablesHtml += '</div>';
+                    variablesHtml += '</div></div>';
 
                     // Build sections preview
-                    let sectionsHtml = '<div class="preview-item"><div class="preview-label">Section Preview:</div>';
+                    let sectionsHtml = '<div class="preview-item"><div class="preview-label collapsed" onclick="togglePreviewSection(this)">Section Preview</div><div class="preview-content-wrapper collapsed">';
                     if (data && data.sections && Object.keys(data.sections).length > 0) {
-                        for (const section of Object.values(data.sections)) {
+                        for (const [sectionKey, section] of Object.entries(data.sections)) {
                             if (!section || !section.enabled) continue;
                             const header = section.header || 'Unnamed Section';
                             const content = section.content || '(empty section)';
+                            const formattedContent = formatWithLineBreaks(content);
+                            const needsExpand = content && content.length > 300;
                             sectionsHtml += `
                                 <div class="section-preview">
-                                    <h3>${header}</h3>
-                                    <div class="preview-content">${content}</div>
+                                    <h3>${header} (${sectionKey})</h3>
+                                    <div class="preview-content">${formattedContent}</div>
+                                    ${needsExpand ? `<button class="expand-content-btn" onclick="expandContent(this)">Show Full Content</button>` : ''}
                                 </div>`;
                         }
                     } else {
                         sectionsHtml += '<div class="error">No sections found in preview data</div>';
                     }
-                    sectionsHtml += '</div>';
+                    sectionsHtml += '</div></div>';
                     
-                    // After the sections preview...
-                    let promptsHtml = '<div class="preview-item"><div class="preview-label">Prompt Preview:</div>';
+                    // Build prompts preview
+                    let promptsHtml = '<div class="preview-item"><div class="preview-label collapsed" onclick="togglePreviewSection(this)">Prompt Preview</div><div class="preview-content-wrapper collapsed">';
                     if (data && data.prompts) {
                         promptsHtml += `
                             <div class="section-preview">
@@ -2325,25 +2705,108 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                                 <div class="preview-content">${data.prompts.system_prompt}</div>
                             </div>
                             <div class="section-preview">
+                                <h3>System Prompt (Explicit)</h3>
+                                <div class="preview-content">${data.prompts.system_prompt_explicit}</div>
+                            </div>
+                            <div class="section-preview">
+                                <h3>System Prompt (Combat)</h3>
+                                <div class="preview-content">${data.prompts.system_prompt_combat}</div>
+                            </div>
+                            <div class="section-preview">
                                 <h3>Roleplay System Prompt</h3>
                                 <div class="preview-content">${data.prompts.roleplay_system_prompt}</div>
+                            </div>
+                            <div class="section-preview">
+                                <h3>Roleplay System Prompt (Explicit)</h3>
+                                <div class="preview-content">${data.prompts.roleplay_system_prompt_explicit}</div>
+                            </div>
+                            <div class="section-preview">
+                                <h3>Roleplay System Prompt (Combat)</h3>
+                                <div class="preview-content">${data.prompts.roleplay_system_prompt_combat}</div>
                             </div>
                             <div class="section-preview">
                                 <h3>Translation Request</h3>
                                 <div class="preview-content">${data.prompts.translation_request}</div>
                             </div>
                             <div class="section-preview">
+                                <h3>Translation Request (Explicit)</h3>
+                                <div class="preview-content">${data.prompts.translation_request_explicit}</div>
+                            </div>
+                            <div class="section-preview">
+                                <h3>Translation Request (Combat)</h3>
+                                <div class="preview-content">${data.prompts.translation_request_combat}</div>
+                            </div>
+                            <div class="section-preview">
                                 <h3>Roleplay Request</h3>
                                 <div class="preview-content">${data.prompts.roleplay_request}</div>
+                            </div>
+                            <div class="section-preview">
+                                <h3>Roleplay Request (Explicit)</h3>
+                                <div class="preview-content">${data.prompts.roleplay_request_explicit}</div>
+                            </div>
+                            <div class="section-preview">
+                                <h3>Roleplay Request (Combat)</h3>
+                                <div class="preview-content">${data.prompts.roleplay_request_combat}</div>
                             </div>
                         `;
                     } else {
                         promptsHtml += '<div class="error">No prompt data available</div>';
                     }
-                    promptsHtml += '</div>';
+                    promptsHtml += '</div></div>';
+                    
+                    // Build narrator system prompt preview
+                    let narratorSystemPromptHtml = '<div class="preview-item"><div class="preview-label collapsed" onclick="togglePreviewSection(this)">Complete System Prompt (Narrator Perspective)</div><div class="preview-content-wrapper collapsed">';
+                    if (data && data.narrator_system_prompt) {
+                        narratorSystemPromptHtml += `
+                            <div class="preview-description">
+                                This is the full system prompt from the Narrator's perspective, showing how all your context settings are combined.
+                            </div>
+                            <div class="system-prompt-preview">
+                                <div class="preview-content">${data.narrator_system_prompt}</div>
+                            </div>
+                        `;
+                    } else {
+                        narratorSystemPromptHtml += '<div class="error">Narrator system prompt not available</div>';
+                    }
+                    narratorSystemPromptHtml += '</div></div>';
+                    
+                    // Build actor system prompt preview
+                    let actorSystemPromptHtml = '<div class="preview-item"><div class="preview-label collapsed" onclick="togglePreviewSection(this)">Complete System Prompt (Other Actor Perspective)</div><div class="preview-content-wrapper collapsed">';
+                    if (data && data.actor_system_prompt) {
+                        actorSystemPromptHtml += `
+                            <div class="preview-description">
+                                This is the full system prompt from ${testActorName}'s perspective, showing how your context settings appear when the AI responds as a character.
+                            </div>
+                            <div class="system-prompt-preview">
+                                <div class="preview-content">${data.actor_system_prompt}</div>
+                            </div>
+                        `;
+                    } else {
+                        actorSystemPromptHtml += '<div class="error">${testActorName} system prompt not available</div>';
+                    }
+                    actorSystemPromptHtml += '</div></div>';
+                    
+                    // Build NPC-to-NPC system prompt preview
+                    let npcToNpcSystemPromptHtml = '<div class="preview-item"><div class="preview-label collapsed" onclick="togglePreviewSection(this)">Complete System Prompt (NPC-to-NPC Interaction)</div><div class="preview-content-wrapper collapsed">';
+                    if (data && data.npc_to_npc_system_prompt) {
+                        npcToNpcSystemPromptHtml += `
+                            <div class="preview-description">
+                                This is the full system prompt showing how ${testActorName} would interact with ${data.second_npc_name}, demonstrating NPC-to-NPC conversation.
+                            </div>
+                            <div class="system-prompt-preview">
+                                <div class="preview-content">${data.npc_to_npc_system_prompt}</div>
+                            </div>
+                        `;
+                    } else {
+                        npcToNpcSystemPromptHtml += `<div class="error">NPC-to-NPC system prompt not available</div>`;
+                    }
+                    npcToNpcSystemPromptHtml += '</div></div>';
                     
                     document.getElementById('preview-content').innerHTML = 
-                        variablesHtml + sectionsHtml + promptsHtml;
+                        expandAllButton + variablesHtml + sectionsHtml + promptsHtml + narratorSystemPromptHtml + actorSystemPromptHtml + npcToNpcSystemPromptHtml;
+                        
+                    // We no longer automatically expand all preview items
+                    // Removing this to keep them collapsed by default
                 } catch (parseError) {
                     console.error('JSON Parse Error:', parseError);
                     console.log('Raw response:', text);
@@ -2357,9 +2820,26 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     `<div class="error">Failed to load preview. ${error.message}</div>`;
             }
         }
+        
+        // Function to toggle preview sections
+        function togglePreviewSection(element) {
+            element.classList.toggle("collapsed");
+            element.nextElementSibling.classList.toggle("collapsed");
+        }
 
-        // Load preview on page load
-        document.addEventListener('DOMContentLoaded', refreshPreview);
+        // New function to fully expand scrollable content
+        function expandContent(element) {
+            const contentElement = element.previousElementSibling;
+            if (contentElement.style.maxHeight === 'none') {
+                // Return to original max-height
+                contentElement.style.maxHeight = '';
+                element.textContent = 'Show Full Content';
+            } else {
+                // Remove max-height constraint
+                contentElement.style.maxHeight = 'none';
+                element.textContent = 'Collapse Content';
+            }
+        }
 
         const templates = {
             noble: {
@@ -2545,6 +3025,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     PROMPT_HEAD_OVERRIDE: document.getElementById('prompt-head-override').value,
                     use_narrator_profile: document.getElementById('use-narrator-profile').checked,
                     enforce_short_responses: document.getElementById('enforce-short-responses').checked,
+                    enable_prompt_slop_cleanup: document.getElementById('enable-prompt-slop-cleanup').checked,
                     stop_narrator_context_leak: document.getElementById('stop-narrator-context-leak').checked,
                     devious_narrator_eldritch_voice: document.getElementById('eldritch-voice').value,
                     devious_narrator_telvanni_voice: document.getElementById('telvanni-voice').value,
@@ -2563,6 +3044,8 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     strip_emotes_from_output: document.getElementById('strip-emotes').checked,
                     use_defeat: document.getElementById('use-defeat').checked,
                     realnames_support: document.getElementById('realnames-support').checked,
+                    inventory_items_limit: parseInt(document.getElementById('inventory-items-limit').value),
+                    use_item_relevancy_scoring: document.getElementById('use-item-relevancy-scoring').checked,
                     voicetype_fallbacks: getVoiceTypeFallbacks(),
                     action_prompts: {
                         singing: document.getElementById('singing-prompt').value,
@@ -2593,7 +3076,10 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                         roleplay_request_combat: document.getElementById('roleplay-request-combat').value,
 
                         sections: {}
-                    }
+                    },
+                    
+                    // Context builder settings
+                    minai_context: getContextBuilderSettings()
                 };
 
                 // Add sections in their current order
@@ -2606,6 +3092,9 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                         order: index
                     };
                 });
+
+                // Add context builder settings
+                config.minai_context = getContextBuilderSettings();
 
                 // Create file
                 const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
@@ -2649,6 +3138,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                         document.getElementById('prompt-head-override').value = importedConfig.PROMPT_HEAD_OVERRIDE ?? baseConfig.PROMPT_HEAD_OVERRIDE;
                         document.getElementById('use-narrator-profile').checked = importedConfig.use_narrator_profile ?? baseConfig.use_narrator_profile;
                         document.getElementById('enforce-short-responses').checked = importedConfig.enforce_short_responses ?? baseConfig.enforce_short_responses;
+                        document.getElementById('enable-prompt-slop-cleanup').checked = importedConfig.enable_prompt_slop_cleanup ?? baseConfig.enable_prompt_slop_cleanup;
                         document.getElementById('stop-narrator-context-leak').checked = importedConfig.stop_narrator_context_leak ?? baseConfig.stop_narrator_context_leak;
                         document.getElementById('eldritch-voice').value = importedConfig.devious_narrator_eldritch_voice ?? baseConfig.devious_narrator_eldritch_voice;
                         document.getElementById('telvanni-voice').value = importedConfig.devious_narrator_telvanni_voice ?? baseConfig.devious_narrator_telvanni_voice;
@@ -2665,6 +3155,10 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                         document.getElementById('strip-emotes').checked = importedConfig.strip_emotes_from_output ?? baseConfig.strip_emotes_from_output;
                         document.getElementById('use-defeat').checked = importedConfig.use_defeat ?? baseConfig.use_defeat;
                         document.getElementById('realnames-support').checked = importedConfig.realnames_support ?? baseConfig.realnames_support;
+
+                        // Inventory settings
+                        document.getElementById('inventory-items-limit').value = importedConfig.inventory_items_limit ?? baseConfig.inventory_items_limit;
+                        document.getElementById('use-item-relevancy-scoring').checked = importedConfig.use_item_relevancy_scoring ?? baseConfig.use_item_relevancy_scoring;
 
                         // Handle arrays and objects
                         if (importedConfig.commands_to_purge) {
@@ -2757,6 +3251,11 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                                 // Reinitialize sortable sections
                                 initializeSortableSections();
                             }
+                        }
+
+                        // Handle context builder settings
+                        if (importedConfig.minai_context) {
+                            loadContextBuilderSettings(importedConfig.minai_context);
                         }
 
                         // Compare the imported config with the current server config
@@ -2953,6 +3452,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 'prompt-head-override': 'PROMPT_HEAD_OVERRIDE',
                 'use-narrator-profile': 'use_narrator_profile',
                 'enforce-short-responses': 'enforce_short_responses',
+                'enable-prompt-slop-cleanup': 'enable_prompt_slop_cleanup',
                 'stop-narrator-context-leak': 'stop_narrator_context_leak',
                 'eldritch-voice': 'devious_narrator_eldritch_voice',
                 'telvanni-voice': 'devious_narrator_telvanni_voice',
@@ -2972,6 +3472,10 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 'voicetype-fallbacks': 'voicetype_fallbacks',
                 'commands-to-purge': 'commands_to_purge',
                 'events-to-ignore': 'events_to_ignore',
+                
+                // Inventory settings
+                'inventory-items-limit': 'inventory_items_limit',
+                'use-item-relevancy-scoring': 'use_item_relevancy_scoring',
 
                 // Action prompts
                 'singing-prompt': 'action_prompts.singing',
@@ -3076,6 +3580,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     'prompt-head-override': 'PROMPT_HEAD_OVERRIDE',
                     'use-narrator-profile': 'use_narrator_profile',
                     'enforce-short-responses': 'enforce_short_responses',
+                    'enable-prompt-slop-cleanup': 'enable_prompt_slop_cleanup',
                     'stop-narrator-context-leak': 'stop_narrator_context_leak',
                     'eldritch-voice': 'devious_narrator_eldritch_voice',
                     'telvanni-voice': 'devious_narrator_telvanni_voice',
@@ -3095,6 +3600,10 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     'voicetype-fallbacks': 'voicetype_fallbacks',
                     'commands-to-purge': 'commands_to_purge',
                     'events-to-ignore': 'events_to_ignore',
+
+                    // Inventory settings
+                    'inventory-items-limit': 'inventory_items_limit',
+                    'use-item-relevancy-scoring': 'use_item_relevancy_scoring',
 
                     // Action prompts
                     'singing-prompt': 'action_prompts.singing',
@@ -3146,6 +3655,9 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                         let isModified;
                         if (element.type === 'checkbox') {
                             isModified = element.checked !== defaultValue;
+                        } else if (element.type === 'number' || optionId === 'inventory-items-limit' || optionId === 'input-delay') {
+                            // Convert to numbers before comparison for numeric inputs
+                            isModified = Number(element.value) !== Number(defaultValue);
                         } else {
                             isModified = element.value !== defaultValue;
                         }
@@ -3175,6 +3687,224 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
             } catch (error) {
                 console.error('Error checking modified values:', error);
             }
+        }
+
+        // Context Builder Settings functions
+        function loadContextBuilderSettings(minai_context) {
+            if (!minai_context) return;
+            
+            // Group context options by category based on their names
+            const contextGroups = {
+                "Character Context": [],
+                "Core Context": [],
+                "Environmental Context": [],
+                "NSFW Context": [],
+                "Relationship Context": [],
+                "System Prompt Settings": [],
+                "Other": []
+            };
+            
+            // Define which keys belong to which groups
+            const categoryMappings = {
+                // Character context
+                "physical_description": "Character Context",
+                "equipment": "Character Context",
+                "tattoos": "Character Context",
+                "arousal": "Character Context",
+                "fertility": "Character Context",
+                "following": "Character Context",
+                "survival": "Character Context",
+                "player_status": "Character Context",
+                "bounty": "Character Context",
+                "mind_influence": "Character Context",
+                "dynamic_state": "Character Context",
+                "career": "Character Context",
+                "dirt_and_blood": "Character Context",
+                "level": "Character Context",
+                "family_status": "Character Context",
+                
+                // Core context
+                "personality": "Core Context",
+                "interaction": "Core Context",
+                "player_background": "Core Context",
+                "current_task": "Core Context",
+                
+                // Environmental context
+                "day_night_state": "Environmental Context",
+                "weather": "Environmental Context",
+                "moon_phase": "Environmental Context",
+                "location": "Environmental Context",
+                "frostfall": "Environmental Context",
+                "character_state": "Environmental Context",
+                "nearby_characters": "Environmental Context",
+                "npc_relationships": "Environmental Context",
+                "third_party": "Environmental Context",
+                "nearby_buildings": "Environmental Context",
+                
+                // Relationship context
+                "relationship": "Relationship Context",
+                "relative_power": "Relationship Context",
+                "devious_follower": "Relationship Context",
+                "submissive_lola": "Relationship Context",
+                "party_membership": "Relationship Context",
+                // NSFW context
+                "nsfw_reputation": "NSFW Context",
+                
+                // System prompt settings
+                "response_guidelines": "System Prompt Settings",
+                "action_enforcement": "System Prompt Settings"
+            };
+            
+            // Auto-categorization patterns for future additions
+            const categoryPatterns = [
+                { regex: /nsfw|sex|arousal|submissive|fertility/i, category: "NSFW Context" },
+                { regex: /relation|follower|companion|friend|rival|enemy/i, category: "Relationship Context" },
+                { regex: /weather|location|moon|sun|day|night|nearby|frostfall|environment/i, category: "Environmental Context" },
+                { regex: /physical|equipment|tattoo|appearance|status|state|blood|health|level|family|mind|career|bounty/i, category: "Character Context" },
+                { regex: /personality|interaction|background|task|goal|quest/i, category: "Core Context" },
+                { regex: /guideline|enforcement|response|action|behavior|rule/i, category: "System Prompt Settings" }
+            ];
+            
+            // Sort context options into groups
+            for (const [key, value] of Object.entries(minai_context)) {
+                // First check explicit mappings
+                let category = categoryMappings[key];
+                
+                // If no explicit mapping, try to categorize based on patterns
+                if (!category) {
+                    for (const pattern of categoryPatterns) {
+                        if (pattern.regex.test(key)) {
+                            category = pattern.category;
+                            break;
+                        }
+                    }
+                }
+                
+                // Default to "Other" if no category is found
+                category = category || "Other";
+                contextGroups[category].push({ key, value });
+            }
+            
+            // Generate HTML for each group
+            const contextBuilderContainer = document.getElementById('context-builder-groups');
+            contextBuilderContainer.innerHTML = '';
+            
+            for (const [category, items] of Object.entries(contextGroups)) {
+                // Skip empty categories
+                if (items.length === 0) continue;
+                
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'option-subgroup';
+                
+                const heading = document.createElement('h3');
+                heading.textContent = category;
+                groupDiv.appendChild(heading);
+                
+                const checkboxGroup = document.createElement('div');
+                checkboxGroup.className = 'checkbox-group';
+                
+                // Sort items alphabetically for consistent display
+                items.sort((a, b) => a.key.localeCompare(b.key));
+                
+                // Add each option
+                items.forEach(item => {
+                    const checkboxContainer = document.createElement('div');
+                    checkboxContainer.className = 'checkbox-container';
+                    
+                    // Create a user-friendly label from the key
+                    const friendlyName = item.key
+                        .replace(/_/g, ' ')
+                        .replace(/\b\w/g, l => l.toUpperCase());
+                    
+                    const htmlId = `ctx-${item.key.replace(/_/g, '-')}`;
+                    
+                    checkboxContainer.innerHTML = `
+                        <input type="checkbox" id="${htmlId}" name="minai_context[${item.key}]" ${item.value ? 'checked' : ''}>
+                        <label for="${htmlId}">${friendlyName}</label>
+                    `;
+                    
+                    checkboxGroup.appendChild(checkboxContainer);
+                });
+                
+                groupDiv.appendChild(checkboxGroup);
+                contextBuilderContainer.appendChild(groupDiv);
+            }
+            
+            // Add change listeners to all context checkboxes
+            document.querySelectorAll('input[name^="minai_context"]').forEach(checkbox => {
+                checkbox.addEventListener('change', () => markAsChanged());
+            });
+        }
+        
+        function getContextBuilderSettings() {
+            const contextSettings = {};
+            document.querySelectorAll('input[name^="minai_context"]').forEach(checkbox => {
+                // Extract key from name attribute which is in format minai_context[key]
+                const key = checkbox.name.match(/\[(.*?)\]/)[1];
+                contextSettings[key] = checkbox.checked;
+            });
+            return contextSettings;
+        }
+        
+        async function resetContextBuilderSettings() {
+            try {
+                const response = await fetch('api/config.php?defaults=true');
+                const defaultConfig = await response.json();
+                
+                if (!defaultConfig || defaultConfig.error) {
+                    throw new Error(defaultConfig.error || 'Failed to load default configuration');
+                }
+                
+                // Load default context builder settings
+                loadContextBuilderSettings(defaultConfig.minai_context);
+                
+                markAsChanged();
+                showStatus('Reset context builder settings to defaults', 'success');
+            } catch (error) {
+                console.error('Reset context builder settings error:', error);
+                showStatus('Failed to reset context builder settings: ' + error.message, 'error');
+            }
+        }
+
+        // Load preview on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshPreview();
+        });
+
+        function expandAllPreviewContent() {
+            // Expand all preview section headers
+            document.querySelectorAll('.preview-label.collapsed').forEach(el => {
+                el.classList.remove('collapsed');
+                el.nextElementSibling.classList.remove('collapsed');
+            });
+            
+            // Expand all content sections
+            document.querySelectorAll('.preview-content').forEach(el => {
+                el.style.maxHeight = 'none';
+            });
+            
+            // Update expand buttons
+            document.querySelectorAll('.expand-content-btn').forEach(el => {
+                el.textContent = 'Collapse Content';
+            });
+        }
+
+        // Add this helper function for escaping HTML
+        function escapeHtml(text) {
+            if (text === null || text === undefined) return '';
+            return text
+                .toString()
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // Add a function to format text with line breaks
+        function formatWithLineBreaks(text) {
+            if (!text) return '';
+            return escapeHtml(text).replace(/\n/g, '<br>');
         }
     </script>
 

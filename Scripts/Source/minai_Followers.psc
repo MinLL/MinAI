@@ -60,10 +60,10 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   Main.Debug("Followers - CommandDispatcher(" + speakerName +", " + command +", " + parameter + ")")
   if (command == "ExtCmdStartLooting")
     StartLooting()
-    Main.RegisterEvent(speakerName + " started looting the area")
+    Main.RegisterEvent(speakerName + " started looting the area", "info_looting_start")
   elseif (command == "ExtCmdStopLooting")
     StartLooting()
-    Main.RegisterEvent(speakerName + " stopped looting the area")
+    Main.RegisterEvent(speakerName + " stopped looting the area", "info_looting_stop")
   EndIf
 EndEvent
 

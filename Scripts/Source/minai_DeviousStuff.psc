@@ -329,11 +329,123 @@ EndFunction
 Event OnDeviceEquipped(Form inventoryDevice, Form deviceKeyword, form akActor)
   Main.Info("Equipped Device: " + (inventoryDevice as Armor).GetName() + " on " + main.GetActorName(akActor as Actor))
   SetContext(akActor as Actor)
+  Keyword asKeyword = deviceKeyword as Keyword
+  ; Map device keywords to info event names
+  string infoEvent = "minai_equip_device"
+  if asKeyword == libs.zad_DeviousCollar
+    infoEvent = "minai_equip_collar"
+  elseif asKeyword == libs.zad_DeviousGag || asKeyword == libs.zad_DeviousGagPanel || asKeyword == libs.zad_DeviousGagLarge
+    infoEvent = "minai_equip_gag"
+  elseif asKeyword == libs.zad_DeviousBelt
+    infoEvent = "minai_equip_belt"
+  elseif asKeyword == libs.zad_DeviousArmbinder
+    infoEvent = "minai_equip_armbinder"
+  elseif asKeyword == libs.zad_DeviousYoke
+    infoEvent = "minai_equip_yoke"
+  elseif asKeyword == libs.zad_DeviousElbowTie
+    infoEvent = "minai_equip_elbowtie"
+  elseif asKeyword == libs.zad_DeviousStraitJacket
+    infoEvent = "minai_equip_straitjacket"
+  elseif asKeyword == libs.zad_DeviousCorset
+    infoEvent = "minai_equip_corset"
+  elseif asKeyword == libs.zad_DeviousHood
+    infoEvent = "minai_equip_hood"
+  elseif asKeyword == libs.zad_DeviousHobbleSkirt
+    infoEvent = "minai_equip_hobbleskirt"
+  elseif asKeyword == libs.zad_DeviousGloves
+    infoEvent = "minai_equip_gloves"
+  elseif asKeyword == libs.zad_DeviousSuit
+    infoEvent = "minai_equip_suit"
+  elseif asKeyword == libs.zad_DeviousHarness
+    infoEvent = "minai_equip_harness"
+  elseif asKeyword == libs.zad_DeviousBlindfold
+    infoEvent = "minai_equip_blindfold"
+  elseif asKeyword == libs.zad_DeviousAnkleShackles
+    infoEvent = "minai_equip_ankleshackles"
+  elseif asKeyword == libs.zad_DeviousClamps
+    infoEvent = "minai_equip_clamps"
+  elseif asKeyword == libs.zad_DeviousPlugVaginal
+    infoEvent = "minai_equip_plugvaginal"
+  elseif asKeyword == libs.zad_DeviousPlugAnal
+    infoEvent = "minai_equip_pluganal"
+  elseif asKeyword == libs.zad_DeviousPiercingsNipple
+    infoEvent = "minai_equip_piercingsnipple"
+  elseif asKeyword == libs.zad_DeviousPiercingsVaginal
+    infoEvent = "minai_equip_piercingsvaginal"
+  elseif asKeyword == libs.zad_DeviousArmCuffs
+    infoEvent = "minai_equip_armcuffs"
+  elseif asKeyword == libs.zad_DeviousLegCuffs
+    infoEvent = "minai_equip_legcuffs"
+  elseif asKeyword == libs.zad_DeviousBra
+    infoEvent = "minai_equip_bra"
+  elseif asKeyword == libs.zad_DeviousPetSuit
+    infoEvent = "minai_equip_petsuit"
+  endif
+
+  if infoEvent != ""
+    Main.RequestLLMResponseFromActor("Equipped Device: " + (inventoryDevice as Armor).GetName() + " on " + main.GetActorName(akActor as Actor), infoEvent, main.GetActorName(akActor as Actor), "both")
+  endif
 EndEvent
 
 Event OnDeviceRemoved(Form inventoryDevice, Form deviceKeyword, form akActor)
-  Main.Info("Removed Device: " + (inventoryDevice as Armor).GetName() + " on " + main.GetActorName(akActor as Actor))
+  Main.Info("Removed Device: " + (inventoryDevice as Armor).GetName() + " from " + main.GetActorName(akActor as Actor))
   SetContext(akActor as Actor)
+  Keyword asKeyword = deviceKeyword as Keyword
+  ; Map device keywords to info event names
+  string infoEvent = "minai_unequip_device"
+  if asKeyword == libs.zad_DeviousCollar
+    infoEvent = "minai_unequip_collar"
+  elseif asKeyword == libs.zad_DeviousGag || asKeyword == libs.zad_DeviousGagPanel || asKeyword == libs.zad_DeviousGagLarge
+    infoEvent = "minai_unequip_gag"
+  elseif asKeyword == libs.zad_DeviousBelt
+    infoEvent = "minai_unequip_belt"
+  elseif asKeyword == libs.zad_DeviousArmbinder
+    infoEvent = "minai_unequip_armbinder"
+  elseif asKeyword == libs.zad_DeviousYoke
+    infoEvent = "minai_unequip_yoke"
+  elseif asKeyword == libs.zad_DeviousElbowTie
+    infoEvent = "minai_unequip_elbowtie"
+  elseif asKeyword == libs.zad_DeviousStraitJacket
+    infoEvent = "minai_unequip_straitjacket"
+  elseif asKeyword == libs.zad_DeviousCorset
+    infoEvent = "minai_unequip_corset"
+  elseif asKeyword == libs.zad_DeviousHood
+    infoEvent = "minai_unequip_hood"
+  elseif asKeyword == libs.zad_DeviousHobbleSkirt
+    infoEvent = "minai_unequip_hobbleskirt"
+  elseif asKeyword == libs.zad_DeviousGloves
+    infoEvent = "minai_unequip_gloves"
+  elseif asKeyword == libs.zad_DeviousSuit
+    infoEvent = "minai_unequip_suit"
+  elseif asKeyword == libs.zad_DeviousHarness
+    infoEvent = "minai_unequip_harness"
+  elseif asKeyword == libs.zad_DeviousBlindfold
+    infoEvent = "minai_unequip_blindfold"
+  elseif asKeyword == libs.zad_DeviousAnkleShackles
+    infoEvent = "minai_unequip_ankleshackles"
+  elseif asKeyword == libs.zad_DeviousClamps
+    infoEvent = "minai_unequip_clamps"
+  elseif asKeyword == libs.zad_DeviousPlugVaginal
+    infoEvent = "minai_unequip_plugvaginal"
+  elseif asKeyword == libs.zad_DeviousPlugAnal
+    infoEvent = "minai_unequip_pluganal"
+  elseif asKeyword == libs.zad_DeviousPiercingsNipple
+    infoEvent = "minai_unequip_piercingsnipple"
+  elseif asKeyword == libs.zad_DeviousPiercingsVaginal
+    infoEvent = "minai_unequip_piercingsvaginal"
+  elseif asKeyword == libs.zad_DeviousArmCuffs
+    infoEvent = "minai_unequip_armcuffs"
+  elseif asKeyword == libs.zad_DeviousLegCuffs
+    infoEvent = "minai_unequip_legcuffs"
+  elseif asKeyword == libs.zad_DeviousBra
+    infoEvent = "minai_unequip_bra"
+  elseif asKeyword == libs.zad_DeviousPetSuit
+    infoEvent = "minai_unequip_petsuit"
+  endif
+
+  if infoEvent != ""
+    Main.RequestLLMResponseFromActor("Removed Device: " + (inventoryDevice as Armor).GetName() + " from " + main.GetActorName(akActor as Actor), infoEvent, main.GetActorName(akActor as Actor), "both")
+  endif
 EndEvent
 
 ; Function ReceiveFunction(Form akSource,Form akFormActor,Int aiSetArousal)
@@ -344,12 +456,12 @@ EndEvent
 
 
 Event OnOrgasm(string eventName, string actorName, float numArg, Form sender)
-  Main.RequestLLMResponseNPC(actorName, "I just had an orgasm!", "everyone")
+  Main.RequestLLMResponseFromActor(actorName + " just had an orgasm!", "minai_orgasm", "everyone", "both")
 EndEvent
 
 
 Event OnEdged(string eventName, string actorName, float numArg, Form sender)
-  Main.RequestLLMResponseNPC(actorName, "I was brought right to the edge of orgasm but the vibrations stopped before I could cum!", "everyone")
+  Main.RequestLLMResponseFromActor(actorName + " was brought right to the edge of orgasm but the vibrations stopped before I could cum!", "minai_edged", "everyone", "both")
 EndEvent
 
 
@@ -367,14 +479,39 @@ String Function getVibStrength(float vibStrength)
   return strength
 endFunction
 
+Actor Function getVibratingActorName(string actorName)
+  if actorName == main.GetActorName(playerRef) || actorName == "The Narrator"
+    return playerRef
+  else
+    return aiff.AIGetAgentByName(actorName)
+  endif
+  return None
+endFunction
+
 Event OnVibrateStart(string eventName, string actorName, float vibStrength, Form sender)
   string strength = getVibStrength(vibStrength)
-  Main.RegisterEvent("A low buzzing sound started to come from " + actorName + " as she started being " + strength + " stimulated by a vibrator.")
+  Main.Info("OnVibrateStart: " + strength)
+  ; Both player and npc's should react to vibrations starting
+  Actor vibratorActor = getVibratingActorName(actorName)
+  if vibratorActor
+    aiff.SetActorVariable(vibratorActor, "isVibratorActive", True)
+  endif
+  Main.RequestLLMResponseFromActor(actorName + " is vibrating: " + strength, "minai_vibrate_start", actorName, "both")
 EndEvent
 
 Event OnVibrateStop(string eventName, string actorName, float vibStrength, Form sender)
   string strength = getVibStrength(vibStrength)
-  Main.RegisterEvent(actorName + " stopped being stimulated by a vibrator.")
+  Main.Info("OnVibrateStop: " + strength)
+  Actor vibratorActor = getVibratingActorName(actorName)
+  if vibratorActor
+    aiff.SetActorVariable(vibratorActor, "isVibratorActive", False)
+  endif
+  string vibString = actorName + " is no longer vibrating: " + strength
+  if config.includePromptSelf
+    Main.RequestLLMResponseFromActor(vibString, "minai_vibrate_stop", actorName, "player")
+  else
+    Main.RegisterEvent(vibString, "info_minai_vibrate_stop")
+  endif
 EndEvent
 
 
@@ -777,44 +914,44 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   if bHasDD ;  && CanVibrate(akTarget)
     int vibTime = Utility.RandomInt(20,60)
     if (command == "ExtCmdForceOrgasm")
+      Main.RegisterEvent(""+speakerName+" made " + targetName + " have an orgasm with a remote vibrator.", "info_orgasm")
       libs.ActorOrgasm(akTarget)
-      Main.RegisterEvent(""+speakerName+" made " + targetName + " have an orgasm with a remote vibrator.")
     elseIf (command == "ExtCmdTeaseWithVibratorVeryWeak")
+      Main.RegisterEvent(""+speakerName+" very weakly teases " + targetName + " with a remote vibrator.", "info_tease_very_weak")
       StartVibration(akTarget, 1, vibTime, True)
-      Main.RegisterEvent(""+speakerName+" very weakly teases " + targetName + " with a remote vibrator.")
     elseIf (command == "ExtCmdStimulateWithVibratorVeryWeak")
+      Main.RegisterEvent(""+speakerName+" very weakly stimulates " + targetName + " with a remote vibrator.", "info_stimulate_very_weak")
       StartVibration(akTarget, 1, vibTime, False)
-      Main.RegisterEvent(""+speakerName+" very weakly stimulates " + targetName + " with a remote vibrator.")
     elseIf (command == "ExtCmdTeaseWithVibratorWeak")
+      Main.RegisterEvent(""+speakerName+" weakly teases " + targetName + " with a remote vibrator.", "info_tease_weak")
       StartVibration(akTarget, 2, vibTime, True)
-      Main.RegisterEvent(""+speakerName+" weakly teases " + targetName + " with a remote vibrator.")
     elseIf (command == "ExtCmdStimulateWithVibratorWeak")
+      Main.RegisterEvent(""+speakerName+" weakly stimulates " + targetName + " with a remote vibrator.", "info_stimulate_weak")
       StartVibration(akTarget, 2, vibTime, False)
-      Main.RegisterEvent(""+speakerName+" weakly stimulates " + targetName + " with a remote vibrator.")
     elseIf (command == "ExtCmdTeaseWithVibratorMedium")
+      Main.RegisterEvent(""+speakerName+" teases " + targetName + " with a remote vibrator.", "info_tease_medium")
       StartVibration(akTarget, 3, vibTime, True)
-      Main.RegisterEvent(""+speakerName+" teases " + targetName + " with a remote vibrator.")
     elseIf (command == "ExtCmdStimulateWithVibratorMedium")
+      Main.RegisterEvent(""+speakerName+" stimulates " + targetName + " with a remote vibrator.", "info_stimulate_medium")
       StartVibration(akTarget, 3, vibTime, False)
-      Main.RegisterEvent(""+speakerName+" stimulates " + targetName + " with a remote vibrator.")
     elseIf (command == "ExtCmdTeaseWithVibratorStrong")
+      Main.RegisterEvent(""+speakerName+" strongly teases " + targetName + " with a remote vibrator.", "info_tease_strong")
       StartVibration(akTarget, 4, vibTime, True)
-      Main.RegisterEvent(""+speakerName+" strongly teases " + targetName + " with a remote vibrator.")
     elseIf (command == "ExtCmdStimulateWithVibratorStrong")
+      Main.RegisterEvent(""+speakerName+" strongly stimulates " + targetName + " with a remote vibrator.", "info_stimulate_strong")
       StartVibration(akTarget, 4, vibTime, False)
-      Main.RegisterEvent(""+speakerName+" strongly stimulates " + targetName + " with a remote vibrator.")
     elseIf (command == "ExtCmdTeaseWithVibratorVeryStrong")
+      Main.RegisterEvent(""+speakerName+" very strongly teases " + targetName + " with a remote vibrator.", "info_tease_very_strong")
       StartVibration(akTarget, 5, vibTime, True)
-      Main.RegisterEvent(""+speakerName+" very strongly teases " + targetName + " with a remote vibrator.")
     elseIf (command == "ExtCmdStimulateWithVibratorVeryStrong")
+      Main.RegisterEvent(""+speakerName+" very strongly stimulates " + targetName + " with a remote vibrator.", "info_stimulate_very_strong")
       StartVibration(akTarget, 5, vibTime, False)
-      Main.RegisterEvent(""+speakerName+" very strongly stimulates " + targetName + " with a remote vibrator.")
     elseIf (command == "ExtCmdTurnOffVibrator")
+      Main.RegisterEvent(""+speakerName+" turns off " + targetName + "'s remote vibrator.", "info_turn_off")
       libs.StopVibrating(akTarget)
-      Main.RegisterEvent(""+speakerName+" turns off " + targetName + "'s remote vibrator.")
     elseIf (command == "ExtCmdshock")
+      Main.RegisterEvent(""+speakerName+" remotely shocks  " + targetName + ".", "info_shock")
       libs.ShockActor(akTarget)
-      Main.RegisterEvent(""+speakerName+" remotely shocks  " + targetName + ".")
     elseIf (command == "ExtCmdEquipVibrator")
       ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_plugs_anal)
       ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_plugs_vaginal)
@@ -823,60 +960,59 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
       bool edgeOnly = sex.CanAnimate(akTarget)
       StartVibration(akTarget, 3, 60, edgeOnly)
       if edgeOnly
-        Main.RegisterEvent(speakerName + " locked vibrating plugs inside " + targetName + ". The plugs immediately began teasing " + targetName + " with moderate vibrations, but won't let them climax.")
+        Main.RegisterEvent(speakerName + " locked vibrating plugs inside " + targetName + ". The plugs immediately began teasing " + targetName + " with moderate vibrations, but won't let them climax.", "info_device_plug_edge")
       else
-        Main.RegisterEvent(speakerName + " locked vibrating plugs inside " + targetName + ". The plugs immediately began stimulating " + targetName + " with moderate vibrations that could potentially make them climax.")
+        Main.RegisterEvent(speakerName + " locked vibrating plugs inside " + targetName + ". The plugs immediately began stimulating " + targetName + " with moderate vibrations that could potentially make them climax.", "info_device_plug_stimulate")
       EndIf
     EndIf
     ; Device equip events
     if bHasDDExpansion
       if (command == "ExtCmdEquipCollar")
+        Main.RegisterEvent(""+speakerName+" locked a collar on " + targetName, "info_device_equip_collar")
         ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_collars)
-        Main.RegisterEvent(""+speakerName+" locked a collar on " + targetName)
       elseif (command == "ExtCmdUnequipCollar")
         if(libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousCollar))
-          Main.RegisterEvent(""+speakerName+" removed a collar from " + targetName)
+          Main.RegisterEvent(""+speakerName+" removed a collar from " + targetName, "info_device_remove_collar")
         else
-          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove a collar from " + targetName)
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove a collar from " + targetName, "info_device_remove_fail")
         EndIf
       elseif (command == "ExtCmdEquipGag")
+        Main.RegisterEvent(""+speakerName+" Puts a gag on " + targetName, "info_device_equip_gag")
         ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_gags_ball_ebonite)
-        Main.RegisterEvent(""+speakerName+" Puts a gag on " + targetName)
       elseif (command == "ExtCmdEquipBinder")
+        Main.RegisterEvent(""+speakerName+" Puts a Armbinder on " + targetName, "info_device_equip_armbinder")
         ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_armbinders_ebonite)
-        Main.RegisterEvent(""+speakerName+" Puts a Armbinder on " + targetName)
       elseif (command == "ExtCmdEquipVibrator")
+        Main.RegisterEvent(""+speakerName+" Puts a Vibrator in " + targetName, "info_device_equip_vibrator")
         ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_plugs_anal)
         ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_plugs_vaginal)
-        Main.RegisterEvent(""+speakerName+" Puts a Vibrator in " + targetName)
-        
       elseif (command == "ExtCmdEquipBelt")
+        Main.RegisterEvent(""+speakerName+" Puts a Chastity Belt on " + targetName, "info_device_equip_belt")
         ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_chastitybelts_closed)
-        Main.RegisterEvent(""+speakerName+" Puts a Chastity Belt on " + targetName)
       elseif (command == "ExtCmdUnequipBelt")
         if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousBelt))
-          Main.RegisterEvent(""+speakerName+" removes a Chastity Belt from " + targetName)
+          Main.RegisterEvent(""+speakerName+" removes a Chastity Belt from " + targetName, "info_device_remove_belt")
         else
-          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove a Chastity Belt from " + targetName)
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove a Chastity Belt from " + targetName, "info_device_remove_fail")
         EndIf
       elseif (command == "ExtCmdUnequipGag")
         if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousGag))
-          Main.RegisterEvent(""+speakerName+" removes a Gag from " + targetName)
+          Main.RegisterEvent(""+speakerName+" removes a Gag from " + targetName, "info_device_remove_gag")
         else
-          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove a Gag from " + targetName)
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove a Gag from " + targetName, "info_device_remove_fail")
         EndIf
             
       elseif (command == "ExtCmdUnequipBinder")
         if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousHeavyBondage))
-          Main.RegisterEvent(""+speakerName+" removes a Armbinder from " + targetName)
+          Main.RegisterEvent(""+speakerName+" removes a Armbinder from " + targetName, "info_device_remove_armbinder")
         else
-          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove a Armbinder from " + targetName)
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove a Armbinder from " + targetName, "info_device_remove_fail")
         EndIf
       elseif (command == "ExtCmdUnequipVibrator")
         if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousPlugVaginal) || libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousPlugAnal))
-          Main.RegisterEvent(""+speakerName+" removes the vibrators from " + targetName)
+          Main.RegisterEvent(""+speakerName+" removes the vibrators from " + targetName, "info_device_remove_vibrator")
         else
-          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove the vibrators from " + targetName)
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove the vibrators from " + targetName, "info_device_remove_fail")
         EndIf
       EndIf
     EndIf
@@ -889,7 +1025,7 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     if bHasDD
       libs.Moan(akTarget)
     EndIf
-    Main.RegisterEvent(""+speakerName+" gropes " + targetName + " in a vulgar manner.")
+    Main.RegisterEvent(""+speakerName+" gropes " + targetName + " in a vulgar manner.", "info_touch_grope")
   EndIf
   If (command == "ExtCmdPinchNipples")
     Debug.Notification(speakerName + " painfully pinches " + main.GetYouYour(akTarget) + " nipples!")
@@ -898,26 +1034,26 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     if bHasDD
       libs.Moan(akTarget)
     EndIf
-    Main.RegisterEvent(""+speakerName+" pinches " + targetName + "'s nipples in a vulgar manner.")
+    Main.RegisterEvent(""+speakerName+" pinches " + targetName + "'s nipples in a vulgar manner.", "info_touch_pinch")
   elseif (command=="ExtCmdSpankAss")
     SpankAss(1, bDeviousFollowerInScene, bLolaOwnerInScene)
-    Main.RegisterEvent(""+speakerName+" spanks " + targetName + "'s ass.")
+    Main.RegisterEvent(""+speakerName+" spanks " + targetName + "'s ass.", "info_spank_ass")
   elseif (command=="ExtCmdSpankTits")
     SpankTits(1, bDeviousFollowerInScene, bLolaOwnerInScene)
-    Main.RegisterEvent(""+speakerName+" spanks " + targetName + "'s tits.")
+    Main.RegisterEvent(""+speakerName+" spanks " + targetName + "'s tits.", "info_spank_breast")
   EndIf
 
   ; Mutually Exclusive commands
   if sex.CanAnimate(akTarget) && sex.CanAnimate(akSpeaker)
     if command == "ExtCmdMolest"
       HorribleHarassmentActivate(akSpeaker)
-      Main.RegisterEvent(""+speakerName+" began to sexually assault " + Main.GetActorName(playerRef) + "'.")
+      Main.RegisterEvent(""+speakerName+" began to sexually assault " + Main.GetActorName(playerRef) + "'.", "info_assault")
     elseif command == "ExtCmdKiss"
       HarassKiss(akSpeaker)
-      Main.RegisterEvent(""+speakerName+" began to kiss " + Main.GetActorName(playerRef) + "'.")
+      Main.RegisterEvent(""+speakerName+" began to kiss " + Main.GetActorName(playerRef) + "'.", "info_kiss")
     elseif command == "ExtCmdHug"
       HarassHug(akSpeaker)
-      Main.RegisterEvent(""+speakerName+" began to hug " + Main.GetActorName(playerRef) + "'.")
+      Main.RegisterEvent(""+speakerName+" began to hug " + Main.GetActorName(playerRef) + "'.", "info_hug")
     EndIf
   EndIf
   if bHasDeviousFollowers
@@ -927,37 +1063,37 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
       Debug.Notification("AI: Accepted Deal: " + targetRule)
       Main.Info("Player Accepted Deal: " + targetRule)
       dfDealController.MakeDeal(targetRule)
-      Main.RegisterEvent(""+targetName+" agreed to obey a new rule: \"" + ruleDesc + "\".")
+      Main.RegisterEvent(""+targetName+" agreed to obey a new rule: \"" + ruleDesc + "\".", "info_deal_accepted")
       ClearTargetRule()
     EndIf
     if (command == "ExtCmdGiveDrugs") 
       Debug.Notification("AI: Drinking Skooma")
       Main.Info("Player Drinking Skooma")
       dfDealController.MDC.DrinkSkooma()
-      Main.RegisterEvent(""+targetName+" used the drugs that " + speakerName + " provided.")
+      Main.RegisterEvent(""+targetName+" used the drugs that " + speakerName + " provided.", "info_drug_consumed")
     EndIf
     if (command == "ExtCmdRejectDeal") 
       Main.Info("Player Reject Deal")
       Debug.Notification("AI: Rejected Deal")
       dfDealController.RejectDeal(targetRule)
-      Main.RegisterEvent(""+targetName+" refused to obey the new rule: \"" + ruleDesc + "\".")
+      Main.RegisterEvent(""+targetName+" refused to obey the new rule: \"" + ruleDesc + "\".", "info_deal_rejected")
       ClearTargetRule()
     EndIf
   EndIf
   if (bHasSubmissiveLola)
     if (command == "ExtCmdGiveTask" && (Quest.GetQuest("vkjMQ") as vkjMQ).MayAskForService)
       Main.Info("Player asked for a task")
-      Main.RegisterEvent(""+Main.GetActorName(playerRef)+" asked " + speakerName +" for a task.")
+      Main.RegisterEvent(""+Main.GetActorName(playerRef)+" asked " + speakerName +" for a task.", "info_task_requested")
       (Quest.GetQuest("vkjMQ") as vkjMQ).KneelScene.Start()
     endif
     if (command == "ExtCmdPunishDisrespectful")
       Main.Info(speakerName + " punishes player moderatly")
-      Main.RegisterEvent(""+speakerName+" punishes " + Main.GetActorName(playerRef) +" moderatly.")
+      Main.RegisterEvent(""+speakerName+" punishes " + Main.GetActorName(playerRef) +" moderatly.", "info_punishment")
       (Quest.GetQuest("vkjMQ") as vkjMQ).Disrespectful(-5)
     endif
     if (command == "ExtCmdPunishWhip")
       Main.Info(speakerName + " punishes player harshly")
-      Main.RegisterEvent(""+speakerName+" punishes " + Main.GetActorName(playerRef) +" harshly.")
+      Main.RegisterEvent(""+speakerName+" punishes " + Main.GetActorName(playerRef) +" harshly.", "info_punishment")
       vkjMQ SubLolaMQ = Quest.GetQuest("vkjMQ") as vkjMQ
       SubLolaMQ.UpdateSubmissionScore(-10)
       SubLolaMQ.OwnerWillPunishThisTime()
@@ -965,12 +1101,12 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     endif
     if (command == "ExtCmdSmallReward")
       Main.Info(speakerName + " rewards the player (small)")
-      Main.RegisterEvent(""+speakerName+" rewards " + Main.GetActorName(playerRef) +" a little.")
+      Main.RegisterEvent(""+speakerName+" rewards " + Main.GetActorName(playerRef) +" a little.", "info_reward")
       (Quest.GetQuest("vkjMQ") as vkjMQ).MinimalReward()
     endif
     if (command == "ExtCmdLargeReward")
       Main.Info(speakerName + " rewards the player (large)")
-      Main.RegisterEvent(""+speakerName+" rewards " + Main.GetActorName(playerRef) +" a lot.")
+      Main.RegisterEvent(""+speakerName+" rewards " + Main.GetActorName(playerRef) +" a lot.", "info_reward")
       (Quest.GetQuest("vkjMQ") as vkjMQ).MediumReward()
     endif
   Endif
@@ -982,7 +1118,10 @@ Function SetContext(actor akTarget)
     return
   EndIf
   string actorName = main.GetActorName(akTarget)
-  aiff.SetActorVariable(akTarget, "canVibrate", CanVibrate(akTarget))
+  if bHasDD
+    aiff.SetActorVariable(akTarget, "canVibrate", CanVibrate(akTarget))
+    aiff.SetActorVariable(akTarget, "isVibratorActive", libs.isVibrating(akTarget))
+  endif
   if bHasDeviousFollowers && akTarget == PlayerRef
     Actor deviousFollower = (Quest.GetQuest("_Dflow") as QF__Gift_09000D62).Alias__DMaster.GetRef() as Actor
     if deviousFollower
@@ -1183,7 +1322,7 @@ EndFunction
 Event OnTNTRAnimation(Form akTarget, string eventSource, string eventName)
     string eventLine = main.GetActorName(akTarget as Actor) + " caught caught by a " + eventSource + " and is being animated with " + eventName
     Main.Info("tntr: " + eventLine)
-    main.RequestLLMResponse(eventLine, "minai_tntr_" + eventSource + "_" + eventName)
+    main.RequestLLMResponseFromActor(eventLine, "minai_tntr_" + eventSource + "_" + eventName, main.GetActorName(akTarget as Actor), "player")
 EndEvent
 
 

@@ -8,8 +8,11 @@ minai_DeviousStuff devious
 minai_Config config
 minai_Reputation reputation
 minai_DirtAndBlood dirtAndBlood
+minai_Relationship relationship
 minai_EnvironmentalAwareness envAwareness
 minai_Util MinaiUtil 
+minai_CombatManager combat
+minai_Crime crimeController
 
 ; Per-actor mutex for SetContext
 int Property contextMutexMap Auto  ; JMap of actor names to mutex states
@@ -32,16 +35,35 @@ Spell ContextSpell
 GlobalVariable minai_SapienceEnabled
 int Property actionRegistry Auto
 int sapientActors = 0
-
+bool inventoryMutex
 bool bHasFollowPlayer = False
 Package FollowPlayerPackage
 Faction FollowingPlayerFaction
 
+int property inventoryTracker auto hidden
+
+; Update throttling
+int property updateTracker auto hidden
+
+float property inventoryUpdateThrottle = 5.0 auto hidden
+
+; Property for inventory burst tracking
+int property inventoryBurstTracker auto hidden
+
+; How many inventory events in a short window before throttling
+int property inventoryEventThreshold = 10 auto hidden
+
+; Time window in seconds for burst detection
+float property inventoryBurstWindow = 1.0 auto hidden
+
+; Whether to use inventory burst protection
+bool property useInventoryBurstProtection = true auto hidden
+
+; Maximum number of items to send in a single batch
+int property maxInventoryBatchSize = 30 auto hidden ; Set in the maintenance function
+
 ; Add new property to track last dialogue time for actors
 int Property lastDialogueTimes Auto  ; JMap of actor names to timestamps
-
-; Add new property for update tracking
-int Property updateTracker Auto  ; JMap for tracking last update times
 
 Function InitFollow()
   bHasFollowPlayer = False
@@ -60,8 +82,10 @@ Function InitFollow()
 EndFunction
 
 Function Maintenance(minai_MainQuestController _main)
+  maxInventoryBatchSize = 120
+  inventoryMutex = False
   if (main.GetVersion() != main.CurrentVersion)
-    Main.Info("AIFF - Maintenance: Version update detected. Resetting action registry.")
+    Main.Info("CHIM - Maintenance: Version update detected. Resetting action registry.")
     ResetActionRegistry()
   EndIf
 
@@ -72,12 +96,45 @@ Function Maintenance(minai_MainQuestController _main)
   contextMutexMap = JMap.object()
   JValue.retain(contextMutexMap)
 
-  ; Initialize update tracker
-  if updateTracker != 0
-    JValue.Release(updateTracker)
+  ; Initialize inventory tracking
+  if inventoryTracker == 0
+    Main.Info("Initializing inventory tracker")
+    inventoryTracker = JMap.object()
+    JValue.retain(inventoryTracker)
   endif
-  updateTracker = JMap.object()
-  JValue.retain(updateTracker)
+
+  ; Initialize inventory burst tracker
+  if inventoryBurstTracker
+    JValue.release(inventoryBurstTracker)
+    inventoryBurstTracker = 0
+  EndIf
+  if inventoryBurstTracker == 0
+    Main.Info("Initializing inventory burst tracker")
+    inventoryBurstTracker = JMap.object()
+    JValue.retain(inventoryBurstTracker)
+  endif
+  ; Initialize update tracker
+  if updateTracker
+    JValue.release(updateTracker)
+    updateTracker = 0
+  EndIf
+  if updateTracker == 0
+    updateTracker = JMap.object()
+    JValue.retain(updateTracker)
+  EndIf
+  ; Set default throttle parameters
+  if inventoryUpdateThrottle <= 0
+    inventoryUpdateThrottle = 5.0  ; Default 5 second throttle
+  EndIf
+  
+  ; Set default burst parameters if not already set
+  if inventoryEventThreshold <= 0
+    inventoryEventThreshold = 10   ; Default 10 events threshold
+  EndIf
+  
+  if inventoryBurstWindow <= 0
+    inventoryBurstWindow = 1.0     ; Default 1 second window
+  EndIf
   
   main = _main
   config = Game.GetFormFromFile(0x0912, "MinAI.esp") as minai_Config
@@ -85,7 +142,7 @@ Function Maintenance(minai_MainQuestController _main)
     main.Fatal("Could not load configuration - script version mismatch with esp")
   EndIf
   player = Game.GetPlayer()
-  Main.Info("- Initializing for AIFF.")
+  Main.Info("- Initializing for CHIM.")
   AIAssisted = Game.GetFormFromFile(0x217a8,"AIAgent.esp") as Keyword
   if !AIAssisted
     main.Fatal("You are running an old / outdated version of AI Follower Framework. Some functionality will be broken.")
@@ -100,11 +157,14 @@ Function Maintenance(minai_MainQuestController _main)
   arousal = (Self as Quest)as minai_Arousal
   devious = (Self as Quest)as minai_DeviousStuff
   dirtAndBlood = (Self as Quest)as minai_DirtAndBlood
+  relationship = (Self as Quest)as minai_Relationship
   envAwareness = (Self as Quest)as minai_EnvironmentalAwareness
   fertility = (Self as Quest)as minai_FertilityMode
   minaiUtil = (Self as Quest) as minai_Util
+  combat = (Self as Quest) as minai_CombatManager
   followers = Game.GetFormFromFile(0x0913, "MinAI.esp") as minai_Followers
   reputation = (Self as Quest) as minai_Reputation
+  crimeController = (Self as Quest) as minai_Crime
   if (!followers)
     Main.Fatal("Could not load followers script - Mismatched script and esp versions")
   EndIf
@@ -125,7 +185,7 @@ Function Maintenance(minai_MainQuestController _main)
   if (Game.GetModByName("MinAI_AIFF.esp") != 255)
     Main.Fatal("You are are running an old version of the beta with min_AIFF.esp. This file is no longer required. Delete this file.")
   EndIf
-
+  
   vibratorCommands = new String[10]
   vibratorCommands[0] = "ExtCmdTeaseWithVibratorVeryWeak"
   vibratorCommands[1] = "ExtCmdTeaseWithVibratorWeak"
@@ -152,6 +212,8 @@ Function Maintenance(minai_MainQuestController _main)
   if config.preserveQueue
     EnablePreserveQueue()
   EndIf
+  
+  Main.Info("MinAI AIFF Maintenance complete - Inventory tracking initialized")
 EndFunction
 
 
@@ -164,9 +226,64 @@ Function CleanupStates()
     SetActorVariable(akTarget, "hostileToPlayer", akTarget.IsHostileToActor(player))
     SetActorVariable(akTarget, "isBleedingOut", akTarget.isBleedingOut())
     SetActorVariable(akTarget, "scene", akTarget.GetCurrentScene())
-    EndFollowTarget(actors[i], true)
+    ; EndFollowTarget(actors[i], true)
     i += 1
   EndWhile
+  
+  ; Clean up tracking data for actors no longer present
+  if inventoryTracker && updateTracker
+    ; Create a map of actor names that are currently present
+    int presentActors = JMap.object()
+    i = 0
+    while i < actors.Length
+      JMap.setInt(presentActors, Main.GetActorName(actors[i]), 1)
+      i += 1
+    EndWhile
+    
+    ; Check all actors in inventoryTracker and remove those not present
+    string[] actorNames = JMap.allKeysPArray(inventoryTracker)
+    i = 0
+    int removedCount = 0
+    while i < actorNames.Length
+      ; Skip player - always keep player's data
+      if actorNames[i] != Main.GetActorName(player) && !JMap.hasKey(presentActors, actorNames[i])
+        ; Actor is not present, clean up their inventory data
+        int inventory = JMap.getObj(inventoryTracker, actorNames[i])
+        if inventory
+          ; Release inventory object
+          JValue.release(inventory)
+        EndIf
+        JMap.removeKey(inventoryTracker, actorNames[i])
+        
+        ; Also clean up update tracking data
+        string invUpdateKey = actorNames[i] + "_invUpdate"
+        JMap.removeKey(updateTracker, invUpdateKey)
+        string invThrottleKey = actorNames[i] + "_invThrottle"
+        JMap.removeKey(updateTracker, invThrottleKey)
+        string invNeedScanKey = actorNames[i] + "_needScan"
+        JMap.removeKey(updateTracker, invNeedScanKey)
+        
+        ; Clean up burst tracker data
+        if inventoryBurstTracker && JMap.hasKey(inventoryBurstTracker, actorNames[i])
+          int burstData = JMap.getObj(inventoryBurstTracker, actorNames[i])
+          if burstData
+            JValue.release(burstData)
+          endif
+          JMap.removeKey(inventoryBurstTracker, actorNames[i])
+        endif
+        
+        removedCount += 1
+      EndIf
+      i += 1
+    EndWhile
+    
+    if removedCount > 0
+      Main.Debug("CleanupStates - Removed tracking data for " + removedCount + " absent actors")
+    EndIf
+    
+    ; Release the temporary map
+    JValue.release(presentActors)
+  EndIf
 EndFunction
 
 Function StartFollowTarget(actor akNpc, actor akTarget)
@@ -257,13 +374,13 @@ EndFunction
 
 Function SetContext(actor akTarget)
   if !akTarget
-    Main.Warn("AIFF - SetContext() called with none target")
+    Main.Warn("CHIM SetContext - Target is None")
     return
   EndIf
   if (!IsInitialized())
-    Main.Warn("SetContext(" + akTarget + ") - Still Initializing.")
+    Main.Warn("CHIM SetContext(" + akTarget + ") - Still Initializing.")
     return
-  EndIf  
+  EndIf
 
   ; Initialize mutex map if needed
   if !contextMutexMap
@@ -273,27 +390,33 @@ Function SetContext(actor akTarget)
 
   ; Get actor name for mutex tracking
   string actorName = Main.GetActorName(akTarget)
+  if actorName == ""
+    Main.Warn("CHIM SetContext - Actor has no name")
+    return
+  EndIf
   
   ; Add trace logging for player
-  if akTarget == player && config.logLevel >= 6
+  if akTarget == player && config.logLevel >= 4
     MinaiUtil.Debug("JMap Sizes:")
     MinaiUtil.Debug("- contextMutexMap: " + JMap.count(contextMutexMap) + " entries")
     MinaiUtil.Debug("- actionRegistry: " + JMap.count(actionRegistry) + " entries") 
     MinaiUtil.Debug("- sapientActors: " + JMap.count(sapientActors) + " entries")
     MinaiUtil.Debug("- lastDialogueTimes: " + JMap.count(lastDialogueTimes) + " entries")
     MinaiUtil.Debug("- updateTracker: " + JMap.count(updateTracker) + " entries")
+    MinaiUtil.Debug("- inventoryTracker: " + JMap.count(inventoryTracker) + " entries")
+    MinaiUtil.Debug("- inventoryBurstTracker: " + JMap.count(inventoryBurstTracker) + " entries")
   EndIf
   
   ; Check if this actor's context is already being set
   if JMap.getInt(contextMutexMap, actorName) == 1
-    Main.Warn("AIFF - SetContext(" + actorName + ") - Already setting context for this actor, skipping")
+    Main.Warn("CHIM - SetContext(" + actorName + ") - Already setting context for this actor, skipping")
     return
   EndIf
-
+  
   ; Set mutex for this actor
   JMap.setInt(contextMutexMap, actorName, 1)
   
-  Main.Debug("AIFF - SetContext(" + actorName + ") START")
+  Main.Debug("CHIM - SetContext(" + actorName + ") START")
   
   ; Only update player-specific context if it's the player
   if akTarget == Player
@@ -314,14 +437,14 @@ Function SetContext(actor akTarget)
   endif
 
   ; Update high-frequency states (every update)
-  Main.Debug("AIFF - SetContext(" + actorName + ") - Setting high-frequency states")
-  devious.SetContext(akTarget)
-  arousal.SetContext(akTarget)
+  Main.Debug("CHIM - SetContext(" + actorName + ") - Setting high-frequency states")
+  arousal.SetContextHighFrequency(akTarget)
   envAwareness.SetContext(akTarget)
+  combat.SetContext(akTarget)
   
   ; Update medium-frequency states
   if !JMap.hasKey(updateTracker, actorKey + "_med") || (currentGameTime - JMap.getFlt(updateTracker, actorKey + "_med")) * 24 * 3600 >= config.mediumFrequencyUpdateInterval
-    Main.Debug("AIFF - SetContext(" + actorName + ") - Setting medium-frequency states")
+    Main.Debug("CHIM - SetContext(" + actorName + ") - Setting medium-frequency states")
     survival.SetContext(akTarget)
     followers.SetContext(akTarget)
     JMap.setFlt(updateTracker, actorKey + "_med", currentGameTime)
@@ -329,24 +452,29 @@ Function SetContext(actor akTarget)
   
   ; Update low-frequency states
   if !JMap.hasKey(updateTracker, actorKey + "_low") || (currentGameTime - JMap.getFlt(updateTracker, actorKey + "_low")) * 24 * 3600 >= config.lowFrequencyUpdateInterval
-    Main.Debug("AIFF - SetContext(" + actorName + ") - Setting low-frequency states")
+    Main.Debug("CHIM - SetContext(" + actorName + ") - Setting low-frequency states")
+    devious.SetContext(akTarget)
     reputation.SetContext(akTarget)
     dirtAndBlood.SetContext(akTarget)
+    relationship.SetContext(akTarget)
     fertility.SetContext(akTarget)
     sex.SetContext(akTarget)
     StoreKeywords(akTarget)
     StoreFactions(akTarget)
+    crimeController.SetContext(akTarget)
+    arousal.SetContext(akTarget)
     JMap.setFlt(updateTracker, actorKey + "_low", currentGameTime)
   endif
 
   if config.disableAIAnimations && akTarget != player
     SetAnimationBusy(1, Main.GetActorName(akTarget))
   EndIf
-
+  
+  PersistInventory(akTarget)
   ; Release mutex for this actor
   JMap.setInt(contextMutexMap, actorName, 0)
   
-  Main.Debug("AIFF - SetContext(" + actorName + ") FINISH")
+  Main.Debug("CHIM - SetContext(" + actorName + ") FINISH")
 EndFunction
 
 
@@ -372,8 +500,9 @@ EndFunction
 
 
 Function RegisterEvent(string eventLine, string eventType)
+  Main.Info("CHIM - RegisterEvent(" + eventLine + ", " + eventType + ")")
   if (!IsInitialized())
-    Main.Info("RegisterEvent() - Still Initializing.")
+    Main.Info("CHIM - RegisterEvent() - Still Initializing.")
     return
   EndIf
   if (!bHasAIFF)
@@ -388,7 +517,7 @@ EndEvent
 
 
 Event CommandDispatcher(String speakerName,String  command, String parameter)
-  Main.Info("AIFF - CommandDispatcher(" + speakerName +", " + command +", " + parameter + ")")
+  Main.Info("CHIM - CommandDispatcher(" + speakerName +", " + command +", " + parameter + ")")
   Actor akActor = AIGetAgentByName(speakerName)
   if vibratorCommands.Find(command) >= 0
     command = "MinaiGlobalVibrator"
@@ -510,7 +639,7 @@ bool Function IsInitialized()
 EndFunction
 
 Function SetInitialized()
-  Main.Info("AIFF initialization complete.")
+  Main.Info("CHIM initialization complete.")
   isInitialized = True
 EndFunction
 
@@ -523,9 +652,59 @@ Event OnUpdate()
   SetContext(player)
   UpdateActions()
   
+  ; Check for actors that need a full inventory scan due to throttling
+  CheckThrottledActors()
+  
   ; Use the base update interval
   RegisterForSingleUpdate(config.highFrequencyUpdateInterval)
 EndEvent
+
+; Function to check for actors that need a full inventory scan due to throttling
+Function CheckThrottledActors()
+  if !updateTracker || !inventoryBurstTracker
+    Main.Warn("CHIM CheckThrottledActors - updateTracker or inventoryBurstTracker is None")
+    return
+  EndIf
+  
+  ; Get all keys from updateTracker that end with "_needScan"
+  string[] keys = JMap.allKeysPArray(updateTracker)
+  int i = 0
+  int processedCount = 0
+  
+  while i < keys.Length
+    string actorKey = keys[i]
+    if StringUtil.Find(actorKey, "_needScan") > 0
+      ; Extract actor name from key (remove "_needScan")
+      string actorName = StringUtil.Substring(actorKey, 0, StringUtil.Find(actorKey, "_needScan"))
+      int needScan = JMap.getInt(updateTracker, actorKey)
+      
+      ; Check if this actor needs a scan
+      if needScan == 1
+        ; Find the actor by name
+        Actor foundActor = AIGetAgentByName(actorName)
+        if foundActor
+          Main.Info("Processing throttled actor scan for " + actorName)
+          TrackActorInventory(foundActor)
+          processedCount += 1
+        elseif Main.GetActorName(player) == actorName
+          Main.Info("Processing throttled actor scan for player")
+          TrackActorInventory(player)
+          processedCount += 1
+        else
+          ; Actor not found, just remove the flag
+          JMap.setInt(updateTracker, actorKey, 0)
+          Main.Debug("Removed scan flag for absent actor " + actorName)
+        EndIf
+      EndIf
+    EndIf
+    
+    i += 1
+  endwhile
+  
+  if processedCount > 0
+    Main.Info("Processed full inventory scans for " + processedCount + " throttled actors")
+  EndIf
+EndFunction
 
 bool Function HasAIFF()
   return bHasAIFF
@@ -577,6 +756,8 @@ Function TrackContext(actor akActor)
   if !akActor.HasSpell(ContextSpell)
     Main.Info("Adding Context Spell to " + Main.GetActorName(akActor))
     akActor.AddSpell(ContextSpell)
+  else
+    Main.Debug("Context Spell already added to " + Main.GetActorName(akActor))
   EndIf
 EndFunction
 
@@ -779,11 +960,9 @@ Event OnAIActorChange(string npcName, string actionName)
       Main.Error("OnAIActorChange: Could not find NPC to add context spell to")
       return
     EndIf
-    if minai_SapienceEnabled.GetValueInt() != 1
-      TrackContext(agent)
-    EndIf
+    TrackContext(agent)
   EndIf
-  ; Can't process spell removal here, since the actor will already be gone from the aiff system at this point. The context script will clean that up instead. 
+  ; Can't process spell removal here, since the actor will already be gone from the CHIM system at this point. The context script will clean that up instead. 
 EndEvent
 
 
@@ -835,8 +1014,9 @@ Function CleanupSapientActors()
       Main.Warn("SAPIENCE: Could not validate that " + actorNames[i] + " is unloaded: Actor is none")
       RemoveActorAI(actorNames[i])
     EndIf
-    bool loaded = akActor.Is3DLoaded()
-    if !loaded || !nearbyActors.Find(akActor)
+    if followers.IsFollower(akActor)
+      Main.Debug("SAPIENCE: Actor " + actorNames[i] + " is a follower. Skipping cleanup.")
+    elseif !akActor.Is3DLoaded() || !nearbyActors.Find(akActor)
       Main.Debug("SAPIENCE: Actor " + actorNames[i] + " is no longer active.")
       RemoveActorAI(actorNames[i])
     else
@@ -886,6 +1066,18 @@ Function RemoveActorAI(string targetName)
     JMap.RemoveKey(updateTracker, targetName + "_voice")
     JMap.RemoveKey(updateTracker, targetName + "_med")
     JMap.RemoveKey(updateTracker, targetName + "_low")
+    JMap.RemoveKey(updateTracker, targetName + "_invUpdate")
+    JMap.RemoveKey(updateTracker, targetName + "_invThrottle")
+  EndIf
+  
+  ; Clean up inventory tracking data
+  if inventoryTracker && JMap.hasKey(inventoryTracker, targetName)
+    int inventory = JMap.getObj(inventoryTracker, targetName)
+    if inventory
+      JValue.release(inventory)
+    EndIf
+    JMap.removeKey(inventoryTracker, targetName)
+    Main.Debug("SAPIENCE: Removed inventory tracking data for " + targetName)
   EndIf
 EndFunction
 
@@ -1075,4 +1267,575 @@ Function AIStopRecording(int keyCode)
     else
         AIAgentFunctions.stopRecording(keyCode)
     EndIf
+EndFunction
+
+; Simplified implementation of inventory tracking
+
+Function TrackActorInventory(actor akActor)
+  if !akActor
+    return
+  EndIf
+  
+  string actorName = Main.GetActorName(akActor)
+  if actorName == ""
+    return
+  EndIf
+  
+  ; Get current inventory array or create a new one
+  int currentInventory = JMap.getObj(inventoryTracker, actorName)
+  if !currentInventory
+    currentInventory = JArray.object()
+    JValue.retain(currentInventory)
+    JMap.setObj(inventoryTracker, actorName, currentInventory)
+  endif
+  
+  ; Check if a full scan was scheduled due to rapid inventory changes
+  bool needScan = JMap.getInt(updateTracker, actorName + "_needScan") == 1
+  
+  ; Handle throttling reset
+  bool wasThrottled = false
+  if needScan && useInventoryBurstProtection
+    int burstData = JMap.getObj(inventoryBurstTracker, actorName)
+    if burstData && JMap.getInt(burstData, "throttled") == 1
+      JMap.setInt(burstData, "throttled", 0)
+      JMap.setInt(burstData, "count", 0)
+      JMap.setFlt(burstData, "startTime", Utility.GetCurrentRealTime())
+      Main.Info("Resetting inventory throttling for " + actorName + " after full scan")
+      wasThrottled = true
+    EndIf
+  EndIf
+  
+  Main.Debug("TrackActorInventory - Scanning inventory for " + actorName)
+  
+  ; Get total number of items in inventory
+  int itemCount = akActor.GetNumItems()
+  int scannedCount = 0
+  
+  ; Clear existing inventory before scan if this was a throttled actor
+  if wasThrottled
+    JArray.clear(currentInventory)
+    Main.Debug("Cleared existing inventory data for " + actorName + " before full scan")
+  EndIf
+  
+  ; Iterate through each item
+  int i = 0
+  while i < itemCount
+    ; Get the form at index i
+    Form itemForm = akActor.GetNthForm(i)
+    
+    if itemForm
+      ; Get item count to check if it exists (>0)
+      int count = akActor.GetItemCount(itemForm)
+      if count > 0
+        ; Check if the form already exists in the array before adding
+        if JArray.findForm(currentInventory, itemForm) == -1
+          ; Store just the Form object in the array
+          JArray.addForm(currentInventory, itemForm)
+          scannedCount += 1
+        EndIf
+      EndIf
+    EndIf
+    
+    i += 1
+  endwhile
+  
+  Main.Debug("TrackActorInventory - Scanned " + scannedCount + " items for " + actorName + " (total inventory size: " + itemCount + ")")
+  
+  ; Clear the need scan flag
+  if needScan
+    JMap.setInt(updateTracker, actorName + "_needScan", 0)
+  EndIf
+  
+  PersistInventory(akActor)
+EndFunction
+
+Function PersistInventory(actor akActor)
+  ; Skip if actor is None or we're not using this system
+  Main.Info("PersistInventory - Actor: " + Main.GetActorName(akActor) + " using batch size: " + maxInventoryBatchSize)
+  if !akActor || !bHasAIFF
+    return
+  EndIf
+  
+  string actorName = Main.GetActorName(akActor)
+  if actorName == ""
+    Main.Warn("PersistInventory - Actor has no name")
+    return
+  EndIf
+  
+  ; Apply throttling if needed - only update once per throttle period
+  float currentTime = Utility.GetCurrentRealTime() ; Use real-time seconds
+  float timeSinceLastUpdate = currentTime - GetActorInventoryLastUpdate(akActor)
+  float actorThrottle = GetActorInventoryThrottle(akActor)
+  
+  if timeSinceLastUpdate < actorThrottle
+    Main.Debug("PersistInventory - Throttling inventory update for " + actorName + " (last update was " + timeSinceLastUpdate + " seconds ago, throttle is " + actorThrottle + " seconds)")
+    return
+  EndIf
+  
+  ; Set a temporary update time to prevent concurrent updates while processing
+  float tempUpdateTime = currentTime + 600.0 ; Set far in future to prevent concurrent updates
+  SetActorInventoryLastUpdate(akActor, tempUpdateTime)
+  
+  ; Get actor's inventory array
+  int actorInventory = JMap.getObj(inventoryTracker, actorName)
+  if !actorInventory
+    Main.Debug("PersistInventory - No inventory tracking object found for " + actorName)
+    ; Reset the update time since we didn't process anything
+    SetActorInventoryLastUpdate(akActor, currentTime)
+    return
+  EndIf
+  
+  ; Get current inventory data for the actor
+  int itemCount = JArray.count(actorInventory)
+  if itemCount == 0
+    Main.Debug("PersistInventory - Inventory tracking empty for " + actorName)
+    ; Reset the update time since we didn't process anything
+    SetActorInventoryLastUpdate(akActor, currentTime)
+    return
+  EndIf
+  
+  ; Process inventory as batches if needed
+  int totalItems = itemCount
+  int processedItems = 0
+  int batchCount = 1
+  int maxItems = maxInventoryBatchSize
+  bool needsBatching = totalItems > maxItems
+  
+  ; Determine total number of batches
+  int totalBatches = 1
+  if needsBatching
+    totalBatches = Math.Ceiling(totalItems as float / maxItems)
+  EndIf
+  
+  int i = 0
+  
+  ; Process all items in batches
+  while processedItems < totalItems
+    ; Start a new batch
+    string batchData = ""
+    int itemsInBatch = 0
+    
+    ; Determine batch status
+    string batchStatus
+    if totalBatches == 1
+      batchStatus = "final" ; Only one batch, mark as final
+    elseif batchCount == 1
+      batchStatus = "initial" ; First batch of many
+    elseif batchCount == totalBatches
+      batchStatus = "final" ; Last batch of many
+    else
+      batchStatus = "partial" ; Middle batch
+    endif
+    
+    ; Process up to maxItems per batch
+    while i < itemCount && itemsInBatch < maxItems
+      Form itemForm = JArray.getForm(actorInventory, i)
+      
+      ; Only process valid forms
+      if itemForm
+        ; Get count directly from the actor
+        int count = akActor.GetItemCount(itemForm)
+        
+        ; Skip items that no longer exist in inventory
+        if count > 0
+          ; Get item details directly from the form
+          string itemName = itemForm.GetName()
+          string modName = minai_Util.FormToModName(itemForm)
+          int formTypeId = itemForm.GetType()
+          string modIndex = minai_Util.FormToModIndexHex(itemForm)
+          string formId = minai_Util.FormToHex(itemForm)
+          if formId == ""
+            formId = "0x" + itemForm.GetFormID()
+          EndIf
+          
+          ; Skip items with no name or from unknown mods
+          if itemName != "" && modName != ""
+            ; Add separator between items
+            if batchData != ""
+              batchData += "~"
+            EndIf
+            
+            ; Format: formId@modName@itemName@formTypeId@modIndex@count
+            batchData += formId + "@" + modName + "@" + itemName + "@" + formTypeId + "@" + modIndex + "@" + count
+          else
+            if itemName == ""
+              Main.Debug("PersistInventory - SKIPPING item: Empty name for " + formId)
+            endif
+            
+            if modName == ""
+              Main.Debug("PersistInventory - SKIPPING item: Empty mod name for " + formId)
+            endif
+          EndIf
+        endif
+      endif
+      
+      itemsInBatch += 1
+      processedItems += 1
+      i += 1
+    EndWhile
+    
+    ; Send this batch to server - always send if it's the final batch, even if empty
+    if batchData != "" || batchStatus == "final"
+      ; Log message stats
+      if needsBatching
+        Main.Debug("Persisting inventory for " + actorName + " - Batch " + batchCount + "/" + totalBatches + " with " + itemsInBatch + " items (status: " + batchStatus + ")")
+      else
+        Main.Debug("Persisting inventory for " + actorName + " - " + itemsInBatch + " items, data length: " + StringUtil.GetLength(batchData) + " chars (status: " + batchStatus + ")")
+      EndIf
+      
+      ; Handle empty final batch case
+      if batchData == "" && batchStatus == "final"
+        Main.Debug("Sending empty final batch for " + actorName)
+      EndIf
+      
+      ; Store the actor name with the batch data and status
+      string actorBatchData = actorName + "@" + batchStatus + "@" + batchData
+      
+      ; Send the batch data to the server
+      AILogMessage(actorBatchData, "minai_storeitem_batch")
+      
+      ; Add a small delay between batches to avoid overwhelming the server
+      if needsBatching && processedItems < totalItems
+        Utility.Wait(2.5)
+      EndIf
+      
+      batchCount += 1
+    EndIf
+  EndWhile
+  
+  if totalItems == 0
+    Main.Debug("PersistInventory - No items to persist for " + actorName)
+  EndIf
+  
+  ; Set the real update time after processing is complete
+  SetActorInventoryLastUpdate(akActor, Utility.GetCurrentRealTime())
+EndFunction
+
+; Function to check if an actor's inventory events are currently being throttled
+bool Function IsInventoryThrottled(actor akActor)
+  if !akActor || !useInventoryBurstProtection
+    return false
+  EndIf
+  
+  string actorName = Main.GetActorName(akActor)
+  if actorName == ""
+    return false
+  EndIf
+  
+  ; Get actor's burst tracking data
+  int burstData = JMap.getObj(inventoryBurstTracker, actorName)
+  if !burstData
+    return false
+  EndIf
+  
+  ; Check if throttled flag is set
+  return JMap.getInt(burstData, "throttled") == 1
+EndFunction
+
+; Function to mark actor for full inventory scan
+Function MarkActorForFullScan(actor akActor)
+  if !akActor
+    return
+  EndIf
+  
+  string actorName = Main.GetActorName(akActor)
+  if actorName == ""
+    return
+  EndIf
+  
+  ; Mark for scan in update tracker
+  JMap.setInt(updateTracker, actorName + "_needScan", 1)
+  
+  Main.Info("Marked " + actorName + " for full inventory scan due to rapid changes")
+EndFunction
+
+; Function to handle inventory change event with throttling
+
+Function SetThrottled(int burstData, actor akActor)
+  Main.Warn("Inventory tracking throttled for " + Main.GetActorName(akActor))
+  JMap.setInt(burstData, "throttled", 1)
+  MarkActorForFullScan(akActor)
+EndFunction
+
+int Function GetBurstData(string actorName)
+  int burstData = JMap.getObj(inventoryBurstTracker, actorName)
+  if !burstData
+    burstData = JMap.object()
+    JValue.retain(burstData)
+    JMap.setFlt(burstData, "startTime", Utility.GetCurrentRealTime())
+    JMap.setInt(burstData, "count", 0)
+    JMap.setInt(burstData, "throttled", 0)
+    JMap.setObj(inventoryBurstTracker, actorName, burstData)
+  EndIf
+  return burstData
+EndFunction
+
+
+bool Function OnInventoryChanged(actor akActor, Form akBaseItem, int aiItemCount, bool abAdded)
+  bool isThrottled = IsInventoryThrottled(akActor)
+  if inventoryMutex && !isThrottled
+    int attempts = 0
+    while inventoryMutex && !isThrottled
+      Utility.Wait(0.5)
+      attempts += 1
+      if attempts > 10 
+        Main.Warn("OnInventoryChanged - Failed to acquire inventory mutex, backing off")
+        ; Throttle
+        SetThrottled(GetBurstData(Main.GetActorName(akActor)), akActor)
+        ; Make sure we don't leave mutex locked even during throttle
+        inventoryMutex = False
+        return true
+      EndIf
+      isThrottled = IsInventoryThrottled(akActor)
+    endWhile
+  EndIf
+  
+  if isThrottled
+    Main.Warn("Made it past spinlock in OnInventoryChanged, but inventory is throttled. Backing off.")
+    inventoryMutex = False
+    return true
+  EndIf
+  
+  inventoryMutex = True
+  
+  if !akActor || !akBaseItem
+    inventoryMutex = False  ; Clear mutex before returning
+    return false
+  EndIf
+  
+  ; Get actor name for logging
+  string actorName = Main.GetActorName(akActor)
+  if actorName == ""
+    Main.Warn("OnInventoryChanged - Actor has no name, skipping")
+    inventoryMutex = False  ; Clear mutex before returning
+    return false
+  EndIf
+  
+  ; Check for burst protection if enabled
+  if useInventoryBurstProtection
+    float currentTime = Utility.GetCurrentRealTime()
+    
+    ; Get or create burst tracking data for this actor
+    int burstData = GetBurstData(actorName)
+    
+    ; Check if we're in a new time window
+    float startTime = JMap.getFlt(burstData, "startTime")
+    if currentTime - startTime > inventoryBurstWindow
+      ; Reset for new window
+      JMap.setFlt(burstData, "startTime", currentTime)
+      JMap.setInt(burstData, "count", 1)
+      JMap.setInt(burstData, "throttled", 0)
+    else
+      ; Increment count in current window
+      int eventCount = JMap.getInt(burstData, "count") + 1
+      JMap.setInt(burstData, "count", eventCount)
+      
+      ; Check if we've exceeded threshold and should throttle
+      if eventCount > inventoryEventThreshold
+        if JMap.getInt(burstData, "throttled") == 0
+          Main.Info("Inventory burst detected for " + actorName + " - Throttling and scheduling full scan")
+          JMap.setInt(burstData, "throttled", 1)
+          MarkActorForFullScan(akActor)
+        EndIf
+        
+        ; If already throttled, skip processing this event
+        inventoryMutex = False  ; Clear mutex before returning
+        return true  ; Return true to indicate throttling
+      EndIf
+    EndIf
+  EndIf
+  
+  ; Get basic item info for logging
+  string itemName = akBaseItem.GetName()
+  string formId = minai_Util.FormToHex(akBaseItem)
+  if formId == ""
+    formId = "0x" + akBaseItem.GetFormID()
+  EndIf
+  
+  ; Track all inventory changes
+  string changeType
+  if abAdded
+    changeType = "added"
+  else
+    changeType = "removed"
+  endif
+  Main.Debug("Inventory " + changeType + " for " + actorName + ": " + aiItemCount + "x " + itemName + " (" + formId + ")")
+  
+  ; Get the current actor inventory array
+  int actorInventory = JMap.getObj(inventoryTracker, actorName)
+  if !actorInventory
+    ; Create new inventory object if none exists
+    actorInventory = JArray.object()
+    JValue.retain(actorInventory)
+    JMap.setObj(inventoryTracker, actorName, actorInventory)
+    Main.Debug("Created new inventory array for " + actorName)
+  EndIf
+  
+  ; Get the actual current count from the actor
+  int actualCount = akActor.GetItemCount(akBaseItem)
+  
+  ; Find the item's index in the array if it exists
+  int itemIndex = JArray.findForm(actorInventory, akBaseItem)
+  
+  ; Update array based on current item count
+  if actualCount > 0
+    ; Add item if it's not already in the array
+    if itemIndex == -1
+      JArray.addForm(actorInventory, akBaseItem)
+      Main.Debug("Added " + itemName + " to " + actorName + " inventory tracking")
+    EndIf
+  else
+    ; Remove item if it's in the array and count is zero
+    if itemIndex != -1
+      JArray.eraseForm(actorInventory, akBaseItem)
+      Main.Debug("Removed " + itemName + " from " + actorName + " inventory tracking")
+    EndIf
+  EndIf
+
+  PersistInventory(akActor)
+  
+  inventoryMutex = False  ; Clear mutex before returning
+  return false  ; Return false to indicate no throttling occurred
+EndFunction
+
+; Function to clean up inventory tracking data
+Function CleanupInventoryTracker()
+  if !inventoryTracker
+    return
+  EndIf
+  
+  string[] actorNames = JMap.allKeysPArray(inventoryTracker)
+  int i = 0
+  while i < actorNames.Length
+    int inventory = JMap.getObj(inventoryTracker, actorNames[i])
+    if inventory
+      JValue.release(inventory)
+    EndIf
+    i += 1
+  EndWhile
+  
+  JValue.release(inventoryTracker)
+  inventoryTracker = JMap.object()
+  JValue.retain(inventoryTracker)
+  
+  Main.Info("Cleaned up inventory tracker")
+EndFunction
+
+; Function to set a custom inventory update throttle for a specific actor
+Function SetActorInventoryThrottle(actor akActor, float throttleTime)
+  if !akActor
+    Main.Warn("SetActorInventoryThrottle - Actor is None")
+    return
+  EndIf
+  
+  string actorName = Main.GetActorName(akActor)
+  if actorName == ""
+    Main.Warn("SetActorInventoryThrottle - Actor has no name")
+    return
+  EndIf
+  
+  ; Validate the throttle value - must be at least 0.1 seconds
+  if throttleTime < 0.1
+    throttleTime = 0.1
+  EndIf
+  
+  ; Store the custom throttle value directly in updateTracker
+  string throttleKey = actorName + "_invThrottle"
+  JMap.setFlt(updateTracker, throttleKey, throttleTime)
+  Main.Info("Set custom inventory throttle for " + actorName + " to " + throttleTime + " seconds")
+EndFunction
+
+
+; Public function to check if an actor's inventory events are being throttled
+; Other scripts can use this to decide whether to register for events
+bool Function IsActorInventoryThrottled(actor akActor)
+  if !akActor || !useInventoryBurstProtection
+    return false
+  EndIf
+  
+  return IsInventoryThrottled(akActor)
+EndFunction
+
+; Function to enable or disable inventory burst protection
+Function SetInventoryBurstProtection(bool enable)
+  useInventoryBurstProtection = enable
+  
+  if enable
+    Main.Info("Inventory burst protection enabled")
+  else
+    Main.Info("Inventory burst protection disabled")
+  EndIf
+  
+  ; If disabling, clear any throttled state
+  if !enable
+    string[] actorNames = JMap.allKeysPArray(inventoryBurstTracker)
+    int i = 0
+    while i < actorNames.Length
+      int burstData = JMap.getObj(inventoryBurstTracker, actorNames[i])
+      if burstData
+        JMap.setInt(burstData, "throttled", 0)
+      EndIf
+      i += 1
+    endwhile
+    
+    Main.Info("Cleared throttling state for all actors")
+  EndIf
+EndFunction
+
+; Function to adjust burst detection parameters
+Function SetBurstThresholdParameters(int threshold, float windowSeconds)
+  if threshold > 0
+    inventoryEventThreshold = threshold
+  EndIf
+  
+  if windowSeconds > 0
+    inventoryBurstWindow = windowSeconds
+  EndIf
+  
+  Main.Info("Set inventory burst parameters: threshold=" + inventoryEventThreshold + ", window=" + inventoryBurstWindow + "s")
+EndFunction
+
+; Function to get the last update time for an actor's inventory in seconds
+float Function GetActorInventoryLastUpdate(actor akActor)
+  if !akActor
+    return 0.0
+  EndIf
+  
+  string actorName = Main.GetActorName(akActor)
+  if actorName == ""
+    return 0.0
+  EndIf
+  
+  string updateKey = actorName + "_invUpdate"
+  return JMap.getFlt(updateTracker, updateKey, 0.0)
+EndFunction
+
+; Function to set the last update time for an actor's inventory in seconds
+Function SetActorInventoryLastUpdate(actor akActor, float currentTime)
+  if !akActor
+    return
+  EndIf
+  
+  string actorName = Main.GetActorName(akActor)
+  if actorName == ""
+    return
+  EndIf
+  
+  string updateKey = actorName + "_invUpdate"
+  JMap.setFlt(updateTracker, updateKey, currentTime)
+EndFunction
+
+; Function to get the throttle time for an actor's inventory in seconds
+float Function GetActorInventoryThrottle(actor akActor)
+  if !akActor
+    return inventoryUpdateThrottle
+  EndIf
+  
+  string actorName = Main.GetActorName(akActor)
+  if actorName == ""
+    return inventoryUpdateThrottle
+  EndIf
+  
+  string throttleKey = actorName + "_invThrottle"
+  return JMap.getFlt(updateTracker, throttleKey, inventoryUpdateThrottle)
 EndFunction

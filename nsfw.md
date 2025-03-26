@@ -21,14 +21,14 @@ MinAI includes 3467 ostim/sexlab scene descriptions (as of 10/24/2024) for bette
 * If you want to use the old keyword based system instead, you can disable this system in config.php.
 
 ### CBPC
-* Exposes physics collisions from CBPC as context. NPC's will be made aware of where the player touches them or other actors (or themselves) and will react to and comment on it. This is also active during OStim/SL sex scenes. Requires solid CBPC configs. (Tested with these: https://www.nexusmods.com/skyrimspecialedition/mods/82745)
+* Exposes physics collisions from CBPC as context. NPC's will be made aware of where the player touches them or other actors (or themselves) and will react to and comment on it. This is also active during OStim/SL sex scenes. Requires solid CBPC configs. (Tested with these: https://www.nexusmods.com/skyrimspecialedition/mods/82745)
 * This can be further expanded by enabling additional colliders in your CBPC configuration. You could for example, enable detection when the head collides with the vagina, etc.
 * Works particularly well in VR since you can freely move your hands. HIGGS/PLANCK recommended.
 * This has integration with Devious Devices - The LLM will be aware if you try to touch yourself / others through a chastity belt, or other devices as an example.
 
 ### Devious Devices
 * NPC's will be aware of, and react to all devices worn by eachoother, and the player.
-* The AI can decide to remotely activate the player's vibrating piercings/plugs at 10 different levels of strength (1-5 tease only, 1-5 potential climax). 
+* The AI can decide to remotely activate the player's vibrating piercings/plugs at 10 different levels of strength (1-5 tease only, 1-5 potential climax). 
 * The AI can remotely shock the player using the standard DD functions.
 * The AI can decide to reward the character with an orgasm, or edge her instead.
 * The AI can detect when the player is edged, or has an orgasm through DD, and will react to it. I've had the AI penalize me for having an orgasm without permission in some scenarios.
@@ -47,13 +47,14 @@ MinAI includes 3467 ostim/sexlab scene descriptions (as of 10/24/2024) for bette
 
 ### Deviously Accessible
 * Has support for the Telvanni quest from Deviously Accessible - If doing the quest, the Narrator will be replaced with the telvanni mage's personality. He will be aware of how well you've been doing, and of the dreams you've been having recently.
+* The "Brillius Tiredius" questline from Deviously Accessible has been integrated. This questline features a lot of hypnosis / mind control content. This impacts the player's self roleplay, and self-thoughts.
 * Has WIP support for the Eldritch Horror quest from Deviously Accessible as another alternative narrator.
 
 ### Devious Followers
 * The AI will be aware that it is a devious follower, and will roleplay as such. It will try to tease you and trick you.
 * The AI is aware of how much gold the player currently owes, and if they are in debt. The further in debt the player is, the stricter the AI becomes.
 * The AI is aware of how many days are left on the player's contract.
-* The AI is aware of all deals that are active, and will incorporate them into its behavior / responses. For example, if you have the "ask for spanks daily rule", the AI will actually make you do this.  See the screenshots for a completely unscripted scenario of exactly that happening in my game. Not all rules have this same level of integration / support, this is WIP as I play through the content, I will continue adding more.
+* The AI is aware of all deals that are active, and will incorporate them into its behavior / responses. For example, if you have the "ask for spanks daily rule", the AI will actually make you do this.  See the screenshots for a completely unscripted scenario of exactly that happening in my game. Not all rules have this same level of integration / support, this is WIP as I play through the content, I will continue adding more.
 * Skooma rule integration. If under the skooma rule, you can ask your devious follower for drugs, and he will provide them.
 * The Devious Follower is very fond of remotely activating piercings / plugs (This varies depending on the personality of the NPC you chose as your follower), and generally harassing the player.
 * The Devious Follower will present new rules to you, and actively negotiate them with you when your debt is high. If you verbally agree to the deal, it will be accepted by the devious followers ramework.
@@ -91,11 +92,21 @@ MinAI includes 3467 ostim/sexlab scene descriptions (as of 10/24/2024) for bette
 ### General
 * The player can convince NPC's to trade with them, dress, or undress.
 * NPC's can grope the player if they want. This event needs to be expanded. It's pretty simple at the moment.
-* NPC's can pinch the player's nipples if they want. This event needs to be expanded. It's pretty simple at the moment.
+* NPC's can pinch the player's nipples if they want. This event needs to be expanded. It's pretty simple at the moment.
 
 ### (In Development) Diary of Mine (DoM, PAH, HSH, AYGAS)
 * Slave context, character info, and events exposed to CHIM/Sapient NPC's
 * Slave actions - TBD
+
+### Fertility Mode
+* Adds LLM awareness of pregnancy states - The AI will know when female actors are in their first, second, or third trimester
+* The AI will acknowledge visible physical changes throughout pregnancy progression
+* For narrators and self-awareness, includes detailed fertility cycle information:
+  * Ovulation and fertility status
+  * PMS symptoms
+  * Menstruation state
+* Integrates with Fill Her Up for comprehensive reproductive state tracking
+* Additionally supports fertility tweaks
 
 ### Fill Her Up
 * Adds LLM awareness of inflation states - The AI will know when actors are inflated vaginally, anally, or orally
@@ -103,3 +114,31 @@ MinAI includes 3467 ostim/sexlab scene descriptions (as of 10/24/2024) for bette
 * Includes support for impregnation states from Fill Her Up
 * The AI will acknowledge when events from Fill Her Up occur.
 * Provides detailed contextual descriptions of belly size and other physical changes
+
+### Enhanced NSFW Context
+* Improved prompts for NSFW events and interactions
+* Better context awareness during sex scenes
+* Enhanced device awareness and interactions
+* More natural dialogue during intimate encounters
+* Better handling of complex NSFW scenarios
+
+### Devious Devices Improvements
+* Enhanced device awareness and interactions
+* Better context for device events (equip/unequip, vibrations)
+* Improved prompts for device-related actions
+* More natural responses to device events
+* Better integration with other NSFW systems
+
+### Scene Descriptions
+* Updated scene descriptions for better context
+* More accurate and detailed descriptions of intimate encounters
+* Better integration with animation frameworks
+* Improved support for both OStim and Sexlab scenes
+* Enhanced awareness of scene transitions and positions
+
+### SlaveTats
+* Added support for SlaveTats with:
+  * Visibility rules based on clothing and equipment
+  * Custom descriptions per tattoo
+  * Alpha value support for tattoo visibility
+  * Hidden tattoo tracking for narrator

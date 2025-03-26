@@ -6,6 +6,7 @@ minai_Sex  sex
 minai_DeviousStuff devious
 bool Property ActionRegistryIsDirty = false Auto
 minai_SapienceController sapience
+minai_Crime crimeController
 
 ; OID definitions
 int logLevelOID
@@ -43,6 +44,7 @@ int allowSexTransitionsOID
 int allowActorsToJoinSexOID
 int aOIDMap ; Jmap for storing action oid's
 int aCategoryMap ; Jmap for storing action categories
+int useOstimOID ; New OID for Ostim preference
 
 int actionEnabledOID
 int actionIntervalOID
@@ -60,19 +62,24 @@ int singKeyOID          ; New OID for sing keybind
 int narratorKeyOID      ; New OID for narrator keybind
 int narratorTextKeyOID  ; New OID for narrator text input keybind
 
-; Add new OID definitions near other key OIDs
 int roleplayKeyOID      ; New OID for roleplay voice keybind
 int roleplayTextKeyOID  ; New OID for roleplay text input keybind
+int diaryKeyOID         ; OID for diary hotkey
+int dungeonMasterKeyOID        ; New OID for dungeon master voice keybind
+int dungeonMasterTextKeyOID    ; New OID for dungeon master text input keybind
 
 ; Key properties
 int Property toggleSapienceKey = -1 Auto
 int Property singKey = -1 Auto          ; New property for sing key
 int Property narratorKey = -1 Auto      ; New property for narrator key
 int Property narratorTextKey = -1 Auto  ; New property for narrator text input key
+int Property diaryKey = -1 Auto         ; Property for diary hotkey
 
 ; Add new key properties
 int Property roleplayKey = -1 Auto          ; Property for roleplay voice key
 int Property roleplayTextKey = -1 Auto      ; Property for roleplay text key
+int Property dungeonMasterKey = -1 Auto     ; Property for dungeon master voice key
+int Property dungeonMasterTextKey = -1 Auto ; Property for dungeon master text key
 
 ; Legacy globals
 GlobalVariable useCBPC
@@ -81,6 +88,9 @@ GlobalVariable minai_SapienceEnabled
 
 bool Property enableCBPC = false Auto
 bool enableCBPCDefault = false
+
+bool Property useOstim = true Auto
+bool useOstimDefault = true
 
 string currentAction
 string currentCategory
@@ -234,7 +244,7 @@ bool Property enableAIAgentRequestMessage = True Auto
 bool Property enableAIAgentRecordSoundEx = True Auto
 bool Property enableAIAgentStopRecording = True Auto
 
-; Add these OIDs near the other OID definitions
+; Add these OIDs near the other OID declarations
 int enableAIAgentRequestMessageOID
 int enableAIAgentRecordSoundExOID  
 int enableAIAgentStopRecordingOID
@@ -276,14 +286,36 @@ int Property lowFrequencyUpdateIntervalOID Auto
 int Property contextUpdateIntervalOID Auto
 int Property highPerformanceModeOID Auto
 
+int SmallBountyAmountDefault = 50
+int Property SmallBountyAmount = 50 Auto
+int smallBountyAmountOID
+
+int MediumBountyAmountDefault = 200
+int Property MediumBountyAmount = 200 Auto
+int mediumBountyAmountOID
+
+int LargeBountyAmountDefault = 1000
+int Property LargeBountyAmount = 1000 Auto
+int largeBountyAmountOID
+
+; After other bool Property declarations
+bool includePromptSelfDefault = True
+bool Property includePromptSelf = True Auto
+
+; After other int OID declarations
+int includePromptSelfOID
+
 Event OnConfigInit()
-  main.Info("Building mcm menu.")
+  Debug.Trace("[MinAI] OnConfigInit()")
   InitializeMCM()
+  main.Info("Built mcm menu.")
 EndEvent
 
 Function InitializeMCM()
+  Debug.Trace("[MinAI] InitializeMCM()")
   minai_UseOStim = Game.GetFormFromFile(0x0906, "MinAI.esp") as GlobalVariable
   aiff = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_AIFF
+  crimeController = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_Crime
   sex = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_Sex
   main = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_MainQuestController
   devious = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_DeviousStuff
@@ -300,19 +332,21 @@ EndFunction
 
 Function SetupPages()
   if sex.IsNSFW()
-    Pages = new string[6]
+    Pages = new string[7]
     Pages[0] = "General"
     Pages[1] = "Physics (CBPC)"
     Pages[2] = "Devious Stuff"
     Pages[3] = "Sex Settings"
-    Pages[4] = "Action Registry"
-    Pages[5] = "Performance"
+    Pages[4] = "Crime Settings"
+    Pages[5] = "Action Registry"
+    Pages[6] = "Performance"
   Else
-    Pages = new string[4]
+    Pages = new string[5]
     Pages[0] = "General"
     Pages[1] = "Physics (CBPC)"
-    Pages[2] = "Action Registry"
-    Pages[3] = "Performance"
+    Pages[2] = "Crime Settings"
+    Pages[3] = "Action Registry"
+    Pages[4] = "Performance"
   EndIf
 EndFunction
 
@@ -333,6 +367,8 @@ Event OnPageReset(string page)
     RenderDeviousPage()
   elseif page == "Sex Settings"
     RenderSexPage()
+  elseif page == "Crime Settings"
+    RenderCrimePage()
   elseif page == "Action Registry"
     RenderActionsPage();
   elseif page == "Performance"
@@ -348,6 +384,7 @@ Function RenderGeneralPage()
   autoUpdateDiaryOID = AddToggleOption("Automatically Update Follower Diaries", autoUpdateDiary)
   updateNarratorDiaryOID = AddToggleOption("Update Narrator Diary on Sleep", updateNarratorDiary)
   updateNarratorProfileOID = AddToggleOption("Update Narrator Dynamic Profile on Sleep", updateNarratorProfile)
+  includePromptSelfOID = AddToggleOption("Include Self Prompts for Events", includePromptSelf)
   requestResponseCooldownOID = AddSliderOption("LLM Response Request Cooldown", requestResponseCooldown, "{1}")
   AddHeaderOption("Sapience Settings")
   useSapienceOID = AddToggleOption("Enable Sapience", minai_SapienceEnabled.GetValueInt() == 1)
@@ -370,6 +407,9 @@ Function RenderGeneralPage()
   ; singKeyOID = AddKeyMapOption("Sing", singKey)              ; New keybind option
   narratorKeyOID = AddKeyMapOption("Talk to Narrator", narratorKey)  ; New keybind option
   narratorTextKeyOID = AddKeyMapOption("Type to Narrator", narratorTextKey)
+  diaryKeyOID = AddKeyMapOption("Diary Hotkey", diaryKey)  ; New diary hotkey option
+  dungeonMasterKeyOID = AddKeyMapOption("Direct Prompting Voice", dungeonMasterKey)  ; New dungeon master voice hotkey
+  dungeonMasterTextKeyOID = AddKeyMapOption("Direct Prompting Text", dungeonMasterTextKey)  ; New dungeon master text hotkey
   disableAIAnimationsOID = AddToggleOption("Disable AI-FF Animations", disableAIAnimations)
   AddHeaderOption("Debug")
   logLevelOID = AddSliderOption("Log Level", logLevel, "{0}")
@@ -416,6 +456,7 @@ Function RenderSexPage()
   trackVictimAwarenessOID = AddToggleOption("Track Victim Actor Awareness", trackVictimAwareness)
   AddHeaderOption("NPC Sex Settings")
   enableAISexOID = AddToggleOption("Enable NPC -> NPC Sex", enableAISex)
+  useOstimOID = AddToggleOption("Use Ostim as Preferred Framework", useOstim) ; Add new toggle option
   ; right column
   SetCursorPosition(1)
   AddHeaderOption("Comments during sex")
@@ -839,6 +880,18 @@ Event OnOptionSelect(int oid)
       SetOptionFlags(contextUpdateIntervalOID, OPTION_FLAG_NONE)
     endif
     ForcePageReset()
+  elseif oid == includePromptSelfOID
+    includePromptSelf = !includePromptSelf
+    SetToggleOptionValue(oid, includePromptSelf)
+  elseif oid == useOstimOID
+    useOstim = !useOstim
+    SetToggleOptionValue(oid, useOstim)
+    if (useOstim)
+      minai_UseOstim.SetValue(1)
+    else
+      minai_UseOstim.SetValue(0)
+    endif
+    Debug.Notification("Sex framework preference changed.")
   EndIf
   int i = 0
   string[] categories = JMap.allKeysPArray(aCategoryMap)
@@ -870,6 +923,9 @@ Event OnOptionDefault(int oid)
   if oid == enableConsoleLoggingOID
     enableConsoleLogging = enableConsoleLoggingDefault
     SetToggleOptionValue(oid, enableConsoleLogging)
+  elseif oid == includePromptSelfOID
+    includePromptSelf = includePromptSelfDefault
+    SetToggleOptionValue(oid, includePromptSelf)
   elseif oid == UseCBPCOID
     enableCBPC = enableCBPCDefault
     SetToggleOptionValue(oid, enableCBPC)
@@ -1044,6 +1100,26 @@ Event OnOptionDefault(int oid)
   elseif oid == logLevelOID
     logLevel = logLevelDefault
     SetSliderOptionValue(oid, logLevelDefault, "{0}")
+  elseif oid == smallBountyAmountOID
+    SmallBountyAmount = SmallBountyAmountDefault
+    SetSliderOptionValue(oid, SmallBountyAmount, "{0} gold")
+    crimeController.StoreCrimeVariables()
+  elseif oid == mediumBountyAmountOID
+    MediumBountyAmount = MediumBountyAmountDefault
+    SetSliderOptionValue(oid, MediumBountyAmount, "{0} gold")
+    crimeController.StoreCrimeVariables()
+  elseif oid == largeBountyAmountOID
+    LargeBountyAmount = LargeBountyAmountDefault
+    SetSliderOptionValue(oid, LargeBountyAmount, "{0} gold")
+    crimeController.StoreCrimeVariables()
+  elseif oid == useOstimOID
+    useOstim = useOstimDefault
+    SetToggleOptionValue(oid, useOstim)
+    if (useOstim)
+      minai_UseOstim.SetValue(1)
+    else
+      minai_UseOstim.SetValue(0)
+    endif
   EndIf
 EndEvent
 
@@ -1192,6 +1268,22 @@ Event OnOptionHighlight(int oid)
     SetInfoText("How often NPCs should update their context. Effectively this checks how often the above settings are checked.")
   elseif oid == highPerformanceModeOID
     SetInfoText("Use optimized performance settings that reduce update frequency for better performance")
+  elseif oid == diaryKeyOID
+    SetInfoText("Hotkey to update diaries. When crouching: updates narrator diary. When standing: updates all diaries. When looking at an NPC: updates that NPC's diary.")
+  elseif oid == dungeonMasterKeyOID
+    SetInfoText("Hotkey to directly prompt the LLM")
+  elseif oid == dungeonMasterTextKeyOID
+    SetInfoText("Hotkey to directly type relevant information to the LLM")
+  elseif oid == smallBountyAmountOID
+    SetInfoText("Amount of gold given for minor infractions (trespassing, petty theft, etc.)")
+  elseif oid == mediumBountyAmountOID
+    SetInfoText("Amount of gold given for moderate crimes (assault, significant theft, etc.)")
+  elseif oid == largeBountyAmountOID
+    SetInfoText("Amount of gold given for serious crimes (murder, grievous assault, etc.)")
+  elseif oid == includePromptSelfOID
+    SetInfoText("When enabled, prompts the player/narrator to respond to in-game events in addition to or instead of a nearby NPC. Disable to reduce interruptions.")
+  elseif oid == useOstimOID
+    SetInfoText("When enabled, Ostim will be used as the preferred sex animation framework. When disabled, the mod will default to using Sexlab.")
   EndIf
   int i = 0
   string[] actions = JMap.allKeysPArray(aiff.actionRegistry)
@@ -1381,6 +1473,21 @@ Event OnOptionSliderOpen(int oid)
       SetOptionFlags(lowFrequencyUpdateIntervalOID, OPTION_FLAG_NONE)
       SetOptionFlags(contextUpdateIntervalOID, OPTION_FLAG_NONE)
     endif
+  elseif oid == smallBountyAmountOID
+    SetSliderDialogStartValue(SmallBountyAmount)
+    SetSliderDialogDefaultValue(SmallBountyAmountDefault)
+    SetSliderDialogRange(10, 1000)
+    SetSliderDialogInterval(10)
+  elseif oid == mediumBountyAmountOID
+    SetSliderDialogStartValue(MediumBountyAmount)
+    SetSliderDialogDefaultValue(MediumBountyAmountDefault)
+    SetSliderDialogRange(100, 10000)
+    SetSliderDialogInterval(50)
+  elseif oid == largeBountyAmountOID
+    SetSliderDialogStartValue(LargeBountyAmount)
+    SetSliderDialogDefaultValue(LargeBountyAmountDefault)
+    SetSliderDialogRange(100, 50000)
+    SetSliderDialogInterval(100)
   EndIf
 EndEvent
 
@@ -1507,6 +1614,18 @@ Event OnOptionSliderAccept(int oid, float value)
       SetOptionFlags(lowFrequencyUpdateIntervalOID, OPTION_FLAG_NONE)
       SetOptionFlags(contextUpdateIntervalOID, OPTION_FLAG_NONE)
     endif
+  elseif oid == smallBountyAmountOID
+    SmallBountyAmount = value as int
+    SetSliderOptionValue(oid, SmallBountyAmount, "{0} gold")
+    crimeController.StoreCrimeVariables()
+  elseif oid == mediumBountyAmountOID
+    MediumBountyAmount = value as int
+    SetSliderOptionValue(oid, MediumBountyAmount, "{0} gold")
+    crimeController.StoreCrimeVariables()
+  elseif oid == largeBountyAmountOID
+    LargeBountyAmount = value as int
+    SetSliderOptionValue(oid, LargeBountyAmount, "{0} gold")
+    crimeController.StoreCrimeVariables()
   EndIf
 EndEvent
 
@@ -1549,6 +1668,26 @@ event OnOptionKeyMapChange(int a_option, int a_keyCode, string a_conflictControl
             roleplayTextKey = a_keyCode
             SetKeymapOptionValue(a_option, a_keyCode)
             main.SetRoleplayTextKey(true)
+        elseif (a_option == diaryKeyOID)
+            diaryKey = a_keyCode
+            SetKeymapOptionValue(a_option, a_keyCode)
+            main.SetDiaryKey(true)
+        elseif (a_option == dungeonMasterKeyOID)
+            dungeonMasterKey = a_keyCode
+            SetKeymapOptionValue(a_option, a_keyCode)
+            main.SetDungeonMasterKey(true)
+        elseif (a_option == dungeonMasterTextKeyOID)
+            dungeonMasterTextKey = a_keyCode
+            SetKeymapOptionValue(a_option, a_keyCode)
+            main.SetDungeonMasterTextKey(true)
         endIf
     endIf
 EndEvent
+
+Function RenderCrimePage()
+  SetCursorFillMode(TOP_TO_BOTTOM)		
+  AddHeaderOption("Bounty Settings")
+  smallBountyAmountOID = AddSliderOption("Small Bounty Amount", SmallBountyAmount, "{0} gold")
+  mediumBountyAmountOID = AddSliderOption("Medium Bounty Amount", MediumBountyAmount, "{0} gold")
+  largeBountyAmountOID = AddSliderOption("Large Bounty Amount", LargeBountyAmount, "{0} gold")
+EndFunction

@@ -1,5 +1,20 @@
 <?php
 require_once("/var/www/html/HerikaServer/lib/data_functions.php");
+// Add the system prompt context builder include
+require_once(__DIR__ . "/contextbuilders/system_prompt_context.php");
+require_once(__DIR__ . "/utils/format_util.php");
+
+function convertRelationshipStatus($targetActor) {
+    $relationshipRank = GetActorValue($targetActor, "relationshipRank");
+    if ($relationshipRank == 0) {
+        return "a stranger";
+    } else if ($relationshipRank < 1) {
+        return "someone you dislike";
+    } else {
+        return "someone you are fond of";
+    }
+}
+
 function convertToFirstPerson($text, $name, $pronouns) {
     if (empty($text)) {
         return "";
@@ -15,6 +30,13 @@ function convertToFirstPerson($text, $name, $pronouns) {
         "You have",
         "Your",
     ], $text);
+
+    // General name replacement - replace all occurrences of the name
+    $text = preg_replace('/\b' . preg_quote($name, '/') . '\b(?!\')/', 'you', $text);
+    
+    // Capitalize 'you' if it appears at the beginning of a sentence
+    $text = preg_replace('/([.!?]\s+)you\b/', '$1You', $text);
+    $text = preg_replace('/^you\b/', 'You', $text);
 
     // Pronoun replacements
     $text = str_replace([
@@ -154,7 +176,7 @@ function interceptRoleplayInput() {
 
         // Get recent context - use configured value for context messages
         $contextMessages = $settings['context_messages'];
-        $contextDataHistoric = DataLastDataExpandedFor("", $contextMessages * -1);
+        $contextDataHistoric = GetRecentContext("", $contextMessages);
         
         // Get info about location and NPCs
         $contextDataWorld = DataLastInfoFor("", -2);
@@ -173,13 +195,19 @@ function interceptRoleplayInput() {
         $playerPronouns = GetActorPronouns($PLAYER_NAME);
         
         // Get contexts and convert to first person
-        $physDesc = convertToFirstPerson(GetPhysicalDescription($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
-        $arousalStatus = convertToFirstPerson(GetArousalContext($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
-        $survivalStatus = convertToFirstPerson(GetSurvivalContext($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
-        $clothingStatus = convertToFirstPerson(GetClothingContext($PLAYER_NAME, true), $PLAYER_NAME, $playerPronouns);
-        $devicesStatus = convertToFirstPerson(GetDDContext($PLAYER_NAME, true), $PLAYER_NAME, $playerPronouns);
-        $fertilityStatus = convertToFirstPerson(GetFertilityContext($PLAYER_NAME), $PLAYER_NAME, $playerPronouns);
-        $mindState = convertToFirstPerson(GetMindInfluenceContext(GetMindInfluenceState($PLAYER_NAME)), $PLAYER_NAME, $playerPronouns);
+        $params = ['herika_name' => "The Narrator", 'player_name' => $PLAYER_NAME];
+        $physDesc = convertToFirstPerson(callContextBuilder('physical_description', $params), $PLAYER_NAME, $playerPronouns);
+        $arousalStatus = convertToFirstPerson(callContextBuilder('arousal', $params), $PLAYER_NAME, $playerPronouns);
+        $survivalStatus = convertToFirstPerson(callContextBuilder('survival', $params), $PLAYER_NAME, $playerPronouns);
+        $clothingStatus = convertToFirstPerson(GetUnifiedEquipmentContext($PLAYER_NAME, true), $PLAYER_NAME, $playerPronouns);
+        
+        $fertilityStatus = convertToFirstPerson(callContextBuilder('fertility', $params), $PLAYER_NAME, $playerPronouns);
+        $mindState = convertToFirstPerson(callContextBuilder('mind_influence', $params), $PLAYER_NAME, $playerPronouns);
+        $tattooStatus = convertToFirstPerson(callContextBuilder('tattoos', $params), $PLAYER_NAME, $playerPronouns);
+        // Add crime context
+        $bountyStatus = convertToFirstPerson(callContextBuilder('bounty', $params), $PLAYER_NAME, $playerPronouns);
+        $relationshipStatus = convertRelationshipStatus($HERIKA_NAME);
+        $weather = convertToFirstPerson(callContextBuilder('weather', $params), $PLAYER_NAME, $playerPronouns);
         // Replace variables in system prompt and request
         $variableReplacements = [
             'PLAYER_NAME' => $PLAYER_NAME,
@@ -198,11 +226,15 @@ function interceptRoleplayInput() {
             'AROUSAL_STATUS' => $arousalStatus,
             'SURVIVAL_STATUS' => $survivalStatus,
             'CLOTHING_STATUS' => $clothingStatus,
-            'DEVICES_STATUS' => $devicesStatus,
             'FERTILITY_STATUS' => $fertilityStatus,
+            'TATTOO_STATUS' => $tattooStatus,
+            'BOUNTY_STATUS' => $bountyStatus,
             'HERIKA_NAME' => $HERIKA_NAME,
             'HERIKA_PERS' => $HERIKA_PERS,
-            'MIND_STATE' => $mindState
+            'MIND_STATE' => $mindState,
+            'RELATIONSHIP_STATUS' => $relationshipStatus,
+            'WEATHER' => $weather,
+            'DEVICE_STATUS' => '' // Remove old device status string
         ];
 
         // Determine scene context
@@ -250,7 +282,40 @@ function interceptRoleplayInput() {
         }
 
         // Apply variable replacements to the selected prompts
-        $systemPrompt = replaceVariables($systemPrompt, $variableReplacements);
+        $sectionMap = [
+            "HERIKA_PERS" => "## PERSONALITY",
+            "DYNAMIC_STATE" => "## CURRENT STATE",
+            "PHYSICAL_DESCRIPTION" => "## PHYSICAL APPEARANCE",
+            "CLOTHING_STATUS" => "## EQUIPMENT",
+            "TATTOO_STATUS" => "## TATTOOS",
+            "AROUSAL_STATUS" => "## AROUSAL STATUS",
+            "FERTILITY_STATUS" => "## FERTILITY STATUS",
+            "SURVIVAL_STATUS" => "## SURVIVAL STATUS",
+            "MIND_STATE" => "## MENTAL STATE",
+            "WEATHER" => "## WEATHER",
+            "NEARBY_ACTORS" => "## NEARBY CHARACTERS",
+            "PLAYER_BIOS" => "## YOUR BACKGROUND",
+            "BOUNTY_STATUS" => "## BOUNTY STATUS"
+        ];
+
+        // Helper function to replace variables with section headers
+        function inflatePrompt($text, $replacements) {
+            global $sectionMap;
+            return preg_replace_callback('/\{([^}]+)\}/', function($matches) use ($replacements, $sectionMap) {
+                $key = $matches[1];
+                if (isset($replacements[$key])) {
+                    // If the key exists in sectionMap, prepend the section header
+                    $value = $replacements[$key];
+                    if (isset($sectionMap[$key])) {
+                        return $sectionMap[$key] . "\n" . $value;
+                    }
+                    return $value;
+                }
+                return $matches[0];
+            }, $text);
+        }
+
+        $systemPrompt = replaceVariables(inflatePrompt($systemPrompt, $variableReplacements), $variableReplacements);
 
         // Sort sections by their order if it exists
         $sections = $settings['sections'];
@@ -271,6 +336,9 @@ function interceptRoleplayInput() {
 
             $content = $section['header'] . "\n";
             $content .= replaceVariables($section['content'], $variableReplacements);
+            
+            // Format the section content using the shared formatter
+            $content = FormatUtil::formatContext($content);
 
             $contextMessage .= $content;
         }
@@ -280,7 +348,7 @@ function interceptRoleplayInput() {
         $messages = [
             ['role' => 'system', 'content' => $systemPrompt . "\n\n"],
             ['role' => 'system', 'content' => replaceVariables($contextMessage, $variableReplacements)],
-            ['role' => 'user', 'content' => "\n" . replaceVariables($requestFormat, $variableReplacements)]
+            ['role' => 'user', 'content' => "\n\n" . replaceVariables($requestFormat, $variableReplacements)]
         ];
 
         // Debug log the messages being sent to LLM
@@ -289,7 +357,7 @@ function interceptRoleplayInput() {
         // Call LLM with specific parameters for dialogue generation
         $response = callLLM($messages, $CONNECTOR["openrouter"]["model"], [
             'temperature' => floatval($CONNECTOR["openrouter"]["temperature"]),
-            'max_tokens' => 150
+            'max_tokens' => 2048
         ]);
 
         if ($response !== null) {
@@ -309,7 +377,7 @@ function interceptRoleplayInput() {
             if ($GLOBALS["gameRequest"][0] == "minai_roleplay") {
                 // rewrite as player input
                 $GLOBALS["gameRequest"][0] = "inputtext";
-                $GLOBALS["gameRequest"][3] = $response;
+                $GLOBALS["gameRequest"][3] = $PLAYER_NAME . ": " . $response;
             }
             else {
                 // Format the response with a single character name prefix

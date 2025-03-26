@@ -62,6 +62,7 @@ EndEvent
 
 Function SetContext(actor akTarget)
   Main.Debug("SetContext CombatManager(" + main.GetActorName(akTarget) + ")")
+  aiff.SetActorVariable(akTarget, "inCombat", akTarget.GetCombatState() >= 1)
 EndFunction
 
 
@@ -98,7 +99,7 @@ Function OnBleedoutStart(actor akTarget)
   Main.Info("Combat: OnBleedoutStart()")
   if akTarget != playerRef
     string targetName = Main.GetActorName(akTarget)
-    Main.RequestLLMResponseFromActor(targetName + " has been knocked down and is badly injured!", "minai_bleedoutself", targetName)
+    Main.RequestLLMResponseFromActor(targetName + " has been knocked down and is badly injured!", "minai_bleedoutself", targetName, "npc")
   EndIf
 EndFunction
 

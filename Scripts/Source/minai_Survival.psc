@@ -6,6 +6,7 @@ bool bHasBFT = False
 bool bHasCampfire = False
 bool bHasSurvivalMode = False
 bool bHasRequiem = False
+bool bHasGourmet = False
 
 _shweathersystem sunhelmWeather
 _SunHelmMain property sunhelmMain auto
@@ -35,6 +36,33 @@ GlobalVariable property Survival_ExhaustionNeedMaxValue auto
 
 MagicEffect property REQ_Effect_Alcohol auto
 MagicEffect property REQ_Effect_Drug_Skooma01_FX auto
+
+; Gourmet Alcohol Effects
+MagicEffect property MAG_AlcoholDamageMagicka auto
+MagicEffect property MAG_AlcoholDamageStamina auto
+MagicEffect property MAG_AlcoholFortifyMagicka auto
+MagicEffect property MAG_AlcoholFortifyStamina auto
+MagicEffect property MAG_AlcoholUpgradeEffect01 auto
+MagicEffect property MAG_AlcoholUpgradeEffect02 auto
+MagicEffect property MAG_AlcoholUpgradePerkEffect01 auto
+MagicEffect property MAG_AlcoholUpgradePerkEffect02 auto
+
+; Gourmet Drug Effects
+MagicEffect property MAG_DrugsAddictionEffect auto
+MagicEffect property MAG_DrugsDamageHealth auto
+MagicEffect property MAG_DrugsDamageMagicka auto
+MagicEffect property MAG_DrugsDamageStamina auto
+MagicEffect property MAG_DrugsFortifyHealth auto
+MagicEffect property MAG_DrugsFortifyHealthAlt auto
+MagicEffect property MAG_DrugsFortifyHealthRegen auto
+MagicEffect property MAG_DrugsFortifyMagicka auto
+MagicEffect property MAG_DrugsFortifyMagickaRegen auto
+MagicEffect property MAG_DrugsFortifyStamina auto
+MagicEffect property MAG_DrugsFortifyStaminaRegen auto
+MagicEffect property MAG_DrugsVisualEffectEversnow auto
+MagicEffect property MAG_DrugsVisualEffectSkooma auto
+MagicEffect property MAG_DrugsVisualEffectSkoomaRed auto
+MagicEffect property MAG_DrugsVisualEffectSleepingTreeSap auto
 
 function Maintenance(minai_MainQuestController _main)
   playerRef = Game.GetPlayer()
@@ -132,7 +160,50 @@ function Maintenance(minai_MainQuestController _main)
     EndIf
   EndIf
 
+  ; Load Gourmet effects
+  if Game.GetModByName("Gourmet.esp") != 255
+    bHasGourmet = True
+    Main.Info("Found Gourmet")
+    
+    ; Load alcohol effects
+    MAG_AlcoholDamageMagicka = Game.GetFormFromFile(0x01B806, "Gourmet.esp") as MagicEffect
+    MAG_AlcoholDamageStamina = Game.GetFormFromFile(0x01B803, "Gourmet.esp") as MagicEffect
+    MAG_AlcoholFortifyMagicka = Game.GetFormFromFile(0x01B804, "Gourmet.esp") as MagicEffect
+    MAG_AlcoholFortifyStamina = Game.GetFormFromFile(0x01B805, "Gourmet.esp") as MagicEffect
+    MAG_AlcoholUpgradeEffect01 = Game.GetFormFromFile(0x01B927, "Gourmet.esp") as MagicEffect
+    MAG_AlcoholUpgradeEffect02 = Game.GetFormFromFile(0x01B928, "Gourmet.esp") as MagicEffect
+    MAG_AlcoholUpgradePerkEffect01 = Game.GetFormFromFile(0x01B925, "Gourmet.esp") as MagicEffect
+    MAG_AlcoholUpgradePerkEffect02 = Game.GetFormFromFile(0x01B926, "Gourmet.esp") as MagicEffect
+    
+    ; Load drug effects
+    MAG_DrugsAddictionEffect = Game.GetFormFromFile(0x01B95F, "Gourmet.esp") as MagicEffect
+    MAG_DrugsDamageHealth = Game.GetFormFromFile(0x01B93F, "Gourmet.esp") as MagicEffect
+    MAG_DrugsDamageMagicka = Game.GetFormFromFile(0x01B823, "Gourmet.esp") as MagicEffect
+    MAG_DrugsDamageStamina = Game.GetFormFromFile(0x01B824, "Gourmet.esp") as MagicEffect
+    MAG_DrugsFortifyHealth = Game.GetFormFromFile(0x01B82E, "Gourmet.esp") as MagicEffect
+    MAG_DrugsFortifyHealthAlt = Game.GetFormFromFile(0x01B942, "Gourmet.esp") as MagicEffect
+    MAG_DrugsFortifyHealthRegen = Game.GetFormFromFile(0x01B941, "Gourmet.esp") as MagicEffect
+    MAG_DrugsFortifyMagicka = Game.GetFormFromFile(0x01B825, "Gourmet.esp") as MagicEffect
+    MAG_DrugsFortifyMagickaRegen = Game.GetFormFromFile(0x01B940, "Gourmet.esp") as MagicEffect
+    MAG_DrugsFortifyStamina = Game.GetFormFromFile(0x01B826, "Gourmet.esp") as MagicEffect
+    MAG_DrugsFortifyStaminaRegen = Game.GetFormFromFile(0x01B93E, "Gourmet.esp") as MagicEffect
+    MAG_DrugsVisualEffectEversnow = Game.GetFormFromFile(0x01B973, "Gourmet.esp") as MagicEffect
+    MAG_DrugsVisualEffectSkooma = Game.GetFormFromFile(0x01B827, "Gourmet.esp") as MagicEffect
+    MAG_DrugsVisualEffectSkoomaRed = Game.GetFormFromFile(0x01B82D, "Gourmet.esp") as MagicEffect
+    MAG_DrugsVisualEffectSleepingTreeSap = Game.GetFormFromFile(0x0E3CBB, "Gourmet.esp") as MagicEffect
+
+    ; Verify all effects loaded correctly
+    if !MAG_AlcoholDamageMagicka || !MAG_AlcoholDamageStamina || !MAG_AlcoholFortifyMagicka || !MAG_AlcoholFortifyStamina || \
+       !MAG_DrugsAddictionEffect || !MAG_DrugsDamageHealth || !MAG_DrugsDamageMagicka || !MAG_DrugsDamageStamina || \
+       !MAG_DrugsFortifyHealth || !MAG_DrugsFortifyHealthAlt || !MAG_DrugsFortifyHealthRegen || !MAG_DrugsFortifyMagicka || \
+       !MAG_DrugsFortifyStaminaRegen || !MAG_DrugsVisualEffectEversnow || !MAG_DrugsVisualEffectSkooma || !MAG_DrugsVisualEffectSkoomaRed
+      Main.Error("Could not load all Gourmet effects - Drug/Alcohol state tracking will be disabled")
+      bHasGourmet = False
+    EndIf
+  EndIf
+
   aiff.SetModAvailable("Requiem", bHasRequiem)
+  aiff.SetModAvailable("Gourmet", bHasGourmet)
 EndFunction
 
 
@@ -221,7 +292,7 @@ Function ActionResponse(actor akTarget, actor akSpeaker, string sayLine, actor[]
     EndIf
     if stringutil.Find(sayLine, "-trade-") != -1
       akSpeaker.showbartermenu()
-      main.RegisterEvent(main.GetActorName(player) + " began to trade with " + Main.GetActorName(akSpeaker))
+      main.RegisterEvent(main.GetActorName(player) + " began to trade with " + Main.GetActorName(akSpeaker), "info_trade")
     EndIf
     if stringutil.Find(sayLine, "-gift-") != -1
       akSpeaker.ShowGiftMenu(true)
@@ -253,33 +324,33 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   if command == "ExtCmdServeFood"
     Main.Debug("Feeding Player")
     FeedPlayer(akSpeaker, PlayerRef)
-    Main.RegisterEvent(""+speakerName+" served " + targetName + " a meal.")
+    Main.RegisterEvent("" + targetName + " paid for a meal, which "+speakerName+" then served to them.", "info_meal_served")
   EndIf
   ; Vanilla functionality
   if command == "ExtCmdRentRoom"
     Main.Debug("Renting Room")
     if playerRef.GetItemCount(Gold) < (DialogueGeneric as DialogueGenericScript).RoomRentalCost.GetValue() as Int
       Debug.Notification("AI: Player does not have enough gold to rent room.")
-      Main.RegisterEvent("" + targetName + " did not have enough gold for the room.")
+      Main.RegisterEvent("" + targetName + " did not have enough gold for the room.", "info_room_denied")
     Else
       (akSpeaker as RentRoomScript).RentRoom(DialogueGeneric as DialogueGenericScript)
-      Main.RegisterEvent(""+speakerName+" provided " + targetName + " a room for the night.")
+      Main.RegisterEvent(""+targetName + " paid for a room, which "+speakerName+" then provided to them.", "info_room_rented")
     EndIf
   EndIf
   if command == "ExtCmdTrade"
     akSpeaker.showbartermenu()
-    Main.RegisterEvent(""+speakerName+" started trading goods with " + targetName + ".")
+    Main.RegisterEvent(""+speakerName+" started trading goods with " + targetName + ".", "info_trade")
   EndIf
   if command == "ExtCmdCarriageRide"
     ; Parameter has destination
     int destination = GetDestination(parameter)
     carriageScript.Travel(destination, akSpeaker)
-    Main.RegisterEvent(""+speakerName+" gave " + targetName + " a ride in a carriage to " + destination + ".")
+    Main.RegisterEvent(""+speakerName+" gave " + targetName + " a ride in a carriage to " + destination + ".", "info_carriage_ride")
   EndIf
     if command == "ExtCmdTrainSkill"
     Main.Debug(speakerName + " is training the player")
     Game.ShowTrainingMenu(akSpeaker)
-    Main.RegisterEvent(""+speakerName+" gave " + targetName + " some training.")
+    Main.RegisterEvent(""+speakerName+" gave " + targetName + " some training.", "info_training")
   EndIf
 EndEvent
 
@@ -363,6 +434,7 @@ Function SetContext(actor akTarget)
       aiff.SetActorVariable(playerRef, "hunger", sunhelmMain.Hunger.CurrentHungerStage)
       aiff.SetActorVariable(playerRef, "thirst", sunhelmMain.Thirst.CurrentThirstStage)
       aiff.SetActorVariable(playerRef, "fatigue", sunhelmMain.Fatigue.CurrentFatigueStage)
+      aiff.SetActorVariable(playerRef, "cold", sunhelmMain.Cold.CurrentColdStage)
     ElseIf bHasSurvivalMode && Survival_ModeEnabled.GetValueInt() == 1
       ; Convert needs to percentage values for consistency
       float hungerPercent = ((Survival_HungerNeedValue.GetValue() / Survival_HungerNeedMaxValue.GetValue())) * 100
@@ -384,7 +456,49 @@ Function SetContext(actor akTarget)
       EndIf
     EndIf
     
-    aiff.SetActorVariable(playerRef, "weather", Weather.GetCurrentWeather())
+    ; Track Gourmet effects if mod is present
+    if bHasGourmet
+      ; Track alcohol effects and set isDrunk if any alcohol effect is active
+      bool hasAnyAlcoholEffect = playerRef.HasMagicEffect(MAG_AlcoholDamageMagicka) || \
+                                playerRef.HasMagicEffect(MAG_AlcoholDamageStamina) || \
+                                playerRef.HasMagicEffect(MAG_AlcoholFortifyMagicka) || \
+                                playerRef.HasMagicEffect(MAG_AlcoholFortifyStamina) || \
+                                playerRef.HasMagicEffect(MAG_AlcoholUpgradeEffect01) || \
+                                playerRef.HasMagicEffect(MAG_AlcoholUpgradeEffect02) || \
+                                playerRef.HasMagicEffect(MAG_AlcoholUpgradePerkEffect01) || \
+                                playerRef.HasMagicEffect(MAG_AlcoholUpgradePerkEffect02)
+      
+      if hasAnyAlcoholEffect
+        aiff.SetActorVariable(playerRef, "isDrunk", true)
+      ElseIf !bHasRequiem 
+        aiff.SetActorVariable(playerRef, "isDrunk", false)
+      EndIf
+      
+      ; Track drug effects and set isOnSkooma if any drug effect is active
+      bool hasAnyDrugEffect = playerRef.HasMagicEffect(MAG_DrugsAddictionEffect) || \
+                             playerRef.HasMagicEffect(MAG_DrugsDamageHealth) || \
+                             playerRef.HasMagicEffect(MAG_DrugsDamageMagicka) || \
+                             playerRef.HasMagicEffect(MAG_DrugsDamageStamina) || \
+                             playerRef.HasMagicEffect(MAG_DrugsFortifyHealth) || \
+                             playerRef.HasMagicEffect(MAG_DrugsFortifyHealthAlt) || \
+                             playerRef.HasMagicEffect(MAG_DrugsFortifyHealthRegen) || \
+                             playerRef.HasMagicEffect(MAG_DrugsFortifyMagicka) || \
+                             playerRef.HasMagicEffect(MAG_DrugsFortifyMagickaRegen) || \
+                             playerRef.HasMagicEffect(MAG_DrugsFortifyStamina) || \
+                             playerRef.HasMagicEffect(MAG_DrugsFortifyStaminaRegen) || \
+                             playerRef.HasMagicEffect(MAG_DrugsVisualEffectEversnow) || \
+                             playerRef.HasMagicEffect(MAG_DrugsVisualEffectSkooma) || \
+                             playerRef.HasMagicEffect(MAG_DrugsVisualEffectSkoomaRed)
+      
+      if hasAnyDrugEffect
+        aiff.SetActorVariable(playerRef, "isOnSkooma", true)
+      ElseIf !bHasRequiem 
+        aiff.SetActorVariable(playerRef, "isOnSkooma", false)
+      EndIf
+    EndIf
+    Weather currentWeather = Weather.GetCurrentWeather()
+    aiff.SetActorVariable(playerRef, "weather", currentWeather)
+    aiff.SetActorVariable(playerRef, "windSpeed", PO3_SKSEFunctions.GetWindSpeedAsFloat(currentWeather))
     aiff.SetActorVariable(playerRef, "skyMode", Weather.GetSkyMode())
     aiff.SetActorVariable(playerRef, "currentGameHour", GetCurrentHourOfDay())
   EndIf
@@ -409,7 +523,7 @@ EndFunction
 Event Campfire_OnObjectPlaced(Form akPlacedObject, float afPositionX, float afPositionY, float afPositionZ, float afAngleX, float afAngleY, float afAngleZ, bool abIsTent)
   string playerName = Main.GetActorName(playerRef)
   if abIsTent
-    Main.RequestLLMResponse(playerName + " set up a tent.", "chatnf_survival_1")
+    Main.RequestLLMResponseFromActor(playerName + " set up a tent.", "chatnf_minai_narrate", "everyone", "player")
   EndIf
 EndEvent
 
@@ -417,17 +531,17 @@ EndEvent
 Event Campfire_OnObjectRemoved(Form akBaseObject, float afPositionX, float afPositionY, float afPositionZ, float afAngleX, float afAngleY, float afAngleZ, bool abIsTent)
   string playerName = Main.GetActorName(playerRef)
   if abIsTent
-    Main.RequestLLMResponse(playerName + " took down a tent.", "chatnf_survival_1")
+    Main.RequestLLMResponseFromActor(playerName + " took down a tent.", "chatnf_minai_narrate", "everyone", "player")
   EndIf
 EndEvent
 
 Event Campfire_OnBedrollSitLay(Form akTent, bool abGettingUp)
   string playerName = Main.GetActorName(playerRef)
   if !abGettingUp
-    Main.RequestLLMResponse(playerName + " laid down on a bedroll.", "chatnf_survival_1")
+    Main.RequestLLMResponseFromActor(playerName + " laid down on a bedroll.", "chatnf_minai_narrate", "everyone", "player")
   else
     ; This might be too spammy if it's chat, since they'll also get the "goodmorning" message at the same time
-    Main.RequestLLMResponse(playerName + " got up from a bedroll.", "chatnf_survival_1")
+    Main.RequestLLMResponseFromActor(playerName + " got up from a bedroll.", "chatnf_minai_narrate", "everyone", "player")
   endif
 endEvent
 
@@ -435,9 +549,9 @@ endEvent
 Event Campfire_OnTentEnter(Form akTent, bool abHasShelter)
   string playerName = Main.GetActorName(playerRef)
   if abHasShelter
-    Main.RequestLLMResponse(playerName + " entered their tent, which has adequate shelter.", "chatnf_survival_1")
+    Main.RequestLLMResponseFromActor(playerName + " entered their tent, which has adequate shelter.", "chatnf_minai_narrate", "everyone", "player")
   else
-    Main.RequestLLMResponse(playerName + " entered their tent, which is unsheltered from the elements.", "chatnf_survival_1")
+    Main.RequestLLMResponseFromActor(playerName + " entered their tent, which is unsheltered from the elements.", "chatnf_minai_narrate", "everyone", "player")
   endif
 endEvent
 

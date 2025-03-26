@@ -10,6 +10,7 @@ $GLOBALS['disable_nsfw'] = false;
 $GLOBALS['restrict_nonfollower_functions'] = true;
 $GLOBALS['always_enable_functions'] = true;
 $GLOBALS['force_aiff_name_to_ingame_name'] = true;
+$GLOBALS['enable_prompt_slop_cleanup'] = false;
 $GLOBALS['commands_to_purge'] = Array("TakeASeat", "Folow");
 $GLOBALS['events_to_ignore'] = Array("rpg_lvlup");
 $GLOBALS['use_defeat'] = false;
@@ -25,6 +26,62 @@ $GLOBALS['enforce_short_responses'] = false;
 $GLOBALS['use_llm_fallback'] = false;
 $GLOBALS['enforce_single_json'] = false;
 
+// Context Builder Configuration - controls which sections are included in the system prompt
+$GLOBALS['minai_context'] = array(
+    // Character context builders
+    'physical_description' => true,
+    'equipment' => true,
+    'tattoos' => true,
+    'arousal' => true,
+    'fertility' => true,
+    'following' => true,
+    'survival' => true,
+    'player_status' => true,
+    'bounty' => true,
+    'mind_influence' => true,
+    'dynamic_state' => true,
+    'career' => true,
+    'dirt_and_blood' => true,
+    'level' => true,
+    'family_status' => true,
+    'party_membership' => true,
+    
+    // Core context builders
+    'personality' => true,
+    'interaction' => true,
+    'player_background' => true,
+    'current_task' => true,
+    
+    // Environmental context builders
+    'day_night_state' => true,
+    'weather' => true,
+    'moon_phase' => true,
+    'location' => true,
+    'frostfall' => true,
+    'character_state' => true,
+    'nearby_characters' => true,
+    'npc_relationships' => true,
+    'third_party' => true,
+    'nearby_buildings' => true,
+    
+    // Relationship context builders
+    'relationship' => true,
+    'relative_power' => true,
+    'devious_follower' => true,
+    'submissive_lola' => true,
+    
+    // NSFW context builders
+    'nsfw_reputation' => true,
+    
+    // System prompt settings
+    'response_guidelines' => true,
+    'action_enforcement' => true
+);
+
+// Inventory system configuration
+$GLOBALS['inventory_items_limit'] = 5; // Number of Items to expose to LLM from an actor's inventory
+$GLOBALS['use_item_relevancy_scoring'] = false; // Use relevancy scoring for items
+
 // Default action prompts with variables
 $GLOBALS['action_prompts'] = Array(
     "singing" => "Respond with a song from #player_name#. Be creative, and match the mood of the scene.",
@@ -33,9 +90,9 @@ $GLOBALS['action_prompts'] = Array(
     
     "self_narrator_normal" => "Respond as #player_name#, thinking privately to #player_object#self about the current situation and recent events. Stay in first person, capturing #player_possessive# genuine thoughts, emotions, and internal conflicts. Focus on #player_possessive# personal perspective, biases, and feelings rather than an objective summary of events. Keep the response introspective and true to how #player_name# would process and react internally.",
 
-    "explicit_scene" => "Choose the ACTION or TALK that best conveys #herika_name#'s immediate physical and emotional responses. Focus heavily on explicit dialogue and verbal expressions to enhance the scene, but also utilize ACTIONS to vividly depict #herika_name#'s sensations and feelings when interacting with #target#. Avoid narration and emoting.",
+    "explicit_scene" => "Respond to #target# as #herika_name# would in this intimate situation. Choose an appropriate action that reflects #herika_name#'s desires and the scene context. Express #herika_name#'s reactions and feelings naturally emphasizing the #SEX_SCENARIO, then use an action that advances the intimate nature of the scene in a meaningful way.",
     
-    "normal_scene" => "Select the most contextually appropriate ACTION to respond to #target#. Prioritize actions that directly address the current interaction (like BeginTrading for commerce, Talk for dialogue). Use combat actions such as Attack when warranted by the situation, or when your character wants to do so. Your character must act according to their personality and profession first, and prioritize maintaining dialogue and scene continuity.",
+    "normal_scene" => "Respond to #target# as #herika_name# would in this situation. Express your thoughts or dialogue naturally, then consider boldly using an appropriate action that aligns with your character's personality and objectives. Your response should feel authentic and progress the scene or conversation naturally.",
 
     // Diary prompts
     "player_diary" => "#player_name# regularly keeps a diary, which you are now tasked to update. Please write a several page story of #player_name#'s recent thoughts, feelings, and adventures. Respond as if you are writing this into a private diary, including completely unfiltered thoughts and feelings. WRITE AS IF YOU ARE #player_name# WRITING INTO A PRIVATE DIARY.",
@@ -43,9 +100,6 @@ $GLOBALS['action_prompts'] = Array(
     "follower_diary" => "#herika_name# regularly keeps a diary, which you are now tasked to update. Please write a several page story of #herika_name#'s  recent thoughts, feelings, and adventures. Respond as if you are writing this into a private diary, including completely unfiltered thoughts and feelings. WRITE AS IF YOU ARE #herika_name# WRITING INTO A PRIVATE DIARY."
 );
 
-$GLOBALS['action_prompts_nsfw'] = Array(
-    "normal_scene" => "Select the most contextually appropriate ACTION to respond to #target#. Prioritize actions that directly address the current interaction (like BeginTrading for commerce, Talk for dialogue). Use combat or intimate actions such as Grope when warranted by the situation, or when your character wants to do so. Your character must act according to their personality and profession first, and prioritize maintaining dialogue and scene continuity.",
-);
 
 // Roleplay translation settings
 $GLOBALS['roleplay_settings'] = Array(
@@ -65,31 +119,31 @@ $GLOBALS['roleplay_settings'] = Array(
     "sections" => Array(
         "CHARACTER_BACKGROUND" => Array(
             "enabled" => true,
-            "header" => "=== YOUR BACKGROUND ===",
-            "content" => "#PLAYER_BIOS#\nPronouns: #PLAYER_SUBJECT#/#PLAYER_OBJECT#/#PLAYER_POSSESSIVE#\n\nCurrent State: #HERIKA_DYNAMIC#\n\nPhysical Description: #PHYSICAL_DESCRIPTION#\n\Mental State: #MIND_STATE#",
+            "header" => "## YOUR DESCRIPTION AND PERSONALITY",
+            "content" => "#PLAYER_BIOS#\n#HERIKA_PERS#\nPronouns: #PLAYER_SUBJECT#/#PLAYER_OBJECT#/#PLAYER_POSSESSIVE#\nCurrent State: #HERIKA_DYNAMIC#\nPhysical Description: #PHYSICAL_DESCRIPTION#\nMental State: #MIND_STATE#",
             "order" => 0
         ),
         "CHARACTER_STATUS" => Array(
             "enabled" => true,
-            "header" => "=== YOUR CURRENT STATUS ===",
-            "content" => "#AROUSAL_STATUS#\n#SURVIVAL_STATUS#\n#CLOTHING_STATUS#\n#DEVICES_STATUS#\n#FERTILITY_STATUS#",
+            "header" => "## YOUR CURRENT STATUS",
+            "content" => "#AROUSAL_STATUS#\n#SURVIVAL_STATUS#\n#CLOTHING_STATUS#\n#FERTILITY_STATUS#\n#TATTOO_STATUS#\n#BOUNTY_STATUS#",
             "order" => 1
         ),
         "NEARBY_ENTITIES" => Array(
             "enabled" => true,
-            "header" => "=== NEARBY ENTITIES ===",
+            "header" => "## NEARBY ENTITIES",
             "content" => "Characters: #NEARBY_ACTORS#\nLocations: #NEARBY_LOCATIONS#",
             "order" => 2
         ),
         "RECENT_EVENTS" => Array(
             "enabled" => true,
-            "header" => "=== RECENT EVENTS ===",
+            "header" => "## RECENT EVENTS",
             "content" => "#RECENT_EVENTS#",
             "order" => 3
         ),
         "INSTRUCTIONS" => Array(
             "enabled" => true,
-            "header" => "=== INSTRUCTIONS ===",
+            "header" => "## INSTRUCTIONS",
             "content" => "1. Correct any misheard names using the nearby names list\n2. Keep responses brief and true to the original meaning\n3. Do not add character name prefixes to your response\n4. Provide only the translated dialogue\n5. Emphasize recent events and dialogue in your response.",
             "order" => 4
         )

@@ -41,7 +41,9 @@ if (!file_exists("$pluginPath/config.php")) {
 require_once("config.php");
 require_once("util.php");
 require_once("customintegrations.php");
-
+require_once("functions/deviousnarrator.php");
+require_once("items.php");
+require_once("functions/action_builder.php");
 
 if ($GLOBALS["force_voice_type"]) {
     require "fix_xtts.php";
@@ -70,36 +72,36 @@ if (ShouldClearFollowerFunctions()) {
 else {
     // Follower specific commands
     if (!IsInFaction($GLOBALS["HERIKA_NAME"], "NoActionsFaction"))
-        require "followers.php";
+        require "functions/followers.php";
 }
 
 if (!IsInFaction($GLOBALS["HERIKA_NAME"], "NoActionsFaction")) {
-    require "survival.php";
+    require "functions/survival.php";
+    require "functions/crimes.php"; 
 
-
-
-    if (!$GLOBALS["disable_nsfw"] && !IsInFaction($GLOBALS["HERIKA_NAME"], "NoNSFWActionsFaction")) {
+    if (!IsInFaction($GLOBALS["HERIKA_NAME"], "NoNSFWActionsFaction")) {
         // NSFW comands
-        require "arousal.php";
+        require "functions/arousal.php";
         if (!IsInFaction($GLOBALS["HERIKA_NAME"], "NoSexActionsFaction")) {
             if (ShouldEnableSexFunctions($GLOBALS["HERIKA_NAME"])) {
-                require "sex.php";
+                require "functions/sex.php";
             }
             if (ShouldEnableHarassFunctions($GLOBALS["HERIKA_NAME"])) {
-                require "slapp.php";
+                require "functions/slapp.php";
             }
         }
-        require_once("deviousnarrator.php");
+        require_once("functions/deviousnarrator.php");
         if (ShouldUseDeviousNarrator()) {
             // Anything loaded after this will have functions enabled for the narrator
             EnableDeviousNarratorActions();
-            require_once("generalperverted.php");
+            require_once("functions/generalperverted.php");
         }
         if (ShouldEnableHarassFunctions($GLOBALS["HERIKA_NAME"])) {
-            require_once("generalperverted.php");
+            require_once("functions/generalperverted.php");
         }
-        require "deviousdevices.php";
-        require_once("deviousfollower.php");
+        require "functions/deviousdevices.php";
+        require_once("contextbuilders/deviousfollower_context.php");
+        require_once("functions/items_commands.php");
         if ($GLOBALS["always_enable_functions"] && $GLOBALS["HERIKA_NAME"] != "The Narrator" && $GLOBALS["HERIKA_NAME"] != "Narrator" && $GLOBALS["HERIKA_NAME"] != "Player") {
             // Always enable actions for followers (During rechats and such)
             $GLOBALS["FUNCTIONS_ARE_ENABLED"]=true;

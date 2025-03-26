@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tattoo Descriptions Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2196F3;
+            --background-dark: #1a1a1a;
+            --background-light: #2d2d2d;
+            --text-color: #e0e0e0;
+            --border-color: #404040;
+            --success-color: #40c057;
+            --error-color: #f44336;
+            --warning-color: #ffc107;
+            --info-color: #4dabf7;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: radial-gradient(circle at center, var(--background-light) 0%, var(--background-dark) 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 95vw;
+            margin: 20px auto;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--text-color);
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-panel {
+            background-color: var(--background-light);
+            padding: 15px;
+            text-align: center;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(4px);
+        }
+
+        .nav-panel a {
+            display: inline-block;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 1.1rem;
+            margin: 0 20px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
+            border: 1px solid var(--border-color);
+        }
+
+        .nav-panel a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .section {
+            background: rgba(45, 45, 45, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        .section h2 {
+            color: var(--text-color);
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            opacity: 0.9;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--background-dark);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        button {
+            padding: 8px 16px;
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        button.primary {
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.2) 0%,
+                rgba(76, 175, 80, 0.3) 100%
+            );
+            border-color: var(--primary-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: var(--background-light);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: rgba(0, 0, 0, 0.2);
+            font-weight: 500;
+        }
+
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .notification {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .success {
+            background-color: rgba(64, 192, 87, 0.1);
+            border: 1px solid var(--success-color);
+            color: var(--success-color);
+        }
+
+        .error {
+            background-color: rgba(244, 67, 54, 0.1);
+            border: 1px solid var(--error-color);
+            color: var(--error-color);
+        }
+
+        .info {
+            background-color: rgba(33, 150, 243, 0.1);
+            border: 1px solid var(--info-color);
+            color: var(--info-color);
+        }
+
+        .warning {
+            background-color: rgba(255, 193, 7, 0.1);
+            border: 1px solid var(--warning-color);
+            color: var(--warning-color);
+        }
+
+        .import-export {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .import-export > div {
+            flex: 1;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .filter-controls input,
+        .filter-controls select {
+            margin: 0;
+        }
+
+        .view-button {
+            background: linear-gradient(135deg,
+                rgba(33, 150, 243, 0.2) 0%,
+                rgba(33, 150, 243, 0.3) 100%
+            );
+            border-color: var(--secondary-color);
+        }
+
+        .modal-overlay {
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Tattoo Descriptions Management</h1>
+        
+        <div class="nav-panel">
+            <a href="index.html">Home</a>
+            <a href="config.html">Configuration</a>
+            <a href="personalities.html">Personalities</a>
+            <a href="scene_descriptions.html">Scene Descriptions</a>
+            <a href="tattoo_descriptions.html">Tattoo Descriptions</a>
+        </div>
+
+        <div id="notification" class="notification"></div>
+        
+        <div class="section">
+            <h2>Actors with Tattoos</h2>
+            <p>Below is a list of all actors that have tattoos recorded in the system.</p>
+            
+            <div id="actorsList">
+                <table id="actorsTable">
+                    <thead>
+                        <tr>
+                            <th>Actor Name</th>
+                            <th>Last Updated</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Actor data will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>All Tattoos in System</h2>
+            <p>This shows all tattoos that have been seen across all actors in the game.</p>
+            
+            <div class="filter-controls">
+                <input type="text" id="tattooFilter" placeholder="Filter tattoos..." style="max-width: 300px;">
+                <select id="sectionFilter" style="max-width: 200px;">
+                    <option value="">All Sections</option>
+                    <!-- Sections will be loaded dynamically -->
+                </select>
+                <select id="sortBy" style="max-width: 200px;">
+                    <option value="section">Sort by Section</option>
+                    <option value="name">Sort by Name</option>
+                    <option value="actors">Sort by Actor Count</option>
+                </select>
+                <button id="addNewTattooButton" class="primary" style="margin-left: auto;">Add New Tattoo</button>
+            </div>
+            
+            <div id="tattooStats" class="notification info" style="margin-bottom: 15px; display: none;"></div>
+            
+            <div id="allTattoosList">
+                <table id="allTattoosTable">
+                    <thead>
+                        <tr>
+                            <th>Section</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Hidden By</th>
+                            <th>Actor Count</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- All tattoos data will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Tattoo Descriptions</h2>
+            <p>Manage tattoo descriptions that will be used to describe tattoos on NPCs.</p>
+            
+            <div id="tattooList">
+                <table id="tattooTable">
+                    <thead>
+                        <tr>
+                            <th>Section</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Hidden By</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Tattoo data will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2 id="formTitle">Add New Tattoo Description</h2>
+            
+            <form id="tattooForm">
+                <input type="hidden" id="editMode" value="add">
+                
+                <div class="form-grid">
+                    <div>
+                        <label for="section">Section:</label>
+                        <input type="text" id="section" name="section" required>
+                    </div>
+                    
+                    <div>
+                        <label for="name">Name:</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                </div>
+                
+                <div>
+                    <label for="description">Description:</label>
+                    <textarea id="description" name="description" rows="4" placeholder="Enter a description of how this tattoo appears on the character..."></textarea>
+                </div>
+                
+                <div>
+                    <label>Hidden By:</label>
+                    <div id="hiddenByOptions" style="margin-top: 10px;">
+                        <!-- Common Items Section -->
+                        <div class="hidden-by-section">
+                            <h4 style="margin-top: 0; margin-bottom: 10px; color: var(--primary-color);">Common Items</h4>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;">
+                                <label><input type="checkbox" name="hidden_by" value="cuirass"> Cuirass/Armor</label>
+                                <label><input type="checkbox" name="hidden_by" value="helmet"> Helmet/Hood</label>
+                                <label><input type="checkbox" name="hidden_by" value="gloves"> Gloves/Gauntlets</label>
+                                <label><input type="checkbox" name="hidden_by" value="boots"> Boots/Footwear</label>
+                                <label><input type="checkbox" name="hidden_by" value="wearing_top"> Wearing Top</label>
+                                <label><input type="checkbox" name="hidden_by" value="wearing_bottom"> Wearing Bottom</label>
+                            </div>
+                        </div>
+                        
+                        <!-- SLA Keywords Section (Collapsible) -->
+                        <div class="hidden-by-section" style="margin-top: 15px;">
+                            <button type="button" class="collapsible-button" style="width: 100%; text-align: left; padding: 8px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: 4px;">
+                                <h4 style="margin: 0; display: inline;">SLA Keywords</h4>
+                                <span style="float: right;">▼</span>
+                            </button>
+                            <div class="collapsible-content" style="display: none; padding: 10px; border: 1px solid var(--border-color); border-top: none; border-radius: 0 0 4px 4px;">
+                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;">
+                                    <label><input type="checkbox" name="hidden_by" value="SLA_ArmorHarness"> Armor Harness</label>
+                                    <label><input type="checkbox" name="hidden_by" value="SLA_ArmorHalfNaked"> Half Naked Armor</label>
+                                    <label><input type="checkbox" name="hidden_by" value="SLA_HalfNakedBikini"> Half Naked Bikini</label>
+                                    <label><input type="checkbox" name="hidden_by" value="SLA_ArmorSpendex"> Spandex/Latex</label>
+                                    <label><input type="checkbox" name="hidden_by" value="SLA_ArmorTransparent"> Transparent Outfit</label>
+                                    <label><input type="checkbox" name="hidden_by" value="SLA_ArmorLewdLeotard"> Lewd Leotard</label>
+                                    <label><input type="checkbox" name="hidden_by" value="SLA_ArmorRubber"> Rubber/Ebonite</label>
+                                    <label><input type="checkbox" name="hidden_by" value="SLA_Brabikini"> Bra/Bikini</label>
+                                    <label><input type="checkbox" name="hidden_by" value="SLA_Thong"> Thong</label>
+                                    <label><input type="checkbox" name="hidden_by" value="SLA_PantiesNormal"> Normal Panties</label>
+                                    <label><input type="checkbox" name="hidden_by" value="SLA_PantsNormal"> Normal Pants</label>
+                                    <label><input type="checkbox" name="hidden_by" value="SLA_PelvicCurtain"> Pelvic Curtain</label>
+                                    <label><input type="checkbox" name="hidden_by" value="SLA_FullSkirt"> Full Skirt</label>
+                                    <label><input type="checkbox" name="hidden_by" value="SLA_MiniSkirt"> Mini Skirt</label>
+                                    <label><input type="checkbox" name="hidden_by" value="SLA_MicroHotPants"> Micro Hot Pants</label>
+                                    <label><input type="checkbox" name="hidden_by" value="SLA_Heels"> High Heels</label>
+                                    <label><input type="checkbox" name="hidden_by" value="SLA_PiercingVulva"> Vulva Piercing</label>
+                                    <label><input type="checkbox" name="hidden_by" value="SLA_PiercingBelly"> Belly Piercing</label>
+                                    <label><input type="checkbox" name="hidden_by" value="SLA_PiercingNipple"> Nipple Piercing</label>
+                                    <label><input type="checkbox" name="hidden_by" value="SLA_PiercingClit"> Clit Piercing</label>
+                                    <label><input type="checkbox" name="hidden_by" value="EroticArmor"> Erotic Armor</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Devious Devices Keywords Section (Collapsible) -->
+                        <div class="hidden-by-section" style="margin-top: 15px;">
+                            <button type="button" class="collapsible-button" style="width: 100%; text-align: left; padding: 8px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: 4px;">
+                                <h4 style="margin: 0; display: inline;">Devious Devices Keywords</h4>
+                                <span style="float: right;">▼</span>
+                            </button>
+                            <div class="collapsible-content" style="display: none; padding: 10px; border: 1px solid var(--border-color); border-top: none; border-radius: 0 0 4px 4px;">
+                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;">
+                                    <label><input type="checkbox" name="hidden_by" value="zad_DeviousPlugVaginal"> Vaginal Plug</label>
+                                    <label><input type="checkbox" name="hidden_by" value="zad_DeviousPlugAnal"> Anal Plug</label>
+                                    <label><input type="checkbox" name="hidden_by" value="zad_DeviousBelt"> Chastity Belt</label>
+                                    <label><input type="checkbox" name="hidden_by" value="zad_DeviousBra"> Chastity Bra</label>
+                                    <label><input type="checkbox" name="hidden_by" value="zad_DeviousCollar"> Collar</label>
+                                    <label><input type="checkbox" name="hidden_by" value="zad_DeviousArmCuffs"> Arm Cuffs</label>
+                                    <label><input type="checkbox" name="hidden_by" value="zad_DeviousLegCuffs"> Leg Cuffs</label>
+                                    <label><input type="checkbox" name="hidden_by" value="zad_DeviousArmbinder"> Armbinder</label>
+                                    <label><input type="checkbox" name="hidden_by" value="zad_DeviousYoke"> Yoke</label>
+                                    <label><input type="checkbox" name="hidden_by" value="zad_DeviousElbowTie"> Elbow Tie</label>
+                                    <label><input type="checkbox" name="hidden_by" value="zad_DeviousPetSuit"> Pet Suit</label>
+                                    <label><input type="checkbox" name="hidden_by" value="zad_DeviousStraitJacket"> Strait Jacket</label>
+                                    <label><input type="checkbox" name="hidden_by" value="zad_DeviousCorset"> Corset</label>
+                                    <label><input type="checkbox" name="hidden_by" value="zad_DeviousHobbleSkirt"> Hobble Skirt</label>
+                                    <label><input type="checkbox" name="hidden_by" value="zad_DeviousGloves"> Locking Gloves</label>
+                                    <label><input type="checkbox" name="hidden_by" value="zad_DeviousSuit"> Body Suit</label>
+                                    <label><input type="checkbox" name="hidden_by" value="zad_DeviousHarness"> Harness</label>
+                                    <label><input type="checkbox" name="hidden_by" value="zad_DeviousHood"> Hood</label>
+                                    <label><input type="checkbox" name="hidden_by" value="zad_DeviousGag"> Gag</label>
+                                    <label><input type="checkbox" name="hidden_by" value="zad_DeviousGagPanel"> Panel Gag</label>
+                                    <label><input type="checkbox" name="hidden_by" value="zad_DeviousGagLarge"> Large Gag</label>
+                                    <label><input type="checkbox" name="hidden_by" value="zad_DeviousBlindfold"> Blindfold</label>
+                                    <label><input type="checkbox" name="hidden_by" value="zad_DeviousAnkleShackles"> Ankle Shackles</label>
+                                    <label><input type="checkbox" name="hidden_by" value="zad_DeviousClamps"> Nipple Clamps</label>
+                                    <label><input type="checkbox" name="hidden_by" value="zad_DeviousPiercingsNipple"> DD Nipple Piercing</label>
+                                    <label><input type="checkbox" name="hidden_by" value="zad_DeviousPiercingsVaginal"> DD Vaginal Piercing</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="hiddenBy" name="hiddenBy">
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <button type="submit" class="primary" id="saveButton">Save Tattoo</button>
+                    <button type="button" id="cancelButton" style="display: none;">Cancel</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="section">
+            <h2>Import/Export Tattoo Descriptions</h2>
+            
+            <div class="import-export">
+                <div>
+                    <h3>Export</h3>
+                    <p>Download all tattoo descriptions as a JSON file.</p>
+                    <button id="exportButton" class="primary">Export Tattoo Descriptions</button>
+                </div>
+                
+                <div>
+                    <h3>Import</h3>
+                    <p>Import tattoo descriptions from a JSON file.</p>
+                    <div>
+                        <input type="file" id="importFile" accept=".json" style="display: none;">
+                        <button id="importSelectButton">Select File</button>
+                        <span id="selectedFileName"></span>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <label>
+                            <input type="checkbox" id="clearExisting">
+                            Clear existing tattoo descriptions before import
+                        </label>
+                    </div>
+                    <button id="importButton" class="primary" disabled>Import Tattoo Descriptions</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Bulk Edit Tattoos</h2>
+            <p>Apply changes to multiple tattoos at once based on section or other criteria.</p>
+            
+            <div class="form-grid">
+                <div>
+                    <label for="bulkEditSection">Section:</label>
+                    <select id="bulkEditSection">
+                        <option value="">Select Section</option>
+                        <!-- Sections will be loaded dynamically -->
+                    </select>
+                </div>
+            </div>
+            
+            <div style="margin-top: 15px;">
+                <label>Hidden By:</label>
+                <div id="bulkHiddenByOptions" style="margin-top: 10px;">
+                    <!-- Common Items Section -->
+                    <div class="hidden-by-section">
+                        <h4 style="margin-top: 0; margin-bottom: 10px; color: var(--primary-color);">Common Items</h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;">
+                            <label><input type="checkbox" name="bulk_hidden_by" value="cuirass"> Cuirass/Armor</label>
+                            <label><input type="checkbox" name="bulk_hidden_by" value="helmet"> Helmet/Hood</label>
+                            <label><input type="checkbox" name="bulk_hidden_by" value="gloves"> Gloves/Gauntlets</label>
+                            <label><input type="checkbox" name="bulk_hidden_by" value="boots"> Boots/Footwear</label>
+                            <label><input type="checkbox" name="bulk_hidden_by" value="wearing_top"> Wearing Top</label>
+                            <label><input type="checkbox" name="bulk_hidden_by" value="wearing_bottom"> Wearing Bottom</label>
+                        </div>
+                    </div>
+                    
+                    <!-- SLA Keywords Section (Collapsible) -->
+                    <div class="hidden-by-section" style="margin-top: 15px;">
+                        <button type="button" class="collapsible-button" style="width: 100%; text-align: left; padding: 8px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: 4px;">
+                            <h4 style="margin: 0; display: inline;">SLA Keywords</h4>
+                            <span style="float: right;">▼</span>
+                        </button>
+                        <div class="collapsible-content" style="display: none; padding: 10px; border: 1px solid var(--border-color); border-top: none; border-radius: 0 0 4px 4px;">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;">
+                                <label><input type="checkbox" name="bulk_hidden_by" value="SLA_ArmorHarness"> Armor Harness</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="SLA_ArmorHalfNaked"> Half Naked Armor</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="SLA_HalfNakedBikini"> Half Naked Bikini</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="SLA_ArmorSpendex"> Spandex/Latex</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="SLA_ArmorTransparent"> Transparent Outfit</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="SLA_ArmorLewdLeotard"> Lewd Leotard</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="SLA_ArmorRubber"> Rubber/Ebonite</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="SLA_Brabikini"> Bra/Bikini</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="SLA_Thong"> Thong</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="SLA_PantiesNormal"> Normal Panties</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="SLA_PantsNormal"> Normal Pants</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="SLA_PelvicCurtain"> Pelvic Curtain</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="SLA_FullSkirt"> Full Skirt</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="SLA_MiniSkirt"> Mini Skirt</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="SLA_MicroHotPants"> Micro Hot Pants</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="SLA_Heels"> High Heels</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="SLA_PiercingVulva"> Vulva Piercing</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="SLA_PiercingBelly"> Belly Piercing</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="SLA_PiercingNipple"> Nipple Piercing</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="SLA_PiercingClit"> Clit Piercing</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="EroticArmor"> Erotic Armor</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Devious Devices Keywords Section (Collapsible) -->
+                    <div class="hidden-by-section" style="margin-top: 15px;">
+                        <button type="button" class="collapsible-button" style="width: 100%; text-align: left; padding: 8px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: 4px;">
+                            <h4 style="margin: 0; display: inline;">Devious Devices Keywords</h4>
+                            <span style="float: right;">▼</span>
+                        </button>
+                        <div class="collapsible-content" style="display: none; padding: 10px; border: 1px solid var(--border-color); border-top: none; border-radius: 0 0 4px 4px;">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;">
+                                <label><input type="checkbox" name="bulk_hidden_by" value="zad_DeviousPlugVaginal"> Vaginal Plug</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="zad_DeviousPlugAnal"> Anal Plug</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="zad_DeviousBelt"> Chastity Belt</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="zad_DeviousBra"> Chastity Bra</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="zad_DeviousCollar"> Collar</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="zad_DeviousArmCuffs"> Arm Cuffs</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="zad_DeviousLegCuffs"> Leg Cuffs</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="zad_DeviousArmbinder"> Armbinder</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="zad_DeviousYoke"> Yoke</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="zad_DeviousElbowTie"> Elbow Tie</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="zad_DeviousPetSuit"> Pet Suit</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="zad_DeviousStraitJacket"> Strait Jacket</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="zad_DeviousCorset"> Corset</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="zad_DeviousHobbleSkirt"> Hobble Skirt</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="zad_DeviousGloves"> Locking Gloves</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="zad_DeviousSuit"> Body Suit</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="zad_DeviousHarness"> Harness</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="zad_DeviousHood"> Hood</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="zad_DeviousGag"> Gag</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="zad_DeviousGagPanel"> Panel Gag</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="zad_DeviousGagLarge"> Large Gag</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="zad_DeviousBlindfold"> Blindfold</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="zad_DeviousAnkleShackles"> Ankle Shackles</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="zad_DeviousClamps"> Nipple Clamps</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="zad_DeviousPiercingsNipple"> DD Nipple Piercing</label>
+                                <label><input type="checkbox" name="bulk_hidden_by" value="zad_DeviousPiercingsVaginal"> DD Vaginal Piercing</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" id="bulkHiddenBy" name="bulkHiddenBy">
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <button id="applyBulkEdit" class="primary">Apply to All Tattoos in Section</button>
+                <p class="warning" style="margin-top: 10px; font-size: 0.9em;">Warning: This will update all tattoos in the selected section. This action cannot be undone.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const tattooTable = document.getElementById('tattooTable');
+            const actorsTable = document.getElementById('actorsTable');
+            const allTattoosTable = document.getElementById('allTattoosTable');
+            const tattooForm = document.getElementById('tattooForm');
+            const formTitle = document.getElementById('formTitle');
+            const editMode = document.getElementById('editMode');
+            const sectionInput = document.getElementById('section');
+            const nameInput = document.getElementById('name');
+            const descriptionInput = document.getElementById('description');
+            const hiddenByInput = document.getElementById('hiddenBy');
+            const saveButton = document.getElementById('saveButton');
+            const cancelButton = document.getElementById('cancelButton');
+            const notification = document.getElementById('notification');
+            const exportButton = document.getElementById('exportButton');
+            const importSelectButton = document.getElementById('importSelectButton');
+            const importFile = document.getElementById('importFile');
+            const selectedFileName = document.getElementById('selectedFileName');
+            const importButton = document.getElementById('importButton');
+            const clearExisting = document.getElementById('clearExisting');
+            const tattooFilter = document.getElementById('tattooFilter');
+            const sectionFilter = document.getElementById('sectionFilter');
+            const sortBy = document.getElementById('sortBy');
+            const bulkEditSection = document.getElementById('bulkEditSection');
+            const bulkHiddenByOptions = document.getElementById('bulkHiddenByOptions');
+            const applyBulkEdit = document.getElementById('applyBulkEdit');
+            
+            // Store all tattoos data
+            let allTattoos = [];
+            let allActors = [];
+            let uniqueSections = new Set();
+            
+            // Add a helper function for date formatting
+            function formatDate(dateValue) {
+                if (!dateValue) return 'N/A';
+                
+                try {
+                    // Check if it's a Unix timestamp (number or numeric string)
+                    if (!isNaN(dateValue) && String(dateValue).length === 10) {
+                        // Convert seconds to milliseconds for JavaScript Date
+                        const timestamp = parseInt(dateValue) * 1000;
+                        const date = new Date(timestamp);
+                        return date.toLocaleString();
+                    }
+                    
+                    // Try to parse as a standard date string
+                    const date = new Date(dateValue);
+                    
+                    // Check if date is valid
+                    if (!isNaN(date.getTime())) {
+                        return date.toLocaleString();
+                    } else {
+                        // Try alternative format if MySQL/PHP date format (YYYY-MM-DD HH:MM:SS)
+                        const parts = String(dateValue).match(/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/);
+                        if (parts) {
+                            const date = new Date(parts[1], parts[2]-1, parts[3], parts[4], parts[5], parts[6]);
+                            return date.toLocaleString();
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error formatting date:', e);
+                }
+                
+                return String(dateValue); // Use raw value as fallback
+            }
+            
+            // Add event listeners to hidden_by checkboxes to update the hidden input
+            document.querySelectorAll('input[name="hidden_by"]').forEach(checkbox => {
+                checkbox.addEventListener('change', updateHiddenByInput);
+            });
+            
+            // Add event listeners to bulk_hidden_by checkboxes
+            document.querySelectorAll('input[name="bulk_hidden_by"]').forEach(checkbox => {
+                checkbox.addEventListener('change', updateBulkHiddenByInput);
+            });
+            
+            // Add event listeners to collapsible buttons
+            document.querySelectorAll('.collapsible-button').forEach(button => {
+                button.addEventListener('click', toggleCollapsible);
+            });
+            
+            function toggleCollapsible() {
+                const content = this.nextElementSibling;
+                const arrow = this.querySelector('span');
+                
+                if (content.style.display === 'none' || !content.style.display) {
+                    content.style.display = 'block';
+                    arrow.textContent = '▲';
+                } else {
+                    content.style.display = 'none';
+                    arrow.textContent = '▼';
+                }
+            }
+            
+            function updateHiddenByInput() {
+                const hiddenByValues = [];
+                document.querySelectorAll('input[name="hidden_by"]:checked').forEach(checkbox => {
+                    hiddenByValues.push(checkbox.value);
+                });
+                hiddenByInput.value = hiddenByValues.join(',');
+            }
+            
+            function updateBulkHiddenByInput() {
+                const hiddenByValues = [];
+                document.querySelectorAll('input[name="bulk_hidden_by"]:checked').forEach(checkbox => {
+                    hiddenByValues.push(checkbox.value);
+                });
+                document.getElementById('bulkHiddenBy').value = hiddenByValues.join(',');
+            }
+            
+            // Load tattoo descriptions and actors
+            loadTattooDescriptions();
+            
+            // Event listeners
+            tattooForm.addEventListener('submit', saveTattooDescription);
+            cancelButton.addEventListener('click', resetForm);
+            exportButton.addEventListener('click', exportTattooDescriptions);
+            importSelectButton.addEventListener('click', () => importFile.click());
+            importFile.addEventListener('change', handleFileSelect);
+            importButton.addEventListener('click', importTattooDescriptions);
+            tattooFilter.addEventListener('input', filterTattoos);
+            sectionFilter.addEventListener('change', filterTattoos);
+            sortBy.addEventListener('change', filterTattoos);
+            document.getElementById('addNewTattooButton').addEventListener('click', () => {
+                resetForm();
+                document.querySelector('.section:nth-child(5)').scrollIntoView({ behavior: 'smooth' });
+            });
+            applyBulkEdit.addEventListener('click', applyBulkEditTattoos);
+            
+            // Functions
+            function loadTattooDescriptions() {
+                // Show loading notification
+                showNotification('Loading tattoo data...', 'info');
+                
+                // First, load the tattoo descriptions
+                fetch('/HerikaServer/ext/minai_plugin/api/tattoos.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            allTattoos = data.tattoos;
+                            allActors = data.actors || [];
+                            
+                            // Extract unique sections for the filter
+                            uniqueSections = new Set(allTattoos.map(tattoo => tattoo.section));
+                            populateSectionFilter();
+                            
+                            // Display data in tables
+                            displayTattooDescriptions(allTattoos);
+                            displayActorsWithTattoos(allActors);
+                            
+                            // Now load all unique tattoos across all actors
+                            loadAllUniqueTattoos();
+                        } else {
+                            showNotification('Error loading tattoo descriptions', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showNotification('Error loading tattoo descriptions', 'error');
+                    });
+            }
+            
+            function loadAllUniqueTattoos() {
+                fetch('/HerikaServer/ext/minai_plugin/api/tattoos.php?all_tattoos=1')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Display all unique tattoos
+                            displayAllTattoos(data.tattoos);
+                            
+                            // Clear the loading notification
+                            notification.style.display = 'none';
+                        } else {
+                            showNotification(`Error: ${data.message || 'Failed to load all tattoos'}`, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showNotification('Error loading all tattoos', 'error');
+                    });
+            }
+            
+            function populateSectionFilter() {
+                sectionFilter.innerHTML = '<option value="">All Sections</option>';
+                bulkEditSection.innerHTML = '<option value="">Select Section</option>';
+                
+                // Sort sections alphabetically
+                const sortedSections = Array.from(uniqueSections).sort();
+                
+                sortedSections.forEach(section => {
+                    // Add to filter dropdown
+                    const filterOption = document.createElement('option');
+                    filterOption.value = section;
+                    filterOption.textContent = section;
+                    sectionFilter.appendChild(filterOption);
+                    
+                    // Add to bulk edit dropdown
+                    const bulkOption = document.createElement('option');
+                    bulkOption.value = section;
+                    bulkOption.textContent = section;
+                    bulkEditSection.appendChild(bulkOption);
+                });
+            }
+            
+            function displayTattooDescriptions(tattoos) {
+                const tbody = tattooTable.querySelector('tbody');
+                tbody.innerHTML = '';
+                
+                if (tattoos.length === 0) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = '<td colspan="5" style="text-align: center;">No tattoo descriptions found</td>';
+                    tbody.appendChild(row);
+                    return;
+                }
+                
+                tattoos.forEach(tattoo => {
+                    const row = document.createElement('tr');
+                    
+                    row.innerHTML = `
+                        <td>${escapeHtml(tattoo.section)}</td>
+                        <td>${escapeHtml(tattoo.name)}</td>
+                        <td>${escapeHtml(tattoo.description || '')}</td>
+                        <td>${escapeHtml(tattoo.hidden_by || '')}</td>
+                        <td class="action-buttons">
+                            <button class="edit-button" data-section="${escapeHtml(tattoo.section)}" data-name="${escapeHtml(tattoo.name)}">Edit</button>
+                            <button class="delete-button" data-section="${escapeHtml(tattoo.section)}" data-name="${escapeHtml(tattoo.name)}">Delete</button>
+                        </td>
+                    `;
+                    
+                    tbody.appendChild(row);
+                });
+                
+                // Add event listeners to edit and delete buttons
+                document.querySelectorAll('.edit-button').forEach(button => {
+                    button.addEventListener('click', editTattooDescription);
+                });
+                
+                document.querySelectorAll('.delete-button').forEach(button => {
+                    button.addEventListener('click', deleteTattooDescription);
+                });
+            }
+            
+            function displayActorsWithTattoos(actors) {
+                const tbody = actorsTable.querySelector('tbody');
+                tbody.innerHTML = '';
+                
+                if (actors.length === 0) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = '<td colspan="3" style="text-align: center;">No actors with tattoos found</td>';
+                    tbody.appendChild(row);
+                    return;
+                }
+                
+                actors.forEach(actor => {
+                    const row = document.createElement('tr');
+                    const formattedDate = formatDate(actor.updated_at);
+                    
+                    row.innerHTML = `
+                        <td>${escapeHtml(actor.actor_name)}</td>
+                        <td>${escapeHtml(formattedDate)}</td>
+                        <td class="action-buttons">
+                            <button class="view-button" data-actor="${escapeHtml(actor.actor_name)}">View Tattoos</button>
+                        </td>
+                    `;
+                    
+                    tbody.appendChild(row);
+                });
+                
+                // Add event listeners to view buttons
+                document.querySelectorAll('.view-button').forEach(button => {
+                    button.addEventListener('click', viewActorTattoos);
+                });
+            }
+            
+            function displayAllTattoos(tattoos) {
+                const tbody = allTattoosTable.querySelector('tbody');
+                tbody.innerHTML = '';
+                
+                if (!tattoos || tattoos.length === 0) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = '<td colspan="6" style="text-align: center;">No tattoos found</td>';
+                    tbody.appendChild(row);
+                    return;
+                }
+                
+                // Update tattoo stats
+                const tattooStats = document.getElementById('tattooStats');
+                tattooStats.textContent = `Found ${tattoos.length} unique tattoos across all actors`;
+                tattooStats.style.display = 'block';
+                
+                tattoos.forEach(tattoo => {
+                    const row = document.createElement('tr');
+                    
+                    // Format the actors list for tooltip
+                    const actorCount = Array.isArray(tattoo.actors) ? tattoo.actors.length : 0;
+                    const actorsList = Array.isArray(tattoo.actors) ? tattoo.actors.join(', ') : '';
+                    
+                    row.innerHTML = `
+                        <td>${escapeHtml(tattoo.section)}</td>
+                        <td>${escapeHtml(tattoo.name)}</td>
+                        <td>${escapeHtml(tattoo.description || '')}</td>
+                        <td>${escapeHtml(tattoo.hidden_by || '')}</td>
+                        <td title="${escapeHtml(actorsList)}">${actorCount} actor${actorCount !== 1 ? 's' : ''}</td>
+                        <td class="action-buttons">
+                            <button class="edit-button" data-section="${escapeHtml(tattoo.section)}" data-name="${escapeHtml(tattoo.name)}">Edit</button>
+                            <button class="view-actors-button" data-section="${escapeHtml(tattoo.section)}" data-name="${escapeHtml(tattoo.name)}" data-actors="${escapeHtml(actorsList)}">View Actors</button>
+                        </td>
+                    `;
+                    
+                    tbody.appendChild(row);
+                });
+                
+                // Add event listeners to buttons
+                document.querySelectorAll('.edit-button').forEach(button => {
+                    button.addEventListener('click', editTattooDescription);
+                });
+                
+                document.querySelectorAll('.view-actors-button').forEach(button => {
+                    button.addEventListener('click', viewActorsWithTattoo);
+                });
+            }
+            
+            function filterTattoos() {
+                const filterText = tattooFilter.value.toLowerCase();
+                const selectedSection = sectionFilter.value;
+                const selectedSort = sortBy.value;
+                
+                // Show loading notification
+                showNotification('Filtering tattoos...', 'info');
+                
+                // Fetch all tattoos again to apply the filter
+                fetch('/HerikaServer/ext/minai_plugin/api/tattoos.php?all_tattoos=1')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const allTattoos = data.tattoos;
+                            
+                            const filteredTattoos = allTattoos.filter(tattoo => {
+                                const matchesFilter = 
+                                    tattoo.section.toLowerCase().includes(filterText) ||
+                                    tattoo.name.toLowerCase().includes(filterText) ||
+                                    (tattoo.description && tattoo.description.toLowerCase().includes(filterText)) ||
+                                    (Array.isArray(tattoo.actors) && tattoo.actors.some(actor => actor.toLowerCase().includes(filterText)));
+                                
+                                const matchesSection = !selectedSection || tattoo.section === selectedSection;
+                                
+                                return matchesFilter && matchesSection;
+                            });
+                            
+                            const sortedTattoos = filteredTattoos.sort((a, b) => {
+                                if (selectedSort === 'section') {
+                                    return a.section.localeCompare(b.section);
+                                } else if (selectedSort === 'name') {
+                                    return a.name.localeCompare(b.name);
+                                } else if (selectedSort === 'actors') {
+                                    return b.actors.length - a.actors.length;
+                                }
+                                return 0;
+                            });
+                            
+                            displayAllTattoos(sortedTattoos);
+                            
+                            // Clear the loading notification
+                            notification.style.display = 'none';
+                        } else {
+                            showNotification(`Error: ${data.message || 'Failed to load all tattoos'}`, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showNotification('Error filtering tattoos', 'error');
+                    });
+            }
+            
+            function viewActorTattoos(event) {
+                const actorName = event.target.dataset.actor;
+                
+                // Show loading notification
+                showNotification(`Loading tattoo data for ${actorName}...`, 'info');
+                
+                fetch(`/HerikaServer/ext/minai_plugin/api/tattoos.php?actor=${encodeURIComponent(actorName)}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            showActorTattoosModal(data.actor, data.tattoos);
+                            
+                            // Clear the loading notification
+                            notification.style.display = 'none';
+                        } else {
+                            showNotification(`Error: ${data.message || 'Failed to load tattoo data'}`, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showNotification(`Error loading tattoo data: ${error.message}`, 'error');
+                    });
+            }
+            
+            function showActorTattoosModal(actorName, tattoos) {
+                // Create modal overlay
+                const modalOverlay = document.createElement('div');
+                modalOverlay.className = 'modal-overlay';
+                modalOverlay.style.position = 'fixed';
+                modalOverlay.style.top = '0';
+                modalOverlay.style.left = '0';
+                modalOverlay.style.width = '100%';
+                modalOverlay.style.height = '100%';
+                modalOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+                modalOverlay.style.zIndex = '1000';
+                modalOverlay.style.display = 'flex';
+                modalOverlay.style.justifyContent = 'center';
+                modalOverlay.style.alignItems = 'center';
+                
+                // Create modal content
+                const modalContent = document.createElement('div');
+                modalContent.className = 'modal-content';
+                modalContent.style.backgroundColor = 'var(--background-dark)';
+                modalContent.style.borderRadius = '8px';
+                modalContent.style.padding = '20px';
+                modalContent.style.width = '80%';
+                modalContent.style.maxWidth = '1000px';
+                modalContent.style.maxHeight = '80vh';
+                modalContent.style.overflowY = 'auto';
+                modalContent.style.border = '1px solid var(--border-color)';
+                
+                // Create modal header
+                const modalHeader = document.createElement('div');
+                modalHeader.style.display = 'flex';
+                modalHeader.style.justifyContent = 'space-between';
+                modalHeader.style.alignItems = 'center';
+                modalHeader.style.marginBottom = '20px';
+                
+                const modalTitle = document.createElement('h2');
+                modalTitle.textContent = `${actorName}'s Tattoos`;
+                
+                const closeButton = document.createElement('button');
+                closeButton.textContent = 'Close';
+                closeButton.addEventListener('click', () => {
+                    document.body.removeChild(modalOverlay);
+                });
+                
+                modalHeader.appendChild(modalTitle);
+                modalHeader.appendChild(closeButton);
+                
+                // Create tattoo table
+                const table = document.createElement('table');
+                table.style.width = '100%';
+                table.style.borderCollapse = 'collapse';
+                
+                const thead = document.createElement('thead');
+                thead.innerHTML = `
+                    <tr>
+                        <th>Section</th>
+                        <th>Name</th>
+                        <th>Area</th>
+                        <th>Texture</th>
+                        <th>Color</th>
+                        <th>Description</th>
+                    </tr>
+                `;
+                
+                const tbody = document.createElement('tbody');
+                
+                // Ensure tattoos is an array and has items
+                if (!Array.isArray(tattoos) || tattoos.length === 0) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = '<td colspan="6" style="text-align: center;">No tattoos found for this actor</td>';
+                    tbody.appendChild(row);
+                } else {
+                    // Sort tattoos by section and name for better organization
+                    tattoos.sort((a, b) => {
+                        if (a.section === b.section) {
+                            return a.name.localeCompare(b.name);
+                        }
+                        return a.section.localeCompare(b.section);
+                    });
+                    
+                    tattoos.forEach(tattoo => {
+                        // Skip entries with missing required fields
+                        if (!tattoo.section || !tattoo.name) {
+                            return;
+                        }
+                        
+                        const row = document.createElement('tr');
+                        
+                        // Find description if available
+                        const tattooDesc = allTattoos.find(
+                            t => t.section === tattoo.section && t.name === tattoo.name
+                        );
+                        const description = tattooDesc ? tattooDesc.description : '';
+                        
+                        row.innerHTML = `
+                            <td>${escapeHtml(tattoo.section)}</td>
+                            <td>${escapeHtml(tattoo.name)}</td>
+                            <td>${escapeHtml(tattoo.area || '')}</td>
+                            <td>${escapeHtml(tattoo.texture || '')}</td>
+                            <td>${escapeHtml(tattoo.color || '')}</td>
+                            <td>${escapeHtml(description || '')}</td>
+                        `;
+                        
+                        tbody.appendChild(row);
+                    });
+                    
+                    // If all tattoos were filtered out due to missing fields
+                    if (tbody.children.length === 0) {
+                        const row = document.createElement('tr');
+                        row.innerHTML = '<td colspan="6" style="text-align: center;">No valid tattoos found for this actor</td>';
+                        tbody.appendChild(row);
+                    }
+                }
+                
+                table.appendChild(thead);
+                table.appendChild(tbody);
+                
+                // Assemble modal
+                modalContent.appendChild(modalHeader);
+                modalContent.appendChild(table);
+                modalOverlay.appendChild(modalContent);
+                
+                // Add to document
+                document.body.appendChild(modalOverlay);
+            }
+            
+            function viewActorsWithTattoo(event) {
+                const section = event.target.dataset.section;
+                const name = event.target.dataset.name;
+                const actorsStr = event.target.dataset.actors || '';
+                
+                // Create modal content
+                const modalContent = document.createElement('div');
+                
+                if (!actorsStr) {
+                    modalContent.innerHTML = `
+                        <h3>Actors with ${escapeHtml(section)} - ${escapeHtml(name)}</h3>
+                        <p>No actors found with this tattoo.</p>
+                    `;
+                } else {
+                    const actors = actorsStr.split(', ');
+                    modalContent.innerHTML = `
+                        <h3>Actors with ${escapeHtml(section)} - ${escapeHtml(name)}</h3>
+                        <div style="margin-bottom: 15px;">
+                            <p>The following actors have this tattoo:</p>
+                            <ul style="max-height: 300px; overflow-y: auto;">
+                                ${actors.map(actor => `<li>${escapeHtml(actor)}</li>`).join('')}
+                            </ul>
+                        </div>
+                    `;
+                }
+                
+                // Show the modal
+                showModal(modalContent);
+            }
+            
+            function saveTattooDescription(event) {
+                event.preventDefault();
+                
+                // Make sure the hidden input is updated with the latest checkbox values
+                updateHiddenByInput();
+                
+                const tattooData = {
+                    section: sectionInput.value.trim(),
+                    name: nameInput.value.trim(),
+                    description: descriptionInput.value.trim(),
+                    hidden_by: hiddenByInput.value
+                };
+                
+                fetch('/HerikaServer/ext/minai_plugin/api/tattoos.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(tattooData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification('Tattoo description saved successfully', 'success');
+                        resetForm();
+                        
+                        // Refresh all data
+                        loadTattooDescriptions();
+                    } else {
+                        showNotification(`Error: ${data.message || 'Failed to save tattoo description'}`, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Error saving tattoo description', 'error');
+                });
+            }
+            
+            function editTattooDescription(event) {
+                const section = event.target.dataset.section;
+                const name = event.target.dataset.name;
+                
+                // Find the tattoo in the table
+                const row = event.target.closest('tr');
+                const description = row.cells[2].textContent;
+                const hiddenBy = row.cells[3].textContent;
+                
+                // Fill the form
+                sectionInput.value = section;
+                nameInput.value = name;
+                descriptionInput.value = description;
+                
+                // Uncheck all checkboxes first
+                document.querySelectorAll('input[name="hidden_by"]').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                
+                // Check the appropriate checkboxes based on the hidden_by value
+                if (hiddenBy) {
+                    const hiddenByItems = hiddenBy.split(',');
+                    hiddenByItems.forEach(item => {
+                        const checkbox = document.querySelector(`input[name="hidden_by"][value="${item.trim()}"]`);
+                        if (checkbox) {
+                            checkbox.checked = true;
+                        }
+                    });
+                }
+                
+                // Update the hidden input
+                updateHiddenByInput();
+                
+                // Update form state
+                formTitle.textContent = 'Edit Tattoo Description';
+                editMode.value = 'edit';
+                saveButton.textContent = 'Update Tattoo';
+                cancelButton.style.display = 'inline-block';
+                
+                // Disable section and name fields in edit mode
+                sectionInput.readOnly = true;
+                nameInput.readOnly = true;
+                
+                // Scroll to the form
+                tattooForm.scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            function deleteTattooDescription(event) {
+                if (!confirm('Are you sure you want to delete this tattoo description?')) {
+                    return;
+                }
+                
+                const section = event.target.dataset.section;
+                const name = event.target.dataset.name;
+                
+                fetch('/HerikaServer/ext/minai_plugin/api/tattoos.php', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ section, name })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification('Tattoo description deleted successfully', 'success');
+                        
+                        // Refresh all data
+                        loadTattooDescriptions();
+                    } else {
+                        showNotification(`Error: ${data.message || 'Failed to delete tattoo description'}`, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Error deleting tattoo description', 'error');
+                });
+            }
+            
+            function resetForm() {
+                tattooForm.reset();
+                formTitle.textContent = 'Add New Tattoo Description';
+                editMode.value = 'add';
+                saveButton.textContent = 'Save Tattoo';
+                cancelButton.style.display = 'none';
+                
+                // Uncheck all checkboxes
+                document.querySelectorAll('input[name="hidden_by"]').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                
+                // Enable section and name fields
+                sectionInput.readOnly = false;
+                nameInput.readOnly = false;
+            }
+            
+            function exportTattooDescriptions() {
+                fetch('/HerikaServer/ext/minai_plugin/api/tattoos.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const exportData = {
+                                tattoos: data.tattoos,
+                                exportDate: new Date().toISOString()
+                            };
+                            
+                            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+                            const url = URL.createObjectURL(blob);
+                            
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `tattoo_descriptions_${new Date().toISOString().split('T')[0]}.json`;
+                            document.body.appendChild(a);
+                            a.click();
+                            
+                            setTimeout(() => {
+                                document.body.removeChild(a);
+                                URL.revokeObjectURL(url);
+                            }, 0);
+                            
+                            showNotification('Tattoo descriptions exported successfully', 'success');
+                        } else {
+                            showNotification('Error exporting tattoo descriptions', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showNotification('Error exporting tattoo descriptions', 'error');
+                    });
+            }
+            
+            function handleFileSelect(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    selectedFileName.textContent = file.name;
+                    importButton.disabled = false;
+                } else {
+                    selectedFileName.textContent = '';
+                    importButton.disabled = true;
+                }
+            }
+            
+            function importTattooDescriptions() {
+                const file = importFile.files[0];
+                if (!file) {
+                    showNotification('Please select a file to import', 'error');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const importData = JSON.parse(e.target.result);
+                        
+                        if (!importData.tattoos || !Array.isArray(importData.tattoos)) {
+                            showNotification('Invalid import file format', 'error');
+                            return;
+                        }
+                        
+                        const data = {
+                            tattoos: importData.tattoos,
+                            clear: clearExisting.checked
+                        };
+                        
+                        fetch('/HerikaServer/ext/minai_plugin/api/tattoos.php?action=import', {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(data)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                showNotification('Tattoo descriptions imported successfully', 'success');
+                                
+                                // Refresh all data
+                                loadTattooDescriptions();
+                                
+                                // Reset import form
+                                importFile.value = '';
+                                selectedFileName.textContent = '';
+                                importButton.disabled = true;
+                                clearExisting.checked = false;
+                            } else {
+                                showNotification(`Error: ${data.message || 'Failed to import tattoo descriptions'}`, 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showNotification('Error importing tattoo descriptions', 'error');
+                        });
+                    } catch (error) {
+                        console.error('Error parsing JSON:', error);
+                        showNotification('Error parsing import file', 'error');
+                    }
+                };
+                
+                reader.readAsText(file);
+            }
+            
+            function showNotification(message, type) {
+                notification.textContent = message;
+                notification.className = `notification ${type}`;
+                notification.style.display = 'block';
+                
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 5000);
+            }
+            
+            function escapeHtml(str) {
+                if (!str) return '';
+                return str
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+            
+            function showModal(content) {
+                // Create modal overlay
+                const modalOverlay = document.createElement('div');
+                modalOverlay.className = 'modal-overlay';
+                modalOverlay.style.position = 'fixed';
+                modalOverlay.style.top = '0';
+                modalOverlay.style.left = '0';
+                modalOverlay.style.width = '100%';
+                modalOverlay.style.height = '100%';
+                modalOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+                modalOverlay.style.zIndex = '1000';
+                modalOverlay.style.display = 'flex';
+                modalOverlay.style.justifyContent = 'center';
+                modalOverlay.style.alignItems = 'center';
+                
+                // Create modal content
+                const modalContent = document.createElement('div');
+                modalContent.className = 'modal-content';
+                modalContent.style.backgroundColor = 'var(--background-dark)';
+                modalContent.style.borderRadius = '8px';
+                modalContent.style.padding = '20px';
+                modalContent.style.width = '80%';
+                modalContent.style.maxWidth = '600px';
+                modalContent.style.maxHeight = '80vh';
+                modalContent.style.overflowY = 'auto';
+                modalContent.style.border = '1px solid var(--border-color)';
+                
+                // Add close button
+                const closeButton = document.createElement('button');
+                closeButton.textContent = 'Close';
+                closeButton.style.marginTop = '15px';
+                closeButton.addEventListener('click', () => {
+                    document.body.removeChild(modalOverlay);
+                });
+                
+                // Append content and close button
+                modalContent.appendChild(content);
+                modalContent.appendChild(closeButton);
+                modalOverlay.appendChild(modalContent);
+                
+                // Add to document
+                document.body.appendChild(modalOverlay);
+            }
+            
+            function applyBulkEditTattoos() {
+                const section = bulkEditSection.value;
+                
+                // Collect hidden_by values from checkboxes
+                const hiddenByValues = [];
+                document.querySelectorAll('input[name="bulk_hidden_by"]:checked').forEach(checkbox => {
+                    hiddenByValues.push(checkbox.value);
+                });
+                
+                const hiddenBy = hiddenByValues.join(',');
+                
+                if (!section || hiddenByValues.length === 0) {
+                    showNotification('Please select a section and at least one hidden_by item', 'error');
+                    return;
+                }
+                
+                if (!confirm('Are you sure you want to apply this bulk edit? This action cannot be undone.')) {
+                    return;
+                }
+                
+                // Show loading notification
+                showNotification('Applying bulk edit...', 'info');
+                
+                fetch('/HerikaServer/ext/minai_plugin/api/tattoos.php?action=bulk_edit', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ section, hidden_by: hiddenBy })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification('Bulk edit applied successfully', 'success');
+                        
+                        // Refresh all data
+                        loadTattooDescriptions();
+                    } else {
+                        showNotification(`Error: ${data.message || 'Failed to apply bulk edit'}`, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Error applying bulk edit', 'error');
+                });
+            }
+        });
+    </script>
+</body>
+
+</html> 

@@ -2,6 +2,9 @@ scriptname minai_Arousal extends Quest
 
 BaboDialogueConfigMenu baboConfigs
 slaUtilScr Aroused
+SexLabFramework slf
+
+Keyword Property ActorTypeNPC Auto
 
 Keyword SLA_HalfNakedBikini
 Keyword SLA_ArmorHalfNaked
@@ -44,7 +47,11 @@ bool bHasAroused = False
 bool bHasArousedKeywords = False
 bool bHasBabo = False
 bool bHasTNG = False
+bool bHasSexlab = False
 int cuirassSlot = 0x00000004
+int helmetSlot = 0x00000001
+int glovesSlot = 0x00000008
+int bootsSlot = 0x00000080
 
 
 minai_MainQuestController main
@@ -58,6 +65,18 @@ function Maintenance(minai_MainQuestController _main)
   aiff = (Self as Quest) as minai_AIFF
   
   Main.Info("Initializing Arousal Module.")
+  
+  ; Check if SexLab is installed
+  if Game.GetModByName("SexLab.esm") != 255
+    Main.Info("Found SexLab")
+    bHasSexlab = True
+    slf = Game.GetFormFromFile(0xD62, "SexLab.esm") as SexLabFramework
+    if !slf
+      bHasSexlab = False
+      Main.Error("Could not fetch SexLabFramework object")
+    EndIf
+  EndIf
+  
   if Game.GetModByName("SexlabAroused.esm") != 255
     Main.Info("Found Sexlab Aroused")
     bHasAroused = True
@@ -197,14 +216,31 @@ function WriteClothingString(actor akActor, actor player, bool isYou=false, acto
 		if (currentActor != None)
 			String actorName = main.GetActorName(currentActor)
 			Armor cuirass = currentActor.GetWornForm(cuirassSlot) as Armor
+			Armor helmet = currentActor.GetWornForm(helmetSlot) as Armor
+			Armor gloves = currentActor.GetWornForm(glovesSlot) as Armor
+			Armor boots = currentActor.GetWornForm(bootsSlot) as Armor
+			
 			if cuirass == None
 				main.RegisterAction(actorName + " is naked.")
 			else
 				main.RegisterAction(actorName + " is wearing " + cuirass.GetName())
 			EndIf
+			
+			if helmet != None
+				main.RegisterAction(actorName + " is wearing " + helmet.GetName() + " on their head.")
+			EndIf
+			
+			if gloves != None
+				main.RegisterAction(actorName + " is wearing " + gloves.GetName() + " on their hands.")
+			EndIf
+			
+			if boots != None
+				main.RegisterAction(actorName + " is wearing " + boots.GetName() + " on their feet.")
+			EndIf
+			
 			if bHasTNG
 				bool exposed = IsTNGExposed(currentActor)
-				if exposed && ((currentActor.GetActorBase().GetSex() == 0) || currentActor.HasKeyword(TNG_Gentlewoman))
+				if exposed && currentActor.HasKeyword(ActorTypeNPC) && ((currentActor.GetActorBase().GetSex() == 0) || currentActor.HasKeyword(TNG_Gentlewoman))
 					main.RegisterAction(actorName + "'s genitals are exposed.")
           string sizeDescription = ""
           Main.Debug("TNG Dick Check on "+ actorName)
@@ -474,14 +510,20 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
   if command == "ExtCmdIncreaseArousal"
     UpdateArousal(akSpeaker, 6)
     Debug.Notification(Main.GetActorName(akSpeaker) + " is getting more turned on.")
-    Main.RegisterEvent(""+speakerName+"'s arousal level increased.")
+    Main.RegisterEvent(""+speakerName+"'s arousal level increased.", "info_arousal_increase")
   EndIf
   if command == "ExtCmdDecreaseArousal"
     UpdateArousal(akSpeaker, -12)
     Debug.Notification(Main.GetActorName(akSpeaker) + " is getting less turned on.")
-    Main.RegisterEvent(""+speakerName+"'s arousal level decreased.")
+    Main.RegisterEvent(""+speakerName+"'s arousal level decreased.", "info_arousal_decrease")
   EndIf
 EndEvent
+
+Function SetContextHighFrequency(actor akTarget)
+  Main.Debug("SetContextHighFrequency(" + main.GetActorName(akTarget) + ")")
+  aiff.SetActorVariable(akTarget, "arousal", GetActorArousal(akTarget))
+EndFunction
+
 
 Function SetContext(actor akTarget)
   Main.Debug("SetContext Arousal(" + main.GetActorName(akTarget) + ")")
@@ -490,14 +532,35 @@ Function SetContext(actor akTarget)
   EndIf
   String actorName = main.GetActorName(akTarget)
   Armor cuirass = akTarget.GetWornForm(cuirassSlot) as Armor
+  Armor helmet = akTarget.GetWornForm(helmetSlot) as Armor
+  Armor gloves = akTarget.GetWornForm(glovesSlot) as Armor
+  Armor boots = akTarget.GetWornForm(bootsSlot) as Armor
+  
   aiff.SetActorVariable(akTarget, "isnaked", !cuirass)
-  aiff.SetActorVariable(akTarget, "arousal", GetActorArousal(akTarget))
   aiff.SetActorVariable(akTarget, "isexposed", IsTNGExposed(akTarget))
   
   if cuirass == None
     aiff.SetActorVariable(akTarget, "cuirass", "")
   Else
     aiff.SetActorVariable(akTarget, "cuirass", cuirass.GetName())
+  EndIf
+
+  if helmet == None
+    aiff.SetActorVariable(akTarget, "helmet", "")
+  Else
+    aiff.SetActorVariable(akTarget, "helmet", helmet.GetName())
+  EndIf
+
+  if gloves == None
+    aiff.SetActorVariable(akTarget, "gloves", "")
+  Else
+    aiff.SetActorVariable(akTarget, "gloves", gloves.GetName())
+  EndIf
+
+  if boots == None
+    aiff.SetActorVariable(akTarget, "boots", "")
+  Else
+    aiff.SetActorVariable(akTarget, "boots", boots.GetName())
   EndIf
 
   string wornEquipments = GetWornEquipments(akTarget)
@@ -511,17 +574,32 @@ Function SetContext(actor akTarget)
     aiff.SetActorVariable(akTarget, "breastsScore", baboConfigs.BreastsValue.GetValueInt())
     aiff.SetActorVariable(akTarget, "buttScore", baboConfigs.ButtocksValue.GetValueInt())
   EndIf
+  
   string gender = "male"
-  if akTarget.GetActorBase().GetSex() != 0
-    gender = "female"
-    if akTarget.HasKeyword(TNG_Gentlewoman)
-      aiff.SetActorVariable(akTarget, "tngsize", TNG_PapyrusUtil.GetActorSize(akTarget))
+  int genderValue = 0
+  
+  if bHasSexlab && slf
+    ; Use SexLab gender if available (0 = male, 1 = female, 2 = other)
+    genderValue = slf.GetGender(akTarget)
+    if genderValue == 0
+      gender = "male"
+    elseif genderValue == 1
+      gender = "female"
+    else
+      gender = "futa"
+    EndIf
+  else
+    ; Fallback to vanilla gender
+    if akTarget.GetActorBase().GetSex() != 0
+      gender = "female"
     EndIf
   EndIf
-  if gender == "male"
+  
+  aiff.SetActorVariable(akTarget, "gender", gender)
+  
+  if bHasTNG && akTarget.HasKeyword(ActorTypeNPC) && (gender == "male" || akTarget.HasKeyword(TNG_Gentlewoman))
     aiff.SetActorVariable(akTarget, "tngsize", TNG_PapyrusUtil.GetActorSize(akTarget))
   EndIf
-  aiff.SetActorVariable(akTarget, "gender", gender)
   string actorRace = (akTarget.GetActorBase().GetRace() as Form).GetName()
   int cotrIndex = StringUtil.Find(actorRace, " DZ")
   if cotrIndex != -1

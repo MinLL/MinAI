@@ -342,7 +342,7 @@ Event OnUpdate()
   Else
     ; Prompt AIFF to comment on it if we're not in a sex scene at the moment
     if (sex.CanAnimate(playerRef)) 
-      main.RequestLLMResponseFromActor(lineToSay, "chatnf_vr_1", actorName)
+      main.RequestLLMResponseFromActor(lineToSay, "chatnf_minai_narrate", actorName, "both")
     EndIf
     ; sex.sexTalkCollision(akActor, lineToSay)
     lastCollisionSpeechTime = currentTime
@@ -371,7 +371,7 @@ Function ProcessArousal(actor akActor)
   if devious.HasDD()
     float currentTime = Utility.GetCurrentRealTime()
     if currentTime - lastMoanTime > 8
-      Main.RegisterEvent(Main.GetActorName(akActor) + " moaned due to being touched")
+      Main.RegisterEvent(Main.GetActorName(akActor) + " moaned due to being touched", "info_touch_moan")
       lastMoanTime = currentTime
       devious.libs.Moan(akActor)
     EndIf

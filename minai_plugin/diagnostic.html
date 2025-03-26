@@ -1297,6 +1297,122 @@
             position: relative;
             gap: 5px;
         }
+
+        /* Add styles for emotional tone indicators */
+        .emotional-tones {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            position: relative;
+        }
+        
+        .emotional-tones-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 5px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .dominant-emotion {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            font-size: 0.9em;
+        }
+        
+        .dominant-emotion-label {
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+        
+        .dominant-emotion-value {
+            font-weight: bold;
+        }
+        
+        .tone-indicators-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            width: 100%;
+        }
+        
+        .tone-indicator {
+            display: flex;
+            align-items: center;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .tone-indicator .tone-label {
+            margin-right: 5px;
+            color: var(--text-color);
+            opacity: 0.8;
+            min-width: 70px;
+        }
+        
+        .tone-indicator .tone-value {
+            font-weight: bold;
+            min-width: 30px;
+            text-align: right;
+        }
+        
+        .tone-happiness { color: #4CAF50; }
+        .tone-sadness { color: #2196F3; }
+        .tone-disgust { color: #9C27B0; }
+        .tone-fear { color: #FF9800; }
+        .tone-surprise { color: #00BCD4; }
+        .tone-anger { color: #F44336; }
+        .tone-other { color: #607D8B; }
+        .tone-neutral { color: #9E9E9E; }
+        
+        /* Redesigned tone bar styles */
+        .tone-bar {
+            height: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            margin-left: 8px;
+            flex-grow: 1;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+        
+        .tone-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: width 0.3s ease;
+        }
+        
+        /* Tone bar fill colors */
+        .tone-bar-fill.tone-happiness { background-color: #4CAF50 !important; }
+        .tone-bar-fill.tone-sadness { background-color: #2196F3 !important; }
+        .tone-bar-fill.tone-disgust { background-color: #9C27B0 !important; }
+        .tone-bar-fill.tone-fear { background-color: #FF9800 !important; }
+        .tone-bar-fill.tone-surprise { background-color: #00BCD4 !important; }
+        .tone-bar-fill.tone-anger { background-color: #F44336 !important; }
+        .tone-bar-fill.tone-other { background-color: #607D8B !important; }
+        .tone-bar-fill.tone-neutral { background-color: #9E9E9E !important; }
+        
+        /* Add these styles to the <style> section */
     </style>
 </head>
 <body>
@@ -1631,7 +1747,119 @@
                 // Try to parse as JSON if it wasn't a simple quoted string
                 try {
                     const json = JSON.parse(line);
-                    return `<div class="log-line">${formatDialogueJson(json)}</div>`;
+                    
+                    // Check if this is a dialogue JSON with emotional tones
+                    const hasTones = json.response_tone_happiness !== undefined || 
+                                    json.response_tone_sadness !== undefined ||
+                                    json.response_tone_disgust !== undefined ||
+                                    json.response_tone_fear !== undefined ||
+                                    json.response_tone_surprise !== undefined ||
+                                    json.response_tone_anger !== undefined ||
+                                    json.response_tone_other !== undefined ||
+                                    json.response_tone_neutral !== undefined;
+                    
+                    if (hasTones) {
+                        // Create a more visual representation with emotional tone indicators
+                        let output = `<div class="log-line">`;
+                        
+                        // Add the basic JSON representation
+                        output += `${formatDialogueJson(json)}`;
+                        
+                        // Find the dominant emotion
+                        const tones = [
+                            { name: 'Happiness', value: parseFloat(json.response_tone_happiness || 0), cssClass: 'tone-happiness' },
+                            { name: 'Sadness', value: parseFloat(json.response_tone_sadness || 0), cssClass: 'tone-sadness' },
+                            { name: 'Disgust', value: parseFloat(json.response_tone_disgust || 0), cssClass: 'tone-disgust' },
+                            { name: 'Fear', value: parseFloat(json.response_tone_fear || 0), cssClass: 'tone-fear' },
+                            { name: 'Surprise', value: parseFloat(json.response_tone_surprise || 0), cssClass: 'tone-surprise' },
+                            { name: 'Anger', value: parseFloat(json.response_tone_anger || 0), cssClass: 'tone-anger' },
+                            { name: 'Other', value: parseFloat(json.response_tone_other || 0), cssClass: 'tone-other' },
+                            { name: 'Neutral', value: parseFloat(json.response_tone_neutral || 0), cssClass: 'tone-neutral' }
+                        ];
+                        
+                        // Sort tones by value (descending)
+                        tones.sort((a, b) => b.value - a.value);
+                        
+                        // Format the dominant emotion value to 1 decimal place
+                        const dominantValue = tones[0].value.toFixed(1);
+                        
+                        // Add visual tone indicators
+                        output += `<div class="emotional-tones">`;
+                        
+                        // Add header with dominant emotion
+                        output += `<div class="emotional-tones-header">`;
+                        output += `<div class="dominant-emotion">
+                            <span class="dominant-emotion-label">Dominant:</span>
+                            <span class="dominant-emotion-value ${tones[0].cssClass}">${tones[0].name} (${dominantValue})</span>
+                        </div>`;
+                        output += `</div>`;
+                        
+                        // Add container for tone indicators
+                        output += `<div class="tone-indicators-container">`;
+                        
+                        // Helper function to add tone indicators with a completely different approach
+                        const addToneIndicator = (name, value, cssClass) => {
+                            if (value !== undefined) {
+                                // Ensure we're working with a number
+                                const numValue = typeof value === 'string' ? parseFloat(value) : value;
+                                
+                                // Format the display value to 1 decimal place
+                                const displayValue = numValue.toFixed(1);
+                                
+                                // Calculate width as percentage
+                                const widthPercent = Math.round(numValue * 100);
+                                
+                                // Get the appropriate color for this emotion
+                                const getToneColor = (toneClass) => {
+                                    switch(toneClass) {
+                                        case 'tone-happiness': return '#4CAF50'; // Green
+                                        case 'tone-sadness': return '#2196F3';   // Blue
+                                        case 'tone-disgust': return '#9C27B0';   // Purple
+                                        case 'tone-fear': return '#FF9800';      // Orange
+                                        case 'tone-surprise': return '#00BCD4';  // Cyan
+                                        case 'tone-anger': return '#F44336';     // Red
+                                        case 'tone-other': return '#607D8B';     // Blue Grey
+                                        case 'tone-neutral': return '#9E9E9E';   // Grey
+                                        default: return '#9E9E9E';               // Default Grey
+                                    }
+                                };
+                                
+                                const barColor = getToneColor(cssClass);
+                                
+                                // Log the width percentage for each tone
+                                console.log(`${name} tone width: ${widthPercent}%`);
+                                
+                                output += `
+                                    <div class="tone-indicator">
+                                        <span class="tone-label">${name}:</span>
+                                        <span class="tone-value ${cssClass}">${displayValue}</span>
+                                        <div class="tone-bar">
+                                            <div class="tone-bar-fill ${cssClass}" style="width: ${widthPercent}%; background-color: ${barColor};"></div>
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                        };
+                        
+                        // Add all possible tones
+                        addToneIndicator('Happiness', json.response_tone_happiness, 'tone-happiness');
+                        addToneIndicator('Sadness', json.response_tone_sadness, 'tone-sadness');
+                        addToneIndicator('Disgust', json.response_tone_disgust, 'tone-disgust');
+                        addToneIndicator('Fear', json.response_tone_fear, 'tone-fear');
+                        addToneIndicator('Surprise', json.response_tone_surprise, 'tone-surprise');
+                        addToneIndicator('Anger', json.response_tone_anger, 'tone-anger');
+                        addToneIndicator('Other', json.response_tone_other, 'tone-other');
+                        addToneIndicator('Neutral', json.response_tone_neutral, 'tone-neutral');
+                        
+                        output += `</div>`; // Close tone-indicators-container
+                        output += `</div>`; // Close emotional-tones
+                        output += `</div>`; // Close log-line
+                        
+                        return output;
+                    } else {
+                        // Use the standard JSON formatting for non-tone entries
+                        return `<div class="log-line">${formatDialogueJson(json)}</div>`;
+                    }
                 } catch (e) {
                     // If not valid JSON, try to highlight JSON-like content
                     if (line.includes('{') && line.includes('}')) {
@@ -1677,6 +1905,58 @@
             if (json.message) {
                 parts.push(`<span class="json-key">message</span>: <span class="json-string">${sanitizeAndQuote(json.message)}</span>`);
             }
+            
+            // Add response tone fields
+            if (json.response_tone_happiness !== undefined) {
+                parts.push(`<span class="json-key">response_tone_happiness</span>: <span class="json-number">${json.response_tone_happiness}</span>`);
+            }
+            if (json.response_tone_sadness !== undefined) {
+                parts.push(`<span class="json-key">response_tone_sadness</span>: <span class="json-number">${json.response_tone_sadness}</span>`);
+            }
+            if (json.response_tone_disgust !== undefined) {
+                parts.push(`<span class="json-key">response_tone_disgust</span>: <span class="json-number">${json.response_tone_disgust}</span>`);
+            }
+            if (json.response_tone_fear !== undefined) {
+                parts.push(`<span class="json-key">response_tone_fear</span>: <span class="json-number">${json.response_tone_fear}</span>`);
+            }
+            if (json.response_tone_surprise !== undefined) {
+                parts.push(`<span class="json-key">response_tone_surprise</span>: <span class="json-number">${json.response_tone_surprise}</span>`);
+            }
+            if (json.response_tone_anger !== undefined) {
+                parts.push(`<span class="json-key">response_tone_anger</span>: <span class="json-number">${json.response_tone_anger}</span>`);
+            }
+            if (json.response_tone_other !== undefined) {
+                parts.push(`<span class="json-key">response_tone_other</span>: <span class="json-number">${json.response_tone_other}</span>`);
+            }
+            if (json.response_tone_neutral !== undefined) {
+                parts.push(`<span class="json-key">response_tone_neutral</span>: <span class="json-number">${json.response_tone_neutral}</span>`);
+            }
+            
+            // Handle any other fields that might be present in the JSON
+            Object.keys(json).forEach(key => {
+                // Skip fields we've already processed
+                if (['character', 'listener', 'mood', 'action', 'target', 'message', 
+                     'response_tone_happiness', 'response_tone_sadness', 'response_tone_disgust',
+                     'response_tone_fear', 'response_tone_surprise', 'response_tone_anger',
+                     'response_tone_other', 'response_tone_neutral'].includes(key)) {
+                    return;
+                }
+                
+                // Handle different value types
+                const value = json[key];
+                if (typeof value === 'string') {
+                    parts.push(`<span class="json-key">${key}</span>: <span class="json-string">${sanitizeAndQuote(value)}</span>`);
+                } else if (typeof value === 'number') {
+                    parts.push(`<span class="json-key">${key}</span>: <span class="json-number">${value}</span>`);
+                } else if (typeof value === 'boolean') {
+                    parts.push(`<span class="json-key">${key}</span>: <span class="json-boolean">${value}</span>`);
+                } else if (value === null) {
+                    parts.push(`<span class="json-key">${key}</span>: <span class="json-null">null</span>`);
+                } else {
+                    // For objects or arrays, stringify them
+                    parts.push(`<span class="json-key">${key}</span>: ${JSON.stringify(value)}`);
+                }
+            });
             
             return `{ ${parts.join(', ')} }`;
         }

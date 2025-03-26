@@ -1,11 +1,8 @@
 scriptname minai_EnvironmentalAwareness extends Quest
 
-
-; some support for Frostfall -- would like to know players soggieness and coldness, temprature
-; followers would notice frostbite setting in etc
-
+; Support for Frostfall
 bool bHasFrostfall
-; frostfall vars
+; Frostfall variables
 GlobalVariable _Frost_CurrentTemperature
 GlobalVariable _Frost_NearFire 
 GlobalVariable _Frost_CurrentHeatSourceDistance 
@@ -19,15 +16,11 @@ GlobalVariable _Frost_ExposureTarget
 FormList _Frost_OvercastWeatherList
 FormList _Frost_SevereWeatherList
 
-; tracked actors - most attributes don't change so once found we'll save that here
-; so that we know the db is aready updated 
-; we'll use a map of actorName to boolean true for tracked actors
-; rather than searching a list for a match, just use map
+; Tracked actors map
 int iActorMap 
 
-; other attributes track with the actor to a certain degree so needs to be updated regularly
-
-minai_Util  MinaiUtil
+; Utilities and references
+minai_Util MinaiUtil
 minai_MainQuestController main
 minai_AIFF aiff
 Actor playerRef
@@ -35,7 +28,7 @@ string playerName
 minai_Followers followers
 bool bIsNight = false
 
-
+; Get the current day/night state based on game time
 string function GetDayState() 
 	float Time = Utility.GetCurrentGameTime()
 	Time -= Math.Floor(Time) ; Remove "previous in-game days passed" bit
@@ -85,24 +78,150 @@ string function GetDayState()
   return str
 EndFunction
 
-String Function GetRaceName(Race akRace)
-	String name = akRace.GetName()
-	If akRace.HasKeywordString("Vampire")
-		name = "$RacenameVampire{" + name + "}"
-	ElseIf akRace.GetFormId() == 0x97a3d
-		name = "$Afflicted"
-	EndIf
-	return name
+Function SetFrostfallContext()
+  if (bHasFrostfall)
+    actor akActor = playerRef
+    ; Store temperature as a semantic value
+    float currentTemp = _Frost_CurrentTemperature.GetValueInt()
+    string temperature = ""
+    
+    if (currentTemp < -14)
+      temperature = "frigid and deadly"
+    elseif (currentTemp < -9)
+      temperature = "bone-chilling"
+    elseif (currentTemp < -4)
+      temperature = "biting cold"
+    elseif (currentTemp < 1)
+      temperature = "cold"
+    elseif (currentTemp < 6)
+      temperature = "chilly"
+    elseif (currentTemp < 10)
+      temperature = "cool"
+    elseif (currentTemp == 10)
+      temperature = "temperate"
+    elseif (currentTemp < 15)
+      temperature = "pleasant"
+    elseif (currentTemp < 18)
+      temperature = "warm"
+    else 
+      temperature = "hot"
+    endif
+    
+    aiff.SetActorVariable(akActor, "temperature", temperature)
+    
+    ; Weather severity
+    Weather currentWeather = Weather.GetCurrentWeather()
+    bool isWeatherSevere = _Frost_SevereWeatherList.HasForm(currentWeather)
+    
+    if (isWeatherSevere)
+      aiff.SetActorVariable(akActor, "weatherSeverity", "The weather is severe and dangerous. People must be careful!")
+    else
+      aiff.SetActorVariable(akActor, "weatherSeverity", "")
+    endif
+    
+    ; Shelter status - using direct boolean
+    aiff.SetActorVariable(akActor, "isSheltered", _Frost_IsTakingShelter.GetValueInt() == 1)
+    
+    ; Wetness level
+    int wetLevel = _Frost_WetLevel.GetValueInt()
+    string wetnessLevel = ""
+    
+    if (wetLevel >= 80)
+      wetnessLevel = "soaking wet"
+    elseif (wetLevel >= 60)
+      wetnessLevel = "very wet"
+    elseif (wetLevel >= 40)
+      wetnessLevel = "wet"
+    elseif (wetLevel >= 20)
+      wetnessLevel = "damp"
+    else
+      wetnessLevel = "dry"
+    endif
+    
+    aiff.SetActorVariable(akActor, "wetnessLevel", wetnessLevel)
+    
+    ; Exposure level
+    float exposureLevel = _Frost_ExposureLevel.GetValue()
+    
+    if (exposureLevel >= 80)
+      aiff.SetActorVariable(akActor, "exposureLevel", "You are freezing to death, seek warmth immediately!")
+    elseif (exposureLevel >= 60)
+      aiff.SetActorVariable(akActor, "exposureLevel", "You are dangerously cold, frostbite is setting in.")
+    elseif (exposureLevel >= 40)
+      aiff.SetActorVariable(akActor, "exposureLevel", "You are very cold.")
+    elseif (exposureLevel >= 20)
+      aiff.SetActorVariable(akActor, "exposureLevel", "You feel cold.")
+    else
+      aiff.SetActorVariable(akActor, "exposureLevel", "")
+    endif
+    
+    ; Baseline exposure
+    float exposureRate = _Frost_ExposureTarget.GetValue()
+    
+    if (exposureRate > 0.3)
+      aiff.SetActorVariable(akActor, "baselineExposure", "The cold is rapidly seeping into your bones.")
+    elseif (exposureRate > 0.1)
+      aiff.SetActorVariable(akActor, "baselineExposure", "The cold is gradually affecting you.")
+    elseif (exposureRate > 0)
+      aiff.SetActorVariable(akActor, "baselineExposure", "The cold is slowly affecting you.")
+    elseif (exposureRate < -0.3)
+      aiff.SetActorVariable(akActor, "baselineExposure", "You are warming up rapidly.")
+    elseif (exposureRate < -0.1)
+      aiff.SetActorVariable(akActor, "baselineExposure", "You are gradually warming up.")
+    elseif (exposureRate < 0)
+      aiff.SetActorVariable(akActor, "baselineExposure", "You are slowly warming up.")
+    else
+      aiff.SetActorVariable(akActor, "baselineExposure", "")
+    endif
+    
+    ; Warmth rating
+    int warmthRating = _Frost_AttributeWarmth.GetValueInt()
+    
+    if (warmthRating >= 80)
+      aiff.SetActorVariable(akActor, "warmthRating", "extremely warmly")
+    elseif (warmthRating >= 60)
+      aiff.SetActorVariable(akActor, "warmthRating", "very warmly")
+    elseif (warmthRating >= 40)
+      aiff.SetActorVariable(akActor, "warmthRating", "warmly")
+    elseif (warmthRating >= 20)
+      aiff.SetActorVariable(akActor, "warmthRating", "somewhat warmly")
+    else
+      aiff.SetActorVariable(akActor, "warmthRating", "poorly for the weather")
+    endif
+    
+    ; Coverage rating
+    int coverageRating = _Frost_AttributeCoverage.GetValueInt()
+    
+    if (coverageRating >= 90)
+      aiff.SetActorVariable(akActor, "coverageRating", "is completely covered, with no exposed skin")
+    elseif (coverageRating >= 70)
+      aiff.SetActorVariable(akActor, "coverageRating", "has most skin covered")
+    elseif (coverageRating >= 50)
+      aiff.SetActorVariable(akActor, "coverageRating", "has some exposed skin")
+    elseif (coverageRating >= 30)
+      aiff.SetActorVariable(akActor, "coverageRating", "has a lot of exposed skin")
+    else
+      aiff.SetActorVariable(akActor, "coverageRating", "is barely covered")
+    endif
+  endif
 EndFunction
 
 function Maintenance(minai_MainQuestController _main)  
   main = _main
   main.Info("Environmental Awareness Initializing")
+  
   aiff = (Self as Quest) as minai_AIFF
   MinaiUtil = (self as Quest) as minai_Util
   bHasFrostfall = False
-  iActorMap = JMap.object()
+  if (iActorMap)
+    ; Release actor map every time the game loads to avoid infinite memory growth
+    JValue.release(iActorMap)
+    iActorMap = 0
+  endif
+  
   playerRef = Game.GetPlayer()
+  ; Store location data
+  SetLocationData(playerRef)
   playerName = main.GetActorName(playerRef)
   If Game.GetModByName("Frostfall.esp") != 255
     GlobalVariable FrostfallRunning = Game.GetFormFromFile(0x06DCFB, "Frostfall.esp") as GlobalVariable
@@ -127,489 +246,97 @@ EndFunction
 
 function SetContext(actor akActor)
   Main.Debug("SetContext EnvironmentalAwareness(" + Main.GetActorName(akActor) + ")")
-  string an = Main.GetActorName(akActor)
-  if(akActor == playerRef)
-    string envDescription = GetDayState()
-    if(envDescription)
-      envDescription = "It is " + envDescription + "."
+  string actorName = Main.GetActorName(akActor)
+  ; Some variables are only relevant for the player
+  if (akActor == playerRef)   
+    ; Store day state
+    string dayState = GetDayState()
+    if (dayState != "")
+      aiff.SetActorVariable(akActor, "dayState", dayState)
     endif
+
+    ;  Snow is 3, Rain is 2, Cloudy is 1, Clear is 0, and -1 is used 
+    aiff.SetActorVariable(akActor, "weatherClassification", Weather.GetCurrentWeather().GetClassification() as string)
+    ; Store moon data
+    StoreMoonData(akActor)
+  
+    ; Weather data
     int weatherInt = Weather.GetCurrentWeather().GetClassification()
-    if(weatherInt == 3)
-      envDescription += "It is snowing outside. "
-    elseif(weatherInt == 2) 
-      envDescription += "It is raining outside. "
-    endif
-    ; Snow is 3, Rain is 2, Cloudy is 1, Clear is 0, and -1 is used 
-    envDescription += GetMoonStatus()
+    aiff.SetActorVariable(akActor, "weatherClassification", weatherInt as string)
+    SetFrostfallContext()
+  else ; NPCs
+    ; Check if bribed - using direct boolean from function
+    aiff.SetActorVariable(akActor, "isBribed", akActor.IsBribed())
 
-    if(akActor.IsInInterior())
-      envDescription = "We are indoors. "
-    endif
-
-    if(bHasFrostfall)
-      Weather akWeather = Weather.GetCurrentWeather()
-      bool IsWeatherOvercast = _Frost_OvercastWeatherList.HasForm(akWeather)
-      if(IsWeatherOvercast)
-        envDescription += "The sky is overcast. "
-      endif
-
-      float currentTemp = _Frost_CurrentTemperature.GetValueInt()
-      ; describe the temprature
-      string airTemprature = ""
-      if currentTemp < -14
-        airTemprature = "frigid and deadly"
-      elseif currentTemp < -9
-        airTemprature = "bone-chilling"
-      elseif currentTemp < -4
-        airTemprature = "biting cold"
-      elseif currentTemp < 1
-        airTemprature = "cold"
-      elseif currentTemp < 6
-        airTemprature = "chilly"
-      elseif currentTemp < 10
-        airTemprature = "cool"
-      elseif currentTemp == 10
-        airTemprature = "temperate"
-      elseif currentTemp < 15
-        airTemprature = "pleasant"
-      elseif currentTemp < 18
-        airTemprature = "warm"
-      else 
-        airTemprature = "hot"
-      endif
-      envDescription += "The temperature is " + airTemprature + ". "
-      bool IsWeatherSevere = _Frost_SevereWeatherList.HasForm(akWeather)
-      if(IsWeatherSevere)
-        dynamicData += "The weather is severe and dangerous. People must be careful! "
-      endif
-    endIf
-    envDescription += "\n"
-    aiff.SetActorVariable(akActor, "EnviromentalAwarenessPlayerEnviroment", envDescription)
-  endIf
- 
-
-  ; if name not in list yet lets do some sets of stuff, like family
-  ; except for the oddity that is certain family rearing mods where children can grow
-  int r = PO3_SKSEFunctions.GenerateRandomInt(0,20)
-
-  bool bNotInList = (JMap.getInt(iActorMap , an) != 1)
-  string wasInList = an + " was in the list!"
-  if(bNotInList) 
-    wasInList = an + " was NOT in list"
-  endIf
-  MinaiUtil.Debug("Environmental Awareness SetContext 002 :: "  + wasInList)
-
-  ; the player's data can change pretty often, and so can a follower's
-  ; even player's height/race/sex/gender, so run it half the time rather than 1 in 20
-  bool bIsPlayerOrFollower = playerRef == akActor || followers.IsFollower(akActor)
-  if bIsPlayerOrFollower
-    r += 9
-  endif 
-  if(bNotInList||r>19)
-    if(bNotInList)
-      JMap.setInt(iActorMap, an, 1)
-      MinaiUtil.Debug("Environmental Awareness SetContext 003 added :: "  + an)
-    EndIf
-
-   
-    ; use the sqrt of the player's level to assign brackets of peer combat status.
-    ; so a level 9 finds levels like 6-12 peers, 13 through level 15 to be better, 15+ much better  
-    ; level 49 finds level 42-56 to be peers. Works for scaling levels. 
-    int actorLevel = akActor.GetLevel()
-    int playerLevel = playerRef.GetLevel()
-    float sqrtOfPlayerLevel = Math.sqrt(playerLevel as float)
-    int levelDifference = actorLevel - playerLevel
+    ; Check if intimidated - using direct boolean from function
+    aiff.SetActorVariable(akActor, "isIntimidated", akActor.IsIntimidated())
     
-    int ranking = 3 
-    if(levelDifference<-2*sqrtOfPlayerLevel)
-      ranking = 1
-    elseif(levelDifference<-1*sqrtOfPlayerLevel)
-      ranking = 2
-    elseif(levelDifference>2*sqrtOfPlayerLevel)
-      ranking = 5
-    elseif(levelDifference>sqrtOfPlayerLevel)
-      ranking = 4
-    endif
-    
-    ; 5 - much better
-    ; 4 - better than
-    ; 3 - peer
-    ; 2 - weaker than
-    ; 1 - much weaker than
-    ; if you're between the upper and lower limit you're something of a peer
-    
-    string staticData = "" + an + " is: "
+    ; Check relationship rank with player
+    aiff.SetActorVariable(akActor, "relationshipRank", akActor.GetRelationshipRank(playerRef) as string)
+
     bool isKid = akActor.IsChild()
     bool hasAFamily = akActor.HasFamilyRelationship()
+    ; Child status - using direct boolean
+    aiff.SetActorVariable(akActor, "isChild", isKid)
     
-    if(isKid && !hasAFamily)
-      staticData += ", an orphan child"
-    ElseIf (isKid)
-      staticData += ", a child with family nearby"
-    ElseIf (hasAFamily)
-      staticData += ", an adult who has family"
-    else 
-      staticData += ", an adult"
-    EndIf
-
-    ; anything different from 1 is shorter or taller, .05 difference is notably short/ 1.05 notably taller than their racial norm
-    ; for relative height "is short for a nord"
-
-    Race akRace = akActor.GetRace()
-    string racename = GetRaceName(akRace)
-    staticData += ", a " + racename
-    float height = akActor.GetActorBase().GetHeight()
-    if(height<0.95)
-      staticData += ", very short for a " + racename
-    elseif(height<0.98)
-      staticData += ", short compared to a normal " + racename
-    elseif(height<1.02)
-      staticData += ", of normal height for a " + racename
-    elseif(height<1.05) 
-      staticData += ", tall for a " + racename
-    else
-      staticData += ", very tall for a " + racename
-    endIf
-
-    ; maybe i'll write a mod so NPCs change their wardrobes some day but for now NPCs (not followers) rarely change outfits
-    ; this will focus on things you can see without intending to look at someone, helmet, armor, shoes
-    ; cause everyone looks at your shoes
-    ; shield because logos matter like gang signs in skyrim
-
-    Armor helmetArmor = akActor.GetEquippedArmorInSlot(30)
-    Armor torsoArmor = akActor.GetEquippedArmorInSlot(32)
-    Armor shoesArmor = akActor.GetEquippedArmorInSlot(37)
-    Armor shieldArmor = akActor.GetEquippedArmorInSlot(39)
-    
-    bool IsHeavyArmor = false
-    bool IsLightArmor = false
-    bool richClothes = false
-    bool poorClothes = false
-    string helmet = ""
-    string torso = ""
-    string shoes = ""
-    string shield = ""
-
-    if(torsoArmor)
-      torso = " " + torsoArmor.GetName()
-      IsHeavyArmor = torsoArmor.IsHeavyArmor()
-      IsLightArmor = torsoArmor.IsLightArmor()
-      richClothes = torsoArmor.IsClothingRich()
-      poorClothes = torsoArmor.IsClothingPoor()
-
-    endIf
-
-    string wealthText = ""
-    if(richClothes) 
-      wealthText = " expensive"
-    elseif(poorClothes)
-      wealthText = " cheap"
-    EndIf
-
-    if(wealthText!="")
-      staticData += ". " + an + " is dressed " + wealthText + " "
-    EndIf
-
-    if(!bHasFrostfall || playerRef != akActor)
-      float actorsWarmth = akActor.GetWarmthRating()
-      ; supposedly 140 is max for orc and nord who get +10 to cold benefit
-      ; add 30 because NPCs are always underdressed 
-      ; and some mods add undetected clothes for weather
-      ; but if basically naked no bonus
-      if(!bIsPlayerOrFollower && actorsWarmth>=30)
-        actorsWarmth += 30
-      endif
-      string warmthLanguage = ""
-      if(actorsWarmth>=130)
-        warmthLanguage = "extremely warm"
-      elseif(actorsWarmth>=110)
-        warmthLanguage = "very warm"
-      elseif(actorsWarmth>=90)
-        warmthLanguage = "moderately warm"
-      elseif(actorsWarmth>=70)
-        warmthLanguage = "uninsulated to the cold"
-      elseif(actorsWarmth>=50)
-        warmthLanguage = "not warm at all"
-      elseif(actorsWarmth>=30)
-        warmthLanguage = "exposing them to the cold"
-      else 
-        warmthLanguage = "completely vulnerable to the cold"
-      endif
-      staticData += ", and their attire is " + warmthLanguage + ". "
-    endif
-    string privateKnowledge = ""
-
-    if(akActor!=playerRef)     
-      if(ranking<=1)
-        staticData += " " + an + " would be a helpless combatant against " + playerName + ". "
-      elseif(ranking==2)
-        staticData += " " + an + " would be a vastly overmatched combatant against " + playerName + ". "
-      elseif(ranking==3)
-        staticData += " " + an + " is a peer combatant when compared to " + playerName + ". "
-      elseif(ranking==4)
-        staticData += " " + playerName + " would be a vastly overmatched combatant against " + an + ". "
-      elseif(ranking>=5)
-        staticData += " " + playerName + " would be a helpless combatant against " + an + ". "
-      endif     
-    endIf        
-    
-    ; what class are people around you?
-    ActorBase akBase = akActor.GetBaseObject() as ActorBase
-    Class aClass = akBase.GetClass()
-
-    string careerName = aClass.GetName()
-    string publicCareerText = " " + an + " is a " + careerName + ". "
-    ; prevent Razita is a Razita 
-    if(careerName == an)
-      publicCareerText = ""
-    endif
-    if(careerName == "Assassin" || careerName == "Thief" || careerName == "Bandit Archer" || careerName == "Bandit" || careerName == "Bandit Wizard"|| careerName == "Blade" || careerName == "Vampire" || careerName == "Werewolf" || careerName == "dremora")
-      string privateCareerText = an + " is a " + careerName + " but is secretive about that unless in select company - like with other " + careerName + "s or close friends.  "
-      privateKnowledge += " " + privateCareerText
-      publicCareerText = an + " has an air of mystery about them. "
-      Main.Debug("Actor " + an + " is a " + careerName)
-    endif
-    staticData +=  publicCareerText
-    aiff.SetActorVariable(akActor, "EnvironmentalAwarenessPrivateKnowledge", privateKnowledge) 
-    aiff.SetActorVariable(akActor, "EnviromentalAwarenessMoreStableData", staticData)
-  EndIF
-
-  string dynamicData = ""
-  ; trying to sit or maybe is sitting or trying to get up
-  ; 4: Sitting, wants to stand
-  ; 3: Sitting
-  ; 2: Not sitting, wants to sit
-  ; 0: Not sitting
-  int sitValue = akActor.GetSitState()
-  if (sitValue == 3)
-    dynamicData += ", sitting down"
-  elseif(sitValue == 2)
-    dynamicData += ", trying to sit down"
-  elseif(sitValue == 4)
-    dynamicData += ", getting up"
-  endIf
-
-  int sleepValue = akActor.GetSleepState()
-  if(sleepValue==3) 
-    dynamicData += ", sleeping"
-  elseif(sleepValue==2)
-    dynamicData += ", wanting to sleep"
-  elseif(sleepValue==4)
-    dynamicData += ", waking up"
-  endif
-
-  if(akActor.IsOverEncumbered())
-      dynamicData += "\n\t overly encumbered and slow to move, carrying exhausting weight"
-  endif
-
-  if(akActor.IsOnMount())
-    dynamicData += "\n\t riding a horse"
-  Endif
-  
-  if(akActor.IsSwimming())
-    dynamicData += ", swimming"
-  endif
-
-  if(bHasFrostfall && akActor == playerRef)
-    bool nearFire = _Frost_NearFire.GetValueInt() == 2
-    if(nearFire) 
-      dynamicData += ", near a fire, which helps them dry if wet"
-    endIf
-    int heatSize = _Frost_CurrentHeatSourceSize.GetValueInt()
-    if(heatSize == 0) 
-      dynamicData += ", not near a fire"
-    elseif(heatSize == 1)
-      dynamicData += ", near a small fire"
-    elseif(heatSize == 2)
-      dynamicData += ", near a good fire"
-    elseif(heatSize == 3)
-      dynamicData += ", near a roaring fire"
-    endif
-    float heatDistance = _Frost_CurrentHeatSourceDistance.GetValue()
-    if(heatDistance<0)
-      dynamicData += ""
-    elseif(heatDistance <= 300) 
-      dynamicData += ", very close to the fire"
-    elseif(heatDistance<=450)
-      dynamicData += ", close to the fire"
-    else 
-      dynamicData += ", at the edge of the fire's heat"
-    endif
-
-    int whereAreWe = Weather.GetSkyMode()
-    ; 0 - No sky 
-    ; 1 - Interior
-    ; 2 - Skydome only
-    ; 3 - Full sky
-    if(whereAreWe>1 && _Frost_IsTakingShelter.GetValue()==2)
-      dynamicData += ", sheltered by things overhead"
-    endif
-    
-    int playerWetness = _Frost_WetLevel.GetValueInt()
-    if(playerWetness==0) 
-      dynamicData += ", is dry"
-    elseif(playerWetness==1)
-      dynamicData += ", is damp"
-    elseif(playerWetness==2)
-      dynamicData += ", is wet"
-    else
-      dynamicData += ", is drenched"
-    endif
-    string actorName = an
-
-    ; exposure is the measure of a body losing heat faster than it can make it, like when falling into cold water
-    int playersExposureLevel = _Frost_ExposureLevel.GetValueInt()
-    if(playersExposureLevel==-1)
-      dynamicData += "" ;  in unexposed say nothing
-    elseif(playersExposureLevel==0)
-      dynamicData += ". " + actorName + " is a bit chilled."
-    elseif(playersExposureLevel == 1)
-      dynamicData += ". " + actorName + " seems chilly, with a reddened nose."
-    elseif(playersExposureLevel == 2)
-      dynamicData += ". " + actorName + " is cold, rubbing their hands together periodically."
-    elseif(playersExposureLevel == 3)
-      dynamicData += ". " + actorName + " is very cold, shivering lightly, their teeth chatter."
-    elseif(playersExposureLevel == 4)
-      dynamicData += ". " + actorName + " is freezing, dangerously cold, their teeth chatter and interupt their speech, they are shivering noticably."
-    elseif(playersExposureLevel == 5)
-      dynamicData += ". " + actorName + " is freezing to death. They are looking blue, their teeth are chattering, and they are shivering in a big hard to control vibrating motion. "
-    elseif(playersExposureLevel == 6)
-      dynamicData += ". " + actorName + " is too cold, nearing hypothermia, they are nearing death! They can't speak and can barely move due to the cold. "
-    endif
-
-    ; what will the baseline exposure of the player be if they don't take any actions, stand near fires etc
-
-    float playersBaseline = _Frost_ExposureTarget.GetValue()
-    if(playersBaseline<20)
-      dynamicData += ". " + actorName + " finds the weather warm. "
-    elseif(playersBaseline<40)
-      dynamicData += ". " + actorName + " finds the weather comfortable. "
-    elseif(playersBaseline<60)
-      dynamicData += ". " + actorName + " finds the weather cold. "
-    elseif(playersBaseline<80)
-      dynamicData += ". " + actorName + " finds the weather very cold. "
-    elseif(playersBaseline<100)
-      dynamicData += ". The weather dangerously cold for " + actorName + ", it is freezing and going away from heat is very risky. "
-    else
-      dynamicData += ". The weather is lethally cold for " + actorName + " and they could easily freeze to death. "
-    endif
-
-
-    ; how bundled up is the player
-    int actorsWarmth = _Frost_AttributeWarmth.GetValueInt()
-    ; in frostfall, 300 is a good score, so more like double non-frostfall version
-    if(actorsWarmth>=290)
-      dynamicData += actorName + " is dressed very warmly. "
-    elseif(actorsWarmth>=270)
-      dynamicData += actorName + " is dressed warmly. "
-    elseif(actorsWarmth>=240)
-      dynamicData += actorName + " is dressed lukewarmly. "
-    elseif(actorsWarmth>=200)
-      dynamicData += actorName + " is dressed for moderate weather. "
-    elseif(actorsWarmth>=160)
-      dynamicData += actorName + " does not appear dressed for warmth. "
-    elseif(actorsWarmth>=100)
-      dynamicData += actorName + " is dressed like a summertime swimmer. "
-    else 
-      dynamicData += actorName + " is lacking any clothes that would keep them warm. "
-    endif
-    
-    float cTemp = _Frost_CurrentTemperature.GetValueInt()
-    ; describe the temprature
-    string aTemp = ""
-    if cTemp <= -15
-      aTemp = " lethally cold"
-    elseif cTemp <= 0
-      aTemp = " dangerously cold"
-    elseif cTemp <= 10
-      aTemp = " cold"
-    elseif cTemp < 20
-      aTemp = " mild"
-    elseif cTemp < 23
-      aTemp = " room temprature"
-    elseif cTemp < 34
-      aTemp = " warm"
-    elseif cTemp < 40
-      aTemp = " hot"
-    else 
-      aTemp = " extremely hot"
-    endif
-  
-    if(actorsWarmth < 30 && cTemp <= 10)
-      dynamicData += " " + actorName + "'s clothing situation leaves them completely exposed to the" + aTemp + " weather. "
-    elseif(actorsWarmth < 50 && cTemp <= 10)
-      dynamicData += " " + actorName + "'s clothing is not protecting them from the" + aTemp + " weather. "
-    elseif(actorsWarmth < 70 && cTemp <= 10)
-      dynamicData += " " + actorName + "'s clothing is almost no protection from the" + aTemp + " weather. "
-    endif
+    ; Family relationships - using direct boolean
+    aiff.SetActorVariable(akActor, "hasFamily", hasAFamily)
       
-    int playerCoverage = _Frost_AttributeCoverage.GetValueInt()
-    if(playerCoverage>=300)
-      dynamicData += " " + actorName + " has great protection from rain and wind by some combination of their clothes or environment. "
-    elseif(playerCoverage>=270)
-      dynamicData += " " + actorName + " has good protection from rain and wind by some combination of their clothes or environment. "
-    elseif(playerCoverage>=220)
-      dynamicData += " " + actorName + " has some pretty nice protection from rain and wind because of their clothes or the things around them. "
-    elseif(playerCoverage>=160)
-      dynamicData += " " + actorName + " has some protection from rain and wind because of their clothes or the things around them. "
-    elseif(playerCoverage>=80)
-      dynamicData += " " + actorName + " has little protection from rain and wind. "
+    ; Sleep state
+    int sleepState = akActor.GetSleepState()
+    if (sleepState == 3)
+      aiff.SetActorVariable(akActor, "sleepState", "sleeping deeply")
+    elseif (sleepState == 2)
+        aiff.SetActorVariable(akActor, "sleepState", "sleeping")
+    elseif (sleepState == 1)
+        aiff.SetActorVariable(akActor, "sleepState", "resting")
     else
-      dynamicData += " " + actorName + " is completely exposed to any rain and wind. "
+      aiff.SetActorVariable(akActor, "sleepState", "")
     endif
-  Endif
-  if(dynamicData != "") 
-    dynamicData =  " " + an + " is " + dynamicData 
+     ; Get and store actor's class/career name as raw data
+    ActorBase akBase = akActor.GetBaseObject() as ActorBase
+    if (akBase)
+      Class aClass = akBase.GetClass()
+      if (aClass)
+        string careerName = aClass.GetName()
+        aiff.SetActorVariable(akActor, "career", careerName)
+      endif
+    endif
   endif
+  ;;;;;;;;;;;;;;;;;;;;;;;; Applicable to everyone
 
-  if(akActor != playerRef)
-    ; has player ever bribed this NPC?
-    bool bIsBribed = false
-    if (akActor.IsBribed())
-      bIsBribed = true
-    endIf
-
-
-    ; check if player has intimidated this character, if a player ever has this is true,
-    ; and by the laws of the game's mechanics if a player is intimidating to someone in the past even moreso in the future!
-    ; maybe though if they meet and the player is laid low by a defeat mod, we can reset the NPC's intimidation
-    ; to be future compatible allow the value to change back to false if we add "un-intimidate" mechanics
-    bool bIsIntimidated = false
-    if(akActor.isIntimidated())
-      bIsIntimidated = true
-    endif
-
-    bool bWouldBeIntimidated = false
-    ; check if the player could intimidate the NPC if they wanted to, because in the battle familiar world of Skyrim everyone knows
-    ; who can take who out, so for added flavor of respect, fear, grovelling, or worship
-    if(akActor.willIntimidateSucceed())
-      bWouldBeIntimidated = true
-    endif
-
-    string dynamicPrivateData = ""
-    if(bIsBribed)
-      dynamicPrivateData += an + " has accepted bribes from " + playerName + ". "
-      dynamicData += an + " seems smug around " + playerName + ". "
-    endif
-    if(bIsIntimidated)
-      dynamicData += " " + an + " seems anxious and a little frightend around " + playerName + ". "
-      dynamicPrivateData = playerName + " has used threats against me in the past, I do what " + playerName + " wants because I am frightend of them. "
-    endif
-    if(bWouldBeIntimidated && !bIsIntimidated)
-      dynamicPrivateData += " " + an + " finds " + playerName + " potentially intimidating, though " + playerName + " has not been aggressive with them. " 
-    endif
-    aiff.SetActorVariable(akActor, "EnvironmentalAwarenessDynamicPrivateData", dynamicPrivateData)
-  endIf
-  aiff.SetActorVariable(akActor, "EnvironmentalAwarenessDynamicData", dynamicData)
+  ; Character level
+  aiff.SetActorVariable(akActor, "level", akActor.GetLevel() as string)
+  
+  ; Character state data - using direct booleans
+  aiff.SetActorVariable(akActor, "isSneaking", akActor.IsSneaking())
+  aiff.SetActorVariable(akActor, "isSwimming", akActor.IsSwimming())
+  aiff.SetActorVariable(akActor, "isOnMount", akActor.IsOnMount())
+  aiff.SetActorVariable(akActor, "isEncumbered", akActor.IsOverEncumbered())
+  ; Sitting state - store raw value and let server handle formatting
+  aiff.SetActorVariable(akActor, "sitState", akActor.GetSitState() as string)
 EndFunction
 
+; Store moon phase data as raw values
+function StoreMoonData(actor akActor)
+  ; Store the moon phase (0-7)
+  int phase = GetCurrentMoonPhase()
+  aiff.SetActorVariable(akActor, "moonPhase", phase as string)
+  
+  ; Store whether it's night or day
+  aiff.SetActorVariable(akActor, "isNight", bIsNight)
+  
+  ; Store whether there are one or two moons visible
+  string moonCount = GetCurrentMoonSync()
+  aiff.SetActorVariable(akActor, "moonCount", moonCount)
+endfunction
 
-; moon phase logic is from the papyrus wiki
 Int Function GetPassedGameDays()
 	Float GameDaysPassed
 	GameDaysPassed = Utility.GetCurrentGameTime()
 	Return GameDaysPassed As Int
 EndFunction
+
 
 Int Function GetPassedGameHours() Global
 	Float GameTime
@@ -620,64 +347,34 @@ Int Function GetPassedGameHours() Global
 	Return GameHoursPassed As Int
 EndFunction
 
-string function GetMoonStatus()
-  int phase = GetCurrentMoonPhase()
-  string txt = "The " + GetCurrentMoonSync()
-  if(bIsNight)
-    txt += " are"
-  else
-    txt += " will be"
-  endif
-  if(phase == 0) 
-    txt += " full"
-  elseif(phase == 1)
-    txt += " wanning gibbious"
-  elseif(phase == 2)
-    txt += " third quarter"
-  elseif(phase == 3)
-    txt += " wanning crescent"
-  elseif(phase == 4)
-    txt += " in new moon"
-  elseif(phase == 5)
-    txt += " waxing crescent"
-  elseif(phase == 6)
-    txt += " first quarter"
-  elseif(phase == 7)
-    txt += " waxing gibbious"
-  endif
-  txt += " tonight."
-  return txt
-endfunction
-
+; Get current moon phase (0-7)
 int Function GetCurrentMoonPhase()
-	Int GameDaysPassed
-	Int GameHoursPassed
-	Int PhaseTest
-	GameDaysPassed = GetPassedGameDays()
-	GameHoursPassed = GetPassedGameHours()
-	If (GameHoursPassed >= 12.0)
-		GameDaysPassed += 1
-	EndIf
-	PhaseTest = GameDaysPassed % 24 ;A full cycle through the moon phases lasts 24 days
-	If PhaseTest >= 22 || PhaseTest == 0
-		Return 7
-	ElseIf PhaseTest < 4
-		Return 0
-	ElseIf PhaseTest < 7
-		Return 1
-	ElseIf PhaseTest < 10
-		Return 2
-	ElseIF PhaseTest < 13
-		Return 3
-	ElseIf PhaseTest < 16
-		Return 4
-	ElseIf PhaseTest < 19
-		Return 5
-	ElseIf PhaseTest < 22
-		Return 6
-	EndIf
+  Int GameDaysPassed = GetPassedGameDays()
+  Int GameHoursPassed = GetPassedGameHours()
+  If (GameHoursPassed >= 12.0)
+    GameDaysPassed += 1
+  EndIf
+  int PhaseTest = GameDaysPassed % 24 ;A full cycle through the moon phases lasts 24 days
+  If PhaseTest >= 22 || PhaseTest == 0
+    Return 7
+  ElseIf PhaseTest < 4
+    Return 0
+  ElseIf PhaseTest < 7
+    Return 1
+  ElseIf PhaseTest < 10
+    Return 2
+  ElseIf PhaseTest < 13
+    Return 3
+  ElseIf PhaseTest < 16
+    Return 4
+  ElseIf PhaseTest < 19
+    Return 5
+  ElseIf PhaseTest < 22
+    Return 6
+  EndIf
 EndFunction
 
+; Get moon count ("moon" or "two moons")
 string Function GetCurrentMoonSync()
 	Int GameDaysPassed
 	Int GameHoursPassed
@@ -694,3 +391,292 @@ string Function GetCurrentMoonSync()
   endif
   return " moon"
 EndFunction
+
+; New function to handle location data
+function SetLocationData(actor whoCares)
+  actor akActor = playerRef
+  Location currentLoc = akActor.GetCurrentLocation()
+  
+  ; Try alternative methods if GetCurrentLocation returns None
+  if (!currentLoc)
+    ; Try getting location from parent cell
+    Cell parentCell = akActor.GetParentCell()
+    if (parentCell)
+      ; If cell location is None, try getting location directly from cell refs
+      int numRefs = parentCell.GetNumRefs(0) ; 0 to get all refs
+      int i = 0
+      while (!currentLoc && i < numRefs && i < 20)
+        ObjectReference ref = parentCell.GetNthRef(i, 0)
+        currentLoc = ref.GetCurrentLocation()
+        i += 1
+      endwhile
+    endif
+    
+    ; If still no location, try getting from nearby references
+    if (!currentLoc)
+      ObjectReference nearbyRef = PO3_SKSEFunctions.GetObjectUnderFeet(akActor)
+      if (nearbyRef)
+        currentLoc = nearbyRef.GetCurrentLocation()
+      endif
+    endif
+  endif
+  
+  if (currentLoc)
+    ; Store current location name
+    aiff.SetActorVariable(akActor, "currentLocation", currentLoc.GetName())
+    
+    ; Store hold information if available
+    Location holdLoc = PO3_SKSEFunctions.GetParentLocation(currentLoc)
+    if (holdLoc)
+      aiff.SetActorVariable(akActor, "currentHold", holdLoc.GetName())
+    else
+      ; We will use the last known hold if we can't find the current hold
+      ; aiff.SetActorVariable(akActor, "currentHold", "")
+    endif
+  else
+    aiff.SetActorVariable(akActor, "currentLocation", "")
+  EndIf
+  ; Store interior/exterior status
+  aiff.SetActorVariable(akActor, "isInterior", akActor.IsInInterior())
+  
+  ; Store worldspace information
+  WorldSpace currentWorld = playerRef.GetWorldSpace()
+  if (currentWorld)
+    aiff.SetActorVariable(akActor, "currentWorldspace", currentWorld.GetName())
+  else
+    aiff.SetActorVariable(akActor, "currentWorldspace", "")
+  endif
+  
+  ; Store cell information
+  Cell currentCell = akActor.GetParentCell()
+  if (currentCell)
+    aiff.SetActorVariable(akActor, "currentCell", currentCell.GetName())
+  else
+    aiff.SetActorVariable(akActor, "currentCell", "")
+  endif
+  
+  ; Build location keywords string
+  string locationKeywords = ""
+  if (currentLoc)
+    ; Add each keyword if present
+    if (currentLoc.HasKeywordString("LocTypeCity"))
+      locationKeywords += "city~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTown"))
+      locationKeywords += "town~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeVillage"))
+      locationKeywords += "village~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeSettlement"))
+      locationKeywords += "settlement~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeDungeon"))
+      locationKeywords += "dungeon~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeRuin"))
+      locationKeywords += "ruin~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeFort"))
+      locationKeywords += "fort~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTemple"))
+      locationKeywords += "temple~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTavern"))
+      locationKeywords += "tavern~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeShop"))
+      locationKeywords += "shop~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeHouse"))
+      locationKeywords += "house~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeFarm"))
+      locationKeywords += "farm~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeMine"))
+      locationKeywords += "mine~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeCamp"))
+      locationKeywords += "camp~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeMilitaryCamp"))
+      locationKeywords += "military_camp~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeBanditCamp"))
+      locationKeywords += "bandit_camp~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeDragonLair"))
+      locationKeywords += "dragon_lair~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeGiantCamp"))
+      locationKeywords += "giant_camp~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeVampireLair"))
+      locationKeywords += "vampire_lair~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeWerewolfLair"))
+      locationKeywords += "werewolf_lair~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeCave"))
+      locationKeywords += "cave~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTomb"))
+      locationKeywords += "tomb~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeCrypt"))
+      locationKeywords += "crypt~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeBarrow"))
+      locationKeywords += "barrow~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeNordicRuin"))
+      locationKeywords += "nordic_ruin~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeDwemerRuin"))
+      locationKeywords += "dwemer_ruin~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeFalmerLair"))
+      locationKeywords += "falmer_lair~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypePrison"))
+      locationKeywords += "prison~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeJail"))
+      locationKeywords += "jail~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeBarracks"))
+      locationKeywords += "barracks~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypePalace"))
+      locationKeywords += "palace~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeCastle"))
+      locationKeywords += "castle~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeKeep"))
+      locationKeywords += "keep~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTower"))
+      locationKeywords += "tower~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeLighthouse"))
+      locationKeywords += "lighthouse~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeMill"))
+      locationKeywords += "mill~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeStable"))
+      locationKeywords += "stable~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeSmithy"))
+      locationKeywords += "smithy~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeForge"))
+      locationKeywords += "forge~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeSmelter"))
+      locationKeywords += "smelter~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTannery"))
+      locationKeywords += "tannery~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeFishery"))
+      locationKeywords += "fishery~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeBrewery"))
+      locationKeywords += "brewery~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeWinery"))
+      locationKeywords += "winery~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeMeadery"))
+      locationKeywords += "meadery~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeBakery"))
+      locationKeywords += "bakery~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeButcherShop"))
+      locationKeywords += "butcher_shop~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeGeneralStore"))
+      locationKeywords += "general_store~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeClothingStore"))
+      locationKeywords += "clothing_store~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeJewelryStore"))
+      locationKeywords += "jewelry_store~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeBookStore"))
+      locationKeywords += "book_store~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypePotionStore"))
+      locationKeywords += "potion_store~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeScrollStore"))
+      locationKeywords += "scroll_store~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeWeaponStore"))
+      locationKeywords += "weapon_store~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeArmorStore"))
+      locationKeywords += "armor_store~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeFoodStore"))
+      locationKeywords += "food_store~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeFurnitureStore"))
+      locationKeywords += "furniture_store~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeBlackMarket"))
+      locationKeywords += "black_market~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeThievesGuild"))
+      locationKeywords += "thieves_guild~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeDarkBrotherhood"))
+      locationKeywords += "dark_brotherhood~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeCompanionsGuild"))
+      locationKeywords += "companions_guild~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeCollegeOfWinterhold"))
+      locationKeywords += "college_of_winterhold~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTempleOfKynareth"))
+      locationKeywords += "temple_of_kynareth~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTempleOfTalos"))
+      locationKeywords += "temple_of_talos~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTempleOfArkay"))
+      locationKeywords += "temple_of_arkay~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTempleOfDibella"))
+      locationKeywords += "temple_of_dibella~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTempleOfMara"))
+      locationKeywords += "temple_of_mara~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTempleOfZenithar"))
+      locationKeywords += "temple_of_zenithar~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTempleOfStendarr"))
+      locationKeywords += "temple_of_stendarr~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTempleOfJulianos"))
+      locationKeywords += "temple_of_julianos~"
+    endif
+    if (currentLoc.HasKeywordString("LocTypeTempleOfAkatosh"))
+      locationKeywords += "temple_of_akatosh~"
+    endif
+  EndIf
+  
+  ; Store the location keywords string
+  aiff.SetActorVariable(akActor, "locationKeywords", locationKeywords)
+  aiff.SetActorVariable(akActor, "isTrespassing", playerRef.IsTrespassing())
+  main.Info("Set location data")
+
+endfunction

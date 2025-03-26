@@ -18,8 +18,10 @@ $GLOBALS["TTS_FALLBACK_FNCT"] = function($responseTextUnmooded, $mood, $response
         $GLOBALS["speaker"] = $GLOBALS["HERIKA_NAME"];
     $race = str_replace(" ", "", strtolower(GetActorValue($GLOBALS["speaker"], "Race")));
     $gender = strtolower(GetActorValue($GLOBALS["speaker"], "Gender"));
-    $fallback = $GLOBALS["voicetype_fallbacks"][$gender.$race];
-    if (!$fallback) {
+    if ($gender.$race) {
+        $fallback = $GLOBALS["voicetype_fallbacks"][$gender.$race];
+    }
+    if (!isset($fallback)) {
         minai_log("info", "Warning: Could not find fallback for {$GLOBALS["speaker"]}: {$gender}{$race}. Using last resort fallback: malecommoner");
         $fallback = "malecommoner";
     }
@@ -35,4 +37,19 @@ $GLOBALS["TTS_FALLBACK_FNCT"] = function($responseTextUnmooded, $mood, $response
     }
     return null;
 };
+
+
+
+
+$GLOBALS["external_fast_commands"] = [
+    // Events that set $MUST_DIE=true in customintegrations.php
+    "minai_init",             // Initialization event
+    "storecontext",           // Store custom context
+    "registeraction",         // Register custom action
+    "updatethreadsdb",        // Update threads database
+    "storetattoodesc",        // Store tattoo description
+    "minai_storeitem",        // Store single item
+    "minai_storeitem_batch"  // Store multiple items
+    // "minai_clearinventory"    // Clear inventory
+];
 

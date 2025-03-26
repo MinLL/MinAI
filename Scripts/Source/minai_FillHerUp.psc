@@ -168,7 +168,7 @@ Event OnAnimationEvent(ObjectReference akSource, string asEventName)
     
     if eventType != ""
         string eventLine = main.GetActorName(target) + " is performing animation " + asEventName
-        main.RequestLLMResponse(eventLine, "minai_fillherup_" + eventType)
+        main.RequestLLMResponseFromActor(eventLine, "minai_fillherup_" + eventType, "everyone", "player")
     EndIf
 EndEvent
 
@@ -359,7 +359,7 @@ Event SRInflateEvent(Form akSpeakerform, Bool Inflation, int poolmask, float amo
     if eventType != ""
         string eventLine = main.GetActorName(target) + "'s " + bodyPart + " was " + inflateAction + " " + amount + " units of cum over " + time + " seconds"
         if Inflation
-            main.RequestLLMResponse(eventLine, "minai_fillherup_" + eventType)
+            main.RequestLLMResponseFromActor(eventLine, "minai_fillherup_" + eventType, "everyone", "player")
         else
             main.RegisterEvent(eventLine, "minai_fillherup_" + eventType)
         EndIf
@@ -419,7 +419,7 @@ Event SRInflateEventWithInjector(Form akSpeakerform, Form akInjectorform, Bool I
         eventLine += " over " + time + " seconds"
         
         if Inflation
-            main.RequestLLMResponse(eventLine, "minai_fillherup_" + eventType)
+            main.RequestLLMResponseFromActor(eventLine, "minai_fillherup_" + eventType, "everyone", "player")
         else
             main.RegisterEvent(eventLine, "minai_fillherup_" + eventType)
         EndIf

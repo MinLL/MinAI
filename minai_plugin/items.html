@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MinAI Items Management</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2196F3;
+            --background-dark: #1a1a1a;
+            --background-light: #2d2d2d;
+            --text-color: #e0e0e0;
+            --border-color: #404040;
+            --success-color: #40c057;
+            --error-color: #f44336;
+            --warning-color: #ffc107;
+            --info-color: #4dabf7;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--background-dark);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            background: radial-gradient(circle at center, var(--background-light) 0%, var(--background-dark) 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-panel {
+            background-color: var(--background-light);
+            padding: 15px;
+            text-align: center;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(4px);
+        }
+
+        .nav-panel a {
+            display: inline-block;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 1.1rem;
+            margin: 0 20px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
+            border: 1px solid var(--border-color);
+        }
+
+        .nav-panel a:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.15) 0%,
+                rgba(255, 255, 255, 0.08) 100%
+            );
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--text-color);
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+            color: var(--text-color);
+            margin-top: 30px;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 20px;
+            background-color: rgba(45, 45, 45, 0.4);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(4px);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="file"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--background-dark);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="file"]:focus,
+        textarea:focus,
+        select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+            accent-color: var(--primary-color);
+        }
+
+        button {
+            display: inline-block;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 1.1rem;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.1) 0%,
+                rgba(76, 175, 80, 0.2) 100%
+            );
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg,
+                rgba(76, 175, 80, 0.2) 0%,
+                rgba(76, 175, 80, 0.3) 100%
+            );
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        button.delete {
+            background: linear-gradient(135deg,
+                rgba(244, 67, 54, 0.1) 0%,
+                rgba(244, 67, 54, 0.2) 100%
+            );
+            border: 1px solid rgba(244, 67, 54, 0.3);
+        }
+
+        button.delete:hover {
+            background: linear-gradient(135deg,
+                rgba(244, 67, 54, 0.2) 0%,
+                rgba(244, 67, 54, 0.3) 100%
+            );
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .search-container {
+            display: flex;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .search-container input {
+            flex: 1;
+        }
+
+        .filter-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-container select {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .message {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .message.success {
+            background-color: rgba(64, 192, 87, 0.2);
+            border: 1px solid var(--success-color);
+            color: var(--success-color);
+        }
+
+        .message.error {
+            background-color: rgba(244, 67, 54, 0.2);
+            border: 1px solid var(--error-color);
+            color: var(--error-color);
+        }
+
+        .message.info {
+            background-color: rgba(33, 150, 243, 0.2);
+            border: 1px solid var(--info-color);
+            color: var(--info-color);
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            background-color: rgba(45, 45, 45, 0.4);
+            margin-right: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background-color: rgba(76, 175, 80, 0.2);
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            margin: 0 5px;
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+
+        .warning-text {
+            color: var(--error-color);
+            font-size: 0.9rem;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                margin: 20px 10px;
+            }
+
+            .nav-panel a {
+                margin: 0 10px;
+                padding: 8px 15px;
+                font-size: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .section {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-panel">
+            <a href="index.html">Home</a>
+            <a href="config.html">Configuration</a>
+            <a href="items.html">Items</a>
+            <a href="personalities.html">Personalities</a>
+            <a href="scene_descriptions.html">Scene Descriptions</a>
+        </div>
+
+        <h1>MinAI Items Management</h1>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="items-list">Items List</div>
+            <div class="tab" data-tab="add-item">Add Item</div>
+            <div class="tab" data-tab="import-export">Import/Export</div>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <!-- Items List Tab -->
+        <div id="items-list" class="tab-content active">
+            <div class="section">
+                <h2>Items List</h2>
+                
+                <div class="search-container">
+                    <input type="text" id="search-input" placeholder="Search items...">
+                    <button id="search-button">Search</button>
+                    <button id="reset-button">Reset</button>
+                </div>
+                
+                <div class="filter-container">
+                    <select id="category-filter">
+                        <option value="">All Categories</option>
+                    </select>
+                    <select id="type-filter">
+                        <option value="">All Types</option>
+                    </select>
+                    <select id="availability-filter">
+                        <option value="">All Availability</option>
+                        <option value="true">Available</option>
+                        <option value="false">Not Available</option>
+                    </select>
+                    <select id="sort-by">
+                        <option value="name">Sort by Name</option>
+                        <option value="last_seen">Sort by Last Seen</option>
+                        <option value="category">Sort by Category</option>
+                        <option value="item_type">Sort by Type</option>
+                        <option value="created_at">Sort by Created</option>
+                    </select>
+                    <select id="sort-order">
+                        <option value="ASC">Ascending</option>
+                        <option value="DESC">Descending</option>
+                    </select>
+                </div>
+                
+                <div class="table-container">
+                    <table id="items-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Item ID</th>
+                                <th>File Name</th>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Type</th>
+                                <th>Category</th>
+                                <th>Mod Index</th>
+                                <th>Available</th>
+                                <th>Last Seen</th>
+                                <th>Created At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="items-table-body">
+                            <!-- Items will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="pagination">
+                    <button id="prev-page">Previous</button>
+                    <span id="page-info">Page 1 of 1</span>
+                    <button id="next-page">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Item Tab -->
+        <div id="add-item" class="tab-content">
+            <div class="section">
+                <h2>Add New Item</h2>
+                
+                <form id="add-item-form">
+                    <div class="form-group">
+                        <label for="item-id">Item ID (format: 0x??012345)</label>
+                        <input type="text" id="item-id" name="item_id" placeholder="0x00012345" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="file-name">File Name</label>
+                        <input type="text" id="file-name" name="file_name" placeholder="Skyrim.esm" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="item-name">Item Name</label>
+                        <input type="text" id="item-name" name="name" placeholder="Gold" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="item-description">Description</label>
+                        <textarea id="item-description" name="description" rows="4" placeholder="A description of the item"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="item-type">Item Type</label>
+                        <input type="text" id="item-type" name="item_type" placeholder="Item, Weapon, Armor, etc." value="Item">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="item-category">Category</label>
+                        <input type="text" id="item-category" name="category" placeholder="Weapons, Armor, Potions, etc.">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="mod-index">Mod Index</label>
+                        <input type="text" id="mod-index" name="mod_index" placeholder="Optional mod index">
+                    </div>
+                    
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="is-available" name="is_available" checked>
+                        <label for="is-available">Available for use</label>
+                    </div>
+                    
+                    <button type="submit">Add Item</button>
+                    <button type="reset">Reset Form</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Import/Export Tab -->
+        <div id="import-export" class="tab-content">
+            <div class="section">
+                <h2>Import Items</h2>
+                
+                <form id="import-form">
+                    <div class="form-group">
+                        <label for="import-file">Select JSON File</label>
+                        <input type="file" id="import-file" name="import_file" accept=".json">
+                    </div>
+                    
+                    <button type="submit">Import Items</button>
+                </form>
+            </div>
+            
+            <div class="section">
+                <h2>Export Items</h2>
+                
+                <div class="form-group">
+                    <label for="export-category">Export Category (optional)</label>
+                    <select id="export-category">
+                        <option value="">All Categories</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="export-type">Export Type (optional)</label>
+                    <select id="export-type">
+                        <option value="">All Types</option>
+                    </select>
+                </div>
+                
+                <button id="export-button">Export to JSON</button>
+            </div>
+            
+            <div class="section">
+                <h2>Database Management</h2>
+                
+                <button id="reset-db-button" class="delete">Reset Database</button>
+                <p class="warning-text">Warning: This will delete all items from the database. This action cannot be undone.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/items.js"></script>
+</body>
+</html> 

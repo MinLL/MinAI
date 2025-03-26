@@ -75,6 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         "restrict_nonfollower_functions" => $GLOBALS["restrict_nonfollower_functions"],
         "always_enable_functions" => $GLOBALS["always_enable_functions"],
         "force_aiff_name_to_ingame_name" => $GLOBALS["force_aiff_name_to_ingame_name"],
+        "enable_prompt_slop_cleanup" => $GLOBALS["enable_prompt_slop_cleanup"],
         
         // Arrays
         "commands_to_purge" => $GLOBALS["commands_to_purge"],
@@ -92,6 +93,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         // Server settings
         "input_delay_for_radiance" => intval($GLOBALS["input_delay_for_radiance"]),
         
+        // Inventory settings
+        "inventory_items_limit" => intval($GLOBALS["inventory_items_limit"]),
+        "use_item_relevancy_scoring" => $GLOBALS["use_item_relevancy_scoring"],
+        
         // Action prompts
         "action_prompts" => array(
             "singing" => $GLOBALS["action_prompts"]["singing"],
@@ -105,6 +110,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         
         // Add roleplay settings to GET response
         "roleplay_settings" => $GLOBALS["roleplay_settings"],
+        
+        // Add context builder settings
+        "minai_context" => $GLOBALS["minai_context"],
     );
 
     // Return the config data as JSON
@@ -153,6 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $newConfig .= "\$GLOBALS['restrict_nonfollower_functions'] = " . ($input['restrict_nonfollower_functions'] ? 'true' : 'false') . ";\n";
         $newConfig .= "\$GLOBALS['always_enable_functions'] = " . ($input['always_enable_functions'] ? 'true' : 'false') . ";\n";
         $newConfig .= "\$GLOBALS['force_aiff_name_to_ingame_name'] = " . ($input['force_aiff_name_to_ingame_name'] ? 'true' : 'false') . ";\n";
+        $newConfig .= "\$GLOBALS['enable_prompt_slop_cleanup'] = " . ($input['enable_prompt_slop_cleanup'] ? 'true' : 'false') . ";\n";
         
         // Arrays
         $newConfig .= "\$GLOBALS['commands_to_purge'] = " . buildArrayString($input['commands_to_purge']) . ";\n";
@@ -170,6 +179,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Server settings
         $newConfig .= "\$GLOBALS['input_delay_for_radiance'] = " . (intval($input['input_delay_for_radiance']) ?: 15) . ";\n";
         
+        // Inventory settings
+        $newConfig .= "\$GLOBALS['inventory_items_limit'] = " . (intval($input['inventory_items_limit']) ?: 5) . ";\n";
+        $newConfig .= "\$GLOBALS['use_item_relevancy_scoring'] = " . ($input['use_item_relevancy_scoring'] ? 'true' : 'false') . ";\n";
+        
         // Action prompts
         $newConfig .= "\$GLOBALS['action_prompts'] = " . buildAssociativeArrayString(array(
             'singing' => $input['action_prompts']['singing'],
@@ -183,6 +196,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Save roleplay settings
         $newConfig .= "\$GLOBALS['roleplay_settings'] = " . var_export($input['roleplay_settings'], true) . ";\n";
+        
+        // Save context builder settings
+        $newConfig .= "\$GLOBALS['minai_context'] = " . var_export($input['minai_context'], true) . ";\n";
 
         // Write configuration
         $configFile = "$pluginPath/config.php";
