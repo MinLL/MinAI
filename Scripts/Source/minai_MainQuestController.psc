@@ -41,7 +41,7 @@ EndEvent
 
 
 Int Function GetVersion()
-  return 122
+  return 200
 EndFunction
 
 
@@ -62,11 +62,13 @@ EndFunction
 Function Maintenance()
   playerRef = game.GetPlayer()
   config = Game.GetFormFromFile(0x0912, "MinAI.esp") as minai_Config
+  MinaiUtil = (Self as Quest) as minai_Util
   if !config
     Fatal("Could not load configuration - script version mismatch with esp")
   EndIf
   Info("Maintenance() - minai v" +GetVersion() + " initializing.")
   CheckForCriticalDependencies()
+  minAIFF = (Self as Quest) as minai_AIFF
   ; Set keybinds
   SetSapienceKey()
   SetNarratorKey()
@@ -91,7 +93,6 @@ Function Maintenance()
 
   minai_WhichAI = Game.GetFormFromFile(0x0907, "MinAI.esp") as GlobalVariable
   minMantella = (Self as Quest) as minai_Mantella
-  minAIFF = (Self as Quest) as minai_AIFF
   sex = (Self as Quest) as minai_Sex
   survival = (Self as Quest) as minai_Survival
   arousal = (Self as Quest) as minai_Arousal
@@ -102,7 +103,6 @@ Function Maintenance()
   combat = (Self as Quest) as minai_CombatManager
   sapience = Game.GetFormFromFile(0x091D, "MinAI.esp") as minai_SapienceController
   reputation = (Self as Quest) as minai_Reputation
-  MinaiUtil = (Self as Quest) as minai_Util
   MinaiUtil.Maintenance()
   dirtAndBlood = (Self as Quest) as minai_DirtAndBlood
   relationship = (Self as Quest) as minai_Relationship
