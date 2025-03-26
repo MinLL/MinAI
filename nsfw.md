@@ -47,6 +47,7 @@ MinAI includes 3467 ostim/sexlab scene descriptions (as of 10/24/2024) for bette
 
 ### Deviously Accessible
 * Has support for the Telvanni quest from Deviously Accessible - If doing the quest, the Narrator will be replaced with the telvanni mage's personality. He will be aware of how well you've been doing, and of the dreams you've been having recently.
+* The "Brillius Tiredius" questline from Deviously Accessible has been integrated. This questline features a lot of hypnosis / mind control content. This impacts the player's self roleplay, and self-thoughts.
 * Has WIP support for the Eldritch Horror quest from Deviously Accessible as another alternative narrator.
 
 ### Devious Followers
