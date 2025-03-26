@@ -179,16 +179,24 @@ class DeviceEventHandler {
 
 // Function to register device events
 function RegisterDeviceEvents($deviceType, $handler) {
-    if ($GLOBALS["gameRequest"][0] == "minai_equip_" . $deviceType) {
+    if ($GLOBALS["gameRequest"][0] == "minai_equip_" . $deviceType || $GLOBALS["gameRequest"][0] == "info_minai_equip_" . $deviceType) {
         $prompt = $handler->getEquipPrompt();
         $GLOBALS["PROMPTS"]["minai_equip_" . $deviceType] = [
             "cue" => [],
             "player_request" => [$prompt]
         ];
+        $GLOBALS["PROMPTS"]["info_minai_equip_" . $deviceType] = [
+            "cue" => [],
+            "player_request" => [$prompt]
+        ];
         OverrideGameRequestPrompt($prompt);
-    } elseif ($GLOBALS["gameRequest"][0] == "minai_unequip_" . $deviceType) {
+    } elseif ($GLOBALS["gameRequest"][0] == "minai_unequip_" . $deviceType || $GLOBALS["gameRequest"][0] == "info_minai_unequip_" . $deviceType) {
         $prompt = $handler->getUnequipPrompt();
         $GLOBALS["PROMPTS"]["minai_unequip_" . $deviceType] = [
+            "cue" => [],
+            "player_request" => [$prompt]
+        ];
+        $GLOBALS["PROMPTS"]["info_minai_unequip_" . $deviceType] = [
             "cue" => [],
             "player_request" => [$prompt]
         ];
