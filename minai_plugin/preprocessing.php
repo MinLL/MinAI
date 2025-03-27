@@ -11,6 +11,17 @@ else {
     // error_log("Processing Non-Fast request: " . $GLOBALS["gameRequest"][0]);
 }
 
+// Check for banned phrases in gameRequest[3]
+$banned_phrases = ["Thank you for watching"];
+if (isset($GLOBALS["gameRequest"][3])) {
+    $message = strtolower($GLOBALS["gameRequest"][3]);
+    foreach ($banned_phrases as $phrase) {
+        if (stripos($message, strtolower($phrase)) !== false) {
+            error_log("MinAI: Aborting request due to banned phrase: " . $phrase);
+            die("Banned phrase detected: " . $phrase);
+        }
+    }
+}
 
 // Avoid processing for fast / storage events
 if (isset($GLOBALS["minai_skip_processing"]) && $GLOBALS["minai_skip_processing"]) {
