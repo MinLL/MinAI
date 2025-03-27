@@ -22,6 +22,9 @@ elseif (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"] && $GLOBAL
         }
     } else {
         $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] = ExpandPromptVariables($GLOBALS["action_prompts"]["self_narrator_normal"]);
+        if (IsEnabled($GLOBALS["PLAYER_NAME"], "inCombat")) {
+            $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] .= " {$GLOBALS["PLAYER_NAME"]} is currently in combat. You MUST factor this into your response.";
+        }
         if ($mindPrompt) {
             $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] .= " " . $mindPrompt;
         }
