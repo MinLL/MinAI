@@ -35,6 +35,16 @@ function InitializeCoreContextBuilders() {
         'builder_callback' => 'BuildDynamicStateContext'
     ]);
     
+    // Register combat context builder
+    $registry->register('combat', [
+        'section' => 'interaction',
+        'header' => 'Combat Status',
+        'description' => 'Information about current combat situation',
+        'priority' => 15, // High priority in interaction section
+        'enabled' => isset($GLOBALS['minai_context']['combat']) ? (bool)$GLOBALS['minai_context']['combat'] : true,
+        'builder_callback' => 'BuildCombatContext'
+    ]);
+    
     // Register basic interaction context builder
     $registry->register('interaction', [
         'section' => 'interaction',
@@ -95,6 +105,56 @@ function BuildPersonalityContext($params) {
 }
 
 /**
+ * Build the combat context
+ * 
+ * @param array $params Parameters including herika_name, player_name, target
+ * @return string Formatted combat context
+ */
+function BuildCombatContext($params) {
+    $target = $params['target'];
+    $ret = "";
+    
+    // Add combat information if available
+    $inCombat = GetActorValue($target, "inCombat");
+    if ($inCombat === "true") {
+        $ret .= "{$target} is currently engaged in battle!\n";
+        
+        // Add combat allies if any
+        $allies = GetActorValue($target, "combatAllies");
+        if (!empty($allies)) {
+            $allies = explode('~', $allies);
+            // Remove target and narrator from allies list (case insensitive)
+            $allies = array_filter($allies, function($ally) use ($target) {
+                return strcasecmp(trim($ally), trim($target)) !== 0 && strcasecmp(trim($ally), "The Narrator") !== 0;
+            });
+
+            if (!empty($allies)) {
+                $ret .= "{$target} is fighting alongside: " . implode(', ', $allies) . "\n";
+            }
+            else {
+                $ret .= "{$target} is fighting alone!\n";
+            }
+        }
+        
+        // Add combat targets if any
+        $targets = GetActorValue($target, "combatTargets");
+        if (!empty($targets)) {
+            $targets = explode('~', $targets);
+            // Remove narrator from targets list (case insensitive)
+            $targets = array_filter($targets, function($t) {
+                return strcasecmp(trim($t), "The Narrator") !== 0;
+            });
+            
+            if (!empty($targets)) {
+                $ret .= "{$target} is fighting against: " . implode(', ', $targets) . "\n";
+            }
+        }
+    }
+    
+    return $ret;
+}
+
+/**
  * Build the basic interaction context
  * 
  * @param array $params Parameters including herika_name, player_name, target, is_self_narrator
@@ -117,6 +177,7 @@ function BuildInteractionContext($params) {
             $ret .= "{$target} is currently trespassing in this location.\n";
         }
     }
+
     if ($is_self_narrator) {
         $ret .= "You are {$player_name}'s inner voice, providing thoughts, perspective, and advice directly to them.";
     }
