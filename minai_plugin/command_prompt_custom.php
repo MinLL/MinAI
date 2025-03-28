@@ -46,3 +46,5 @@ if (isset($GLOBALS["enforce_single_json"]) && $GLOBALS["enforce_single_json"]) {
 if (isset($GLOBALS["enforce_short_responses"]) && $GLOBALS["enforce_short_responses"]) {
     $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"].=" You MUST respond with no more than 2-3 sentences and no more than 40 words.";
 }
+
+$GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] .= " Provide variety in your responses, avoid repeating the same phrases while still being consistent with the character and maintaining scene continuity.";
