@@ -260,7 +260,7 @@ if (IsPlayer(GetTargetActor())) {
         
     // Register take item action
     registerMinAIAction("ExtCmdTakeItem", "TakeItem")
-        ->withDescription("Used when {$targetName} needs to take or receive an item from {$playerName}. The target MUST be specified as 'ItemName:Count', representing the item and quantity. This action should be used for all scenarios where {$playerName} is the giver and {$targetName} is the receiver - including when {$playerName} offers something, during trade exchanges, when collecting quest items, or accepting payments. Available items that can be received: {$playerItemsStr}.")
+        ->withDescription("Used when {$targetName} needs to take or receive an item from {$playerName}. The target MUST be specified as 'ItemName:Count', representing the item and quantity. This action must be used for all scenarios where {$playerName} is the giver and {$targetName} is the receiver - including when {$playerName} offers something, indicates that they are giving you something, during trade exchanges, or accepting payments. Available items that can be received: {$playerItemsStr}.")
         ->withParameter("parameter", "string", "The item name and optionally the count in format 'ItemName:Count'. Use this for requesting payments, collecting quest items, or receiving goods. Examples: 'Gold:75' (collect payment), 'Iron Ore:10' (purchase resources), 'Health Potion' (request healing supply)", [], true)
         ->withReturnFunction($GLOBALS["GenericFuncRet"])
         ->register();
