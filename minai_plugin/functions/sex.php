@@ -40,19 +40,6 @@ function shouldEnableOStimAction() {
     return ShouldEnableSexFunctions($GLOBALS['HERIKA_NAME']) && IsSexActive() && IsModEnabled("Ostim");
 }
 
-// Function to check if the stop following action should be enabled
-function shouldEnableStopFollowing() {
-    return !IsFollower($GLOBALS['HERIKA_NAME']) && 
-           !IsRadiant() && 
-           IsFollowing($GLOBALS['HERIKA_NAME']);
-}
-
-// Function to check if the follow target action should be enabled
-function shouldEnableFollowTarget() {
-    return !IsFollower($GLOBALS['HERIKA_NAME']) && 
-           !IsRadiant() && 
-           !IsFollowing($GLOBALS['HERIKA_NAME']);
-}
 
 // Map actions to their appropriate enable conditions based on gender requirements
 $actionEnableConditions = [
@@ -159,22 +146,6 @@ foreach ($commonSexActions as $actionName => $actionInfo) {
     
     $action->register();
 }
-
-// Register "Stop Following" action using the action builder
-registerMinAIAction("ExtCmdStopFollowing", "StopFollowing")
-    ->withDescription("Cease following the target - use when you want to remain in current location")
-    ->withParameter("target", "string", "Target Actor", isset($GLOBALS["nearby"]) ? $GLOBALS["nearby"] : [])
-    ->withEnableCondition('shouldEnableStopFollowing')
-    ->withReturnFunction($GLOBALS["GenericFuncRet"])
-    ->register();
-
-// Register "Follow Target" action using the action builder
-registerMinAIAction("ExtCmdFollow", "FollowTarget")
-    ->withDescription("Start following the target to a new location - use when you want to accompany them")
-    ->withParameter("target", "string", "Target Actor", isset($GLOBALS["nearby"]) ? $GLOBALS["nearby"] : [])
-    ->withEnableCondition('shouldEnableFollowTarget')
-    ->withReturnFunction($GLOBALS["GenericFuncRet"])
-    ->register();
 
 // Register female-specific action: Fingering
 registerMinAIAction("ExtCmdStartFingering", "StartFingering")
