@@ -56,7 +56,7 @@ function GetEroticDeviceDescription($deviceType, $bodyArea, $category) {
         "hot pants" => "very short, tight hot pants that leave most of the legs bare",
         
         // Full outfits
-        "body harness" => "a decorative body harness with straps that wrap around the torso in patterns without providing actual coverage",
+        "body harness" => "a body harness with thin leather straps that sensually wrap around the curves of the torso, accentuating the wearer's feminine form while leaving most of their bare skin exposed",
         "bikini armor" => "bikini-style armor pieces that cover only the breasts and genital area",
         "revealing attire" => "revealing clothing intentionally designed with openings that expose significant portions of the body",
         "form-fitting outfit" => "an extremely form-fitting outfit that shows the exact shape of the body underneath",
