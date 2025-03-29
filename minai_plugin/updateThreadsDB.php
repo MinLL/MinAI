@@ -62,21 +62,8 @@ function updateThreadsDB() {
             case "startthread": 
             case "scenechange": {
                 $thread = $db->fetchAll("SELECT * from minai_threads WHERE thread_id = $threadId");
-                if(!isset($thread)) {
-                    minai_log("error", "Failed to fetch thread with ID: $threadId");
-                    return;
-                }
-
-                if (sizeof($thread) > 0) {
-                    $thread = $thread[0];
-                }
-
-                if(isset($thread) && strtolower($type) !== "startthread") {
-                    $currSceneId = $thread["curr_scene_id"];
-                    
-                    $db->update('minai_threads', "prev_scene_id = '$currSceneId', curr_scene_id = '$scene', fallback = '{$db->escape($fallback)}'", "thread_id = $threadId");
-                    minai_log("info", "Updated existing thread $threadId with new scene: $scene");
-                } else {
+                if(!$thread || sizeof($thread) === 0) {
+                    minai_log("info", "No existing thread found with ID: $threadId, creating new thread");
                     // Ensure victimActors is properly formatted for DB storage
                     $victimActors = !empty($victimActors) ? $victimActors : null;
                     
@@ -91,7 +78,13 @@ function updateThreadsDB() {
                     ];
                     
                     $db->upsertRowOnConflict('minai_threads', $insertData, 'thread_id');
-                    minai_log("info", "Inserted new thread with data: " . json_encode($insertData));
+                    minai_log("info", "Created new thread with data: " . json_encode($insertData));
+                } else {
+                    $thread = $thread[0];
+                    $currSceneId = isset($thread["curr_scene_id"]) ? $thread["curr_scene_id"] : null;
+                    
+                    $db->update('minai_threads', "prev_scene_id = " . ($currSceneId ? "'$currSceneId'" : "NULL") . ", curr_scene_id = '$scene', fallback = '{$db->escape($fallback)}'", "thread_id = $threadId");
+                    minai_log("info", "Updated existing thread $threadId with new scene: $scene");
                 }
                 $scene = getScene("", $threadId);
                 $sceneDesc = $scene["description"];
