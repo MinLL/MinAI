@@ -49,7 +49,7 @@ Function SetNarratorProfile() {
             global $TTS;
             global $STT;
             global $ITT;
-        global $FEATURES;
+            global $FEATURES;
             $path = GetNarratorConfigPath();
             $_GET["profile"] = md5("Narrator");
             require_once($path);
@@ -94,6 +94,8 @@ Function SetNarratorProfile() {
         // Always set these after restoring cache
         $_GET["profile"] = md5("Narrator");
     }
+    // Make sure the user doesn't change the narrator profile name
+    $GLOBALS["HERIKA_NAME"] = "The Narrator";
 }
 
 Function GetFallbackConfigPath() {
