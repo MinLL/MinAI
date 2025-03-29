@@ -86,7 +86,8 @@ function updateThreadsDB() {
                     $db->update('minai_threads', "prev_scene_id = " . ($currSceneId ? "'$currSceneId'" : "NULL") . ", curr_scene_id = '$scene', fallback = '{$db->escape($fallback)}'", "thread_id = $threadId");
                     minai_log("info", "Updated existing thread $threadId with new scene: $scene");
                 }
-                $sceneDesc = $thread["description"];
+                $scene = getScene("", $threadId);
+                $sceneDesc = $scene["description"];
         
                 addSexEventsToEventLog($sceneDesc, $threadId);
                 break;
