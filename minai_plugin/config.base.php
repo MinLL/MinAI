@@ -45,6 +45,7 @@ $GLOBALS['minai_context'] = array(
     'level' => true,
     'family_status' => true,
     'party_membership' => true,
+    'combat' => true,
     
     // Core context builders
     'personality' => true,

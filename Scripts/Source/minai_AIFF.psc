@@ -82,7 +82,7 @@ Function InitFollow()
 EndFunction
 
 Function Maintenance(minai_MainQuestController _main)
-  maxInventoryBatchSize = 120
+  maxInventoryBatchSize = 40
   inventoryMutex = False
   if (main.GetVersion() != main.CurrentVersion)
     Main.Info("CHIM - Maintenance: Version update detected. Resetting action registry.")
@@ -1007,6 +1007,17 @@ Function CleanupSapientActors()
   ; Cleanup actors that are not currently loaded
   string[] actorNames = JMap.allKeysPArray(sapientActors)
   actor[] nearbyActors = AIFindAllNearbyAgents()
+  ; Print all nearby agents for debugging
+  if nearbyActors.Length > 0
+    Main.Debug("SAPIENCE: Found " + nearbyActors.Length + " nearby agents:")
+    int j = 0
+    while j < nearbyActors.Length
+      Main.Debug("  - " + Main.GetActorName(nearbyActors[j]))
+      j += 1
+    endWhile
+  else
+    Main.Debug("SAPIENCE: No nearby agents found")
+  endIf
   int i = 0
   while i < actorNames.Length
     actor akActor = JMap.GetForm(sapientActors, actorNames[i]) as Actor
@@ -1016,8 +1027,11 @@ Function CleanupSapientActors()
     EndIf
     if followers.IsFollower(akActor)
       Main.Debug("SAPIENCE: Actor " + actorNames[i] + " is a follower. Skipping cleanup.")
-    elseif !akActor.Is3DLoaded() || !nearbyActors.Find(akActor)
-      Main.Debug("SAPIENCE: Actor " + actorNames[i] + " is no longer active.")
+    elseif !akActor.Is3DLoaded()
+      Main.Debug("SAPIENCE: Actor " + actorNames[i] + " is no longer 3d loaded.")
+      RemoveActorAI(actorNames[i])
+    elseif nearbyActors.Find(akActor) < 0
+      Main.Debug("SAPIENCE: Actor " + actorNames[i] + " is no longer nearby.")
       RemoveActorAI(actorNames[i])
     else
       Main.Debug("SAPIENCE: Actor " + actorNames[i] + " is still active.")
@@ -1045,7 +1059,7 @@ Function RemoveActorAI(string targetName)
   ; If actor had dialogue within last 60 seconds, don't remove
   ; They will get cleaned up later on location change by cleanup
   if (lastDialogueTime > 0 && (currentTime - lastDialogueTime) < 60.0 && minai_DynamicSapienceToggleStealth.GetValueInt() == 1)
-    Main.Debug("SAPIENCE: Not removing " + targetName + " - recent dialogue activity")
+    Main.Debug("SAPIENCE: Not removing " + targetName + " - dialogue activity " + (currentTime - lastDialogueTime) + " seconds ago")
     return
   EndIf
 

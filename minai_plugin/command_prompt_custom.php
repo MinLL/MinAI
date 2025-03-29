@@ -22,6 +22,9 @@ elseif (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"] && $GLOBAL
         }
     } else {
         $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] = ExpandPromptVariables($GLOBALS["action_prompts"]["self_narrator_normal"]);
+        if (IsEnabled($GLOBALS["PLAYER_NAME"], "inCombat")) {
+            $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] .= " {$GLOBALS["PLAYER_NAME"]} is currently in combat. You MUST factor this into your response.";
+        }
         if ($mindPrompt) {
             $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] .= " " . $mindPrompt;
         }
@@ -43,3 +46,5 @@ if (isset($GLOBALS["enforce_single_json"]) && $GLOBALS["enforce_single_json"]) {
 if (isset($GLOBALS["enforce_short_responses"]) && $GLOBALS["enforce_short_responses"]) {
     $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"].=" You MUST respond with no more than 2-3 sentences and no more than 40 words.";
 }
+
+$GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] .= " Provide variety in your responses, avoid repeating the same phrases while still being consistent with the character and maintaining scene continuity.";

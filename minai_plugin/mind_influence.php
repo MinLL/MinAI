@@ -155,7 +155,8 @@ function GetMindInfluenceContext($state) {
     // Add contexts for simple states
     $simpleContexts = [
         "drunk" => "Your mind is currently affected by alcohol. Your thoughts are fuzzy and your inhibitions are lowered.\n",
-        "high" => "Your mind is currently affected by skooma. Everything feels intense and dreamlike, and your thoughts are scattered.\n"
+        "high" => "Your mind is currently affected by skooma. Everything feels intense and dreamlike, and your thoughts are scattered.\n",
+        "normal" => "",
     ];
 
     // Return simple contexts if in a simple state
