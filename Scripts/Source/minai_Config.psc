@@ -81,6 +81,17 @@ int Property roleplayTextKey = -1 Auto      ; Property for roleplay text key
 int Property dungeonMasterKey = -1 Auto     ; Property for dungeon master voice key
 int Property dungeonMasterTextKey = -1 Auto ; Property for dungeon master text key
 
+; Default values for keys
+int toggleSapienceKeyDefault = -1
+int singKeyDefault = -1
+int narratorKeyDefault = -1
+int narratorTextKeyDefault = -1
+int diaryKeyDefault = -1
+int roleplayKeyDefault = -1
+int roleplayTextKeyDefault = -1
+int dungeonMasterKeyDefault = -1
+int dungeonMasterTextKeyDefault = -1
+
 ; Legacy globals
 GlobalVariable useCBPC
 GlobalVariable minai_UseOstim
@@ -1050,6 +1061,51 @@ Event OnOptionDefault(int oid)
       aiff.DisablePreserveQueue()
     EndIf
     SetToggleOptionValue(oid, preserveQueueDefault)
+  elseif oid == toggleSapienceOID
+    UnregisterForKey(toggleSapienceKey)
+    toggleSapienceKey = toggleSapienceKeyDefault
+    SetKeymapOptionValue(oid, toggleSapienceKey)
+    main.SetSapienceKey()
+  elseif oid == singKeyOID
+    UnregisterForKey(singKey)
+    singKey = singKeyDefault
+    SetKeymapOptionValue(oid, singKey)
+    main.SetSingKey()
+  elseif oid == narratorKeyOID
+    UnregisterForKey(narratorKey)
+    narratorKey = narratorKeyDefault
+    SetKeymapOptionValue(oid, narratorKey)
+    main.SetNarratorKey()
+  elseif oid == narratorTextKeyOID
+    UnregisterForKey(narratorTextKey)
+    narratorTextKey = narratorTextKeyDefault
+    SetKeymapOptionValue(oid, narratorTextKey)
+    main.SetNarratorTextKey()
+  elseif oid == roleplayKeyOID
+    UnregisterForKey(roleplayKey)
+    roleplayKey = roleplayKeyDefault
+    SetKeymapOptionValue(oid, roleplayKey)
+    main.SetRoleplayKey()
+  elseif oid == roleplayTextKeyOID
+    UnregisterForKey(roleplayTextKey)
+    roleplayTextKey = roleplayTextKeyDefault
+    SetKeymapOptionValue(oid, roleplayTextKey)
+    main.SetRoleplayTextKey()
+  elseif oid == diaryKeyOID
+    UnregisterForKey(diaryKey)
+    diaryKey = diaryKeyDefault
+    SetKeymapOptionValue(oid, diaryKey)
+    main.SetDiaryKey()
+  elseif oid == dungeonMasterKeyOID
+    UnregisterForKey(dungeonMasterKey)
+    dungeonMasterKey = dungeonMasterKeyDefault
+    SetKeymapOptionValue(oid, dungeonMasterKey)
+    main.SetDungeonMasterKey()
+  elseif oid == dungeonMasterTextKeyOID
+    UnregisterForKey(dungeonMasterTextKey)
+    dungeonMasterTextKey = dungeonMasterTextKeyDefault
+    SetKeymapOptionValue(oid, dungeonMasterTextKey)
+    main.SetDungeonMasterTextKey()	
   elseif oid == trackVictimAwarenessOID
     trackVictimAwareness = trackVictimAwarenessDefault
     SetToggleOptionValue(oid, trackVictimAwareness)
@@ -1633,7 +1689,7 @@ EndEvent
 event OnOptionKeyMapChange(int a_option, int a_keyCode, string a_conflictControl, string a_conflictName)
     {Called when a key has been remapped}
     bool continue = true
-    if (a_conflictControl != "")
+    if (a_conflictControl != "" && a_keyCode != 1)
         string msg
         if (a_conflictName != "")
             msg = "This key is already mapped to:\n'" + a_conflictControl + "'\n(" + a_conflictName + ")\n\nAre you sure you want to continue?"
@@ -1643,43 +1699,93 @@ event OnOptionKeyMapChange(int a_option, int a_keyCode, string a_conflictControl
         continue = ShowMessage(msg, true, "$Yes", "$No")
     endIf
 
+    ; clear if escape key
+    if (a_keyCode == 1)
+        a_keyCode = -1
+    endIf
+
     if (continue)
         if (a_option == toggleSapienceOID)
+            UnregisterForKey(toggleSapienceKey)
             toggleSapienceKey = a_keyCode
-            SetKeymapOptionValue(a_option, a_keyCode)
             main.SetSapienceKey(true)
+            if (a_keyCode == -1)
+                ForcePageReset()
+            else
+                SetKeymapOptionValue(a_option, a_keyCode)
+            endif
         elseif (a_option == singKeyOID)
+            UnregisterForKey(singKey)
             singKey = a_keyCode
-            SetKeymapOptionValue(a_option, a_keyCode)
             main.SetSingKey(true)
+            if (a_keyCode == -1)
+                ForcePageReset()
+            else
+                SetKeymapOptionValue(a_option, a_keyCode)
+            endif
         elseif (a_option == narratorKeyOID)
+            UnregisterForKey(narratorKey)
             narratorKey = a_keyCode 
-            SetKeymapOptionValue(a_option, a_keyCode)
             main.SetNarratorKey(true)
+            if (a_keyCode == -1)
+                ForcePageReset()
+            else
+                SetKeymapOptionValue(a_option, a_keyCode)
+            endif
         elseif (a_option == narratorTextKeyOID)
+            UnregisterForKey(narratorTextKey)
             narratorTextKey = a_keyCode
-            SetKeymapOptionValue(a_option, a_keyCode)
             main.SetNarratorTextKey(true)
+            if (a_keyCode == -1)
+                ForcePageReset()
+            else
+                SetKeymapOptionValue(a_option, a_keyCode)
+            endif
         elseif (a_option == roleplayKeyOID)
+            UnregisterForKey(roleplayKey)
             roleplayKey = a_keyCode
-            SetKeymapOptionValue(a_option, a_keyCode)
             main.SetRoleplayKey(true)
+            if (a_keyCode == -1)
+                ForcePageReset()
+            else
+                SetKeymapOptionValue(a_option, a_keyCode)
+            endif
         elseif (a_option == roleplayTextKeyOID)
+            UnregisterForKey(roleplayTextKey)
             roleplayTextKey = a_keyCode
-            SetKeymapOptionValue(a_option, a_keyCode)
             main.SetRoleplayTextKey(true)
+            if (a_keyCode == -1)
+                ForcePageReset()
+            else
+                SetKeymapOptionValue(a_option, a_keyCode)
+            endif
         elseif (a_option == diaryKeyOID)
+            UnregisterForKey(diaryKey)
             diaryKey = a_keyCode
-            SetKeymapOptionValue(a_option, a_keyCode)
             main.SetDiaryKey(true)
+            if (a_keyCode == -1)
+                ForcePageReset()
+            else
+                SetKeymapOptionValue(a_option, a_keyCode)
+            endif
         elseif (a_option == dungeonMasterKeyOID)
+            UnregisterForKey(dungeonMasterKey)
             dungeonMasterKey = a_keyCode
-            SetKeymapOptionValue(a_option, a_keyCode)
             main.SetDungeonMasterKey(true)
+            if (a_keyCode == -1)
+                ForcePageReset()
+            else
+                SetKeymapOptionValue(a_option, a_keyCode)
+            endif
         elseif (a_option == dungeonMasterTextKeyOID)
+            UnregisterForKey(dungeonMasterTextKey)
             dungeonMasterTextKey = a_keyCode
-            SetKeymapOptionValue(a_option, a_keyCode)
             main.SetDungeonMasterTextKey(true)
+            if (a_keyCode == -1)
+                ForcePageReset()
+            else
+                SetKeymapOptionValue(a_option, a_keyCode)
+            endif
         endIf
     endIf
 EndEvent
