@@ -82,7 +82,7 @@ Function InitFollow()
 EndFunction
 
 Function Maintenance(minai_MainQuestController _main)
-  maxInventoryBatchSize = 120
+  maxInventoryBatchSize = 40
   inventoryMutex = False
   if (main.GetVersion() != main.CurrentVersion)
     Main.Info("CHIM - Maintenance: Version update detected. Resetting action registry.")
