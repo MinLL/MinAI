@@ -93,7 +93,7 @@ Function SetNarratorProfile() {
         
         // Always set these after restoring cache
         // Make sure the user doesn't change the narrator profile name
-        $GLOBALS["HERIKA_NAME"] = "The Narrator";
+        // $GLOBALS["HERIKA_NAME"] = "The Narrator";
         $_GET["profile"] = md5("Narrator");
     }
 }
