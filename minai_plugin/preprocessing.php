@@ -12,7 +12,7 @@ else {
 }
 
 // Check for banned phrases in gameRequest[3]
-$banned_phrases = ["Thank you for watching"];
+$banned_phrases = ["Thank you for watching", "Thanks for watching"];
 if (isset($GLOBALS["gameRequest"][3])) {
     $message = strtolower($GLOBALS["gameRequest"][3]);
     foreach ($banned_phrases as $phrase) {

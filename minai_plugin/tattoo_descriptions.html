@@ -845,7 +845,7 @@
                         <td>${escapeHtml(tattoo.section)}</td>
                         <td>${escapeHtml(tattoo.name)}</td>
                         <td>${escapeHtml(tattoo.description || '')}</td>
-                        <td>${escapeHtml(tattoo.hidden_by || '')}</td>
+                        <td>${escapeHtml(tattoo.hidden_by.replaceAll(',', ', ') || '')}</td>
                         <td class="action-buttons">
                             <button class="edit-button" data-section="${escapeHtml(tattoo.section)}" data-name="${escapeHtml(tattoo.name)}">Edit</button>
                             <button class="delete-button" data-section="${escapeHtml(tattoo.section)}" data-name="${escapeHtml(tattoo.name)}">Delete</button>
@@ -924,7 +924,7 @@
                         <td>${escapeHtml(tattoo.section)}</td>
                         <td>${escapeHtml(tattoo.name)}</td>
                         <td>${escapeHtml(tattoo.description || '')}</td>
-                        <td>${escapeHtml(tattoo.hidden_by || '')}</td>
+                        <td>${escapeHtml(tattoo.hidden_by.replaceAll(',', ', ') || '')}</td>
                         <td title="${escapeHtml(actorsList)}">${actorCount} actor${actorCount !== 1 ? 's' : ''}</td>
                         <td class="action-buttons">
                             <button class="edit-button" data-section="${escapeHtml(tattoo.section)}" data-name="${escapeHtml(tattoo.name)}">Edit</button>

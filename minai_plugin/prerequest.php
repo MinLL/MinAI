@@ -290,6 +290,20 @@ if (IsEnabled($GLOBALS["PLAYER_NAME"], "isDungeonMaster")) {
 // Incompatible with new context system
 $GLOBALS["ADD_PLAYER_BIOS"]  = false;
 
+// If the name matches the player's name, they are talking to the narrator
+// This will cause problems if the player's name is the same as the npc's name, though.
+// CHIM itself is sending the player's name as herika name sometimes. Need to debug / fix that.
+// This is a temporary fix / workaround.
+if (strtolower($GLOBALS["HERIKA_NAME"]) == strtolower($GLOBALS["PLAYER_NAME"])) {
+    $GLOBALS["HERIKA_NAME"] = "The Narrator";
+}
+
+// If the name is "player", set name to "The Narrator"
+if (strtolower($GLOBALS["HERIKA_NAME"]) == "player") {
+    $GLOBALS["HERIKA_NAME"] = "The Narrator";
+    SetNarratorProfile();
+}
+
 
 // Entries will be removed from the context history while cleanining up slop. 
 // To avoid having too few, we will overfetch the context history and later reduce it.

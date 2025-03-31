@@ -9,6 +9,7 @@ $GLOBALS["PROMPTS"]["minai_fillherup_spermout_start"] = [
         "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s body tenses as they start expelling the cum inside them."
     ]
 ];
+$GLOBALS["PROMPTS"]["info_minai_fillherup_spermout_start"] = $GLOBALS["PROMPTS"]["minai_fillherup_spermout_start"];
 
 $GLOBALS["PROMPTS"]["minai_fillherup_spermout_loop"] = [
     "player_request"=>[
@@ -17,6 +18,8 @@ $GLOBALS["PROMPTS"]["minai_fillherup_spermout_loop"] = [
         "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s body continues to expel the cum inside them."
     ]
 ];
+$GLOBALS["PROMPTS"]["info_minai_fillherup_spermout_loop"] = $GLOBALS["PROMPTS"]["minai_fillherup_spermout_loop"];
+
 
 $GLOBALS["PROMPTS"]["minai_fillherup_spermout_end"] = [
     "player_request"=>[
@@ -25,6 +28,8 @@ $GLOBALS["PROMPTS"]["minai_fillherup_spermout_end"] = [
         "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s body relaxes as they finish expelling the cum."
     ]
 ];
+$GLOBALS["PROMPTS"]["info_minai_fillherup_spermout_end"] = $GLOBALS["PROMPTS"]["minai_fillherup_spermout_end"];
+
 
 $GLOBALS["PROMPTS"]["minai_fillherup_spermanal_start"] = [
     "player_request"=>[
@@ -33,6 +38,8 @@ $GLOBALS["PROMPTS"]["minai_fillherup_spermanal_start"] = [
         "The Narrator: #SEX_INFO {$GLOBALS["target"]} starts pushing out the cum filling their rear."
     ]
 ];
+$GLOBALS["PROMPTS"]["info_minai_fillherup_spermanal_start"] = $GLOBALS["PROMPTS"]["minai_fillherup_spermanal_start"];
+
 
 $GLOBALS["PROMPTS"]["minai_fillherup_spermanal_loop"] = [
     "player_request"=>[
@@ -41,6 +48,7 @@ $GLOBALS["PROMPTS"]["minai_fillherup_spermanal_loop"] = [
         "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s body keeps pushing out the cum filling their rear."
     ]
 ];
+$GLOBALS["PROMPTS"]["info_minai_fillherup_spermanal_loop"] = $GLOBALS["PROMPTS"]["minai_fillherup_spermanal_loop"];
 
 $GLOBALS["PROMPTS"]["minai_fillherup_spermanal_end"] = [
     "player_request"=>[
@@ -49,6 +57,7 @@ $GLOBALS["PROMPTS"]["minai_fillherup_spermanal_end"] = [
         "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s body relaxes as they finish pushing out the cum."
     ]
 ];
+$GLOBALS["PROMPTS"]["info_minai_fillherup_spermanal_end"] = $GLOBALS["PROMPTS"]["minai_fillherup_spermanal_end"];
 
 $GLOBALS["PROMPTS"]["minai_fillherup_spermoral_start"] = [
     "player_request"=>[
@@ -57,6 +66,7 @@ $GLOBALS["PROMPTS"]["minai_fillherup_spermoral_start"] = [
         "The Narrator: #SEX_INFO Cum begins to leak from {$GLOBALS["target"]}'s mouth."
     ]
 ];
+$GLOBALS["PROMPTS"]["info_minai_fillherup_spermoral_start"] = $GLOBALS["PROMPTS"]["minai_fillherup_spermoral_start"];
 
 $GLOBALS["PROMPTS"]["minai_fillherup_spermoral_loop"] = [
     "player_request"=>[
@@ -65,6 +75,8 @@ $GLOBALS["PROMPTS"]["minai_fillherup_spermoral_loop"] = [
         "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s throat continues expelling cum."
     ]
 ];
+$GLOBALS["PROMPTS"]["info_minai_fillherup_spermoral_loop"] = $GLOBALS["PROMPTS"]["minai_fillherup_spermoral_loop"];
+
 
 $GLOBALS["PROMPTS"]["minai_fillherup_spermoral_end"] = [
     "player_request"=>[
@@ -73,6 +85,7 @@ $GLOBALS["PROMPTS"]["minai_fillherup_spermoral_end"] = [
         "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s throat finally stops leaking cum."
     ]
 ];
+$GLOBALS["PROMPTS"]["info_minai_fillherup_spermoral_end"] = $GLOBALS["PROMPTS"]["minai_fillherup_spermoral_end"];
 
 $GLOBALS["PROMPTS"]["minai_fillherup_sperm_expel"] = [
     "player_request"=>[
@@ -81,6 +94,7 @@ $GLOBALS["PROMPTS"]["minai_fillherup_sperm_expel"] = [
         "The Narrator: #SEX_INFO With determined effort, {$GLOBALS["target"]} expels the cum from their body."
     ]
 ];
+$GLOBALS["PROMPTS"]["info_minai_fillherup_sperm_expel"] = $GLOBALS["PROMPTS"]["minai_fillherup_sperm_expel"];
 
 $GLOBALS["PROMPTS"]["minai_fillherup_sperm_expel_panting"] = [
     "player_request"=>[
@@ -89,6 +103,7 @@ $GLOBALS["PROMPTS"]["minai_fillherup_sperm_expel_panting"] = [
         "The Narrator: #SEX_INFO Panting with effort, {$GLOBALS["target"]} works to expel the cum filling them."
     ]
 ];
+$GLOBALS["PROMPTS"]["info_minai_fillherup_sperm_expel_panting"] = $GLOBALS["PROMPTS"]["minai_fillherup_sperm_expel_panting"];
 
 $GLOBALS["PROMPTS"]["minai_fillherup_sperm_expel_refuse"] = [
     "player_request"=>[
@@ -97,6 +112,7 @@ $GLOBALS["PROMPTS"]["minai_fillherup_sperm_expel_refuse"] = [
         "The Narrator: #SEX_INFO Despite their efforts, {$GLOBALS["target"]}'s body won't release the cum inside."
     ]
 ];
+$GLOBALS["PROMPTS"]["info_minai_fillherup_sperm_expel_refuse"] = $GLOBALS["PROMPTS"]["minai_fillherup_sperm_expel_refuse"];
 
 $GLOBALS["PROMPTS"]["minai_fillherup_sperm_expel_fail"] = [
     "player_request"=>[
@@ -105,6 +121,7 @@ $GLOBALS["PROMPTS"]["minai_fillherup_sperm_expel_fail"] = [
         "The Narrator: #SEX_INFO {$GLOBALS["target"]} struggles but can't expel the cum from their rear."
     ]
 ];
+$GLOBALS["PROMPTS"]["info_minai_fillherup_sperm_expel_fail"] = $GLOBALS["PROMPTS"]["minai_fillherup_sperm_expel_fail"];
 
 $GLOBALS["PROMPTS"]["minai_fillherup_stomach_rubbing"] = [
     "player_request"=>[
@@ -113,6 +130,7 @@ $GLOBALS["PROMPTS"]["minai_fillherup_stomach_rubbing"] = [
         "The Narrator: #SEX_INFO {$GLOBALS["target"]} tenderly caresses their belly, distended with cum."
     ]
 ];
+$GLOBALS["PROMPTS"]["info_minai_fillherup_stomach_rubbing"] = $GLOBALS["PROMPTS"]["minai_fillherup_stomach_rubbing"];
 
 // Fill Her Up inflation/absorption prompts
 $GLOBALS["PROMPTS"]["minai_fillherup_inflate_vaginal"] = [
@@ -122,6 +140,7 @@ $GLOBALS["PROMPTS"]["minai_fillherup_inflate_vaginal"] = [
         "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s abdomen starts to stretch as cum floods into their womb."
     ]
 ];
+$GLOBALS["PROMPTS"]["info_minai_fillherup_inflate_vaginal"] = $GLOBALS["PROMPTS"]["minai_fillherup_inflate_vaginal"];
 
 $GLOBALS["PROMPTS"]["minai_fillherup_inflate_anal"] = [
     "player_request"=>[
@@ -130,6 +149,7 @@ $GLOBALS["PROMPTS"]["minai_fillherup_inflate_anal"] = [
         "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s abdomen begins to bulge as cum pumps into their rear."
     ]
 ];
+$GLOBALS["PROMPTS"]["info_minai_fillherup_inflate_anal"] = $GLOBALS["PROMPTS"]["minai_fillherup_inflate_anal"];
 
 $GLOBALS["PROMPTS"]["minai_fillherup_inflate_oral"] = [
     "player_request"=>[
@@ -138,6 +158,7 @@ $GLOBALS["PROMPTS"]["minai_fillherup_inflate_oral"] = [
         "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s abdomen stretches as cum floods their stomach."
     ]
 ];
+$GLOBALS["PROMPTS"]["info_minai_fillherup_inflate_oral"] = $GLOBALS["PROMPTS"]["minai_fillherup_inflate_oral"];
 
 $GLOBALS["PROMPTS"]["minai_fillherup_absorb_vaginal"] = [
     "player_request"=>[
@@ -146,6 +167,7 @@ $GLOBALS["PROMPTS"]["minai_fillherup_absorb_vaginal"] = [
         "The Narrator: #SEX_INFO The cum filling {$GLOBALS["target"]}'s womb is gradually absorbed into their body."
     ]
 ];
+$GLOBALS["PROMPTS"]["info_minai_fillherup_absorb_vaginal"] = $GLOBALS["PROMPTS"]["minai_fillherup_absorb_vaginal"];
 
 $GLOBALS["PROMPTS"]["minai_fillherup_absorb_anal"] = [
     "player_request"=>[
@@ -154,6 +176,7 @@ $GLOBALS["PROMPTS"]["minai_fillherup_absorb_anal"] = [
         "The Narrator: #SEX_INFO The cum filling {$GLOBALS["target"]}'s gut is slowly absorbed into their system."
     ]
 ];
+$GLOBALS["PROMPTS"]["info_minai_fillherup_absorb_anal"] = $GLOBALS["PROMPTS"]["minai_fillherup_absorb_anal"];
 
 $GLOBALS["PROMPTS"]["minai_fillherup_absorb_oral"] = [
     "player_request"=>[
@@ -162,6 +185,7 @@ $GLOBALS["PROMPTS"]["minai_fillherup_absorb_oral"] = [
         "The Narrator: #SEX_INFO The cum in {$GLOBALS["target"]}'s stomach is gradually absorbed into their system."
     ]
 ];
+$GLOBALS["PROMPTS"]["info_minai_fillherup_absorb_oral"] = $GLOBALS["PROMPTS"]["minai_fillherup_absorb_oral"];
 
 // Fill Her Up deflation prompts
 $GLOBALS["PROMPTS"]["minai_fillherup_deflate_vaginal"] = [
@@ -171,6 +195,7 @@ $GLOBALS["PROMPTS"]["minai_fillherup_deflate_vaginal"] = [
         "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s swollen belly shrinks as their womb empties."
     ]
 ];
+$GLOBALS["PROMPTS"]["info_minai_fillherup_deflate_vaginal"] = $GLOBALS["PROMPTS"]["minai_fillherup_deflate_vaginal"];
 
 $GLOBALS["PROMPTS"]["minai_fillherup_deflate_anal"] = [
     "player_request"=>[
@@ -179,6 +204,7 @@ $GLOBALS["PROMPTS"]["minai_fillherup_deflate_anal"] = [
         "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s distended gut returns to normal as it empties."
     ]
 ];
+$GLOBALS["PROMPTS"]["info_minai_fillherup_deflate_anal"] = $GLOBALS["PROMPTS"]["minai_fillherup_deflate_anal"];
 
 $GLOBALS["PROMPTS"]["minai_fillherup_deflate_oral"] = [
     "player_request"=>[
@@ -187,3 +213,4 @@ $GLOBALS["PROMPTS"]["minai_fillherup_deflate_oral"] = [
         "The Narrator: #SEX_INFO {$GLOBALS["target"]}'s swollen belly returns to normal as their stomach empties."
     ]
 ];
+$GLOBALS["PROMPTS"]["info_minai_fillherup_deflate_oral"] = $GLOBALS["PROMPTS"]["minai_fillherup_deflate_oral"];

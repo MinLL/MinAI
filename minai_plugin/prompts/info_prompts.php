@@ -22,11 +22,31 @@ if (isset($GLOBALS["minai_skip_processing"]) && $GLOBALS["minai_skip_processing"
 // Get all PHP files in current directory
 $files = glob(dirname(__FILE__) . "/info_*.php");
 
-// Import all info_*.php files except this one
-foreach ($files as $file) {
-    $basename = basename($file);
-    if ($basename !== "info_prompts.php") {
-        require_once($file);
+if ($GLOBALS["gameRequest"][0] && (strpos($GLOBALS["gameRequest"][0], "info_") === 0 || strpos($GLOBALS["gameRequest"][0], "minai_") === 0)) {
+    // Import all info_*.php files except this one
+    foreach ($files as $file) {
+        $basename = basename($file);
+        if ($basename !== "info_prompts.php") {
+            require_once($file);
+        }
+    }
+    /**
+     * Overrides the game request prompt with a randomly selected prompt from the appropriate event
+     */
+    if (isset($GLOBALS["gameRequest"])) {
+        $eventName = $GLOBALS["gameRequest"][0];
+        
+        // Check if we have prompts for this event
+        if (isset($GLOBALS["PROMPTS"][$eventName]) && isset($GLOBALS["PROMPTS"][$eventName]["player_request"])) {
+            $prompts = $GLOBALS["PROMPTS"][$eventName]["player_request"];
+            
+            // Select a random prompt
+            $randomPrompt = $prompts[array_rand($prompts)];
+            
+            // Override the game request prompt
+            OverrideGameRequestPrompt($randomPrompt);
+            
+        }
     }
 }
 
