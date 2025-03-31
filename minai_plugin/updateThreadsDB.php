@@ -87,7 +87,14 @@ function updateThreadsDB() {
                     minai_log("info", "Updated existing thread $threadId with new scene: $scene");
                 }
                 $scene = getScene("", $threadId);
-                $sceneDesc = $scene["description"];
+                if ($scene === null) {
+                    minai_log("error", "Failed to get scene for thread $threadId");
+                    return;
+                }
+                $sceneDesc = getSceneDesc($scene);
+                if (empty($sceneDesc)) {
+                    minai_log("warning", "No description found for scene in thread $threadId");
+                }
         
                 addSexEventsToEventLog($sceneDesc, $threadId);
                 break;
@@ -107,4 +114,3 @@ function updateThreadsDB() {
         minai_log("error", "Error in updateThreadsDB: " . $e->getMessage());
     }
 };
-    
