@@ -194,6 +194,6 @@ if (isset($GLOBALS["minai_processing_input"]) && $GLOBALS["minai_processing_inpu
 }
 
 require_once("prompts/info_tntr_prompts.php");
-require_once("prompts/fillherup_prompts.php");
-require_once("prompts/vibrator_prompts.php");
+require_once("prompts/info_fillherup_prompts.php");
+require_once("prompts/info_vibrator_prompts.php");
 require_once("prompts/info_narrate.php");
