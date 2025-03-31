@@ -133,7 +133,7 @@ Event OnSleepStart(float afSleepStartTime, float afDesiredSleepEndTime)
     followers.UpdateFollowerDiaries()
   EndIf
   if config.updateNarratorProfile && bHasAIFF
-    aiff.UpdateProfile("The Narrator")
+    aiff.UpdateProfile("PLAYER")
   EndIf
   EnableInventoryTracking()
 EndEvent

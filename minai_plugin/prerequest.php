@@ -298,6 +298,12 @@ if (strtolower($GLOBALS["HERIKA_NAME"]) == strtolower($GLOBALS["PLAYER_NAME"])) 
     $GLOBALS["HERIKA_NAME"] = "The Narrator";
 }
 
+// If the name is "player", set name to "The Narrator"
+if (strtolower($GLOBALS["HERIKA_NAME"]) == "player") {
+    $GLOBALS["HERIKA_NAME"] = "The Narrator";
+    SetNarratorProfile();
+}
+
 
 // Entries will be removed from the context history while cleanining up slop. 
 // To avoid having too few, we will overfetch the context history and later reduce it.

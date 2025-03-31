@@ -97,7 +97,7 @@ Function UpdateFollowerDiaries()
   EndWhile
   if !didNarrator && config.UpdateNarratorDiary
     Main.Debug("Updating diary for The Narrator")
-    aiff.UpdateDiary("The Narrator")
+    aiff.UpdateDiary("PLAYER")
   EndIf
 EndFunction
 
