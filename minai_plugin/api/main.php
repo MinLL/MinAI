@@ -9,6 +9,11 @@ $path = "..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARAT
 require_once($path . "conf".DIRECTORY_SEPARATOR."conf.php");
 require_once($path. "lib" .DIRECTORY_SEPARATOR."{$GLOBALS["DBDRIVER"]}.class.php");
 $GLOBALS["db"] = new sql();
+// Fix missing config.php warning
+$pluginPath = "/var/www/html/HerikaServer/ext/minai_plugin";
+if (!file_exists("$pluginPath/config.php")) {
+    copy("$pluginPath/config.base.php", "$pluginPath/config.php");
+}
 require_once("..".DIRECTORY_SEPARATOR."config.php");
 require_once("..".DIRECTORY_SEPARATOR."importDataToDB.php");
 require_once("..".DIRECTORY_SEPARATOR."util.php");
