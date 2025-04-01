@@ -70,6 +70,7 @@ $GLOBALS['minai_context'] = array(
     'relative_power' => true,
     'devious_follower' => true,
     'submissive_lola' => true,
+    'devious_narrator' => true,
     
     // NSFW context builders
     'nsfw_reputation' => true,
