@@ -53,3 +53,4 @@ $GLOBALS["external_fast_commands"] = [
     // "minai_clearinventory"    // Clear inventory
 ];
 
+$GLOBALS["CHIM_NO_EXAMPLES"] = true;
