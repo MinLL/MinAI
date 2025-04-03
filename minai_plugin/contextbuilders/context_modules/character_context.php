@@ -218,6 +218,16 @@ function InitializeCharacterContextBuilders() {
         'enabled' => isset($GLOBALS['minai_context']['third_party']) ? (bool)$GLOBALS['minai_context']['third_party'] : true,
         'builder_callback' => 'BuildThirdPartyGlobalContext'
     ]);
+
+    // Register vitals context builder
+    $registry->register('vitals', [
+        'section' => 'status',
+        'header' => 'Combat Vitals',
+        'description' => 'Character health, magicka, stamina and combat status',
+        'priority' => 25,
+        'enabled' => isset($GLOBALS['minai_context']['vitals']) ? (bool)$GLOBALS['minai_context']['vitals'] : true,
+        'builder_callback' => 'BuildVitalsContext'
+    ]);
 }
 
 /**
@@ -1037,5 +1047,132 @@ function GetGlobalThirdPartyContext() {
     }
     
     return $ret;
+}
+
+/**
+ * Build the vitals context
+ * 
+ * @param array $params Parameters including herika_name, player_name, target
+ * @return string Formatted vitals context
+ */
+function BuildVitalsContext($params) {
+    $params = ValidateContextParams($params);
+    $character = $params['herika_name'];
+    
+    // Get the vitals string
+    if ($character == "The Narrator") {
+        $character = $params['player_name'];
+    }
+    $vitalsStr = GetActorValue($character, "vitals");
+    if (empty($vitalsStr)) {
+        return "";
+    }
+    
+    // Parse the vitals string (format: health~maxHealth~magicka~maxMagicka~stamina~maxStamina~weaponsDrawn)
+    $vitals = explode("~", $vitalsStr);
+    if (count($vitals) < 7) {
+        return "";
+    }
+    
+    $health = floatval($vitals[0]);
+    $maxHealth = floatval($vitals[1]);
+    $magicka = floatval($vitals[2]);
+    $maxMagicka = floatval($vitals[3]);
+    $stamina = floatval($vitals[4]);
+    $maxStamina = floatval($vitals[5]);
+    $weaponsDrawn = $vitals[6] === "1";
+    
+    // Calculate percentages
+    $healthPercent = $maxHealth > 0 ? round(($health / $maxHealth) * 100) : 0;
+    $magickaPercent = $maxMagicka > 0 ? round(($magicka / $maxMagicka) * 100) : 0;
+    $staminaPercent = $maxStamina > 0 ? round(($stamina / $maxStamina) * 100) : 0;
+    
+    // Get proper pronouns for the character
+    $pronouns = GetActorPronouns($character);
+    
+    // Build the context string
+    $context = "";
+    
+    // Health status - 10 stages + 0 state
+    if ($healthPercent <= 0) {
+        $context .= "{$character} is knocked down and incapacitated. ";
+    } elseif ($healthPercent <= 10) {
+        $context .= "{$character} is on the brink of death, barely clinging to life with grievous wounds. ";
+    } elseif ($healthPercent <= 20) {
+        $context .= "{$character} is critically wounded, suffering from severe injuries that threaten their life. ";
+    } elseif ($healthPercent <= 30) {
+        $context .= "{$character} is severely wounded, bearing multiple serious injuries that require immediate attention. ";
+    } elseif ($healthPercent <= 40) {
+        $context .= "{$character} is seriously wounded, showing signs of significant injury and pain. ";
+    } elseif ($healthPercent <= 50) {
+        $context .= "{$character} is moderately wounded, showing clear signs of injury but still able to function. ";
+    } elseif ($healthPercent <= 60) {
+        $context .= "{$character} is wounded, bearing several injuries that are causing discomfort. ";
+    } elseif ($healthPercent <= 70) {
+        $context .= "{$character} is lightly wounded, showing some signs of injury but still in good fighting condition. ";
+    } elseif ($healthPercent <= 85) {
+        $context .= "{$character} is slightly wounded, bearing minor injuries that don't significantly impair them. ";
+    } elseif ($healthPercent < 100) {
+        $context .= "{$character} is nearly unscathed, showing only the faintest signs of injury. ";
+    } else {
+        $context .= "{$character} appears completely unharmed. ";
+    }
+    
+    // Magicka status - 10 stages + 0 state
+    if ($magickaPercent <= 0) {
+        $context .= ucfirst($pronouns['subject']) . " is completely drained of magical energy and unable to cast even the simplest spells. ";
+    } elseif ($magickaPercent <= 10) {
+        $context .= ucfirst($pronouns['subject']) . " is nearly devoid of magical energy, barely able to muster the strength for minor spells. ";
+    } elseif ($magickaPercent <= 20) {
+        $context .= ucfirst($pronouns['subject']) . " is critically low on magical energy, struggling to maintain even basic magical abilities. ";
+    } elseif ($magickaPercent <= 30) {
+        $context .= ucfirst($pronouns['subject']) . " is severely drained of magical energy, finding it difficult to cast more than simple spells. ";
+    } elseif ($magickaPercent <= 40) {
+        $context .= ucfirst($pronouns['subject']) . " is seriously depleted of magical energy, showing signs of magical fatigue. ";
+    } elseif ($magickaPercent <= 50) {
+        $context .= ucfirst($pronouns['subject']) . " is moderately drained of magical energy, able to cast spells but showing signs of strain. ";
+    } elseif ($magickaPercent <= 60) {
+        $context .= ucfirst($pronouns['subject']) . " is running low on magical energy, though still capable of casting most spells. ";
+    } elseif ($magickaPercent <= 70) {
+        $context .= ucfirst($pronouns['subject']) . " is somewhat drained of magical energy, showing slight signs of magical fatigue. ";
+    } elseif ($magickaPercent <= 85) {
+        $context .= ucfirst($pronouns['subject']) . " is slightly drained of magical energy, still maintaining good magical reserves. ";
+    } elseif ($magickaPercent < 100) {
+        $context .= ucfirst($pronouns['subject']) . " has nearly full magical energy, ready for most magical endeavors. ";
+    } 
+    
+    // Stamina status - 10 stages + 0 state
+    if ($staminaPercent <= 0) {
+        $context .= ucfirst($pronouns['subject']) . " has completely depleted their energy reserves, gasping for breath and unable to continue. ";
+    } elseif ($staminaPercent <= 10) {
+        $context .= ucfirst($pronouns['subject']) . " is nearly out of breath, barely able to muster the energy for another action. ";
+    } elseif ($staminaPercent <= 20) {
+        $context .= ucfirst($pronouns['subject']) . " is heavily winded, struggling to catch their breath between actions. ";
+    } elseif ($staminaPercent <= 30) {
+        $context .= ucfirst($pronouns['subject']) . " is breathing heavily, their energy reserves running dangerously low. ";
+    } elseif ($staminaPercent <= 40) {
+        $context .= ucfirst($pronouns['subject']) . " is noticeably winded, their movements becoming more labored. ";
+    } elseif ($staminaPercent <= 50) {
+        $context .= ucfirst($pronouns['subject']) . " is breathing harder, their energy reserves about half depleted. ";
+    } elseif ($staminaPercent <= 60) {
+        $context .= ucfirst($pronouns['subject']) . " is starting to breathe harder, showing signs of exertion. ";
+    } elseif ($staminaPercent <= 70) {
+        $context .= ucfirst($pronouns['subject']) . " is breathing slightly faster, their energy reserves still good. ";
+    } elseif ($staminaPercent <= 85) {
+        $context .= ucfirst($pronouns['subject']) . " is breathing normally, maintaining good energy levels. ";
+    } elseif ($staminaPercent < 100) {
+        $context .= ucfirst($pronouns['subject']) . " is nearly at full energy, breathing easily and ready for action. ";
+    } else {
+        $context .= ucfirst($pronouns['subject']) . " is at full energy, breathing easily and ready for any exertion. ";
+    }
+    
+    // Weapons drawn status
+    if ($weaponsDrawn) {
+        $context .= ucfirst($pronouns['subject']) . " has " . $pronouns['possessive'] . " weapons at the ready, prepared for battle.";
+    } else {
+        $context .= ucfirst($pronouns['subject']) . " has " . $pronouns['possessive'] . " weapons sheathed, not currently prepared for combat.";
+    }
+    
+    return $context;
 } 
 

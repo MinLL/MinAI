@@ -46,7 +46,8 @@ $GLOBALS['minai_context'] = array(
     'family_status' => true,
     'party_membership' => true,
     'combat' => true,
-    
+    'vitals' => true,
+
     // Core context builders
     'personality' => true,
     'interaction' => true,
@@ -128,7 +129,7 @@ $GLOBALS['roleplay_settings'] = Array(
         "CHARACTER_STATUS" => Array(
             "enabled" => true,
             "header" => "## YOUR CURRENT STATUS",
-            "content" => "#AROUSAL_STATUS#\n#SURVIVAL_STATUS#\n#CLOTHING_STATUS#\n#FERTILITY_STATUS#\n#TATTOO_STATUS#\n#BOUNTY_STATUS#",
+            "content" => "#VITALS#\n#AROUSAL_STATUS#\n#SURVIVAL_STATUS#\n#CLOTHING_STATUS#\n#FERTILITY_STATUS#\n#TATTOO_STATUS#\n#BOUNTY_STATUS#",
             "order" => 1
         ),
         "NEARBY_ENTITIES" => Array(

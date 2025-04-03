@@ -3,6 +3,7 @@ require_once("/var/www/html/HerikaServer/lib/data_functions.php");
 // Add the system prompt context builder include
 require_once(__DIR__ . "/contextbuilders/system_prompt_context.php");
 require_once(__DIR__ . "/utils/format_util.php");
+require_once(__DIR__ . "/utils/prompt_slop_cleanup.php");
 
 function convertRelationshipStatus($targetActor) {
     $relationshipRank = GetActorValue($targetActor, "relationshipRank");
@@ -70,6 +71,13 @@ function convertToFirstPerson($text, $name, $pronouns) {
         "You ",
     ], $text);
 
+    // Replace "has you" with "have your"
+    $text = str_replace(" has you ", " have your ", $text);
+    $text = str_replace("Has you ", "Have your ", $text);
+
+    // Replace "you has" with "you have"
+    $text = str_replace(" you has ", " you have ", $text);
+    $text = str_replace("You has ", "You have ", $text);
     // Clean up any double spaces
     $text = preg_replace('/\s+/', ' ', $text);
     
@@ -187,7 +195,7 @@ function interceptRoleplayInput() {
         
         // Combine contexts
         $contextDataFull = array_merge($contextDataWorld, $contextDataHistoric);
-        
+        $contextDataFull = cleanupSlop($contextDataFull);
         // Build messages array using config settings
         $messages = [];
         
@@ -208,6 +216,7 @@ function interceptRoleplayInput() {
         $bountyStatus = convertToFirstPerson(callContextBuilder('bounty', $params), $PLAYER_NAME, $playerPronouns);
         $relationshipStatus = convertRelationshipStatus($HERIKA_NAME);
         $weather = convertToFirstPerson(callContextBuilder('weather', $params), $PLAYER_NAME, $playerPronouns);
+        $vitals = convertToFirstPerson(callContextBuilder('vitals', $params), $PLAYER_NAME, $playerPronouns);
         // Replace variables in system prompt and request
         $variableReplacements = [
             'PLAYER_NAME' => $PLAYER_NAME,
@@ -234,6 +243,7 @@ function interceptRoleplayInput() {
             'MIND_STATE' => $mindState,
             'RELATIONSHIP_STATUS' => $relationshipStatus,
             'WEATHER' => $weather,
+            'VITALS' => $vitals,
             'DEVICE_STATUS' => '' // Remove old device status string
         ];
 

@@ -1112,13 +1112,21 @@ EndFunction
 
 Function UpdateDiary(string targetName)
   if bHasAIFF
-    AIRequestMessageForActor("Please, update your diary","diary", targetName)
+    if targetName == "PLAYER"
+      AIRequestMessageForActor("Please, update your diary","minai_diary_player", targetName)
+    else
+      AIRequestMessageForActor("Please, update your diary","minai_diary", targetName)
+    endif
   EndIf
 EndFunction
 
 Function UpdateProfile(string targetName)
   if bHasAIFF
-    AIRequestMessageForActor("Please, update your profile", "updateprofile", targetName)
+    if targetName == "PLAYER"
+      AIRequestMessageForActor("Please, update your profile", "minai_updateprofile_player", targetName)
+    else
+      AIRequestMessageForActor("Please, update your profile", "minai_updateprofile", targetName)
+    endif
   EndIf
 EndFunction
 

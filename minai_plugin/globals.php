@@ -49,7 +49,9 @@ $GLOBALS["external_fast_commands"] = [
     "updatethreadsdb",        // Update threads database
     "storetattoodesc",        // Store tattoo description
     "minai_storeitem",        // Store single item
-    "minai_storeitem_batch"  // Store multiple items
+    "minai_storeitem_batch",  // Store multiple items
+    "minai_diary",            // Diary request
+    "minai_updateprofile"     // Profile update request
     // "minai_clearinventory"    // Clear inventory
 ];
 

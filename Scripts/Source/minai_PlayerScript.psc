@@ -4,6 +4,8 @@ minai_MainQuestController Property  MainQuestController  Auto
 minai_AIFF aiff
 minai_Followers followers
 minai_Config config
+minai_CombatManager combat
+
 bool bHasAIFF
 Spell minai_PlayerStateTracker
 actor playerRef
@@ -14,6 +16,11 @@ Form gold
 bool trackingEnabled = False
 bool equipRunning = False
 bool unequipRunning = False
+
+bool OnHitMutex = false
+float LastHitTime = 0.0
+float HitThrottleTime = 1.0  ; Throttle to 1.0 seconds
+
 Function StartTrackingPlayer()
   if playerRef.HasSpell(minai_PlayerStateTracker)
     playerRef.RemoveSpell(minai_PlayerStateTracker)
@@ -98,6 +105,7 @@ Event OnPlayerLoadGame()
   if (bHasAIFF)
     aiff = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_AIFF
   endif
+  combat = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_CombatManager
   environmentalAwareness = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_EnvironmentalAwareness
   if (!environmentalAwareness)
     MainQuestController.Error("Could not retrieve minai_EnvironmentalAwareness from esp")
@@ -233,3 +241,21 @@ event OnObjectUnequipped(Form akBaseItem, ObjectReference akReference)
   aiff.SetContext(playerRef)
   unequipRunning = False
 endEvent
+
+
+
+Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile, bool abPowerAttack, bool abSneakAttack, bool abBashAttack, bool abHitBlocked)
+  if OnHitMutex
+    return
+  EndIf
+  
+  float currentTime = Utility.GetCurrentGameTime()
+  if (currentTime - LastHitTime) < HitThrottleTime
+    return
+  EndIf
+  
+  OnHitMutex = true
+  LastHitTime = currentTime
+  combat.SetVitals(playerRef)
+  OnHitMutex = false
+EndEvent

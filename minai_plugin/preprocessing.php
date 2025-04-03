@@ -27,11 +27,37 @@ if (isset($GLOBALS["gameRequest"][3])) {
 if (isset($GLOBALS["minai_skip_processing"]) && $GLOBALS["minai_skip_processing"]) {
     return;
 }
+
+
+
 require_once("util.php");
 require_once("contextbuilders.php");
 require_once("roleplaybuilder.php");
 // TODO: Add an actual install routine to the HerikaServer proper to not do this every request.
 // InitiateDBTables();
+
+// This is a hack to get around CHIM eating "diary" requests for the player in the DLL
+if (isset($GLOBALS["gameRequest"][0]) && $GLOBALS["gameRequest"][0] == "minai_diary") {
+    minai_log("info", "Diary request detected for {$GLOBALS["HERIKA_NAME"]}");
+    $GLOBALS["gameRequest"][0] = "diary";
+}
+// Check to see if this is a profile update request
+if (isset($GLOBALS["gameRequest"][0]) && $GLOBALS["gameRequest"][0] == "minai_updateprofile") {
+    minai_log("info", "Profile update request detected for {$GLOBALS["HERIKA_NAME"]}");
+    $GLOBALS["gameRequest"][0] = "updateprofile";
+}
+
+if (isset($GLOBALS["gameRequest"][0]) && $GLOBALS["gameRequest"][0] == "minai_updateprofile_player") {
+    minai_log("info", "Profile update request detected for {$GLOBALS["HERIKA_NAME"]}");
+    $GLOBALS["gameRequest"][0] = "updateprofile";
+    SetNarratorProfile();
+}
+
+if (isset($GLOBALS["gameRequest"][0]) && $GLOBALS["gameRequest"][0] == "minai_diary_player") {
+    minai_log("info", "Diary request detected for {$GLOBALS["HERIKA_NAME"]}");
+    $GLOBALS["gameRequest"][0] = "diary";
+    SetNarratorProfile();
+}
 
 interceptRoleplayInput();
 

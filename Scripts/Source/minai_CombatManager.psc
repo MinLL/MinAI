@@ -60,9 +60,23 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
 EndEvent
 
 
+Function SetVitals(actor akTarget)
+  float health = akTarget.GetActorValue("Health")
+  float maxHealth = akTarget.GetBaseActorValue("Health")
+  float magicka = akTarget.GetActorValue("Magicka")
+  float maxMagicka = akTarget.GetBaseActorValue("Magicka")
+  float stamina = akTarget.GetActorValue("Stamina")
+  float maxStamina = akTarget.GetBaseActorValue("Stamina")
+  bool weaponsDrawn = akTarget.IsWeaponDrawn()
+  
+  string vitals = health + "~" + maxHealth + "~" + magicka + "~" + maxMagicka + "~" + stamina + "~" + maxStamina + "~" + weaponsDrawn
+  aiff.SetActorVariable(akTarget, "vitals", vitals)
+EndFunction
+
 Function SetContext(actor akTarget)
   Main.Debug("SetContext CombatManager(" + main.GetActorName(akTarget) + ")")
   aiff.SetActorVariable(akTarget, "inCombat", akTarget.GetCombatState() >= 1)
+  SetVitals(akTarget)
 EndFunction
 
 
@@ -78,6 +92,7 @@ EndFunction
 
 Function OnCombatStart(actor akTarget)
   Main.Info("Combat: OnCombatStart()")
+  SetVitals(akTarget)
 EndFunction
 
 Function OnCombatEnd(actor akTarget)
@@ -85,6 +100,7 @@ Function OnCombatEnd(actor akTarget)
   if !bHasDefeat || !bHasAIFF
     return
   EndIf
+  SetVitals(akTarget)
   bool defeated = Defeat.IsDefeatActive(akTarget)
   if (defeated && akTarget == playerRef)
     AIAgentFunctions.requestMessage("The party was defeated in combat", "minai_combatenddefeat")
@@ -97,6 +113,7 @@ EndFunction
 
 Function OnBleedoutStart(actor akTarget)
   Main.Info("Combat: OnBleedoutStart()")
+  SetVitals(akTarget)
   if akTarget != playerRef
     string targetName = Main.GetActorName(akTarget)
     Main.RequestLLMResponseFromActor(targetName + " has been knocked down and is badly injured!", "minai_bleedoutself", targetName, "npc")
@@ -105,4 +122,5 @@ EndFunction
 
 Function OnBleedoutEnd(actor akTarget)
   Main.Info("Combat: OnBleedoutEnd()")
+  SetVitals(akTarget)
 EndFunction

@@ -5,6 +5,12 @@ minai_MainQuestController main
 minai_CombatManager combat
 actor playerRef
 
+; Will this be enough to keep this performant?
+bool OnHitMutex = false
+float LastHitTime = 0.0
+float HitThrottleTime = 1.0  ; Throttle to 1.0 seconds
+
+
 String Function ActorArrayToString(Actor[] actors) global
   String result = ""
   int maxActors = 10
@@ -26,6 +32,8 @@ Event OnEffectStart(Actor akTarget, Actor akCaster)
   combat = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_CombatManager
   aiff = Game.GetFormFromFile(0x0802, "MinAI.esp") as minai_AIFF
   playerRef = Game.GetPlayer()
+  lastHitTime = 0.0
+
   if (!akTarget || !main || !aiff || !aiff.IsInitialized())
     Debug.Trace("[minai] Skipping OnEffectStart, not ready")
     return
@@ -64,4 +72,25 @@ Event OnEffectFinish(Actor akTarget, Actor akCaster)
   EndIf
   combat.OnCombatEnd(akTarget)
 EndEvent
+
+
+Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile, bool abPowerAttack, bool abSneakAttack, bool abBashAttack, bool abHitBlocked)
+  if OnHitMutex
+    return
+  EndIf
+  
+  float currentTime = Utility.GetCurrentGameTime()
+  if (currentTime - LastHitTime) < HitThrottleTime
+    return
+  EndIf
+  
+  OnHitMutex = true
+  LastHitTime = currentTime
+  actor akTarget = GetTargetActor()
+  if akTarget
+    combat.SetVitals(akTarget)
+  endif
+  OnHitMutex = false
+EndEvent
+
 
