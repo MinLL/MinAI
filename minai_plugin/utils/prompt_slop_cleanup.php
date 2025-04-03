@@ -46,7 +46,8 @@ function cleanupSlop($contextData) {
         'throne' => ['throne', 'jarl seat'],
         'practicing' => ['training dummy', 'archery target', 'practice target'],
         'praying' => ['prayer mat', 'kneeler', 'meditation spot'],
-        'crafting' => ['staff enchanter', 'atronach forge', 'spell making altar']
+        'crafting' => ['staff enchanter', 'atronach forge', 'spell making altar'],
+        'meditating' => ['cancel meditation']
     ];
     
     foreach ($contextData as $entry) {
@@ -246,6 +247,9 @@ function cleanupSlop($contextData) {
                                     break;
                                 case 'crafting':
                                     $formattedMessage = "$character uses the $object to craft magical items";
+                                    break;
+                                case 'meditating':
+                                    $formattedMessage = "$character meditates and regains focus, restoring their magicka";
                                     break;
                             }
                             $categorized = true;
