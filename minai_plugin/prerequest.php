@@ -122,53 +122,53 @@ $GLOBALS["VALIDATE_LLM_OUTPUT_FNCT"] = function($output) {
     return validateLLMResponse($output);
 };
 
+
+// Helper function to get item details by name
+function getItemByName($itemName) {
+    $db = $GLOBALS['db'];
+    
+    try {
+        $escapedName = $db->escape($itemName);
+        // First try exact match
+        $query = "SELECT * FROM minai_items WHERE LOWER(name) = LOWER('{$escapedName}')";
+        $result = $db->fetchAll($query);
+        
+        // If not found, try partial match
+        if (count($result) == 0) {
+            $query = "SELECT * FROM minai_items WHERE LOWER(name) LIKE LOWER('%{$escapedName}%') ORDER BY LENGTH(name) ASC";
+            $result = $db->fetchAll($query);
+        }
+        
+        // If we found multiple items with the same name, sort by form ID
+        if (count($result) > 1) {
+            minai_log("info", "Found multiple items with name '{$itemName}', sorting by form ID");
+            
+            // Sort by form ID as hex values
+            usort($result, function($a, $b) {
+                // Strip the '0x' prefix and convert hex to decimal for comparison
+                $valueA = hexdec(ltrim($a['item_id'], '0x'));
+                $valueB = hexdec(ltrim($b['item_id'], '0x'));
+                
+                // Higher hex values should come last (so we'll select them with end())
+                return $valueA <=> $valueB;
+            });
+            
+            // Log what we're selecting
+            $selected = end($result);
+            minai_log("info", "Selected item with form ID '{$selected['item_id']}' from multiple matches");
+            
+            return $selected;
+        }
+        
+        return count($result) > 0 ? $result[0] : null;
+    } catch (Exception $e) {
+        minai_log("error", "Error in getItemByName: " . $e->getMessage());
+        return null;
+    }
+}
+
 $GLOBALS["action_post_process_fnct"] = function($actions) {
     minai_log("info", "Processing actions: ".json_encode($actions));
-    
-    // Helper function to get item details by name
-    function getItemByName($itemName) {
-        $db = $GLOBALS['db'];
-        
-        try {
-            $escapedName = $db->escape($itemName);
-            // First try exact match
-            $query = "SELECT * FROM minai_items WHERE LOWER(name) = LOWER('{$escapedName}')";
-            $result = $db->fetchAll($query);
-            
-            // If not found, try partial match
-            if (count($result) == 0) {
-                $query = "SELECT * FROM minai_items WHERE LOWER(name) LIKE LOWER('%{$escapedName}%') ORDER BY LENGTH(name) ASC";
-                $result = $db->fetchAll($query);
-            }
-            
-            // If we found multiple items with the same name, sort by form ID
-            if (count($result) > 1) {
-                minai_log("info", "Found multiple items with name '{$itemName}', sorting by form ID");
-                
-                // Sort by form ID as hex values
-                usort($result, function($a, $b) {
-                    // Strip the '0x' prefix and convert hex to decimal for comparison
-                    $valueA = hexdec(ltrim($a['item_id'], '0x'));
-                    $valueB = hexdec(ltrim($b['item_id'], '0x'));
-                    
-                    // Higher hex values should come last (so we'll select them with end())
-                    return $valueA <=> $valueB;
-                });
-                
-                // Log what we're selecting
-                $selected = end($result);
-                minai_log("info", "Selected item with form ID '{$selected['item_id']}' from multiple matches");
-                
-                return $selected;
-            }
-            
-            return count($result) > 0 ? $result[0] : null;
-        } catch (Exception $e) {
-            minai_log("error", "Error in getItemByName: " . $e->getMessage());
-            return null;
-        }
-    }
-    
     // Process each action
     foreach ($actions as $key => $action) {
         // Check if this is one of our item commands
