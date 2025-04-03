@@ -34,6 +34,7 @@ MagicEffect Dirty_NPCEffect_Dirt3_Bandits_Fix
 MagicEffect Dirty_NPCEffect_Dirt4_Bandits_Fix
 MagicEffect Dirty_Effect_SwimmingNPC
 
+Dirty_BathingQuest bathingQuest
 
 bool bDirty_Effect_Dirt1 = False
 bool bDirty_Effect_Dirt2 = False
@@ -76,6 +77,7 @@ bool bSoapPurpleMountainFlowerSoapEffect
 bool bSoapRedMountainFlowerSoapEffect
 bool bSoapSuperiorMountainFlowerSoapEffect
 
+
 function Maintenance(minai_MainQuestController _main)
   main = _main
   MinaiUtil = (self as Quest) as minai_Util
@@ -108,7 +110,12 @@ function Maintenance(minai_MainQuestController _main)
     Dirty_NPCEffect_Dirt3_Bandits_Fix = Game.GetFormFromFile(0x000DC1, "Dirt and Blood - Dynamic Visuals.esp") as MagicEffect
     Dirty_NPCEffect_Dirt4_Bandits_Fix = Game.GetFormFromFile(0x000DC2, "Dirt and Blood - Dynamic Visuals.esp") as MagicEffect
     Dirty_Effect_SwimmingNPC = Game.GetFormFromFile(0x000DE7, "Dirt and Blood - Dynamic Visuals.esp") as MagicEffect
+    
+    ; Load the bathing quest
+    bathingQuest = Game.GetFormFromFile(0x000DC3, "Dirt and Blood - Dynamic Visuals.esp") as Dirty_BathingQuest
+    
     aiff.SetModAvailable("DirtAndBlood", bHasDirtAndBlood)
+    aiff.RegisterAction("ExtCmdStartBathing", "StartBathing", "Start bathing animation", "DirtAndBlood", 1, 5, 2, 5, 60, bHasDirtAndBlood)
     If Game.GetModByName("More Soaps.esp") != 255
       SoapBlueMountainSoapEffect = Game.GetFormFromFile(0x001806, "More Soaps.esp") as Spell
       SoapDragonsTongueSoapEffect = Game.GetFormFromFile(0x001814, "More Soaps.esp") as Spell
@@ -324,5 +331,23 @@ string Function GetTagsForActor(actor currentActor)
   EndIf
   return msg
 EndFunction
+
+Event CommandDispatcher(String speakerName, String command, String parameter)
+  Actor akSpeaker = aiff.AIGetAgentByName(speakerName)
+  Actor akTarget = aiff.AIGetAgentByName(parameter)
+  if !akTarget
+    akTarget = PlayerRef
+  EndIf
+  Main.Debug("DirtAndBlood - CommandDispatcher(" + speakerName + ", " + command + ", " + parameter + ")")
+
+  if command == "ExtCmdStartBathing"
+    if bathingQuest
+      bathingQuest.PlayBatheAnimation(akSpeaker, false, false)
+      Main.RegisterEvent(speakerName + " stripped down naked and started bathing.", "minai_bathing")
+    else
+      Main.Error("Dirty_BathingQuest not found - cannot start bathing animation")
+    EndIf
+  EndIf
+EndEvent
 
 
