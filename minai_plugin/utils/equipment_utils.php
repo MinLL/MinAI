@@ -1,4 +1,64 @@
 <?php
+// Static cache for equipment data to avoid repeated parsing
+$GLOBALS['equipment_cache'] = array();
+
+// Add a helper function to check for keywords in equipment data
+function HasEquipmentKeyword($actorName, $keyword) {
+    // Use cached equipment data if available
+    if (!isset($GLOBALS['equipment_cache'][$actorName])) {
+        // Get the equipment data for this actor
+        $encodedString = GetActorValue($actorName, "AllWornEquipment");
+        
+        // If empty or not available, fall back to the old method
+        if (empty($encodedString)) {
+            $GLOBALS['equipment_cache'][$actorName] = false;
+            return HasKeyword($actorName, $keyword);
+        }
+        
+        try {
+            $parsedEquipment = ParseEncodedEquipmentData($encodedString);
+            
+            // Build a simple lookup table for fast keyword checking
+            $keywordLookup = array();
+            foreach ($parsedEquipment as $equipment) {
+                if (isset($equipment['keywords']) && is_array($equipment['keywords'])) {
+                    foreach ($equipment['keywords'] as $kw) {
+                        $keywordLookup[strtolower($kw)] = true;
+                    }
+                }
+            }
+            
+            // Cache both the full parsed data and the keyword lookup
+            $GLOBALS['equipment_cache'][$actorName] = [
+                'parsed' => $parsedEquipment,
+                'keywordLookup' => $keywordLookup
+            ];
+        } catch (Exception $e) {
+            // If there's an error parsing, fall back to the old method
+            minai_log("info", "Error checking equipment keyword: " . $e->getMessage());
+            $GLOBALS['equipment_cache'][$actorName] = false;
+            return HasKeyword($actorName, $keyword);
+        }
+    }
+    
+    // Use cached data for keyword lookup
+    if ($GLOBALS['equipment_cache'][$actorName] === false) {
+        return HasKeyword($actorName, $keyword);
+    }
+    
+    // Fast keyword lookup using the cached table
+    return isset($GLOBALS['equipment_cache'][$actorName]['keywordLookup'][strtolower($keyword)]);
+}
+
+// Clear equipment cache for a specific actor or all actors
+function ClearEquipmentCache($actorName = null) {
+    if ($actorName === null) {
+        $GLOBALS['equipment_cache'] = array();
+    } else {
+        unset($GLOBALS['equipment_cache'][$actorName]);
+    }
+}
+
 // Function to get erotic device descriptions
 function GetEroticDeviceDescription($deviceType, $bodyArea, $category) {
     // Mapping of basic device types to their erotic descriptions
@@ -113,14 +173,16 @@ Function GetDevicesContext($name, $vibratingOnly = false) {
     
     // For vibrating devices, we need arousal information
     $arousal = $vibratingOnly ? GetActorArousal($name) : 0;
-    $hasChastityBelt = HasKeyword($name, "zad_DeviousBelt");
-    $hasChastityBra = HasKeyword($name, "zad_DeviousBra");
-    $hasNipplePiercing = HasKeyword($name, "zad_DeviousPiercingsNipple") || HasKeyword($name, "SLA_PiercingNipple");
-    $hasVaginalPiercing = HasKeyword($name, "zad_DeviousPiercingsVaginal") || HasKeyword($name, "SLA_PiercingClit");
-    $hasHarness = HasKeyword($name, "zad_DeviousHarness");
-    $hasGag = HasKeyword($name, "zad_DeviousGag");
-    $hasVaginalPlug = HasKeyword($name, "zad_DeviousPlugVaginal");
-    $hasAnalPlug = HasKeyword($name, "zad_DeviousPlugAnal");
+    
+    // Use the new function to check for equipment keywords
+    $hasChastityBelt = HasEquipmentKeyword($name, "zad_DeviousBelt");
+    $hasChastityBra = HasEquipmentKeyword($name, "zad_DeviousBra");
+    $hasNipplePiercing = HasEquipmentKeyword($name, "zad_DeviousPiercingsNipple") || HasEquipmentKeyword($name, "SLA_PiercingNipple");
+    $hasVaginalPiercing = HasEquipmentKeyword($name, "zad_DeviousPiercingsVaginal") || HasEquipmentKeyword($name, "SLA_PiercingClit");
+    $hasHarness = HasEquipmentKeyword($name, "zad_DeviousHarness");
+    $hasGag = HasEquipmentKeyword($name, "zad_DeviousGag");
+    $hasVaginalPlug = HasEquipmentKeyword($name, "zad_DeviousPlugVaginal");
+    $hasAnalPlug = HasEquipmentKeyword($name, "zad_DeviousPlugAnal");
 
     // Get the correct pronouns for this actor
     $pronouns = GetActorPronouns($name);
@@ -430,120 +492,120 @@ Function GetDevicesContext($name, $vibratingOnly = false) {
     
     // Layer 0: Body layer devices (piercings, plugs directly on skin)
     // These would typically be the first items added and visibility determined
-    if (HasKeyword($name, "zad_DeviousPiercingsNipple")) {
+    if (HasEquipmentKeyword($name, "zad_DeviousPiercingsNipple")) {
         $addToLayer("nipple piercings", true, false, false, 0);
-    } elseif (!$vibratingOnly && HasKeywordAndNotSkip($name, $eqContext, "SLA_PiercingNipple")) {
+    } elseif (!$vibratingOnly && HasEquipmentKeyword($name, "SLA_PiercingNipple")) {
         $addToLayer("nipple piercings", true, false, false, 0);
     }
     
-    if (HasKeyword($name, "zad_DeviousPiercingsVaginal")) {
+    if (HasEquipmentKeyword($name, "zad_DeviousPiercingsVaginal")) {
         $addToLayer("clitoral ring", false, true, false, 0);
-    } elseif (!$vibratingOnly && HasKeywordAndNotSkip($name, $eqContext, "SLA_PiercingClit")) {
+    } elseif (!$vibratingOnly && HasEquipmentKeyword($name, "SLA_PiercingClit")) {
         $addToLayer("clitoral piercing", false, true, false, 0);
     }
     
-    if (!$vibratingOnly && HasKeywordAndNotSkip($name, $eqContext, "SLA_PiercingVulva")) {
+    if (!$vibratingOnly && HasEquipmentKeyword($name, "SLA_PiercingVulva")) {
         $addToLayer("labia piercings", false, true, false, 0);
     }
     
-    if (!$vibratingOnly && HasKeywordAndNotSkip($name, $eqContext, "SLA_PiercingBelly")) {
+    if (!$vibratingOnly && HasEquipmentKeyword($name, "SLA_PiercingBelly")) {
         $addToLayer("navel piercing", false, false, false, 0);
     }
     
-    if (HasKeyword($name, "zad_DeviousPlugVaginal")) {
+    if (HasEquipmentKeyword($name, "zad_DeviousPlugVaginal")) {
         $addToLayer("vaginal plug", false, true, false, 0);
     }
     
-    if (HasKeyword($name, "zad_DeviousPlugAnal")) {
+    if (HasEquipmentKeyword($name, "zad_DeviousPlugAnal")) {
         $addToLayer("anal plug", false, true, false, 0);
     }
     
     // Layer 1: Underwear layer
     if (!$vibratingOnly) {
-        if (HasKeywordAndNotSkip($name, $eqContext, "SLA_Brabikini")) {
+        if (HasEquipmentKeyword($name, "SLA_Brabikini")) {
             $addToLayer("bra", true, false, false, 1);
         }
         
-        if (HasKeywordAndNotSkip($name, $eqContext, "SLA_Thong")) {
+        if (HasEquipmentKeyword($name, "SLA_Thong")) {
             $addToLayer("thong", false, true, false, 1);
         }
         
-        if (HasKeywordAndNotSkip($name, $eqContext, "SLA_PantiesNormal")) {
+        if (HasEquipmentKeyword($name, "SLA_PantiesNormal")) {
             $addToLayer("panties", false, true, false, 1);
         }
     }
     
     // Chastity items (restraints but on underwear layer)
-    if (HasKeyword($name, "zad_DeviousBelt")) {
+    if (HasEquipmentKeyword($name, "zad_DeviousBelt")) {
         $addToLayer("chastity belt", false, true, false, 1);
     }
     
-    if (HasKeyword($name, "zad_DeviousBra")) {
+    if (HasEquipmentKeyword($name, "zad_DeviousBra")) {
         $addToLayer("chastity bra", true, false, false, 1);
     }
     
-    if (HasKeyword($name, "zad_DeviousCorset")) {
+    if (HasEquipmentKeyword($name, "zad_DeviousCorset")) {
         $addToLayer("corset", false, false, false, 1);
     }
     
-    if (HasKeyword($name, "zad_DeviousHarness")) {
+    if (HasEquipmentKeyword($name, "zad_DeviousHarness")) {
         $addToLayer("harness", false, false, false, 1);
     }
     
     // Layer 2: Main clothing layer
     if (!$vibratingOnly) {
         // Bottom clothing
-        if (HasKeywordAndNotSkip($name, $eqContext, "SLA_PantsNormal")) {
+        if (HasEquipmentKeyword($name, "SLA_PantsNormal")) {
             $addToLayer("pants", false, true, false, 2);
         }
         
-        if (HasKeywordAndNotSkip($name, $eqContext, "SLA_PelvicCurtain")) {
+        if (HasEquipmentKeyword($name, "SLA_PelvicCurtain")) {
             $addToLayer("pelvic curtain", false, true, false, 2);
         }
         
-        if (HasKeywordAndNotSkip($name, $eqContext, "SLA_FullSkirt")) {
+        if (HasEquipmentKeyword($name, "SLA_FullSkirt")) {
             $addToLayer("full skirt", false, true, false, 2);
         }
         
-        if (HasKeywordAndNotSkip($name, $eqContext, "SLA_MiniSkirt")) {
+        if (HasEquipmentKeyword($name, "SLA_MiniSkirt")) {
             $addToLayer("mini-skirt", false, true, false, 2);
         }
         
-        if (HasKeywordAndNotSkip($name, $eqContext, "SLA_MicroHotPants")) {
+        if (HasEquipmentKeyword($name, "SLA_MicroHotPants")) {
             $addToLayer("hot pants", false, true, false, 2);
         }
         
         // Full body outfits
-        if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorHarness")) {
+        if (HasEquipmentKeyword($name, "SLA_ArmorHarness")) {
             $addToLayer("body harness", false, false, false, 2);
         }
         
-        if (HasKeywordAndNotSkip($name, $eqContext, "SLA_HalfNakedBikini")) {
+        if (HasEquipmentKeyword($name, "SLA_HalfNakedBikini")) {
             $addToLayer("bikini armor", true, true, false, 2);
         }
         
-        if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorHalfNaked")) {
+        if (HasEquipmentKeyword($name, "SLA_ArmorHalfNaked")) {
             $addToLayer("revealing attire", true, true, false, 2);
         }
         
-        if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorSpendex")) {
+        if (HasEquipmentKeyword($name, "SLA_ArmorSpendex")) {
             $addToLayer("form-fitting outfit", true, true, false, 2);
         }
         
-        if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorTransparent")) {
+        if (HasEquipmentKeyword($name, "SLA_ArmorTransparent")) {
             $addToLayer("transparent outfit", true, true, false, 2);
         }
         
-        if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorLewdLeotard")) {
+        if (HasEquipmentKeyword($name, "SLA_ArmorLewdLeotard")) {
             $addToLayer("leotard", true, true, false, 2);
         }
         
-        if (HasKeywordAndNotSkip($name, $eqContext, "SLA_ArmorRubber")) {
+        if (HasEquipmentKeyword($name, "SLA_ArmorRubber")) {
             $addToLayer("form-fitting outfit", true, true, false, 2);
         }
         
         // Accessories
-        if (HasKeywordAndNotSkip($name, $eqContext, "SLA_Heels")) {
+        if (HasEquipmentKeyword($name, "SLA_Heels")) {
             $addToLayer("high heels", false, false, false, 2);
         }
     }
@@ -551,120 +613,120 @@ Function GetDevicesContext($name, $vibratingOnly = false) {
     // Restraints (mostly layer 2)
     if (!$vibratingOnly) {
         // Head restraints
-        if (HasKeyword($name, "zad_DeviousHood")) {
+        if (HasEquipmentKeyword($name, "zad_DeviousHood")) {
             $addToLayer("hood", false, false, true, 2);
         }
         
-        if (HasKeyword($name, "zad_DeviousGag")) {
+        if (HasEquipmentKeyword($name, "zad_DeviousGag")) {
             $addToLayer("mouth gag", false, false, false, 2);
         }
         
-        if (HasKeyword($name, "zad_DeviousGagPanel")) {
+        if (HasEquipmentKeyword($name, "zad_DeviousGagPanel")) {
             $addToLayer("panel gag", false, false, false, 2);
         }
         
-        if (HasKeyword($name, "zad_DeviousGagLarge")) {
+        if (HasEquipmentKeyword($name, "zad_DeviousGagLarge")) {
             $addToLayer("large gag", false, false, false, 2);
         }
         
-        if (HasKeyword($name, "zad_DeviousBlindfold")) {
+        if (HasEquipmentKeyword($name, "zad_DeviousBlindfold")) {
             $addToLayer("blindfold", false, false, true, 2);
         }
         
         // Upper body restraints
-        if (HasKeyword($name, "zad_DeviousArmCuffs")) {
+        if (HasEquipmentKeyword($name, "zad_DeviousArmCuffs")) {
             $addToLayer("arm cuffs", false, false, false, 2);
         }
         
-        if (HasKeyword($name, "zad_DeviousArmbinder")) {
+        if (HasEquipmentKeyword($name, "zad_DeviousArmbinder")) {
             $addToLayer("armbinder", false, false, true, 2);
         }
         
-        if (HasKeyword($name, "zad_DeviousYoke")) {
+        if (HasEquipmentKeyword($name, "zad_DeviousYoke")) {
             $addToLayer("restraining yoke", false, false, true, 2);
         }
         
-        if (HasKeyword($name, "zad_DeviousElbowTie")) {
+        if (HasEquipmentKeyword($name, "zad_DeviousElbowTie")) {
             $addToLayer("elbow tie", false, false, true, 2);
         }
         
-        if (HasKeyword($name, "zad_DeviousGloves")) {
+        if (HasEquipmentKeyword($name, "zad_DeviousGloves")) {
             $addToLayer("locking gloves", false, false, false, 2);
         }
         
         // Lower body restraints
-        if (HasKeyword($name, "zad_DeviousLegCuffs")) {
+        if (HasEquipmentKeyword($name, "zad_DeviousLegCuffs")) {
             $addToLayer("leg cuffs", false, false, false, 2);
         }
         
-        if (HasKeyword($name, "zad_DeviousAnkleShackles")) {
+        if (HasEquipmentKeyword($name, "zad_DeviousAnkleShackles")) {
             $addToLayer("ankle shackles", false, false, true, 2);
         }
         
         // Full body restraints
-        if (HasKeyword($name, "zad_DeviousStraitJacket")) {
+        if (HasEquipmentKeyword($name, "zad_DeviousStraitJacket")) {
             $addToLayer("strait jacket", false, false, true, 2);
         }
         
-        if (HasKeyword($name, "zad_DeviousPetSuit")) {
+        if (HasEquipmentKeyword($name, "zad_DeviousPetSuit")) {
             $addToLayer("bodysuit", true, true, true, 2);
         }
         
-        if (HasKeyword($name, "zad_DeviousHobbleSkirt")) {
+        if (HasEquipmentKeyword($name, "zad_DeviousHobbleSkirt")) {
             $addToLayer("hobble skirt", false, true, true, 2);
         }
         
-        if (HasKeyword($name, "zad_DeviousSuit")) {
+        if (HasEquipmentKeyword($name, "zad_DeviousSuit")) {
             $addToLayer("bodysuit", true, true, true, 2);
         }
 
-        if (HasKeyword($name, "zad_DeviousBoots")) {
+        if (HasEquipmentKeyword($name, "zad_DeviousBoots")) {
             $addToLayer("slave boots", false, false, true, 2);
         }
         
-        if (HasKeyword($name, "zad_DeviousArmbinderElbow")) {
+        if (HasEquipmentKeyword($name, "zad_DeviousArmbinderElbow")) {
             $addToLayer("elbow armbinder", false, false, true, 2);
         }
         
-        if (HasKeyword($name, "zad_DeviousHeavyBondage")) {
+        if (HasEquipmentKeyword($name, "zad_DeviousHeavyBondage")) {
             $addToLayer("heavy bondage", false, false, true, 2);
         }
         
-        if (HasKeyword($name, "zad_DeviousHobbleSkirtRelaxed")) {
+        if (HasEquipmentKeyword($name, "zad_DeviousHobbleSkirtRelaxed")) {
             $addToLayer("relaxed hobble skirt", false, true, true, 2);
         }
         
-        if (HasKeyword($name, "zad_DeviousCuffsFront")) {
+        if (HasEquipmentKeyword($name, "zad_DeviousCuffsFront")) {
             $addToLayer("front cuffs", false, false, false, 2);
         }
         
-        if (HasKeyword($name, "zad_DeviousYokeBB")) {
+        if (HasEquipmentKeyword($name, "zad_DeviousYokeBB")) {
             $addToLayer("breast yoke", false, false, true, 2);
         }
         
-        if (HasKeyword($name, "zad_DeviousBondageMittens")) {
+        if (HasEquipmentKeyword($name, "zad_DeviousBondageMittens")) {
             $addToLayer("bondage mittens", false, false, true, 2);
         }
         
-        if (HasKeyword($name, "zad_DeviousPonyGear")) {
+        if (HasEquipmentKeyword($name, "zad_DeviousPonyGear")) {
             $addToLayer("pony gear", false, false, true, 2);
         }
         
         // Permission keywords
-        if (HasKeyword($name, "zad_PermitOral")) {
+        if (HasEquipmentKeyword($name, "zad_PermitOral")) {
             $addToLayer("oral permission", false, false, false, 0);
         }
         
-        if (HasKeyword($name, "zad_PermitAnal")) {
+        if (HasEquipmentKeyword($name, "zad_PermitAnal")) {
             $addToLayer("anal permission", false, false, false, 0);
         }
         
-        if (HasKeyword($name, "zad_PermitVaginal")) {
+        if (HasEquipmentKeyword($name, "zad_PermitVaginal")) {
             $addToLayer("vaginal permission", false, false, false, 0);
         }
         
         // Collar (always visible, even with clothing)
-        if (HasKeyword($name, "zad_DeviousCollar")) {
+        if (HasEquipmentKeyword($name, "zad_DeviousCollar")) {
             $addToLayer("collar", false, false, false, 2);
         }
     } else if ($hasGag) {
@@ -781,46 +843,46 @@ Function GetRevealedStatus($name) {
     if (!empty($cuirass)) {
         $wearingTop = true;
     }
-    if (HasKeyword($name, "SLA_HalfNakedBikini")) {
+    if (HasEquipmentKeyword($name, "SLA_HalfNakedBikini")) {
         $wearingTop = true;
     }
-    if (HasKeyword($name, "SLA_ArmorHalfNaked")) {
+    if (HasEquipmentKeyword($name, "SLA_ArmorHalfNaked")) {
         $wearingTop = true;
     }
-    if (HasKeyword($name, "SLA_Brabikini" )) {
+    if (HasEquipmentKeyword($name, "SLA_Brabikini" )) {
         $wearingTop = true;
     }
-    if (HasKeyword($name, "SLA_Thong")) {
+    if (HasEquipmentKeyword($name, "SLA_Thong")) {
         $wearingBottom = true;
     }
-    if (HasKeyword($name, "SLA_PantiesNormal")) {
+    if (HasEquipmentKeyword($name, "SLA_PantiesNormal")) {
         $wearingBottom = true;
     }
-    if (HasKeyword($name, "SLA_PantsNormal")) {
+    if (HasEquipmentKeyword($name, "SLA_PantsNormal")) {
         $wearingBottom = true;
     }
-    if (HasKeyword($name, "SLA_MicroHotPants")) {
+    if (HasEquipmentKeyword($name, "SLA_MicroHotPants")) {
         $wearingBottom = true;
     }
     
-    if (HasKeyword($name, "SLA_ArmorTransparent")) {
+    if (HasEquipmentKeyword($name, "SLA_ArmorTransparent")) {
         $wearingBottom = false;
         $wearingTop = false;
     }
-    if (HasKeyword($name, "SLA_ArmorLewdLeotard")) {
+    if (HasEquipmentKeyword($name, "SLA_ArmorLewdLeotard")) {
         $wearingBottom = true;
         $wearingTop = true;
     }
-    if (HasKeyword($name, "SLA_PelvicCurtain")) {
+    if (HasEquipmentKeyword($name, "SLA_PelvicCurtain")) {
         $wearingBottom = true;
     }
-    if (HasKeyword($name, "SLA_FullSkirt")) {
+    if (HasEquipmentKeyword($name, "SLA_FullSkirt")) {
         $wearingBottom = true;
     }
-    if (HasKeyword($name, "SLA_MiniSkirt")) {
+    if (HasEquipmentKeyword($name, "SLA_MiniSkirt")) {
         $wearingBottom = true;
     }
-    if (HasKeyword($name, "EroticArmor")) {
+    if (HasEquipmentKeyword($name, "EroticArmor")) {
         $wearingBottom = true;
         $wearingTop = true;
     }
@@ -829,8 +891,8 @@ Function GetRevealedStatus($name) {
 }
 
 
-Function HasKeywordAndNotSkip($name, $eqContext, $keyword) {
-    return HasKeyword($name, $keyword) && !IsSkipKeyword($keyword, $eqContext["skipKeywords"]);
+Function HasEquipmentKeywordAndNotSkip($name, $eqContext, $keyword) {
+    return HasEquipmentKeyword($name, $keyword) && !IsSkipKeyword($keyword, $eqContext["skipKeywords"]);
 }
 
 Function GetClothingKeywordMap() {
@@ -866,8 +928,8 @@ Function IsDeviceMatchingSelfClothing($name, $deviceType) {
     // If this device type has a corresponding keyword
     if (isset($keywordMap[$deviceType])) {
         $keyword = $keywordMap[$deviceType];
-        // Check if the actor has this keyword
-        if (HasKeyword($name, $keyword)) {
+        // Check if the actor has this keyword in their equipment
+        if (HasEquipmentKeyword($name, $keyword)) {
             return true;
         }
     }
@@ -925,19 +987,19 @@ Function GetVibrationSources($name) {
     // If no specific sources found but vibration is occurring
     if (empty($sources) && CanVibrate($name) && (IsInFaction($name, "Vibrator Effect Faction") || IsEnabled($name, "isVibratorActive"))) {
         // Check for potential vibration sources based on known device types
-        if (HasKeyword($name, "zad_DeviousPiercingsNipple")) {
+        if (HasEquipmentKeyword($name, "zad_DeviousPiercingsNipple")) {
             $sources[] = "nipple piercings";
             $accessibilityInfo["nipple piercings"] = $hasChastityBra ? "inaccessible behind the chastity bra" : "accessible";
         }
-        if (HasKeyword($name, "zad_DeviousPiercingsVaginal")) {
+        if (HasEquipmentKeyword($name, "zad_DeviousPiercingsVaginal")) {
             $sources[] = "clitoral ring";
             $accessibilityInfo["clitoral ring"] = $hasChastityBelt ? "inaccessible behind the chastity belt" : "accessible";
         }
-        if (HasKeyword($name, "zad_DeviousPlugVaginal")) {
+        if (HasEquipmentKeyword($name, "zad_DeviousPlugVaginal")) {
             $sources[] = "vaginal plug";
             $accessibilityInfo["vaginal plug"] = $hasChastityBelt ? "inaccessible behind the chastity belt" : "accessible";
         }
-        if (HasKeyword($name, "zad_DeviousPlugAnal")) {
+        if (HasEquipmentKeyword($name, "zad_DeviousPlugAnal")) {
             $sources[] = "anal plug";
             $accessibilityInfo["anal plug"] = $hasChastityBelt ? "partially inaccessible behind the chastity belt" : "accessible";
         }
@@ -975,3 +1037,12 @@ Function GetPromptPerspective($target = null) {
         return "self";
     }
 }
+
+// Function to handle equipment changes
+function HandleEquipmentChange($actorName) {
+    // Clear the equipment cache for this actor since equipment has changed
+    ClearEquipmentCache($actorName);
+}
+
+// Hook this function to events where equipment might change
+// This would typically be called from game scripts when equipment changes

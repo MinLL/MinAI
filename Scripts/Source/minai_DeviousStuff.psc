@@ -1247,45 +1247,7 @@ EndFunction
 
 string Function GetKeywordsForActor(actor akTarget)
   string ret = ""
-  if bHasDD
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousPlugVaginal", libs.zad_DeviousPlugVaginal)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousPlugAnal", libs.zad_DeviousPlugAnal)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousBelt", libs.zad_DeviousBelt)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousCollar", libs.zad_DeviousCollar)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousPiercingsNipple", libs.zad_DeviousPiercingsNipple)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousPiercingsVaginal", libs.zad_DeviousPiercingsVaginal)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousArmCuffs", libs.zad_DeviousArmCuffs)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousLegCuffs", libs.zad_DeviousLegCuffs)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousBra", libs.zad_DeviousBra)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousArmbinder", libs.zad_DeviousArmbinder)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousYoke", libs.zad_DeviousYoke)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousElbowTie", libs.zad_DeviousElbowTie)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousPetSuit", libs.zad_DeviousPetSuit)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousStraitJacket", libs.zad_DeviousStraitJacket)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousCorset", libs.zad_DeviousCorset)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousHood", libs.zad_DeviousHood)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousHobbleSkirt", libs.zad_DeviousHobbleSkirt)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousGloves", libs.zad_DeviousGloves)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousSuit", libs.zad_DeviousSuit)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousGag", libs.zad_DeviousGag)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousGagPanel", libs.zad_DeviousGagPanel)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousGagLarge", libs.zad_DeviousGagLarge)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousHarness", libs.zad_DeviousHarness)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousBlindfold", libs.zad_DeviousBlindfold)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousAnkleShackles", libs.zad_DeviousAnkleShackles)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousClamps", libs.zad_DeviousClamps)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousBoots", libs.zad_DeviousBoots)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousArmbinderElbow", libs.zad_DeviousArmbinderElbow)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousHeavyBondage", libs.zad_DeviousHeavyBondage)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousHobbleSkirtRelaxed", libs.zad_DeviousHobbleSkirtRelaxed)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousCuffsFront", libs.zad_DeviousCuffsFront)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousYokeBB", libs.zad_DeviousYokeBB)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousBondageMittens", libs.zad_DeviousBondageMittens)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_DeviousPonyGear", libs.zad_DeviousPonyGear)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_PermitOral", libs.zad_PermitOral)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_PermitAnal", libs.zad_PermitAnal)
-    ret += aiff.GetKeywordIfExists(akTarget, "zad_PermitVaginal", libs.zad_PermitVaginal)
-  EndIf
+  ; Now handled via the equipment system in minai_Arousal.psc
   return ret
 EndFunction
 

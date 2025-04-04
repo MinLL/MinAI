@@ -175,11 +175,33 @@ function GetAllEquipmentContext($actorName)
 
   // if this fails, still be able to continue without this functionality
   try {
-    $encodedString = GetActorValue($actorName, "AllWornEquipment");
-    // minai_log("info", "AllWornEquipment: " . $encodedString);
-    // we can potentially cache this by hashing the encodedString since equipment doesn't change often
-    // especially for npc, but this should be fine for now
-    $parsedResult = ParseEncodedEquipmentData($encodedString);
+    // Check if we already have parsed equipment data in the cache
+    if (isset($GLOBALS['equipment_cache'][$actorName]) && $GLOBALS['equipment_cache'][$actorName] !== false) {
+      $parsedResult = $GLOBALS['equipment_cache'][$actorName]['parsed'];
+    } else {
+      $encodedString = GetActorValue($actorName, "AllWornEquipment");
+      // minai_log("info", "AllWornEquipment: " . $encodedString);
+      // we can potentially cache this by hashing the encodedString since equipment doesn't change often
+      // especially for npc, but this should be fine for now
+      $parsedResult = ParseEncodedEquipmentData($encodedString);
+      
+      // Build a simple lookup table for fast keyword checking
+      $keywordLookup = array();
+      foreach ($parsedResult as $equipment) {
+        if (isset($equipment['keywords']) && is_array($equipment['keywords'])) {
+          foreach ($equipment['keywords'] as $kw) {
+            $keywordLookup[strtolower($kw)] = true;
+          }
+        }
+      }
+      
+      // Cache both the full parsed data and the keyword lookup
+      $GLOBALS['equipment_cache'][$actorName] = [
+        'parsed' => $parsedResult,
+        'keywordLookup' => $keywordLookup
+      ];
+    }
+    
     EnrichEquipmentDataFromDb($parsedResult);
     return GetEquipmentContext($parsedResult);
   } catch (Exception $e) {
@@ -195,4 +217,24 @@ function GetAllEquipmentContext($actorName)
 function IsSkipKeyword($keyword, $skipKeywords)
 {
   return isset($skipKeywords[strtolower($keyword)]);
+}
+
+// Function to check if a specific keyword exists in the equipment data
+function HasKeywordInEquipment($parsedEquipment, $targetKeyword) {
+  foreach ($parsedEquipment as $equipment) {
+    if (isset($equipment['keywords']) && is_array($equipment['keywords'])) {
+      foreach ($equipment['keywords'] as $keyword) {
+        if (strtolower($keyword) === strtolower($targetKeyword)) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+// Updated function to check for keyword in equipment rather than on actor
+function HasKeywordAndNotSkip($actorName, $eqContext, $keyword) {
+  // Use the HasEquipmentKeyword function which utilizes the cache
+  return HasEquipmentKeyword($actorName, $keyword) && !IsSkipKeyword($keyword, $eqContext["skipKeywords"]);
 }
