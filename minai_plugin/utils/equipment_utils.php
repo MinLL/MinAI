@@ -4,68 +4,82 @@ function GetEroticDeviceDescription($deviceType, $bodyArea, $category) {
     // Mapping of basic device types to their erotic descriptions
     $descriptions = [
         // Piercings
-        "nipple piercings" => "metal rings inserted through the nipples with embedded soulgem fragments",
-        "clitoral ring" => "small metal ring pierced through the clitoris with a soulgem fragment",
-        "clitoral piercing" => "small metal piercing through the clitoris with a soulgem fragment",
-        "labia piercings" => "metal jewelry pierced through the labia with soulgem fragments",
-        "navel piercing" => "decorative jewelry inserted through the belly button",
+        "nipple piercings" => "delicate metal rings pierced through the sensitive nipples, each adorned with a pulsing soulgem fragment that seems to throb with inner light",
+        "clitoral ring" => "an exquisitely crafted metal ring pierced through the swollen clitoris, its embedded soulgem fragment sending waves of pleasure with each movement",
+        "clitoral piercing" => "a delicate metal piercing through the engorged clitoris, its soulgem fragment pulsing with an inner warmth that radiates through the sensitive flesh",
+        "labia piercings" => "ornate metal jewelry pierced through the sensitive labia, each piece adorned with soulgem fragments that seem to pulse in time with the wearer's heartbeat",
+        "navel piercing" => "a decorative jeweled piercing that draws attention to the belly button, catching the light with each movement",
         
         // Plugs and vibrators
-        "vaginal plug" => "a sleek plug nestled deep inside the vagina with embedded soulgems",
-        "anal plug" => "a firm plug inserted into the anus with embedded soulgems",
+        "vaginal plug" => "a sleek, perfectly sized plug nestled deep within her pussy, its embedded soulgems pulsing with an inner warmth that radiates through the sensitive walls",
+        "anal plug" => "a firm plug seated snugly within her tight asshole, its embedded soulgems sending waves of pleasure that ripple through the surrounding flesh",
         
         // Restraints - Head
-        "hood" => "a leather hood that completely covers the head, restricting vision, hearing, and speech",
-        "mouth gag" => "a mouth gag inserted between the lips that prevents speech and keeps the jaw open",
-        "panel gag" => "a panel gag that covers and seals the mouth, preventing speech",
-        "large gag" => "a large ball gag that forces the mouth wide open, preventing speech and causing drooling",
-        "blindfold" => "a blindfold that completely blocks vision, preventing the wearer from seeing",
+        "hood" => "a supple leather hood that encases the head completely, its tight embrace restricting vision, hearing, and speech while heightening other sensations",
+        "mouth gag" => "a mouth-filling gag that forces the jaw wide, preventing speech while allowing drool to escape in a constant stream",
+        "panel gag" => "a panel gag that seals the mouth shut, its smooth surface pressing against the tongue while preventing any sound from escaping",
+        "large gag" => "an oversized ball gag that stretches the mouth wide, forcing the jaw to remain open while drool drips freely from the corners",
+        "blindfold" => "a soft blindfold that plunges the wearer into darkness, heightening their awareness of every touch and sound",
         
         // Restraints - Arms and upper body
-        "arm cuffs" => "decorative arm cuffs worn around the wrists with rings for potential attachment of bindings",
-        "armbinder" => "a leather armbinder that binds both arms together behind the back from wrists to shoulders",
-        "restraining yoke" => "a metal restraining yoke that locks around the neck with attachments that secure the wrists away from the body",
-        "elbow tie" => "an elbow tie made of ropes or straps that bind the elbows together behind the back",
-        "locking gloves" => "gloves that are locked onto the hands",
+        "arm cuffs" => "decorative arm cuffs that encircle the delicate wrists, their rings ready for the attachment of bindings that will restrict movement",
+        "armbinder" => "a leather armbinder that pulls both arms together behind the back, forcing the chest forward while completely restricting upper body movement",
+        "restraining yoke" => "a metal yoke that locks around the neck, its rigid frame extending to hold the arms out to the sides, leaving the body completely exposed",
+        "elbow tie" => "a tight binding that pulls the elbows together behind the back, forcing the chest forward while restricting arm movement",
+        "locking gloves" => "gloves that lock onto the hands, preventing the fingers from grasping or touching anything",
+        "elbow armbinder" => "a specialized armbinder that secures the arms at the elbows, forcing them into a more restrictive position that emphasizes the curves of the body",
+        "front cuffs" => "cuffs that secure the wrists in front of the body, keeping the hands visible and accessible while still restricting movement",
+        "breast yoke" => "a yoke designed to frame and display the breasts while keeping the arms restrained, drawing attention to the sensitive flesh",
+        "bondage mittens" => "mittens that completely encase the hands, rendering them useless while emphasizing the helplessness of the wearer",
         
         // Restraints - Lower body
-        "leg cuffs" => "decorative leg cuffs worn around the ankles with rings for potential attachment of bindings",
-        "ankle shackles" => "heavy metal ankle shackles connected by a chain between the ankles, limiting the wearer's stride",
-        "hobble skirt" => "a tight hobble skirt that keeps the legs close together, allowing only small steps",
-        
-        // Chastity devices
-        "chastity belt" => "a locked metal chastity belt covering the genital area with shields that prevent access or stimulation",
-        "chastity bra" => "a locked metal chastity bra covering the breasts that prevents them from being touched or stimulated",
+        "leg cuffs" => "decorative leg cuffs that encircle the delicate ankles, their rings ready for the attachment of bindings that will restrict movement",
+        "ankle shackles" => "heavy metal ankle shackles connected by a short chain, forcing the wearer to take small, mincing steps that emphasize their vulnerability",
+        "hobble skirt" => "a tight hobble skirt that keeps the legs pressed together, allowing only tiny steps that emphasize the sway of the hips",
+        "relaxed hobble skirt" => "a slightly less restrictive version of a hobble skirt that allows slightly more movement while still emphasizing the curves of the body",
+        "shackles" => "heavy metal restraints that bind the wrists or ankles together, their weight a constant reminder of the wearer's helplessness",
         
         // Full body restraints
-        "strait jacket" => "a canvas strait jacket that binds the arms against the body, completely restricting upper body movement",
-        "harness" => "a leather body harness with straps that wrap around the torso with rings for attaching other restraints",
-        "bodysuit" => "a tight-fitting latex bodysuit that covers the entire body",
-        "corset" => "a rigid, tightly-laced corset that compresses the waist, shapes the torso, and restricts breathing",
+        "strait jacket" => "a canvas strait jacket that binds the arms tightly against the body, its multiple straps and buckles ensuring complete immobility",
+        "harness" => "a leather body harness with straps that wrap sensually around the curves of the torso, its rings providing anchor points for additional restraints",
+        "bodysuit" => "a tight-fitting latex bodysuit that clings to every curve, its smooth surface gleaming in the light while restricting movement",
+        "corset" => "a rigid, tightly-laced corset that cinches the waist, forcing the breasts up and out while restricting breathing to shallow gasps",
+        "heavy bondage" => "multiple layers of restrictive bondage that encase the body, each layer adding to the feeling of complete helplessness",
+        "pony gear" => "a complete set of restraints designed to transform the wearer into a pony, including a bit that fills the mouth, a bridle that controls the head, and a harness that emphasizes the curves of the body",
+        
+        // Chastity devices
+        "chastity belt" => "a locked metal chastity belt that covers the genital area with impenetrable shields, its smooth surface a constant reminder of denied pleasure",
+        "chastity bra" => "a locked metal chastity bra that encases the breasts in a rigid cage, preventing any touch or stimulation of the sensitive flesh",
         
         // Clothing - Tops
-        "bra" => "a supportive bra that lifts and covers the breasts",
+        "bra" => "a supportive bra that lifts and frames the breasts, drawing attention to their curves",
         
         // Clothing - Bottoms
-        "thong" => "a thong with a narrow band at the back that leaves the buttocks exposed",
-        "panties" => "silk panties that cover the genital area and buttocks",
-        "pants" => "form-fitting pants that cover the lower body from waist to ankles",
-        "pelvic curtain" => "a pelvic curtain made of hanging fabric that covers only the front of the pelvis",
-        "full skirt" => "a long, flowing skirt that covers the legs to below the knees",
-        "mini-skirt" => "an extremely short mini-skirt that barely covers the buttocks",
-        "hot pants" => "very short, tight hot pants that leave most of the legs bare",
+        "thong" => "a narrow strip of fabric that disappears between the cheeks, leaving the buttocks completely exposed",
+        "panties" => "silk panties that cling to the curves of the body, their smooth surface catching the light",
+        "pants" => "form-fitting pants that hug every curve, emphasizing the shape of the legs and hips",
+        "pelvic curtain" => "a hanging fabric that covers only the front of the pelvis, swaying with each movement to reveal glimpses of what lies beneath",
+        "full skirt" => "a long, flowing skirt that swishes around the legs, its fabric catching the light with each movement",
+        "mini-skirt" => "an extremely short skirt that barely covers the buttocks, constantly threatening to reveal what lies beneath",
+        "hot pants" => "very short, tight shorts that leave most of the legs bare, emphasizing the curves of the hips and thighs",
         
         // Full outfits
-        "body harness" => "a body harness with thin leather straps that sensually wrap around the curves of the torso, accentuating the wearer's feminine form while leaving most of their bare skin exposed",
-        "bikini armor" => "bikini-style armor pieces that cover only the breasts and genital area",
-        "revealing attire" => "revealing clothing intentionally designed with openings that expose significant portions of the body",
-        "form-fitting outfit" => "an extremely form-fitting outfit that shows the exact shape of the body underneath",
-        "transparent outfit" => "a transparent outfit made of see-through material that provides the illusion of coverage while revealing what's underneath",
-        "leotard" => "a one-piece leotard that covers the torso with high-cut leg openings",
+        "body harness" => "a body harness with thin leather straps that wrap sensually around the curves of the torso, drawing attention to every curve while leaving most of the skin bare",
+        "bikini armor" => "bikini-style armor pieces that cover only the most intimate areas, leaving the rest of the body exposed to view",
+        "revealing attire" => "clothing intentionally designed with strategic openings that expose significant portions of the body, teasing the viewer with glimpses of bare skin",
+        "form-fitting outfit" => "an extremely form-fitting outfit that clings to every curve, leaving nothing to the imagination",
+        "transparent outfit" => "a see-through garment that provides the illusion of coverage while revealing every detail of the body beneath",
+        "leotard" => "a one-piece garment that hugs every curve, with high-cut leg openings that emphasize the length of the legs",
         
         // Accessories
-        "collar" => "a lockable collar worn tightly around the neck, with a ring for attaching a leash",
-        "high heels" => "high-heeled shoes with tall, narrow heels that force the wearer to walk on the balls of their feet"
+        "slave boots" => "a pair of locked metal high-heels with a chain between the ankles, forcing the wearer to walk on the balls of their feet while emphasizing the sway of their hips",
+        "collar" => "a lockable collar worn tightly around the neck, its smooth metal surface catching the light while the attached ring serves as a constant reminder of ownership",
+        "high heels" => "tall, narrow heels that force the wearer to walk on the balls of their feet, emphasizing the sway of their hips with each step",
+        
+        // Permissions
+        "oral permission" => "Her gag allows her to take a cock in her mouth.",
+        "anal permission" => "Her chastity belt leaves her ass available for use.",
+        // "vaginal permission" => "Her pussy is open and ready for use."
     ];
     
     // Return the description if available, otherwise return the basic device type
@@ -248,13 +262,22 @@ Function GetDevicesContext($name, $vibratingOnly = false) {
         $device["category"] = $category;
         
         // Track movement limitation for restraints
-        if ($isRestraint) {
+        //if ($isRestraint) {
             // These restraints significantly limit movement
             $limitsMovement = strpos($deviceType, "armbinder") !== false || 
                                strpos($deviceType, "yoke") !== false || 
                                strpos($deviceType, "hobble") !== false ||
                                strpos($deviceType, "strait") !== false ||
-                               strpos($deviceType, "pet suit") !== false;
+                               strpos($deviceType, "pet suit") !== false ||
+                               strpos($deviceType, "elbow tie") !== false ||
+                               strpos($deviceType, "elbow armbinder") !== false ||
+                               strpos($deviceType, "heavy bondage") !== false ||
+                               strpos($deviceType, "pony gear") !== false ||
+                               strpos($deviceType, "ankle shackles") !== false ||
+                               strpos($deviceType, "slave boots") !== false ||
+                               strpos($deviceType, "bondage mittens") !== false ||
+                               strpos($deviceType, "hood") !== false ||
+                               strpos($deviceType, "front cuffs") !== false;
                                
             $device["limitsMovement"] = $limitsMovement;
             
@@ -262,7 +285,7 @@ Function GetDevicesContext($name, $vibratingOnly = false) {
             if (isset($restrainedAreas[$bodyArea])) {
                 $restrainedAreas[$bodyArea] = true;
             }
-        }
+        //}
         
         // Get an erotic description for this device
         $device["description"] = GetEroticDeviceDescription($deviceType, $bodyArea, $category);
@@ -593,6 +616,51 @@ Function GetDevicesContext($name, $vibratingOnly = false) {
         
         if (HasKeyword($name, "zad_DeviousSuit")) {
             $addToLayer("bodysuit", true, true, true, 2);
+        }
+
+        if (HasKeyword($name, "zad_DeviousBoots")) {
+            $addToLayer("slave boots", false, false, true, 2);
+        }
+        
+        if (HasKeyword($name, "zad_DeviousArmbinderElbow")) {
+            $addToLayer("elbow armbinder", false, false, true, 2);
+        }
+        
+        if (HasKeyword($name, "zad_DeviousHeavyBondage")) {
+            $addToLayer("heavy bondage", false, false, true, 2);
+        }
+        
+        if (HasKeyword($name, "zad_DeviousHobbleSkirtRelaxed")) {
+            $addToLayer("relaxed hobble skirt", false, true, true, 2);
+        }
+        
+        if (HasKeyword($name, "zad_DeviousCuffsFront")) {
+            $addToLayer("front cuffs", false, false, false, 2);
+        }
+        
+        if (HasKeyword($name, "zad_DeviousYokeBB")) {
+            $addToLayer("breast yoke", false, false, true, 2);
+        }
+        
+        if (HasKeyword($name, "zad_DeviousBondageMittens")) {
+            $addToLayer("bondage mittens", false, false, true, 2);
+        }
+        
+        if (HasKeyword($name, "zad_DeviousPonyGear")) {
+            $addToLayer("pony gear", false, false, true, 2);
+        }
+        
+        // Permission keywords
+        if (HasKeyword($name, "zad_PermitOral")) {
+            $addToLayer("oral permission", false, false, false, 0);
+        }
+        
+        if (HasKeyword($name, "zad_PermitAnal")) {
+            $addToLayer("anal permission", false, false, false, 0);
+        }
+        
+        if (HasKeyword($name, "zad_PermitVaginal")) {
+            $addToLayer("vaginal permission", false, false, false, 0);
         }
         
         // Collar (always visible, even with clothing)

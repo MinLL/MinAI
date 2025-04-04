@@ -177,9 +177,9 @@ function get_info_edged_prompt() {
 }
 
 // Register the prompt only if this specific prompt is requested
-if ($GLOBALS["gameRequest"][0] == "info_edged" || $GLOBALS["gameRequest"][0] == "minai_edged" ) {
+if ($GLOBALS["gameRequest"][0] == "info_minai_edged" || $GLOBALS["gameRequest"][0] == "minai_edged" ) {
     $promptText = OverrideGameRequestPrompt(get_info_edged_prompt());
-    $GLOBALS["PROMPTS"]["info_edged"] = [
+    $GLOBALS["PROMPTS"]["info_minai_edged"] = [
         "cue"=>[],
         "player_request"=>[$promptText]
     ];
