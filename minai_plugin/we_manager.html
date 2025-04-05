@@ -2,25 +2,43 @@
 <html>
 <head>
     <title>Equipment Description Management</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <style>
         :root {
-            --primary-color: #4CAF50;
-            --secondary-color: #2196F3;
-            --background-dark: #1a1a1a;
-            --background-light: #2d2d2d;
-            --text-color: #e0e0e0;
-            --border-color: #404040;
+            --primary-color: #4dabf7;
+            --primary-dark: #3c8bc7;
+            --secondary-color: #38d9a9;
+            --secondary-dark: #20c997;
+            --background-dark: #121212;
+            --background-light: #1e1e1e;
+            --card-bg: rgba(30, 30, 30, 0.8);
+            --text-color: #e9ecef;
+            --text-secondary: #adb5bd;
+            --border-color: #343a40;
             --success-color: #40c057;
-            --error-color: #f44336;
-            --warning-color: #ffc107;
+            --error-color: #fa5252;
+            --warning-color: #fcc419;
             --info-color: #4dabf7;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.3);
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --transition-fast: all 0.2s ease;
+            --transition-normal: all 0.3s ease;
+            --font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
         }
 
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: var(--font-family);
             background: radial-gradient(circle at center, var(--background-light) 0%, var(--background-dark) 100%);
             color: var(--text-color);
             min-height: 100vh;
@@ -28,30 +46,42 @@
         }
 
         .container {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 30px;
+            max-width: 95%;
+            margin: 2rem auto;
+            padding: 1.5rem;
             background: rgba(0, 0, 0, 0.2);
-            border-radius: 16px;
+            border-radius: var(--radius-lg);
             backdrop-filter: blur(10px);
             border: 1px solid var(--border-color);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            box-shadow: var(--shadow-lg);
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--text-color);
+            margin-top: 0;
+            line-height: 1.3;
         }
 
         h1 {
             text-align: center;
-            color: var(--text-color);
-            margin-bottom: 30px;
+            margin-bottom: 1.5rem;
             font-size: 2.5rem;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            font-weight: 600;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         .nav-panel {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
             background-color: var(--background-light);
-            padding: 15px;
-            text-align: center;
-            border-radius: 12px;
-            margin-bottom: 30px;
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            margin-bottom: 2rem;
             border: 1px solid var(--border-color);
             backdrop-filter: blur(4px);
         }
@@ -60,257 +90,742 @@
             display: inline-block;
             color: var(--text-color);
             text-decoration: none;
-            font-size: 1.1rem;
-            margin: 0 20px;
-            padding: 10px 20px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
+            font-size: 1rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-sm);
+            transition: var(--transition-normal);
             background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.1) 0%,
-                rgba(255, 255, 255, 0.05) 100%
-            );
+                rgba(77, 171, 247, 0.1) 0%,
+                rgba(77, 171, 247, 0.05) 100%);
             border: 1px solid var(--border-color);
         }
 
         .nav-panel a:hover {
             transform: translateY(-2px);
             background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.15) 0%,
-                rgba(255, 255, 255, 0.08) 100%
-            );
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                rgba(77, 171, 247, 0.2) 0%,
+                rgba(77, 171, 247, 0.1) 100%);
+            box-shadow: var(--shadow-md);
         }
 
         .equipment-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
         }
 
         .equipment-card {
-            background: rgba(45, 45, 45, 0.4);
+            position: relative;
+            background: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-            transition: all 0.3s ease;
+            border-radius: var(--radius-md);
+            padding: 1rem 0.75rem 0.75rem 0.75rem;
+            transition: var(--transition-normal);
             backdrop-filter: blur(4px);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
         }
 
         .equipment-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+            border-color: rgba(77, 171, 247, 0.3);
+        }
+
+        .equipment-title-row {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 0.5rem;
+            background: rgba(0, 0, 0, 0.15);
+            border-top-left-radius: var(--radius-md);
+            border-top-right-radius: var(--radius-md);
+        }
+        
+        .equipment-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            display: block;
+            word-break: break-word;
+            width: 100%;
+            line-height: 1.3;
         }
 
         .equipment-header {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .equipment-name {
-            font-size: 1.2rem;
-            font-weight: 500;
-            color: var(--primary-color);
+            justify-content: flex-end;
+            margin-bottom: 0.5rem;
+            padding: 0 0.5rem 0.5rem;
         }
 
         .equipment-controls {
             display: flex;
-            gap: 10px;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
 
         button {
-            padding: 8px 16px;
+            padding: 0.5rem 1rem;
             background: linear-gradient(135deg,
                 rgba(255, 255, 255, 0.1) 0%,
-                rgba(255, 255, 255, 0.05) 100%
-            );
+                rgba(255, 255, 255, 0.05) 100%);
             color: var(--text-color);
             border: 1px solid var(--border-color);
-            border-radius: 6px;
+            border-radius: var(--radius-sm);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition-normal);
+            font-family: var(--font-family);
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         button:hover {
             transform: translateY(-2px);
             background: linear-gradient(135deg,
                 rgba(255, 255, 255, 0.15) 0%,
-                rgba(255, 255, 255, 0.08) 100%
-            );
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                rgba(255, 255, 255, 0.08) 100%);
+            box-shadow: var(--shadow-sm);
         }
 
         button.primary {
             background: linear-gradient(135deg,
-                rgba(76, 175, 80, 0.2) 0%,
-                rgba(76, 175, 80, 0.3) 100%
-            );
+                rgba(77, 171, 247, 0.2) 0%,
+                rgba(77, 171, 247, 0.3) 100%);
             border-color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        button.primary:hover {
+            background: linear-gradient(135deg,
+                rgba(77, 171, 247, 0.3) 0%,
+                rgba(77, 171, 247, 0.4) 100%);
         }
 
         .add-equipment {
-            margin: 20px 0;
-            padding: 20px;
-            background: rgba(45, 45, 45, 0.4);
-            border-radius: 12px;
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
             border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-normal);
+        }
+
+        .add-equipment:hover {
+            box-shadow: var(--shadow-md);
+            border-color: rgba(77, 171, 247, 0.2);
         }
 
         input[type="text"], textarea {
             width: 100%;
-            padding: 12px;
-            background-color: var(--background-dark);
+            padding: 0.75rem 1rem;
+            background-color: rgba(0, 0, 0, 0.2);
             border: 1px solid var(--border-color);
             color: var(--text-color);
-            border-radius: 8px;
-            margin-bottom: 15px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 1rem;
             font-size: 1rem;
-            transition: all 0.3s ease;
+            transition: var(--transition-normal);
+            font-family: var(--font-family);
         }
 
         input[type="text"]:focus, textarea:focus {
             border-color: var(--primary-color);
             outline: none;
-            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+            box-shadow: 0 0 0 2px rgba(77, 171, 247, 0.2);
         }
 
         .equipment-details {
-            margin-top: 15px;
+            margin-top: 1rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
         }
 
         .detail-row {
-            display: flex;
-            margin-bottom: 10px;
-            align-items: flex-start;
-            flex-wrap: wrap;
-            gap: 8px;
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            margin-bottom: 0.5rem;
+            gap: 0.75rem;
+            align-items: baseline;
+            font-size: 0.95rem;
         }
 
         .detail-label {
-            flex: 0 0 120px;
-            color: var(--text-color);
-            opacity: 0.8;
+            color: var(--text-secondary);
+            font-weight: 500;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .detail-value {
-            flex: 1;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            min-width: 0;
         }
 
         .status-message {
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
+            padding: 1rem;
+            border-radius: var(--radius-sm);
+            margin: 1rem 0;
             display: none;
+            font-weight: 500;
         }
 
         .status-message.success {
-            background-color: rgba(64, 192, 87, 0.2);
+            background-color: rgba(64, 192, 87, 0.1);
             color: var(--success-color);
             border: 1px solid var(--success-color);
         }
 
         .status-message.error {
-            background-color: rgba(244, 67, 54, 0.2);
+            background-color: rgba(244, 67, 54, 0.1);
             color: var(--error-color);
             border: 1px solid var(--error-color);
         }
 
         @media (max-width: 768px) {
             .container {
-                margin: 20px;
-                padding: 20px;
-            }
-
-            .nav-panel a {
-                display: block;
-                margin: 10px 0;
+                margin: 1rem auto;
+                padding: 1rem;
+                max-width: 98%;
+                border-radius: var(--radius-md);
             }
 
             .equipment-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+                gap: 0.75rem;
             }
 
             h1 {
-                font-size: 2rem;
+                font-size: 1.8rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+
+            .equipment-card {
+                padding: 0 0 1rem 0;
+            }
+            
+            .equipment-title-row {
+                padding: 0.75rem;
+            }
+            
+            .equipment-name {
+                font-size: 1.1rem;
+            }
+            
+            .equipment-header {
+                padding: 0 0.75rem 0.5rem;
+            }
+            
+            .equipment-controls {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                justify-content: flex-end;
+            }
+            
+            .add-equipment {
+                padding: 1rem;
+            }
+            
+            button {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.85rem;
+            }
+            
+            .detail-row {
+                grid-template-columns: 100px 1fr;
+                gap: 0.5rem;
+                padding: 0 0.75rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-panel {
+                flex-direction: column;
+                padding: 0.75rem;
+            }
+            
+            .nav-panel a {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .equipment-name {
+                font-size: 1rem;
+            }
+            
+            .detail-row {
+                grid-template-columns: 1fr;
+                margin-bottom: 0.5rem;
+            }
+            
+            .detail-label {
+                color: var(--primary-color);
+                margin-bottom: 0.1rem;
             }
         }
 
         .form-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .add-equipment h3 {
-            color: var(--text-color);
+            color: var(--primary-color);
             margin-top: 0;
-            margin-bottom: 20px;
-            font-size: 1.2rem;
-            opacity: 0.9;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
         }
 
         .deleteBtn {
             background: linear-gradient(135deg,
-                rgba(244, 67, 54, 0.2) 0%,
-                rgba(244, 67, 54, 0.3) 100%
-            );
+                rgba(244, 67, 54, 0.1) 0%,
+                rgba(244, 67, 54, 0.2) 100%);
             border-color: var(--error-color);
+        }
+
+        .deleteBtn:hover {
+            background: linear-gradient(135deg,
+                rgba(244, 67, 54, 0.2) 0%,
+                rgba(244, 67, 54, 0.3) 100%);
         }
 
         .editBtn {
             background: linear-gradient(135deg,
-                rgba(33, 150, 243, 0.2) 0%,
-                rgba(33, 150, 243, 0.3) 100%
-            );
+                rgba(77, 171, 247, 0.1) 0%,
+                rgba(77, 171, 247, 0.2) 100%);
             border-color: var(--info-color);
+        }
+
+        .editBtn:hover {
+            background: linear-gradient(135deg,
+                rgba(77, 171, 247, 0.2) 0%,
+                rgba(77, 171, 247, 0.3) 100%);
         }
 
         .equipment-card.editing {
             background: linear-gradient(135deg,
-                rgba(76, 175, 80, 0.1) 0%,
-                rgba(76, 175, 80, 0.2) 100%
-            );
-            border-color: var(--primary-color);
-        }
-
-        .sort {
-            color: var(--text-color);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .sort:hover {
-            color: var(--primary-color);
-        }
-
-        .sort::after {
-            content: '↕';
-            font-size: 0.8em;
-        }
-
-        .sort.asc::after {
-            content: '↑';
-        }
-
-        .sort.desc::after {
-            content: '↓';
+                rgba(56, 217, 169, 0.05) 0%,
+                rgba(56, 217, 169, 0.1) 100%);
+            border-color: var(--secondary-color);
+            box-shadow: var(--shadow-md);
         }
 
         .clearBtn {
             background: linear-gradient(135deg,
                 rgba(244, 67, 54, 0.1) 0%,
-                rgba(244, 67, 54, 0.2) 100%
-            );
+                rgba(244, 67, 54, 0.2) 100%);
             border-color: var(--error-color);
-            padding: 4px 8px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        /* New styles for revised equipment system */
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .checkbox-container label {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .hidden-by-section h5 {
+            color: var(--primary-color);
+            margin-top: 0.5rem;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .collapsible-button {
+            cursor: pointer;
+            transition: var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .collapsible-button::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: linear-gradient(to right, transparent, rgba(77, 171, 247, 0.1));
+            opacity: 0;
+            transition: var(--transition-normal);
+        }
+
+        .collapsible-button:hover::after {
+            opacity: 1;
+        }
+
+        .hidden-by-editor {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            box-shadow: var(--shadow-sm) inset;
+        }
+
+        .edit-hidden-by-btn {
+            width: 100%;
+            text-align: center;
+            background: linear-gradient(135deg,
+                rgba(77, 171, 247, 0.1) 0%,
+                rgba(77, 171, 247, 0.2) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .edit-hidden-by-btn::before {
+            content: '\2699'; /* Unicode gear icon */
+            margin-right: 5px;
             font-size: 0.9rem;
+        }
+        
+        .edit-hidden-by-btn::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: linear-gradient(to right, transparent, rgba(77, 171, 247, 0.2));
+            opacity: 0;
+            transition: var(--transition-normal);
+        }
+        
+        .edit-hidden-by-btn:hover::after {
+            opacity: 1;
+        }
+
+        input[type="checkbox"] {
+            accent-color: var(--primary-color);
+        }
+
+        /* Filter section improvements */
+        #filterForm .form-grid {
+            margin-bottom: 1rem;
+        }
+
+        /* Toggle Switch Styles */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+
+        .toggle-switch input[type="checkbox"] {
+            position: absolute;
+            height: 24px;
+            width: 50px;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 2;
+            margin: 0;
+            padding: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            cursor: pointer;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: var(--transition-normal);
+            border-radius: 24px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: var(--transition-normal);
+            border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--primary-color);
+        }
+
+        input:focus + .toggle-slider {
+            box-shadow: 0 0 1px var(--primary-color);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        
+        .equipment-card.disabled {
+            opacity: 0.7;
+            border: 1px dashed var(--border-color);
+            background: rgba(30, 30, 30, 0.6);
+        }
+        
+        .equipment-card.disabled .equipment-name {
+            color: var(--text-secondary);
+            text-decoration: line-through;
+        }
+        
+        .status {
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+        }
+        
+        .status-enabled {
+            color: var(--success-color);
+            background-color: rgba(64, 192, 87, 0.1);
+        }
+
+        .status-enabled::before {
+            content: '\25CF'; /* Unicode bullet symbol */
+            font-size: 0.75rem;
+        }
+        
+        .status-disabled {
+            color: var(--error-color);
+            background-color: rgba(250, 82, 82, 0.1);
+        }
+
+        .status-disabled::before {
+            content: '\25CB'; /* Unicode empty circle */
+            font-size: 0.75rem;
+        }
+
+        /* Card action buttons improvements */
+        .equipment-controls button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.375rem;
+        }
+
+        .editBtn::before {
+            content: '\270E'; /* Unicode pencil icon that's more widely supported */
+            font-size: 0.9rem;
+        }
+
+        .deleteBtn::before {
+            content: '\2715'; /* Unicode X that's more widely supported */
+            font-size: 0.9rem;
+        }
+
+        /* Empty state for data grid */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-secondary);
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: var(--radius-md);
+            border: 1px dashed var(--border-color);
+            margin: 2rem 0;
+        }
+
+        .empty-state h4 {
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Add loading animation styles */
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        #loading-indicator {
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(77, 171, 247, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Enhanced toast notifications */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .toast {
+            padding: 12px 20px;
+            margin-top: 10px;
+            background: var(--background-light);
+            color: var(--text-color);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-md);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            border-left: 3px solid var(--primary-color);
+            display: flex;
+            align-items: center;
+            min-width: 280px;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast.error {
+            border-left-color: var(--error-color);
+        }
+
+        .toast.error::before {
+            content: '\2715';  /* Unicode X instead of "✕" */
+            color: var(--error-color);
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .toast.success {
+            border-left-color: var(--success-color);
+        }
+
+        .toast.success::before {
+            content: '\2713';  /* Unicode checkmark instead of "✓" */
+            color: var(--success-color);
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        /* The switch - the box around the slider */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        /* Hide default HTML checkbox */
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        /* The slider */
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: .4s;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Rounded sliders */
+        .slider.round {
+            border-radius: 24px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+
+        .toggle-container {
+            margin-left: 8px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .dropdown-arrow::before {
+            content: '\25BC'; /* Down arrow - Unicode triangle down */
+        }
+        
+        .collapsible-button.active .dropdown-arrow::before {
+            content: '\25B2'; /* Up arrow - Unicode triangle up */
         }
     </style>
 </head>
@@ -332,8 +847,17 @@
                     <input type="text" id="filterModName" placeholder="Filter by ModName">
                     <input type="text" id="filterName" placeholder="Filter by Name">
                     <input type="text" id="filterDescription" placeholder="Filter by Description">
+                    <input type="text" id="filterBodyPart" placeholder="Filter by Body Part">
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="filterIsRestraint">
+                        <label for="filterIsRestraint">Only Restraints</label>
+                    </div>
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="filterShowDisabled">
+                        <label for="filterShowDisabled">Show Disabled Items</label>
+                    </div>
                 </div>
-                <button type="submit" class="primary">Apply Filter</button>
+                <button type="button" id="clearFilters" class="clearBtn">Clear Filters</button>
             </form>
         </div>
 
@@ -346,8 +870,91 @@
                     <input type="text" id="newModName" placeholder="ModName" required>
                     <input type="text" id="newName" placeholder="Name">
                     <input type="text" id="newDescription" placeholder="Description">
+                    <input type="text" id="newBodyPart" placeholder="Body Part">
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="newIsRestraint">
+                        <label for="newIsRestraint">Is Restraint</label>
+                    </div>
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="newIsEnabled" checked>
+                        <label for="newIsEnabled">Enabled</label>
+                    </div>
                 </div>
-                <button type="submit" class="primary">Add Equipment</button>
+                
+                <div class="hidden-by-section">
+                    <h3>Hidden By</h3>
+                    <button type="button" class="collapsible-button">Common Items <span class="dropdown-arrow"></span></button>
+                    <div class="collapsible-content" style="display: none;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 10px;">
+                            <label><input type="checkbox" name="newHiddenBy" value="cuirass"> Cuirass/Armor</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="helmet"> Helmet/Hood</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="gloves"> Gloves/Gauntlets</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="boots"> Boots/Footwear</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="wearing_top"> Wearing Top</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="wearing_bottom"> Wearing Bottom</label>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="collapsible-button" style="margin-top: 10px;">SLA Keywords <span class="dropdown-arrow"></span></button>
+                    <div class="collapsible-content" style="display: none;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 10px;">
+                            <label><input type="checkbox" name="newHiddenBy" value="SLA_ArmorHarness"> Armor Harness</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="SLA_ArmorHalfNaked"> Half Naked Armor</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="SLA_HalfNakedBikini"> Half Naked Bikini</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="SLA_ArmorSpendex"> Spandex/Latex</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="SLA_ArmorTransparent"> Transparent Outfit</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="SLA_ArmorLewdLeotard"> Lewd Leotard</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="SLA_ArmorRubber"> Rubber/Ebonite</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="SLA_Brabikini"> Bra/Bikini</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="SLA_Thong"> Thong</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="SLA_PantiesNormal"> Normal Panties</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="SLA_PantsNormal"> Normal Pants</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="SLA_PelvicCurtain"> Pelvic Curtain</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="SLA_FullSkirt"> Full Skirt</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="SLA_MiniSkirt"> Mini Skirt</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="SLA_MicroHotPants"> Micro Hot Pants</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="SLA_Heels"> High Heels</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="SLA_PiercingVulva"> Vulva Piercing</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="SLA_PiercingBelly"> Belly Piercing</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="SLA_PiercingNipple"> Nipple Piercing</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="SLA_PiercingClit"> Clit Piercing</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="EroticArmor"> Erotic Armor</label>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="collapsible-button" style="margin-top: 10px;">Devious Devices Keywords <span class="dropdown-arrow"></span></button>
+                    <div class="collapsible-content" style="display: none;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 10px;">
+                            <label><input type="checkbox" name="newHiddenBy" value="zad_DeviousPlugVaginal"> Vaginal Plug</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="zad_DeviousPlugAnal"> Anal Plug</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="zad_DeviousBelt"> Chastity Belt</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="zad_DeviousBra"> Chastity Bra</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="zad_DeviousCollar"> Collar</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="zad_DeviousArmCuffs"> Arm Cuffs</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="zad_DeviousLegCuffs"> Leg Cuffs</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="zad_DeviousHood"> Hood</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="zad_DeviousGag"> Gag</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="zad_DeviousGagPanel"> Panel Gag</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="zad_DeviousGagLarge"> Large Gag</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="zad_DeviousBlindfold"> Blindfold</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="zad_DeviousCorset"> Corset</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="zad_DeviousHarness"> Harness</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="zad_DeviousStraitjacket"> Straitjacket</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="zad_DeviousArmbinder"> Armbinder</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="zad_DeviousElbowTie"> Elbow Tie</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="zad_DeviousYoke"> Restraining Yoke</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="zad_DeviousGloves"> Bondage Gloves</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="zad_DeviousHobbleSkirt"> Hobble Skirt</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="zad_DeviousAnkleShackles"> Ankle Shackles</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="zad_DeviousBoots"> Slave Boots</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="zad_DeviousSuit"> Full Bodysuit</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="zad_PiercingsNipple"> Nipple Piercings</label>
+                            <label><input type="checkbox" name="newHiddenBy" value="zad_PiercingsVaginal"> Genital Piercings</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="primary" style="margin-top: 15px;">Add Equipment</button>
             </form>
         </div>
 
@@ -360,11 +967,19 @@
     <!-- Template for equipment card -->
     <template id="equipment-template">
         <div class="equipment-card">
-            <div class="equipment-header">
+            <div class="equipment-title-row">
                 <span class="equipment-name"></span>
+            </div>
+            <div class="equipment-header">
                 <div class="equipment-controls">
                     <button class="editBtn">Edit</button>
                     <button class="deleteBtn">Delete</button>
+                    <div class="toggle-container">
+                        <label class="switch">
+                            <input type="checkbox" class="toggle-enabled">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
                 </div>
             </div>
             <div class="equipment-details">
@@ -380,6 +995,22 @@
                     <span class="detail-label">Description:</span>
                     <span class="detail-value description"></span>
                 </div>
+                <div class="detail-row">
+                    <span class="detail-label">Body Part:</span>
+                    <span class="detail-value body-part"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Is Restraint:</span>
+                    <span class="detail-value is-restraint"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Hidden By:</span>
+                    <span class="detail-value hidden-by"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Status:</span>
+                    <span class="detail-value status"></span>
+                </div>
             </div>
         </div>
     </template>
@@ -387,30 +1018,152 @@
     <script>
         $(document).ready(function() {
             let currentSort = { column: null, direction: null };
+            let isLoading = false;
+            let currentFilters = {
+                action: 'load',
+                baseFormId: '',
+                modName: '',
+                name: '',
+                description: '',
+                body_part: '',
+                is_restraint: 0,
+                show_disabled: 0
+            };
+            let filterDebounceTimer;
+            const DEBOUNCE_DELAY = 300; // milliseconds
+            
+            // Initialize collapsible sections
+            $(document).on('click', '.collapsible-button', function() {
+                $(this).toggleClass('active');
+                $(this).next('.collapsible-content').slideToggle(300);
+            });
+            
+            // Set up filter listeners for auto-filtering
+            setupFilterListeners();
             
             // Load table data initially
+            showLoading();
             loadTableData();
 
+            function setupFilterListeners() {
+                // Text inputs with debounce
+                $('#filterBaseFormId, #filterModName, #filterName, #filterDescription, #filterBodyPart').on('input', function() {
+                    clearTimeout(filterDebounceTimer);
+                    filterDebounceTimer = setTimeout(applyFilters, DEBOUNCE_DELAY);
+                });
+                
+                // Checkboxes
+                $('#filterIsRestraint, #filterShowDisabled').on('change', applyFilters);
+                
+                // Clear filters button
+                $('#clearFilters').click(function() {
+                    $('#filterForm')[0].reset();
+                    applyFilters();
+                });
+            }
+            
+            function applyFilters() {
+                // Update current filters
+                currentFilters = {
+                    action: 'load',
+                    baseFormId: $('#filterBaseFormId').val(),
+                    modName: $('#filterModName').val(),
+                    name: $('#filterName').val(),
+                    description: $('#filterDescription').val(),
+                    body_part: $('#filterBodyPart').val(),
+                    is_restraint: $('#filterIsRestraint').prop('checked') ? 1 : 0,
+                    show_disabled: $('#filterShowDisabled').prop('checked') ? 1 : 0
+                };
+                
+                loadFilteredData();
+            }
+            
+            function loadFilteredData() {
+                showLoading();
+                
+                $.ajax({
+                    url: 'we_manager.php',
+                    method: 'GET',
+                    data: currentFilters,
+                    success: function(response) {
+                        hideLoading();
+                        if (response.status === 'success') {
+                            renderEquipmentCards(response.data);
+                        } else {
+                            showErrorMessage('Failed to load equipment data');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        hideLoading();
+                        showErrorMessage('Failed to load equipment data: ' + error);
+                    }
+                });
+            }
+
+            function showLoading() {
+                isLoading = true;
+                const container = document.getElementById('dataTable');
+                container.innerHTML = `
+                    <div class="empty-state" id="loading-indicator">
+                        <div class="loading-spinner"></div>
+                        <h4>Loading equipment data...</h4>
+                        <p>Please wait while we fetch your equipment data.</p>
+                    </div>
+                `;
+            }
+
+            function hideLoading() {
+                isLoading = false;
+                $('#loading-indicator').remove();
+            }
+
             function loadTableData() {
+                if (!isLoading) showLoading();
+                
                 $.ajax({
                     url: 'we_manager.php?action=load',
                     method: 'GET',
                     success: function(response) {
+                        hideLoading();
                         if (response.status === 'success') {
                             renderEquipmentCards(response.data);
                         } else {
                             console.error('Error loading data:', response.message);
+                            showErrorMessage('Failed to load equipment data');
                         }
                     },
                     error: function(xhr, status, error) {
+                        hideLoading();
                         console.error('Error loading data:', error);
+                        showErrorMessage('Failed to load equipment data: ' + error);
                     }
                 });
+            }
+
+            function showErrorMessage(message) {
+                const container = document.getElementById('dataTable');
+                container.innerHTML = `
+                    <div class="empty-state error">
+                        <h4>Error</h4>
+                        <p>${message}</p>
+                        <button class="primary" onclick="location.reload()">Retry</button>
+                    </div>
+                `;
             }
 
             function renderEquipmentCards(data) {
                 const container = document.getElementById('dataTable');
                 container.innerHTML = ''; // Clear existing cards
+                
+                if (data.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <h4>No Equipment Found</h4>
+                            <p>Add your first equipment item using the form above.</p>
+                        </div>
+                    `;
+                    return;
+                }
                 
                 // Sort data if needed
                 if (currentSort.column) {
@@ -425,7 +1178,7 @@
 
                 const template = document.getElementById('equipment-template');
                 
-                data.forEach(item => {
+                data.forEach((item, index) => {
                     const card = template.content.cloneNode(true);
                     const cardElement = card.querySelector('.equipment-card');
                     
@@ -434,56 +1187,377 @@
                     cardElement.dataset.modname = item.modName;
                     
                     // Set card content
-                    card.querySelector('.equipment-name').textContent = item.name || 'Unnamed Equipment';
-                    card.querySelector('.baseFormId').textContent = item.baseFormId;
-                    card.querySelector('.modName').textContent = item.modName;
-                    card.querySelector('.description').textContent = item.description || 'No description';
+                    const nameElement = cardElement.querySelector('.equipment-name');
+                    // Decode HTML entities if present in the name and use fallback for empty names
+                    const itemName = item.name ? item.name.trim() : 'Unnamed Equipment';
+                    nameElement.textContent = itemName;
+                    
+                    cardElement.querySelector('.baseFormId').textContent = item.baseFormId;
+                    cardElement.querySelector('.modName').textContent = item.modName;
+                    cardElement.querySelector('.description').textContent = item.description || 'No description';
+                    cardElement.querySelector('.body-part').textContent = item.body_part || 'None';
+                    
+                    // Correctly check if is_restraint is truthy (1, true, "1", etc.)
+                    const isRestraint = item.is_restraint && item.is_restraint !== "0" && item.is_restraint !== 0;
+                    cardElement.querySelector('.is-restraint').textContent = isRestraint ? 'Yes' : 'No';
+                    
+                    cardElement.querySelector('.hidden-by').textContent = formatHiddenBy(item.hidden_by);
+                    
+                    // Set status text and styling - make sure to check if is_enabled is truthy
+                    const isEnabled = item.is_enabled && item.is_enabled !== "0" && item.is_enabled !== 0;
+                    const statusElement = cardElement.querySelector('.status');
+                    
+                    if (isEnabled) {
+                        statusElement.textContent = 'Enabled';
+                        statusElement.classList.add('status-enabled');
+                        statusElement.classList.remove('status-disabled');
+                        cardElement.classList.remove('disabled');
+                    } else {
+                        statusElement.textContent = 'Disabled';
+                        statusElement.classList.add('status-disabled');
+                        statusElement.classList.remove('status-enabled');
+                        cardElement.classList.add('disabled');
+                    }
+
+                    // Set toggle state to match is_enabled
+                    const toggleElement = cardElement.querySelector('.toggle-enabled');
+                    toggleElement.checked = isEnabled;
+                    
+                    // Ensure toggle ID is set for proper labeling
+                    const toggleId = `toggle_${item.baseFormId.replace(/[^a-zA-Z0-9]/g, '_')}_${index}`;
+                    toggleElement.id = toggleId;
+                    
+                    // Use both click and change events for cross-browser compatibility
+                    $(toggleElement).on('click change', function(e) {
+                        e.stopPropagation(); // Prevent bubbling
+                        const isChecked = this.checked;
+                        console.log('Toggle event:', e.type, isChecked);
+                        
+                        // Send request to server - double check we're using the correct parameters
+                        $.ajax({
+                            url: 'we_manager.php',
+                            method: 'POST',
+                            data: {
+                                action: 'toggle_enabled',
+                                baseFormId: item.baseFormId,
+                                modName: item.modName,
+                                is_enabled: isChecked ? 1 : 0
+                            },
+                            success: function(response) {
+                                console.log('Toggle response:', response);
+                                if (response.status === 'success') {
+                                    // Update UI state
+                                    if (isChecked) {
+                                        statusElement.textContent = 'Enabled';
+                                        statusElement.classList.remove('status-disabled');
+                                        statusElement.classList.add('status-enabled');
+                                        cardElement.classList.remove('disabled');
+                                    } else {
+                                        statusElement.textContent = 'Disabled';
+                                        statusElement.classList.remove('status-enabled');
+                                        statusElement.classList.add('status-disabled');
+                                        cardElement.classList.add('disabled');
+                                    }
+                                    
+                                    // Update dataset
+                                    cardElement.dataset.isenabled = isChecked ? 1 : 0;
+                                    
+                                    showToast(isChecked ? 'Equipment enabled' : 'Equipment disabled');
+                                } else {
+                                    // Revert the toggle if there was an error
+                                    toggleElement.checked = !isChecked;
+                                    showToast('Failed to update equipment status', 'error');
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Error toggling equipment status:', error, xhr.responseText);
+                                // Revert the toggle if there was an error
+                                toggleElement.checked = !isChecked;
+                                showToast('Failed to update equipment status: ' + error, 'error');
+                            }
+                        });
+                    });
+
+                    // Store data attributes for hidden fields - ensure we're storing correct boolean values
+                    cardElement.dataset.isrestraint = isRestraint ? 1 : 0;
+                    cardElement.dataset.bodypart = item.body_part || '';
+                    cardElement.dataset.hiddenby = item.hidden_by || '';
+                    cardElement.dataset.isenabled = isEnabled ? 1 : 0;
 
                     // Add edit functionality
-                    const editBtn = card.querySelector('.editBtn');
+                    const editBtn = cardElement.querySelector('.editBtn');
                     editBtn.addEventListener('click', () => {
                         const cardElement = editBtn.closest('.equipment-card');
                         if (cardElement.classList.contains('editing')) {
-                            // Save changesG
-                            const updatedData = {
-                                baseFormId: item.baseFormId,
-                                modName: item.modName,
-                                name: cardElement.querySelector('.equipment-name').textContent,
-                                description: cardElement.querySelector('.description').textContent || ''
-                            };
-                            
-                            // Remove clear button
-                            const clearBtn = cardElement.querySelector('.clearBtn');
-                            if (clearBtn) {
-                                clearBtn.remove();
-                            }
-                            
-                            // Remove editable state
-                            cardElement.querySelector('.description').contentEditable = false;
-                            cardElement.querySelector('.description').style = '';
-                            cardElement.querySelector('.equipment-name').contentEditable = false;
-                            cardElement.querySelector('.equipment-name').style = '';
-                            
-                            updateEquipment(updatedData);
-                            cardElement.classList.remove('editing');
-                            editBtn.textContent = 'Edit';
+                            // Save changes
+                            saveEquipmentChanges(cardElement);
                         } else {
                             // Enable editing
-                            makeEditable(cardElement.querySelector('.equipment-name'));
-                            makeEditable(cardElement.querySelector('.description'));
-                            cardElement.classList.add('editing');
-                            editBtn.textContent = 'Save';
+                            enableEquipmentEditing(cardElement);
                         }
                     });
 
                     // Add delete functionality
-                    card.querySelector('.deleteBtn').addEventListener('click', () => {
+                    cardElement.querySelector('.deleteBtn').addEventListener('click', () => {
                         if (confirm('Are you sure you want to delete this equipment?')) {
                             deleteEquipment(item.baseFormId, item.modName);
                         }
                     });
 
                     container.appendChild(card);
+                });
+            }
+
+            function showToast(message, type = 'success') {
+                // Create toast if it doesn't exist
+                if (!$('#toast-container').length) {
+                    $('body').append('<div id="toast-container"></div>');
+                }
+                
+                const toast = $(`<div class="toast ${type}">${message}</div>`);
+                $('#toast-container').append(toast);
+                
+                // Animate and remove after timeout
+                setTimeout(() => {
+                    toast.addClass('show');
+                    
+                    setTimeout(() => {
+                        toast.removeClass('show');
+                        setTimeout(() => toast.remove(), 300);
+                    }, 3000);
+                }, 100);
+            }
+
+            function formatHiddenBy(hiddenByStr) {
+                if (!hiddenByStr) return 'None';
+                const items = hiddenByStr.split(',');
+                if (items.length <= 3) return items.join(', ');
+                return items.slice(0, 3).join(', ') + ` (+ ${items.length - 3} more)`;
+            }
+
+            function enableEquipmentEditing(cardElement) {
+                // Store original values for potential rollback
+                cardElement.dataset.originalDesc = cardElement.querySelector('.description').textContent;
+                cardElement.dataset.originalBodyPart = cardElement.dataset.bodypart;
+                cardElement.dataset.originalIsRestraint = cardElement.dataset.isrestraint;
+                cardElement.dataset.originalHiddenBy = cardElement.dataset.hiddenby;
+                cardElement.dataset.originalIsEnabled = cardElement.dataset.isenabled;
+                
+                // Make fields editable
+                const descElement = cardElement.querySelector('.description');
+                makeEditable(descElement);
+                
+                // Replace body part with input
+                const bodyPartElement = cardElement.querySelector('.body-part');
+                const bodyPartValue = bodyPartElement.textContent === 'None' ? '' : bodyPartElement.textContent;
+                bodyPartElement.innerHTML = `<input type="text" class="edit-body-part" value="${bodyPartValue}">`;
+                
+                // Replace is-restraint with checkbox
+                const restraintElement = cardElement.querySelector('.is-restraint');
+                const isRestraint = restraintElement.textContent === 'Yes';
+                restraintElement.innerHTML = `<input type="checkbox" class="edit-is-restraint" ${isRestraint ? 'checked' : ''}>`;
+                
+                // Replace status with enabled checkbox
+                const statusElement = cardElement.querySelector('.status');
+                const isEnabled = cardElement.dataset.isenabled === '1';
+                statusElement.innerHTML = `<div class="checkbox-container">
+                    <input type="checkbox" class="edit-is-enabled" ${isEnabled ? 'checked' : ''}>
+                    <label>Enabled</label>
+                </div>`;
+                
+                // Replace hidden-by with expandable section
+                const hiddenByElement = cardElement.querySelector('.hidden-by');
+                const hiddenByValues = cardElement.dataset.hiddenby ? cardElement.dataset.hiddenby.split(',') : [];
+                
+                hiddenByElement.innerHTML = `
+                    <button type="button" class="edit-hidden-by-btn">Configure Hidden By Keywords</button>
+                    <div class="hidden-by-editor" style="display:none; margin-top:10px;">
+                        <!-- Common Items Section -->
+                        <div style="margin-bottom: 15px;">
+                            <h5>Common Items</h5>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;">
+                                <label><input type="checkbox" name="editHiddenBy" value="cuirass" ${hiddenByValues.includes('cuirass') ? 'checked' : ''}> Cuirass/Armor</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="helmet" ${hiddenByValues.includes('helmet') ? 'checked' : ''}> Helmet/Hood</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="gloves" ${hiddenByValues.includes('gloves') ? 'checked' : ''}> Gloves/Gauntlets</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="boots" ${hiddenByValues.includes('boots') ? 'checked' : ''}> Boots/Footwear</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="wearing_top" ${hiddenByValues.includes('wearing_top') ? 'checked' : ''}> Wearing Top</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="wearing_bottom" ${hiddenByValues.includes('wearing_bottom') ? 'checked' : ''}> Wearing Bottom</label>
+                            </div>
+                        </div>
+                        
+                        <!-- SLA Keywords -->
+                        <div style="margin-bottom: 10px;">
+                            <h5>SLA Keywords</h5>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;">
+                                <label><input type="checkbox" name="editHiddenBy" value="SLA_ArmorHarness" ${hiddenByValues.includes('SLA_ArmorHarness') ? 'checked' : ''}> Armor Harness</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="SLA_ArmorHalfNaked" ${hiddenByValues.includes('SLA_ArmorHalfNaked') ? 'checked' : ''}> Half Naked Armor</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="SLA_HalfNakedBikini" ${hiddenByValues.includes('SLA_HalfNakedBikini') ? 'checked' : ''}> Half Naked Bikini</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="SLA_ArmorSpendex" ${hiddenByValues.includes('SLA_ArmorSpendex') ? 'checked' : ''}> Spandex/Latex</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="SLA_ArmorTransparent" ${hiddenByValues.includes('SLA_ArmorTransparent') ? 'checked' : ''}> Transparent Outfit</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="SLA_ArmorLewdLeotard" ${hiddenByValues.includes('SLA_ArmorLewdLeotard') ? 'checked' : ''}> Lewd Leotard</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="SLA_ArmorRubber" ${hiddenByValues.includes('SLA_ArmorRubber') ? 'checked' : ''}> Rubber/Ebonite</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="SLA_Brabikini" ${hiddenByValues.includes('SLA_Brabikini') ? 'checked' : ''}> Bra/Bikini</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="SLA_Thong" ${hiddenByValues.includes('SLA_Thong') ? 'checked' : ''}> Thong</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="SLA_PantiesNormal" ${hiddenByValues.includes('SLA_PantiesNormal') ? 'checked' : ''}> Normal Panties</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="SLA_PantsNormal" ${hiddenByValues.includes('SLA_PantsNormal') ? 'checked' : ''}> Normal Pants</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="SLA_PelvicCurtain" ${hiddenByValues.includes('SLA_PelvicCurtain') ? 'checked' : ''}> Pelvic Curtain</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="SLA_FullSkirt" ${hiddenByValues.includes('SLA_FullSkirt') ? 'checked' : ''}> Full Skirt</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="SLA_MiniSkirt" ${hiddenByValues.includes('SLA_MiniSkirt') ? 'checked' : ''}> Mini Skirt</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="SLA_MicroHotPants" ${hiddenByValues.includes('SLA_MicroHotPants') ? 'checked' : ''}> Micro Hot Pants</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="SLA_Heels" ${hiddenByValues.includes('SLA_Heels') ? 'checked' : ''}> High Heels</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="SLA_PiercingVulva" ${hiddenByValues.includes('SLA_PiercingVulva') ? 'checked' : ''}> Vulva Piercing</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="SLA_PiercingBelly" ${hiddenByValues.includes('SLA_PiercingBelly') ? 'checked' : ''}> Belly Piercing</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="SLA_PiercingNipple" ${hiddenByValues.includes('SLA_PiercingNipple') ? 'checked' : ''}> Nipple Piercing</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="SLA_PiercingClit" ${hiddenByValues.includes('SLA_PiercingClit') ? 'checked' : ''}> Clit Piercing</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="EroticArmor" ${hiddenByValues.includes('EroticArmor') ? 'checked' : ''}> Erotic Armor</label>
+                            </div>
+                        </div>
+                        <div>
+                            <h5>Devious Devices Keywords</h5>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;">
+                                <label><input type="checkbox" name="editHiddenBy" value="zad_DeviousPlugVaginal" ${hiddenByValues.includes('zad_DeviousPlugVaginal') ? 'checked' : ''}> Vaginal Plug</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="zad_DeviousPlugAnal" ${hiddenByValues.includes('zad_DeviousPlugAnal') ? 'checked' : ''}> Anal Plug</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="zad_DeviousBelt" ${hiddenByValues.includes('zad_DeviousBelt') ? 'checked' : ''}> Chastity Belt</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="zad_DeviousBra" ${hiddenByValues.includes('zad_DeviousBra') ? 'checked' : ''}> Chastity Bra</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="zad_DeviousCollar" ${hiddenByValues.includes('zad_DeviousCollar') ? 'checked' : ''}> Collar</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="zad_DeviousArmCuffs" ${hiddenByValues.includes('zad_DeviousArmCuffs') ? 'checked' : ''}> Arm Cuffs</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="zad_DeviousLegCuffs" ${hiddenByValues.includes('zad_DeviousLegCuffs') ? 'checked' : ''}> Leg Cuffs</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="zad_DeviousHood" ${hiddenByValues.includes('zad_DeviousHood') ? 'checked' : ''}> Hood</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="zad_DeviousGag" ${hiddenByValues.includes('zad_DeviousGag') ? 'checked' : ''}> Gag</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="zad_DeviousGagPanel" ${hiddenByValues.includes('zad_DeviousGagPanel') ? 'checked' : ''}> Panel Gag</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="zad_DeviousGagLarge" ${hiddenByValues.includes('zad_DeviousGagLarge') ? 'checked' : ''}> Large Gag</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="zad_DeviousBlindfold" ${hiddenByValues.includes('zad_DeviousBlindfold') ? 'checked' : ''}> Blindfold</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="zad_DeviousCorset" ${hiddenByValues.includes('zad_DeviousCorset') ? 'checked' : ''}> Corset</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="zad_DeviousHarness" ${hiddenByValues.includes('zad_DeviousHarness') ? 'checked' : ''}> Harness</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="zad_DeviousStraitjacket" ${hiddenByValues.includes('zad_DeviousStraitjacket') ? 'checked' : ''}> Straitjacket</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="zad_DeviousArmbinder" ${hiddenByValues.includes('zad_DeviousArmbinder') ? 'checked' : ''}> Armbinder</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="zad_DeviousElbowTie" ${hiddenByValues.includes('zad_DeviousElbowTie') ? 'checked' : ''}> Elbow Tie</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="zad_DeviousYoke" ${hiddenByValues.includes('zad_DeviousYoke') ? 'checked' : ''}> Restraining Yoke</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="zad_DeviousGloves" ${hiddenByValues.includes('zad_DeviousGloves') ? 'checked' : ''}> Bondage Gloves</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="zad_DeviousHobbleSkirt" ${hiddenByValues.includes('zad_DeviousHobbleSkirt') ? 'checked' : ''}> Hobble Skirt</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="zad_DeviousAnkleShackles" ${hiddenByValues.includes('zad_DeviousAnkleShackles') ? 'checked' : ''}> Ankle Shackles</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="zad_DeviousBoots" ${hiddenByValues.includes('zad_DeviousBoots') ? 'checked' : ''}> Slave Boots</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="zad_DeviousSuit" ${hiddenByValues.includes('zad_DeviousSuit') ? 'checked' : ''}> Full Bodysuit</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="zad_PiercingsNipple" ${hiddenByValues.includes('zad_PiercingsNipple') ? 'checked' : ''}> Nipple Piercings</label>
+                                <label><input type="checkbox" name="editHiddenBy" value="zad_PiercingsVaginal" ${hiddenByValues.includes('zad_PiercingsVaginal') ? 'checked' : ''}> Genital Piercings</label>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Configure hidden by button click
+                hiddenByElement.querySelector('.edit-hidden-by-btn').addEventListener('click', function() {
+                    $(this).next('.hidden-by-editor').slideToggle(300);
+                });
+                
+                // Change edit button text and add editing class
+                cardElement.querySelector('.editBtn').textContent = 'Save';
+                cardElement.classList.add('editing');
+            }
+
+            function saveEquipmentChanges(cardElement) {
+                // Collect edited values
+                const description = cardElement.querySelector('.description').textContent;
+                const bodyPart = cardElement.querySelector('.edit-body-part')?.value || '';
+                
+                // Make sure we're getting the actual boolean value, not assuming it's checked
+                const isRestraint = cardElement.querySelector('.edit-is-restraint')?.checked ? 1 : 0;
+                const isEnabled = cardElement.querySelector('.edit-is-enabled')?.checked ? 1 : 0;
+                
+                // Get hidden by values
+                const hiddenByValues = [];
+                cardElement.querySelectorAll('input[name="editHiddenBy"]:checked').forEach(checkbox => {
+                    hiddenByValues.push(checkbox.value);
+                });
+                const hiddenBy = hiddenByValues.join(',');
+                
+                // Collect form ID and mod name
+                const baseFormId = cardElement.dataset.baseformid;
+                const modName = cardElement.dataset.modname;
+                
+                console.log(`Saving changes for ${baseFormId} / ${modName}:`, {
+                    description,
+                    bodyPart,
+                    isRestraint,
+                    hiddenBy,
+                    isEnabled
+                });
+                
+                // Send AJAX request to update
+                $.ajax({
+                    url: 'we_manager.php',
+                    method: 'POST',
+                    data: {
+                        action: 'edit',
+                        baseFormId: baseFormId,
+                        modName: modName,
+                        description: description,
+                        body_part: bodyPart,
+                        is_restraint: isRestraint,
+                        hidden_by: hiddenBy,
+                        is_enabled: isEnabled
+                    },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            // Update displayed values
+                            const restraintElement = cardElement.querySelector('.is-restraint');
+                            restraintElement.textContent = isRestraint ? 'Yes' : 'No';
+                            
+                            const bodyPartElement = cardElement.querySelector('.body-part');
+                            bodyPartElement.textContent = bodyPart || 'None';
+                            
+                            const hiddenByElement = cardElement.querySelector('.hidden-by');
+                            hiddenByElement.textContent = formatHiddenBy(hiddenBy);
+                            
+                            const statusElement = cardElement.querySelector('.status');
+                            if (isEnabled) {
+                                statusElement.textContent = 'Enabled';
+                                statusElement.classList.add('status-enabled');
+                                statusElement.classList.remove('status-disabled');
+                                cardElement.classList.remove('disabled');
+                            } else {
+                                statusElement.textContent = 'Disabled';
+                                statusElement.classList.add('status-disabled');
+                                statusElement.classList.remove('status-enabled');
+                                cardElement.classList.add('disabled');
+                            }
+                            
+                            // Update toggle
+                            const toggleElement = cardElement.querySelector('.toggle-enabled');
+                            if (toggleElement) {
+                                toggleElement.checked = isEnabled;
+                            }
+                            
+                            // Update data attributes
+                            cardElement.dataset.isrestraint = isRestraint;
+                            cardElement.dataset.bodypart = bodyPart;
+                            cardElement.dataset.hiddenby = hiddenBy;
+                            cardElement.dataset.isenabled = isEnabled;
+                            
+                            // Remove any clear buttons
+                            cardElement.querySelectorAll('.clearBtn').forEach(btn => btn.remove());
+                            
+                            // Reset content editable fields
+                            cardElement.querySelectorAll('[contenteditable="true"]').forEach(element => {
+                                element.contentEditable = false;
+                                element.style.backgroundColor = '';
+                                element.style.padding = '';
+                                element.style.borderRadius = '';
+                                element.style.border = '';
+                            });
+                            
+                            // Reset edit state
+                            cardElement.querySelector('.editBtn').textContent = 'Edit';
+                            cardElement.classList.remove('editing');
+                            
+                            showToast('Equipment updated successfully');
+                        } else {
+                            showToast('Failed to update equipment', 'error');
+                        }
+                    },
+                    error: function() {
+                        showToast('Error updating equipment', 'error');
+                    }
                 });
             }
 
@@ -511,90 +1585,6 @@
                 }
             }
 
-            // Filter form submission
-            $('#filterForm').submit(function(e) {
-                e.preventDefault();
-                const filters = {
-                    action: 'load',
-                    baseFormId: $('#filterBaseFormId').val(),
-                    modName: $('#filterModName').val(),
-                    name: $('#filterName').val(),
-                    description: $('#filterDescription').val()
-                };
-
-                $.ajax({
-                    url: 'we_manager.php',
-                    method: 'GET',
-                    data: filters,
-                    success: function(response) {
-                        if (response.status === 'success') {
-                            renderEquipmentCards(response.data);
-                        }
-                    }
-                });
-            });
-
-            // Add new equipment form submission
-            $('#addForm').submit(function(e) {
-                e.preventDefault();
-                const newData = {
-                    action: 'add',
-                    baseFormId: $('#newBaseFormId').val(),
-                    modName: $('#newModName').val(),
-                    name: $('#newName').val(),
-                    description: $('#newDescription').val()
-                };
-
-                $.ajax({
-                    url: 'we_manager.php',
-                    method: 'POST',
-                    data: newData,
-                    success: function(response) {
-                        if (response.status === 'success') {
-                            loadTableData();
-                            $('#addForm')[0].reset();
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error adding equipment:', error);
-                    }
-                });
-            });
-
-            function updateEquipment(data) {
-                const updateData = {
-                    action: 'edit',
-                    baseFormId: data.baseFormId,
-                    modName: data.modName,
-                    description: data.description || ''
-                };
-
-                // Add visual feedback
-                const cardElement = document.querySelector(`.equipment-card[data-baseformid="${data.baseFormId}"][data-modname="${data.modName}"]`);
-                if (cardElement) {
-                    const descriptionElement = cardElement.querySelector('.description');
-                    const originalText = descriptionElement.textContent;
-                    
-                    $.ajax({
-                        url: 'we_manager.php',
-                        method: 'POST',
-                        data: updateData,
-                        success: function(response) {
-                            if (response.status === 'success') {
-                                loadTableData();
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            console.error('Error updating equipment:', error);
-                            // Revert on error
-                            if (descriptionElement) {
-                                descriptionElement.textContent = originalText;
-                            }
-                        }
-                    });
-                }
-            }
-
             function deleteEquipment(baseFormId, modName) {
                 $.ajax({
                     url: 'we_manager.php',
@@ -606,14 +1596,60 @@
                     },
                     success: function(response) {
                         if (response.status === 'success') {
-                            loadTableData();
+                            loadFilteredData(); // Use filtered data 
+                            showToast('Equipment deleted successfully');
                         }
                     },
                     error: function(xhr, status, error) {
                         console.error('Error deleting equipment:', error);
+                        showToast('Error deleting equipment', 'error');
                     }
                 });
             }
+
+            // Add new equipment form submission with proper name handling
+            $('#addForm').submit(function(e) {
+                e.preventDefault();
+                
+                // Get selected hiddenBy values
+                const hiddenByCheckboxes = document.querySelectorAll('input[name="newHiddenBy"]:checked');
+                const hiddenByValues = Array.from(hiddenByCheckboxes).map(cb => cb.value);
+                
+                // Clean and sanitize inputs, especially the name
+                const nameInput = $('#newName').val().trim();
+                
+                const newData = {
+                    action: 'add',
+                    baseFormId: $('#newBaseFormId').val().trim(),
+                    modName: $('#newModName').val().trim(),
+                    name: nameInput,
+                    description: $('#newDescription').val().trim(),
+                    body_part: $('#newBodyPart').val().trim(),
+                    is_restraint: $('#newIsRestraint').prop('checked') ? 1 : 0,
+                    is_enabled: $('#newIsEnabled').prop('checked') ? 1 : 0,
+                    hidden_by: hiddenByValues.join(',')
+                };
+
+                $.ajax({
+                    url: 'we_manager.php',
+                    method: 'POST',
+                    data: newData,
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            loadFilteredData();
+                            $('#addForm')[0].reset();
+                            // Reset any open collapsible sections
+                            $('.collapsible-content').hide();
+                            $('.collapsible-button span').text('▼');
+                            showToast('Equipment added successfully');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error adding equipment:', error);
+                        showToast('Error adding equipment', 'error');
+                    }
+                });
+            });
         });
     </script>
 </body>

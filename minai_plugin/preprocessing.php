@@ -1,7 +1,6 @@
 <?php
 // Start metrics for this entry point
 require_once("utils/metrics_util.php");
-minai_start_timer('preprocessing_php', 'CHIM');
 
 $fast_commands = ["addnpc","_quest","setconf","request","_speech","infoloc","infonpc","infonpc_close",
 "infoaction","status_msg","delete_event","itemfound","_questdata","_uquest","location","_questreset"];
@@ -19,6 +18,10 @@ else {
 if (isset($GLOBALS["minai_skip_processing"]) && $GLOBALS["minai_skip_processing"]) {
     return;
 }
+
+// minai_start_timer('CHIM');
+// minai_start_timer('Pre-LLM', 'CHIM');
+minai_start_timer('preprocessing_php', 'MinAI');
 
 // Initialize common variables
 require_once("utils/init_common_variables.php");

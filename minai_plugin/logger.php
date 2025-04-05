@@ -1,4 +1,5 @@
 <?php
+include_once("/var/www/html/HerikaServer/lib/logger.php");
 function minai_log($level, $message, $logFile = 'minai.log') {
     // Ensure level is lowercase for consistency
     $level = strtolower($level);

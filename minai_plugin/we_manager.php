@@ -15,10 +15,10 @@ if (!file_exists($configFilepath . "conf.php")) {
 require_once($rootEnginePath . "conf" . DIRECTORY_SEPARATOR . "conf.php");
 require_once($rootEnginePath . "lib" . DIRECTORY_SEPARATOR . "{$GLOBALS["DBDRIVER"]}.class.php");
 require_once("logger.php");
-
+require_once("db_utils.php");
 $db = new sql();
 $GLOBALS['db'] = $db;
-
+CreateEquipmentDescriptionTableIfNotExist();
 $response = ['status' => 'success'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -30,8 +30,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $modName = $db->escape($_POST['modName']);
         $name = $db->escape($_POST['name']);
         $description = $db->escape($_POST['description']);
+        // If description is "no description" (case insensitive), use empty string
+        if (strtolower($description) === "no description") {
+            $description = "";
+        }
+        $is_restraint = isset($_POST['is_restraint']) ? intval($_POST['is_restraint']) : 0;
+        $body_part = $db->escape($_POST['body_part'] ?? '');
+        $hidden_by = $db->escape($_POST['hidden_by'] ?? '');
+        $is_enabled = isset($_POST['is_enabled']) ? intval($_POST['is_enabled']) : 0;
 
-        $insertQuery = "INSERT INTO equipment_description (baseFormId, modName, name, description) VALUES ('{$baseFormId}', '{$modName}', '{$name}', '{$description}')";
+        $insertQuery = "INSERT INTO equipment_description (baseFormId, modName, name, description, is_restraint, body_part, hidden_by, is_enabled) 
+                        VALUES ('{$baseFormId}', '{$modName}', '{$name}', '{$description}', {$is_restraint}, '{$body_part}', '{$hidden_by}', {$is_enabled})";
 
         $db->execQuery($insertQuery);
 
@@ -39,14 +48,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Edit existing row
         $baseFormId = $db->escape($_POST['baseFormId']);
         $modName = $db->escape($_POST['modName']);
-        //$name = $db->escape($_POST['name']);
         $description = $db->escape($_POST['description']);
+        // If description is "no description" (case insensitive), use empty string
+        if (strtolower($description) === "no description") {
+            $description = "";
+        }
+        $is_restraint = isset($_POST['is_restraint']) ? intval($_POST['is_restraint']) : 0;
+        $body_part = $db->escape($_POST['body_part'] ?? '');
+        $hidden_by = $db->escape($_POST['hidden_by'] ?? '');
+        $is_enabled = isset($_POST['is_enabled']) ? intval($_POST['is_enabled']) : 0;
 
         // Update existing record
-        $updateQuery = "UPDATE equipment_description SET description = '{$description}' WHERE baseFormId = '{$baseFormId}' AND modName = '{$modName}'";
+        $updateQuery = "UPDATE equipment_description 
+                        SET description = '{$description}',
+                            is_restraint = {$is_restraint},
+                            body_part = '{$body_part}',
+                            hidden_by = '{$hidden_by}',
+                            is_enabled = {$is_enabled}
+                        WHERE baseformid = '{$baseFormId}' AND modname = '{$modName}'";
+        
         minai_log("info", 'update query: ' . $updateQuery);
         $db->execQuery($updateQuery);
 
+    } elseif ($action === 'toggle_enabled') {
+        // Toggle enabled status
+        $baseFormId = $db->escape($_POST['baseFormId']);
+        $modName = $db->escape($_POST['modName']);
+        $is_enabled = isset($_POST['is_enabled']) ? intval($_POST['is_enabled']) : 0;
+        error_log("Toggling enabled status for {$baseFormId} {$modName}");
+        $updateQuery = "UPDATE equipment_description SET is_enabled = {$is_enabled} WHERE baseformid = '{$baseFormId}' AND modname = '{$modName}'";
+        error_log("Update query: {$updateQuery}");
+        $db->execQuery($updateQuery);
+        
     } elseif ($action === 'delete') {
         // Delete existing row
         $baseFormId = $db->escape($_POST['baseFormId']);
@@ -68,6 +101,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['act
     $modName = $db->escape($_GET['modName'] ?? '');
     $name = $db->escape($_GET['name'] ?? '');
     $description = $db->escape($_GET['description'] ?? '');
+    $body_part = $db->escape($_GET['body_part'] ?? '');
+    $is_restraint = isset($_GET['is_restraint']) && $_GET['is_restraint'] ? intval($_GET['is_restraint']) : 0;
+    $show_disabled = isset($_GET['show_disabled']) && $_GET['show_disabled'] ? true : false;
 
     if (!empty($baseFormId)) {
         $query .= " AND baseFormId ILIKE '%{$baseFormId}%'";
@@ -84,6 +120,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['act
     if (!empty($description)) {
         $query .= " AND description ILIKE '%{$description}%'";
     }
+    
+    if (!empty($body_part)) {
+        $query .= " AND body_part ILIKE '%{$body_part}%'";
+    }
+    
+    if (isset($_GET['is_restraint']) && $_GET['is_restraint']) {
+        $query .= " AND is_restraint = 1";
+    }
+    
+    // Only show enabled items unless specifically asked to show disabled
+    if (!$show_disabled) {
+        $query .= " AND is_enabled = 1";
+    }
 
     $query .= " ORDER BY $sort";
 
@@ -96,7 +145,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['act
             'baseFormId' => $row['baseformid'],
             'modName' => $row['modname'],
             'name' => $row['name'],
-            'description' => $row['description']
+            'description' => $row['description'],
+            'is_restraint' => $row['is_restraint'] ?? 0,
+            'body_part' => $row['body_part'] ?? '',
+            'hidden_by' => $row['hidden_by'] ?? '',
+            'is_enabled' => $row['is_enabled'] ?? 1
         ];
     }
 

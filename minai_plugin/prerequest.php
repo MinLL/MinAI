@@ -7,7 +7,7 @@
 
 // Start metrics for this entry point
 require_once("utils/metrics_util.php");
-minai_start_timer('prerequest_php', 'CHIM');
+minai_start_timer('prerequest_php', 'MinAI');
 
 // Avoid processing for fast / storage events
 if (isset($GLOBALS["minai_skip_processing"]) && $GLOBALS["minai_skip_processing"]) {

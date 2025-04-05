@@ -18,7 +18,7 @@ class FormatUtil {
         }
         
         // Add debug logging
-        minai_log("debug", "Original context: " . str_replace("\n", "\\n", $context));
+        // minai_log("debug", "Original context: " . str_replace("\n", "\\n", $context));
         
         // Split into lines for processing
         $lines = explode("\n", $context);
@@ -99,7 +99,7 @@ class FormatUtil {
         $formatted = implode("\n", $result);
         
         // Add debug logging for the result
-        minai_log("debug", "Formatted context: " . str_replace("\n", "\\n", $formatted));
+        // minai_log("debug", "Formatted context: " . str_replace("\n", "\\n", $formatted));
         
         return $formatted;
     }

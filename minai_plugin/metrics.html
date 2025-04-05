@@ -452,6 +452,142 @@
             font-size: 12px;
             margin-left: 5px;
         }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .time-trends-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+        
+        .time-range-selector {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .time-range-btn {
+            background-color: var(--background-dark);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .time-range-btn.active {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .component-toggles {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            max-width: 60%;
+        }
+        
+        .component-toggle {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background-color: rgba(45, 45, 45, 0.7);
+            border-radius: 20px;
+            padding: 4px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+        
+        .component-toggle:hover {
+            border-color: var(--secondary-color);
+        }
+        
+        .component-toggle.inactive {
+            opacity: 0.5;
+        }
+        
+        .component-toggle.focused {
+            border: 2px solid white;
+            background-color: rgba(70, 70, 70, 0.9);
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        }
+        
+        .component-toggle-color {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        .chart-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chart-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+            justify-content: space-between;
+        }
+        
+        .stat-box {
+            flex: 1;
+            min-width: 120px;
+            background-color: rgba(45, 45, 45, 0.5);
+            border-radius: 6px;
+            padding: 10px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1px solid var(--border-color);
+        }
+        
+        .stat-title {
+            font-size: 12px;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--info-color);
+            margin: 5px 0;
+        }
+        
+        .stat-unit {
+            font-size: 12px;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+        
+        /* Component Legend at bottom */
+        .component-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+            justify-content: center;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        
+        /* Add Font Awesome */
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
     </style>
 </head>
 <body>
@@ -464,19 +600,23 @@
         <div class="tabs">
             <div class="tab active" data-tab="overview">Overview</div>
             <div class="tab" data-tab="processing">Processing Times</div>
-            <div class="tab" data-tab="system">System Metrics</div>
-            <div class="tab" data-tab="raw">Raw Data</div>
-            <div class="tab" data-tab="entrypoints">Entry Points</div>
+            <div class="tab hidden" data-tab="system">System Metrics</div>
             <div class="tab" data-tab="hierarchy">Hierarchy</div>
+            <div class="tab" data-tab="raw">Raw Data</div>            
         </div>
 
         <div class="card">
             <div class="filters">
                 <select id="timeRange">
+                    <option value="5m">Last 5 Minutes</option>
+                    <option value="10m">Last 10 Minutes</option>
+                    <option value="30m">Last 30 Minutes</option>
                     <option value="1h">Last Hour</option>
-                    <option value="24h" selected>Last 24 Hours</option>
-                    <option value="7d">Last 7 Days</option>
-                    <option value="30d">Last 30 Days</option>
+                    <option value="4h">Last 4 Hours</option>
+                    <option value="8h">Last 8 Hours</option>
+                    <option value="1d" selected>Last 24 Hours</option>
+                    <option value="2d">Last 2 Days</option>
+                    <option value="all">All Time</option>
                 </select>
                 <select id="componentFilter">
                     <option value="all">All Components</option>
@@ -527,11 +667,11 @@
                     <canvas id="componentTimeChart"></canvas>
                 </div>
             </div>
-
+                        
             <div class="card">
-                <h2>Request Types Distribution</h2>
+                <h2>Top Time-Consuming Components</h2>
                 <div class="chart-container">
-                    <canvas id="requestTypesChart"></canvas>
+                    <canvas id="topComponentsChart"></canvas>
                 </div>
             </div>
             
@@ -541,11 +681,18 @@
                     <canvas id="hierarchyLevelChart"></canvas>
                 </div>
             </div>
-            
+
             <div class="card">
-                <h2>Top Time-Consuming Components</h2>
+                <h2>Processing Time by Actor</h2>
                 <div class="chart-container">
-                    <canvas id="topComponentsChart"></canvas>
+                    <canvas id="actorTimeChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card hidden">
+                <h2>Request Types Distribution</h2>
+                <div class="chart-container">
+                    <canvas id="requestTypesChart"></canvas>
                 </div>
             </div>
         </div>
@@ -554,15 +701,49 @@
         <div class="tab-content" id="processing-tab" style="display:none;">
             <div class="card">
                 <h2>Processing Time Trends</h2>
+                <div class="time-trends-controls">
+                    <div class="time-range-selector">
+                        <button class="time-range-btn" data-range="5m">5m</button>
+                        <button class="time-range-btn" data-range="10m">10m</button>
+                        <button class="time-range-btn" data-range="30m">30m</button>
+                        <button class="time-range-btn active" data-range="1h">1h</button>
+                        <button class="time-range-btn" data-range="4h">4h</button>
+                        <button class="time-range-btn" data-range="8h">8h</button>
+                        <button class="time-range-btn" data-range="1d">1d</button>
+                        <button class="time-range-btn" data-range="all">All</button>
+                    </div>
+                    <div class="chart-actions">
+                        <button id="resetZoomBtn" title="Reset zoom"><i class="fa fa-refresh"></i> Reset Zoom</button>
+                        <button id="downloadChartBtn" title="Download chart as image"><i class="fa fa-download"></i> Download</button>
+                    </div>
+                </div>
+                <div class="chart-stats">
+                    <div class="stat-box">
+                        <span class="stat-title">Max Processing Time</span>
+                        <span class="stat-value" id="max-time">0.348</span>
+                        <span class="stat-unit">seconds</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-title">Min Processing Time</span>
+                        <span class="stat-value" id="min-time">0.000</span>
+                        <span class="stat-unit">seconds</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-title">Standard Deviation</span>
+                        <span class="stat-value" id="std-dev">0.036</span>
+                        <span class="stat-unit">seconds</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-title">95th Percentile</span>
+                        <span class="stat-value" id="percentile-95">0.067</span>
+                        <span class="stat-unit">seconds</span>
+                    </div>
+                </div>
                 <div class="chart-container">
                     <canvas id="timeSeriesChart"></canvas>
                 </div>
-            </div>
-
-            <div class="card">
-                <h2>Processing Time by Actor</h2>
-                <div class="chart-container">
-                    <canvas id="actorTimeChart"></canvas>
+                <div class="component-legend" id="component-toggles">
+                    <!-- Will be populated dynamically -->
                 </div>
             </div>
         </div>
@@ -618,56 +799,6 @@
             </div>
         </div>
         
-        <!-- Entry Points Tab Content -->
-        <div class="tab-content" id="entrypoints-tab" style="display:none;">
-            <div class="card">
-                <h2>Entry Points Performance</h2>
-                <div class="chart-container">
-                    <canvas id="entrypointsChart"></canvas>
-                </div>
-            </div>
-            
-            <div class="metrics-grid">
-                <div class="metric-card">
-                    <h3 class="metric-title">globals.php</h3>
-                    <div class="metric-value" id="globals-time">-</div>
-                    <p>avg seconds</p>
-                </div>
-                <div class="metric-card">
-                    <h3 class="metric-title">preprocessing.php</h3>
-                    <div class="metric-value" id="preprocessing-time">-</div>
-                    <p>avg seconds</p>
-                </div>
-                <div class="metric-card">
-                    <h3 class="metric-title">prerequest.php</h3>
-                    <div class="metric-value" id="prerequest-time">-</div>
-                    <p>avg seconds</p>
-                </div>
-                <div class="metric-card">
-                    <h3 class="metric-title">functions.php</h3>
-                    <div class="metric-value" id="functions-time">-</div>
-                    <p>avg seconds</p>
-                </div>
-                <div class="metric-card">
-                    <h3 class="metric-title">context.php</h3>
-                    <div class="metric-value" id="context-time">-</div>
-                    <p>avg seconds</p>
-                </div>
-                <div class="metric-card">
-                    <h3 class="metric-title">pre-llm total</h3>
-                    <div class="metric-value" id="prellm-time">-</div>
-                    <p>avg seconds</p>
-                </div>
-            </div>
-            
-            <div class="card">
-                <h2>Entry Points Time Proportion</h2>
-                <div class="chart-container">
-                    <canvas id="entrypointsPieChart"></canvas>
-                </div>
-            </div>
-        </div>
-
         <!-- Hierarchy Tab Content -->
         <div class="tab-content" id="hierarchy-tab" style="display:none;">
             <div class="card">
@@ -722,8 +853,6 @@
             let memoryChart = null;
             let cpuChart = null;
             let diskChart = null;
-            let entrypointsChart = null;
-            let entrypointsPieChart = null;
             let hierarchyLevelChart = null;
             let topComponentsChart = null;
 
@@ -740,14 +869,17 @@
                 document.getElementById('request-count').textContent = '...';
                 document.getElementById('system-memory').textContent = '...';
                 
-                document.getElementById('globals-time').textContent = '...';
-                document.getElementById('preprocessing-time').textContent = '...';
-                document.getElementById('prerequest-time').textContent = '...';
-                document.getElementById('functions-time').textContent = '...';
-                document.getElementById('context-time').textContent = '...';
-                document.getElementById('prellm-time').textContent = '...';
+                // Convert dropdown timeRange to API parameter
+                let apiTimeRange = timeRange;
+                if (timeRange === 'all') {
+                    apiTimeRange = 'all';
+                } else if (timeRange === '5m' || timeRange === '10m' || timeRange === '30m') {
+                    // Convert minutes to seconds for API
+                    const minutes = parseInt(timeRange);
+                    apiTimeRange = (minutes * 60) + 's';
+                }
                 
-                fetch(`metrics.php?timeRange=${timeRange}&component=${component}&requestType=${requestType}&actor=${actor}`)
+                fetch(`metrics.php?timeRange=${apiTimeRange}&component=${component}&requestType=${requestType}&actor=${actor}`)
                     .then(response => response.json())
                     .then(data => {
                         // Store level counts for hierarchy visualization
@@ -784,21 +916,14 @@
 
             // Update dashboard with metrics data
             function updateDashboard(data) {
+                // Store summary metrics globally for use in other functions
+                window.summaryMetrics = data.summary;
+                
                 // Update summary metrics
                 document.getElementById('avg-prompt-time').textContent = data.summary.avgPromptTime.toFixed(3);
                 document.getElementById('avg-total-time').textContent = data.summary.avgTotalTime ? data.summary.avgTotalTime.toFixed(3) : '0.000';
                 document.getElementById('request-count').textContent = data.summary.requestCount;
                 document.getElementById('system-memory').textContent = data.summary.systemMemoryUsage.toFixed(1) + '%';
-
-                // Update entrypoints metrics
-                if (data.entrypoints) {
-                    document.getElementById('globals-time').textContent = data.entrypoints.globals.toFixed(3);
-                    document.getElementById('preprocessing-time').textContent = data.entrypoints.preprocessing.toFixed(3);
-                    document.getElementById('prerequest-time').textContent = data.entrypoints.prerequest.toFixed(3);
-                    document.getElementById('functions-time').textContent = data.entrypoints.functions.toFixed(3);
-                    document.getElementById('context-time').textContent = data.entrypoints.context.toFixed(3);
-                    document.getElementById('prellm-time').textContent = data.entrypoints.prellm.toFixed(3);
-                }
 
                 // Update request type and actor filters
                 updateFilters(data.filters);
@@ -809,7 +934,6 @@
                 updateTimeSeriesChart(data.timeSeries);
                 updateActorTimeChart(data.actorTimes);
                 updateSystemCharts(data.systemMetrics);
-                updateEntrypointsCharts(data.entrypoints);
                 updateRawDataTable(data.rawData);
                 
                 // Update hierarchy view with parent-child relationships
@@ -876,7 +1000,19 @@
                                     color: 'rgba(255, 255, 255, 0.1)'
                                 },
                                 ticks: {
-                                    color: 'rgba(224, 224, 224, 0.8)'
+                                    color: 'rgba(224, 224, 224, 0.8)',
+                                    maxRotation: 90,
+                                    minRotation: 45,
+                                    autoSkip: true,
+                                    maxTicksLimit: 25,
+                                    callback: function(value, index, values) {
+                                        // Truncate long labels
+                                        const label = this.getLabelForValue(value);
+                                        const maxLength = 15;
+                                        return label.length > maxLength ? 
+                                               label.substring(0, maxLength) + '...' : 
+                                               label;
+                                    }
                                 }
                             }
                         },
@@ -890,6 +1026,10 @@
                             },
                             tooltip: {
                                 callbacks: {
+                                    title: function(context) {
+                                        // Show full label in tooltip
+                                        return context[0].label;
+                                    },
                                     afterLabel: function(context) {
                                         const label = context.label;
                                         const depth = data.depths && data.depths[label] ? data.depths[label] : 1;
@@ -951,6 +1091,105 @@
                     timeSeriesChart.destroy();
                 }
                 
+                // Store the time series data globally for later filtering
+                window.timeSeriesData = data;
+                
+                // Update stats display
+                if (data.stats) {
+                    document.getElementById('max-time').textContent = data.stats.max.toFixed(3);
+                    document.getElementById('min-time').textContent = data.stats.min.toFixed(3);
+                    document.getElementById('std-dev').textContent = data.stats.stdDev.toFixed(3);
+                    document.getElementById('percentile-95').textContent = data.stats.percentile95.toFixed(3);
+                }
+                
+                // Track focused state
+                window.focusedDatasets = [];
+                
+                // Populate component toggles (now in legend at bottom)
+                const togglesContainer = document.getElementById('component-toggles');
+                togglesContainer.innerHTML = '';
+                
+                data.datasets.forEach((dataset, index) => {
+                    const color = getColorForIndex(index);
+                    const toggle = document.createElement('div');
+                    toggle.className = 'component-toggle';
+                    toggle.dataset.index = index;
+                    toggle.innerHTML = `
+                        <span class="component-toggle-color" style="background-color: ${color}"></span>
+                        <span>${dataset.label}</span>
+                    `;
+                    
+                    toggle.addEventListener('click', function(e) {
+                        const datasetIndex = parseInt(this.dataset.index);
+                        
+                        // Handle focusing behavior
+                        if (e.ctrlKey || e.metaKey) {
+                            // Toggle visibility with Ctrl/Cmd+click
+                            this.classList.toggle('inactive');
+                            timeSeriesChart.setDatasetVisibility(
+                                datasetIndex, 
+                                !timeSeriesChart.isDatasetVisible(datasetIndex)
+                            );
+                        } else {
+                            // Focus behavior
+                            const isFocused = this.classList.contains('focused');
+                            
+                            if (isFocused) {
+                                // Unfocus all if clicking on a focused item
+                                window.focusedDatasets = [];
+                                document.querySelectorAll('.component-toggle').forEach(t => {
+                                    t.classList.remove('focused');
+                                });
+                                
+                                // Reset opacities
+                                timeSeriesChart.data.datasets.forEach((ds, i) => {
+                                    ds.borderWidth = 2;
+                                    ds.borderColor = getColorForIndex(i);
+                                });
+                            } else {
+                                // Focus behavior - first clear other focuses if not holding shift
+                                if (!e.shiftKey) {
+                                    window.focusedDatasets = [];
+                                    document.querySelectorAll('.component-toggle').forEach(t => {
+                                        t.classList.remove('focused');
+                                    });
+                                }
+                                
+                                // Add this dataset to focused list
+                                window.focusedDatasets.push(datasetIndex);
+                                this.classList.add('focused');
+                                
+                                // Update visuals
+                                timeSeriesChart.data.datasets.forEach((ds, i) => {
+                                    if (window.focusedDatasets.includes(i)) {
+                                        ds.borderWidth = 3;
+                                        ds.borderColor = getColorForIndex(i);
+                                    } else {
+                                        ds.borderWidth = 1;
+                                        // Fade the non-focused lines
+                                        const baseColor = getColorForIndex(i);
+                                        ds.borderColor = baseColor.replace('0.7', '0.2');
+                                    }
+                                });
+                            }
+                        }
+                        
+                        timeSeriesChart.update();
+                    });
+                    
+                    togglesContainer.appendChild(toggle);
+                });
+                
+                // Calculate appropriate time unit based on selected range
+                let timeUnit = 'hour';
+                const selectedRange = document.querySelector('.time-range-btn.active')?.dataset.range || '1h';
+                if (selectedRange === '5m' || selectedRange === '10m' || selectedRange === '30m') {
+                    timeUnit = 'minute';
+                } else if (selectedRange === '1d' || selectedRange === '2d' || selectedRange === 'all') {
+                    timeUnit = 'day';
+                }
+                
+                // Create chart with enhanced options and more height
                 timeSeriesChart = new Chart(ctx, {
                     type: 'line',
                     data: {
@@ -960,17 +1199,27 @@
                             borderColor: getColorForIndex(index),
                             backgroundColor: getColorForIndex(index, 0.1),
                             fill: false,
-                            tension: 0.2
+                            tension: 0.2,
+                            pointRadius: 2,
+                            pointHoverRadius: 5,
+                            borderWidth: 2
                         }))
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        aspectRatio: 2.5, // Taller chart
+                        interaction: {
+                            mode: 'nearest',
+                            axis: 'x',
+                            intersect: false
+                        },
                         scales: {
                             x: {
                                 type: 'time',
                                 time: {
-                                    unit: 'hour'
+                                    unit: timeUnit,
+                                    tooltipFormat: 'MMM dd, yyyy HH:mm:ss'
                                 },
                                 title: {
                                     display: true,
@@ -1001,13 +1250,215 @@
                         },
                         plugins: {
                             legend: {
-                                labels: {
-                                    color: 'rgba(224, 224, 224, 0.8)'
+                                display: false // No default legend, we're using our custom one
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                titleColor: 'rgba(255, 255, 255, 0.9)',
+                                bodyColor: 'rgba(255, 255, 255, 0.9)',
+                                borderColor: 'rgba(255, 255, 255, 0.2)',
+                                borderWidth: 1,
+                                padding: 10,
+                                boxPadding: 5,
+                                usePointStyle: true,
+                                callbacks: {
+                                    afterTitle: function(context) {
+                                        // Add component name in tooltip
+                                        return context[0].dataset.label;
+                                    },
+                                    afterBody: function(context) {
+                                        // Add percentage of total time
+                                        if (data.stats && data.stats.max > 0) {
+                                            const value = context[0].parsed.y;
+                                            const percent = ((value / data.stats.max) * 100).toFixed(1);
+                                            return `${percent}% of peak processing time`;
+                                        }
+                                        return '';
+                                    }
+                                }
+                            },
+                            zoom: {
+                                pan: {
+                                    enabled: true,
+                                    mode: 'x'
+                                },
+                                zoom: {
+                                    wheel: {
+                                        enabled: true
+                                    },
+                                    pinch: {
+                                        enabled: true
+                                    },
+                                    mode: 'x'
+                                }
+                            }
+                        },
+                        onClick: function(e) {
+                            // Handle clicks on the chart
+                            const points = timeSeriesChart.getElementsAtEventForMode(
+                                e, 
+                                'nearest', 
+                                { intersect: true }, 
+                                false
+                            );
+                            
+                            if (points.length) {
+                                // Get the clicked dataset index
+                                const datasetIndex = points[0].datasetIndex;
+                                const toggle = document.querySelector(`.component-toggle[data-index="${datasetIndex}"]`);
+                                
+                                // Simulate a click on the toggle
+                                if (toggle) {
+                                    // Create a synthetic event that mimics the original modifiers
+                                    const clickEvent = new MouseEvent('click', {
+                                        ctrlKey: e.native.ctrlKey,
+                                        shiftKey: e.native.shiftKey,
+                                        metaKey: e.native.metaKey
+                                    });
+                                    toggle.dispatchEvent(clickEvent);
+                                }
+                            } else {
+                                // Clicked outside a line - reset focuses if any
+                                if (window.focusedDatasets && window.focusedDatasets.length > 0) {
+                                    window.focusedDatasets = [];
+                                    document.querySelectorAll('.component-toggle').forEach(t => {
+                                        t.classList.remove('focused');
+                                    });
+                                    
+                                    // Reset opacities
+                                    timeSeriesChart.data.datasets.forEach((ds, i) => {
+                                        ds.borderWidth = 2;
+                                        ds.borderColor = getColorForIndex(i);
+                                    });
+                                    
+                                    timeSeriesChart.update();
                                 }
                             }
                         }
                     }
                 });
+                
+                // Add event listener for time range buttons
+                document.querySelectorAll('.time-range-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        // Set active class
+                        document.querySelectorAll('.time-range-btn').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Get time range
+                        const range = this.dataset.range;
+                        
+                        // Update time unit based on range
+                        let timeUnit = 'hour';
+                        if (range === '5m' || range === '10m' || range === '30m') {
+                            timeUnit = 'minute';
+                        } else if (range === '1d' || range === '2d' || range === 'all') {
+                            timeUnit = 'day';
+                        }
+                        timeSeriesChart.options.scales.x.time.unit = timeUnit;
+                        
+                        // Filter data based on range
+                        filterTimeSeriesData(range);
+                        
+                        // Maintain focus states after filtering
+                        if (window.focusedDatasets && window.focusedDatasets.length > 0) {
+                            timeSeriesChart.data.datasets.forEach((ds, i) => {
+                                if (window.focusedDatasets.includes(i)) {
+                                    ds.borderWidth = 3;
+                                    ds.borderColor = getColorForIndex(i);
+                                } else {
+                                    ds.borderWidth = 1;
+                                    const baseColor = getColorForIndex(i);
+                                    ds.borderColor = baseColor.replace('0.7', '0.2');
+                                }
+                            });
+                            timeSeriesChart.update();
+                        }
+                    });
+                });
+                
+                // Add event listener for reset zoom button
+                document.getElementById('resetZoomBtn').addEventListener('click', function() {
+                    timeSeriesChart.resetZoom();
+                });
+                
+                // Add event listener for download button
+                document.getElementById('downloadChartBtn').addEventListener('click', function() {
+                    const link = document.createElement('a');
+                    link.download = 'minai-processing-time-trends.png';
+                    link.href = timeSeriesChart.toBase64Image();
+                    link.click();
+                });
+                
+                // Add instructions tooltip to component legend
+                const instructionsEl = document.createElement('div');
+                instructionsEl.className = 'legend-instructions';
+                instructionsEl.innerHTML = `
+                    <small>
+                        <i class="fa fa-info-circle"></i> Click line or legend item to focus. Shift+click to select multiple. Click chart background to reset focus.
+                    </small>
+                `;
+                togglesContainer.appendChild(instructionsEl);
+            }
+            
+            // Filter time series data based on selected time range
+            function filterTimeSeriesData(range) {
+                if (!window.timeSeriesData || !timeSeriesChart) return;
+                
+                const now = new Date();
+                let cutoff = new Date();
+                
+                switch(range) {
+                    case '5m':
+                        cutoff.setMinutes(now.getMinutes() - 5);
+                        break;
+                    case '10m':
+                        cutoff.setMinutes(now.getMinutes() - 10);
+                        break;
+                    case '30m':
+                        cutoff.setMinutes(now.getMinutes() - 30);
+                        break;
+                    case '1h':
+                        cutoff.setHours(now.getHours() - 1);
+                        break;
+                    case '4h':
+                        cutoff.setHours(now.getHours() - 4);
+                        break;
+                    case '8h':
+                        cutoff.setHours(now.getHours() - 8);
+                        break;
+                    case '1d':
+                        cutoff.setHours(now.getHours() - 24);
+                        break;
+                    case '2d':
+                        cutoff.setHours(now.getHours() - 48);
+                        break;
+                    case 'all':
+                        cutoff = new Date(0); // Beginning of time
+                        break;
+                    default:
+                        cutoff.setHours(now.getHours() - 24);
+                        break;
+                }
+                
+                // Filter datasets
+                const filteredDatasets = window.timeSeriesData.datasets.map(dataset => {
+                    const filteredData = dataset.data.filter(point => {
+                        return new Date(point.x) >= cutoff;
+                    });
+                    
+                    return {
+                        ...dataset,
+                        data: filteredData
+                    };
+                });
+                
+                // Update chart
+                timeSeriesChart.data.datasets.forEach((dataset, index) => {
+                    dataset.data = filteredDatasets[index].data;
+                });
+                
+                timeSeriesChart.update();
             }
 
             // Update actor time chart
@@ -1068,127 +1519,6 @@
                 });
             }
 
-            // Update entry points charts
-            function updateEntrypointsCharts(data) {
-                if (!data) return;
-
-                // Bar chart
-                const entrypointsCtx = document.getElementById('entrypointsChart').getContext('2d');
-                if (entrypointsChart) {
-                    entrypointsChart.destroy();
-                }
-                
-                const labels = ['globals.php', 'preprocessing.php', 'prerequest.php', 'functions.php', 'context.php', 'pre-llm total'];
-                const values = [
-                    data.globals,
-                    data.preprocessing,
-                    data.prerequest,
-                    data.functions,
-                    data.context,
-                    data.prellm
-                ];
-                
-                entrypointsChart = new Chart(entrypointsCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Average Time (seconds)',
-                            data: values,
-                            backgroundColor: [
-                                'rgba(76, 175, 80, 0.7)',  // globals
-                                'rgba(33, 150, 243, 0.7)', // preprocessing
-                                'rgba(156, 39, 176, 0.7)', // prerequest
-                                'rgba(255, 193, 7, 0.7)',  // functions
-                                'rgba(244, 67, 54, 0.7)',  // context
-                                'rgba(0, 188, 212, 0.7)'   // pre-llm
-                            ],
-                            borderColor: [
-                                'rgba(76, 175, 80, 1)',
-                                'rgba(33, 150, 243, 1)',
-                                'rgba(156, 39, 176, 1)',
-                                'rgba(255, 193, 7, 1)',
-                                'rgba(244, 67, 54, 1)',
-                                'rgba(0, 188, 212, 1)'
-                            ],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Time (seconds)',
-                                    color: 'rgba(224, 224, 224, 0.8)'
-                                },
-                                grid: {
-                                    color: 'rgba(255, 255, 255, 0.1)'
-                                },
-                                ticks: {
-                                    color: 'rgba(224, 224, 224, 0.8)'
-                                }
-                            },
-                            x: {
-                                grid: {
-                                    color: 'rgba(255, 255, 255, 0.1)'
-                                },
-                                ticks: {
-                                    color: 'rgba(224, 224, 224, 0.8)'
-                                }
-                            }
-                        },
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        }
-                    }
-                });
-                
-                // Pie chart for proportion
-                const piectx = document.getElementById('entrypointsPieChart').getContext('2d');
-                if (entrypointsPieChart) {
-                    entrypointsPieChart.destroy();
-                }
-                
-                // Use the first 5 values (excluding pre-llm total)
-                const pieLabels = labels.slice(0, 5);
-                const pieValues = values.slice(0, 5);
-                
-                entrypointsPieChart = new Chart(piectx, {
-                    type: 'pie',
-                    data: {
-                        labels: pieLabels,
-                        datasets: [{
-                            data: pieValues,
-                            backgroundColor: [
-                                'rgba(76, 175, 80, 0.7)',
-                                'rgba(33, 150, 243, 0.7)',
-                                'rgba(156, 39, 176, 0.7)',
-                                'rgba(255, 193, 7, 0.7)',
-                                'rgba(244, 67, 54, 0.7)'
-                            ]
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'right',
-                                labels: {
-                                    color: 'rgba(224, 224, 224, 0.8)'
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-
             // Update system metrics charts
             function updateSystemCharts(data) {
                 // Memory chart
@@ -1200,7 +1530,7 @@
                     type: 'line',
                     data: {
                         datasets: [{
-                            label: 'Memory Usage (MB)',
+                            label: 'Memory Usage (%)',
                             data: data.memory.map(point => ({
                                 x: new Date(point.timestamp * 1000),
                                 y: point.value / (1024 * 1024)
@@ -1549,7 +1879,7 @@
                 const rootNodes = buildTreeStructure(hierarchyData, componentTimes);
                 
                 // Calculate total time for percentages
-                const totalTime = Object.values(componentTimes).reduce((sum, time) => sum + time, 0);
+                const totalTime = window.summaryMetrics ? window.summaryMetrics.avgTotalTime : Object.values(componentTimes).reduce((sum, time) => sum + time, 0);
                 
                 // Create and attach the root components
                 renderComponentNodes(treeContainer, rootNodes, totalTime);
@@ -1808,6 +2138,14 @@
                             plugins: {
                                 legend: {
                                     display: false
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        title: function(context) {
+                                            // Show full label in tooltip
+                                            return context[0].label;
+                                        }
+                                    }
                                 }
                             },
                             scales: {
@@ -1822,7 +2160,15 @@
                                 },
                                 y: {
                                     ticks: {
-                                        color: 'rgba(224, 224, 224, 0.8)'
+                                        color: 'rgba(224, 224, 224, 0.8)',
+                                        callback: function(value, index, values) {
+                                            // Truncate long labels in y-axis
+                                            const label = this.getLabelForValue(value);
+                                            const maxLength = 25;
+                                            return label.length > maxLength ? 
+                                                   label.substring(0, maxLength) + '...' : 
+                                                   label;
+                                        }
                                     },
                                     grid: {
                                         display: false
@@ -1857,5 +2203,7 @@
             fetchMetrics();
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.2.1/dist/chartjs-plugin-zoom.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </body>
 </html> 

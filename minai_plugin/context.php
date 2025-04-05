@@ -1,7 +1,7 @@
 <?php
 // Start metrics for this entry point
 require_once("utils/metrics_util.php");
-minai_start_timer('context_php', 'CHIM');
+minai_start_timer('context_php', 'MinAI');
 
 // Avoid processing for fast / storage events
 if (isset($GLOBALS["minai_skip_processing"]) && $GLOBALS["minai_skip_processing"]) {
@@ -119,3 +119,4 @@ UpdateSystemPrompt();
 
 require "/var/www/html/HerikaServer/ext/minai_plugin/command_prompt_custom.php";
 minai_stop_timer('context_php');
+// minai_stop_timer('Pre-LLM');

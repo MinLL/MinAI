@@ -20,7 +20,7 @@ function load_function_module($module_path) {
         $GLOBALS["loaded_function_modules"][$module_path] = true;
     }
 }
-minai_start_timer('functions_php', 'CHIM');
+minai_start_timer('functions_php', 'MinAI');
 load_function_module("functions/deviousnarrator.php");
 /***
 

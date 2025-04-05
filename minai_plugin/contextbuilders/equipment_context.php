@@ -2,562 +2,682 @@
 require_once("wornequipment_context.php");
 
 /**
- * Helper function to get a formatted device name
- * 
- * @param array $device The device data array
- * @param string $name The actor's name
- * @param bool $isNaked Whether the actor is naked
- * @return string The formatted device name
- */
-function GetDeviceName($device, $name, $isNaked) {
-    // If it's a naked state
-    if (isset($device['type']) && $device['type'] === 'naked') {
-        return "completely naked and exposed";
-    }
-    
-    // Use full description if available
-    if (isset($device['fullDescription']) && !empty($device['fullDescription'])) {
-        return $device['fullDescription'];
-    }
-    
-    // Return the base device type if no description is available
-    return $device['type'];
-}
-
-/**
- * Helper function to get restraint info text
- * 
- * @param string $name The actor's name
- * @param array $device The device data array
- * @param bool $isWeaponDrawn Whether a weapon is drawn
- * @return string The restraint info text
- */
-function GetRestraintInfo($name, $device, $isWeaponDrawn) {
-    $pronouns = GetActorPronouns($name);
-    $their = $pronouns["possessive"];
-    
-    if (isset($device['limitsMovement']) && $device['limitsMovement']) {
-        return " which severely restricts $their movement";
-    } else {
-        return " which restrains $their " . (isset($device['bodyArea']) ? $device['bodyArea'] : "body");
-    }
-}
-
-/**
- * Function to provide a unified view of both equipment and devices an actor is wearing.
- * This combines custom equipment descriptions and keyword-based device detection.
+ * Function to provide a unified view of equipment an actor is wearing.
+ * This uses the new fields: is_restraint, hidden_by, and is_enabled to simplify processing.
  * 
  * @param string $name The actor's name
  * @param bool $forceNarrator Whether to force narrator-perspective (sees hidden items)
+ * @param bool $debug Whether to include debug information
  * @return string A formatted description of all the actor's worn items
  */
-Function GetUnifiedEquipmentContext($name, $forceNarrator = false) {
+Function GetUnifiedEquipmentContext($name, $forceNarrator = false, $debug = false) {
     $ret = "";
     $isNarrator = $forceNarrator || ($GLOBALS["HERIKA_NAME"] == "The Narrator");
     
-    // Get equipment context - this gives us database-stored custom descriptions
-    $eqContext = GetAllEquipmentContext($name);
+    // Get equipment data
+    $equipment = ProcessEquipment($name);
     
-    // Get device context - this gives us keyword-based detection of devices and clothing
-    $deviceContext = GetAllDevicesContext($name);
-    
-    // Check if vibration effects are active
-    $isVibratorActive = IsInFaction($name, "Vibrator Effect Faction") || IsEnabled($name, "isVibratorActive");
-    
-    // Choose which device array to use based on perspective
-    $devices = [];
-    
-    // If the narrator is the target or forced narrator perspective
-    if ($isNarrator) {
-        $devices = $deviceContext["narratorDevices"];
-    } 
-    // If the target is the player, use others' perspective
-    elseif ($name == $GLOBALS["PLAYER_NAME"]) {
-        $devices = $deviceContext["otherDevices"];
-    } 
-    // For all other cases, use wearer's perspective
-    else {
-        $devices = $deviceContext["wearerDevices"];
-    }
-    
-    // Get basic info
-    $wearingTop = $deviceContext["wearingTop"];
-    $wearingBottom = $deviceContext["wearingBottom"];
-    $helplessness = $deviceContext["helplessness"];
-    $pronouns = $deviceContext["pronouns"];
+    // Get pronouns
+    $pronouns = GetActorPronouns($name);
     $their = $pronouns["possessive"];
     
-    // Get specific equipment slots directly
-    $boots = GetActorValue($name, "boots", false, true);
-    $gloves = GetActorValue($name, "gloves", false, true);
-    $helmet = GetActorValue($name, "helmet", false, true);
-    $cuirass = GetActorValue($name, "cuirass", false, true);
-    
-    // Check if the actor is restrained
-    $isRestrained = !empty($deviceContext["constraintDevices"]);
+    // Check if the actor is naked
+    $isNaked = IsEnabled($name, "isNaked");
     
     // Check if weapon is drawn
     $isWeaponDrawn = IsEnabled($name, "weaponDrawn");
     
-    // Check naked state but don't return immediately
-    $isNaked = IsEnabled($name, "isNaked") && !$wearingTop && !$wearingBottom;
+    // Organize items by category
+    $categories = CategorizeItems($equipment["visibleItems"], $equipment["hiddenItems"]);
     
-    // Initialize arrays for categorizing items
-    $restraints = [];
-    $fullbodyClothing = [];
-    $topClothing = [];
-    $bottomClothing = [];
-    $accessories = [];
-    $innerWear = [];
-    $otherHidden = [];
-    $vibratingDevices = ["visible" => [], "hidden" => []]; // New array for tracking vibrating devices
+    // Count restraints to determine helplessness level
+    $visibleRestraints = count($categories["restraints"]["visible"]);
+    $totalRestraints = $visibleRestraints + count($categories["restraints"]["hidden"]);
     
-    // Define categories for organizing items with visibility already handled
-    $categories = [
-        "clothing" => ["visible" => [], "hidden" => []],
-        "armor" => ["visible" => [], "hidden" => []],
-        "restraints" => ["visible" => [], "hidden" => []],
-        "piercings" => ["visible" => [], "hidden" => []],
-        "plugs" => ["visible" => [], "hidden" => []],
-        "other" => ["visible" => [], "hidden" => []]
-    ];
-    
-    // Define keywords for categorization
-    $categoryKeywords = [
-        "clothing" => ['outfit', 'clothing', 'armor', 'bra', 'panties', 'thong', 'pants', 'skirt', 'leotard', 'curtain', 'bikini', 'attire', 'shorts', 'bikini', 'underwear', 'top', 'bottom'],
-        "armor" => ['armor', 'cuirass', 'helmet', 'gloves', 'boots', 'gauntlets', 'shield'],
-        "restraints" => ['gag', 'cuffs', 'collar', 'bind', 'restrain', 'restrict', 'chastity', 'yoke', 'armbinder', 'shackles'],
-        "piercings" => ['piercing'],
-        "plugs" => ['plug', 'vibrator']
-    ];
-    
-    // Process custom equipment descriptions from database first
-    $customItems = [];
-    if (!empty($eqContext["context"])) {
-        // Split the context by commas and periods to get individual items
-        $items = preg_split('/[,\.]\s*/', trim($eqContext["context"]));
-        foreach ($items as $item) {
-            if (!empty(trim($item))) {
-                $customItems[] = trim($item);
-            }
-        }
+    // Determine restraint description
+    $restraintDesc = "";
+    if ($totalRestraints > 2) {
+        $restraintDesc = "thoroughly restrained and helpless";
+    } elseif ($totalRestraints > 0) {
+        $restraintDesc = "partially restrained";
     }
     
-    // Add custom items to appropriate categories
-    foreach ($customItems as $item) {
-        $added = false;
-        $isHidden = (strpos(strtolower($item), 'hidden beneath') !== false);
-        $visibilityKey = $isHidden ? "hidden" : "visible";
-        
-        foreach ($categoryKeywords as $category => $keywords) {
-            foreach ($keywords as $keyword) {
-                if (strpos(strtolower($item), $keyword) !== false) {
-                    $categories[$category][$visibilityKey][] = $item;
-                    $added = true;
-                    break;
-                }
-            }
-            if ($added) break;
-        }
-        
-        // If not categorized, add to other
-        if (!$added) {
-            $categories["other"][$visibilityKey][] = $item;
-        }
-    }
+    // Build description based on categories
     
-    // Format a device for output
-    $formatDevice = function ($name, $device, $isNaked) use ($isRestrained, $isWeaponDrawn) {
-        // Format a device for output
-        $deviceName = GetDeviceName($device, $name, $isNaked);
-        
-        if ($isRestrained && isset($device["isRestraint"]) && $device["isRestraint"]) {
-            return $deviceName . GetRestraintInfo($name, $device, $isWeaponDrawn);
-        } else {
-            return $deviceName;
-        }
-    };
-    
-    // Process visible devices for all perspectives
-    foreach ($devices["visible"] as $device) {
-        $deviceName = $formatDevice($name, $device, $isNaked);
-        $isRestraint = isset($device["isRestraint"]) && $device["isRestraint"];
-        
-        // For non-narrator views, check if this should be hidden based on layer
-        $shouldBeHidden = false;
-        $layer = isset($device["layer"]) ? (int)$device["layer"] : 2;
-        
-        // Layer 0 and 1 items (body layer, underwear) should be hidden if wearing clothing
-        if ($layer <= 1) {
-            if (($wearingTop && isset($device["coversTop"])) || 
-                ($wearingBottom && isset($device["coversBottom"]))) {
-                $shouldBeHidden = true;
-            }
-        }
-
-        // For non-narrator views, move covered items to hidden
-        // For narrator views, respect the original hidden state
-        if ($shouldBeHidden || (isset($device["hidden"]) && $device["hidden"])) {
-            if (isset($device["category"])) {
-                $category = $device["category"];
-                if (isset($categories[$category])) {
-                    $categories[$category]["hidden"][] = $deviceName;
-                } else {
-                    $categories["other"]["hidden"][] = $deviceName;
-                }
-            }
-            continue;
-        }
-        
-        // Check if this is a device that can vibrate
-        $canVibrate = false;
-        if (isset($device["type"])) {
-            $deviceType = strtolower($device["type"]);
-            $canVibrate = (strpos($deviceType, "vaginal piercing") !== false) ||
-                         (strpos($deviceType, "nipple piercing") !== false) ||
-                         (strpos($deviceType, "vaginal plug") !== false) ||
-                         (strpos($deviceType, "anal plug") !== false);
-        }
-        
-        // Track vibrating devices if they can vibrate and vibration is active
-        if ($canVibrate && $isVibratorActive) {
-            $vibratingDevices["visible"][] = $deviceName;
-        }
-        
-        // Categorize visible devices
-        if ($isRestraint) {
-            $restraints[] = $deviceName;
-        } elseif (isset($device["coversTop"]) && isset($device["coversBottom"]) && 
-                 $device["coversTop"] && $device["coversBottom"]) {
-            $fullbodyClothing[] = $deviceName;
-        } elseif (isset($device["coversTop"]) && $device["coversTop"]) {
-            $topClothing[] = $deviceName;
-        } elseif (isset($device["coversBottom"]) && $device["coversBottom"]) {
-            $bottomClothing[] = $deviceName;
-        } else {
-            $accessories[] = $deviceName;
-        }
-    }
-    
-    // Process hidden devices differently based on perspective
-    if (isset($devices["hidden"]) && !empty($devices["hidden"])) {
-        // Narrator sees all hidden items
-        if ($isNarrator) {
-            foreach ($devices["hidden"] as $device) {
-                $deviceName = $formatDevice($name, $device, $isNaked);
-                $isRestraint = isset($device["isRestraint"]) && $device["isRestraint"];
-                
-                // Check if this is a device that can vibrate
-                $canVibrate = false;
-                if (isset($device["type"])) {
-                    $deviceType = strtolower($device["type"]);
-                    $canVibrate = (strpos($deviceType, "vaginal piercing") !== false) ||
-                                 (strpos($deviceType, "nipple piercing") !== false) ||
-                                 (strpos($deviceType, "vaginal plug") !== false) ||
-                                 (strpos($deviceType, "anal plug") !== false);
-                }
-                
-                // Track vibrating devices if they can vibrate and vibration is active
-                if ($canVibrate && $isVibratorActive) {
-                    $vibratingDevices["hidden"][] = $deviceName;
-                }
-                
-                $layer = isset($device["layer"]) ? (int)$device["layer"] : 2;
-                
-                // Categorize hidden items for narrator view
-                if ($isRestraint) {
-                    $categories["restraints"]["hidden"][] = $deviceName;
-                } elseif (isset($device["category"])) {
-                    $category = $device["category"];
-                    if (isset($categories[$category])) {
-                        $categories[$category]["hidden"][] = $deviceName;
-                    } else {
-                        $categories["other"]["hidden"][] = $deviceName;
-                    }
-                } else {
-                    // Default categorization based on layer
-                    if ($layer <= 1) {
-                        $innerWear[] = $deviceName;
-                    } else {
-                        $otherHidden[] = $deviceName;
-                    }
-                }
-            }
-        } 
-        // Wearer can see their own restraints and feel devices
-        elseif ($name != $GLOBALS["PLAYER_NAME"]) {
-            foreach ($devices["hidden"] as $device) {
-                $isRestraint = isset($device["isRestraint"]) && $device["isRestraint"];
-                
-                // Wearer can always see or feel their own restraints
-                if ($isRestraint) {
-                    $deviceName = $formatDevice($name, $device, $isNaked);
-                    $categories["restraints"]["hidden"][] = $deviceName;
-                }
-                // Wearer can feel certain devices even if hidden
-                elseif (isset($device["category"]) && 
-                        ($device["category"] == "plugs" || $device["category"] == "vibrator")) {
-                    $deviceName = $formatDevice($name, $device, $isNaked);
-                    $categories["plugs"]["hidden"][] = $deviceName;
-                }
-            }
-        }
-        // Others (including player) might see suggestive cues for hidden devices
-        else {
-            // This is handled separately with inferredDevices below
-        }
-    }
-    
-    // Build the output string with each category grouped by visibility
-    
-    // Handle nakedness first
+    // Handle nakedness
     if ($isNaked) {
-        $hasVisibleItems = false;
-        foreach ($categories as $category => $visibilityGroups) {
-            if (!empty($visibilityGroups["visible"])) {
-                $hasVisibleItems = true;
-                break;
-            }
-        }
-        
-        if (!$hasVisibleItems && empty($boots) && empty($gloves) && empty($helmet)) {
-            // If truly naked with nothing visible
-            $ret .= "{$name} is completely naked and exposed.\n";
-        } else {
-            // Naked but wearing some visible items
-            $ret .= "{$name} is naked";
+        if (empty($categories["clothing"]["visible"]) && 
+            empty($categories["armor"]["head"]) && 
+            empty($categories["armor"]["torso"]) && 
+            empty($categories["armor"]["arms"]) && 
+            empty($categories["armor"]["legs"])) {
+            // Truly naked
+            $ret .= "- {$name} is completely naked and exposed";
             
-            // Add exceptions for footwear, gloves, helmet
+            // Add restraint status to nakedness if applicable
+            if (!empty($restraintDesc)) {
+                $ret .= ", and is " . $restraintDesc;
+            }
+            
+            $ret .= ".\n";
+        } else {
+            // Naked with some items
+            $ret .= "- {$name} is naked";
+            
+            // Add exceptions for armor pieces
             $exceptions = [];
-            if (!empty($boots)) $exceptions[] = $boots;
-            if (!empty($gloves)) $exceptions[] = $gloves;
-            if (!empty($helmet)) $exceptions[] = $helmet;
+            if (!empty($categories["armor"]["head"])) $exceptions[] = "headwear";
+            if (!empty($categories["armor"]["arms"])) $exceptions[] = "arm protection";
+            if (!empty($categories["armor"]["legs"])) $exceptions[] = "leg protection";
             
             if (!empty($exceptions)) {
                 $ret .= " except for " . implode(" and ", $exceptions);
+            }
+            
+            // Add restraint status
+            if (!empty($restraintDesc)) {
+                $ret .= ", and is " . $restraintDesc;
             }
             
             $ret .= ".\n";
         }
     }
     
-    // Handle visible clothing and armor
-    $visibleClothing = array_merge(
-        $fullbodyClothing,
-        $topClothing,
-        $bottomClothing,
-        $categories["clothing"]["visible"],
-        $categories["armor"]["visible"]
-    );
-    
-    // Remove duplicates and any items that are also in hidden categories
-    $visibleClothing = array_unique($visibleClothing);
-    $hiddenClothing = array_merge(
-        $categories["clothing"]["hidden"],
-        $categories["armor"]["hidden"]
-    );
-    $visibleClothing = array_diff($visibleClothing, $hiddenClothing);
-    
-    if (!empty($visibleClothing)) {
-        $ret .= "{$name} is wearing " . implode(", ", $visibleClothing) . ".\n";
-    } elseif (!$isNaked && !empty($cuirass)) {
-        // If no other clothing but cuirass is set
-        $ret .= "{$name} is wearing {$cuirass}.\n";
+    // Build clothing/armor description
+    $armorPieces = [];
+    foreach ($categories["armor"] as $bodyPart => $items) {
+        if (!empty($items)) {
+            $armorPieces = array_merge($armorPieces, $items);
+        }
     }
     
-    // Handle hidden clothing and armor for narrator
-    if ($isNarrator) {
-        $hiddenClothing = array_merge(
-            $categories["clothing"]["hidden"],
-            $categories["armor"]["hidden"]
-        );
+    if (!empty($categories["clothing"]["visible"])) {
+        $armorPieces = array_merge($armorPieces, $categories["clothing"]["visible"]);
+    }
+    
+    // Deduplicate armor pieces
+    $armorPieces = array_unique($armorPieces);
+    
+    if (!empty($armorPieces) && !$isNaked) {
+        $ret .= "- {$name} is wearing " . implode(", ", $armorPieces) . ".\n";
+    }
+    
+    // Add accessories
+    if (!empty($categories["accessories"])) {
+        // Deduplicate accessories
+        $accessories = array_unique($categories["accessories"]);
+        $ret .= "- {$name} is " . ((!$isNaked && !empty($armorPieces)) ? "also " : "") . 
+                "wearing " . implode(", ", $accessories) . ".\n";
+    }
+    
+    // Update restraints display
+    if (!empty($categories['restraints']['visible'])) {
+        // Group similar restraints by their base description
+        $groupedRestraints = GroupSimilarItems($categories['restraints']['visible']);
+        $formattedRestraints = FormatGroupedItems($groupedRestraints);
         
-        if (!empty($hiddenClothing) || !empty($innerWear)) {
-            if (!empty($innerWear)) {
-                $ret .= "Beneath " . ($isNaked ? "these items" : "their outer clothing") . ", {$name} is wearing " . implode(", ", $innerWear) . ".\n";
-            }
-            
-            if (!empty($hiddenClothing)) {
-                $ret .= "Also hidden from view, {$name} has " . implode(", ", $hiddenClothing) . ".\n";
+        if (!empty($formattedRestraints)) {
+            if (empty($restraintDesc)) {
+                $ret .= "- {$name} " . ((!$isNaked && !empty($armorPieces) || !empty($categories["accessories"])) ? "also " : "") . 
+                          "wears " . implode(", ", $formattedRestraints);
+            } else {
+                // If we already mentioned being restrained, list the specific items
+                $ret .= "- {$name} is visibly wearing some restraints: " . implode(", ", $formattedRestraints);
             }
         }
-    }
-    
-    // Handle restraints grouped by visibility
-    $visibleRestraints = array_merge($restraints, $categories["restraints"]["visible"]);
-    $hiddenRestraints = $categories["restraints"]["hidden"];
-    
-    if (!empty($visibleRestraints)) {
-        $ret .= "{$name} " . ((!$isNaked && !empty($visibleClothing)) ? "also " : "") . 
-                "has " . implode(", ", $visibleRestraints);
-      
-        // Add helplessness description if relevant
-        if (!empty($helplessness)) {
-            $ret .= ", and is {$helplessness}";
+                
+        // Add restraint status to clothing description if applicable
+        if (!empty($restraintDesc)) {
+            $ret .= ", and is " . $restraintDesc;
         }
+        
         $ret .= ".\n";
-    } elseif (!empty($helplessness)) {
-        // If no visible restraints but helplessness is defined
-        $ret .= "{$name} is {$helplessness}.\n";
     }
-      
+    
     // Add hidden restraints based on perspective
-    if (!empty($hiddenRestraints)) {
-        if ($isNarrator) {
-            $ret .= "Hidden beneath clothing, {$name} also has " . implode(", ", $hiddenRestraints) . ".\n";
-        } elseif ($name != $GLOBALS["PLAYER_NAME"]) {
-            // For the wearer's perspective - they know about their restraints even if hidden
-            $ret .= "{$name} can feel " . implode(", ", $hiddenRestraints) . " beneath " . $their . " clothing.\n";
+    if (!empty($categories['restraints']['hidden'])) {
+        $groupedHiddenRestraints = GroupSimilarItems($categories['restraints']['hidden']);
+        $formattedHiddenRestraints = FormatGroupedItems($groupedHiddenRestraints);
+        
+        if (!empty($formattedHiddenRestraints)) {
+            if ($isNarrator) {
+                // Player perspective
+                $ret .= "- Hidden beneath $their outfit, {$name} is wearing some restraints: " . implode(", ", $formattedHiddenRestraints) . "\n";
+            }
         }
     }
     
-    // Handle piercings grouped by visibility
-    $visiblePiercings = $categories["piercings"]["visible"];
-    $hiddenPiercings = $categories["piercings"]["hidden"];
-    
-    // For non-narrator views, all piercings should be hidden if covered by clothing
-    if (!$isNarrator) {
-        $hiddenPiercings = array_merge($visiblePiercings, $hiddenPiercings);
-        $visiblePiercings = [];
-    }
-    
-    if (!empty($visiblePiercings)) {
-        $ret .= "{$name}'s body is adorned with " . implode(", ", $visiblePiercings) . ".\n";
+    // Update piercings display
+    if (!empty($categories['piercings']['visible'])) {
+        $groupedPiercings = GroupSimilarItems($categories['piercings']['visible']);
+        $formattedPiercings = FormatGroupedItems($groupedPiercings);
+        
+        if (!empty($formattedPiercings)) {
+            $ret .= "- {$name}'s body is adorned with " . implode(", ", $formattedPiercings) . ".\n";
+        }
     }
     
     // Add hidden piercings based on perspective
-    if (!empty($hiddenPiercings)) {
-        if ($isNarrator) {
-            $ret .= "Beneath clothing, {$name}'s body is also adorned with " . implode(", ", $hiddenPiercings) . ".\n";
-        } elseif ($name != $GLOBALS["PLAYER_NAME"]) {
-            // Wearer knows about their own piercings
-            $ret .= "{$name} has " . implode(", ", $hiddenPiercings) . " hidden beneath " . $their . " clothing.\n";
+    if (!empty($categories['piercings']['hidden'])) {
+        $groupedHiddenPiercings = GroupSimilarItems($categories['piercings']['hidden']);
+        $formattedHiddenPiercings = FormatGroupedItems($groupedHiddenPiercings);
+        
+        if (!empty($formattedHiddenPiercings)) {
+            if ($isNarrator) {
+                $ret .= "- Hidden beneath $their outfit, {$name}'s body is adorned with " . implode(", ", $formattedHiddenPiercings) . ".\n";
+            }
         }
     }
     
-    // Handle plugs/vibrators grouped by visibility
-    $visiblePlugs = $categories["plugs"]["visible"];
-    $hiddenPlugs = $categories["plugs"]["hidden"];
-    
-    // For non-narrator views, all plugs should be hidden
-    if (!$isNarrator) {
-        $hiddenPlugs = array_merge($visiblePlugs, $hiddenPlugs);
-        $visiblePlugs = [];
-    }
-    
-    if (!empty($visiblePlugs)) {
-        $ret .= "{$name} has " . implode(" and ", $visiblePlugs) . " inserted.\n";
+    // Update plugs display
+    if (!empty($categories['plugs']['visible'])) {
+        $groupedPlugs = GroupSimilarItems($categories['plugs']['visible']);
+        $formattedPlugs = FormatGroupedItems($groupedPlugs, true); // Use "and" for last item
+        
+        if (!empty($formattedPlugs)) {
+            $ret .= "- {$name} has " . implode(", ", $formattedPlugs) . " inserted into " . $their . " body.\n";
+        }
     }
     
     // Add hidden plugs based on perspective
-    if (!empty($hiddenPlugs)) {
-        if ($isNarrator) {
-            $ret .= "Additionally, {$name} has " . implode(" and ", $hiddenPlugs) . " inserted, hidden beneath clothing.\n";
-        } elseif ($name != $GLOBALS["PLAYER_NAME"]) {
-            // Wearer feels their own plugs/vibrators
-            $ret .= "{$name} can feel " . implode(" and ", $hiddenPlugs) . " inserted inside " . $their . " body.\n";
-        }
-    }
-    
-    // Handle other items grouped by visibility
-    $visibleOther = array_merge($accessories, $categories["other"]["visible"]);
-    $hiddenOther = $categories["other"]["hidden"];
-    
-    if (!empty($visibleOther)) {
-        $ret .= "{$name} is also equipped with " . implode(", ", $visibleOther) . ".\n";
-    }
-    
-    // Add hidden other items for narrator
-    if ($isNarrator && !empty($hiddenOther)) {
-        $ret .= "{$name} has " . implode(", ", $hiddenOther) . " hidden from view.\n";
-    }
-    
-    // Handle inferred items for non-narrator perspectives observing others
-    if (!$isNarrator && $name != $GLOBALS["PLAYER_NAME"]) {
-        $inferredDevices = [];
+    if (!empty($categories['plugs']['hidden'])) {
+        $groupedHiddenPlugs = GroupSimilarItems($categories['plugs']['hidden']);
+        $formattedHiddenPlugs = FormatGroupedItems($groupedHiddenPlugs, true); // Use "and" for last item
         
-        // Look for devices with inferred presence in the hidden category
-        if (isset($deviceContext["otherDevices"]["hidden"])) {
-            foreach ($deviceContext["otherDevices"]["hidden"] as $device) {
-                if (isset($device['inferredPresence']) && $device['inferredPresence']) {
-                    $inferredDevices[] = isset($device['inferredType']) ? $device['inferredType'] : 'hidden device';
-                }
-            }
-        }
-        
-        if (!empty($inferredDevices)) {
-            // Remove duplicates and format nicely
-            $inferredDevices = array_unique($inferredDevices);
-            
-            // If we detected unexplained reactions
-            if (in_array('unexplained reaction', $inferredDevices)) {
-                $ret .= "You notice " . $name . " occasionally " . 
-                       (count($inferredDevices) > 1 ? "flinches and shifts uncomfortably" : "shifts uncomfortably") . 
-                       ", suggesting the presence of hidden devices.\n";
-            }
-            
-            // If we detected rigid objects under clothing
-            if (in_array('rigid object', $inferredDevices)) {
-                $ret .= "The outline of something rigid is visible beneath " . $their . " clothing.\n";
-            }
-        }
-    }
-    
-    // Handle vibrating devices status
-    $hasVibratingDevices = false;
-    foreach ($devices as $visibility => $deviceList) {
-        foreach ($deviceList as $device) {
-            if (isset($device["type"])) {
-                $deviceType = strtolower($device["type"]);
-                if (strpos($deviceType, "vaginal piercing") !== false ||
-                    strpos($deviceType, "nipple piercing") !== false ||
-                    strpos($deviceType, "vaginal plug") !== false ||
-                    strpos($deviceType, "anal plug") !== false) {
-                    $hasVibratingDevices = true;
-                    break 2;
-                }
-            }
-        }
-    }
-
-    if ($hasVibratingDevices) {
-        if ($isVibratorActive) {
-            // Handle visible vibrating devices
-            if (!empty($vibratingDevices["visible"])) {
-                $ret .= implode(" and ", $vibratingDevices["visible"]) . " " . 
-                        (count($vibratingDevices["visible"]) > 1 ? "are" : "is") . " actively vibrating.\n";
-            }
-            
-            // Handle hidden vibrating devices based on perspective
-            if (!empty($vibratingDevices["hidden"])) {
-                if ($isNarrator) {
-                    $ret .= "Hidden from view, " . implode(" and ", $vibratingDevices["hidden"]) . " " . 
-                            (count($vibratingDevices["hidden"]) > 1 ? "are" : "is") . " also vibrating, stimulating their body.\n";
-                } elseif ($name != $GLOBALS["PLAYER_NAME"]) {
-                    // Wearer can feel their own vibrating devices
-                    $ret .= "{$name} can feel " . implode(" and ", $vibratingDevices["hidden"]) . " vibrating beneath " . 
-                            $their . " clothing.\n";
-                } else {
-                    // For others observing, add subtle hints about vibrating devices
-                    $ret .= $name . " occasionally " . 
-                           (count($vibratingDevices["hidden"]) > 1 ? 
-                            "shudders and squirms" : "shudders slightly") . 
-                           ", suggesting the presence of something hidden that is stimulating their body.\n";
-                }
-            }
-        } else {
-            // Devices present but not active
+        if (!empty($formattedHiddenPlugs)) {
             if ($isNarrator) {
-                $ret .= "The vibrating devices are currently inactive.\n";
-            } elseif ($name != $GLOBALS["PLAYER_NAME"]) {
-                $ret .= "{$name} can feel " . $their . " vibrating devices, though they are currently inactive.\n";
+                $ret .= "- Hidden beneath $their outfit, {$name} can feel " . implode(", ", $formattedHiddenPlugs) . 
+                " inserted inside " . $their . " body.\n";
             }
         }
     }
     
-    if ($ret != "")
-      $ret .= "\n";
+    // Add hidden clothing for narrator only
+    if ($isNarrator && !empty($categories["clothing"]["hidden"])) {
+        // Deduplicate hidden clothing
+        $hiddenClothing = array_unique($categories["clothing"]["hidden"]);
+        $ret .= "- Hidden beneath $their outfit, {$name} is also wearing " . implode(", ", $hiddenClothing) . ".\n";
+    }
+    
+    // Add debug information if requested
+    if ($debug) {
+        $ret .= "\n### DEBUG INFO\n";
+        $ret .= "- Armor (Head): " . count($categories["armor"]["head"]) . "\n";
+        $ret .= "- Armor (Torso): " . count($categories["armor"]["torso"]) . "\n";
+        $ret .= "- Armor (Arms): " . count($categories["armor"]["arms"]) . "\n";
+        $ret .= "- Armor (Legs): " . count($categories["armor"]["legs"]) . "\n";
+        $ret .= "- Clothing: " . count($categories["clothing"]["visible"]) . " visible, " . 
+                count($categories["clothing"]["hidden"]) . " hidden\n";
+        $ret .= "- Restraints: " . count($categories["restraints"]["visible"]) . " visible, " . 
+                count($categories["restraints"]["hidden"]) . " hidden " .
+                "(" . ($totalRestraints > 0 ? $restraintDesc : "not restrained") . ")\n";
+        $ret .= "- Accessories: " . count($categories["accessories"]) . "\n";
+        $ret .= "- Piercings: " . count($categories["piercings"]["visible"]) . " visible, " . 
+                count($categories["piercings"]["hidden"]) . " hidden\n";
+        $ret .= "- Plugs: " . count($categories["plugs"]["visible"]) . " visible, " . 
+                count($categories["plugs"]["hidden"]) . " hidden\n";
+    }
+    
     return $ret;
+}
+
+/**
+ * Helper function to categorize items based on their itemTypes
+ */
+function CategorizeItems($visibleItems, $hiddenItems) {
+    $categories = [
+        "armor" => [
+            "head" => [],
+            "torso" => [],
+            "arms" => [],
+            "legs" => []
+        ],
+        "clothing" => [
+            "visible" => [],
+            "hidden" => []
+        ],
+        "restraints" => [
+            "visible" => [],
+            "hidden" => []
+        ],
+        "accessories" => [],
+        "piercings" => [
+            "visible" => [],
+            "hidden" => []
+        ],
+        "plugs" => [
+            "visible" => [],
+            "hidden" => []
+        ]
+    ];
+    
+    // Helper function to add item to category only if not already present
+    $addToCategory = function($category, $subCategory, $description) use (&$categories) {
+        // Check for duplicates
+        if (!in_array($description, $categories[$category][$subCategory])) {
+            $categories[$category][$subCategory][] = $description;
+        }
+    };
+    
+    // Helper function to add item to flat category only if not already present
+    $addToFlatCategory = function($category, $description) use (&$categories) {
+        // Check for duplicates
+        if (!in_array($description, $categories[$category])) {
+            $categories[$category][] = $description;
+        }
+    };
+    
+    // Process visible items
+    foreach ($visibleItems as $item) {
+        $description = !empty($item['description']) ? $item['description'] : $item['name'];
+        $types = $item['itemTypes'] ?? [];
+        
+        // Restraints - only use is_restraint flag
+        if (!empty($item['is_restraint'])) {
+            // Add restraint type if available
+            $restraintType = GetRestraintTypeFromTypes($types);
+            if (!empty($restraintType) && stripos($description, $restraintType) === false) {
+                $description = $restraintType . " " . $description;
+            }
+            
+            // Clean up description
+            $description = trim(str_replace('  ', ' ', $description));
+            $addToCategory('restraints', 'visible', $description);
+            continue;
+        }
+        
+        // Use direct type matching rather than complex logic
+        
+        // Plugs
+        if (in_array('vaginal_plug', $types) || in_array('anal_plug', $types)) {
+            // Add plug type if not in description
+            $plugType = in_array('vaginal_plug', $types) ? "vaginal" : 
+                       (in_array('anal_plug', $types) ? "anal" : "");
+            
+            // Make sure we have a meaningful description - at minimum "plug"
+            if (trim($description) == "") {
+                $description = "plug";
+            }
+            
+            // Only add plug type if it's not already in the description
+            if (!empty($plugType) && stripos($description, $plugType) === false) {
+                $description = $description . " (" . $plugType . ")";
+            }
+            
+            $addToCategory('plugs', 'visible', $description);
+            continue;
+        }
+        
+        // Piercings
+        if (in_array('piercing', $types) || in_array('nipple_piercing', $types) || 
+            in_array('genital_piercing', $types) || in_array('belly_piercing', $types)) {
+            
+            // Add piercing location if not in description
+            $piercingType = "";
+            if (in_array('nipple_piercing', $types) && stripos($description, 'nipple') === false) {
+                $piercingType = "nipples";
+            } elseif (in_array('genital_piercing', $types) && 
+                     stripos($description, 'genital') === false && 
+                     stripos($description, 'clitoral') === false && 
+                     stripos($description, 'labia') === false) {
+                $piercingType = "genital";
+            } elseif (in_array('belly_piercing', $types) && 
+                     stripos($description, 'belly') === false && 
+                     stripos($description, 'navel') === false) {
+                $piercingType = "navel";
+            }
+            
+            if (!empty($piercingType)) {
+                $description = $description . " (" . $piercingType . ")";
+            }
+            
+            $addToCategory('piercings', 'visible', $description);
+            continue;
+        }
+        
+        // Accessories
+        if (in_array('amulet', $types) || in_array('ring', $types) || 
+            in_array('jewelry', $types) || in_array('circlet', $types)) {
+            $addToFlatCategory('accessories', $description);
+            continue;
+        }
+        
+        // Head armor
+        if (in_array('helmet', $types) || in_array('circlet', $types) || 
+            in_array('hood', $types) || stripos($item['name'], 'faceguard') !== false) {
+            $addToCategory('armor', 'head', $description);
+            continue;
+        }
+        
+        // Torso armor
+        if (in_array('body', $types) || in_array('chest', $types) || 
+            in_array('back', $types) || in_array('armor', $types) || 
+            in_array('revealing_armor', $types) || in_array('erotic_armor', $types) || 
+            in_array('bra', $types) || in_array('harness', $types) || 
+            in_array('chastity_bra', $types) || in_array('bodysuit', $types) || 
+            in_array('leotard', $types)) {
+            $addToCategory('armor', 'torso', $description);
+            continue;
+        }
+        
+        // Arm armor
+        if (in_array('gloves', $types) || in_array('gauntlets', $types) || 
+            in_array('bondage_gloves', $types)) {
+            $addToCategory('armor', 'arms', $description);
+            continue;
+        }
+        
+        // Leg armor
+        if (in_array('boots', $types) || in_array('greaves', $types) || 
+            (stripos($item['name'], 'boots') !== false) ||
+            in_array('legs', $types) || in_array('pants', $types) || 
+            in_array('hotpants', $types) || in_array('thong', $types) || 
+            in_array('panties', $types) || in_array('skirt', $types) || 
+            in_array('pelvis', $types) || in_array('chastity_belt', $types)) {
+            $addToCategory('armor', 'legs', $description);
+            continue;
+        }
+        
+        // Clothing (catch-all for other clothing types)
+        if (in_array('robes', $types) || in_array('common_clothes', $types) || 
+            in_array('fine_clothes', $types) || in_array('ragged_clothes', $types) || 
+            in_array('bikini', $types)) {
+            $addToCategory('clothing', 'visible', $description);
+            continue;
+        }
+        
+        // Fallback: Use body_part field if available
+        if (!empty($item['body_part'])) {
+            switch(strtolower($item['body_part'])) {
+                case 'head':
+                case 'face':
+                case 'hair':
+                    $addToCategory('armor', 'head', $description);
+                    break;
+                case 'torso':
+                case 'chest':
+                case 'back':
+                    $addToCategory('armor', 'torso', $description);
+                    break;
+                case 'arms':
+                case 'hands':
+                case 'wrists':
+                    $addToCategory('armor', 'arms', $description);
+                    break;
+                case 'legs':
+                case 'feet':
+                case 'ankles':
+                case 'groin':
+                    $addToCategory('armor', 'legs', $description);
+                    break;
+                case 'accessory':
+                case 'neck':
+                case 'finger':
+                    $addToFlatCategory('accessories', $description);
+                    break;
+                case 'piercing':
+                    $addToCategory('piercings', 'visible', $description);
+                    break;
+                case 'device':
+                case 'plug':
+                    $addToCategory('plugs', 'visible', $description);
+                    break;
+                default:
+                    $addToCategory('clothing', 'visible', $description);
+            }
+            continue;
+        }
+        
+        // Ultimate fallback: any remaining items go to visible clothing
+        $addToCategory('clothing', 'visible', $description);
+    }
+    
+    // Process hidden items - simplified categorization
+    foreach ($hiddenItems as $item) {
+        $description = !empty($item['description']) ? $item['description'] : $item['name'];
+        $types = $item['itemTypes'] ?? [];
+        
+        // Restraints - only use is_restraint flag
+        if (!empty($item['is_restraint'])) {
+            // Add restraint type if available
+            $restraintType = GetRestraintTypeFromTypes($types);
+            if (!empty($restraintType) && stripos($description, $restraintType) === false) {
+                $description = $restraintType . " " . $description;
+            }
+            
+            // Clean up description
+            $description = trim(str_replace('  ', ' ', $description));
+            $addToCategory('restraints', 'hidden', $description);
+            continue;
+        }
+        
+        // Plugs
+        if (in_array('vaginal_plug', $types) || in_array('anal_plug', $types) || 
+            (!empty($item['body_part']) && strtolower($item['body_part']) == 'plug')) {
+            
+            // Add plug type if not in description
+            $plugType = in_array('vaginal_plug', $types) ? "vaginal" : 
+                       (in_array('anal_plug', $types) ? "anal" : "");
+            
+            // Make sure we have a meaningful description - at minimum "plug"
+            if (trim($description) == "") {
+                $description = "plug";
+            }
+            
+            // Only add plug type if it's not already in the description
+            if (!empty($plugType) && stripos($description, $plugType) === false) {
+                $description = $description . " (" . $plugType . ")";
+            }
+            
+            $addToCategory('plugs', 'hidden', $description);
+            continue;
+        }
+        
+        // Piercings
+        if (in_array('piercing', $types) || in_array('nipple_piercing', $types) || 
+            in_array('genital_piercing', $types) || in_array('belly_piercing', $types) ||
+            (!empty($item['body_part']) && strtolower($item['body_part']) == 'piercing')) {
+            
+            // Add piercing location if not in description
+            $piercingType = "";
+            if (in_array('nipple_piercing', $types) && stripos($description, 'nipple') === false) {
+                $piercingType = "nipples";
+            } elseif (in_array('genital_piercing', $types) && 
+                     stripos($description, 'genital') === false && 
+                     stripos($description, 'clitoral') === false && 
+                     stripos($description, 'labia') === false) {
+                $piercingType = "genital";
+            } elseif (in_array('belly_piercing', $types) && 
+                     stripos($description, 'belly') === false && 
+                     stripos($description, 'navel') === false) {
+                $piercingType = "navel";
+            }
+            
+            if (!empty($piercingType)) {
+                $description = $description . " (" . $piercingType . ")";
+            }
+            
+            $addToCategory('piercings', 'hidden', $description);
+            continue;
+        }
+        
+        // All other hidden items go to clothing
+        $addToCategory('clothing', 'hidden', $description);
+    }
+    
+    return $categories;
+}
+
+/**
+ * Helper function to get a descriptive restraint type from itemTypes
+ */
+function GetRestraintTypeFromTypes($types) {
+    if (in_array('gag', $types)) return 'gag';
+    if (in_array('blindfold', $types)) return 'blindfold';
+    if (in_array('hood', $types)) return 'hood';
+    if (in_array('collar', $types)) return 'collar';
+    if (in_array('armbinder', $types)) return 'armbinder';
+    if (in_array('cuffs', $types)) return 'cuffs';
+    if (in_array('yoke', $types)) return 'yoke';
+    if (in_array('harness', $types)) return 'harness';
+    if (in_array('chastity_belt', $types)) return 'chastity belt';
+    if (in_array('chastity_bra', $types)) return 'chastity bra';
+    if (in_array('bodysuit', $types)) return 'bondage bodysuit';
+    if (in_array('bondage_gloves', $types)) return 'bondage gloves';
+    
+    return '';
+}
+
+
+/**
+ * Helper function to group similar items that have the same description
+ * @param array $items Array of item strings to group
+ * @return array Grouped items by description
+ */
+function GroupSimilarItems($items) {
+  $groupedByDescription = [];
+  $descriptionMap = [];
+  
+  // First pass: extract descriptions and identify standalone descriptions
+  foreach ($items as $item) {
+    // Check if this is a "name - description" format
+    if (strpos($item, ' - ') !== false) {
+      list($name, $description) = explode(' - ', $item, 2);
+      $descriptionMap[$item] = trim($description);
+    } else {
+      // If it's a standalone description, add it as is
+      $descriptionMap[$item] = trim($item);
+    }
+  }
+  
+  // Second pass: group items by description
+  foreach ($items as $item) {
+    $description = $descriptionMap[$item];
+    $added = false;
+    
+    // Check for exact match with existing description
+    foreach ($groupedByDescription as $groupDesc => $groupItems) {
+      // If we find an exact description match
+      if (trim($description) === trim($groupDesc)) {
+        $groupedByDescription[$groupDesc][] = $item;
+        $added = true;
+        break;
+      }
+      
+      // Check for significant partial match within descriptions
+      // This helps match "collar lockable neck restraint" with "lockable neck restraint"
+      if (
+        (stripos($description, $groupDesc) !== false && strlen($groupDesc) > 15) || 
+        (stripos($groupDesc, $description) !== false && strlen($description) > 15)
+      ) {
+        // Use the longer description as the key
+        $newKey = (strlen($groupDesc) > strlen($description)) ? $groupDesc : $description;
+        
+        // Move existing items to new key if needed
+        if ($newKey !== $groupDesc) {
+          $groupedByDescription[$newKey] = $groupItems;
+          unset($groupedByDescription[$groupDesc]);
+        }
+        
+        $groupedByDescription[$newKey][] = $item;
+        $added = true;
+        break;
+      }
+      
+      // Check for similarity based on word overlap (for longer descriptions)
+      if (strlen($description) > 20 && strlen($groupDesc) > 20) {
+        $descWords = explode(' ', strtolower($description));
+        $groupWords = explode(' ', strtolower($groupDesc));
+        
+        // Count common words
+        $common = array_intersect($descWords, $groupWords);
+        $commonCount = count($common);
+        $totalWords = count($descWords) + count($groupWords);
+        
+        // If more than 60% words are common, consider them similar
+        if ($commonCount > 3 && ($commonCount / ($totalWords / 2) > 0.6)) {
+          // Use the longer description as the key
+          $newKey = (strlen($groupDesc) > strlen($description)) ? $groupDesc : $description;
+          
+          // Move existing items to new key if needed
+          if ($newKey !== $groupDesc) {
+            $groupedByDescription[$newKey] = $groupItems;
+            unset($groupedByDescription[$groupDesc]);
+          }
+          
+          $groupedByDescription[$newKey][] = $item;
+          $added = true;
+          break;
+        }
+      }
+    }
+    
+    // If no match found, create a new group
+    if (!$added) {
+      $groupedByDescription[$description] = [$item];
+    }
+  }
+  
+  return $groupedByDescription;
+}
+
+/**
+ * Helper function to format grouped items
+ * @param array $groupedItems Items grouped by description
+ * @param bool $useAndForLast Whether to use "and" before the last item
+ * @return array Formatted strings
+ */
+function FormatGroupedItems($groupedItems, $useAndForLast = false) {
+  $result = [];
+  
+  foreach ($groupedItems as $description => $items) {
+    // Skip empty groups
+    if (empty($items)) continue;
+    
+    // Extract names from items with name-description format
+    $names = [];
+    $standaloneItems = [];
+    
+    foreach ($items as $item) {
+      // If item has a name - description format
+      if (strpos($item, ' - ') !== false) {
+        list($name, $itemDesc) = explode(' - ', $item, 2);
+        if (!empty(trim($name))) {
+          $names[] = trim($name);
+        }
+      } else {
+        // This is a standalone description
+        $standaloneItems[] = $item;
+      }
+    }
+    
+    // Format the output
+    if (!empty($names)) {
+      // Format name list with commas and optional "and"
+      if (count($names) > 1) {
+        if ($useAndForLast) {
+          $lastItem = array_pop($names);
+          $nameList = implode(', ', $names) . ' and ' . $lastItem;
+        } else {
+          $nameList = implode(', ', $names);
+        }
+        $result[] = $nameList . ' - ' . $description;
+      } else {
+        // Single item with name
+        $result[] = $names[0] . ' - ' . $description;
+      }
+    } 
+    
+    // Add standalone items (descriptions without names)
+    foreach ($standaloneItems as $item) {
+      // Only add if we don't already have a named item with this description
+      if (empty($names) || $item !== $description) {
+        $result[] = $item;
+      }
+    }
+  }
+  
+  return $result;
 }
   
   

@@ -97,6 +97,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         "inventory_items_limit" => intval($GLOBALS["inventory_items_limit"]),
         "use_item_relevancy_scoring" => $GLOBALS["use_item_relevancy_scoring"],
         
+        // Metrics settings
+        "minai_metrics_enabled" => $GLOBALS["minai_metrics_enabled"],
+        "minai_metrics_sampling_rate" => floatval($GLOBALS["minai_metrics_sampling_rate"]),
+        
         // Action prompts
         "action_prompts" => array(
             "singing" => $GLOBALS["action_prompts"]["singing"],
@@ -182,6 +186,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Inventory settings
         $newConfig .= "\$GLOBALS['inventory_items_limit'] = " . (intval($input['inventory_items_limit']) ?: 5) . ";\n";
         $newConfig .= "\$GLOBALS['use_item_relevancy_scoring'] = " . ($input['use_item_relevancy_scoring'] ? 'true' : 'false') . ";\n";
+        
+        // Metrics settings
+        $newConfig .= "\$GLOBALS['minai_metrics_enabled'] = " . ($input['minai_metrics_enabled'] ? 'true' : 'false') . ";\n";
+        $newConfig .= "\$GLOBALS['minai_metrics_sampling_rate'] = " . (floatval($input['minai_metrics_sampling_rate']) ?: 0.1) . ";\n";
         
         // Action prompts
         $newConfig .= "\$GLOBALS['action_prompts'] = " . buildAssociativeArrayString(array(

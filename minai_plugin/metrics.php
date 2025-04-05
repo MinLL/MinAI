@@ -24,9 +24,9 @@ if (isset($_GET['action']) && $_GET['action'] === 'clear') {
     
     try {
         // Create backup first
-        $backupFile = $metricsFile . '.bak.' . date('Ymd_His');
+        // $backupFile = $metricsFile . '.bak.' . date('Ymd_His');
         if (file_exists($metricsFile)) {
-            copy($metricsFile, $backupFile);
+            // copy($metricsFile, $backupFile);
             
             // Clear the file by opening it with 'w' mode
             file_put_contents($metricsFile, '');
@@ -527,7 +527,8 @@ if (count($totalMetrics) > 0) {
     $allComponents = [];
     
     // Initialize component nodes 
-    if ($data) {
+    // Replace with proper null check on $hierarchy
+    if (!empty($hierarchy) && is_array($hierarchy)) {
         foreach ($hierarchy as $component => $data) {
             if (!isset($allComponents[$component])) {
                 $allComponents[$component] = [

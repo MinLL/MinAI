@@ -1,7 +1,7 @@
 <?php
 // Start metrics for this entry point
 require_once("utils/metrics_util.php");
-$globalTimer = new MinAITimerScope('globals_php', 'CHIM');
+// $globalTimer = new MinAITimerScope('globals_php', 'MinAI');
 
 require_once("config.base.php");
 require_once("logger.php");

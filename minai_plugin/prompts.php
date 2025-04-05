@@ -3,7 +3,7 @@
 if (isset($GLOBALS["minai_skip_processing"]) && $GLOBALS["minai_skip_processing"]) {
     return;
 }
-minai_start_timer("prompts_php", "CHIM");
+minai_start_timer("prompts_php", "MinAI");
 
 require_once("config.php");
 require_once("util.php");

@@ -45,6 +45,15 @@ class MinAIMetrics {
      * Constructor
      */
     private function __construct() {
+        // Initialize request type and actor name from globals
+        if (isset($GLOBALS["gameRequest"][0])) {
+            $this->requestType = $GLOBALS["gameRequest"][0];
+        }
+        
+        if (isset($GLOBALS["HERIKA_NAME"])) {
+            $this->actorName = $GLOBALS["HERIKA_NAME"];
+        }
+        
         // Initialize sampling threshold based on sampling rate
         $this->samplingThreshold = $this->samplingRate * getrandmax();
         
@@ -103,10 +112,6 @@ class MinAIMetrics {
         
         // Record basic system metrics
         $systemMetrics = $this->getSystemMetrics();
-        
-        // Get request context
-        $this->requestType = isset($GLOBALS["gameRequest"][0]) ? $GLOBALS["gameRequest"][0] : 'unknown';
-        $this->actorName = isset($GLOBALS["HERIKA_NAME"]) ? $GLOBALS["HERIKA_NAME"] : 'unknown';
         
         $this->sessionStarted = true;
         $this->logSessionEvent('session_start');
