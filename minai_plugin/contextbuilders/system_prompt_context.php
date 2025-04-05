@@ -9,6 +9,7 @@
 require_once(__DIR__ . "/../config.php");
 require_once(__DIR__ . "/../util.php");
 require_once(__DIR__ . "/../utils/format_util.php");
+require_once(__DIR__ . "/../utils/metrics_util.php");
 
 // Include all context builder modules
 require_once(__DIR__ . "/context_modules/core_context.php");
@@ -319,6 +320,9 @@ class ContextBuilderRegistry {
  * @return array System prompt content in the format expected for contextDataFull
  */
 function BuildSystemPrompt() {
+    // Start metrics collection for system prompt builder
+    minai_start_timer('system_prompt_builder', 'context_php');
+    
     // Access global variables needed for the system prompt
     $prompt_head = isset($GLOBALS["PROMPT_HEAD"]) ? $GLOBALS["PROMPT_HEAD"] : "";
     $herika_name = isset($GLOBALS["HERIKA_NAME"]) ? $GLOBALS["HERIKA_NAME"] : "";
@@ -424,6 +428,9 @@ function BuildSystemPrompt() {
         
         // Process each section for this actor
         foreach ($actor_sections as $section_id => $section_title) {
+            // Start timer for this section, with system_prompt_builder as parent
+            minai_start_timer('section_build_' . $section_id, 'system_prompt_builder');
+            
             $section_content = "";
             $builders = $registry->getBuilders($section_id, $include_nsfw);
             
@@ -434,12 +441,22 @@ function BuildSystemPrompt() {
                     continue;
                 }
                 
+                // Start timer for this context builder, with section_build_X as parent
+                minai_start_timer('context_builder_' . $id, 'section_build_' . $section_id);
+                
                 try {
                     // Call the builder function with actor-specific params
                     $context = call_user_func($builder['builder_callback'], $actor_params);
                     
                     // Skip if no content returned
                     if (empty($context)) {
+                        minai_stop_timer('context_builder_' . $id, [
+                            'builder_id' => $id,
+                            'section' => $section_id,
+                            'actor' => $actor_name,
+                            'success' => false,
+                            'content_length' => 0
+                        ]);
                         continue;
                     }
                     
@@ -453,8 +470,27 @@ function BuildSystemPrompt() {
                     
                     // Add the content
                     $section_content .= trim($context) . "\n\n";
+                    
+                    // Record metrics for this builder
+                    minai_stop_timer('context_builder_' . $id, [
+                        'builder_id' => $id,
+                        'section' => $section_id,
+                        'actor' => $actor_name,
+                        'success' => true,
+                        'content_length' => strlen($context)
+                    ]);
+                    
                 } catch (Exception $e) {
                     minai_log("error", "Error in builder '{$id}' for actor '{$actor_name}': " . $e->getMessage());
+                    
+                    // Record error metrics
+                    minai_stop_timer('context_builder_' . $id, [
+                        'builder_id' => $id,
+                        'section' => $section_id,
+                        'actor' => $actor_name,
+                        'success' => false,
+                        'error' => $e->getMessage()
+                    ]);
                 }
             }
             
@@ -463,6 +499,13 @@ function BuildSystemPrompt() {
                 $actor_content .= "## " . $section_title . "\n";
                 $actor_content .= $section_content;
             }
+            
+            // Record metrics for section build
+            minai_stop_timer('section_build_' . $section_id, [
+                'section' => $section_id,
+                'actor' => $actor_name,
+                'content_length' => strlen($section_content)
+            ]);
         }
         
         // Add the actor section to the system prompt if it has content
@@ -479,6 +522,9 @@ function BuildSystemPrompt() {
     
     // Add shared sections (environment, misc, etc.)
     foreach ($shared_sections as $section_id => $section_header) {
+        // Start timer for this section, with system_prompt_builder as parent
+        minai_start_timer('section_build_' . $section_id, 'system_prompt_builder');
+        
         $section_content = "";
         $builders = $registry->getBuilders($section_id, $include_nsfw);
         
@@ -489,12 +535,21 @@ function BuildSystemPrompt() {
                 continue;
             }
             
+            // Start timer for this context builder, with section_build_X as parent
+            minai_start_timer('context_builder_' . $id, 'section_build_' . $section_id);
+            
             try {
                 // Call the builder function with error handling
                 $context = call_user_func($builder['builder_callback'], $params);
                 
                 // Skip if no content returned
                 if (empty($context)) {
+                    minai_stop_timer('context_builder_' . $id, [
+                        'builder_id' => $id,
+                        'section' => $section_id,
+                        'success' => false,
+                        'content_length' => 0
+                    ]);
                     continue;
                 }
                 
@@ -508,8 +563,25 @@ function BuildSystemPrompt() {
                 
                 // Add the content
                 $section_content .= trim($context) . "\n\n";
+                
+                // Record metrics for this builder
+                minai_stop_timer('context_builder_' . $id, [
+                    'builder_id' => $id,
+                    'section' => $section_id,
+                    'success' => true,
+                    'content_length' => strlen($context)
+                ]);
+                
             } catch (Exception $e) {
                 minai_log("error", "Error in builder '{$id}': " . $e->getMessage());
+                
+                // Record error metrics
+                minai_stop_timer('context_builder_' . $id, [
+                    'builder_id' => $id,
+                    'section' => $section_id,
+                    'success' => false,
+                    'error' => $e->getMessage()
+                ]);
             }
         }
         
@@ -518,6 +590,12 @@ function BuildSystemPrompt() {
             $system_prompt .= $section_header . "\n";
             $system_prompt .= $section_content;
         }
+        
+        // Record metrics for section build
+        minai_stop_timer('section_build_' . $section_id, [
+            'section' => $section_id,
+            'content_length' => strlen($section_content)
+        ]);
     }
     
     // Add guidance for the LLM on how to format responses
@@ -565,6 +643,9 @@ function BuildSystemPrompt() {
         // no change required
     }
     
+    // Process decorators
+    minai_start_timer('expand_decorators', 'system_prompt_builder');
+    
     // Expand decorators for all hashtags in the system prompt
     $system_prompt = $registry->expandAllDecorators($system_prompt, $params);
     
@@ -573,6 +654,16 @@ function BuildSystemPrompt() {
     
     // Replace escaped quotes with regular quotes
     $system_prompt = str_replace("\\'", "'", $system_prompt);
+    
+    minai_stop_timer('expand_decorators', [
+        'content_length' => strlen($system_prompt)
+    ]);
+    
+    // Record metrics for system prompt builder
+    minai_stop_timer('system_prompt_builder', [
+        'content_length' => strlen($system_prompt)
+    ]);
+    
     return array(
         'role' => 'system',
         'content' => $system_prompt

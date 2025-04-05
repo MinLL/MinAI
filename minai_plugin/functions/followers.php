@@ -3,16 +3,18 @@
 require_once("action_builder.php");
 
 // StartLooting Action
-registerMinAIAction("ExtCmdStartLooting", "StartLooting")
-    ->withDescription("Start looting the area")
-    ->withParameter("target", "string", "Target NPC, Actor, or being", [], true)
-    ->withReturnFunction($GLOBALS["GenericFuncRet"])
-    ->register();
+directRegisterAction(
+    "ExtCmdStartLooting", 
+    "StartLooting", 
+    "Start looting the area",
+    true
+);
 
 // StopLooting Action
-registerMinAIAction("ExtCmdStopLooting", "StopLooting")
-    ->withDescription("Stop looting the area")
-    ->withParameter("target", "string", "Target NPC, Actor, or being", [], true)
-    ->withReturnFunction($GLOBALS["GenericFuncRet"])
-    ->register();
+directRegisterAction(
+    "ExtCmdStopLooting", 
+    "StopLooting", 
+    "Stop looting the area",
+    true
+);
 

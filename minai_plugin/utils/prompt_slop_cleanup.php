@@ -9,7 +9,7 @@ function cleanupSlop($contextData) {
     if (!is_array($contextData)) {
         return $contextData;
     }
-    $playerPronouns = GetActorPronouns($GLOBALS["PLAYER_NAME"]);
+    $playerPronouns = $GLOBALS["player_pronouns"];
     $pronounSelf = "{$playerPronouns['object']}self";
     $cleaned = [];
     $lastTimePassIndex = -1; // Track index of the last "Time passes" message
@@ -340,8 +340,8 @@ function cleanupSlop($contextData) {
             if ($isTimePassMessage && $lastTimePassIndex >= 0) {
                 continue; // Skip adding this as a new entry
             }
-            error_log("DEBUG: Original content: " . $originalContent);
-            error_log("DEBUG: Joined content: " . $joinedContent);
+            // error_log("DEBUG: Original content: " . $originalContent);
+            // error_log("DEBUG: Joined content: " . $joinedContent);
             $entry['content'] = $joinedContent;
             $cleaned[] = $entry;
             
@@ -384,10 +384,10 @@ function cleanupSlop($contextData) {
     // Only prune if original context history was set
     if (isset($GLOBALS["ORIGINAL_CONTEXT_HISTORY"])) {
         // error_log("DEBUG: Pruning context history to " . $GLOBALS["ORIGINAL_CONTEXT_HISTORY"]);
-        error_log( "Returning context history: " . json_encode($cleaned));
+        // error_log( "Returning context history: " . json_encode($cleaned));
         $n = $GLOBALS["ORIGINAL_CONTEXT_HISTORY"];
         return array_slice($cleaned, -$n);
     }
-    error_log( "Returning context history: " . json_encode($cleaned));
+    // error_log( "Returning context history: " . json_encode($cleaned));
     return $cleaned;
 } 

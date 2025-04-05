@@ -1,4 +1,8 @@
 <?php
+// Start metrics for this entry point
+require_once("utils/metrics_util.php");
+$globalTimer = new MinAITimerScope('globals_php', 'CHIM');
+
 require_once("config.base.php");
 require_once("logger.php");
 $pluginPath = "/var/www/html/HerikaServer/ext/minai_plugin";

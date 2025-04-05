@@ -1,4 +1,8 @@
 <?php
+// Start metrics for this entry point
+require_once("utils/metrics_util.php");
+minai_start_timer('preprocessing_php', 'CHIM');
+
 $fast_commands = ["addnpc","_quest","setconf","request","_speech","infoloc","infonpc","infonpc_close",
 "infoaction","status_msg","delete_event","itemfound","_questdata","_uquest","location","_questreset"];
 
@@ -11,6 +15,14 @@ else {
     // error_log("Processing Non-Fast request: " . $GLOBALS["gameRequest"][0]);
 }
 
+// Avoid processing for fast / storage events
+if (isset($GLOBALS["minai_skip_processing"]) && $GLOBALS["minai_skip_processing"]) {
+    return;
+}
+
+// Initialize common variables
+require_once("utils/init_common_variables.php");
+
 // Check for banned phrases in gameRequest[3]
 $banned_phrases = ["Thank you for watching", "Thanks for watching"];
 if (isset($GLOBALS["gameRequest"][3])) {
@@ -22,13 +34,6 @@ if (isset($GLOBALS["gameRequest"][3])) {
         }
     }
 }
-
-// Avoid processing for fast / storage events
-if (isset($GLOBALS["minai_skip_processing"]) && $GLOBALS["minai_skip_processing"]) {
-    return;
-}
-
-
 
 require_once("util.php");
 require_once("contextbuilders.php");
@@ -61,3 +66,4 @@ if (isset($GLOBALS["gameRequest"][0]) && $GLOBALS["gameRequest"][0] == "minai_di
 
 interceptRoleplayInput();
 
+minai_stop_timer('preprocessing_php');

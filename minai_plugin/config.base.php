@@ -152,3 +152,8 @@ $GLOBALS['roleplay_settings'] = Array(
         )
     )
 );
+
+// Metrics configuration
+$GLOBALS['minai_metrics_enabled'] = true;                                     // Enable metrics collection
+$GLOBALS['minai_metrics_sampling_rate'] = 1.0;                                // Sampling rate (0.0-1.0, where 1.0 = 100%)
+$GLOBALS['minai_metrics_file'] = "/var/www/html/HerikaServer/log/minai_metrics.jsonl"; // Path to store metrics data

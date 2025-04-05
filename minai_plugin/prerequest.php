@@ -1,4 +1,13 @@
 <?php
+/**
+ * MinAI Pre-request Processing
+ * 
+ * This file is included at the beginning of each request to perform initialization and preparation.
+ */
+
+// Start metrics for this entry point
+require_once("utils/metrics_util.php");
+minai_start_timer('prerequest_php', 'CHIM');
 
 // Avoid processing for fast / storage events
 if (isset($GLOBALS["minai_skip_processing"]) && $GLOBALS["minai_skip_processing"]) {
@@ -10,6 +19,18 @@ require_once("contextbuilders.php");
 require_once("prompts/info_prompts.php");
 $GLOBALS["speaker"] = $GLOBALS["HERIKA_NAME"];
 $GLOBALS["minai_processing_input"] = false;
+
+// Configure metrics collection with default values if not set in config
+if (!isset($GLOBALS['minai_metrics_enabled'])) {
+    $GLOBALS['minai_metrics_enabled'] = true;
+}
+if (!isset($GLOBALS['minai_metrics_sampling_rate'])) {
+    $GLOBALS['minai_metrics_sampling_rate'] = 0.1; // Default to 10% sampling
+}
+if (!isset($GLOBALS['minai_metrics_file'])) {
+    $GLOBALS['minai_metrics_file'] = "/var/www/html/HerikaServer/log/minai_metrics.jsonl";
+}
+
 
 Function SetRadiance($rechat_h, $rechat_p) {
     // minai_log("info", "Setting Rechat Parameters (h={$rechat_h}, p={$rechat_p})");
@@ -30,7 +51,9 @@ if (IsEnabled($GLOBALS["PLAYER_NAME"], "isTalkingToNarrator") && isPlayerInput()
     $GLOBALS["HERIKA_NAME"] = "The Narrator";
     $GLOBALS["minai_processing_input"] = true;
     $GLOBALS["using_self_narrator"] = true;
+    
     SetNarratorProfile();
+    
     if ($GLOBALS["self_narrator"]) {
         $pronouns = GetActorPronouns($GLOBALS["PLAYER_NAME"]);
         OverrideGameRequestPrompt($GLOBALS["PLAYER_NAME"] . " thinks to " . $pronouns["object"] . "self: " . GetCleanedMessage());
@@ -317,4 +340,4 @@ if (isset($GLOBALS["enable_prompt_slop_cleanup"]) && $GLOBALS["enable_prompt_slo
     // error_log("DEBUG: Context history set to " . $GLOBALS["CONTEXT_HISTORY"]);
 }
 
-
+minai_stop_timer('prerequest_php');

@@ -138,9 +138,30 @@ Function GetActorValue($name, $key, $preserveCase=false, $skipCache=false) {
     return $ret;
 }
 
+// Cache for IsEnabled checks to reduce database queries
+if (!isset($GLOBALS["minai_is_enabled_cache"])) {
+    $GLOBALS["minai_is_enabled_cache"] = [];
+}
+
 Function IsEnabled($name, $key) {
-    $name = strtolower($GLOBALS["db"]->escape($name));
-    return $GLOBALS["db"]->fetchAll("select 1 from conf_opts where LOWER(id)=LOWER('_minai_{$name}//{$key}') and LOWER(value)=LOWER('TRUE')");
+    // Create unique cache key
+    $name = strtolower($name);
+    $key = strtolower($key);
+    $cacheKey = "{$name}|{$key}";
+    
+    // Check cache first
+    if (isset($GLOBALS["minai_is_enabled_cache"][$cacheKey])) {
+        return $GLOBALS["minai_is_enabled_cache"][$cacheKey];
+    }
+    
+    // Not in cache, check database
+    $escapedName = $GLOBALS["db"]->escape($name);
+    $result = $GLOBALS["db"]->fetchAll("select 1 from conf_opts where LOWER(id)=LOWER('_minai_{$escapedName}//{$key}') and LOWER(value)=LOWER('TRUE')");
+    
+    // Cache the result
+    $GLOBALS["minai_is_enabled_cache"][$cacheKey] = !empty($result);
+    
+    return $GLOBALS["minai_is_enabled_cache"][$cacheKey];
 }
 
 Function SetEnabled($name, $key, $enabled) {
@@ -148,9 +169,225 @@ Function SetEnabled($name, $key, $enabled) {
     $key = strtolower($GLOBALS["db"]->escape($key));
     $value = $enabled ? 'TRUE' : 'FALSE';
 
+    // Update cache
+    $cacheKey = "{$name}|{$key}";
+    $GLOBALS["minai_is_enabled_cache"][$cacheKey] = $enabled;
+
     return $GLOBALS["db"]->query("UPDATE conf_opts SET value = '{$value}' WHERE LOWER(id) = LOWER('_minai_{$name}//{$key}')");
 }
 
+// Cache for faction membership checks
+if (!isset($GLOBALS["minai_faction_cache"])) {
+    $GLOBALS["minai_faction_cache"] = [];
+}
+
+Function IsInFaction($name, $faction) {
+    $name = strtolower($name);
+    $faction = strtolower($faction);
+    
+    // Check cache first
+    if (!isset($GLOBALS["minai_faction_cache"][$name])) {
+        // Cache all factions for this actor at once
+        $allFactions = strtolower(GetActorValue($name, "AllFactions"));
+        $GLOBALS["minai_faction_cache"][$name] = $allFactions;
+    }
+    
+    return str_contains($GLOBALS["minai_faction_cache"][$name], $faction);
+}
+
+// Cache for keyword checks
+if (!isset($GLOBALS["minai_keyword_cache"])) {
+    $GLOBALS["minai_keyword_cache"] = [];
+}
+
+Function HasKeyword($name, $keyword) {
+    $name = strtolower($name);
+    $keyword = strtolower($keyword);
+    
+    // Check cache first
+    if (!isset($GLOBALS["minai_keyword_cache"][$name])) {
+        // Cache all keywords for this actor at once
+        $allKeywords = strtolower(GetActorValue($name, "AllKeywords"));
+        $GLOBALS["minai_keyword_cache"][$name] = $allKeywords;
+    }
+    
+    return str_contains($GLOBALS["minai_keyword_cache"][$name], $keyword);
+}
+
+// Cache for follower status
+if (!isset($GLOBALS["minai_follower_cache"])) {
+    $GLOBALS["minai_follower_cache"] = [];
+}
+
+Function IsFollower($name) {
+    $name = strtolower($name);
+    
+    // Check cache first
+    if (isset($GLOBALS["minai_follower_cache"][$name])) {
+        return $GLOBALS["minai_follower_cache"][$name];
+    }
+    
+    // Not in cache, check party membership
+    $result = IsInParty($name);
+    
+    // Cache the result
+    $GLOBALS["minai_follower_cache"][$name] = $result;
+    
+    return $result;
+}
+
+// Cache for following status
+if (!isset($GLOBALS["minai_following_cache"])) {
+    $GLOBALS["minai_following_cache"] = [];
+}
+
+// Check if the specified actor is following (not follower)
+Function IsFollowing($name) {
+    $name = strtolower($name);
+    
+    // Check cache first
+    if (isset($GLOBALS["minai_following_cache"][$name])) {
+        return $GLOBALS["minai_following_cache"][$name];
+    }
+    
+    // Not in cache, check faction membership
+    $result = IsInFaction($name, "FollowingPlayerFaction");
+    
+    // Cache the result
+    $GLOBALS["minai_following_cache"][$name] = $result;
+    
+    return $result;
+}
+
+// Batch load factions for multiple NPCs at once to reduce DB queries
+function PreloadFactions($actorNames) {
+    if (empty($actorNames)) {
+        return;
+    }
+    
+    // Initialize faction cache if needed
+    if (!isset($GLOBALS["minai_faction_cache"])) {
+        $GLOBALS["minai_faction_cache"] = [];
+    }
+    
+    $missingActors = [];
+    foreach ($actorNames as $name) {
+        $lowerName = strtolower($name);
+        if (!isset($GLOBALS["minai_faction_cache"][$lowerName])) {
+            $missingActors[] = $lowerName;
+        }
+    }
+    
+    if (empty($missingActors)) {
+        return; // All actors already cached
+    }
+    
+    // Use BatchGetActorValues to get all factions in one query
+    $result = BatchGetActorValues($missingActors, ["AllFactions"]);
+    
+    foreach ($result as $actor => $values) {
+        if (isset($values["allfactions"])) {
+            $GLOBALS["minai_faction_cache"][$actor] = strtolower($values["allfactions"]);
+        } else {
+            // Cache empty string to avoid repeated lookups
+            $GLOBALS["minai_faction_cache"][$actor] = "";
+        }
+    }
+}
+
+// Batch load enabled flags for multiple NPCs at once
+function PreloadEnabledFlags($actorNames, $flagNames) {
+    if (empty($actorNames) || empty($flagNames)) {
+        return;
+    }
+    
+    // Initialize enabled flags cache if needed
+    if (!isset($GLOBALS["minai_is_enabled_cache"])) {
+        $GLOBALS["minai_is_enabled_cache"] = [];
+    }
+    
+    // Use BatchIsEnabled to get all flags in one query
+    $results = BatchIsEnabled($actorNames, $flagNames);
+    
+    // Update cache with results
+    foreach ($results as $actor => $flags) {
+        foreach ($flags as $flag => $isEnabled) {
+            $cacheKey = "{$actor}|{$flag}";
+            $GLOBALS["minai_is_enabled_cache"][$cacheKey] = $isEnabled;
+        }
+    }
+}
+
+// Function to preload multiple actor value types at once
+function PreloadActorValues($actorNames, $valueTypes) {
+    if (empty($actorNames) || empty($valueTypes)) {
+        return;
+    }
+    
+    // Initialize actor value cache for missing actors
+    foreach ($actorNames as $actor) {
+        $actor = strtolower($actor);
+        if (!HasActorValueCache($actor)) {
+            $GLOBALS[MINAI_ACTOR_VALUE_CACHE][$actor] = [];
+        }
+    }
+    
+    // Use BatchGetActorValues to get all values in one query
+    $results = BatchGetActorValues($actorNames, $valueTypes);
+    
+    // Update cache with results
+    foreach ($results as $actor => $values) {
+        foreach ($values as $key => $value) {
+            if (!empty($value)) {
+                $GLOBALS[MINAI_ACTOR_VALUE_CACHE][$actor][$key] = $value;
+            }
+        }
+    }
+}
+
+// Function to preload all commonly accessed data for the current context
+function PreloadCommonActorData() {
+    // Get the key actors in the current context
+    $relevantActors = [$GLOBALS["HERIKA_NAME"], $GLOBALS["PLAYER_NAME"], $GLOBALS["target"]];
+    
+    // Add nearby actors if available
+    if (isset($GLOBALS["nearby"]) && is_array($GLOBALS["nearby"])) {
+        $relevantActors = array_merge($relevantActors, $GLOBALS["nearby"]);
+    }
+    
+    // Remove duplicates and empty values
+    $relevantActors = array_filter(array_unique($relevantActors));
+    
+    // Common flag checks
+    $commonFlags = [
+        "inCombat", 
+        "isChild", 
+        "CanVibrate", 
+        "isVibratorActive",
+        "enableAISex"
+    ];
+    
+    // Common actor values to preload
+    $commonValues = [
+        "AllFactions", 
+        "AllKeywords", 
+        "Race", 
+        "arousal", 
+        "scene",
+        "playerName"
+    ];
+    
+    // Preload all data in batch
+    minai_start_timer("preload_factions", "preload_actor_data");
+    PreloadFactions($relevantActors);
+    minai_stop_timer("preload_factions");
+    minai_start_timer("preload_enabled_flags", "preload_actor_data");
+    PreloadEnabledFlags($relevantActors, $commonFlags);
+    minai_stop_timer("preload_enabled_flags");
+    minai_start_timer("preload_actor_values", "preload_actor_data");
+    PreloadActorValues($relevantActors, $commonValues);
+    minai_stop_timer("preload_actor_values");
+}
 
 Function IsSexActive() {
     // if there is active scene thread involving current speaker
@@ -178,36 +415,8 @@ Function IsModEnabled($mod) {
     return IsEnabled($GLOBALS['PLAYER_NAME'], "mod_{$mod}");
 }
 
-Function IsInFaction($name, $faction) {
-    $faction = strtolower($faction);
-    return str_contains(strtolower(GetActorValue($name, "AllFactions")), $faction);
-}
-
-Function HasKeyword($name, $keyword) {
-    $keyword = strtolower($keyword);
-    return str_contains(strtolower(GetActorValue($name, "AllKeywords")), $keyword);
-}
-
 Function IsConfigEnabled($configKey) {
     return IsEnabled($GLOBALS['PLAYER_NAME'], $configKey);
-}
-
-Function IsFollower($name) {
-    /*return (
-        IsInFaction($name, "Framework Follower Faction") ||
-        IsInFaction($name, "Follower Role Faction") ||
-        IsInFaction($name, "PotentialFollowerFaction") ||
-        IsInFaction($name, "CurrentFollowerFaction") ||
-        IsInFaction($name, "DLC1SeranaFaction") ||
-        IsInFaction($name, "Potential Follower")
-    );*/
-    
-    return IsInParty($name);
-}
-
-// Check if the specified actor is following (not follower)
-Function IsFollowing($name) {
-    return IsInFaction($name, "FollowingPlayerFaction");
 }
 
 Function IsInScene($name) {
@@ -275,23 +484,103 @@ Function IsFemale($name) {
 }
 
 
-Function IsActionEnabled($actionName) {
-    $actionName = strtolower($GLOBALS["db"]->escape($actionName));
-    return $GLOBALS["db"]->fetchAll("select 1 from conf_opts where LOWER(id)=LOWER('_minai_ACTION//{$actionName}') and LOWER(value)=LOWER('TRUE')");
+// Cache for action enabled checks
+if (!isset($GLOBALS["minai_action_enabled_cache"])) {
+    $GLOBALS["minai_action_enabled_cache"] = [];
 }
 
+Function IsActionEnabled($actionName) {
+    $actionName = strtolower($actionName);
+    
+    // Check cache first
+    if (isset($GLOBALS["minai_action_enabled_cache"][$actionName])) {
+        return $GLOBALS["minai_action_enabled_cache"][$actionName];
+    }
+    
+    // Not in cache, check database
+    $escapedName = $GLOBALS["db"]->escape($actionName);
+    $result = $GLOBALS["db"]->fetchAll("select 1 from conf_opts where LOWER(id)=LOWER('_minai_ACTION//{$escapedName}') and LOWER(value)=LOWER('TRUE')");
+    
+    // Cache the result
+    $GLOBALS["minai_action_enabled_cache"][$actionName] = !empty($result);
+    
+    return $GLOBALS["minai_action_enabled_cache"][$actionName];
+}
+
+// Cache for action registrations to avoid duplicates
+if (!isset($GLOBALS["minai_registered_actions"])) {
+    $GLOBALS["minai_registered_actions"] = [];
+}
 
 Function RegisterAction($actionName) {
+    // Check if already registered to avoid duplicates
+    if (isset($GLOBALS["minai_registered_actions"][$actionName])) {
+        return;
+    }
+    
     $checkName = $actionName;
     if (str_contains(strtolower($actionName), 'stimulatewith') || str_contains(strtolower($actionName), 'teasewith')) {
         $checkName = 'MinaiGlobalVibrator';
     }
+    
     if (IsActionEnabled($checkName)) {
         $GLOBALS["ENABLED_FUNCTIONS"][]=$actionName;
+        $GLOBALS["minai_registered_actions"][$actionName] = true;
         minai_log("info", "Registering {$actionName}");
     }
     else {
+        $GLOBALS["minai_registered_actions"][$actionName] = false;
         minai_log("info", "Not Registering {$actionName}");
+    }
+}
+
+// Batch preload action status for multiple actions at once
+function PreloadActions($actionNames) {
+    if (empty($actionNames)) {
+        return;
+    }
+    
+    // Initialize action cache if needed
+    if (!isset($GLOBALS["minai_action_enabled_cache"])) {
+        $GLOBALS["minai_action_enabled_cache"] = [];
+    }
+    
+    $missingActions = [];
+    foreach ($actionNames as $action) {
+        $action = strtolower($action);
+        if (!isset($GLOBALS["minai_action_enabled_cache"][$action])) {
+            $missingActions[] = $action;
+        }
+    }
+    
+    if (empty($missingActions)) {
+        return; // All actions already cached
+    }
+    
+    // Build a single query to get all enabled actions at once
+    $whereConditions = [];
+    foreach ($missingActions as $action) {
+        $escapedAction = $GLOBALS["db"]->escape($action);
+        $whereConditions[] = "LOWER(id)=LOWER('_minai_ACTION//{$escapedAction}')";
+    }
+    
+    if (empty($whereConditions)) {
+        return;
+    }
+    
+    $whereClause = implode(" OR ", $whereConditions);
+    $query = "SELECT LOWER(SUBSTRING(id FROM 14)) as action_name FROM conf_opts WHERE ({$whereClause}) AND LOWER(value)=LOWER('TRUE')";
+    $rows = $GLOBALS["db"]->fetchAll($query);
+    
+    // Mark missing actions as disabled by default
+    foreach ($missingActions as $action) {
+        $GLOBALS["minai_action_enabled_cache"][$action] = false;
+    }
+    
+    // Update cache with enabled actions from query result
+    foreach ($rows as $row) {
+        $actionName = strtolower($row['action_name']);
+        $GLOBALS["minai_action_enabled_cache"][$actionName] = true;
     }
 }
 
@@ -397,7 +686,7 @@ Function GetLastInput() {
 }
 
 Function IsRadiant() {
-    return (GetTargetActor() != $GLOBALS["PLAYER_NAME"]);
+    return ($GLOBALS["target"] != $GLOBALS["PLAYER_NAME"]);
 }
 
 
@@ -409,13 +698,6 @@ function overrideTargetToTalk($name) {
 
 function isPlayerInput() {
     return  in_array($GLOBALS["gameRequest"][0],["inputtext","inputtext_s","ginputtext","ginputtext_s","instruction","init"]);
-}
-
-
-$GLOBALS["target"] = GetTargetActor();
-$GLOBALS["nearby"] = explode(",", GetActorValue("PLAYER", "nearbyActors"));
-if (IsChildActor($GLOBALS['HERIKA_NAME']) || IsChildActor($GLOBALS["target"])) {
-    $GLOBALS["disable_nsfw"] = true;
 }
 
 function GetCleanedMessage() {
@@ -625,3 +907,138 @@ function GetCurrentLocationContext($actor) {
     
     return $locationData;
 }
+
+/**
+ * Batch fetch actor values for multiple actors and attributes
+ * 
+ * @param array $actors List of actor names
+ * @param array $attributes List of attributes to fetch
+ * @return array Multi-dimensional array with actor->attribute->value mapping
+ */
+function BatchGetActorValues($actors, $attributes) {
+    $db = $GLOBALS["db"];
+    $result = [];
+    
+    // Initialize result array with empty values
+    foreach ($actors as $actor) {
+        $result[strtolower($actor)] = [];
+        foreach ($attributes as $attr) {
+            $result[strtolower($actor)][strtolower($attr)] = "";
+        }
+    }
+    
+    // Build a single query to get all values at once
+    $whereConditions = [];
+    foreach ($actors as $actor) {
+        $escapedActor = $db->escape(strtolower($actor));
+        foreach ($attributes as $attr) {
+            $escapedAttr = $db->escape(strtolower($attr));
+            $whereConditions[] = "LOWER(id) = LOWER('_minai_{$escapedActor}//{$escapedAttr}')";
+        }
+    }
+    
+    if (empty($whereConditions)) {
+        return $result;
+    }
+    
+    $whereClause = implode(" OR ", $whereConditions);
+    $query = "SELECT id, value FROM conf_opts WHERE {$whereClause}";
+    $rows = $db->fetchAll($query);
+    
+    // Parse results into the result array
+    foreach ($rows as $row) {
+        $id = strtolower($row['id']);
+        $value = $row['value'];
+        
+        // Extract actor and attribute from the ID
+        if (preg_match('/_minai_([^\/]+)\/\/(.+)$/i', $id, $matches)) {
+            $actor = strtolower($matches[1]);
+            $attr = strtolower($matches[2]);
+            $result[$actor][$attr] = $value;
+        }
+    }
+    
+    return $result;
+}
+
+/**
+ * Batch check if multiple flags are enabled for multiple actors
+ * 
+ * @param array $actors List of actor names
+ * @param array $flags List of flags to check
+ * @return array Multi-dimensional array with actor->flag->boolean mapping
+ */
+function BatchIsEnabled($actors, $flags) {
+    $db = $GLOBALS["db"];
+    $result = [];
+    
+    // Initialize result array with false values
+    foreach ($actors as $actor) {
+        $result[strtolower($actor)] = [];
+        foreach ($flags as $flag) {
+            $result[strtolower($actor)][strtolower($flag)] = false;
+        }
+    }
+    
+    // Build a single query to get all enabled flags at once
+    $whereConditions = [];
+    foreach ($actors as $actor) {
+        $escapedActor = $db->escape(strtolower($actor));
+        foreach ($flags as $flag) {
+            $escapedFlag = $db->escape(strtolower($flag));
+            $whereConditions[] = "(LOWER(id) = LOWER('_minai_{$escapedActor}//{$escapedFlag}') AND LOWER(value) = LOWER('TRUE'))";
+        }
+    }
+    
+    if (empty($whereConditions)) {
+        return $result;
+    }
+    
+    $whereClause = implode(" OR ", $whereConditions);
+    $query = "SELECT id FROM conf_opts WHERE {$whereClause}";
+    $rows = $db->fetchAll($query);
+    
+    // Parse results into the result array
+    foreach ($rows as $row) {
+        $id = strtolower($row['id']);
+        
+        // Extract actor and flag from the ID
+        if (preg_match('/_minai_([^\/]+)\/\/(.+)$/i', $id, $matches)) {
+            $actor = strtolower($matches[1]);
+            $flag = strtolower($matches[2]);
+            $result[$actor][$flag] = true;
+        }
+    }
+    
+    return $result;
+}
+
+/**
+ * Get all actor values for a specific actor in one database query
+ * 
+ * @param string $actor Actor name
+ * @return array Associative array of attribute => value
+ */
+function GetAllActorValues($actor) {
+    $db = $GLOBALS["db"];
+    $actor = strtolower($db->escape($actor));
+    $result = [];
+    
+    $query = "SELECT id, value FROM conf_opts WHERE LOWER(id) LIKE LOWER('_minai_{$actor}//%')";
+    $rows = $db->fetchAll($query);
+    
+    foreach ($rows as $row) {
+        $id = $row['id'];
+        $value = $row['value'];
+        
+        // Extract attribute from the ID
+        if (preg_match('/_minai_[^\/]+\/\/(.+)$/i', $id, $matches)) {
+            $attr = strtolower($matches[1]);
+            $result[$attr] = $value;
+        }
+    }
+    
+    return $result;
+}
+
+require_once("utils/init_common_variables.php");

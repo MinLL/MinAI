@@ -1,4 +1,8 @@
 <?php
+// Start metrics for this entry point
+require_once("utils/metrics_util.php");
+minai_start_timer('context_php', 'CHIM');
+
 // Avoid processing for fast / storage events
 if (isset($GLOBALS["minai_skip_processing"]) && $GLOBALS["minai_skip_processing"]) {
   return;
@@ -11,6 +15,8 @@ require_once("environmentalContext.php");
 require_once("contextbuilders/system_prompt_context.php");
 require_once("utils/prompt_slop_cleanup.php");
 
+
+minai_start_timer("contextProcessing", "context_php");
 // Clean up context
 $locaLastElement=[];
 $narratorElements=[];
@@ -98,14 +104,18 @@ if ($GLOBALS["minai_processing_input"]) {
 }
 
 // Clean up slop text patterns
+minai_start_timer('cleanupSlop', 'contextProcessing');
 if (isset($GLOBALS["enable_prompt_slop_cleanup"]) && $GLOBALS["enable_prompt_slop_cleanup"]) {
     $GLOBALS["contextDataFull"] = cleanupSlop($GLOBALS["contextDataFull"]);
 }
+minai_stop_timer('cleanupSlop');
 
 // Re-index the array after removing elements
 $GLOBALS["contextDataFull"] = array_values($GLOBALS["contextDataFull"]);
+minai_stop_timer('contextProcessing');
 
 // Update the system prompt (0th entry) with our optimized version
 UpdateSystemPrompt();
 
 require "/var/www/html/HerikaServer/ext/minai_plugin/command_prompt_custom.php";
+minai_stop_timer('context_php');

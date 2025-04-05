@@ -22,7 +22,7 @@ if(isset($scene)){
     $talkTo = "(talking to $targetToSpeak)";
     $enforceLength = "You MUST Respond with no more than two sentences.";
     
-    $pronouns = GetActorPronouns($GLOBALS["HERIKA_NAME"]);
+    $pronouns = $GLOBALS["herika_pronouns"];
 
     switch($speakStyle) {
         case "victim talk": {

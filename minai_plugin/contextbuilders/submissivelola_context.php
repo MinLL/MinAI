@@ -103,10 +103,11 @@ function GetSubmissiveLolaContext($name) {
 }
 
 function RegisterSubLolaAction($command, $name, $description) {
-    registerMinAIAction($command, $name)
-        ->withDescription($description)
-        ->withParameter("target", "string", "Target NPC, Actor, or being", $GLOBALS["nearby"], true)
-        ->withReturnFunction($GLOBALS["GenericFuncRet"])
-        ->register();
+    directRegisterAction(
+        $command, 
+        $name, 
+        $description,
+        true
+    );
 }
 

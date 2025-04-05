@@ -14,7 +14,7 @@ $GLOBALS["db"] = new sql();
 require_once("../util.php");
 require_once("../contextbuilders.php");
 require_once("../roleplaybuilder.php");
-
+require_once("../utils/init_common_variables.php");
 // Set narrator name and load profile if needed
 $GLOBALS["HERIKA_NAME"] = "The Narrator";
 SetNarratorProfile();

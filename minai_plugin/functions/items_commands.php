@@ -241,7 +241,7 @@ function BuildInventoryListString($items, $limit = null) {
 }
 
 // Only register item commands if target is the player
-if (IsPlayer(GetTargetActor())) {
+if (IsPlayer($GLOBALS["target"])) {
     // Get target and player inventories for command descriptions
     $targetName = $GLOBALS["HERIKA_NAME"];
     $playerName = $GLOBALS["PLAYER_NAME"];
@@ -252,37 +252,48 @@ if (IsPlayer(GetTargetActor())) {
     $playerItemsStr = BuildInventoryListString($playerInventory);
         
     // Register give item action
-    registerMinAIAction("ExtCmdGiveItem", "GiveItem")
-        ->withDescription("Used when {$targetName} needs to give or hand over an item to {$playerName}. The target MUST be specified as 'ItemName:Count', representing the item and quantity. This action should be used for all scenarios where {$targetName} is the giver and {$playerName} is the receiver - including gifting, paying, rewarding, or trading items. Available items that can be given: {$targetItemsStr}.")
-        ->withParameter("parameter", "string", "The item name and optionally the count in format 'ItemName:Count'. Use this for giving gifts, payments, quest items, or rewards. Examples: 'Gold:100' (payment), 'Iron Sword' (gift), 'Health Potion:5' (supplies), 'Septim:50' (payment)", [], true)
-        ->withReturnFunction($GLOBALS["GenericFuncRet"])
-        ->register();
+    directRegisterAction(
+        "ExtCmdGiveItem", 
+        "GiveItem", 
+        "Used when {$targetName} needs to give or hand over an item to {$playerName}. The target MUST be specified as 'ItemName:Count', representing the item and quantity. This action should be used for all scenarios where {$targetName} is the giver and {$playerName} is the receiver - including gifting, paying, rewarding, or trading items. Available items that can be given: {$targetItemsStr}.",
+        true
+    );
         
     // Register take item action
-    registerMinAIAction("ExtCmdTakeItem", "TakeItem")
-        ->withDescription("Used when {$targetName} needs to take or receive an item from {$playerName}. The target MUST be specified as 'ItemName:Count', representing the item and quantity. This action must be used for all scenarios where {$playerName} is the giver and {$targetName} is the receiver - including when {$playerName} offers something, indicates that they are giving you something, during trade exchanges, or accepting payments. Available items that can be received: {$playerItemsStr}.")
-        ->withParameter("parameter", "string", "The item name and optionally the count in format 'ItemName:Count'. Use this for requesting payments, collecting quest items, or receiving goods. Examples: 'Gold:75' (collect payment), 'Iron Ore:10' (purchase resources), 'Health Potion' (request healing supply)", [], true)
-        ->withReturnFunction($GLOBALS["GenericFuncRet"])
-        ->register();
+    directRegisterAction(
+        "ExtCmdTakeItem", 
+        "TakeItem", 
+        "Used when {$targetName} needs to take or receive an item from {$playerName}. The target MUST be specified as 'ItemName:Count', representing the item and quantity. This action must be used for all scenarios where {$playerName} is the giver and {$targetName} is the receiver - including when {$playerName} offers something, indicates that they are giving you something, during trade exchanges, or accepting payments. Available items that can be received: {$playerItemsStr}.",
+        true
+    );
     
     // Register equipment-related actions
     /*
-    registerMinAIAction("ExtCmdEquipItem", "EquipItem")
-        ->withDescription("Command the target to equip a specific item they are carrying - useful to prepare for combat or roleplay")
-        ->withParameter("parameter", "string", "The name of the item to equip. Examples: 'Iron Sword', 'Leather Armor', 'Amulet of Mara'", [], true)
-        ->withReturnFunction($GLOBALS["GenericFuncRet"])
-        ->register();
+    directRegisterAction(
+        "ExtCmdEquipItem", 
+        "EquipItem", 
+        "Command the target to equip a specific item they are carrying - useful to prepare for combat or roleplay",
+        true,
+        [],
+        ["parameter"]
+    );
         
-    registerMinAIAction("ExtCmdUnequipItem", "UnequipItem")
-        ->withDescription("Command the target to unequip a specific item they are wearing - useful for changing outfits or roleplay")
-        ->withParameter("parameter", "string", "The name of the item to unequip. Examples: 'Helmet', 'Weapon', 'All Armor'", [], true)
-        ->withReturnFunction($GLOBALS["GenericFuncRet"])
-        ->register();
+    directRegisterAction(
+        "ExtCmdUnequipItem", 
+        "UnequipItem", 
+        "Command the target to unequip a specific item they are wearing - useful for changing outfits or roleplay",
+        true,
+        [],
+        ["parameter"]
+    );
         
-    registerMinAIAction("ExtCmdDropItem", "DropItem")
-        ->withDescription("Command the target to drop a specific item on the ground - useful for getting rid of items or sharing with multiple people")
-        ->withParameter("parameter", "string", "The name of the item to drop and optionally the count in format 'ItemName:Count'. Examples: 'Iron Ore:5', 'Stolen Goods', 'Useless Junk'", [], true)
-        ->withReturnFunction($GLOBALS["GenericFuncRet"])
-        ->register();
+    directRegisterAction(
+        "ExtCmdDropItem", 
+        "DropItem", 
+        "Command the target to drop a specific item on the ground - useful for getting rid of items or sharing with multiple people",
+        true,
+        [],
+        ["parameter"]
+    );
     */
 } 

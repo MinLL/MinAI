@@ -588,11 +588,12 @@ function RegisterThirdPartyActions() {
             $targetEnum = explode(",", $row["targetenum"]);
             minai_log("info", "Inserting third-party action: {$actionName} ({$actionPrompt})");
             
-            registerMinAIAction($cmdName, $actionName)
-                ->withDescription($actionPrompt)
-                ->withParameter("target", "string", $targetDesc, $targetEnum, true)
-                ->withReturnFunction($GLOBALS["GenericFuncRet"])
-                ->register();
+            directRegisterAction(
+                $cmdName, 
+                $actionName, 
+                $actionPrompt,
+                true
+            );
         }
     }
 }

@@ -3,6 +3,7 @@
 if (isset($GLOBALS["minai_skip_processing"]) && $GLOBALS["minai_skip_processing"]) {
     return;
 }
+minai_start_timer("prompts_php", "CHIM");
 
 require_once("config.php");
 require_once("util.php");
@@ -219,3 +220,5 @@ require_once("prompts/info_tntr_prompts.php");
 require_once("prompts/info_fillherup_prompts.php");
 require_once("prompts/info_vibrator_prompts.php");
 require_once("prompts/info_narrate.php");
+
+minai_stop_timer("prompts_php");
