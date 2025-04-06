@@ -99,7 +99,8 @@ Function GetUnifiedEquipmentContext($name, $forceNarrator = false, $debug = fals
     $armorPieces = array_unique($armorPieces);
     
     if (!empty($armorPieces) && !$isNaked) {
-        $ret .= "- {$name} is wearing " . implode(", ", $armorPieces) . ".\n";
+        $ret .= "- {$name} is wearing the following:\n";
+        $ret .= "  - " . implode("\n  - ", $armorPieces) . "\n";
     }
     
     // Add accessories
@@ -107,7 +108,8 @@ Function GetUnifiedEquipmentContext($name, $forceNarrator = false, $debug = fals
         // Deduplicate accessories
         $accessories = array_unique($categories["accessories"]);
         $ret .= "- {$name} is " . ((!$isNaked && !empty($armorPieces)) ? "also " : "") . 
-                "wearing " . implode(", ", $accessories) . ".\n";
+                "wearing the following accessories:\n";
+        $ret .= "  - " . implode("\n  - ", $accessories) . "\n";
     }
     
     // Update restraints display
@@ -119,19 +121,21 @@ Function GetUnifiedEquipmentContext($name, $forceNarrator = false, $debug = fals
         if (!empty($formattedRestraints)) {
             if (empty($restraintDesc)) {
                 $ret .= "- {$name} " . ((!$isNaked && !empty($armorPieces) || !empty($categories["accessories"])) ? "also " : "") . 
-                          "wears " . implode(", ", $formattedRestraints);
+                          "visibly wears the following restraints:\n";
+                $ret .= "  - " . implode("\n  - ", $formattedRestraints) . "\n";
             } else {
                 // If we already mentioned being restrained, list the specific items
-                $ret .= "- {$name} is visibly wearing some restraints: " . implode(", ", $formattedRestraints);
+                $ret .= "- {$name} is visibly wearing the following restraints:\n";
+                $ret .= "  - " . implode("\n  - ", $formattedRestraints);
+                
+                // Add restraint status to clothing description if applicable
+                if (!empty($restraintDesc)) {
+                    $ret .= ", and is " . $restraintDesc;
+                }
+                
+                $ret .= ".\n";
             }
         }
-                
-        // Add restraint status to clothing description if applicable
-        if (!empty($restraintDesc)) {
-            $ret .= ", and is " . $restraintDesc;
-        }
-        
-        $ret .= ".\n";
     }
     
     // Add hidden restraints based on perspective
@@ -142,7 +146,8 @@ Function GetUnifiedEquipmentContext($name, $forceNarrator = false, $debug = fals
         if (!empty($formattedHiddenRestraints)) {
             if ($isNarrator) {
                 // Player perspective
-                $ret .= "- Hidden beneath $their outfit, {$name} is wearing some restraints: " . implode(", ", $formattedHiddenRestraints) . "\n";
+                $ret .= "- Hidden beneath $their outfit, {$name} is wearing the following restraints:\n";
+                $ret .= "  - " . implode("\n  - ", $formattedHiddenRestraints) . "\n";
             }
         }
     }
@@ -153,7 +158,8 @@ Function GetUnifiedEquipmentContext($name, $forceNarrator = false, $debug = fals
         $formattedPiercings = FormatGroupedItems($groupedPiercings);
         
         if (!empty($formattedPiercings)) {
-            $ret .= "- {$name}'s body is adorned with " . implode(", ", $formattedPiercings) . ".\n";
+            $ret .= "- {$name}'s body is adorned with the following piercings:\n";
+            $ret .= "  - " . implode("\n  - ", $formattedPiercings) . "\n";
         }
     }
     
@@ -164,7 +170,8 @@ Function GetUnifiedEquipmentContext($name, $forceNarrator = false, $debug = fals
         
         if (!empty($formattedHiddenPiercings)) {
             if ($isNarrator) {
-                $ret .= "- Hidden beneath $their outfit, {$name}'s body is adorned with " . implode(", ", $formattedHiddenPiercings) . ".\n";
+                $ret .= "- Hidden beneath $their outfit, {$name}'s body is adorned with the following piercings:\n";
+                $ret .= "  - " . implode("\n  - ", $formattedHiddenPiercings) . "\n";
             }
         }
     }
@@ -175,7 +182,8 @@ Function GetUnifiedEquipmentContext($name, $forceNarrator = false, $debug = fals
         $formattedPlugs = FormatGroupedItems($groupedPlugs, true); // Use "and" for last item
         
         if (!empty($formattedPlugs)) {
-            $ret .= "- {$name} has " . implode(", ", $formattedPlugs) . " inserted into " . $their . " body.\n";
+            $ret .= "- {$name} has the following inserted into $their body:\n";
+            $ret .= "  - " . implode("\n  - ", $formattedPlugs) . "\n";
         }
     }
     
@@ -186,8 +194,8 @@ Function GetUnifiedEquipmentContext($name, $forceNarrator = false, $debug = fals
         
         if (!empty($formattedHiddenPlugs)) {
             if ($isNarrator) {
-                $ret .= "- Hidden beneath $their outfit, {$name} can feel " . implode(", ", $formattedHiddenPlugs) . 
-                " inserted inside " . $their . " body.\n";
+                $ret .= "- Hidden beneath $their outfit, {$name} can feel the following inserted inside $their body:\n";
+                $ret .= "  - " . implode("\n  - ", $formattedHiddenPlugs) . "\n";
             }
         }
     }
@@ -196,7 +204,8 @@ Function GetUnifiedEquipmentContext($name, $forceNarrator = false, $debug = fals
     if ($isNarrator && !empty($categories["clothing"]["hidden"])) {
         // Deduplicate hidden clothing
         $hiddenClothing = array_unique($categories["clothing"]["hidden"]);
-        $ret .= "- Hidden beneath $their outfit, {$name} is also wearing " . implode(", ", $hiddenClothing) . ".\n";
+        $ret .= "- Hidden beneath $their outfit, {$name} is also wearing the following:\n";
+        $ret .= "  - " . implode("\n  - ", $hiddenClothing) . "\n";
     }
     
     // Add debug information if requested

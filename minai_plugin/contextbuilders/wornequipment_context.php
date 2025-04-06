@@ -609,6 +609,10 @@ function SeparateVisibleAndHiddenItems($parsedEquipment, $actorName)
   $wearingTop = $revealedStatus["wearingTop"];
   $wearingBottom = $revealedStatus["wearingBottom"];
   $cuirass = $revealedStatus["cuirass"];
+  $gloves = $revealedStatus["gloves"];
+  $boots = $revealedStatus["boots"];
+  $helmet = $revealedStatus["helmet"];
+
 
   foreach ($parsedEquipment as $item) {
     // Skip disabled items
@@ -621,20 +625,31 @@ function SeparateVisibleAndHiddenItems($parsedEquipment, $actorName)
     if (!empty($item['hidden_by'])) {
       $hidingItems = explode(',', $item['hidden_by']);
       foreach ($hidingItems as $hidingItem) {
-        if ($hidingItem == "cuirass" || $hidingItem == "wearing_top" || $hidingItem == "wearing_bottom") {
-          if ($cuirass) {
-            $isHidden = true;
-            continue;
-          }
-          if ($wearingTop) {
-            $isHidden = true;
-            break;
-          }
-          if ($wearingBottom) {
-            $isHidden = true;
-            break;
-          }
+        if ($hidingItem == "cuirass" && $cuirass) {
+          $isHidden = true;
+          continue;
         }
+        if ($hidingItem == "helmet" && $helmet) {
+          $isHidden = true;
+          continue;
+          }
+        if ($hidingItem == "gloves" && $gloves) {
+          $isHidden = true;
+          continue;
+        }
+        if ($hidingItem == "boots" && $boots) {
+          $isHidden = true;
+          continue;
+        }
+        if ($hidingItem == "wearing_top" && $wearingTop) {
+          $isHidden = true;
+          continue;
+        }
+        if ($hidingItem == "wearing_bottom" && $wearingBottom) {
+          $isHidden = true;
+          continue;
+        }
+
         if (IsItemHidden($parsedEquipment, trim($hidingItem))) {
           $isHidden = true;
           break;
@@ -746,7 +761,10 @@ function HasEquipmentKeyword($actorName, $keyword)
 
 Function GetRevealedStatus($name) {
   $cuirass = GetActorValue($name, "cuirass", false, true);
-  
+  $gloves = GetActorValue($name, "gloves", false, true);
+  $boots = GetActorValue($name, "boots", false, true);
+  $helmet = GetActorValue($name, "helmet", false, true);
+
   $wearingBottom = false;
   $wearingTop = false;
   
