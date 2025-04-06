@@ -154,14 +154,19 @@ Function IsEnabled($name, $key) {
         return $GLOBALS["minai_is_enabled_cache"][$cacheKey];
     }
     
-    // Not in cache, check database
-    $escapedName = $GLOBALS["db"]->escape($name);
-    $result = $GLOBALS["db"]->fetchAll("select 1 from conf_opts where LOWER(id)=LOWER('_minai_{$escapedName}//{$key}') and LOWER(value)=LOWER('TRUE')");
+    // Not in cache, try actor value cache
+    if (!HasActorValueCache($name)) {
+        BuildActorValueCache($name);
+    }
+    
+    // Check if value exists in actor value cache
+    $value = GetActorValueCache($name, $key);
+    $isEnabled = ($value !== null && strtolower($value) === 'true');
     
     // Cache the result
-    $GLOBALS["minai_is_enabled_cache"][$cacheKey] = !empty($result);
+    $GLOBALS["minai_is_enabled_cache"][$cacheKey] = $isEnabled;
     
-    return $GLOBALS["minai_is_enabled_cache"][$cacheKey];
+    return $isEnabled;
 }
 
 Function SetEnabled($name, $key, $enabled) {
@@ -489,22 +494,34 @@ if (!isset($GLOBALS["minai_action_enabled_cache"])) {
     $GLOBALS["minai_action_enabled_cache"] = [];
 }
 
+// Flag to track if all actions have been loaded
+if (!isset($GLOBALS["minai_all_actions_loaded"])) {
+    $GLOBALS["minai_all_actions_loaded"] = false;
+}
+
 Function IsActionEnabled($actionName) {
     $actionName = strtolower($actionName);
     
-    // Check cache first
-    if (isset($GLOBALS["minai_action_enabled_cache"][$actionName])) {
-        return $GLOBALS["minai_action_enabled_cache"][$actionName];
+    // If we haven't loaded all actions yet, do it now
+    if (!$GLOBALS["minai_all_actions_loaded"]) {
+        // Load all enabled actions at once
+        $query = "SELECT LOWER(SUBSTRING(id FROM 14)) as action_name FROM conf_opts WHERE LOWER(id) LIKE LOWER('_minai_ACTION//%') AND LOWER(value)=LOWER('TRUE')";
+        $rows = $GLOBALS["db"]->fetchAll($query);
+        
+        // Mark all found actions as enabled
+        foreach ($rows as $row) {
+            $GLOBALS["minai_action_enabled_cache"][strtolower($row['action_name'])] = true;
+        }
+        
+        // Mark that we've loaded all actions
+        $GLOBALS["minai_all_actions_loaded"] = true;
+        
+        minai_log("info", "Preloaded all enabled actions");
     }
     
-    // Not in cache, check database
-    $escapedName = $GLOBALS["db"]->escape($actionName);
-    $result = $GLOBALS["db"]->fetchAll("select 1 from conf_opts where LOWER(id)=LOWER('_minai_ACTION//{$escapedName}') and LOWER(value)=LOWER('TRUE')");
-    
-    // Cache the result
-    $GLOBALS["minai_action_enabled_cache"][$actionName] = !empty($result);
-    
-    return $GLOBALS["minai_action_enabled_cache"][$actionName];
+    // Return from cache (defaults to false if not found)
+    return isset($GLOBALS["minai_action_enabled_cache"][$actionName]) ? 
+           $GLOBALS["minai_action_enabled_cache"][$actionName] : false;
 }
 
 // Cache for action registrations to avoid duplicates

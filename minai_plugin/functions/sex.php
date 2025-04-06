@@ -1,9 +1,4 @@
 <?php
-
-// Get global variables for target actor and the AI name
-$target = $GLOBALS["target"];
-$actorName = $GLOBALS["HERIKA_NAME"];
-
 // Function to check if sex actions should be enabled
 function shouldEnableSexAction() {
     return ShouldEnableSexFunctions($GLOBALS['HERIKA_NAME']);
@@ -39,6 +34,7 @@ function shouldEnableOStimAction() {
     return ShouldEnableSexFunctions($GLOBALS['HERIKA_NAME']) && IsSexActive() && IsModEnabled("Ostim");
 }
 
+
 // Check if NSFW is disabled globally
 $nsfwDisabled = $GLOBALS["disable_nsfw"];
 
@@ -47,11 +43,8 @@ if ($nsfwDisabled) {
     return;
 }
 
-// Cache gender values once
-$speakerGender = $GLOBALS["herika_gender"];
-$targetGender = $GLOBALS["target_gender"];
-$genderKey = "$speakerGender-$targetGender";
-$nearby = isset($GLOBALS["nearby"]) ? $GLOBALS["nearby"] : [];
+// Start timer for conditions evaluation
+minai_start_timer('sex_conditions', 'load_module_sex.php');
 
 // Cache enable conditions results to avoid recalculation
 $sexEnabled = shouldEnableSexAction();
@@ -60,6 +53,8 @@ $femaleActionsEnabled = $sexEnabled && hasAtLeastOneFemale();
 $maleActionsEnabled = $sexEnabled && hasAtLeastOneMale();
 $ostimEnabled = $activeSexEnabled && IsModEnabled("Ostim");
 
+minai_stop_timer('sex_conditions');
+
 // If no sex actions are enabled, skip everything
 if (!$sexEnabled) {
     return;
@@ -67,6 +62,8 @@ if (!$sexEnabled) {
 
 // COMMON SEX ACTIONS
 if ($sexEnabled) {
+    minai_start_timer('common_sex_actions', 'load_module_sex.php');
+    
     // Masturbate
     directRegisterAction(
         "ExtCmdMasturbate", 
@@ -131,10 +128,14 @@ if ($sexEnabled) {
         "Take off all clothing and armor - necessary for intimate activities", 
         true
     );
+    
+    minai_stop_timer('common_sex_actions');
 }
 
 // MALE-SPECIFIC ACTIONS
 if ($maleActionsEnabled) {
+    minai_start_timer('male_sex_actions', 'load_module_sex.php');
+    
     // StartBlowjob
     directRegisterAction(
         "ExtCmdStartBlowjob", 
@@ -160,10 +161,14 @@ if ($maleActionsEnabled) {
             "male-male" => "Stimulate #target_possessive# penis with your hands or have #target_object# stimulate yours"
         ]
     );
+    
+    minai_stop_timer('male_sex_actions');
 }
 
 // FEMALE-SPECIFIC ACTIONS
 if ($femaleActionsEnabled) {
+    minai_start_timer('female_sex_actions', 'load_module_sex.php');
+    
     // StartFingering
     directRegisterAction(
         "ExtCmdStartFingering", 
@@ -197,10 +202,14 @@ if ($femaleActionsEnabled) {
             "female-female" => "Manually stimulate #target_possessive# clitoris - focuses on #target_possessive# pleasure"
         ]
     );
+    
+    minai_stop_timer('female_sex_actions');
 }
 
 // ACTIVE SEX SCENE ACTIONS
 if ($activeSexEnabled) {
+    minai_start_timer('active_sex_actions', 'load_module_sex.php');
+    
     // StartCuddleSex
     directRegisterAction(
         "ExtCmdStartCuddleSex", 
@@ -316,10 +325,14 @@ if ($activeSexEnabled) {
             "female-male" => "Begin oral sex by sitting on #target_possessive# face"
         ]
     );
+    
+    minai_stop_timer('active_sex_actions');
 }
 
 // MALE + ACTIVE ACTIONS
 if ($maleActionsEnabled && $activeSexEnabled) {
+    minai_start_timer('male_active_sex_actions', 'load_module_sex.php');
+    
     // StartFootjob
     directRegisterAction(
         "ExtCmdStartFootjob", 
@@ -392,10 +405,14 @@ if ($maleActionsEnabled && $activeSexEnabled) {
             "female-male" => "Begin stimulating #target_possessive# penis between your thighs"
         ]
     );
+    
+    minai_stop_timer('male_active_sex_actions');
 }
 
 // OSTIM ACTIONS
 if ($ostimEnabled) {
+    minai_start_timer('ostim_actions', 'load_module_sex.php');
+    
     // SpeedUpSex
     directRegisterAction(
         "ExtCmdSpeedUpSex", 
@@ -411,4 +428,6 @@ if ($ostimEnabled) {
         "Reduce the intensity and pace of the current sexual activity - use when you want a gentler pace", 
         true
     );
+    
+    minai_stop_timer('ostim_actions');
 }
