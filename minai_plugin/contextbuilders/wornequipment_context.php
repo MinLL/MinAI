@@ -24,7 +24,7 @@ function ParseEncodedEquipmentData($encodedString) {
       $name = ParseName($encodedString, $currentIndex);
 
       // Determine item types from keywords and slotMask
-      $itemTypes = DetermineItemTypes($keywords, $slotMask);
+      $itemTypes = DetermineItemTypes($keywords, $slotMask, $name);
 
       // Store the parsed data for this segment
       $results[] = [
@@ -41,28 +41,24 @@ function ParseEncodedEquipmentData($encodedString) {
 }
 
 // Helper function to determine item types based on keywords and slotMask
-function DetermineItemTypes($keywords, $slotMask) {
+function DetermineItemTypes($keywords, $slotMask, $itemName) {
   $types = [];
   
   // SlotMask-based type detection
-  if ($slotMask & 0x00000004) $types[] = 'helmet';
-  if ($slotMask & 0x00000010) $types[] = 'body'; // Cuirass/armor
-  if ($slotMask & 0x00000020) $types[] = 'gloves';
-  if ($slotMask & 0x00000040) $types[] = 'gauntlets';
-  if ($slotMask & 0x00000080) $types[] = 'amulet';
-  if ($slotMask & 0x00000100) $types[] = 'ring';
-  if ($slotMask & 0x00000200) $types[] = 'boots';
-  if ($slotMask & 0x00000400) $types[] = 'greaves';
-  if ($slotMask & 0x00000800) $types[] = 'shield';
-  if ($slotMask & 0x00004000) $types[] = 'circlet';
-  if ($slotMask & 0x00010000) $types[] = 'mouth';
-  if ($slotMask & 0x00020000) $types[] = 'neck';
-  if ($slotMask & 0x00040000) $types[] = 'chest';
-  if ($slotMask & 0x00080000) $types[] = 'back';
-  if (($slotMask & 0x00100000) || ($slotMask & 0x00200000) || 
-      ($slotMask & 0x00400000) || ($slotMask & 0x00800000)) $types[] = 'pelvis';
-  if (($slotMask & 0x01000000) || ($slotMask & 0x02000000) || 
-      ($slotMask & 0x04000000)) $types[] = 'legs';
+  if ($slotMask & 0x00000001) $types[] = 'helmet'; // HEAD
+  if ($slotMask & 0x00000002) $types[] = 'hair'; // Hair
+  if ($slotMask & 0x00000004) $types[] = 'body'; // BODY
+  if ($slotMask & 0x00000008) $types[] = 'gloves'; // Hands
+  if ($slotMask & 0x00000010) $types[] = 'forearms'; // Forearms
+  if ($slotMask & 0x00000020) $types[] = 'amulet'; // Amulet
+  if ($slotMask & 0x00000040) $types[] = 'ring'; // Ring
+  if ($slotMask & 0x00000080) $types[] = 'boots'; // Feet
+  if ($slotMask & 0x00000100) $types[] = 'greaves'; // Calves
+  if ($slotMask & 0x00000200) $types[] = 'shield'; // SHIELD
+  if ($slotMask & 0x00000400) $types[] = 'tail'; // TAIL
+  if ($slotMask & 0x00000800) $types[] = 'longhair'; // LongHair
+  if ($slotMask & 0x00001000) $types[] = 'circlet'; // Circlet
+  if ($slotMask & 0x00002000) $types[] = 'ears'; // Ears
   
   // Keyword-based type detection for standard armor/clothing
   foreach ($keywords as $keyword) {
@@ -596,7 +592,8 @@ function ProcessEquipment($actorName)
     minai_log("info", $e->getTraceAsString());
     return [
       'visibleItems' => [],
-      'hiddenItems' => []
+      'hiddenItems' => [],
+      'revealedStatus' => []
     ];
   }
 }
@@ -667,7 +664,8 @@ function SeparateVisibleAndHiddenItems($parsedEquipment, $actorName)
   
   return [
     'visibleItems' => $visibleItems,
-    'hiddenItems' => $hiddenItems
+    'hiddenItems' => $hiddenItems,
+    'revealedStatus' => $revealedStatus
   ];
 }
 

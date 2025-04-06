@@ -16,13 +16,14 @@ Function GetUnifiedEquipmentContext($name, $forceNarrator = false, $debug = fals
     
     // Get equipment data
     $equipment = ProcessEquipment($name);
-    
+    $revealedStatus = $equipment["revealedStatus"];
+
     // Get pronouns
     $pronouns = GetActorPronouns($name);
     $their = $pronouns["possessive"];
     
     // Check if the actor is naked
-    $isNaked = IsEnabled($name, "isNaked");
+    $isNaked = IsEnabled($name, "isNaked") && !$revealedStatus["wearingTop"] && !$revealedStatus["wearingBottom"];
     
     // Check if weapon is drawn
     $isWeaponDrawn = IsEnabled($name, "weaponDrawn");
@@ -353,7 +354,8 @@ function CategorizeItems($visibleItems, $hiddenItems) {
         
         // Head armor
         if (in_array('helmet', $types) || in_array('circlet', $types) || 
-            in_array('hood', $types) || stripos($item['name'], 'faceguard') !== false) {
+            in_array('hood', $types) || stripos($item['name'], 'faceguard') !== false ||
+            stripos($item['name'], 'visor') !== false) {
             $addToCategory('armor', 'head', $description);
             continue;
         }
