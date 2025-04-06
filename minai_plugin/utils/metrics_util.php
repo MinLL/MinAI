@@ -31,7 +31,7 @@ class MinAIMetrics {
     ];
     private $activeTimers = []; // Track currently active timers for hierarchy tracking
     private $logRotated = false; // Flag to track if rotation has occurred in this request
-    private $maxLogSizeBytes = 100 * 1024 * 1024; // 100MB default max log size
+    private $maxLogSizeBytes = 50 * 1024 * 1024; // 50MB default max log size
     private $maxLogFiles = 5; // Number of rotated log files to keep
     
     /**

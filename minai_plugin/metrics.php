@@ -32,17 +32,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'clear') {
             $clearedFiles[] = $metricsFile;
         }
         
-        // Clear rotated log files
-        $dir = dirname($metricsFile);
-        $baseFilename = basename($metricsFile);
-        for ($i = 1; $i <= 5; $i++) { // Check up to 5 rotated files
-            $rotatedFile = $dir . '/' . $baseFilename . '.' . $i;
-            if (file_exists($rotatedFile)) {
-                file_put_contents($rotatedFile, '');
-                $clearedFiles[] = $rotatedFile;
-            }
-        }
-        
         if (count($clearedFiles) > 0) {
             echo json_encode([
                 'success' => true,
