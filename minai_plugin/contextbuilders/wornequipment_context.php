@@ -910,7 +910,7 @@ function GetEroticDeviceDescription($deviceType) {
       // Accessories
       "slave_boots" => "locked high-heels with ankle chain forcing dainty steps",
       "boots" => "tall footwear accentuating leg curves",
-      "collar" => "lockable neck restraint with ring signifying ownership",
+      "collar" => "lockable collar with ring signifying ownership",
       "high_heels" => "tall, narrow shoes emphasizing hip sway with each step",
       
       // Permissions

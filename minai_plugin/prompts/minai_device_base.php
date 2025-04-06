@@ -101,7 +101,7 @@ class DeviceEventHandler {
             $helplessnessContext = ", while " . $this->deviceContext["helplessness"];
         }
         
-        $promptText = "The {$this->deviceName} is brought to {$this->target}. ";
+        $promptText = "The {$this->deviceName} is locked onto {$this->target}. ";
         $promptText .= "The device $equipDesc$helplessnessContext, $reactionDesc.";
         
         return "The Narrator: " . $promptText;
