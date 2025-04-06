@@ -616,7 +616,7 @@ function SeparateVisibleAndHiddenItems($parsedEquipment, $actorName)
 
   foreach ($parsedEquipment as $item) {
     // Skip disabled items
-    if (!$item['is_enabled']) {
+    if (!isset($item['is_enabled']) || !$item['is_enabled']) {
       continue;
     }
     
