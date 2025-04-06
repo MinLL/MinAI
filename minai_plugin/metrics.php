@@ -23,23 +23,36 @@ if (isset($_GET['action']) && $_GET['action'] === 'clear') {
         : "/var/www/html/HerikaServer/log/minai_metrics.jsonl";
     
     try {
-        // Create backup first
-        // $backupFile = $metricsFile . '.bak.' . date('Ymd_His');
+        $clearedFiles = [];
+        
+        // Clear main metrics file
         if (file_exists($metricsFile)) {
-            // copy($metricsFile, $backupFile);
-            
             // Clear the file by opening it with 'w' mode
             file_put_contents($metricsFile, '');
-            
+            $clearedFiles[] = $metricsFile;
+        }
+        
+        // Clear rotated log files
+        $dir = dirname($metricsFile);
+        $baseFilename = basename($metricsFile);
+        for ($i = 1; $i <= 5; $i++) { // Check up to 5 rotated files
+            $rotatedFile = $dir . '/' . $baseFilename . '.' . $i;
+            if (file_exists($rotatedFile)) {
+                file_put_contents($rotatedFile, '');
+                $clearedFiles[] = $rotatedFile;
+            }
+        }
+        
+        if (count($clearedFiles) > 0) {
             echo json_encode([
                 'success' => true,
-                'message' => 'Metrics cleared successfully. Backup created at ' . $backupFile
+                'message' => 'Cleared ' . count($clearedFiles) . ' metrics files: ' . implode(', ', $clearedFiles)
             ]);
             exit;
         } else {
             echo json_encode([
                 'success' => true,
-                'message' => 'No metrics file found to clear.'
+                'message' => 'No metrics files found to clear.'
             ]);
             exit;
         }
@@ -76,12 +89,93 @@ $metricsFile = isset($GLOBALS['minai_metrics_file'])
 
 $metrics = [];
 try {
+    // Get a list of all available log files (main file and rotated files)
+    $logFiles = [];
+    
+    // Add the main file if it exists
     if (file_exists($metricsFile)) {
-        $handle = fopen($metricsFile, 'r');
+        $logFiles[] = $metricsFile;
+    }
+    
+    // Find rotated log files (they follow pattern: filename.1, filename.2, etc.)
+    $dir = dirname($metricsFile);
+    $baseFilename = basename($metricsFile);
+    for ($i = 1; $i <= 5; $i++) { // Check up to 5 rotated files
+        $rotatedFile = $dir . '/' . $baseFilename . '.' . $i;
+        if (file_exists($rotatedFile)) {
+            $logFiles[] = $rotatedFile;
+        }
+    }
+    
+    // Set maximum metrics to load to avoid excessive memory usage
+    $maxMetricsToLoad = 10000;
+    
+    // Process the most recent files first (main file, then .1, .2, etc.)
+    foreach ($logFiles as $file) {
+        // Stop if we've already loaded enough metrics
+        if (count($metrics) >= $maxMetricsToLoad) {
+            minai_log("info", "Reached maximum number of metrics, stopping file processing");
+            break;
+        }
+        
+        $handle = fopen($file, 'r');
         if ($handle) {
+            // Flag to determine if this file has any records newer than cutoff
+            $hasRecentRecords = false;
+            $oldestRecordTime = PHP_INT_MAX;
+            
+            // First scan first and last line to check if file contains data in our time range
+            // This optimization helps skip entire files if they're too old
+            $firstLine = fgets($handle);
+            if ($firstLine) {
+                $firstMetric = json_decode($firstLine, true);
+                if ($firstMetric && isset($firstMetric['timestamp'])) {
+                    $oldestRecordTime = $firstMetric['timestamp'];
+                }
+                
+                // If the newest record in this file is already older than cutoff,
+                // we can skip the entire file
+                if ($oldestRecordTime < $cutoffTime) {
+                    // Go to end of file to check the latest record
+                    fseek($handle, -2048, SEEK_END); // Go back 2KB from end
+                    $buffer = "";
+                    while (!feof($handle)) {
+                        $buffer .= fread($handle, 1024);
+                    }
+                    
+                    // Get the last complete line
+                    $lines = explode("\n", $buffer);
+                    $lastLine = "";
+                    for ($i = count($lines) - 1; $i >= 0; $i--) {
+                        if (trim($lines[$i]) !== "") {
+                            $lastLine = $lines[$i];
+                            break;
+                        }
+                    }
+                    
+                    if ($lastLine) {
+                        $lastMetric = json_decode($lastLine, true);
+                        if ($lastMetric && isset($lastMetric['timestamp']) && $lastMetric['timestamp'] < $cutoffTime) {
+                            // This entire file is too old, skip it
+                            fclose($handle);
+                            continue;
+                        }
+                    }
+                }
+            }
+            
+            // Reset file pointer to beginning
+            rewind($handle);
+            
+            // Process file line by line
             while (($line = fgets($handle)) !== false) {
                 $metric = json_decode($line, true);
-                if ($metric && isset($metric['timestamp']) && $metric['timestamp'] > $cutoffTime) {
+                if ($metric && isset($metric['timestamp'])) {
+                    // Skip metrics older than cutoff time
+                    if ($metric['timestamp'] < $cutoffTime) {
+                        continue;
+                    }
+                    
                     // Filter by component if needed
                     if ($component !== 'all' && 
                         (!isset($metric['component']) || $metric['component'] !== $component)) {
@@ -101,13 +195,21 @@ try {
                     }
                     
                     $metrics[] = $metric;
+                    $hasRecentRecords = true;
+                    
+                    // Stop if we've reached the maximum limit
+                    if (count($metrics) >= $maxMetricsToLoad) {
+                        minai_log("info", "Reached maximum number of metrics within file, stopping processing");
+                        break;
+                    }
                 }
             }
+            
             fclose($handle);
         }
     }
 } catch (Exception $e) {
-    minai_log("error", "Error reading metrics file: " . $e->getMessage());
+    minai_log("error", "Error reading metrics files: " . $e->getMessage());
 }
 
 // Helper function to determine the depth of a component

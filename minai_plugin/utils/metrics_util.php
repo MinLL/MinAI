@@ -30,6 +30,9 @@ class MinAIMetrics {
         'pre_llm_total' => false
     ];
     private $activeTimers = []; // Track currently active timers for hierarchy tracking
+    private $logRotated = false; // Flag to track if rotation has occurred in this request
+    private $maxLogSizeBytes = 100 * 1024 * 1024; // 100MB default max log size
+    private $maxLogFiles = 5; // Number of rotated log files to keep
     
     /**
      * Get the singleton instance
@@ -262,6 +265,9 @@ class MinAIMetrics {
                 mkdir($dir, 0755, true);
             }
             
+            // Check if log rotation is needed (only once per request)
+            $this->checkAndRotateLog();
+            
             // Append each metric as a JSON line
             $handle = fopen($this->metricsFile, 'a');
             if ($handle) {
@@ -277,6 +283,107 @@ class MinAIMetrics {
         } catch (Exception $e) {
             minai_log("error", "Failed to save metrics: " . $e->getMessage());
         }
+    }
+    
+    /**
+     * Checks if log rotation is needed and performs rotation if necessary.
+     * This will run at most once per request.
+     */
+    private function checkAndRotateLog() {
+        // Skip if already rotated in this request
+        if ($this->logRotated) {
+            return;
+        }
+        
+        // Check if file exists and exceeds max size
+        if (file_exists($this->metricsFile) && filesize($this->metricsFile) > $this->maxLogSizeBytes) {
+            $this->rotateLogFile();
+            $this->logRotated = true;
+        }
+    }
+    
+    /**
+     * Rotates the log file by renaming existing files and creating a new one.
+     * Ensures metrics in rotated files are sorted by timestamp for efficient querying.
+     */
+    private function rotateLogFile() {
+        $baseFile = $this->metricsFile;
+        $dir = dirname($baseFile);
+        $filename = basename($baseFile);
+        
+        // Sort the metrics in the current file by timestamp before rotation
+        // This ensures that when reading from oldest to newest files, we get proper chronological order
+        if (file_exists($baseFile) && filesize($baseFile) > 0) {
+            try {
+                // Read the current file
+                $metrics = [];
+                $handle = fopen($baseFile, 'r');
+                if ($handle) {
+                    while (($line = fgets($handle)) !== false) {
+                        $metric = json_decode($line, true);
+                        if ($metric) {
+                            $metrics[] = $metric;
+                        }
+                    }
+                    fclose($handle);
+                    
+                    // Sort metrics by timestamp (newest first)
+                    usort($metrics, function($a, $b) {
+                        if (!isset($a['timestamp']) || !isset($b['timestamp'])) {
+                            return 0;
+                        }
+                        return $b['timestamp'] <=> $a['timestamp']; // Descending order
+                    });
+                    
+                    // Write back to a temporary file
+                    $tempFile = $baseFile . '.tmp';
+                    $tempHandle = fopen($tempFile, 'w');
+                    if ($tempHandle) {
+                        foreach ($metrics as $metric) {
+                            fwrite($tempHandle, json_encode($metric) . "\n");
+                        }
+                        fclose($tempHandle);
+                        
+                        // Replace the original file with the sorted one
+                        @rename($tempFile, $baseFile);
+                    }
+                }
+            } catch (Exception $e) {
+                // Log error but continue with rotation anyway
+                minai_log("error", "Error sorting metrics before rotation: " . $e->getMessage());
+            }
+        }
+        
+        // Remove oldest log file if it exists
+        $oldestLog = $dir . '/' . $filename . '.' . $this->maxLogFiles;
+        if (file_exists($oldestLog)) {
+            @unlink($oldestLog);
+        }
+        
+        // Shift existing log files
+        for ($i = $this->maxLogFiles - 1; $i >= 1; $i--) {
+            $oldFile = $dir . '/' . $filename . '.' . $i;
+            $newFile = $dir . '/' . $filename . '.' . ($i + 1);
+            if (file_exists($oldFile)) {
+                @rename($oldFile, $newFile);
+            }
+        }
+        
+        // Rename current log file
+        if (file_exists($baseFile)) {
+            @rename($baseFile, $dir . '/' . $filename . '.1');
+        }
+    }
+    
+    /**
+     * Configure the log rotation settings.
+     * 
+     * @param int $maxSizeMB Maximum log file size in MB before rotation
+     * @param int $maxFiles Maximum number of rotated log files to keep
+     */
+    public function configureLogRotation($maxSizeMB = 10, $maxFiles = 5) {
+        $this->maxLogSizeBytes = max(1, $maxSizeMB) * 1024 * 1024; // Convert MB to bytes, minimum 1MB
+        $this->maxLogFiles = max(1, $maxFiles); // At least 1 rotated log file
     }
     
     /**
@@ -343,8 +450,10 @@ class MinAIMetrics {
      * @param boolean $enabled Whether metrics collection is enabled.
      * @param float $samplingRate The rate at which to sample metrics (0.0 to 1.0).
      * @param string $metricsFile The file to which metrics will be written.
+     * @param int $maxLogSizeMB Maximum log file size in MB before rotation
+     * @param int $maxLogFiles Maximum number of rotated log files to keep
      */
-    public function configure($enabled = true, $samplingRate = 1.0, $metricsFile = null) {
+    public function configure($enabled = true, $samplingRate = 1.0, $metricsFile = null, $maxLogSizeMB = 10, $maxLogFiles = 5) {
         $this->metricsEnabled = $enabled;
         $this->samplingRate = max(0.0, min(1.0, $samplingRate)); // Clamp between 0 and 1
         
@@ -353,6 +462,9 @@ class MinAIMetrics {
         } else {
             $this->metricsFile = "/var/www/html/HerikaServer/log/minai_metrics.jsonl";
         }
+        
+        // Configure log rotation
+        $this->configureLogRotation($maxLogSizeMB, $maxLogFiles);
         
         // Decide if we should sample this request based on the sampling rate
         if ($this->metricsEnabled && mt_rand() / mt_getrandmax() <= $this->samplingRate) {
@@ -471,6 +583,16 @@ function minai_set_metrics_enabled($enabled) {
  */
 function minai_is_metrics_enabled() {
     return MinAIMetrics::getInstance()->isEnabled();
+}
+
+/**
+ * Helper function to configure log rotation settings
+ * 
+ * @param int $maxSizeMB Maximum log file size in MB before rotation
+ * @param int $maxFiles Maximum number of rotated log files to keep
+ */
+function minai_configure_log_rotation($maxSizeMB = 10, $maxFiles = 5) {
+    MinAIMetrics::getInstance()->configureLogRotation($maxSizeMB, $maxFiles);
 }
 
 /**
