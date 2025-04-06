@@ -27,7 +27,7 @@ jobs:
           mkdir minai
           mkdir "minai/000 Required - Core Files"
           mkdir "minai/200 Optional - BakaScripts"
-          mkdir "minai/300 Optional - Mantella"
+          mkdir "minai/400 Optional - Dirt and Blood Patch"
 
           # Move core files -> 000 Required - Core Files
           Move-Item -Path Scripts -Destination "minai/000 Required - Core Files" -Force -ErrorAction SilentlyContinue
@@ -40,9 +40,12 @@ jobs:
             Get-ChildItem -Path "minai/000 Required - Core Files/Scripts" -Filter "Baka*.pex" -Recurse -File |
               Move-Item -Destination "minai/200 Optional - BakaScripts" -Force
           }
-
-          # Move mantella_files -> 300 Optional - Mantella
-          Move-Item -Path mantella_files -Destination "minai/300 Optional - Mantella" -Force -ErrorAction SilentlyContinue
+          
+          # Move Dirt and Blood scripts (Dirty*.pex) -> 400 Optional - Dirt and Blood Patch
+          if (Test-Path "minai/000 Required - Core Files/Scripts") {
+            Get-ChildItem -Path "minai/000 Required - Core Files/Scripts" -Filter "Dirty*.pex" -Recurse -File |
+              Move-Item -Destination "minai/400 Optional - Dirt and Blood Patch" -Force
+          }
 
       - name: Create and populate fomod/images
         run: |
@@ -75,7 +78,7 @@ jobs:
           Features:
            - Core Files
            - Optional TNTR Support
-           - Optional Mantella Files
+           - Optional Dirt and Blood Compatibility
           
           Version: $refName
           
@@ -126,17 +129,13 @@ jobs:
                     </plugins>
                   </group>
           
-                  <!-- Group #2: Mantella Files -->
-                  <group name="Mantella Files" type="SelectAny">
+                  <!-- Group #2: Dirt and Blood Compatibility -->
+                  <group name="Dirt and Blood Compatibility" type="SelectAny">
                     <plugins order="Explicit">
-                      <plugin name="Install mantella_files">
-                        <description>Install optional files for Mantella Support</description>
-                        <!-- Another per-plugin image if you want:
-                             <image path="fomod/images/mantella_banner.png"/>
-                        -->
+                      <plugin name="Dirt and Blood 2.37 Patch">
+                        <description>Select this option to install a compatibility patch for Dirt and Blood 2.37</description>
                         <files>
-                          <!-- Installs 300 Optional - Mantella to Data -->
-                          <folder source="300 Optional - Mantella" destination="" priority="2"/>
+                          <folder source="400 Optional - Dirt and Blood Patch" destination="Scripts" priority="1"/>
                         </files>
                         <typeDescriptor>
                           <type name="Optional"/>
