@@ -89,6 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         "realnames_support" => $GLOBALS["realnames_support"],
         "use_llm_fallback" => $GLOBALS["use_llm_fallback"],
         "enforce_single_json" => $GLOBALS["enforce_single_json"],
+        "CHIM_NO_EXAMPLES" => $GLOBALS["CHIM_NO_EXAMPLES"],
         
         // Server settings
         "input_delay_for_radiance" => intval($GLOBALS["input_delay_for_radiance"]),
@@ -179,6 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $newConfig .= "\$GLOBALS['realnames_support'] = " . ($input['realnames_support'] ? 'true' : 'false') . ";\n";
         $newConfig .= "\$GLOBALS['use_llm_fallback'] = " . ($input['use_llm_fallback'] ? 'true' : 'false') . ";\n";
         $newConfig .= "\$GLOBALS['enforce_single_json'] = " . ($input['enforce_single_json'] ? 'true' : 'false') . ";\n";
+        $newConfig .= "\$GLOBALS['CHIM_NO_EXAMPLES'] = " . ($input['CHIM_NO_EXAMPLES'] ? 'true' : 'false') . ";\n";
         
         // Server settings
         $newConfig .= "\$GLOBALS['input_delay_for_radiance'] = " . (intval($input['input_delay_for_radiance']) ?: 15) . ";\n";

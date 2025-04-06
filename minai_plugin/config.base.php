@@ -25,6 +25,7 @@ $GLOBALS['voicetype_fallbacks'] = Array("maleargonian" => "argonianmale", "femal
 $GLOBALS['enforce_short_responses'] = false;
 $GLOBALS['use_llm_fallback'] = false;
 $GLOBALS['enforce_single_json'] = false;
+$GLOBALS['CHIM_NO_EXAMPLES'] = false;
 
 // Context Builder Configuration - controls which sections are included in the system prompt
 $GLOBALS['minai_context'] = array(

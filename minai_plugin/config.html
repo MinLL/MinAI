@@ -1670,6 +1670,16 @@
                             Advanced Settings
                         </div>
                         <div class="section-content collapsed">
+                            <!-- CHIM_NO_EXAMPLES -->
+                            <div class="option-group checkbox-group">
+                                <div class="option-label-container">
+                                    <label class="option-label" for="chim-no-examples">Disable OpenRouterJSON Examples</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('chim-no-examples')">Reset to Default</button>
+                                </div>
+                                <p>Disable the examples that are sent to the LLM ("Stop staring at me / What are you looking at?"). Reduces LLM slop, but may cause issues with particularly weak LLMs that rely on these examples.</p>
+                                <input type="checkbox" id="chim-no-examples">
+                            </div>
+                            
                             <!-- minai_metrics_enabled -->
                             <div class="option-group checkbox-group">
                                 <div class="option-label-container">
@@ -2126,6 +2136,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 document.getElementById('realnames-support').checked = configData.realnames_support;
                 document.getElementById('inventory-items-limit').value = configData.inventory_items_limit;
                 document.getElementById('use-item-relevancy-scoring').checked = configData.use_item_relevancy_scoring;
+                document.getElementById('chim-no-examples').checked = configData.CHIM_NO_EXAMPLES;
                 
                 // Load metrics settings
                 document.getElementById('minai-metrics-enabled').checked = configData.minai_metrics_enabled;
@@ -2271,9 +2282,8 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 strip_emotes_from_output: document.getElementById('strip-emotes').checked,
                 use_defeat: document.getElementById('use-defeat').checked,
                 realnames_support: document.getElementById('realnames-support').checked,
-                
-                // Inventory settings
-                inventory_items_limit: document.getElementById('inventory-items-limit').value,
+                CHIM_NO_EXAMPLES: document.getElementById('chim-no-examples').checked,
+                inventory_items_limit: parseInt(document.getElementById('inventory-items-limit').value),
                 use_item_relevancy_scoring: document.getElementById('use-item-relevancy-scoring').checked,
                 
                 // Metrics settings
@@ -3090,6 +3100,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     strip_emotes_from_output: document.getElementById('strip-emotes').checked,
                     use_defeat: document.getElementById('use-defeat').checked,
                     realnames_support: document.getElementById('realnames-support').checked,
+                    CHIM_NO_EXAMPLES: document.getElementById('chim-no-examples').checked,
                     inventory_items_limit: parseInt(document.getElementById('inventory-items-limit').value),
                     use_item_relevancy_scoring: document.getElementById('use-item-relevancy-scoring').checked,
                     voicetype_fallbacks: getVoiceTypeFallbacks(),
@@ -3201,7 +3212,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                         document.getElementById('strip-emotes').checked = importedConfig.strip_emotes_from_output ?? baseConfig.strip_emotes_from_output;
                         document.getElementById('use-defeat').checked = importedConfig.use_defeat ?? baseConfig.use_defeat;
                         document.getElementById('realnames-support').checked = importedConfig.realnames_support ?? baseConfig.realnames_support;
-
+                        document.getElementById('chim-no-examples').checked = importedConfig.CHIM_NO_EXAMPLES ?? baseConfig.CHIM_NO_EXAMPLES;
                         // Inventory settings
                         document.getElementById('inventory-items-limit').value = importedConfig.inventory_items_limit ?? baseConfig.inventory_items_limit;
                         document.getElementById('use-item-relevancy-scoring').checked = importedConfig.use_item_relevancy_scoring ?? baseConfig.use_item_relevancy_scoring;
@@ -3518,6 +3529,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 'voicetype-fallbacks': 'voicetype_fallbacks',
                 'commands-to-purge': 'commands_to_purge',
                 'events-to-ignore': 'events_to_ignore',
+                'chim-no-examples': 'CHIM_NO_EXAMPLES',
                 
                 // Inventory settings
                 'inventory-items-limit': 'inventory_items_limit',
@@ -3650,6 +3662,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     'voicetype-fallbacks': 'voicetype_fallbacks',
                     'commands-to-purge': 'commands_to_purge',
                     'events-to-ignore': 'events_to_ignore',
+                    'chim-no-examples': 'CHIM_NO_EXAMPLES',
 
                     // Inventory settings
                     'inventory-items-limit': 'inventory_items_limit',
