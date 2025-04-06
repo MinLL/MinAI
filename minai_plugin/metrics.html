@@ -19,6 +19,20 @@
             --warning-color: #ffc107;
             --info-color: #4dabf7;
             --card-bg: rgba(45, 45, 45, 0.7);
+            
+            /* Depth level colors */
+            --depth-level-1-color: rgba(76, 175, 80, 0.7);  /* Green - Entry Points */
+            --depth-level-2-color: rgba(33, 150, 243, 0.7); /* Blue - Major Components */
+            --depth-level-3-color: rgba(156, 39, 176, 0.7); /* Purple - Sub-Components */
+            --depth-level-4-color: rgba(255, 193, 7, 0.7);  /* Yellow - Implementation Details */
+            --depth-level-5-color: rgba(244, 67, 54, 0.7);  /* Red - Other */
+            
+            /* Solid versions for borders */
+            --depth-level-1-solid: rgba(76, 175, 80, 1);
+            --depth-level-2-solid: rgba(33, 150, 243, 1);
+            --depth-level-3-solid: rgba(156, 39, 176, 1);
+            --depth-level-4-solid: rgba(255, 193, 7, 1);
+            --depth-level-5-solid: rgba(244, 67, 54, 1);
         }
 
         body, html {
@@ -216,11 +230,11 @@
             opacity: 0.5;
         }
         
-        .hierarchy-level-1 { opacity: 1.0; }
-        .hierarchy-level-2 { opacity: 0.8; }
-        .hierarchy-level-3 { opacity: 0.6; }
-        .hierarchy-level-4 { opacity: 0.4; }
-        .hierarchy-level-5 { opacity: 0.2; }
+        .hierarchy-level-1 { opacity: 1.0; background-color: var(--depth-level-1-color); }
+        .hierarchy-level-2 { opacity: 0.8; background-color: var(--depth-level-2-color); }
+        .hierarchy-level-3 { opacity: 0.6; background-color: var(--depth-level-3-color); }
+        .hierarchy-level-4 { opacity: 0.4; background-color: var(--depth-level-4-color); }
+        .hierarchy-level-5 { opacity: 0.2; background-color: var(--depth-level-5-color); }
         
         .metric-hierarchy {
             display: flex;
@@ -270,22 +284,22 @@
         }
         
         .tree-node.level-1 {
-            border-left-color: rgba(76, 175, 80, 1);
+            border-left-color: var(--depth-level-1-solid);
             margin-left: 0;
         }
         
         .tree-node.level-2 {
-            border-left-color: rgba(33, 150, 243, 1);
+            border-left-color: var(--depth-level-2-solid);
             margin-left: 20px;
         }
         
         .tree-node.level-3 {
-            border-left-color: rgba(156, 39, 176, 1);
+            border-left-color: var(--depth-level-3-solid);
             margin-left: 40px;
         }
         
         .tree-node.level-4 {
-            border-left-color: rgba(255, 193, 7, 1);
+            border-left-color: var(--depth-level-4-solid);
             margin-left: 60px;
         }
         
@@ -359,10 +373,11 @@
             margin-bottom: 5px;
         }
         
-        .tree-component.level-1 { border-left-color: rgba(76, 175, 80, 1); }
-        .tree-component.level-2 { border-left-color: rgba(33, 150, 243, 1); }
-        .tree-component.level-3 { border-left-color: rgba(156, 39, 176, 1); }
-        .tree-component.level-4 { border-left-color: rgba(255, 193, 7, 1); }
+        .tree-component.level-1 { border-left-color: var(--depth-level-1-solid); }
+        .tree-component.level-2 { border-left-color: var(--depth-level-2-solid); }
+        .tree-component.level-3 { border-left-color: var(--depth-level-3-solid); }
+        .tree-component.level-4 { border-left-color: var(--depth-level-4-solid); }
+        .tree-component.level-5 { border-left-color: var(--depth-level-5-solid); }
         
         .tree-component-stats {
             display: flex;
@@ -949,23 +964,26 @@
                     componentTimeChart.destroy();
                 }
                 
-                // Map to store colors based on component depth
+                // Use consistent color scheme from CSS variables
                 const depthColors = {
-                    1: 'rgba(76, 175, 80, 0.7)',   // Level 1 - Green
-                    2: 'rgba(33, 150, 243, 0.7)',  // Level 2 - Blue
-                    3: 'rgba(156, 39, 176, 0.7)',  // Level 3 - Purple
-                    4: 'rgba(255, 193, 7, 0.7)',   // Level 4 - Yellow
-                    5: 'rgba(244, 67, 54, 0.7)'    // Level 5 - Red
+                    1: getComputedStyle(document.documentElement).getPropertyValue('--depth-level-1-color'),
+                    2: getComputedStyle(document.documentElement).getPropertyValue('--depth-level-2-color'),
+                    3: getComputedStyle(document.documentElement).getPropertyValue('--depth-level-3-color'),
+                    4: getComputedStyle(document.documentElement).getPropertyValue('--depth-level-4-color'),
+                    5: getComputedStyle(document.documentElement).getPropertyValue('--depth-level-5-color')
                 };
                 
                 // Default color
-                const defaultColor = 'rgba(33, 150, 243, 0.7)';
+                const defaultColor = depthColors[2]; // Default to level 2 color
                 
                 // Create colors array based on component depth
                 const colors = data.labels.map(label => {
-                    const depth = data.depths && data.depths[label] ? data.depths[label] : 1;
+                    const depth = data.depths && data.depths[label] ? data.depths[label] : 2;
                     return depthColors[depth] || defaultColor;
                 });
+                
+                // Create solid colors for borders
+                const borderColors = colors.map(color => color.replace('0.7', '1'));
                 
                 componentTimeChart = new Chart(ctx, {
                     type: 'bar',
@@ -975,7 +993,7 @@
                             label: 'Average Time (seconds)',
                             data: data.values,
                             backgroundColor: colors,
-                            borderColor: colors.map(color => color.replace('0.7', '1')),
+                            borderColor: borderColors,
                             borderWidth: 1
                         }]
                     },
@@ -1715,12 +1733,13 @@
                     return;
                 }
                 
-                // Get depth color mapping
+                // Get depth color mapping from CSS variables
                 const depthColors = {
-                    1: 'rgba(76, 175, 80, 0.7)',   // Level 1 - Green
-                    2: 'rgba(33, 150, 243, 0.7)',  // Level 2 - Blue
-                    3: 'rgba(156, 39, 176, 0.7)',  // Level 3 - Purple
-                    4: 'rgba(255, 193, 7, 0.7)'    // Level 4 - Yellow
+                    1: getComputedStyle(document.documentElement).getPropertyValue('--depth-level-1-color'),
+                    2: getComputedStyle(document.documentElement).getPropertyValue('--depth-level-2-color'),
+                    3: getComputedStyle(document.documentElement).getPropertyValue('--depth-level-3-color'),
+                    4: getComputedStyle(document.documentElement).getPropertyValue('--depth-level-4-color'),
+                    5: getComputedStyle(document.documentElement).getPropertyValue('--depth-level-5-color')
                 };
                 
                 data.forEach(item => {
@@ -1785,19 +1804,20 @@
                 }
             }
 
-            // Helper to get a color for chart lines
+            // Helper to get a color for chart lines based on depth when possible
             function getColorForIndex(index, alpha = 0.7) {
-                const colors = [
-                    `rgba(76, 175, 80, ${alpha})`,   // Green
-                    `rgba(33, 150, 243, ${alpha})`,  // Blue
-                    `rgba(156, 39, 176, ${alpha})`,  // Purple
-                    `rgba(255, 193, 7, ${alpha})`,   // Yellow
-                    `rgba(244, 67, 54, ${alpha})`,   // Red
-                    `rgba(0, 188, 212, ${alpha})`,   // Cyan
+                // First try to use the depth colors system if available
+                const depthColors = [
+                    getComputedStyle(document.documentElement).getPropertyValue('--depth-level-1-color'),
+                    getComputedStyle(document.documentElement).getPropertyValue('--depth-level-2-color'),
+                    getComputedStyle(document.documentElement).getPropertyValue('--depth-level-3-color'),
+                    getComputedStyle(document.documentElement).getPropertyValue('--depth-level-4-color'),
+                    getComputedStyle(document.documentElement).getPropertyValue('--depth-level-5-color'),
+                    `rgba(0, 188, 212, ${alpha})`,   // Cyan (for additional datasets)
                     `rgba(255, 87, 34, ${alpha})`,   // Orange
                     `rgba(96, 125, 139, ${alpha})`   // Blue Grey
                 ];
-                return colors[index % colors.length];
+                return depthColors[index % depthColors.length];
             }
 
             // Update hierarchy view with component data and hierarchy information
@@ -2013,7 +2033,8 @@
                     'Level 1 (Entry Points)': 0,
                     'Level 2 (Major Components)': 0,
                     'Level 3 (Sub-Components)': 0,
-                    'Level 4 (Implementation Details)': 0
+                    'Level 4 (Implementation Details)': 0,
+                    'Level 5 (Other)': 0
                 };
                 
                 // Sum up times by level
@@ -2028,17 +2049,21 @@
                     }
                 }
                 
+                // Use depth colors from CSS variables
+                const depthColors = [
+                    getComputedStyle(document.documentElement).getPropertyValue('--depth-level-1-color'),
+                    getComputedStyle(document.documentElement).getPropertyValue('--depth-level-2-color'),
+                    getComputedStyle(document.documentElement).getPropertyValue('--depth-level-3-color'),
+                    getComputedStyle(document.documentElement).getPropertyValue('--depth-level-4-color'),
+                    getComputedStyle(document.documentElement).getPropertyValue('--depth-level-5-color')
+                ];
+                
                 // Prepare chart data
                 const chartData = {
                     labels: Object.keys(levelTotals),
                     datasets: [{
                         label: 'Average Processing Time (s)',
-                        backgroundColor: [
-                            'rgba(76, 175, 80, 0.7)',  // Green
-                            'rgba(33, 150, 243, 0.7)', // Blue
-                            'rgba(156, 39, 176, 0.7)', // Purple
-                            'rgba(255, 193, 7, 0.7)'   // Yellow
-                        ],
+                        backgroundColor: depthColors,
                         data: Object.values(levelTotals)
                     }]
                 };
@@ -2105,20 +2130,21 @@
                 topComponents.sort((a, b) => b.time - a.time);
                 const top10 = topComponents.slice(0, 10);
                 
+                // Use depth colors from CSS variables
+                const depthColors = {
+                    1: getComputedStyle(document.documentElement).getPropertyValue('--depth-level-1-color'),
+                    2: getComputedStyle(document.documentElement).getPropertyValue('--depth-level-2-color'),
+                    3: getComputedStyle(document.documentElement).getPropertyValue('--depth-level-3-color'),
+                    4: getComputedStyle(document.documentElement).getPropertyValue('--depth-level-4-color'),
+                    5: getComputedStyle(document.documentElement).getPropertyValue('--depth-level-5-color')
+                };
+                
                 // Prepare chart data
                 const chartData = {
                     labels: top10.map(c => c.name),
                     datasets: [{
                         label: 'Average Processing Time (s)',
-                        backgroundColor: top10.map(c => {
-                            const colors = [
-                                'rgba(76, 175, 80, 0.7)',  // Green (Level 1)
-                                'rgba(33, 150, 243, 0.7)', // Blue (Level 2)
-                                'rgba(156, 39, 176, 0.7)', // Purple (Level 3)
-                                'rgba(255, 193, 7, 0.7)'   // Yellow (Level 4)
-                            ];
-                            return colors[(c.depth - 1) % colors.length];
-                        }),
+                        backgroundColor: top10.map(c => depthColors[c.depth] || depthColors[2]),
                         data: top10.map(c => c.time)
                     }]
                 };
@@ -2187,6 +2213,7 @@
                     case 2: return 'Major Components';
                     case 3: return 'Sub-Components';
                     case 4: return 'Implementation Details';
+                    case 5: return 'Other';
                     default: return 'Other';
                 }
             }
