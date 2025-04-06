@@ -6,7 +6,9 @@ require_once($path . "/conf".DIRECTORY_SEPARATOR."conf.php");
 require_once("logger.php");
 require_once("db_utils.php");
 require_once("$path/lib/{$GLOBALS["DBDRIVER"]}.class.php");
-$GLOBALS["db"] = new sql();
+if (!isset($GLOBALS["db"])) {
+    $GLOBALS["db"] = new sql();
+}
 
 // Function to add victim_actors column if it doesn't exist
 function AddVictimActorsColumn() {
