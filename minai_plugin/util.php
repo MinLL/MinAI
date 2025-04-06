@@ -505,12 +505,15 @@ Function IsActionEnabled($actionName) {
     // If we haven't loaded all actions yet, do it now
     if (!$GLOBALS["minai_all_actions_loaded"]) {
         // Load all enabled actions at once
-        $query = "SELECT LOWER(SUBSTRING(id FROM 14)) as action_name FROM conf_opts WHERE LOWER(id) LIKE LOWER('_minai_ACTION//%') AND LOWER(value)=LOWER('TRUE')";
+        $query = "SELECT * FROM conf_opts WHERE LOWER(id) LIKE LOWER('_minai_ACTION//%') AND LOWER(value)=LOWER('TRUE')";
         $rows = $GLOBALS["db"]->fetchAll($query);
         
         // Mark all found actions as enabled
         foreach ($rows as $row) {
-            $GLOBALS["minai_action_enabled_cache"][strtolower($row['action_name'])] = true;
+            // This is formated as __minai_ACTION//actionName. Extract it.
+            $actionName = substr($row['id'], 15);
+            minai_log("info", "Preloaded action: " . $actionName);
+            $GLOBALS["minai_action_enabled_cache"][strtolower($actionName)] = true;
         }
         
         // Mark that we've loaded all actions
