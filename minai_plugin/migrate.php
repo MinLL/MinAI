@@ -42,24 +42,38 @@ function Version210Migration() {
     // Check if columns exist in equipment_description table
     $db = $GLOBALS["db"];
     
-    $result = $db->execQuery("SELECT column_name 
-                             FROM information_schema.columns 
-                             WHERE table_name='equipment_description' 
-                             AND column_name IN ('is_restraint', 'hidden_by')");
-    
-    // If the columns don't exist or we don't have both of them
-    if (!$result || count($result) < 2) {
-        minai_log("info", "Required columns missing in equipment_description table. Recreating table.");
-        
-        // Drop the table
-        $db->execQuery("DROP TABLE IF EXISTS equipment_description");
-        
-        // Recreate the table using the function from db_utils.php
+    // First check if the table exists
+    $tableExists = $db->execQuery("SELECT to_regclass('equipment_description') AS exists");
+    if (empty($tableExists) || $tableExists[0]['exists'] === null) {
+        minai_log("info", "equipment_description table does not exist, creating it");
         CreateEquipmentDescriptionTableIfNotExist();
-        
-        minai_log("info", "equipment_description table recreated with all required columns");
     } else {
-        minai_log("info", "equipment_description table already has required columns");
+        // PostgreSQL specific query to check for columns
+        $query = "SELECT column_name 
+                 FROM information_schema.columns 
+                 WHERE table_name='equipment_description' 
+                 AND column_name IN ('is_restraint', 'hidden_by')";
+        
+        $result = $db->execQuery($query);
+        
+        // PostgreSQL will return one row per column that exists
+        $columnCount = is_array($result) ? count($result) : 0;
+        minai_log("info", "Found $columnCount required columns in equipment_description table");
+        
+        // If the columns don't exist or we don't have both of them
+        if ($columnCount < 2) {
+            minai_log("info", "Required columns missing in equipment_description table. Recreating table.");
+            
+            // Drop the table
+            $db->execQuery("DROP TABLE IF EXISTS equipment_description");
+            
+            // Recreate the table using the function from db_utils.php
+            CreateEquipmentDescriptionTableIfNotExist();
+            
+            minai_log("info", "equipment_description table recreated with all required columns");
+        } else {
+            minai_log("info", "equipment_description table already has required columns");
+        }
     }
     
     minai_log("info", "2.1.0 Migration complete");
