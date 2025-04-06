@@ -3,9 +3,10 @@
 $pluginPath = str_replace("/api","", getcwd());
 $path = str_replace("/ext/minai_plugin","", $pluginPath);
 require_once($path . "/conf".DIRECTORY_SEPARATOR."conf.php");
-require_once($path. "/lib" .DIRECTORY_SEPARATOR."{$GLOBALS["DBDRIVER"]}.class.php");
-require_once("customintegrations.php");
-
+require_once("logger.php");
+require_once("db_utils.php");
+require_once("$path/lib/{$GLOBALS["DBDRIVER"]}.class.php");
+$GLOBALS["db"] = new sql();
 
 // Function to add victim_actors column if it doesn't exist
 function AddVictimActorsColumn() {
@@ -13,7 +14,7 @@ function AddVictimActorsColumn() {
     $db = $GLOBALS["db"];
     
     // Check if column exists
-    $result = $db->execQuery("SELECT column_name 
+    $result = $db->fetchAll("SELECT column_name 
                              FROM information_schema.columns 
                              WHERE table_name='minai_threads' 
                              AND column_name='victim_actors'");
@@ -28,22 +29,18 @@ function AddVictimActorsColumn() {
 // Function to be executed for version 1.0.7
 function Version107Migration() {
     minai_log("info", "Executing update to 1.0.7");
-    $GLOBALS["db"] = new sql();
     AddVictimActorsColumn();
     minai_log("info", "1.0.7 Migration complete");
 }
 
 function Version210Migration() {
-    minai_log("info", "Executing update to 2.1.0");
-    if (!isset($GLOBALS["db"])) {
-        $GLOBALS["db"] = new sql();
-    }
-    
+    minai_log("info", "Executing update to 2.1.0");    
     // Check if columns exist in equipment_description table
     $db = $GLOBALS["db"];
     
     // First check if the table exists
-    $tableExists = $db->execQuery("SELECT to_regclass('equipment_description') AS exists");
+    $tableExists = $db->fetchAll("SELECT to_regclass('equipment_description') AS exists");
+    minai_log("info", "tableExists: " . json_encode($tableExists));
     if (empty($tableExists) || $tableExists[0]['exists'] === null) {
         minai_log("info", "equipment_description table does not exist, creating it");
         CreateEquipmentDescriptionTableIfNotExist();
@@ -54,7 +51,7 @@ function Version210Migration() {
                  WHERE table_name='equipment_description' 
                  AND column_name IN ('is_restraint', 'hidden_by')";
         
-        $result = $db->execQuery($query);
+        $result = $db->fetchAll($query);
         
         // PostgreSQL will return one row per column that exists
         $columnCount = is_array($result) ? count($result) : 0;
