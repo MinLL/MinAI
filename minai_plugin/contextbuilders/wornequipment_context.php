@@ -816,7 +816,7 @@ Function GetRevealedStatus($name) {
       $wearingTop = true;
   }
   //error_log("DEBUG Actor: $name, wearingTop: $wearingTop, wearingBottom: $wearingBottom");
-  return ["wearingTop" => $wearingTop, "wearingBottom" => $wearingBottom, "cuirass" => $cuirass];
+  return ["wearingTop" => $wearingTop, "wearingBottom" => $wearingBottom, "cuirass" => $cuirass, "gloves" => $gloves, "boots" => $boots, "helmet" => $helmet];
 }
 
 function ClearEquipmentCache($actorName = null)
