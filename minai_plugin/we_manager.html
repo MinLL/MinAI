@@ -848,6 +848,7 @@
                     <input type="text" id="filterName" placeholder="Filter by Name">
                     <input type="text" id="filterDescription" placeholder="Filter by Description">
                     <input type="text" id="filterBodyPart" placeholder="Filter by Body Part">
+                    <input type="text" id="actorName" placeholder="Enter actor name to show only their worn items">
                     <div class="checkbox-container">
                         <input type="checkbox" id="filterIsRestraint">
                         <label for="filterIsRestraint">Only Restraints</label>
@@ -857,6 +858,7 @@
                         <label for="filterShowDisabled">Show Disabled Items</label>
                     </div>
                 </div>
+                
                 <button type="button" id="clearFilters" class="clearBtn">Clear Filters</button>
             </form>
         </div>
@@ -1027,7 +1029,9 @@
                 description: '',
                 body_part: '',
                 is_restraint: 0,
-                show_disabled: 0
+                show_disabled: 0,
+                filter_worn: 0,
+                actor_name: ''
             };
             let filterDebounceTimer;
             const DEBOUNCE_DELAY = 300; // milliseconds
@@ -1047,7 +1051,7 @@
 
             function setupFilterListeners() {
                 // Text inputs with debounce
-                $('#filterBaseFormId, #filterModName, #filterName, #filterDescription, #filterBodyPart').on('input', function() {
+                $('#filterBaseFormId, #filterModName, #filterName, #filterDescription, #filterBodyPart, #actorName').on('input', function() {
                     clearTimeout(filterDebounceTimer);
                     filterDebounceTimer = setTimeout(applyFilters, DEBOUNCE_DELAY);
                 });
@@ -1072,7 +1076,9 @@
                     description: $('#filterDescription').val(),
                     body_part: $('#filterBodyPart').val(),
                     is_restraint: $('#filterIsRestraint').prop('checked') ? 1 : 0,
-                    show_disabled: $('#filterShowDisabled').prop('checked') ? 1 : 0
+                    show_disabled: $('#filterShowDisabled').prop('checked') ? 1 : 0,
+                    filter_worn: $('#actorName').val().trim() ? 1 : 0,
+                    actor_name: $('#actorName').val()
                 };
                 
                 loadFilteredData();
@@ -1337,11 +1343,16 @@
 
             function enableEquipmentEditing(cardElement) {
                 // Store original values for potential rollback
+                cardElement.dataset.originalName = cardElement.querySelector('.equipment-name').textContent;
                 cardElement.dataset.originalDesc = cardElement.querySelector('.description').textContent;
                 cardElement.dataset.originalBodyPart = cardElement.dataset.bodypart;
                 cardElement.dataset.originalIsRestraint = cardElement.dataset.isrestraint;
                 cardElement.dataset.originalHiddenBy = cardElement.dataset.hiddenby;
                 cardElement.dataset.originalIsEnabled = cardElement.dataset.isenabled;
+                
+                // Make equipment name editable
+                const nameElement = cardElement.querySelector('.equipment-name');
+                makeEditable(nameElement);
                 
                 // Make fields editable
                 const descElement = cardElement.querySelector('.description');
@@ -1457,6 +1468,7 @@
 
             function saveEquipmentChanges(cardElement) {
                 // Collect edited values
+                const name = cardElement.querySelector('.equipment-name').textContent;
                 const description = cardElement.querySelector('.description').textContent;
                 const bodyPart = cardElement.querySelector('.edit-body-part')?.value || '';
                 
@@ -1476,6 +1488,7 @@
                 const modName = cardElement.dataset.modname;
                 
                 console.log(`Saving changes for ${baseFormId} / ${modName}:`, {
+                    name,
                     description,
                     bodyPart,
                     isRestraint,
@@ -1491,6 +1504,7 @@
                         action: 'edit',
                         baseFormId: baseFormId,
                         modName: modName,
+                        name: name,
                         description: description,
                         body_part: bodyPart,
                         is_restraint: isRestraint,
@@ -1499,6 +1513,10 @@
                     },
                     success: function(response) {
                         if (response.status === 'success') {
+                            // Update equipment name display
+                            const nameElement = cardElement.querySelector('.equipment-name');
+                            nameElement.textContent = name;
+                            
                             // Update displayed values
                             const restraintElement = cardElement.querySelector('.is-restraint');
                             restraintElement.textContent = isRestraint ? 'Yes' : 'No';

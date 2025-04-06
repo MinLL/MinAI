@@ -14,10 +14,13 @@ if (!file_exists($configFilepath . "conf.php")) {
 
 require_once($rootEnginePath . "conf" . DIRECTORY_SEPARATOR . "conf.php");
 require_once($rootEnginePath . "lib" . DIRECTORY_SEPARATOR . "{$GLOBALS["DBDRIVER"]}.class.php");
-require_once("logger.php");
-require_once("db_utils.php");
 $db = new sql();
 $GLOBALS['db'] = $db;
+
+require_once("logger.php");
+require_once("db_utils.php");
+require_once("util.php");
+require_once("contextbuilders/wornequipment_context.php");
 CreateEquipmentDescriptionTableIfNotExist();
 $response = ['status' => 'success'];
 
@@ -48,6 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Edit existing row
         $baseFormId = $db->escape($_POST['baseFormId']);
         $modName = $db->escape($_POST['modName']);
+        $name = $db->escape($_POST['name']);
         $description = $db->escape($_POST['description']);
         // If description is "no description" (case insensitive), use empty string
         if (strtolower($description) === "no description") {
@@ -60,7 +64,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Update existing record
         $updateQuery = "UPDATE equipment_description 
-                        SET description = '{$description}',
+                        SET name = '{$name}',
+                            description = '{$description}',
                             is_restraint = {$is_restraint},
                             body_part = '{$body_part}',
                             hidden_by = '{$hidden_by}',
@@ -104,6 +109,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['act
     $body_part = $db->escape($_GET['body_part'] ?? '');
     $is_restraint = isset($_GET['is_restraint']) && $_GET['is_restraint'] ? intval($_GET['is_restraint']) : 0;
     $show_disabled = isset($_GET['show_disabled']) && $_GET['show_disabled'] ? true : false;
+    
+    // Filter for worn equipment
+    $filter_worn = isset($_GET['filter_worn']) && $_GET['filter_worn'] ? true : false;
+    $actor_name = isset($_GET['actor_name']) && !empty($_GET['actor_name']) ? $_GET['actor_name'] : '';
+    
+    // Create an array for IDs of worn equipment
+    $worn_equipment_ids = [];
+    
+    // If filtering by worn equipment, get the equipment data
+    if ($filter_worn && !empty($actor_name)) {
+        $equipment_data = ProcessEquipment($actor_name);
+        
+        // Combine visible and hidden items
+        $all_worn_items = array_merge($equipment_data['visibleItems'], $equipment_data['hiddenItems']);
+        
+        // Create a list of worn equipment IDs for filtering
+        foreach ($all_worn_items as $item) {
+            $worn_equipment_ids[] = strtolower($item['baseFormId'] . '|' . $item['modName']);
+        }
+    }
 
     if (!empty($baseFormId)) {
         $query .= " AND baseFormId ILIKE '%{$baseFormId}%'";
@@ -140,6 +165,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['act
 
     $data = [];
     foreach ($result as $row) {
+        // If filtering by worn equipment, check if this item is currently worn
+        if ($filter_worn) {
+            $item_id = strtolower($row['baseformid'] . '|' . $row['modname']);
+            if (!in_array($item_id, $worn_equipment_ids)) {
+                continue; // Skip items that aren't worn
+            }
+        }
+        
         // result column name is all lower case for some reason
         $data[] = [
             'baseFormId' => $row['baseformid'],

@@ -287,6 +287,7 @@ function EnrichEquipmentDataFromDb(&$parsedData)
 
     if (count($result) > 0) {
       // Row exists, enrich the segment with all the data
+      $segment["name"] = $result[0]["name"] ?? '';
       $segment["description"] = $result[0]["description"] ?? '';
       $segment["is_restraint"] = $result[0]["is_restraint"] ?? 0;
       $segment["hidden_by"] = $result[0]["hidden_by"] ?? '';
