@@ -35,7 +35,9 @@ function Version107Migration() {
 
 function Version210Migration() {
     minai_log("info", "Executing update to 2.1.0");
-    $GLOBALS["db"] = new sql();
+    if (!isset($GLOBALS["db"])) {
+        $GLOBALS["db"] = new sql();
+    }
     
     // Check if columns exist in equipment_description table
     $db = $GLOBALS["db"];
