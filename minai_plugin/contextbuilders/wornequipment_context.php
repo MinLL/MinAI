@@ -538,13 +538,11 @@ function DetermineHiddenByFromTypes($itemTypes, $slotMask) {
   }
   
   if (in_arrayi('slave_boots', $itemTypes)) {
-    // Slave boots generally not hidden but could be by full body suits
-    $hideKeywords[] = 'zad_DeviousSuit';
+
   }
   
   if (in_arrayi('high_heels', $itemTypes)) {
-    // High heels generally not hidden
-    $hideKeywords[] = 'zad_DeviousSuit';
+
   }
   
   if (in_arrayi('pony_gear', $itemTypes)) {
