@@ -89,6 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         "realnames_support" => $GLOBALS["realnames_support"],
         "use_llm_fallback" => $GLOBALS["use_llm_fallback"],
         "enforce_single_json" => $GLOBALS["enforce_single_json"],
+        "CHIM_NO_EXAMPLES" => $GLOBALS["CHIM_NO_EXAMPLES"],
         
         // Server settings
         "input_delay_for_radiance" => intval($GLOBALS["input_delay_for_radiance"]),
@@ -96,6 +97,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         // Inventory settings
         "inventory_items_limit" => intval($GLOBALS["inventory_items_limit"]),
         "use_item_relevancy_scoring" => $GLOBALS["use_item_relevancy_scoring"],
+        
+        // Metrics settings
+        "minai_metrics_enabled" => $GLOBALS["minai_metrics_enabled"],
+        "minai_metrics_sampling_rate" => floatval($GLOBALS["minai_metrics_sampling_rate"]),
         
         // Action prompts
         "action_prompts" => array(
@@ -175,6 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $newConfig .= "\$GLOBALS['realnames_support'] = " . ($input['realnames_support'] ? 'true' : 'false') . ";\n";
         $newConfig .= "\$GLOBALS['use_llm_fallback'] = " . ($input['use_llm_fallback'] ? 'true' : 'false') . ";\n";
         $newConfig .= "\$GLOBALS['enforce_single_json'] = " . ($input['enforce_single_json'] ? 'true' : 'false') . ";\n";
+        $newConfig .= "\$GLOBALS['CHIM_NO_EXAMPLES'] = " . ($input['CHIM_NO_EXAMPLES'] ? 'true' : 'false') . ";\n";
         
         // Server settings
         $newConfig .= "\$GLOBALS['input_delay_for_radiance'] = " . (intval($input['input_delay_for_radiance']) ?: 15) . ";\n";
@@ -182,6 +188,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Inventory settings
         $newConfig .= "\$GLOBALS['inventory_items_limit'] = " . (intval($input['inventory_items_limit']) ?: 5) . ";\n";
         $newConfig .= "\$GLOBALS['use_item_relevancy_scoring'] = " . ($input['use_item_relevancy_scoring'] ? 'true' : 'false') . ";\n";
+        
+        // Metrics settings
+        $newConfig .= "\$GLOBALS['minai_metrics_enabled'] = " . ($input['minai_metrics_enabled'] ? 'true' : 'false') . ";\n";
+        $newConfig .= "\$GLOBALS['minai_metrics_sampling_rate'] = " . (floatval($input['minai_metrics_sampling_rate']) ?: 0.1) . ";\n";
         
         // Action prompts
         $newConfig .= "\$GLOBALS['action_prompts'] = " . buildAssociativeArrayString(array(

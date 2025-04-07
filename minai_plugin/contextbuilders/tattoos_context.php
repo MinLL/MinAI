@@ -29,7 +29,6 @@ Function GetTattooContext($name) {
         }
         
         // Get the actor's current equipment to determine what's visible
-        $eqContext = GetAllEquipmentContext($name);
         $tmp = GetRevealedStatus($name);
         $wearingBottom = $tmp["wearingBottom"];
         $wearingTop = $tmp["wearingTop"];
@@ -135,18 +134,8 @@ Function GetTattooContext($name) {
                       $isVisible = false;
                       break;
                     }
-                    // Check for SLA_ keywords
-                    else if (strpos($item, 'SLA_') === 0 && HasKeyword($name, $item)) {
-                        $isVisible = false;
-                        break;
-                    }
-                    // Check for zad_ keywords
-                    else if (strpos($item, 'zad_') === 0 && HasKeyword($name, $item)) {
-                        $isVisible = false;
-                        break;
-                    }
-                    // Check for other equipment keywords
-                    else if (HasKeywordAndNotSkip($name, $eqContext, $item)) {
+                    // Check for matching keywords in the equipment context
+                    else if (HasEquipmentKeyword($name, $item)) {
                         $isVisible = false;
                         break;
                     }

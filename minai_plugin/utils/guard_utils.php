@@ -4,5 +4,5 @@
 function isGuardTargetingPlayer() {
     return (IsInFaction($GLOBALS["HERIKA_NAME"], "GuardFaction") || 
             IsInFaction($GLOBALS["HERIKA_NAME"], "Guard Faction")) && 
-           GetTargetActor() == $GLOBALS["PLAYER_NAME"];
+           $GLOBALS["target"] == $GLOBALS["PLAYER_NAME"];
 }

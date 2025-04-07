@@ -96,53 +96,59 @@ function canTrainSkill() {
 
 
 // Register ServeFood action
-registerMinAIAction("ExtCmdServeFood", "ServeFood")
-    ->withDescription("Provide food and drink to {$GLOBALS["PLAYER_NAME"]} - alleviates hunger and thirst in survival mode")
-    ->withEnableCondition('canServeFood')
-    ->withReturnFunction($GLOBALS["GenericFuncRet"])
-    ->register();
+directRegisterAction(
+    "ExtCmdServeFood", 
+    "ServeFood", 
+    "Provide food and drink to {$GLOBALS["PLAYER_NAME"]} - alleviates hunger and thirst in survival mode",
+    canServeFood()
+);
 
 // Register RentRoom action
-registerMinAIAction("ExtCmdRentRoom", "RentRoom")
-    ->withDescription("Offer a room for rent to {$GLOBALS["PLAYER_NAME"]} - provides a place to sleep and store belongings")
-    ->withEnableCondition('canRentRoom')
-    ->withReturnFunction($GLOBALS["GenericFuncRet"])
-    ->register();
+directRegisterAction(
+    "ExtCmdRentRoom", 
+    "RentRoom", 
+    "Offer a room for rent to {$GLOBALS["PLAYER_NAME"]} - provides a place to sleep and store belongings",
+    canRentRoom()
+);
 
 // Register CarriageRide action
-registerMinAIAction("ExtCmdCarriageRide", "CarriageRide")
-    ->withDescription("Transport {$GLOBALS["PLAYER_NAME"]} to another settlement - faster than walking but costs gold. Must specify target as the destination. Available destinations: " . implode(", ", $destinations))
-    ->withEnableCondition('canOfferCarriageRide')
-    ->withReturnFunction($GLOBALS["GenericFuncRet"])
-    ->register();
+directRegisterAction(
+    "ExtCmdCarriageRide", 
+    "CarriageRide", 
+    "Transport {$GLOBALS["PLAYER_NAME"]} to another settlement - faster than walking but costs gold. Must specify target as the destination. Available destinations: " . implode(", ", $destinations),
+    canOfferCarriageRide()
+);
 
 // Register Trade action
-registerMinAIAction("ExtCmdTrade", "Trade")
-    ->withDescription("Engage in buying and selling items with {$GLOBALS["PLAYER_NAME"]} - facilitates commerce and equipment upgrades")
-    ->withEnableCondition('canTrade')
-    ->withReturnFunction($GLOBALS["GenericFuncRet"])
-    ->register();
+directRegisterAction(
+    "ExtCmdTrade", 
+    "Trade", 
+    "Engage in buying and selling items with {$GLOBALS["PLAYER_NAME"]} - facilitates commerce and equipment upgrades",
+    canTrade()
+);
 
 // Register TrainSkill action
-registerMinAIAction("ExtCmdTrainSkill", "TrainSkill")
-    ->withDescription("Provide instruction to {$GLOBALS["PLAYER_NAME"]} in a skill - helps them improve abilities")
-    ->withParameter("target", "string", "The skill you are teaching to {$GLOBALS["PLAYER_NAME"]}")
-    ->withEnableCondition('canTrainSkill')
-    ->withReturnFunction($GLOBALS["GenericFuncRet"])
-    ->register();
+directRegisterAction(
+    "ExtCmdTrainSkill", 
+    "TrainSkill", 
+    "Provide instruction to {$GLOBALS["PLAYER_NAME"]} in a skill - helps them improve abilities",
+    canTrainSkill(),
+    [],
+    ["target"]
+);
 
-// Register "Stop Following" action using the action builder
-registerMinAIAction("ExtCmdStopFollowing", "StopFollowing")
-    ->withDescription("Cease following the target - use when you want to remain in current location")
-    ->withParameter("target", "string", "Target Actor", isset($GLOBALS["nearby"]) ? $GLOBALS["nearby"] : [])
-    ->withEnableCondition('shouldEnableStopFollowing')
-    ->withReturnFunction($GLOBALS["GenericFuncRet"])
-    ->register();
+// Register "Stop Following" action
+directRegisterAction(
+    "ExtCmdStopFollowing", 
+    "StopFollowing", 
+    "Cease following the target - use when you want to remain in current location",
+    shouldEnableStopFollowing()
+);
 
-// Register "Follow Target" action using the action builder
-registerMinAIAction("ExtCmdFollow", "FollowTarget")
-    ->withDescription("Start following the target to a new location - use when you want to accompany them")
-    ->withParameter("target", "string", "Target Actor", isset($GLOBALS["nearby"]) ? $GLOBALS["nearby"] : [])
-    ->withEnableCondition('shouldEnableFollowTarget')
-    ->withReturnFunction($GLOBALS["GenericFuncRet"])
-    ->register();
+// Register "Follow Target" action
+directRegisterAction(
+    "ExtCmdFollow", 
+    "FollowTarget", 
+    "Start following the target to a new location - use when you want to accompany them",
+    shouldEnableFollowTarget()
+);

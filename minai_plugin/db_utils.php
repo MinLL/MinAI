@@ -61,6 +61,10 @@ function CreateEquipmentDescriptionTableIfNotExist() {
         modName TEXT NOT NULL,
         name TEXT NOT NULL,
         description TEXT,
+        is_restraint INTEGER DEFAULT 0,
+        body_part TEXT,
+        hidden_by TEXT,
+        is_enabled INTEGER DEFAULT 1,
         PRIMARY KEY (baseFormId, modName)
       )"
     );

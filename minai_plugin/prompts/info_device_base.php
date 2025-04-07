@@ -154,7 +154,7 @@ class DeviceEventHandler {
         
         $formattedType = $this->getFormattedType();
         $formattedType = $formattedType ? " ({$formattedType})" : "";
-        $promptText = "The {$this->deviceName}{$formattedType} is brought to {$this->target}. ";
+        $promptText = "The {$this->deviceName}{$formattedType} is locked onto {$this->target}. ";
         $promptText .= "The device $equipDesc$helplessnessContext, $reactionDesc.";
         
         return "The Narrator: " . $promptText;

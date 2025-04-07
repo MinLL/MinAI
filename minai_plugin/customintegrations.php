@@ -10,8 +10,8 @@ require_once(__DIR__.DIRECTORY_SEPARATOR."utils/narrator_utils.php");
 
 function ProcessIntegrations() {
     if (isset($GLOBALS["gameRequest"])) {
-        minai_log("info", "Processing request: " . json_encode($GLOBALS["gameRequest"]));
-        
+        minai_log("info", "Processing request for {$GLOBALS["HERIKA_NAME"]}: " . json_encode($GLOBALS["gameRequest"]));
+
         // Deduplication check - only proceed if this isn't a duplicate request
         if (isset($GLOBALS["gameRequest"][0]) && isset($GLOBALS["gameRequest"][3])) {
             $eventType = $GLOBALS["gameRequest"][0];
@@ -588,11 +588,12 @@ function RegisterThirdPartyActions() {
             $targetEnum = explode(",", $row["targetenum"]);
             minai_log("info", "Inserting third-party action: {$actionName} ({$actionPrompt})");
             
-            registerMinAIAction($cmdName, $actionName)
-                ->withDescription($actionPrompt)
-                ->withParameter("target", "string", $targetDesc, $targetEnum, true)
-                ->withReturnFunction($GLOBALS["GenericFuncRet"])
-                ->register();
+            directRegisterAction(
+                $cmdName, 
+                $actionName, 
+                $actionPrompt,
+                true
+            );
         }
     }
 }

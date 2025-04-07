@@ -10,7 +10,7 @@ require_once("config.php");
 if (IsEnabled($GLOBALS["PLAYER_NAME"], "isSinging")) {
     $moods=explode(",",$GLOBALS["EMOTEMOODS"]);
     shuffle($moods);
-    $pronouns = GetActorPronouns($GLOBALS["PLAYER_NAME"]);
+    $pronouns = $GLOBALS["player_pronouns"];
     $GLOBALS["responseTemplate"] = [
         "character"=>$GLOBALS["PLAYER_NAME"],
         "listener"=>"{$GLOBALS['PLAYER_NAME']} is singing to those around {$pronouns['object']}",
@@ -31,7 +31,7 @@ if (IsEnabled($GLOBALS["PLAYER_NAME"], "isSinging")) {
 }
 else*/
 if (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"] && $GLOBALS["HERIKA_NAME"] == "The Narrator") {
-    $pronouns = GetActorPronouns($GLOBALS["PLAYER_NAME"]);
+    $pronouns = $GLOBALS["player_pronouns"];
     $GLOBALS["responseTemplate"]["character"] = IsExplicitScene() ? $GLOBALS["PLAYER_NAME"] . "'s body" : $GLOBALS["PLAYER_NAME"] . "'s subconscious";
     $GLOBALS["responseTemplate"]["listener"] = IsExplicitScene()
         ? "{$GLOBALS['PLAYER_NAME']} is reacting to physical sensations"

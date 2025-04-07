@@ -3,6 +3,7 @@ require_once("/var/www/html/HerikaServer/lib/data_functions.php");
 // Add the system prompt context builder include
 require_once(__DIR__ . "/contextbuilders/system_prompt_context.php");
 require_once(__DIR__ . "/utils/format_util.php");
+require_once(__DIR__ . "/utils/prompt_slop_cleanup.php");
 
 function convertRelationshipStatus($targetActor) {
     $relationshipRank = GetActorValue($targetActor, "relationshipRank");
@@ -70,6 +71,13 @@ function convertToFirstPerson($text, $name, $pronouns) {
         "You ",
     ], $text);
 
+    // Replace "has you" with "have your"
+    $text = str_replace(" has you ", " have your ", $text);
+    $text = str_replace("Has you ", "Have your ", $text);
+
+    // Replace "you has" with "you have"
+    $text = str_replace(" you has ", " you have ", $text);
+    $text = str_replace("You has ", "You have ", $text);
     // Clean up any double spaces
     $text = preg_replace('/\s+/', ' ', $text);
     
@@ -129,6 +137,7 @@ function getGaggedSpeech($name) {
 }
 
 function interceptRoleplayInput() {
+    minai_start_timer('interceptRoleplayInput', 'preprocessing_php');
     if (IsEnabled($GLOBALS["PLAYER_NAME"], "isRoleplaying") && (isPlayerInput() || $GLOBALS["gameRequest"][0] == "minai_roleplay")) {
         if ($GLOBALS["gameRequest"][0] == "minai_roleplay") {
             minai_log("info", "Intercepting minai_roleplay.");
@@ -175,6 +184,7 @@ function interceptRoleplayInput() {
         $originalInput = trim($originalInput);
 
         // Get recent context - use configured value for context messages
+        minai_start_timer('getContextData', 'interceptRoleplayInput');
         $contextMessages = $settings['context_messages'];
         $contextDataHistoric = GetRecentContext("", $contextMessages);
         
@@ -187,6 +197,8 @@ function interceptRoleplayInput() {
         
         // Combine contexts
         $contextDataFull = array_merge($contextDataWorld, $contextDataHistoric);
+        $contextDataFull = cleanupSlop($contextDataFull);
+        minai_stop_timer('getContextData');
         
         // Build messages array using config settings
         $messages = [];
@@ -195,6 +207,7 @@ function interceptRoleplayInput() {
         $playerPronouns = GetActorPronouns($PLAYER_NAME);
         
         // Get contexts and convert to first person
+        minai_start_timer('buildPlayerContext', 'interceptRoleplayInput');
         $params = ['herika_name' => "The Narrator", 'player_name' => $PLAYER_NAME];
         $physDesc = convertToFirstPerson(callContextBuilder('physical_description', $params), $PLAYER_NAME, $playerPronouns);
         $arousalStatus = convertToFirstPerson(callContextBuilder('arousal', $params), $PLAYER_NAME, $playerPronouns);
@@ -208,6 +221,9 @@ function interceptRoleplayInput() {
         $bountyStatus = convertToFirstPerson(callContextBuilder('bounty', $params), $PLAYER_NAME, $playerPronouns);
         $relationshipStatus = convertRelationshipStatus($HERIKA_NAME);
         $weather = convertToFirstPerson(callContextBuilder('weather', $params), $PLAYER_NAME, $playerPronouns);
+        $vitals = convertToFirstPerson(callContextBuilder('vitals', $params), $PLAYER_NAME, $playerPronouns);
+        minai_stop_timer('buildPlayerContext');
+        
         // Replace variables in system prompt and request
         $variableReplacements = [
             'PLAYER_NAME' => $PLAYER_NAME,
@@ -234,10 +250,12 @@ function interceptRoleplayInput() {
             'MIND_STATE' => $mindState,
             'RELATIONSHIP_STATUS' => $relationshipStatus,
             'WEATHER' => $weather,
+            'VITALS' => $vitals,
             'DEVICE_STATUS' => '' // Remove old device status string
         ];
 
         // Determine scene context
+        minai_start_timer('determineContext', 'interceptRoleplayInput');
         $isExplicit = IsExplicitScene();
         $inCombat = IsEnabled($PLAYER_NAME, "inCombat");
 
@@ -280,8 +298,10 @@ function interceptRoleplayInput() {
         if ($mindFormat) {
             $requestFormat .= " " . $mindFormat;
         }
+        minai_stop_timer('determineContext');
 
         // Apply variable replacements to the selected prompts
+        minai_start_timer('promptFormatting', 'interceptRoleplayInput');
         $sectionMap = [
             "HERIKA_PERS" => "## PERSONALITY",
             "DYNAMIC_STATE" => "## CURRENT STATE",
@@ -350,17 +370,31 @@ function interceptRoleplayInput() {
             ['role' => 'system', 'content' => replaceVariables($contextMessage, $variableReplacements)],
             ['role' => 'user', 'content' => "\n\n" . replaceVariables($requestFormat, $variableReplacements)]
         ];
+        minai_stop_timer('promptFormatting');
+
+        // Get prompt sizes for telemetry
+        $systemPromptSize = strlen($messages[0]['content']);
+        $contextMessageSize = strlen($messages[1]['content']);
+        $userPromptSize = strlen($messages[2]['content']);
+        $totalPromptSize = $systemPromptSize + $contextMessageSize + $userPromptSize;
+        
 
         // Debug log the messages being sent to LLM
         minai_log("info", "Messages being sent to LLM: " . json_encode($messages, JSON_PRETTY_PRINT));
 
         // Call LLM with specific parameters for dialogue generation
+        minai_start_timer('callLLM', 'interceptRoleplayInput');
         $response = callLLM($messages, $CONNECTOR["openrouter"]["model"], [
             'temperature' => floatval($CONNECTOR["openrouter"]["temperature"]),
             'max_tokens' => 2048
         ]);
-
+        minai_stop_timer('callLLM');
+        
+        minai_start_timer('processResponse', 'interceptRoleplayInput');
         if ($response !== null) {
+            $responseSize = strlen($response);
+            minai_log("info", "Response size: " . $responseSize . " characters");
+            
             // Clean up the response - remove quotes and ensure it's dialogue-ready
             $response = trim($response, "\"' \n");
             
@@ -371,7 +405,8 @@ function interceptRoleplayInput() {
             // Strip all quotes from the response
             $response = str_replace(["", '"'], '', $response);
             
-            
+            $processedResponseSize = strlen($response);
+            minai_log("info", "Processed response size: " . $processedResponseSize . " characters");
             minai_log("info", "Roleplay input transformed from \"{$originalInput}\" to \"{$response}\"");
             
             if ($GLOBALS["gameRequest"][0] == "minai_roleplay") {
@@ -387,6 +422,8 @@ function interceptRoleplayInput() {
         } else {
             minai_log("info", "Failed to generate roleplay response, using original input");
         }
+        minai_stop_timer('processResponse');
 
     }
+    minai_stop_timer('interceptRoleplayInput');
 }

@@ -1,4 +1,8 @@
 <?php
+// Start metrics for this entry point
+require_once("utils/metrics_util.php");
+// $globalTimer = new MinAITimerScope('globals_php', 'MinAI');
+
 require_once("config.base.php");
 require_once("logger.php");
 $pluginPath = "/var/www/html/HerikaServer/ext/minai_plugin";
@@ -49,7 +53,10 @@ $GLOBALS["external_fast_commands"] = [
     "updatethreadsdb",        // Update threads database
     "storetattoodesc",        // Store tattoo description
     "minai_storeitem",        // Store single item
-    "minai_storeitem_batch"  // Store multiple items
+    "minai_storeitem_batch",  // Store multiple items
+    "minai_diary",            // Diary request
+    "minai_updateprofile"     // Profile update request
     // "minai_clearinventory"    // Clear inventory
 ];
 
+$GLOBALS["CHIM_NO_EXAMPLES"] = true;

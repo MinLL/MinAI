@@ -9,6 +9,7 @@ require_once(__DIR__ . "/../../config.php");
 require_once(__DIR__ . "/../../util.php");
 require_once(__DIR__ . "/../system_prompt_context.php");
 require_once(__DIR__ . "/../../contextbuilders/relationship_context.php");
+require_once(__DIR__ . "/../../functions/deviousnarrator.php");
 require_once(__DIR__ . "/../../contextbuilders/deviousfollower_context.php");
 require_once(__DIR__ . "/../../contextbuilders/submissivelola_context.php");
 
@@ -68,6 +69,17 @@ function InitializeRelationshipContextBuilders() {
         'is_nsfw' => true,
         'enabled' => isset($GLOBALS['minai_context']['submissive_lola']) ? (bool)$GLOBALS['minai_context']['submissive_lola'] : true,
         'builder_callback' => 'BuildSubmissiveLolaContext'
+    ]);
+
+    // Register devious narrator context builder
+    $registry->register('devious_narrator', [
+        'section' => 'status',
+        'header' => 'External Influences',
+        'description' => 'Information about external influences on the character',
+        'priority' => 85,
+        'is_nsfw' => true,
+        'enabled' => isset($GLOBALS['minai_context']['devious_narrator']) ? (bool)$GLOBALS['minai_context']['devious_narrator'] : true,
+        'builder_callback' => 'BuildDeviousNarratorContext'
     ]);
 }
 
@@ -276,4 +288,72 @@ function BuildPartyMembershipContext($params) {
             return "{$character} is not currently in an adventuring party with {$player_name}, who is traveling with {$otherMembers}.";
         }
     }
+}
+
+/**
+ * Build the devious narrator context
+ * 
+ * @param array $params Parameters including herika_name, player_name, target
+ * @return string Formatted devious narrator context
+ */
+function BuildDeviousNarratorContext($params) {
+    // Only show this for the narrator
+    if ($params['herika_name'] !== "The Narrator") {
+        return "";
+    }
+
+    // Check if devious narrator functionality is enabled
+    if (!ShouldUseDeviousNarrator()) {
+        return "";
+    }
+
+    $context = "";
+    $questState = intval(GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleGlobal"));
+    $telvanniScore = ($questState % 10);
+    $eldritchScore = intval(intval($questState) / 10);
+
+    // Add Telvanni narrator context if active
+    if ($telvanniScore > 0) {
+        $eyepenalty = GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleEyePenalty");       
+        $eyereward = GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleEyeReward");
+        $eyescore = GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleEyeScore");
+        
+        $context .= "You have been cursed by a Telvanni mage with a remote viewing and control enchantment.\n";
+        $context .= "The mage can watch you through the enchantment, sexually stimulate you remotely, and send you erotic dreams.\n";
+        $context .= "You bear an enchanted womb-tattoo that allows the mage to remotely motivate, tease, stimulate, reward, and punish you as they see fit.\n";
+        
+        // Add dream context based on eye score
+        if ($eyescore > 10) {
+            $context .= "Last night, the mage rewarded you with an intensely pleasurable dream in which you uncontrollably climaxed repeatedly. It felt amazing, and you generally feel very content and relaxed.\n";
+        } elseif ($eyescore > 0) {
+            $context .= "Last night, the mage punished you with a dream of constant stimulation without release. You feel very aroused and frustrated.\n";
+        } else {
+            $context .= "Last night, the mage punished you with a humiliating and degrading dream in which you were raped and humiliated. You feel very ashamed and humiliated.\n";
+        }
+
+        // Add context about satisfaction with entertainment
+        if ($eyereward > 10) {
+            $context .= "The mage is pleased with how much entertainment you have been providing recently.\n";
+        } elseif ($eyereward > 0) {
+            $context .= "The mage is satisfied with the entertainment but wants you to provide more.\n";
+        } else {
+            $context .= "The mage is upset with how little entertainment you have been providing recently.\n";
+        }
+    }
+
+    // Add Eldritch narrator context if active
+    if ($eldritchScore > 0) {
+        $soldSoul = (IsEnabled($GLOBALS["PLAYER_NAME"], "dwp_eldritchwaifueffect_soldsoul") || 
+                    IsEnabled($GLOBALS["PLAYER_NAME"], "dwp_eldritchwaifueffect_soldsoul_belted"));
+        
+        if ($soldSoul) {
+            $context .= "You have sold your soul to an eldritch abomination who now acts as your patron.\n";
+            $context .= "The entity maintains control over you through magical restraints.\n";
+        } else {
+            $context .= "You have been enslaved by an eldritch abomination.\n";
+            $context .= "The entity maintains control over you through magical restraints and periodic summoning.\n";
+        }
+    }
+
+    return $context;
 } 

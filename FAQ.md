@@ -5,7 +5,7 @@ This is caused by the LLM you are using. If you are using Llama 70b, be aware th
 
 
 ## What are your favorite models?
-At this time, I would consider [Claude Sonnet 3.5](https://openrouter.ai/anthropic/claude-3.5-sonnet) to be the strongest model for both Sapience, and followers. It is both fast, and intelligent, though can suffer with censorship in some situations. [Claude Sonnet 3.0](https://openrouter.ai/anthropic/claude-3-sonnet) is a bit better about censorship, while being close in performance.
+At this time, I would consider [Claude Sonnet 3.7](https://openrouter.ai/anthropic/claude-3.7-sonnet) to be the strongest model for both Sapience, and followers. It is both fast, and intelligent, and uncensored with the right prompt. Disable the 'Molest' and 'EquipBinder' actions in the action registry if seeing censorship.
 
 [Grok 2 Beta](https://openrouter.ai/x-ai/grok-beta) is also a strong general purpose model (Though, isn't quite as smart as Command R+ or Claude at action usage), and is completely uncensored.
 

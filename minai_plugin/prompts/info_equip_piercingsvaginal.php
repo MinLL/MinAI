@@ -128,7 +128,7 @@ class VaginalPiercingHandler extends DeviceEventHandler {
             $additionalContext .= ".";
         }
         
-        $promptText = "The {$this->deviceName} is brought to {$this->target}. ";
+        $promptText = "The {$this->deviceName} is inserted into {$this->target}. ";
         $promptText .= "The device $equipDesc$helplessnessContext, $reactionDesc.";
         if ($additionalContext) {
             $promptText .= $additionalContext;

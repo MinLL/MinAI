@@ -3,12 +3,13 @@
 if (isset($GLOBALS["minai_skip_processing"]) && $GLOBALS["minai_skip_processing"]) {
     return;
 }
+minai_start_timer("prompts_php", "MinAI");
 
 require_once("config.php");
 require_once("util.php");
 require_once("sexPrompts.php");
 require_once("customintegrations.php");
-
+require_once("functions/deviousnarrator.php");
 // Custom command / third party integrations support
 // Done here, as this is mounted early in main.php
 ProcessIntegrations();
@@ -88,7 +89,29 @@ $GLOBALS["PROMPTS"]["minai_bleedoutself"]= [
         "{$GLOBALS["HERIKA_NAME"]} expresses their resolve after being badly wounded! {$GLOBALS["TEMPLATE_DIALOG"]} ",
     ],
 ];
-
+$GLOBALS["PROMPTS"]["goodmorning"]=[
+    "cue"=>[
+        (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"] ? 
+            "({$GLOBALS["HERIKA_NAME"]} comment about {$GLOBALS["PLAYER_NAME"]}s time asleep. {$GLOBALS["TEMPLATE_DIALOG"]})" :
+            "({$GLOBALS["HERIKA_NAME"]} comment about {$GLOBALS["PLAYER_NAME"]}s time asleep. {$GLOBALS["TEMPLATE_DIALOG"]})"
+        )
+    ],
+    "player_request"=>[
+        (ShouldUseDeviousNarrator() ? 
+            (($questState = intval(GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleGlobal"))) && 
+             ($telvanniScore = ($questState % 10)) > 0 ? 
+                (($eyescore = GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleEyeScore")) > 10 ? 
+                    "The Narrator: {$GLOBALS["PLAYER_NAME"]} woke up from sleeping. She had an intensely pleasurable dream in which she uncontrollably climaxed repeatedly. She looks content and relaxed." :
+                    ($eyescore > 0 ? 
+                        "The Narrator: {$GLOBALS["PLAYER_NAME"]} woke up from sleeping. She had a dream of constant stimulation without release. She looks aroused and frustrated." :
+                        "The Narrator: {$GLOBALS["PLAYER_NAME"]} woke up from sleeping. She had a humiliating and degrading dream in which she was raped and humiliated. She looks ashamed and humiliated."
+                    )
+                ) : "{$GLOBALS["PLAYER_NAME"]} wakes up from sleeping. ahhhh"
+            ) : "{$GLOBALS["PLAYER_NAME"]} wakes up from sleeping. ahhhh"
+        )
+    ],
+    "extra" => (!empty($GLOBALS["RPG_COMMENTS"]) && in_array("sleep", $GLOBALS["RPG_COMMENTS"])) ? [] : ["dontuse" => true]
+];
 
 if (IsFollower($GLOBALS["HERIKA_NAME"])) {
     $GLOBALS["PROMPTS"]["minai_combatenddefeat"]= [
@@ -197,3 +220,5 @@ require_once("prompts/info_tntr_prompts.php");
 require_once("prompts/info_fillherup_prompts.php");
 require_once("prompts/info_vibrator_prompts.php");
 require_once("prompts/info_narrate.php");
+
+minai_stop_timer("prompts_php");

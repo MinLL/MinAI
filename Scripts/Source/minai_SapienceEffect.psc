@@ -98,6 +98,8 @@ Event OnUpdate()
   Main.Debug("SAPIENCE Processing (" + targetName +")")
   if followers.IsFollower(akTarget)
     Main.Debug("SAPIENCE: Aborting. " + targetName + " is a follower.")
+    ; Still ensure that they're tracked
+    aiff.TrackContext(akTarget)
     return
   EndIf
   if(!aiff || !akTarget.Is3DLoaded())

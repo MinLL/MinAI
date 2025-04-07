@@ -1,4 +1,13 @@
 <?php
+/**
+ * MinAI Pre-request Processing
+ * 
+ * This file is included at the beginning of each request to perform initialization and preparation.
+ */
+
+// Start metrics for this entry point
+require_once("utils/metrics_util.php");
+minai_start_timer('prerequest_php', 'MinAI');
 
 // Avoid processing for fast / storage events
 if (isset($GLOBALS["minai_skip_processing"]) && $GLOBALS["minai_skip_processing"]) {
@@ -10,6 +19,18 @@ require_once("contextbuilders.php");
 require_once("prompts/info_prompts.php");
 $GLOBALS["speaker"] = $GLOBALS["HERIKA_NAME"];
 $GLOBALS["minai_processing_input"] = false;
+
+// Configure metrics collection with default values if not set in config
+if (!isset($GLOBALS['minai_metrics_enabled'])) {
+    $GLOBALS['minai_metrics_enabled'] = true;
+}
+if (!isset($GLOBALS['minai_metrics_sampling_rate'])) {
+    $GLOBALS['minai_metrics_sampling_rate'] = 0.1; // Default to 10% sampling
+}
+if (!isset($GLOBALS['minai_metrics_file'])) {
+    $GLOBALS['minai_metrics_file'] = "/var/www/html/HerikaServer/log/minai_metrics.jsonl";
+}
+
 
 Function SetRadiance($rechat_h, $rechat_p) {
     // minai_log("info", "Setting Rechat Parameters (h={$rechat_h}, p={$rechat_p})");
@@ -30,7 +51,9 @@ if (IsEnabled($GLOBALS["PLAYER_NAME"], "isTalkingToNarrator") && isPlayerInput()
     $GLOBALS["HERIKA_NAME"] = "The Narrator";
     $GLOBALS["minai_processing_input"] = true;
     $GLOBALS["using_self_narrator"] = true;
+    
     SetNarratorProfile();
+    
     if ($GLOBALS["self_narrator"]) {
         $pronouns = GetActorPronouns($GLOBALS["PLAYER_NAME"]);
         OverrideGameRequestPrompt($GLOBALS["PLAYER_NAME"] . " thinks to " . $pronouns["object"] . "self: " . GetCleanedMessage());
@@ -122,53 +145,53 @@ $GLOBALS["VALIDATE_LLM_OUTPUT_FNCT"] = function($output) {
     return validateLLMResponse($output);
 };
 
+
+// Helper function to get item details by name
+function getItemByName($itemName) {
+    $db = $GLOBALS['db'];
+    
+    try {
+        $escapedName = $db->escape($itemName);
+        // First try exact match
+        $query = "SELECT * FROM minai_items WHERE LOWER(name) = LOWER('{$escapedName}')";
+        $result = $db->fetchAll($query);
+        
+        // If not found, try partial match
+        if (count($result) == 0) {
+            $query = "SELECT * FROM minai_items WHERE LOWER(name) LIKE LOWER('%{$escapedName}%') ORDER BY LENGTH(name) ASC";
+            $result = $db->fetchAll($query);
+        }
+        
+        // If we found multiple items with the same name, sort by form ID
+        if (count($result) > 1) {
+            minai_log("info", "Found multiple items with name '{$itemName}', sorting by form ID");
+            
+            // Sort by form ID as hex values
+            usort($result, function($a, $b) {
+                // Strip the '0x' prefix and convert hex to decimal for comparison
+                $valueA = hexdec(ltrim($a['item_id'], '0x'));
+                $valueB = hexdec(ltrim($b['item_id'], '0x'));
+                
+                // Higher hex values should come last (so we'll select them with end())
+                return $valueA <=> $valueB;
+            });
+            
+            // Log what we're selecting
+            $selected = end($result);
+            minai_log("info", "Selected item with form ID '{$selected['item_id']}' from multiple matches");
+            
+            return $selected;
+        }
+        
+        return count($result) > 0 ? $result[0] : null;
+    } catch (Exception $e) {
+        minai_log("error", "Error in getItemByName: " . $e->getMessage());
+        return null;
+    }
+}
+
 $GLOBALS["action_post_process_fnct"] = function($actions) {
     minai_log("info", "Processing actions: ".json_encode($actions));
-    
-    // Helper function to get item details by name
-    function getItemByName($itemName) {
-        $db = $GLOBALS['db'];
-        
-        try {
-            $escapedName = $db->escape($itemName);
-            // First try exact match
-            $query = "SELECT * FROM minai_items WHERE LOWER(name) = LOWER('{$escapedName}')";
-            $result = $db->fetchAll($query);
-            
-            // If not found, try partial match
-            if (count($result) == 0) {
-                $query = "SELECT * FROM minai_items WHERE LOWER(name) LIKE LOWER('%{$escapedName}%') ORDER BY LENGTH(name) ASC";
-                $result = $db->fetchAll($query);
-            }
-            
-            // If we found multiple items with the same name, sort by form ID
-            if (count($result) > 1) {
-                minai_log("info", "Found multiple items with name '{$itemName}', sorting by form ID");
-                
-                // Sort by form ID as hex values
-                usort($result, function($a, $b) {
-                    // Strip the '0x' prefix and convert hex to decimal for comparison
-                    $valueA = hexdec(ltrim($a['item_id'], '0x'));
-                    $valueB = hexdec(ltrim($b['item_id'], '0x'));
-                    
-                    // Higher hex values should come last (so we'll select them with end())
-                    return $valueA <=> $valueB;
-                });
-                
-                // Log what we're selecting
-                $selected = end($result);
-                minai_log("info", "Selected item with form ID '{$selected['item_id']}' from multiple matches");
-                
-                return $selected;
-            }
-            
-            return count($result) > 0 ? $result[0] : null;
-        } catch (Exception $e) {
-            minai_log("error", "Error in getItemByName: " . $e->getMessage());
-            return null;
-        }
-    }
-    
     // Process each action
     foreach ($actions as $key => $action) {
         // Check if this is one of our item commands
@@ -317,4 +340,4 @@ if (isset($GLOBALS["enable_prompt_slop_cleanup"]) && $GLOBALS["enable_prompt_slo
     // error_log("DEBUG: Context history set to " . $GLOBALS["CONTEXT_HISTORY"]);
 }
 
-
+minai_stop_timer('prerequest_php');

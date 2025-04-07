@@ -25,6 +25,7 @@ $GLOBALS['voicetype_fallbacks'] = Array("maleargonian" => "argonianmale", "femal
 $GLOBALS['enforce_short_responses'] = false;
 $GLOBALS['use_llm_fallback'] = false;
 $GLOBALS['enforce_single_json'] = false;
+$GLOBALS['CHIM_NO_EXAMPLES'] = false;
 
 // Context Builder Configuration - controls which sections are included in the system prompt
 $GLOBALS['minai_context'] = array(
@@ -46,7 +47,8 @@ $GLOBALS['minai_context'] = array(
     'family_status' => true,
     'party_membership' => true,
     'combat' => true,
-    
+    'vitals' => true,
+
     // Core context builders
     'personality' => true,
     'interaction' => true,
@@ -70,6 +72,7 @@ $GLOBALS['minai_context'] = array(
     'relative_power' => true,
     'devious_follower' => true,
     'submissive_lola' => true,
+    'devious_narrator' => true,
     
     // NSFW context builders
     'nsfw_reputation' => true,
@@ -127,7 +130,7 @@ $GLOBALS['roleplay_settings'] = Array(
         "CHARACTER_STATUS" => Array(
             "enabled" => true,
             "header" => "## YOUR CURRENT STATUS",
-            "content" => "#AROUSAL_STATUS#\n#SURVIVAL_STATUS#\n#CLOTHING_STATUS#\n#FERTILITY_STATUS#\n#TATTOO_STATUS#\n#BOUNTY_STATUS#",
+            "content" => "#VITALS#\n#AROUSAL_STATUS#\n#SURVIVAL_STATUS#\n#CLOTHING_STATUS#\n#FERTILITY_STATUS#\n#TATTOO_STATUS#\n#BOUNTY_STATUS#",
             "order" => 1
         ),
         "NEARBY_ENTITIES" => Array(
@@ -150,3 +153,8 @@ $GLOBALS['roleplay_settings'] = Array(
         )
     )
 );
+
+// Metrics configuration
+$GLOBALS['minai_metrics_enabled'] = true;                                     // Enable metrics collection
+$GLOBALS['minai_metrics_sampling_rate'] = 1.0;                                // Sampling rate (0.0-1.0, where 1.0 = 100%)
+$GLOBALS['minai_metrics_file'] = "/var/www/html/HerikaServer/log/minai_metrics.jsonl"; // Path to store metrics data

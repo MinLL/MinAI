@@ -48,6 +48,7 @@ bool bHasArousedKeywords = False
 bool bHasBabo = False
 bool bHasTNG = False
 bool bHasSexlab = False
+
 int cuirassSlot = 0x00000004
 int helmetSlot = 0x00000001
 int glovesSlot = 0x00000008
@@ -56,14 +57,16 @@ int bootsSlot = 0x00000080
 
 minai_MainQuestController main
 minai_AIFF aiff
+minai_DeviousStuff devious
 
 actor playerRef
+bool bHasDDNG = False
 
 function Maintenance(minai_MainQuestController _main)
   playerRef = Game.GetPlayer()
   main = _main
   aiff = (Self as Quest) as minai_AIFF
-  
+  devious = (Self as Quest) as minai_DeviousStuff  
   Main.Info("Initializing Arousal Module.")
   
   ; Check if SexLab is installed
@@ -143,6 +146,17 @@ function Maintenance(minai_MainQuestController _main)
       Main.Error("Could not fetch baboConfigs")
     EndIf
   EndIf
+
+  if (devious.libs)
+    if (devious.libs.GetVersionString() == "5.2-NG")
+      bHasDDNG = True
+      Main.Info("Found Devious Devices NG")
+    else
+      bHasDDNG = False
+      Main.Info("Non-NG Devious Devices detected")
+    EndIf
+  EndIf
+
   aiff.SetModAvailable("Aroused", bHasAroused)
   aiff.SetModAvailable("ArousedKeywords", bHasArousedKeywords)
   aiff.SetModAvailable("Babo", bHasBabo)
@@ -630,9 +644,9 @@ string Function GetWornEquipments(Actor target)
   string wornEquipments = ""
   int index
   int slotsChecked
-  slotsChecked += 0x00100000
-  slotsChecked += 0x00200000
-  slotsChecked += 0x00400000
+  ; slotsChecked += 0x00100000
+  ; slotsChecked += 0x00200000
+  ; slotsChecked += 0x00400000
   slotsChecked += 0x80000000
 
   int currentSlot = 0x01
@@ -654,6 +668,27 @@ string Function GetWornEquipments(Actor target)
     endif
     currentSlot *= 2 ;double the number to move on to the next slot
   endWhile
+  
+  ; Add Devious Devices if available
+  if bHasDDNG
+    Main.Debug("Getting Devious Devices for " + Main.GetActorName(target))
+    Armor[] ddDevices = zadNativeFunctions.GetDevices(target, 0, True)
+    if ddDevices && ddDevices.Length > 0
+      int i = 0
+      while i < ddDevices.Length
+        Armor ddArmor = ddDevices[i]
+        if ddArmor
+          int slotMask = ddArmor.GetSlotMask()
+          string ddArmorName = ddArmor.GetName()
+          string baseFormIdHex = PO3_SKSEFunctions.IntToString(Math.LogicalAnd(ddArmor.GetFormID(), 0x00FFFFFF), true)
+          string modName = PO3_SKSEFunctions.GetFormModName(ddArmor, false)
+          wornEquipments += baseFormIdHex + ":" + modName + ":" + PO3_SKSEFunctions.IntToString(slotMask, true) + ":" + GetKeywordsForEquipments(zadNativeFunctions.GetRenderDevice(ddArmor)) + ":" + LengthEncodedString(ddArmorName) + ":"
+        endif
+        i += 1
+      endwhile
+    endif
+  endif
+  
   Main.Debug("GetWornEquipments: " + wornEquipments)
   return wornEquipments
 EndFunction
@@ -666,64 +701,85 @@ string Function GetEquipmentKeywordWithComma(Armor equipment, string keywordStr,
 EndFunction
 
 string Function GetKeywordsForEquipments(Armor theArmor)
+  if !theArmor
+    Main.Warn("GetKeywordsForEquipments: No armor passed")
+    return ""
+  EndIf
   string ret = ""
-  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_HalfNakedBikini", SLA_HalfNakedBikini)
-  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_ArmorHalfNaked", SLA_ArmorHalfNaked)
-  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_Brabikini", SLA_Brabikini)
-  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_ThongT", SLA_ThongT)
-  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_ThongLowLeg", SLA_ThongLowLeg)
-  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_ThongCString", SLA_ThongCString)
-  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_ThongGstring", SLA_ThongGstring)
-  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_PantiesNormal", SLA_PantiesNormal)
-  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_KillerHeels", SLA_KillerHeels)
-  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_BootsHeels", SLA_BootsHeels)
-  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_PantsNormal", SLA_PantsNormal)
-  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_MicroHotPants", SLA_MicroHotPants)
-  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_ArmorHarness", SLA_ArmorHarness)
-  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_ArmorSpendex", SLA_ArmorSpendex)
-  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_ArmorTransparent", SLA_ArmorTransparent)
-  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_ArmorLewdLeotard", SLA_ArmorLewdLeotard)
-  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_PelvicCurtain", SLA_PelvicCurtain)
-  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_FullSkirt", SLA_FullSkirt)
-  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_MiniSkirt", SLA_MiniSkirt)
-  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_MicroSkirt", SLA_MicroSkirt)
-  ret += GetEquipmentKeywordWithComma(theArmor, "EroticArmor", EroticArmor)
-  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_PiercingVulva", SLA_PiercingVulva)
-  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_PiercingBelly", SLA_PiercingBelly)
-  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_PiercingNipple", SLA_PiercingNipple)
-  ret += GetEquipmentKeywordWithComma(theArmor, "SLA_PiercingClit", SLA_PiercingClit)
+  if bHasArousedKeywords
+    ret += GetEquipmentKeywordWithComma(theArmor, "SLA_HalfNakedBikini", SLA_HalfNakedBikini)
+    ret += GetEquipmentKeywordWithComma(theArmor, "SLA_ArmorHalfNaked", SLA_ArmorHalfNaked)
+    ret += GetEquipmentKeywordWithComma(theArmor, "SLA_Brabikini", SLA_Brabikini)
+    ret += GetEquipmentKeywordWithComma(theArmor, "SLA_ThongT", SLA_ThongT)
+    ret += GetEquipmentKeywordWithComma(theArmor, "SLA_ThongLowLeg", SLA_ThongLowLeg)
+    ret += GetEquipmentKeywordWithComma(theArmor, "SLA_ThongCString", SLA_ThongCString)
+    ret += GetEquipmentKeywordWithComma(theArmor, "SLA_ThongGstring", SLA_ThongGstring)
+    ret += GetEquipmentKeywordWithComma(theArmor, "SLA_PantiesNormal", SLA_PantiesNormal)
+    ret += GetEquipmentKeywordWithComma(theArmor, "SLA_KillerHeels", SLA_KillerHeels)
+    ret += GetEquipmentKeywordWithComma(theArmor, "SLA_BootsHeels", SLA_BootsHeels)
+    ret += GetEquipmentKeywordWithComma(theArmor, "SLA_PantsNormal", SLA_PantsNormal)
+    ret += GetEquipmentKeywordWithComma(theArmor, "SLA_MicroHotPants", SLA_MicroHotPants)
+    ret += GetEquipmentKeywordWithComma(theArmor, "SLA_ArmorHarness", SLA_ArmorHarness)
+    ret += GetEquipmentKeywordWithComma(theArmor, "SLA_ArmorSpendex", SLA_ArmorSpendex)
+    ret += GetEquipmentKeywordWithComma(theArmor, "SLA_ArmorTransparent", SLA_ArmorTransparent)
+    ret += GetEquipmentKeywordWithComma(theArmor, "SLA_ArmorLewdLeotard", SLA_ArmorLewdLeotard)
+    ret += GetEquipmentKeywordWithComma(theArmor, "SLA_PelvicCurtain", SLA_PelvicCurtain)
+    ret += GetEquipmentKeywordWithComma(theArmor, "SLA_FullSkirt", SLA_FullSkirt)
+    ret += GetEquipmentKeywordWithComma(theArmor, "SLA_MiniSkirt", SLA_MiniSkirt)
+    ret += GetEquipmentKeywordWithComma(theArmor, "SLA_MicroSkirt", SLA_MicroSkirt)
+    ret += GetEquipmentKeywordWithComma(theArmor, "EroticArmor", EroticArmor)
+    ret += GetEquipmentKeywordWithComma(theArmor, "SLA_PiercingVulva", SLA_PiercingVulva)
+    ret += GetEquipmentKeywordWithComma(theArmor, "SLA_PiercingBelly", SLA_PiercingBelly)
+    ret += GetEquipmentKeywordWithComma(theArmor, "SLA_PiercingNipple", SLA_PiercingNipple)
+    ret += GetEquipmentKeywordWithComma(theArmor, "SLA_PiercingClit", SLA_PiercingClit)
+  EndIf
+  
+  ; Add Devious Devices keywords
+  if bHasDDNG && devious && devious.libs
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousPlugVaginal", devious.libs.zad_DeviousPlugVaginal)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousPlugAnal", devious.libs.zad_DeviousPlugAnal)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousBelt", devious.libs.zad_DeviousBelt)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousCollar", devious.libs.zad_DeviousCollar)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousPiercingsNipple", devious.libs.zad_DeviousPiercingsNipple)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousPiercingsVaginal", devious.libs.zad_DeviousPiercingsVaginal)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousArmCuffs", devious.libs.zad_DeviousArmCuffs)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousLegCuffs", devious.libs.zad_DeviousLegCuffs)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousBra", devious.libs.zad_DeviousBra)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousArmbinder", devious.libs.zad_DeviousArmbinder)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousYoke", devious.libs.zad_DeviousYoke)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousElbowTie", devious.libs.zad_DeviousElbowTie)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousPetSuit", devious.libs.zad_DeviousPetSuit)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousStraitJacket", devious.libs.zad_DeviousStraitJacket)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousCorset", devious.libs.zad_DeviousCorset)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousHood", devious.libs.zad_DeviousHood)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousHobbleSkirt", devious.libs.zad_DeviousHobbleSkirt)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousGloves", devious.libs.zad_DeviousGloves)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousSuit", devious.libs.zad_DeviousSuit)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousGag", devious.libs.zad_DeviousGag)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousGagPanel", devious.libs.zad_DeviousGagPanel)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousGagLarge", devious.libs.zad_DeviousGagLarge)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousHarness", devious.libs.zad_DeviousHarness)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousBlindfold", devious.libs.zad_DeviousBlindfold)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousAnkleShackles", devious.libs.zad_DeviousAnkleShackles)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousClamps", devious.libs.zad_DeviousClamps)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousBoots", devious.libs.zad_DeviousBoots)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousArmbinderElbow", devious.libs.zad_DeviousArmbinderElbow)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousHeavyBondage", devious.libs.zad_DeviousHeavyBondage)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousHobbleSkirtRelaxed", devious.libs.zad_DeviousHobbleSkirtRelaxed)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousCuffsFront", devious.libs.zad_DeviousCuffsFront)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousYokeBB", devious.libs.zad_DeviousYokeBB)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousBondageMittens", devious.libs.zad_DeviousBondageMittens)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_DeviousPonyGear", devious.libs.zad_DeviousPonyGear)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_PermitOral", devious.libs.zad_PermitOral)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_PermitAnal", devious.libs.zad_PermitAnal)
+    ret += GetEquipmentKeywordWithComma(theArmor, "zad_PermitVaginal", devious.libs.zad_PermitVaginal)
+  EndIf
   return ret
 EndFunction
 
 string Function GetKeywordsForActor(actor akTarget)
   string ret = ""
-  if bHasArousedKeywords
-    ret += aiff.GetKeywordIfExists(akTarget, "SLA_HalfNakedBikini", SLA_HalfNakedBikini)
-    ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorHalfNaked", SLA_ArmorHalfNaked)
-    ret += aiff.GetKeywordIfExists(akTarget, "SLA_Brabikini", SLA_Brabikini)
-    ret += aiff.GetKeywordIfExists(akTarget, "SLA_Thong", SLA_ThongT)
-    ret += aiff.GetKeywordIfExists(akTarget, "SLA_Thong", SLA_ThongLowLeg)
-    ret += aiff.GetKeywordIfExists(akTarget, "SLA_Thong", SLA_ThongCString)
-    ret += aiff.GetKeywordIfExists(akTarget, "SLA_Thong", SLA_ThongGstring)
-    ret += aiff.GetKeywordIfExists(akTarget, "SLA_PantiesNormal", SLA_PantiesNormal)
-    ret += aiff.GetKeywordIfExists(akTarget, "SLA_Heels", SLA_KillerHeels)
-    ret += aiff.GetKeywordIfExists(akTarget, "SLA_Heels", SLA_BootsHeels)
-    ret += aiff.GetKeywordIfExists(akTarget, "SLA_PantsNormal", SLA_PantsNormal)
-    ret += aiff.GetKeywordIfExists(akTarget, "SLA_MicroHotPants", SLA_MicroHotPants)
-    ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorHarness", SLA_ArmorHarness)
-    ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorSpendex", SLA_ArmorSpendex)
-    ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorTransparent", SLA_ArmorTransparent)
-    ret += aiff.GetKeywordIfExists(akTarget, "SLA_ArmorLewdLeotard", SLA_ArmorLewdLeotard)
-    ret += aiff.GetKeywordIfExists(akTarget, "SLA_PelvicCurtain", SLA_PelvicCurtain)
-    ret += aiff.GetKeywordIfExists(akTarget, "SLA_FullSkirt", SLA_FullSkirt)
-    ret += aiff.GetKeywordIfExists(akTarget, "SLA_MiniSkirt", SLA_MiniSkirt)
-    ret += aiff.GetKeywordIfExists(akTarget, "SLA_MiniSkirt", SLA_MicroSkirt)
-    ret += aiff.GetKeywordIfExists(akTarget, "EroticArmor", EroticArmor)
-    ret += aiff.GetKeywordIfExists(akTarget, "SLA_PiercingVulva", SLA_PiercingVulva)
-    ret += aiff.GetKeywordIfExists(akTarget, "SLA_PiercingBelly", SLA_PiercingBelly)
-    ret += aiff.GetKeywordIfExists(akTarget, "SLA_PiercingNipple", SLA_PiercingNipple)
-    ret += aiff.GetKeywordIfExists(akTarget, "SLA_PiercingClit", SLA_PiercingClit)
-  EndIf
+
   if bHasTNG
     if akTarget.HasKeyword(TNG_Gentlewoman)
       ret += "TNG_Gentlewoman,"

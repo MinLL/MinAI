@@ -6,7 +6,7 @@ if (isset($GLOBALS["minai_skip_processing"]) && $GLOBALS["minai_skip_processing"
 
 require_once("util.php");
 $GLOBALS["PATCH_PROMPT_ENFORCE_ACTIONS"] = true;
-$target = GetTargetActor();
+$target = $GLOBALS["target"];
 
 if (IsEnabled($GLOBALS["PLAYER_NAME"], "isSinging")) {
     $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] = ExpandPromptVariables($GLOBALS["action_prompts"]["singing"]);

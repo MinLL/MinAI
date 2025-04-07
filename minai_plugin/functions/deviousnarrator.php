@@ -77,6 +77,10 @@ Function SetDeviousNarrator() {
     if (!IsModEnabled("DeviouslyAccessible")) {
         return;
     }
+    if (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"]) {
+        // Don't override the self narrator
+        return;
+    }
     $questState = intval(GetActorValue($GLOBALS['PLAYER_NAME'], "deviouslyAccessibleGlobal"));
     $telvanniScore = ($questState % 10);
     $eldritchScore = intval(intval($questState) / 10);

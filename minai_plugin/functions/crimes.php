@@ -16,13 +16,13 @@ $crimeCommands = [
     "Arrest" => "Arrest {$GLOBALS['PLAYER_NAME']} and send them to jail immediately (for uncooperative criminals or when caught in the act)",
     "ClearBounty" => "Clear all bounty for {$GLOBALS['PLAYER_NAME']} in the current hold (Use in response to fines being paid (When you've already collected payment), or when you otherwise want to clear the bounty)"
 ];
-
-// Register crime actions using the builder
+$isGuardTargetingPlayer = isGuardTargetingPlayer();
+// Register crime actions using directRegisterAction
 foreach ($crimeCommands as $command => $description) {
-    registerMinAIAction("ExtCmd".$command, $command)
-        ->withDescription($description)
-        ->withParameter("target", "string", "Target NPC, Actor, or being (usually the player)")
-        ->withEnableCondition('isGuardTargetingPlayer')
-        ->withReturnFunction($GLOBALS["GenericFuncRet"])
-        ->register();
+    directRegisterAction(
+        "ExtCmd".$command, 
+        $command, 
+        $description,
+        $isGuardTargetingPlayer
+    );
 } 

@@ -9,7 +9,7 @@ function cleanupSlop($contextData) {
     if (!is_array($contextData)) {
         return $contextData;
     }
-    $playerPronouns = GetActorPronouns($GLOBALS["PLAYER_NAME"]);
+    $playerPronouns = $GLOBALS["player_pronouns"];
     $pronounSelf = "{$playerPronouns['object']}self";
     $cleaned = [];
     $lastTimePassIndex = -1; // Track index of the last "Time passes" message
@@ -46,7 +46,8 @@ function cleanupSlop($contextData) {
         'throne' => ['throne', 'jarl seat'],
         'practicing' => ['training dummy', 'archery target', 'practice target'],
         'praying' => ['prayer mat', 'kneeler', 'meditation spot'],
-        'crafting' => ['staff enchanter', 'atronach forge', 'spell making altar']
+        'crafting' => ['staff enchanter', 'atronach forge', 'spell making altar'],
+        'meditating' => ['cancel meditation']
     ];
     
     foreach ($contextData as $entry) {
@@ -124,11 +125,6 @@ function cleanupSlop($contextData) {
 
             // Post-processing: Skip character stat lines
             if (preg_match('/^level:\d+,name:"[^"]+",race:"[^"]+"/', $content)) {
-                continue;
-            }
-
-            // Post-processing: Skip standalone weapon/item references
-            if (preg_match('/^\(with\s+[^)]+\)$/', $content)) {
                 continue;
             }
 
@@ -252,6 +248,9 @@ function cleanupSlop($contextData) {
                                 case 'crafting':
                                     $formattedMessage = "$character uses the $object to craft magical items";
                                     break;
+                                case 'meditating':
+                                    $formattedMessage = "$character meditates and regains focus, restoring their magicka";
+                                    break;
                             }
                             $categorized = true;
                             $formattedMessage = "($formattedMessage)";
@@ -279,6 +278,15 @@ function cleanupSlop($contextData) {
                 // Skip adding this line to the processed lines
                 continue;
             }
+
+            // Pattern: Handle combat defeat messages
+            $content = preg_replace_callback('/\(Context location: ([^)]+)\)(.+?) has defeated (.+?) with (.+?)$/i', function($matches) {
+                $location = $matches[1];
+                $character = $matches[2];
+                $enemy = $matches[3];
+                $weapon = $matches[4];
+                return "((Context location: $location) $character has defeated $enemy with $weapon)";
+            }, $content);
 
             // Pattern: Replace combat engagement messages
             $content = preg_replace_callback('/The party engages combat with\s+(.+?)(?:\s|$)/i', function($matches) {
@@ -332,8 +340,8 @@ function cleanupSlop($contextData) {
             if ($isTimePassMessage && $lastTimePassIndex >= 0) {
                 continue; // Skip adding this as a new entry
             }
-            ///error_log("DEBUG: Original content: " . $originalContent);
-            ///error_log("DEBUG: Joined content: " . $joinedContent);
+            // error_log("DEBUG: Original content: " . $originalContent);
+            // error_log("DEBUG: Joined content: " . $joinedContent);
             $entry['content'] = $joinedContent;
             $cleaned[] = $entry;
             
@@ -375,10 +383,11 @@ function cleanupSlop($contextData) {
     
     // Only prune if original context history was set
     if (isset($GLOBALS["ORIGINAL_CONTEXT_HISTORY"])) {
-        error_log("DEBUG: Pruning context history to " . $GLOBALS["ORIGINAL_CONTEXT_HISTORY"]);
+        // error_log("DEBUG: Pruning context history to " . $GLOBALS["ORIGINAL_CONTEXT_HISTORY"]);
+        // error_log( "Returning context history: " . json_encode($cleaned));
         $n = $GLOBALS["ORIGINAL_CONTEXT_HISTORY"];
         return array_slice($cleaned, -$n);
     }
-    
+    // error_log( "Returning context history: " . json_encode($cleaned));
     return $cleaned;
 } 

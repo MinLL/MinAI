@@ -1,10 +1,11 @@
 <?php
 
 require_once("action_builder.php");
+$target = $GLOBALS["target"];
 
 // Function to check vibration capability (for use in withEnableCondition)
 function canUseVibrations() {
-    $target = GetTargetActor();
+    global $target;
     $canVibrate = CanVibrate($target);
     // Handle eldritch narrator special case
     $eldritch = IsEldritchNarratorActive();
@@ -19,7 +20,7 @@ function canUseVibrations() {
 }
 
 function canStartVibrations() {
-    $target = GetTargetActor();
+    global $target;
     $canVibrate = CanStartVibrator($target);
     // Handle eldritch narrator special case
     $eldritch = IsEldritchNarratorActive();
@@ -31,68 +32,6 @@ function canStartVibrations() {
         }
     }
     return $canVibrate;
-}
-
-// Basic vibration control actions
-$basicVibratorActions = [
-    "ExtCmdShock" => [
-        "display" => "Shock",
-        "desc" => "Apply a painful electrical shock to #target_object# - use to punish misbehavior or rapidly decrease arousal"
-    ],
-    "ExtCmdForceOrgasm" => [
-        "display" => "ForceOrgasm",
-        "desc" => "Force #target_object# to immediately experience an intense climax - effective reward or control mechanism"
-    ],
-    "ExtCmdTurnOffVibrator" => [
-        "display" => "TurnOffVibrator",
-        "desc" => "Deactivate any vibrating devices on #target_object# - use to deny pleasure or end stimulation"
-    ]
-];
-
-// Register basic vibration control actions
-foreach ($basicVibratorActions as $actionName => $actionInfo) {
-    registerMinAIAction($actionName, $actionInfo["display"])
-        ->withDescription($actionInfo["desc"])
-        ->withParameter("target", "string", "Target NPC, Actor, or being", isset($GLOBALS["nearby"]) ? $GLOBALS["nearby"] : [])
-        ->isNSFW()
-        ->withEnableCondition('canUseVibrations')
-        ->withReturnFunction($GLOBALS["GenericFuncRet"])
-        ->register();
-}
-
-// Vibration intensity settings
-$vibSettings = ["Very Weak", "Weak", "Medium", "Strong", "Very Strong"];
-
-// Register teasing actions with different intensities
-foreach ($vibSettings as $strength) {
-    $cleanStrength = str_replace(' ', '', $strength);
-    $actionName = "ExtCmdTeaseWithVibrator" . $cleanStrength;
-    $displayName = "TeaseWithVibrator" . $cleanStrength;
-    $description = "Tease #target_object# with $strength vibrations that build arousal without allowing climax - perfect for control";
-        
-    registerMinAIAction($actionName, $displayName)
-        ->withDescription($description)
-        ->withParameter("target", "string", "Target NPC, Actor, or being", isset($GLOBALS["nearby"]) ? $GLOBALS["nearby"] : [])
-        ->isNSFW()
-        ->withEnableCondition('canStartVibrations')
-        ->withReturnFunction($GLOBALS["GenericFuncRet"])
-        ->register();
-}
-
-// Register stimulation actions with different intensities
-foreach ($vibSettings as $strength) {
-    $cleanStrength = str_replace(' ', '', $strength);
-    $actionName = "ExtCmdStimulateWithVibrator" . $cleanStrength;
-    $displayName = "StimulateWithVibrator" . $cleanStrength;
-    $description = "Stimulate #target_object# with $strength vibrations that can lead to climax - use for gratification or reward";
-    
-    registerMinAIAction($actionName, $displayName)
-        ->withDescription($description)
-        ->withParameter("target", "string", "Target NPC, Actor, or being", isset($GLOBALS["nearby"]) ? $GLOBALS["nearby"] : [])
-        ->isNSFW()
-        ->withEnableCondition('canStartVibrations')
-        ->withReturnFunction($GLOBALS["GenericFuncRet"])
-        ->register();
 }
 
 // Function to check if devices can be modified
@@ -136,6 +75,78 @@ function canModifyDevices($isEquip, $keyword, $keyword2 = null, $beltBlocks = fa
     }
     
     return true;
+}
+
+// Check if NSFW is disabled globally
+$nsfwDisabled = $GLOBALS["disable_nsfw"];
+
+// Skip all registration if NSFW is disabled
+if ($nsfwDisabled) {
+    return;
+}
+
+// Cache conditions once
+$canUseVibrations = canUseVibrations();
+$canStartVibrations = canStartVibrations();
+$inCombat = IsEnabled($GLOBALS["HERIKA_NAME"], "inCombat");
+$allowLock = IsConfigEnabled("allowDeviceLock");
+$allowUnlock = IsConfigEnabled("allowDeviceUnlock");
+$hasBelt = HasKeyword($target, "zad_DeviousBelt");
+$nearby = isset($GLOBALS["nearby"]) ? $GLOBALS["nearby"] : [];
+
+// Basic vibration control actions
+if ($canUseVibrations) {
+    $basicVibratorActions = [
+        "ExtCmdShock" => [
+            "display" => "Shock",
+            "desc" => "Apply a painful electrical shock to #target_object# - use to punish misbehavior or rapidly decrease arousal"
+        ],
+        "ExtCmdForceOrgasm" => [
+            "display" => "ForceOrgasm",
+            "desc" => "Force #target_object# to immediately experience an intense climax - effective reward or control mechanism"
+        ],
+        "ExtCmdTurnOffVibrator" => [
+            "display" => "TurnOffVibrator",
+            "desc" => "Deactivate any vibrating devices on #target_object# - use to deny pleasure or end stimulation"
+        ]
+    ];
+
+    // Register basic vibration control actions
+    foreach ($basicVibratorActions as $actionName => $actionInfo) {
+        directRegisterAction(
+            $actionName, 
+            $actionInfo["display"], 
+            $actionInfo["desc"], 
+            true
+        );
+    }
+}
+
+// Vibration intensity settings
+$vibSettings = ["Very Weak", "Weak", "Medium", "Strong", "Very Strong"];
+
+// Register teasing and stimulation actions with different intensities
+if ($canStartVibrations) {
+    // Register teasing actions
+    foreach ($vibSettings as $strength) {
+        $cleanStrength = str_replace(' ', '', $strength);
+        
+        // Teasing actions
+        directRegisterAction(
+            "ExtCmdTeaseWithVibrator" . $cleanStrength, 
+            "TeaseWithVibrator" . $cleanStrength, 
+            "Tease #target_object# with $strength vibrations that build arousal without allowing climax - perfect for control", 
+            true
+        );
+        
+        // Stimulation actions
+        directRegisterAction(
+            "ExtCmdStimulateWithVibrator" . $cleanStrength, 
+            "StimulateWithVibrator" . $cleanStrength, 
+            "Stimulate #target_object# with $strength vibrations that can lead to climax - use for gratification or reward", 
+            true
+        );
+    }
 }
 
 // Bondage device actions
@@ -214,27 +225,47 @@ $bondageDevices = [
     ]
 ];
 
-// Register bondage device actions
-foreach ($bondageDevices as $actionName => $actionInfo) {
-    $keyword = $actionInfo["keyword"];
-    $keyword2 = $actionInfo["keyword2"] ?? null;
-    $beltBlocks = $actionInfo["belt_blocks"];
-    $isEquip = $actionInfo["equip"];
-    
-    // Set custom prompt template for this action
-    $actionType = $isEquip ? "equipping" : "removing";
-    $deviceType = str_replace(["ExtCmdEquip", "ExtCmdUnequip"], "", $actionName);
-    $GLOBALS["PROMPTS"]["afterfunc"]["cue"][$actionName] = "{$GLOBALS["HERIKA_NAME"]} comments on $actionType a $deviceType on/from {$target}. {$GLOBALS["TEMPLATE_DIALOG"]}";
-    
-    registerMinAIAction($actionName, $actionInfo["display"])
-        ->withDescription($actionInfo["desc"])
-        ->withParameter("target", "string", "Target NPC, Actor, or being", isset($GLOBALS["nearby"]) ? $GLOBALS["nearby"] : [], true)
-        ->isNSFW()
-        ->withEnableCondition(function() use ($isEquip, $keyword, $keyword2, $beltBlocks) {
-            return canModifyDevices($isEquip, $keyword, $keyword2, $beltBlocks);
-        })
-        ->withReturnFunction($GLOBALS["GenericFuncRet"])
-        ->register();
+// Skip all bondage action registration if in combat
+if (!$inCombat) {
+    // Pre-check device conditions
+    foreach ($bondageDevices as $actionName => $actionInfo) {
+        $keyword = $actionInfo["keyword"];
+        $keyword2 = $actionInfo["keyword2"] ?? null;
+        $beltBlocks = $actionInfo["belt_blocks"];
+        $isEquip = $actionInfo["equip"];
+        
+        // Skip if basic conditions aren't met
+        if ($isEquip && !$allowLock) continue;
+        if (!$isEquip && !$allowUnlock) continue;
+        
+        // Check if device is already equipped/not-equipped
+        $isEquipped = HasKeyword($target, $keyword);
+        if ($keyword2 !== null) {
+            $isEquipped = $isEquipped || HasKeyword($target, $keyword2);
+        }
+        
+        // Skip if already in desired state
+        if ($isEquip && $isEquipped) continue;
+        if (!$isEquip && !$isEquipped) continue;
+        
+        // Skip if belt blocks and there is a belt
+        if ($beltBlocks && $hasBelt) continue;
+        
+        // Set custom prompt template for this action
+        $actionType = $isEquip ? "equipping" : "removing";
+        $deviceType = str_replace(["ExtCmdEquip", "ExtCmdUnequip"], "", $actionName);
+        // $GLOBALS["PROMPTS"]["afterfunc"]["cue"][$actionName] = "{$GLOBALS["HERIKA_NAME"]} comments on $actionType a $deviceType on/from {$target}. {$GLOBALS["TEMPLATE_DIALOG"]}";
+        
+        // Register the action
+        directRegisterAction(
+            $actionName, 
+            $actionInfo["display"], 
+            $actionInfo["desc"], 
+            true, 
+            [], 
+            ["target"]
+        );
+    }
 }
 
 

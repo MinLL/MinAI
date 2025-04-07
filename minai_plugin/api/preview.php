@@ -3,7 +3,6 @@
 ob_start();
 require_once("../config.base.php");
 require_once("../logger.php");
-include_once("/var/www/html/HerikaServer/lib/logger.php");
 header('Content-Type: application/json');
 $path = "..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR;
 require_once($path . "conf".DIRECTORY_SEPARATOR."conf.php");
@@ -14,7 +13,7 @@ $GLOBALS["db"] = new sql();
 require_once("../util.php");
 require_once("../contextbuilders.php");
 require_once("../roleplaybuilder.php");
-
+require_once("../utils/init_common_variables.php");
 // Set narrator name and load profile if needed
 $GLOBALS["HERIKA_NAME"] = "The Narrator";
 SetNarratorProfile();
@@ -53,6 +52,7 @@ try {
     $contextDataFull = array_merge($contextDataWorld, $contextDataHistoric);
     $mindState = convertToFirstPerson(callContextBuilder('mind_influence', $params), $playerName, $playerPronouns);
     $relationshipStatus = convertRelationshipStatus($actorName);
+    $vitals = convertToFirstPerson(callContextBuilder('vitals', $params), $playerName, $playerPronouns);
     // Build the variable replacements as they would appear in the prompt
     $variableReplacements = [
         'PLAYER_NAME' => $playerName,
@@ -76,7 +76,8 @@ try {
         'HERIKA_PERS' => $GLOBALS["HERIKA_PERS"] ?? "",
         'MIND_STATE' => $mindState,
         'RELATIONSHIP_STATUS' => $relationshipStatus,
-        'DEVICE_STATUS' => '' // Remove old device status string
+        'DEVICE_STATUS' => '',
+        'VITALS' => $vitals
     ];
 
     // Get sections from roleplay settings

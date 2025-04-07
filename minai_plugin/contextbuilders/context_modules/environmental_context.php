@@ -200,9 +200,9 @@ function BuildMoonPhaseContext($params) {
     $utilities = new Utilities();
     
     // Get raw moon data
-    $moonPhase = $utilities->GetActorValue($character, "moonPhase");
+    $moonPhase = GetActorValue($character, "moonPhase");
     $isNight = IsEnabled($character, "isNight");
-    $moonCount = $utilities->GetActorValue($character, "moonCount");
+    $moonCount = GetActorValue($character, "moonCount");
     
     // Check if we have all required data
     if (empty($moonPhase) || empty($moonCount)) {
@@ -372,7 +372,7 @@ function BuildLocationContext($params) {
     $context = "";
     
     // Get hold information
-    $currentHold = ucwords($utilities->GetActorValue($character, "currentHold"));
+    $currentHold = ucwords(GetActorValue($character, "currentHold"));
     $hasHold = false;
     if (!empty($currentHold)) {
         $context .= "Current Hold: " . $currentHold . ".\n";
@@ -380,14 +380,14 @@ function BuildLocationContext($params) {
     }
     
     // Get location information - prefer location over cell
-    $currentLocation = ucwords($utilities->GetActorValue($character, "currentLocation"));
+    $currentLocation = ucwords(GetActorValue($character, "currentLocation"));
     $hasLocation = false;
     if (!empty($currentLocation)) {
         $context .= "Current Location: " . $currentLocation . ".\n";
         $hasLocation = true;
     } else {
         // Try cell if no location
-        $currentCell = ucwords($utilities->GetActorValue($character, "CurrentCell"));
+        $currentCell = ucwords(GetActorValue($character, "CurrentCell"));
         if (!empty($currentCell)) {
             $context .= "Current Location: " . $currentCell . ".\n";
             $hasLocation = true;
@@ -407,7 +407,7 @@ function BuildLocationContext($params) {
     }
     
     // Get location keywords and format them
-    $locationKeywords = $utilities->GetActorValue($character, "locationKeywords");
+    $locationKeywords = GetActorValue($character, "locationKeywords");
     if (!empty($locationKeywords)) {
         $keywords = explode("~", $locationKeywords);
         $keywords = array_filter($keywords); // Remove empty entries
@@ -445,13 +445,13 @@ function BuildFrostfallContext($params) {
     $context = "";
     
     // Temperature
-    $temperature = $utilities->GetActorValue($character, "temperature");
+    $temperature = GetActorValue($character, "temperature");
     if (!empty($temperature)) {
         $context .= "The temperature is " . $temperature . ". ";
     }
     
     // Weather severity
-    $weatherSeverity = $utilities->GetActorValue($character, "weatherSeverity");
+    $weatherSeverity = GetActorValue($character, "weatherSeverity");
     if (!empty($weatherSeverity)) {
         $context .= $weatherSeverity . " ";
     }
@@ -462,31 +462,31 @@ function BuildFrostfallContext($params) {
     }
     
     // Wetness level
-    $wetnessLevel = $utilities->GetActorValue($character, "wetnessLevel");
+    $wetnessLevel = GetActorValue($character, "wetnessLevel");
     if (!empty($wetnessLevel)) {
         $context .= $character . " is " . $wetnessLevel . ". ";
     }
     
     // Exposure level
-    $exposureLevel = $utilities->GetActorValue($character, "exposureLevel");
+    $exposureLevel = GetActorValue($character, "exposureLevel");
     if (!empty($exposureLevel)) {
         $context .= $exposureLevel . " ";
     }
     
     // Baseline exposure
-    $baselineExposure = $utilities->GetActorValue($character, "baselineExposure");
+    $baselineExposure = GetActorValue($character, "baselineExposure");
     if (!empty($baselineExposure)) {
         $context .= $baselineExposure . " ";
     }
     
     // Warmth rating
-    $warmthRating = $utilities->GetActorValue($character, "warmthRating");
+    $warmthRating = GetActorValue($character, "warmthRating");
     if (!empty($warmthRating)) {
         $context .= $character . " is dressed " . $warmthRating . ". ";
     }
     
     // Coverage rating
-    $coverageRating = $utilities->GetActorValue($character, "coverageRating");
+    $coverageRating = GetActorValue($character, "coverageRating");
     if (!empty($coverageRating)) {
         $context .= $character . " " . $coverageRating . " ";
     }
@@ -528,116 +528,119 @@ function BuildNearbyCharactersContext($params) {
 
     // If we have characters after cleaning, create the formatted list
     if (count($characters) > 0) {
-        $context = "";
-        $utilities = new Utilities();
+        // Define attributes to fetch in batch - use lowercase for array keys
+        $attributes = ['race', 'gender', 'faction', 'sitstate', 'sleepstate', 'dirtandblood'];
+        $flags = ['issneaking', 'isswimming', 'isonmount', 'isincombat', 'isencumbered', 'hostiletoplayer'];
+        
+        // Correctly call the batch functions from global scope
+        $actorValues = \BatchGetActorValues($characters, $attributes);
+        $actorFlags = \BatchIsEnabled($characters, $flags);
+        
+        $contextLines = [];
         
         foreach ($characters as $character) {
-            // Basic character info
-            $context .= $character;
+            $charKey = strtolower($character);
+            $line = $character;
             
             // Get race if available
-            $race = $utilities->GetActorValue($character, "race");
-            if (!empty($race)) {
-                $context .= " (" . $race;
+            if (isset($actorValues[$charKey]['race']) && !empty($actorValues[$charKey]['race'])) {
+                $line .= " (" . $actorValues[$charKey]['race'];
                 
                 // Get gender if available
-                $gender = $utilities->GetActorValue($character, "gender");
-                if (!empty($gender)) {
-                    $context .= " " . $gender;
+                if (isset($actorValues[$charKey]['gender']) && !empty($actorValues[$charKey]['gender'])) {
+                    $line .= " " . $actorValues[$charKey]['gender'];
                 }
                 
-                $context .= ")";
+                $line .= ")";
             }
             
             // Add faction info if available
-            $faction = $utilities->GetActorValue($character, "faction");
-            if (!empty($faction)) {
-                $context .= " - " . $faction;
+            if (isset($actorValues[$charKey]['faction']) && !empty($actorValues[$charKey]['faction'])) {
+                $line .= " - " . $actorValues[$charKey]['faction'];
             }
             
-            
             // Add character state
-            $sitStateValue = $utilities->GetActorValue($character, "sitState");
-            if (!empty($sitStateValue) && intval($sitStateValue) == 3) {
-                $context .= " - sitting";
+            if (isset($actorValues[$charKey]['sitstate']) && !empty($actorValues[$charKey]['sitstate']) && intval($actorValues[$charKey]['sitstate']) == 3) {
+                $line .= " - sitting";
             }
             
             // Check if character is sleeping
-            $sleepState = $utilities->GetActorValue($character, "sleepState");
-            if (!empty($sleepState) && $sleepState != "awake") {
-                $context .= " - " . $sleepState;
+            if (isset($actorValues[$charKey]['sleepstate']) && !empty($actorValues[$charKey]['sleepstate']) && $actorValues[$charKey]['sleepstate'] != "awake") {
+                $line .= " - " . $actorValues[$charKey]['sleepstate'];
             }
             
             // Movement and combat states
-            if (IsEnabled($character, "isSneaking")) {
-                $context .= " - sneaking";
+            if (isset($actorFlags[$charKey]['issneaking']) && $actorFlags[$charKey]['issneaking']) {
+                $line .= " - sneaking";
             }
             
-            if (IsEnabled($character, "isSwimming")) {
-                $context .= " - swimming";
+            if (isset($actorFlags[$charKey]['isswimming']) && $actorFlags[$charKey]['isswimming']) {
+                $line .= " - swimming";
             }
             
-            if (IsEnabled($character, "isOnMount")) {
-                $context .= " - on horseback";
+            if (isset($actorFlags[$charKey]['isonmount']) && $actorFlags[$charKey]['isonmount']) {
+                $line .= " - on horseback";
             }
             
-            if (IsEnabled($character, "isInCombat")) {
-                $context .= " - in combat";
+            if (isset($actorFlags[$charKey]['isincombat']) && $actorFlags[$charKey]['isincombat']) {
+                $line .= " - in combat";
             }
             
-            if (IsEnabled($character, "isEncumbered")) {
-                $context .= " - encumbered";
+            if (isset($actorFlags[$charKey]['isencumbered']) && $actorFlags[$charKey]['isencumbered']) {
+                $line .= " - encumbered";
             }
             
             // Add hostility flag
-            if (IsEnabled($character, "hostileToPlayer")) {
-                $context .= " - hostile to outsiders";
+            if (isset($actorFlags[$charKey]['hostiletoplayer']) && $actorFlags[$charKey]['hostiletoplayer']) {
+                $line .= " - hostile to outsiders";
             }
             
             // Add hygiene information
-            $hygiene = $utilities->GetActorValue($character, "dirtAndBlood");
-            if (!empty($hygiene)) {
+            if (isset($actorValues[$charKey]['dirtandblood']) && !empty($actorValues[$charKey]['dirtandblood'])) {
+                $hygiene = $actorValues[$charKey]['dirtandblood'];
+                
                 if (stripos($hygiene, "Clean") !== false) {
-                    $context .= " - clean";
+                    $line .= " - clean";
                 } elseif (stripos($hygiene, "Dirt4") !== false) {
-                    $context .= " - filthy";
+                    $line .= " - filthy";
                 } elseif (stripos($hygiene, "Dirt3") !== false) {
-                    $context .= " - very dirty";
+                    $line .= " - very dirty";
                 } elseif (stripos($hygiene, "Dirt2") !== false) {
-                    $context .= " - dirty";
+                    $line .= " - dirty";
                 } elseif (stripos($hygiene, "Dirt1") !== false) {
-                    $context .= " - slightly dirty";
+                    $line .= " - slightly dirty";
                 } elseif (stripos($hygiene, "Blood4") !== false) {
-                    $context .= " - covered in blood";
+                    $line .= " - covered in blood";
                 } elseif (stripos($hygiene, "Blood3") !== false) {
-                    $context .= " - bloody";
+                    $line .= " - bloody";
                 } elseif (stripos($hygiene, "Blood2") !== false) {
-                    $context .= " - blood-spattered";
+                    $line .= " - blood-spattered";
                 } elseif (stripos($hygiene, "Blood1") !== false) {
-                    $context .= " - blood-stained";
+                    $line .= " - blood-stained";
                 } elseif (stripos($hygiene, "Bathing") !== false) {
-                    $context .= " - bathing";
+                    $line .= " - bathing";
                 }
                 
                 // Add scent information
                 if (stripos($hygiene, "Lavender") !== false) {
-                    $context .= " - lavender scented";
+                    $line .= " - lavender scented";
                 } elseif (stripos($hygiene, "Blue") !== false) {
-                    $context .= " - fresh scented";
+                    $line .= " - fresh scented";
                 } elseif (stripos($hygiene, "Red") !== false) {
-                    $context .= " - rose scented";
+                    $line .= " - rose scented";
                 } elseif (stripos($hygiene, "DragonsTongue") !== false) {
-                    $context .= " - spicy scented";
+                    $line .= " - spicy scented";
                 } elseif (stripos($hygiene, "Purple") !== false) {
-                    $context .= " - jazbay scented";
+                    $line .= " - jazbay scented";
                 } elseif (stripos($hygiene, "Superior") !== false) {
-                    $context .= " - luxuriously scented";
+                    $line .= " - luxuriously scented";
                 }
             }
-            $context .= "\n";
+            
+            $contextLines[] = $line;
         }
         
-        return $context;
+        return implode("\n", $contextLines);
     }
     
     return "";

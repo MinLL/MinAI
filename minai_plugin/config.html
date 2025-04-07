@@ -1664,6 +1664,45 @@
             <!-- Full width sections -->
             <div class="config-grid">
                 <div class="config-section full-width">
+                    <!-- Advanced Settings Section -->
+                    <div class="config-section">
+                        <div class="section-header collapsed" onclick="toggleSection(this)">
+                            Advanced Settings
+                        </div>
+                        <div class="section-content collapsed">
+                            <!-- CHIM_NO_EXAMPLES -->
+                            <div class="option-group checkbox-group">
+                                <div class="option-label-container">
+                                    <label class="option-label" for="chim-no-examples">Disable OpenRouterJSON Examples</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('chim-no-examples')">Reset to Default</button>
+                                </div>
+                                <p>Disable the examples that are sent to the LLM ("Stop staring at me / What are you looking at?"). Reduces LLM slop, but may cause issues with particularly weak LLMs that rely on these examples.</p>
+                                <input type="checkbox" id="chim-no-examples">
+                            </div>
+                            
+                            <!-- minai_metrics_enabled -->
+                            <div class="option-group checkbox-group">
+                                <div class="option-label-container">
+                                    <label class="option-label" for="minai-metrics-enabled">Enable Metrics Collection</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('minai-metrics-enabled')">Reset to Default</button>
+                                </div>
+                                <p>Enable collection of anonymous usage metrics</p>
+                                <input type="checkbox" id="minai-metrics-enabled">
+                            </div>
+                            
+                            <!-- minai_metrics_sampling_rate -->
+                            <div class="option-group">
+                                <div class="option-label-container">
+                                    <label class="option-label" for="minai-metrics-sampling-rate">Metrics Sampling Rate</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('minai-metrics-sampling-rate')">Reset to Default</button>
+                                </div>
+                                <p>Sampling rate for metrics collection (0.0-1.0, where 1.0 = 100%)</p>
+                                <input type="range" id="minai-metrics-sampling-rate" min="0.0" max="1.0" step="0.1" value="1.0">
+                                <span id="metrics-sampling-display">1.0</span>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- Roleplay Translation Settings Section -->
                     <div class="config-section">
                         <div class="section-header collapsed" onclick="toggleSection(this)">
@@ -2058,6 +2097,15 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             fetchConfigData();
+            
+            // Add event listener for the metrics sampling rate slider
+            const samplingRateSlider = document.getElementById('minai-metrics-sampling-rate');
+            const samplingRateDisplay = document.getElementById('metrics-sampling-display');
+            
+            samplingRateSlider.addEventListener('input', function() {
+                samplingRateDisplay.textContent = this.value;
+                markAsChanged();
+            });
         });
 
         async function fetchConfigData() {
@@ -2081,18 +2129,23 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 document.getElementById('force-aiff-name').checked = configData.force_aiff_name_to_ingame_name;
                 document.getElementById('use-llm-fallback').checked = configData.use_llm_fallback;
                 document.getElementById('enforce-single-json').checked = configData.enforce_single_json;
-                populateDynamicList('commands-to-purge-container', configData.commands_to_purge);
-                populateDynamicList('events-to-ignore-container', configData.events_to_ignore);
                 document.getElementById('disable-worn-equipment').checked = configData.disable_worn_equipment;
                 document.getElementById('input-delay').value = configData.input_delay_for_radiance;
                 document.getElementById('strip-emotes').checked = configData.strip_emotes_from_output;
                 document.getElementById('use-defeat').checked = configData.use_defeat;
                 document.getElementById('realnames-support').checked = configData.realnames_support;
-                
-                // Load inventory settings
                 document.getElementById('inventory-items-limit').value = configData.inventory_items_limit;
                 document.getElementById('use-item-relevancy-scoring').checked = configData.use_item_relevancy_scoring;
+                document.getElementById('chim-no-examples').checked = configData.CHIM_NO_EXAMPLES;
                 
+                // Load metrics settings
+                document.getElementById('minai-metrics-enabled').checked = configData.minai_metrics_enabled;
+                const samplingRateInput = document.getElementById('minai-metrics-sampling-rate');
+                samplingRateInput.value = configData.minai_metrics_sampling_rate;
+                document.getElementById('metrics-sampling-display').textContent = configData.minai_metrics_sampling_rate;
+
+                populateDynamicList('commands-to-purge-container', configData.commands_to_purge);
+                populateDynamicList('events-to-ignore-container', configData.events_to_ignore);
                 populateVoiceTypeFallbacks(configData.voicetype_fallbacks);
                 document.getElementById('singing-prompt').value = configData.action_prompts.singing;
                 document.getElementById('self-narrator-explicit').value = configData.action_prompts.self_narrator_explicit;
@@ -2229,10 +2282,13 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 strip_emotes_from_output: document.getElementById('strip-emotes').checked,
                 use_defeat: document.getElementById('use-defeat').checked,
                 realnames_support: document.getElementById('realnames-support').checked,
-                
-                // Inventory settings
-                inventory_items_limit: document.getElementById('inventory-items-limit').value,
+                CHIM_NO_EXAMPLES: document.getElementById('chim-no-examples').checked,
+                inventory_items_limit: parseInt(document.getElementById('inventory-items-limit').value),
                 use_item_relevancy_scoring: document.getElementById('use-item-relevancy-scoring').checked,
+                
+                // Metrics settings
+                minai_metrics_enabled: document.getElementById('minai-metrics-enabled').checked,
+                minai_metrics_sampling_rate: parseFloat(document.getElementById('minai-metrics-sampling-rate').value),
                 
                 voicetype_fallbacks: getVoiceTypeFallbacks(),
                 action_prompts: {
@@ -3044,6 +3100,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     strip_emotes_from_output: document.getElementById('strip-emotes').checked,
                     use_defeat: document.getElementById('use-defeat').checked,
                     realnames_support: document.getElementById('realnames-support').checked,
+                    CHIM_NO_EXAMPLES: document.getElementById('chim-no-examples').checked,
                     inventory_items_limit: parseInt(document.getElementById('inventory-items-limit').value),
                     use_item_relevancy_scoring: document.getElementById('use-item-relevancy-scoring').checked,
                     voicetype_fallbacks: getVoiceTypeFallbacks(),
@@ -3155,7 +3212,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                         document.getElementById('strip-emotes').checked = importedConfig.strip_emotes_from_output ?? baseConfig.strip_emotes_from_output;
                         document.getElementById('use-defeat').checked = importedConfig.use_defeat ?? baseConfig.use_defeat;
                         document.getElementById('realnames-support').checked = importedConfig.realnames_support ?? baseConfig.realnames_support;
-
+                        document.getElementById('chim-no-examples').checked = importedConfig.CHIM_NO_EXAMPLES ?? baseConfig.CHIM_NO_EXAMPLES;
                         // Inventory settings
                         document.getElementById('inventory-items-limit').value = importedConfig.inventory_items_limit ?? baseConfig.inventory_items_limit;
                         document.getElementById('use-item-relevancy-scoring').checked = importedConfig.use_item_relevancy_scoring ?? baseConfig.use_item_relevancy_scoring;
@@ -3472,10 +3529,15 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 'voicetype-fallbacks': 'voicetype_fallbacks',
                 'commands-to-purge': 'commands_to_purge',
                 'events-to-ignore': 'events_to_ignore',
+                'chim-no-examples': 'CHIM_NO_EXAMPLES',
                 
                 // Inventory settings
                 'inventory-items-limit': 'inventory_items_limit',
                 'use-item-relevancy-scoring': 'use_item_relevancy_scoring',
+
+                // Metrics settings
+                'minai-metrics-enabled': 'minai_metrics_enabled',
+                'minai-metrics-sampling-rate': 'minai_metrics_sampling_rate',
 
                 // Action prompts
                 'singing-prompt': 'action_prompts.singing',
@@ -3600,10 +3662,15 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     'voicetype-fallbacks': 'voicetype_fallbacks',
                     'commands-to-purge': 'commands_to_purge',
                     'events-to-ignore': 'events_to_ignore',
+                    'chim-no-examples': 'CHIM_NO_EXAMPLES',
 
                     // Inventory settings
                     'inventory-items-limit': 'inventory_items_limit',
                     'use-item-relevancy-scoring': 'use_item_relevancy_scoring',
+
+                    // Metrics settings
+                    'minai-metrics-enabled': 'minai_metrics_enabled',
+                    'minai-metrics-sampling-rate': 'minai_metrics_sampling_rate',
 
                     // Action prompts
                     'singing-prompt': 'action_prompts.singing',

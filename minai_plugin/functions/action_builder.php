@@ -8,7 +8,73 @@
  * - Provides enable/disable callbacks
  * - Supports different descriptions based on gender combinations
  * - Minimizes code duplication
+ * - Supports batch registration for performance
  */
+
+// Direct action registration function for optimal performance
+// This bypasses the builder pattern for significant speed improvements
+function directRegisterAction($actionName, $displayName, $description, $enableCondition, $genderDescriptions = [], $required = [], $customDescription = null) {
+    global $GLOBALS;
+    
+    // Skip registration if the enable condition is false
+    if ($enableCondition === false) {
+        return;
+    }
+    
+    // Cache gender values once if not already cached
+    static $speakerGender = null;
+    static $targetGender = null;
+    static $genderKey = null;
+    static $nearby = null;
+    
+    if ($speakerGender === null) {
+        $speakerGender = $GLOBALS["herika_gender"];
+        $targetGender = $GLOBALS["target_gender"];
+        $genderKey = "$speakerGender-$targetGender";
+        $nearby = isset($GLOBALS["nearby"]) ? $GLOBALS["nearby"] : [];
+    }
+    
+    // Use gender-specific description if available
+    $finalDescription = $description;
+    if (isset($genderDescriptions[$genderKey])) {
+        $finalDescription = $genderDescriptions[$genderKey];
+    } elseif ($customDescription !== null) {
+        $finalDescription = $customDescription;
+    }
+    
+    // Expand variables in the description
+    $finalDescription = ExpandPromptVariables($finalDescription);
+    
+    // Set up global arrays directly
+    $GLOBALS["F_NAMES"][$actionName] = $displayName;
+    $GLOBALS["F_TRANSLATIONS"][$actionName] = $finalDescription;
+    
+    // Add function parameter definition
+    $functionParams = [
+        "type" => "object",
+        "properties" => [
+            "target" => [
+                "type" => "string",
+                "description" => "Target NPC, Actor, or being",
+                "enum" => $nearby
+            ]
+        ],
+        "required" => $required
+    ];
+    
+    // Add function to globals
+    $GLOBALS["FUNCTIONS"][] = [
+        "name" => $displayName,
+        "description" => $finalDescription,
+        "parameters" => $functionParams,
+    ];
+    
+    // Set return function
+    $GLOBALS["FUNCRET"][$actionName] = $GLOBALS["GenericFuncRet"];
+    
+    // Register the action
+    RegisterAction($actionName);
+}
 
 class ActionBuilder {
     private $actionName;
@@ -20,6 +86,14 @@ class ActionBuilder {
     private $enableCallback = null;
     private $genderDescriptions = [];
     private $returnFunction = null;
+    
+    // Cached values to avoid recalculation
+    private static $nearby = null;
+    private static $cachedSpeakerGender = null;
+    private static $cachedTargetGender = null;
+    private static $enabledActionsCache = [];
+    private static $batchMode = false;
+    private static $batchActions = [];
 
     /**
      * Create a new action builder
@@ -38,6 +112,11 @@ class ActionBuilder {
     private function __construct($actionName, $displayName = null) {
         $this->actionName = $actionName;
         $this->displayName = $displayName ?: $actionName;
+        
+        // Initialize cached values if needed
+        if (self::$nearby === null && isset($GLOBALS["nearby"])) {
+            self::$nearby = $GLOBALS["nearby"];
+        }
     }
 
     /**
@@ -122,38 +201,174 @@ class ActionBuilder {
     }
 
     /**
+     * Check if an action should be enabled based on its callback
+     * 
+     * @return bool Whether the action should be enabled
+     */
+    private function shouldEnable() {
+        // Check cache first
+        if (isset(self::$enabledActionsCache[$this->actionName])) {
+            return self::$enabledActionsCache[$this->actionName];
+        }
+        
+        // Skip NSFW actions if disabled in config
+        if ($this->isNSFW && $GLOBALS["disable_nsfw"]) {
+            self::$enabledActionsCache[$this->actionName] = false;
+            return false;
+        }
+
+        // Check enable callback
+        if ($this->enableCallback) {
+            $result = is_callable($this->enableCallback) ? 
+                call_user_func($this->enableCallback) : false;
+            self::$enabledActionsCache[$this->actionName] = $result;
+            return $result;
+        }
+        
+        // No callback means enabled
+        self::$enabledActionsCache[$this->actionName] = true;
+        return true;
+    }
+    
+    /**
+     * Get gender-specific description
+     * 
+     * @return string The description text for the current gender combination
+     */
+    private function getGenderSpecificDescription() {
+        // Use cached values if available
+        if (self::$cachedSpeakerGender === null) {
+            self::$cachedSpeakerGender = $GLOBALS["herika_gender"];
+        }
+        
+        if (self::$cachedTargetGender === null) {
+            self::$cachedTargetGender = $GLOBALS["target_gender"];
+        }
+        
+        $genderKey = self::$cachedSpeakerGender . "-" . self::$cachedTargetGender;
+        
+        if (isset($this->genderDescriptions[$genderKey])) {
+            return $this->genderDescriptions[$genderKey];
+        }
+        
+        return $this->description;
+    }
+
+    /**
+     * Start batch registration mode
+     * 
+     * @return void
+     */
+    public static function startBatchRegistration() {
+        self::$batchMode = true;
+        self::$batchActions = [];
+    }
+    
+    /**
+     * Complete batch registration
+     * 
+     * @return void
+     */
+    public static function completeBatchRegistration() {
+        if (!self::$batchMode || empty(self::$batchActions)) {
+            return;
+        }
+        
+        global $GLOBALS;
+        
+        // Process all batched actions
+        foreach (self::$batchActions as $action) {
+            // Skip if not enabled
+            if (!$action->shouldEnable()) {
+                continue;
+            }
+            
+            // Get description with gender specifics
+            $description = $action->getGenderSpecificDescription();
+            $description = ExpandPromptVariables($description);
+            
+            // Register all the properties in global arrays
+            $GLOBALS["F_NAMES"][$action->actionName] = $action->displayName;
+            $GLOBALS["F_TRANSLATIONS"][$action->actionName] = $description;
+            
+            // Build function parameters
+            $functionParams = [
+                "type" => "object",
+                "properties" => [],
+                "required" => $action->required,
+            ];
+            
+            foreach ($action->parameters as $name => $param) {
+                $functionParams["properties"][$name] = [
+                    "type" => $param["type"],
+                    "description" => $param["description"]
+                ];
+                
+                if (!empty($param["enum"])) {
+                    $functionParams["properties"][$name]["enum"] = $param["enum"];
+                }
+            }
+            
+            // Add function to globals
+            $GLOBALS["FUNCTIONS"][] = [
+                "name" => $action->displayName,
+                "description" => $description,
+                "parameters" => $functionParams,
+            ];
+            
+            // Set return function if provided
+            if ($action->returnFunction !== null) {
+                $GLOBALS["FUNCRET"][$action->actionName] = $action->returnFunction;
+            } elseif (isset($GLOBALS["GenericFuncRet"])) {
+                $GLOBALS["FUNCRET"][$action->actionName] = $GLOBALS["GenericFuncRet"];
+            }
+            
+            // Actually register the action
+            RegisterAction($action->actionName);
+        }
+        
+        // Reset batch mode
+        self::$batchMode = false;
+        self::$batchActions = [];
+    }
+    
+    /**
+     * Clear all caches
+     * 
+     * @return void
+     */
+    public static function clearCaches() {
+        self::$nearby = isset($GLOBALS["nearby"]) ? $GLOBALS["nearby"] : [];
+        self::$cachedSpeakerGender = null;
+        self::$cachedTargetGender = null;
+        self::$enabledActionsCache = [];
+    }
+
+    /**
      * Build and register the action
      * 
      * @return void
      */
     public function register() {
+        // Add to batch if in batch mode
+        if (self::$batchMode) {
+            self::$batchActions[] = $this;
+            return;
+        }
+        
         global $GLOBALS;
 
-        // Skip NSFW actions if disabled in config
-        if ($this->isNSFW && $GLOBALS["disable_nsfw"]) {
+        // Skip if not enabled
+        if (!$this->shouldEnable()) {
             return;
         }
 
-        // Check enable callback
-        if ($this->enableCallback && !call_user_func($this->enableCallback)) {
-            return;
-        }
-
-        // Set display name in global array
-        $GLOBALS["F_NAMES"][$this->actionName] = $this->displayName;
-
-        // Determine the correct description based on gender if available
-        $description = $this->description;
-        
-        $speakerGender = IsFemale($GLOBALS["HERIKA_NAME"]) ? 'female' : 'male';
-        $targetGender = IsFemale(GetTargetActor()) ? 'female' : 'male';
-        
-        $genderKey = "$speakerGender-$targetGender";
-        if (isset($this->genderDescriptions[$genderKey])) {
-            $description = $this->genderDescriptions[$genderKey];
-        }
-        
+        // Get description with gender specifics
+        $description = $this->getGenderSpecificDescription();
         $description = ExpandPromptVariables($description);
+        
+        // Register all the properties in global arrays
+        $GLOBALS["F_NAMES"][$this->actionName] = $this->displayName;
         $GLOBALS["F_TRANSLATIONS"][$this->actionName] = $description;
 
         // Build function parameters
@@ -196,4 +411,15 @@ class ActionBuilder {
 // Helper function to quickly create and register an action
 function registerMinAIAction($actionName, $displayName = null) {
     return ActionBuilder::create($actionName, $displayName);
-} 
+}
+
+// Helper function to register actions in batch for performance
+function registerActionsBatch($setupCallback = null) {
+    ActionBuilder::startBatchRegistration();
+    
+    if (is_callable($setupCallback)) {
+        call_user_func($setupCallback);
+    }
+    
+    ActionBuilder::completeBatchRegistration();
+}
