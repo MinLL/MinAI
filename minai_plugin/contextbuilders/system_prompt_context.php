@@ -620,9 +620,12 @@ function BuildSystemPrompt() {
             // Standard response guidelines
             $system_prompt .= "- Stay in character as {$display_name} at all times\n";
             $system_prompt .= "- Respond appropriately to the context of the conversation\n";
-            $system_prompt .= "- Be concise and direct in your responses\n";
+            if ($GLOBALS['enforce_short_responses']) {
+                $system_prompt .= "- Be concise and direct in your responses\n";
+            }
             $system_prompt .= "- Your response should reflect your personality and relationship with {$target}\n";
             $system_prompt .= "- Prioritize responding to the most recent dialogue and events\n";
+            $system_prompt .= "- Include variety in your responses, and avoid repeating yourself\n";
         }
     }
     if (!isset($GLOBALS['minai_context']['action_enforcement'])) {
