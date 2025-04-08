@@ -13,6 +13,7 @@ require_once("functions/deviousnarrator.php");
 // Custom command / third party integrations support
 // Done here, as this is mounted early in main.php
 ProcessIntegrations();
+$cleanedMessage = GetCleanedMessage();
 $enforceLength = "You MUST Respond with no more than two sentences.";
 
 $GLOBALS["PROMPTS"]["radiant"]= [
@@ -70,25 +71,34 @@ $GLOBALS["PROMPTS"]["radiantcombatfriend"]= [
     ]
 ];
 
-$GLOBALS["PROMPTS"]["minai_combatendvictory"]= [
-    "cue"=>[
-        "({$GLOBALS["HERIKA_NAME"]} comments about foes defeated) {$GLOBALS["TEMPLATE_DIALOG"]}",
+if ($GLOBALS["gameRequest"][0] == "minai_combatendvictory" || $GLOBALS["gameRequest"][0] == "info_minai_combatendvictory") {
+    $narratePrompt = "The Narrator: {$cleanedMessage}";
+    $GLOBALS["PROMPTS"]["minai_combatendvictory"]= [
+        "cue"=>[
+            "({$GLOBALS["HERIKA_NAME"]} comments about foes defeated) {$GLOBALS["TEMPLATE_DIALOG"]}",
         "({$GLOBALS["HERIKA_NAME"]} curses the defeated enemies.) {$GLOBALS["TEMPLATE_DIALOG"]}",
         "({$GLOBALS["HERIKA_NAME"]} insults the defeated enemies with anger) {$GLOBALS["TEMPLATE_DIALOG"]}",
         "({$GLOBALS["HERIKA_NAME"]} makes a joke about the defeated enemies) {$GLOBALS["TEMPLATE_DIALOG"]}",
         "({$GLOBALS["HERIKA_NAME"]} makes a comment about the type of enemies that was defeated) {$GLOBALS["TEMPLATE_DIALOG"]}",
-        "({$GLOBALS["HERIKA_NAME"]} notes something peculiar about last enemy defeated) {$GLOBALS["TEMPLATE_DIALOG"]}"
-    ],
-    "extra"=>["force_tokens_max"=>"50","dontuse"=>(time()%10!=0)]   //10% chance
-];
+            "({$GLOBALS["HERIKA_NAME"]} notes something peculiar about last enemy defeated) {$GLOBALS["TEMPLATE_DIALOG"]}"
+        ],
+        "player_request"=>[$narratePrompt],
+        "extra"=>["dontuse"=>(time()%10!=0)]   //10% chance
+    ];
+}
 
-$GLOBALS["PROMPTS"]["minai_bleedoutself"]= [
-    "cue"=>[
-        "{$GLOBALS["HERIKA_NAME"]} calls out for help after being badly wounded! {$GLOBALS["TEMPLATE_DIALOG"]} ",
-        "{$GLOBALS["HERIKA_NAME"]} cries out in pain after being badly wounded! {$GLOBALS["TEMPLATE_DIALOG"]} ",
-        "{$GLOBALS["HERIKA_NAME"]} expresses their resolve after being badly wounded! {$GLOBALS["TEMPLATE_DIALOG"]} ",
-    ],
-];
+if ($GLOBALS["gameRequest"][0] == "minai_bleedoutself" || $GLOBALS["gameRequest"][0] == "info_minai_bleedoutself") {
+    $narratePrompt = "The Narrator: {$cleanedMessage}";
+    $GLOBALS["PROMPTS"]["minai_bleedoutself"]= [
+        "cue"=>[
+            "{$GLOBALS["HERIKA_NAME"]} calls out for help after being badly wounded! {$GLOBALS["TEMPLATE_DIALOG"]} ",
+            "{$GLOBALS["HERIKA_NAME"]} cries out in pain after being badly wounded! {$GLOBALS["TEMPLATE_DIALOG"]} ",
+            "{$GLOBALS["HERIKA_NAME"]} expresses their resolve after being badly wounded! {$GLOBALS["TEMPLATE_DIALOG"]} ",
+        ],
+        "player_request"=>[$narratePrompt]
+    ];
+}
+
 $GLOBALS["PROMPTS"]["goodmorning"]=[
     "cue"=>[
         (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"] ? 
@@ -192,10 +202,6 @@ else {
         ];
     }
 }
-
-
-$cleanedMessage = GetCleanedMessage();
-
 
 
 if (isset($GLOBALS["minai_processing_input"]) && $GLOBALS["minai_processing_input"]) {

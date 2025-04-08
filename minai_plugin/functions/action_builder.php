@@ -58,8 +58,7 @@ function directRegisterAction($actionName, $displayName, $description, $enableCo
                 "description" => "Target NPC, Actor, or being",
                 "enum" => $nearby
             ]
-        ],
-        "required" => $required
+        ]
     ];
     
     // Add function to globals

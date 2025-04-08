@@ -511,9 +511,9 @@ Function IsActionEnabled($actionName) {
         // Mark all found actions as enabled
         foreach ($rows as $row) {
             // This is formated as __minai_ACTION//actionName. Extract it.
-            $actionName = substr($row['id'], 15);
-            minai_log("info", "Preloaded action: " . $actionName);
-            $GLOBALS["minai_action_enabled_cache"][strtolower($actionName)] = true;
+            $tmpName = substr($row['id'], 15);
+            minai_log("info", "Preloaded action: " . $tmpName);
+            $GLOBALS["minai_action_enabled_cache"][strtolower($tmpName)] = true;
         }
         
         // Mark that we've loaded all actions
@@ -523,8 +523,10 @@ Function IsActionEnabled($actionName) {
     }
     
     // Return from cache (defaults to false if not found)
-    return isset($GLOBALS["minai_action_enabled_cache"][$actionName]) ? 
+    $returnValue = isset($GLOBALS["minai_action_enabled_cache"][$actionName]) ? 
            $GLOBALS["minai_action_enabled_cache"][$actionName] : false;
+    minai_log("info", "IsActionEnabled: {$actionName} = {$returnValue}");
+    return $returnValue;
 }
 
 // Cache for action registrations to avoid duplicates
@@ -538,11 +540,11 @@ Function RegisterAction($actionName) {
         return;
     }
     
-    $checkName = $actionName;
+    $checkName = strtolower($actionName);
     if (str_contains(strtolower($actionName), 'stimulatewith') || str_contains(strtolower($actionName), 'teasewith')) {
         $checkName = 'MinaiGlobalVibrator';
     }
-    
+    minai_log("info", "Checking IsActionEnabled: {$checkName}");
     if (IsActionEnabled($checkName)) {
         $GLOBALS["ENABLED_FUNCTIONS"][]=$actionName;
         $GLOBALS["minai_registered_actions"][$actionName] = true;
