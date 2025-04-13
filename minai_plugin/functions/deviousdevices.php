@@ -239,9 +239,9 @@ if (!$inCombat) {
         if (!$isEquip && !$allowUnlock) continue;
         
         // Check if device is already equipped/not-equipped
-        $isEquipped = HasKeyword($target, $keyword);
+        $isEquipped = HasEquipmentKeyword($target, $keyword);
         if ($keyword2 !== null) {
-            $isEquipped = $isEquipped || HasKeyword($target, $keyword2);
+            $isEquipped = $isEquipped || HasEquipmentKeyword($target, $keyword2);
         }
         
         // Skip if already in desired state
