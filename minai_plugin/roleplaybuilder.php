@@ -120,16 +120,16 @@ function GetNameFromProfile() {
 
 function getGaggedSpeech($name) {
     // Check for any type of gag
-    if (!HasKeyword($name, "zad_DeviousGag") && 
-        !HasKeyword($name, "zad_DeviousGagPanel") && 
-        !HasKeyword($name, "zad_DeviousGagLarge")) {
+    if (!HasEquipmentKeyword($name, "zad_DeviousGag") && 
+        !HasEquipmentKeyword($name, "zad_DeviousGagPanel") && 
+        !HasEquipmentKeyword($name, "zad_DeviousGagLarge")) {
         return "";
     }
     
     // Add gag context to the global roleplay settings
-    if (HasKeyword($name, "zad_DeviousGagLarge")) {
+    if (HasEquipmentKeyword($name, "zad_DeviousGagLarge")) {
         return "\nThe player is wearing a large ball gag and can only communicate through muffled sounds like 'mmph', 'nngh', and similar gagged noises. Keep their gagged speech short and clearly muffled.";
-    } else if (HasKeyword($name, "zad_DeviousGagPanel")) {
+    } else if (HasEquipmentKeyword($name, "zad_DeviousGagPanel")) {
         return "\nThe player is wearing a panel gag and can only speak in muffled, restricted sounds. Their speech should be short and clearly impeded.";
     } else {
         return "\nThe player is gagged and can only communicate through muffled sounds. Keep their speech short and obviously restricted.";

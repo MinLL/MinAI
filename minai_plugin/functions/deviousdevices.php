@@ -34,49 +34,6 @@ function canStartVibrations() {
     return $canVibrate;
 }
 
-// Function to check if devices can be modified
-function canModifyDevices($isEquip, $keyword, $keyword2 = null, $beltBlocks = false) {
-    global $target;
-    
-    // Don't equip/unequip during combat
-    if (IsEnabled($GLOBALS["HERIKA_NAME"], "inCombat")) {
-        return false;
-    }
-    
-    // Check if device operation is allowed in config
-    if ($isEquip) {
-        if (!IsConfigEnabled("allowDeviceLock")) {
-            return false;
-        }
-        
-        // Check if device is already equipped
-        if (HasKeyword($target, $keyword)) {
-            return false;
-        }
-    } else {
-        if (!IsConfigEnabled("allowDeviceUnlock")) {
-            return false;
-        }
-        
-        // Check if device is equipped
-        $isEquipped = HasKeyword($target, $keyword);
-        if ($keyword2 !== null) {
-            $isEquipped = $isEquipped || HasKeyword($target, $keyword2);
-        }
-        
-        if (!$isEquipped) {
-            return false;
-        }
-    }
-    
-    // If we need to check for belt blocking
-    if ($beltBlocks) {
-        return !HasKeyword($target, "zad_DeviousBelt");
-    }
-    
-    return true;
-}
-
 // Check if NSFW is disabled globally
 $nsfwDisabled = $GLOBALS["disable_nsfw"];
 
@@ -91,7 +48,7 @@ $canStartVibrations = canStartVibrations();
 $inCombat = IsEnabled($GLOBALS["HERIKA_NAME"], "inCombat");
 $allowLock = IsConfigEnabled("allowDeviceLock");
 $allowUnlock = IsConfigEnabled("allowDeviceUnlock");
-$hasBelt = HasKeyword($target, "zad_DeviousBelt");
+$hasBelt = HasEquipmentKeyword($target, "zad_DeviousBelt");
 $nearby = isset($GLOBALS["nearby"]) ? $GLOBALS["nearby"] : [];
 
 // Basic vibration control actions

@@ -1067,4 +1067,5 @@ function in_arrayi($needle, $haystack) {
     return in_array(strtolower($needle), array_map('strtolower', $haystack));
 }
 
+require_once("contextbuilders/wornequipment_context.php");
 require_once("utils/init_common_variables.php");
