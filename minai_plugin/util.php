@@ -379,6 +379,7 @@ function PreloadCommonActorData() {
         "Race", 
         "arousal", 
         "scene",
+        "relationshipRank",
         "playerName"
     ];
     
