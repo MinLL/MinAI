@@ -18,6 +18,10 @@ function cleanupSlop($contextData) {
     $characterUsesPositions = []; // Store positions of all use messages by character
     $characterLatestUses = [];    // Store only the latest formatted message by character
     
+    // Arrays to keep track of ethereal arrow messages
+    $etherealArrowPositions = []; // Store positions of all ethereal arrow messages by character
+    $etherealArrowLatest = [];    // Store only the latest formatted message by character
+    
     // Define object categories for contextual descriptions
     $objectCategories = [
         'sitting' => ['stool', 'chair', 'bench', 'throne', 'seat'],
@@ -140,6 +144,11 @@ function cleanupSlop($contextData) {
             
             // Pattern: Skip "$name uses" with missing object (both plain and parenthesized formats)
             if (preg_match('/^\(?(.+?)\s+uses\s*\)?$/i', $content)) {
+                continue;
+            }
+
+            // Pattern: Remove "talks to player for first time" message when IsRadiant is true
+            if (IsRadiant() && preg_match('/talks to ' . preg_quote($GLOBALS["PLAYER_NAME"], '/') . ' for the first time\. They haven\'t yet been acquainted/i', $content)) {
                 continue;
             }
             
@@ -279,6 +288,34 @@ function cleanupSlop($contextData) {
                 continue;
             }
 
+            // Pattern: Handle "found Ethereal Arrow" messages
+            if (preg_match('/^\(?(.+?)\s+found\s+(\d+)\s+Ethereal\s+Arrow\)?$/i', $content, $matches)) {
+                $character = trim($matches[1]);
+                $count = intval($matches[2]);
+                
+                // Format the message
+                $formattedMessage = "($character channeled their magic to conjure some Ethereal Arrows)";
+                
+                // Handle ethereal arrow messages separately by creating a new entry
+                $arrowEntry = $entry;
+                $arrowEntry['content'] = "PLACEHOLDER_ARROW_" . $character;
+                
+                // Record the position of this arrow message
+                if (!isset($etherealArrowPositions[$character])) {
+                    $etherealArrowPositions[$character] = [];
+                }
+                $etherealArrowPositions[$character][] = count($cleaned);
+                
+                // Store this as the latest arrow message for this character
+                $etherealArrowLatest[$character] = $formattedMessage;
+                
+                // Add the arrow entry to cleaned array
+                $cleaned[] = $arrowEntry;
+                
+                // Skip adding this line to the processed lines
+                continue;
+            }
+
             // Pattern: Handle combat defeat messages
             $content = preg_replace_callback('/\(Context location: ([^)]+)\)(.+?) has defeated (.+?) with (.+?)$/i', function($matches) {
                 $location = $matches[1];
@@ -333,6 +370,13 @@ function cleanupSlop($contextData) {
         if (!empty($processedLines)) {
             $joinedContent = implode("\n", $processedLines);
             
+            // Skip messages containing specific headers
+            if (stripos($joinedContent, '# PARTY STATUS') !== false || 
+                stripos($joinedContent, '# LOCATIONS OF INTEREST') !== false ||
+                stripos($joinedContent, '# NEARBY ACTOR') !== false) {
+                continue; // Skip this entry entirely
+            }
+            
             // Check if this is a "Time passes" message
             $isTimePassMessage = (stripos($joinedContent, 'Time passes without anyone in the group talking') !== false);
             
@@ -371,6 +415,24 @@ function cleanupSlop($contextData) {
             if ($positionIndex === count($positions) - 1) {
                 // This is the latest message for this character
                 $cleaned[$index]['content'] = $characterLatestUses[$character];
+            } else {
+                // This is not the latest message, remove it
+                unset($cleaned[$index]);
+            }
+        }
+        
+        // Check if this is an "arrow" placeholder
+        if (preg_match('/^PLACEHOLDER_ARROW_(.+)$/', $content, $matches)) {
+            $character = $matches[1];
+            
+            // Find the position of this placeholder in the character's positions list
+            $positions = $etherealArrowPositions[$character];
+            $positionIndex = array_search($index, $positions);
+            
+            // Only keep the latest arrow message for each character
+            if ($positionIndex === count($positions) - 1) {
+                // This is the latest message for this character
+                $cleaned[$index]['content'] = $etherealArrowLatest[$character];
             } else {
                 // This is not the latest message, remove it
                 unset($cleaned[$index]);
