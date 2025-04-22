@@ -18,7 +18,7 @@ function get_info_touch_grope_prompt() {
     $deviceContext = GetInfoDeviceContext($target);
     
     // Get relevant context
-    $arousal = isset($deviceContext["arousal"]) ? $deviceContext["arousal"] : 50;
+    $arousal = isset($deviceContext["arousal"]) ? $deviceContext["arousal"] : 20;
     $arousalIntensity = GetReactionIntensity($arousal);
     $helplessness = isset($deviceContext["helplessness"]) ? $deviceContext["helplessness"] : "";
     $hasGag = isset($deviceContext["hasGag"]) ? $deviceContext["hasGag"] : false;

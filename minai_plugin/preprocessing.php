@@ -27,7 +27,7 @@ minai_start_timer('preprocessing_php', 'MinAI');
 require_once("utils/init_common_variables.php");
 
 // Check for banned phrases in gameRequest[3]
-$banned_phrases = ["Thank you for watching", "Thanks for watching"];
+$banned_phrases = ["Thank you for watching", "Thanks for watching", "Thank you very much for watching"];
 if (isset($GLOBALS["gameRequest"][3])) {
     $message = strtolower($GLOBALS["gameRequest"][3]);
     foreach ($banned_phrases as $phrase) {

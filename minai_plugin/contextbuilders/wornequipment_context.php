@@ -277,9 +277,9 @@ function EnrichEquipmentDataFromDb(&$parsedData)
     $baseFormId = $db->escape($segment['baseFormId']);
     $modName = $db->escape($segment['modName']);
     $name = $db->escape($segment['name']);
-    if ($name == '') {
+    /*if ($name == '') {
       continue;
-    }
+    }*/
     // Check if the row exists
     $result = $db->fetchAll(
       "SELECT * FROM equipment_description WHERE lower(baseFormId) = lower('{$baseFormId}') AND lower(modName) = lower('{$modName}')"
@@ -739,6 +739,10 @@ function BuildKeywordCache($actorName, $parsedEquipment) {
 function HasEquipmentKeyword($actorName, $keyword)
 {
   // Check if we have a keyword cache for this actor
+  if (!isset($GLOBALS['equipment_cache'][$actorName])) {
+    ProcessEquipment($actorName);
+  }
+  
   if (isset($GLOBALS['equipment_cache'][$actorName]) && 
       $GLOBALS['equipment_cache'][$actorName] !== false) {
       

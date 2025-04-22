@@ -95,7 +95,7 @@ function GetDeviousFollowerContext($name) {
         }
         if (str_contains($rule, "chastity")) {
             // Special Chastity Handling
-            if (HasKeyword($playerName, "ZAD_DeviousBelt")) {
+            if (HasEquipmentKeyword($playerName, "ZAD_DeviousBelt")) {
                 $ret .= "{$playerName} must wear a chastity belt that only {$dfName} has the key to at all times. This is to ensure that {$playerName} cannot get relief without permission, and to show that {$dfName} owns {$playerName}'s pussy.\n";
             }
         }

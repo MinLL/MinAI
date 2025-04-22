@@ -196,6 +196,13 @@ foreach ($GLOBALS["ENABLED_FUNCTIONS"] as $n=>$func) {
         $commandsToPurge[] = $n;
     }
 }
+
+
+// if HERIKA_TARGEt is "The Narrator" and isn't the devious narrator, turn off actions.
+if ($GLOBALS["HERIKA_TARGET"] == "The Narrator" && !$GLOBALS["function_eligibility_cache"]["use_devious_narrator"]) {
+    $GLOBALS["FUNCTIONS_ARE_ENABLED"] = false;
+}
+
 minai_stop_timer('purge_commands');
 
 // Remove purged commands more efficiently

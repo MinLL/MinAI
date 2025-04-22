@@ -28,8 +28,8 @@ elseif (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"] && $GLOBAL
         if ($mindPrompt) {
             $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] .= " " . $mindPrompt;
         }
+        $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] .= " Aim for your responses to be 2-4 sentences. ";
     }
-    $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] .= " Aim for your responses to be 2-4 sentences. ";
 }
 else {
     if (IsExplicitScene()) {

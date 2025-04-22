@@ -57,9 +57,9 @@ function validateLLMResponse($responseContent) {
 
 function StripGagAsterisks($text) {
     // Only strip asterisks if player is gagged
-    if (!HasKeyword($GLOBALS["PLAYER_NAME"], "zad_DeviousGag") && 
-        !HasKeyword($GLOBALS["PLAYER_NAME"], "zad_DeviousGagPanel") && 
-        !HasKeyword($GLOBALS["PLAYER_NAME"], "zad_DeviousGagLarge")) {
+    if (!HasEquipmentKeyword($GLOBALS["PLAYER_NAME"], "zad_DeviousGag") && 
+        !HasEquipmentKeyword($GLOBALS["PLAYER_NAME"], "zad_DeviousGagPanel") && 
+        !HasEquipmentKeyword($GLOBALS["PLAYER_NAME"], "zad_DeviousGagLarge")) {
         return $text;
     }
 
