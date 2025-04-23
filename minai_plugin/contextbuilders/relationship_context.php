@@ -32,7 +32,7 @@ class relation {
         } else {
             return "a stranger to";
         }
-
+        
         if (count($statuses) > 1) {
             return relation::rollUpAList($statuses) . " of";
         } else {
@@ -57,6 +57,10 @@ function GetRelationshipContext($targetActor) {
     $playerName = $GLOBALS["PLAYER_NAME"];
     $targetName = $targetActor;
     $relationshipValue = $utilities->GetActorValue($targetActor, "relationshipRank");
+    
+    if ($relationshipValue == null) {
+        $relationshipValue = 0; //retrieveng value has failed, but better to be a stranger than enemy
+    } 
 
     $relationshipStatus = relation::rollUpRelationshipStatus($relationshipValue);
     $contextString = "$targetName is $relationshipStatus $playerName.";
