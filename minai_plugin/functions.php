@@ -199,7 +199,7 @@ foreach ($GLOBALS["ENABLED_FUNCTIONS"] as $n=>$func) {
 
 
 // if HERIKA_TARGEt is "The Narrator" and isn't the devious narrator, turn off actions.
-if ($GLOBALS["HERIKA_TARGET"] == "The Narrator" && !$GLOBALS["function_eligibility_cache"]["use_devious_narrator"]) {
+if ($GLOBALS["target"] == "The Narrator" && !$GLOBALS["function_eligibility_cache"]["use_devious_narrator"]) {
     $GLOBALS["FUNCTIONS_ARE_ENABLED"] = false;
 }
 
