@@ -255,8 +255,8 @@ function Maintenance(minai_MainQuestController _main)
   aiff.RegisterAction("ExtCmdUnequipBelt", "UnequipBelt", "Unlock a Chastity Belt from the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
     aiff.RegisterAction("ExtCmdEquipBinder", "EquipBinder", "Lock a Armbinder on the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
   aiff.RegisterAction("ExtCmdUnequipBinder", "UnequipBinder", "Unlock a Armbinder from the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
-    aiff.RegisterAction("ExtCmdEquipVibrator", "EquipVibrator", "Lock a set of Vibrators on the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
-  aiff.RegisterAction("ExtCmdUnequipVibrator", "UnequipVibrator", "Unlock a set of Vibrators from the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  ; aiff.RegisterAction("ExtCmdEquipVibrator", "EquipVibrator", "Lock a set of Vibrators on the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  ; aiff.RegisterAction("ExtCmdUnequipVibrator", "UnequipVibrator", "Unlock a set of Vibrators from the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
 
   aiff.RegisterAction("ExtCmdAcceptDeal", "AcceptDeal", "Accept Deal Negotiation", "Devious Followers", 1, 1, 2, 5, 300, bHasDeviousFollowers)
   aiff.RegisterAction("ExtCmdGiveDrugs", "GiveDrugs", "Give Drugs to the player", "Devious Followers", 1, 1, 2, 5, 300, bHasDeviousFollowers)
@@ -268,6 +268,66 @@ function Maintenance(minai_MainQuestController _main)
   aiff.RegisterAction("ExtCmdPunishWhip", "PunishWhip", "Whip the player", "Submissive Lola", 1, 1, 2, 5, 300, bHasSubmissiveLola)
   aiff.RegisterAction("ExtCmdSmallReward", "SmallReward", "Reward the player (large)", "Submissive Lola", 1, 1, 2, 5, 300, bHasSubmissiveLola)
   aiff.RegisterAction("ExtCmdLargeReward", "LargeReward", "Reward the player (large)", "Submissive Lola", 1, 1, 2, 5, 300, bHasSubmissiveLola)
+
+  aiff.RegisterAction("ExtCmdEquipYoke", "EquipYoke", "Lock a Yoke on the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdUnequipYoke", "UnequipYoke", "Unlock a Yoke from the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+
+  aiff.RegisterAction("ExtCmdEquipElbowTie", "EquipElbowTie", "Lock an Elbow Tie on the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdUnequipElbowTie", "UnequipElbowTie", "Unlock an Elbow Tie from the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+
+  aiff.RegisterAction("ExtCmdEquipStraitJacket", "EquipStraitJacket", "Lock a Strait Jacket on the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdUnequipStraitJacket", "UnequipStraitJacket", "Unlock a Strait Jacket from the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+
+  aiff.RegisterAction("ExtCmdEquipCorset", "EquipCorset", "Lock a Corset on the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdUnequipCorset", "UnequipCorset", "Unlock a Corset from the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+
+  aiff.RegisterAction("ExtCmdEquipHood", "EquipHood", "Lock a Hood on the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdUnequipHood", "UnequipHood", "Unlock a Hood from the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+
+  aiff.RegisterAction("ExtCmdEquipHobbleSkirt", "EquipHobbleSkirt", "Lock a Hobble Skirt on the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdUnequipHobbleSkirt", "UnequipHobbleSkirt", "Unlock a Hobble Skirt from the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+
+  aiff.RegisterAction("ExtCmdEquipGloves", "EquipGloves", "Lock Gloves on the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdUnequipGloves", "UnequipGloves", "Unlock Gloves from the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+
+  aiff.RegisterAction("ExtCmdEquipSuit", "EquipSuit", "Lock a Suit on the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdUnequipSuit", "UnequipSuit", "Unlock a Suit from the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+
+  aiff.RegisterAction("ExtCmdEquipHarness", "EquipHarness", "Lock a Harness on the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdUnequipHarness", "UnequipHarness", "Unlock a Harness from the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+
+  aiff.RegisterAction("ExtCmdEquipBlindfold", "EquipBlindfold", "Lock a Blindfold on the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdUnequipBlindfold", "UnequipBlindfold", "Unlock a Blindfold from the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+
+  aiff.RegisterAction("ExtCmdEquipAnkleShackles", "EquipAnkleShackles", "Lock Ankle Shackles on the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdUnequipAnkleShackles", "UnequipAnkleShackles", "Unlock Ankle Shackles from the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+
+  aiff.RegisterAction("ExtCmdEquipClamps", "EquipClamps", "Lock Clamps on the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdUnequipClamps", "UnequipClamps", "Unlock Clamps from the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+
+  aiff.RegisterAction("ExtCmdEquipPlugVaginal", "EquipPlugVaginal", "Lock a Vaginal Plug in the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdUnequipPlugVaginal", "UnequipPlugVaginal", "Unlock a Vaginal Plug from the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+
+  aiff.RegisterAction("ExtCmdEquipPlugAnal", "EquipPlugAnal", "Lock an Anal Plug in the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdUnequipPlugAnal", "UnequipPlugAnal", "Unlock an Anal Plug from the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+
+  aiff.RegisterAction("ExtCmdEquipPiercingsNipple", "EquipPiercingsNipple", "Lock Nipple Piercings on the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdUnequipPiercingsNipple", "UnequipPiercingsNipple", "Unlock Nipple Piercings from the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+
+  aiff.RegisterAction("ExtCmdEquipPiercingsVaginal", "EquipPiercingsVaginal", "Lock Vaginal Piercings on the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdUnequipPiercingsVaginal", "UnequipPiercingsVaginal", "Unlock Vaginal Piercings from the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+
+  aiff.RegisterAction("ExtCmdEquipArmCuffs", "EquipArmCuffs", "Lock Arm Cuffs on the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdUnequipArmCuffs", "UnequipArmCuffs", "Unlock Arm Cuffs from the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+
+  aiff.RegisterAction("ExtCmdEquipLegCuffs", "EquipLegCuffs", "Lock Leg Cuffs on the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdUnequipLegCuffs", "UnequipLegCuffs", "Unlock Leg Cuffs from the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+
+  aiff.RegisterAction("ExtCmdEquipBra", "EquipBra", "Lock a Bra on the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdUnequipBra", "UnequipBra", "Unlock a Bra from the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+
+  aiff.RegisterAction("ExtCmdEquipPetSuit", "EquipPetSuit", "Lock a Pet Suit on the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
+  aiff.RegisterAction("ExtCmdUnequipPetSuit", "UnequipPetSuit", "Unlock a Pet Suit from the target", "Devious Stuff", 1, 5, 2, 5, 300, bHasDD)
 EndFunction
 
 Function ResetSpankRule()
@@ -886,7 +946,7 @@ Function StartVibration(actor akTarget, int strength, int vibTime, bool teaseOnl
   libs.VibrateEffect(akTarget, strength, vibTime, teaseOnly)
 EndFunction
 
-Event CommandDispatcher(String speakerName,String  command, String parameter)
+ Event CommandDispatcher(String speakerName,String  command, String parameter)
   Main.Debug("Devious - CommandDispatcher(" + speakerName +", " + command +", " + parameter + ")")
   Actor akSpeaker=aiff.AIGetAgentByName(speakerName)
   actor akTarget= aiff.AIGetAgentByName(parameter)
@@ -952,20 +1012,8 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
     elseIf (command == "ExtCmdshock")
       Main.RegisterEvent(""+speakerName+" remotely shocks  " + targetName + ".", "info_shock")
       libs.ShockActor(akTarget)
-    elseIf (command == "ExtCmdEquipVibrator")
-      ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_plugs_anal)
-      ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_plugs_vaginal)
-      
-      ; Turn on vibrators - edge only if not already in a scene
-      bool edgeOnly = sex.CanAnimate(akTarget)
-      StartVibration(akTarget, 3, 60, edgeOnly)
-      if edgeOnly
-        Main.RegisterEvent(speakerName + " locked vibrating plugs inside " + targetName + ". The plugs immediately began teasing " + targetName + " with moderate vibrations, but won't let them climax.", "info_device_plug_edge")
-      else
-        Main.RegisterEvent(speakerName + " locked vibrating plugs inside " + targetName + ". The plugs immediately began stimulating " + targetName + " with moderate vibrations that could potentially make them climax.", "info_device_plug_stimulate")
-      EndIf
     EndIf
-    ; Device equip events
+    ; Device equip events 
     if bHasDDExpansion
       if (command == "ExtCmdEquipCollar")
         Main.RegisterEvent(""+speakerName+" locked a collar on " + targetName, "info_device_equip_collar")
@@ -978,14 +1026,14 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
         EndIf
       elseif (command == "ExtCmdEquipGag")
         Main.RegisterEvent(""+speakerName+" Puts a gag on " + targetName, "info_device_equip_gag")
-        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_gags_ball_ebonite)
+        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_gags)
       elseif (command == "ExtCmdEquipBinder")
         Main.RegisterEvent(""+speakerName+" Puts a Armbinder on " + targetName, "info_device_equip_armbinder")
-        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_armbinders_ebonite)
+        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_armbinders)
       elseif (command == "ExtCmdEquipVibrator")
         Main.RegisterEvent(""+speakerName+" Puts a Vibrator in " + targetName, "info_device_equip_vibrator")
-        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_plugs_anal)
         ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_plugs_vaginal)
+        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_plugs_anal)
       elseif (command == "ExtCmdEquipBelt")
         Main.RegisterEvent(""+speakerName+" Puts a Chastity Belt on " + targetName, "info_device_equip_belt")
         ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_chastitybelts_closed)
@@ -995,6 +1043,66 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
         else
           Main.RegisterEvent(""+speakerName+" tried, but was unable to remove a Chastity Belt from " + targetName, "info_device_remove_fail")
         EndIf
+      elseif (command == "ExtCmdEquipYoke")
+        Main.RegisterEvent(""+speakerName+" puts a yoke on " + targetName, "info_device_equip_yoke")
+        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_yokes)
+      elseif (command == "ExtCmdEquipElbowTie")
+        Main.RegisterEvent(""+speakerName+" puts an elbow tie on " + targetName, "info_device_equip_elbowtie")
+        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_elbowbinders)
+      elseif (command == "ExtCmdEquipStraitJacket")
+        Main.RegisterEvent(""+speakerName+" puts a strait jacket on " + targetName, "info_device_equip_straitjacket")
+        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_suits_straitjackets)
+      elseif (command == "ExtCmdEquipCorset")
+        Main.RegisterEvent(""+speakerName+" puts a corset on " + targetName, "info_device_equip_corset")
+        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_corsets)
+      elseif (command == "ExtCmdEquipHood")
+        Main.RegisterEvent(""+speakerName+" puts a hood on " + targetName, "info_device_equip_hood")
+        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_hoods)
+      elseif (command == "ExtCmdEquipHobbleSkirt")
+        Main.RegisterEvent(""+speakerName+" puts a hobble skirt on " + targetName, "info_device_equip_hobbleskirt")
+        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_suits_hobbledresses)
+      elseif (command == "ExtCmdEquipGloves")
+        Main.RegisterEvent(""+speakerName+" puts gloves on " + targetName, "info_device_equip_gloves")
+        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_gloves)
+      elseif (command == "ExtCmdEquipSuit")
+        Main.RegisterEvent(""+speakerName+" puts a suit on " + targetName, "info_device_equip_suit")
+        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_suits)
+      elseif (command == "ExtCmdEquipHarness")
+        Main.RegisterEvent(""+speakerName+" puts a harness on " + targetName, "info_device_equip_harness")
+        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_harnesses)
+      elseif (command == "ExtCmdEquipBlindfold")
+        Main.RegisterEvent(""+speakerName+" puts a blindfold on " + targetName, "info_device_equip_blindfold")
+        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_blindfolds)
+      elseif (command == "ExtCmdEquipAnkleShackles")
+        Main.RegisterEvent(""+speakerName+" puts ankle shackles on " + targetName, "info_device_equip_ankleshackles")
+        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_ankleshackles)
+      elseif (command == "ExtCmdEquipClamps")
+        Main.RegisterEvent(""+speakerName+" puts clamps on " + targetName, "info_device_equip_clamps")
+        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_piercings)
+      elseif (command == "ExtCmdEquipPlugVaginal")
+        Main.RegisterEvent(""+speakerName+" puts a vaginal plug in " + targetName, "info_device_equip_plugvaginal")
+        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_plugs_vaginal)
+      elseif (command == "ExtCmdEquipPlugAnal")
+        Main.RegisterEvent(""+speakerName+" puts an anal plug in " + targetName, "info_device_equip_pluganal")
+        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_plugs_anal)
+      elseif (command == "ExtCmdEquipPiercingsNipple")
+        Main.RegisterEvent(""+speakerName+" puts nipple piercings on " + targetName, "info_device_equip_piercingsnipple")
+        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_piercings_nipple)
+      elseif (command == "ExtCmdEquipPiercingsVaginal")
+        Main.RegisterEvent(""+speakerName+" puts vaginal piercings on " + targetName, "info_device_equip_piercingsvaginal")
+        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_piercings_vaginal)
+      elseif (command == "ExtCmdEquipArmCuffs")
+        Main.RegisterEvent(""+speakerName+" puts arm cuffs on " + targetName, "info_device_equip_armcuffs")
+        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_armcuffs)
+      elseif (command == "ExtCmdEquipLegCuffs")
+        Main.RegisterEvent(""+speakerName+" puts leg cuffs on " + targetName, "info_device_equip_legcuffs")
+        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_legcuffs)
+      elseif (command == "ExtCmdEquipBra")
+        Main.RegisterEvent(""+speakerName+" puts a bra on " + targetName, "info_device_equip_bra")
+        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_chastitybras)
+      elseif (command == "ExtCmdEquipPetSuit")
+        Main.RegisterEvent(""+speakerName+" puts a pet suit on " + targetName, "info_device_equip_petsuit")
+        ddLists.EquipRandomDevice(akTarget, ddLists.zad_dev_suits)
       elseif (command == "ExtCmdUnequipGag")
         if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousGag))
           Main.RegisterEvent(""+speakerName+" removes a Gag from " + targetName, "info_device_remove_gag")
@@ -1013,6 +1121,126 @@ Event CommandDispatcher(String speakerName,String  command, String parameter)
           Main.RegisterEvent(""+speakerName+" removes the vibrators from " + targetName, "info_device_remove_vibrator")
         else
           Main.RegisterEvent(""+speakerName+" tried, but was unable to remove the vibrators from " + targetName, "info_device_remove_fail")
+        EndIf
+      elseif (command == "ExtCmdUnequipYoke")
+        if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousYoke))
+          Main.RegisterEvent(""+speakerName+" removes a yoke from " + targetName, "info_device_remove_yoke")
+        else
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove a yoke from " + targetName, "info_device_remove_fail")
+        EndIf
+      elseif (command == "ExtCmdUnequipElbowTie")
+        if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousElbowTie))
+          Main.RegisterEvent(""+speakerName+" removes an elbow tie from " + targetName, "info_device_remove_elbowtie")
+        else
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove an elbow tie from " + targetName, "info_device_remove_fail")
+        EndIf
+      elseif (command == "ExtCmdUnequipStraitJacket")
+        if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousStraitJacket))
+          Main.RegisterEvent(""+speakerName+" removes a strait jacket from " + targetName, "info_device_remove_straitjacket")
+        else
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove a strait jacket from " + targetName, "info_device_remove_fail")
+        EndIf
+      elseif (command == "ExtCmdUnequipCorset")
+        if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousCorset))
+          Main.RegisterEvent(""+speakerName+" removes a corset from " + targetName, "info_device_remove_corset")
+        else
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove a corset from " + targetName, "info_device_remove_fail")
+        EndIf
+      elseif (command == "ExtCmdUnequipHood")
+        if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousHood))
+          Main.RegisterEvent(""+speakerName+" removes a hood from " + targetName, "info_device_remove_hood")
+        else
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove a hood from " + targetName, "info_device_remove_fail")
+        EndIf
+      elseif (command == "ExtCmdUnequipHobbleSkirt")
+        if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousHobbleSkirt))
+          Main.RegisterEvent(""+speakerName+" removes a hobble skirt from " + targetName, "info_device_remove_hobbleskirt")
+        else
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove a hobble skirt from " + targetName, "info_device_remove_fail")
+        EndIf
+      elseif (command == "ExtCmdUnequipGloves")
+        if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousGloves))
+          Main.RegisterEvent(""+speakerName+" removes gloves from " + targetName, "info_device_remove_gloves")
+        else
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove gloves from " + targetName, "info_device_remove_fail")
+        EndIf
+      elseif (command == "ExtCmdUnequipSuit")
+        if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousSuit))
+          Main.RegisterEvent(""+speakerName+" removes a suit from " + targetName, "info_device_remove_suit")
+        else
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove a suit from " + targetName, "info_device_remove_fail")
+        EndIf
+      elseif (command == "ExtCmdUnequipHarness")
+        if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousHarness))
+          Main.RegisterEvent(""+speakerName+" removes a harness from " + targetName, "info_device_remove_harness")
+        else
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove a harness from " + targetName, "info_device_remove_fail")
+        EndIf
+      elseif (command == "ExtCmdUnequipBlindfold")
+        if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousBlindfold))
+          Main.RegisterEvent(""+speakerName+" removes a blindfold from " + targetName, "info_device_remove_blindfold")
+        else
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove a blindfold from " + targetName, "info_device_remove_fail")
+        EndIf
+      elseif (command == "ExtCmdUnequipAnkleShackles")
+        if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousAnkleShackles))
+          Main.RegisterEvent(""+speakerName+" removes ankle shackles from " + targetName, "info_device_remove_ankleshackles")
+        else
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove ankle shackles from " + targetName, "info_device_remove_fail")
+        EndIf
+      elseif (command == "ExtCmdUnequipClamps")
+        if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousClamps))
+          Main.RegisterEvent(""+speakerName+" removes clamps from " + targetName, "info_device_remove_clamps")
+        else
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove clamps from " + targetName, "info_device_remove_fail")
+        EndIf
+      elseif (command == "ExtCmdUnequipPlugVaginal")
+        if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousPlugVaginal))
+          Main.RegisterEvent(""+speakerName+" removes a vaginal plug from " + targetName, "info_device_remove_plugvaginal")
+        else
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove a vaginal plug from " + targetName, "info_device_remove_fail")
+        EndIf
+      elseif (command == "ExtCmdUnequipPlugAnal")
+        if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousPlugAnal))
+          Main.RegisterEvent(""+speakerName+" removes an anal plug from " + targetName, "info_device_remove_pluganal")
+        else
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove an anal plug from " + targetName, "info_device_remove_fail")
+        EndIf
+      elseif (command == "ExtCmdUnequipPiercingsNipple")
+        if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousPiercingsNipple))
+          Main.RegisterEvent(""+speakerName+" removes nipple piercings from " + targetName, "info_device_remove_piercingsnipple")
+        else
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove nipple piercings from " + targetName, "info_device_remove_fail")
+        EndIf
+      elseif (command == "ExtCmdUnequipPiercingsVaginal")
+        if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousPiercingsVaginal))
+          Main.RegisterEvent(""+speakerName+" removes vaginal piercings from " + targetName, "info_device_remove_piercingsvaginal")
+        else
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove vaginal piercings from " + targetName, "info_device_remove_fail")
+        EndIf
+      elseif (command == "ExtCmdUnequipArmCuffs")
+        if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousArmCuffs))
+          Main.RegisterEvent(""+speakerName+" removes arm cuffs from " + targetName, "info_device_remove_armcuffs")
+        else
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove arm cuffs from " + targetName, "info_device_remove_fail")
+        EndIf
+      elseif (command == "ExtCmdUnequipLegCuffs")
+        if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousLegCuffs))
+          Main.RegisterEvent(""+speakerName+" removes leg cuffs from " + targetName, "info_device_remove_legcuffs")
+        else
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove leg cuffs from " + targetName, "info_device_remove_fail")
+        EndIf
+      elseif (command == "ExtCmdUnequipBra")
+        if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousBra))
+          Main.RegisterEvent(""+speakerName+" removes a bra from " + targetName, "info_device_remove_bra")
+        else
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove a bra from " + targetName, "info_device_remove_fail")
+        EndIf
+      elseif (command == "ExtCmdUnequipPetSuit")
+        if (libs.UnlockDeviceByKeyword(akTarget, libs.zad_DeviousPetSuit))
+          Main.RegisterEvent(""+speakerName+" removes a pet suit from " + targetName, "info_device_remove_petsuit")
+        else
+          Main.RegisterEvent(""+speakerName+" tried, but was unable to remove a pet suit from " + targetName, "info_device_remove_fail")
         EndIf
       EndIf
     EndIf
