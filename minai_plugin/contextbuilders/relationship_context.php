@@ -2,6 +2,7 @@
 
 class relation {
     static function rollUpRelationshipStatus($relationshipValue) {
+        $relationshipValue = intval($relationshipValue);
         $statuses = [];
         if ($relationshipValue >= 1) {
             if ($relationshipValue >= 1) {
