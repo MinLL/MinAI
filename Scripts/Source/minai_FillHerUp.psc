@@ -99,23 +99,35 @@ Function Maintenance(minai_MainQuestController _main)
         Main.Info("Found Fill Her Up")
         
         ; Load faction references
+        Main.Debug("Loading Fill Her Up faction references...")
         SR_InflateFaction = Game.GetFormFromFile(0x0A991, "sr_FillHerUp.esp") as Faction
+        Main.Debug("SR_InflateFaction loaded: " + (SR_InflateFaction != None))
+        
         SR_InflateOralFaction = Game.GetFormFromFile(0x14204B, "sr_FillHerUp.esp") as Faction
+        Main.Debug("SR_InflateOralFaction loaded: " + (SR_InflateOralFaction != None))
+        
         sr_Impregnated = Game.GetFormFromFile(0x19306F, "sr_FillHerUp.esp") as Faction
+        Main.Debug("sr_Impregnated loaded: " + (sr_Impregnated != None))
+        
         sr_ImpregnatedAnal = Game.GetFormFromFile(0x193070, "sr_FillHerUp.esp") as Faction
+        Main.Debug("sr_ImpregnatedAnal loaded: " + (sr_ImpregnatedAnal != None))
         
         if !SR_InflateFaction || !SR_InflateOralFaction || !sr_Impregnated || !sr_ImpregnatedAnal
             Main.Error("Could not load all Fill Her Up references")
             bHasFillHerUp = false
         EndIf
 
-        ; Register for all animation events
-        RegisterForAnimationEvents(playerRef)
-        
-        ; Register for Fill Her Up mod events
-        RegisterForModEvent("SR_AbsorbEvent", "SRAbsorbEvent")
-        RegisterForModEvent("SR_InflateEvent", "SRInflateEvent") 
-        RegisterForModEvent("SR_InflateInjectorEvent", "SRInflateEventWithInjector")
+        if bHasFillHerUp
+            Main.Debug("Registering for Fill Her Up events...")
+            ; Register for all animation events
+            RegisterForAnimationEvents(playerRef)
+            
+            ; Register for Fill Her Up mod events
+            RegisterForModEvent("SR_AbsorbEvent", "SRAbsorbEvent")
+            RegisterForModEvent("SR_InflateEvent", "SRInflateEvent") 
+            RegisterForModEvent("SR_InflateInjectorEvent", "SRInflateEventWithInjector")
+            Main.Debug("Fill Her Up events registered")
+        EndIf
     EndIf
 
     aiff.SetModAvailable("FillHerUp", bHasFillHerUp)
