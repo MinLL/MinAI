@@ -36,8 +36,12 @@ if ($GLOBALS["gameRequest"][0] && (strpos($GLOBALS["gameRequest"][0], "info_") =
     if (isset($GLOBALS["gameRequest"])) {
         $eventName = $GLOBALS["gameRequest"][0];
         
-        // Check if we have prompts for this event
-        if (isset($GLOBALS["PROMPTS"][$eventName]) && isset($GLOBALS["PROMPTS"][$eventName]["player_request"])) {
+        if (
+            strpos($eventName, "minai_fillherup_") === 0 ||
+            strpos($eventName, "info_minai_fillherup_") === 0
+        ) {
+            // Skip FillHerUp events, let info_fillherup_prompts.php handle them
+        } else if (isset($GLOBALS["PROMPTS"][$eventName]) && isset($GLOBALS["PROMPTS"][$eventName]["player_request"])) {
             $prompts = $GLOBALS["PROMPTS"][$eventName]["player_request"];
             
             // Select a random prompt
