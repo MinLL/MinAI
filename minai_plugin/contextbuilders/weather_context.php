@@ -630,14 +630,14 @@ function GetWeatherContext() {
     $weather = $weatherDictionary[$wc] ?? null;
     
     // If no exact match, try matching with wildcard
-    if (!$weather) {
+    if (!isset($weather)) {
         $lastSixDigits = substr($wc, 2);
         $wildcardKey = "??" . $lastSixDigits;
         $weather = $weatherDictionary[$wildcardKey] ?? null;
     }
 
-    if (!$weather) {
-        error_log("minai: Unknown Weather type: " . $weatherCode);
+    if (!isset($weather)) {
+        minai_log("debug", "Unknown Weather type: " . $weatherCode);
         // Return basic weather description if available
         if ($basicWeatherDesc) {
             return $basicWeatherDesc . "\n";

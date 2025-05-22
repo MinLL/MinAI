@@ -182,7 +182,7 @@ function BuildInteractionContext($params) {
         $ret .= "You are {$player_name}'s inner voice, providing thoughts, perspective, and advice directly to them.";
     }
     else {
-        $ret .= "You are currently interacting with {$target}.";
+        $ret .= "{$herika_name} currently interacting with {$target}."; // could be 2 NPCs interacting
     }
 
     return $ret;
