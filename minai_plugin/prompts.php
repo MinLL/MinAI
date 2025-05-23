@@ -18,7 +18,8 @@ $enforceLength = "You MUST Respond with no more than two sentences.";
 
 $GLOBALS["PROMPTS"]["radiant"]= [
     "cue"=>[
-        "write dialogue for {$GLOBALS["HERIKA_NAME"]}.{$GLOBALS["TEMPLATE_DIALOG"]}  "
+        //"write dialogue for {$GLOBALS["HERIKA_NAME"]}. {$GLOBALS["TEMPLATE_DIALOG"]} " ////'write' prefix lead to double answers, TEMPLATE_DIALOG already has a "Write ..." => the result is "write dialogue ... Write next line"
+        "{$GLOBALS["TEMPLATE_DIALOG"]} "
     ],
     "player_request"=>[    
         "The Narrator: {$GLOBALS["HERIKA_NAME"]} starts a dialogue with {$GLOBALS["target"]} about a relevant topic",
@@ -36,7 +37,8 @@ $GLOBALS["PROMPTS"]["minai_force_rechat"]= [
 
 $GLOBALS["PROMPTS"]["radiantsearchinghostile"]= [
     "cue"=>[
-        "write dialogue for {$GLOBALS["HERIKA_NAME"]} who is responding in a hostile, and concerned manner.{$GLOBALS["TEMPLATE_DIALOG"]}  $enforceLength"
+        //"write dialogue for {$GLOBALS["HERIKA_NAME"]} who is responding in a hostile, and concerned manner. {$GLOBALS["TEMPLATE_DIALOG"]}  $enforceLength" //lead to double answers 
+        "{$GLOBALS["HERIKA_NAME"]} is responding in in a hostile and concerned manner. {$GLOBALS["TEMPLATE_DIALOG"]} $enforceLength"
     ], 
     "player_request"=>[    
         "The Narrator: {$GLOBALS["HERIKA_NAME"]} is currently searching the area for hostiles, and asks who is there?",
@@ -45,7 +47,8 @@ $GLOBALS["PROMPTS"]["radiantsearchinghostile"]= [
 ];
 $GLOBALS["PROMPTS"]["radiantsearchingfriend"]= [
     "cue"=>[
-        "write dialogue for {$GLOBALS["HERIKA_NAME"]} who is responding in a concerned manner.{$GLOBALS["TEMPLATE_DIALOG"]}  $enforceLength"
+        //"write dialogue for {$GLOBALS["HERIKA_NAME"]} who is responding in a concerned manner.{$GLOBALS["TEMPLATE_DIALOG"]}  $enforceLength"
+        "{$GLOBALS["HERIKA_NAME"]} is responding in a concerned manner. {$GLOBALS["TEMPLATE_DIALOG"]} $enforceLength"
     ], 
     "player_request"=>[    
         "The Narrator: {$GLOBALS["HERIKA_NAME"]} is currently searching the area for hostiles, and starts a dialogue with their ally {$GLOBALS["target"]} about this topic",
@@ -53,7 +56,7 @@ $GLOBALS["PROMPTS"]["radiantsearchingfriend"]= [
 ];
 $GLOBALS["PROMPTS"]["radiantcombathostile"]= [
     "cue"=>[
-        "write dialogue for {$GLOBALS["HERIKA_NAME"]} who is responding in a hostile and combative manner.{$GLOBALS["TEMPLATE_DIALOG"]}  $enforceLength"
+        "{$GLOBALS["HERIKA_NAME"]} is responding in a hostile and combative manner. {$GLOBALS["TEMPLATE_DIALOG"]} $enforceLength"
     ], 
     "player_request"=>[    
         "The Narrator: {$GLOBALS["HERIKA_NAME"]} is engaged in deadly combat with {$GLOBALS["target"]} and taunts them",
@@ -63,7 +66,7 @@ $GLOBALS["PROMPTS"]["radiantcombathostile"]= [
 ];
 $GLOBALS["PROMPTS"]["radiantcombatfriend"]= [
     "cue"=>[
-        "write dialogue for {$GLOBALS["HERIKA_NAME"]} who is responding in a tense, serious manner.{$GLOBALS["TEMPLATE_DIALOG"]}  $enforceLength"
+        "{$GLOBALS["HERIKA_NAME"]} is responding in a tense, serious manner. {$GLOBALS["TEMPLATE_DIALOG"]} $enforceLength"
     ], 
     "player_request"=>[    
         "The Narrator: {$GLOBALS["HERIKA_NAME"]} is teamed up with {$GLOBALS["target"]} in deadly combat against someone and talks about the battle",

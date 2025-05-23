@@ -61,18 +61,23 @@ function updateThreadsDB() {
         switch(strtolower($type)) {
             case "startthread": 
             case "scenechange": {
-                $thread = $db->fetchAll("SELECT * from minai_threads WHERE thread_id = $threadId");
+                $thread = $db->fetchAll("SELECT * from minai_threads WHERE thread_id = $threadId LIMIT 1");
                 if(!isset($thread)) {
                     minai_log("error", "Failed to fetch thread with ID: $threadId");
                     return;
                 }
-
-                if (sizeof($thread) > 0) {
-                    $thread = $thread[0];
+                
+                if (isset($thread[0])) {
+                    $thread0 = $thread[0];
                 }
 
-                if(isset($thread) && strtolower($type) !== "startthread") {
-                    $currSceneId = $thread["curr_scene_id"];
+                if(isset($thread0) && (strtolower($type) !== "startthread")) {
+                    if (isset($thread0["curr_scene_id"])) {
+                        $currSceneId = $thread0["curr_scene_id"];
+                    } else {
+                        minai_log("warn", "curr_scene_id not found for thread with ID: $threadId");
+                        $currSceneId = 'none';
+                    }
                     
                     $db->update('minai_threads', "prev_scene_id = '$currSceneId', curr_scene_id = '$scene', fallback = '{$db->escape($fallback)}'", "thread_id = $threadId");
                     minai_log("info", "Updated existing thread $threadId with new scene: $scene");
@@ -94,7 +99,7 @@ function updateThreadsDB() {
                     minai_log("info", "Inserted new thread with data: " . json_encode($insertData));
                 }
                 $scene = getScene("", $threadId);
-                $sceneDesc = $scene["description"];
+                $sceneDesc = $scene["description"] ?? "";
         
                 addSexEventsToEventLog($sceneDesc, $threadId);
                 break;

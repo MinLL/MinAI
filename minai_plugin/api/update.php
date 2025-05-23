@@ -69,7 +69,7 @@ send_message('progress', "✅ Plugin folder found");
 
 // Update permissions for the minai_plugin folder
 send_message('progress', "🔒 Updating file permissions...");
-$chmodCmd = "chmod -R 775 $pluginFolder 2>&1";
+$chmodCmd = "chmod -R 0775 $pluginFolder 2>&1";
 exec($chmodCmd, $output, $returnVar);
 minai_log("info", "Chmod output: " . implode("\n", $output));
 

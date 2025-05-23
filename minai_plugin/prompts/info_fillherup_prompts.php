@@ -122,7 +122,7 @@ $GLOBALS["PROMPTS"]["minai_fillherup_sperm_expel_fail"] = [
 ];
 $GLOBALS["PROMPTS"]["info_minai_fillherup_sperm_expel_fail"] = $GLOBALS["PROMPTS"]["minai_fillherup_sperm_expel_fail"];
 
-$GLOBALS["PROMPTS"]["minai_fillherup_belly_rubbing"] = [
+$GLOBALS["PROMPTS"]["minai_fillherup_stomach_rubbing"] = [
     "player_request"=>[
         "The Narrator: #SEX_INFO FHU_ACTOR rubs their swollen belly, feeling the cum shifting inside.",
         "The Narrator: #SEX_INFO FHU_ACTOR massages their cum-filled belly gently.",

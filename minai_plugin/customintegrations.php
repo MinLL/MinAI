@@ -119,7 +119,8 @@ function ProcessIntegrations() {
         minai_log("info", "Processing NPC request ({$speaker} => {$target}: {$message})");
         $GLOBALS["PROMPTS"]["npc_talk"]= [
             "cue"=>[
-                "write dialogue for {$GLOBALS["HERIKA_NAME"]}.{$GLOBALS["TEMPLATE_DIALOG"]}  "
+                //"write dialogue for {$GLOBALS["HERIKA_NAME"]}.{$GLOBALS["TEMPLATE_DIALOG"]}  " //'write' prefix lead to double answers, TEMPLATE_DIALOG already has a "Write ..." => the result is "write dialogue ... Write next line"
+                "{$GLOBALS["TEMPLATE_DIALOG"]} "
             ], 
             "player_request"=>[
                 "{$speaker}: {$message} (Talking to {$target})"
