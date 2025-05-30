@@ -312,7 +312,7 @@ function SetContext(actor akActor)
   aiff.SetActorVariable(akActor, "isSneaking", akActor.IsSneaking())
   aiff.SetActorVariable(akActor, "isSwimming", akActor.IsSwimming())
   aiff.SetActorVariable(akActor, "isOnMount", akActor.IsOnMount())
-  aiff.SetActorVariable(akActor, "isEncumbered", akActor.IsOverEncumbered())
+  aiff.SetActorVariable(akActor, "isEncumbered", IsOverEncumberedClassic(akActor))
   ; Sitting state - store raw value and let server handle formatting
   aiff.SetActorVariable(akActor, "sitState", akActor.GetSitState() as string)
 EndFunction
@@ -680,3 +680,15 @@ function SetLocationData(actor whoCares)
   main.Info("Set location data")
 
 endfunction
+
+; Classic Skyrim workaround for encumbrance
+Bool Function IsOverEncumberedClassic(Actor akActor)
+  if !akActor
+    Return False
+  endif
+  if akActor.GetActorValue("InventoryWeight") > akActor.GetActorValue("CarryWeight")
+    Return True
+  else
+    Return False
+  endif
+EndFunction
