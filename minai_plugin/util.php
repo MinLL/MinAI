@@ -396,8 +396,13 @@ function PreloadCommonActorData() {
 }
 
 Function IsSexActive() {
-    // if there is active scene thread involving current speaker
+    // if there is active scene thread involving current speaker or player
     return getScene($GLOBALS["HERIKA_NAME"]) || getScene($GLOBALS["PLAYER_NAME"]);
+}
+
+Function IsSexActiveSpeaker() {
+    // if there is active scene thread involving current speaker
+    return getScene($GLOBALS["HERIKA_NAME"]);
 }
 
 Function IsPlayer($name) {

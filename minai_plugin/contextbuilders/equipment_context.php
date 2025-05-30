@@ -16,14 +16,17 @@ Function GetUnifiedEquipmentContext($name, $forceNarrator = false, $debug = fals
     
     // Get equipment data
     $equipment = ProcessEquipment($name);
-    $revealedStatus = $equipment["revealedStatus"];
-
+    if (isset($equipment["revealedStatus"])) 
+        $revealedStatus = $equipment["revealedStatus"];
+    else
+        $revealedStatus = [];
+    
     // Get pronouns
     $pronouns = GetActorPronouns($name);
     $their = $pronouns["possessive"];
     
     // Check if the actor is naked
-    $isNaked = IsEnabled($name, "isNaked") && !$revealedStatus["wearingTop"] && !$revealedStatus["wearingBottom"];
+    $isNaked = IsEnabled($name, "isNaked") && !($revealedStatus["wearingTop"] ?? false) && !($revealedStatus["wearingBottom"] ?? false); 
     
     // Check if weapon is drawn
     $isWeaponDrawn = IsEnabled($name, "weaponDrawn");

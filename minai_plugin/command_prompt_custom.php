@@ -32,11 +32,11 @@ elseif (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"] && $GLOBAL
     }
 }
 else {
-    if (IsExplicitScene()) {
+    if (IsExplicitScene() && IsSexActiveSpeaker()) { // speaker should be in scene to use explicit prompt, otherwise a spectator would answer like a participant
         $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] = ExpandPromptVariables($GLOBALS["action_prompts"]["explicit_scene"]);
     } else {
         $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] = ExpandPromptVariables($GLOBALS["action_prompts"]["normal_scene"]);
-    }    
+    }   
 }
 
 if (isset($GLOBALS["enforce_single_json"]) && $GLOBALS["enforce_single_json"]) {

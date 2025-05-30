@@ -41,6 +41,8 @@ $GLOBALS["SEX_SCENE_CONTEXT"] = [
 $jsonXPersonality = getXPersonality($currentName);
 addXPersonality($jsonXPersonality);
 
+setPlayfulBanterPrompts($currentName); //default prompts when scene is not found 
+
 if(isset($scene)){
     $targetToSpeak = getTargetDuringSex($scene);
     

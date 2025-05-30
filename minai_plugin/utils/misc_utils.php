@@ -11,6 +11,7 @@ class Utilities {
         "GetActorValue",
         "IsEnabled",
         "IsSexActive",
+        "IsSexActiveSpeaker",
         "IsPlayer",
         "IsModEnabled",
         "IsInFaction",
