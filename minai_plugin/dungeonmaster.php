@@ -17,14 +17,15 @@ function SetDungeonMasterPrompts($message = "") {
     // Base prompt for the dungeon master
     if (isset($GLOBALS['enable_prompt_slop_cleanup']) && $GLOBALS['enable_prompt_slop_cleanup']) {        
         $dungeonMasterPrompt = [
-            "cue" => [
+            "cue" => [ // leaving this empty generate an error in CHIM, so I will write a cue here until further testing
+                "The Narrator: You must respond to the latest dialogue or events. {$GLOBALS["TEMPLATE_DIALOG"]}"
             ]
         ];
     }
     else {
         $dungeonMasterPrompt = [
             "cue" => [
-                "The Narrator: You feel as if you should respond to the latest dialogue or events. {$GLOBALS["TEMPLATE_DIALOG"]}"
+                "The Narrator: You should respond to the latest dialogue or events. {$GLOBALS["TEMPLATE_DIALOG"]}"
             ]
         ];
     }
@@ -81,5 +82,7 @@ function ProcessDungeonMasterEvent($requestData) {
     }
 
     // Set up the prompts with the extracted message
+    $message = "Mandatory OoC instruction: " . trim($message); // that should be executed unconditionally
+    //minai_log("info", "dungeonmaster message: {$message}");
     SetDungeonMasterPrompts($message);
 } 

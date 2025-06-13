@@ -219,7 +219,7 @@ function ProcessIntegrations() {
     // Handle narrator talk events
     if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "minai_narrator_talk") {
         SetEnabled($GLOBALS["PLAYER_NAME"], "isTalkingToNarrator", false);
-        $GLOBALS["ORIGINAL_HERIKA_NAME"] = $GLOBALS["HERIKA_NAME"];
+        SaveOriginalHerikaName(); //$GLOBALS["ORIGINAL_HERIKA_NAME"] = $GLOBALS["HERIKA_NAME"]; // xmd
         $GLOBALS["HERIKA_NAME"] = "The Narrator";
         SetNarratorProfile();
         

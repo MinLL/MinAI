@@ -1,7 +1,7 @@
 <?php
 
 class relation {
-    static function rollUpRelationshipStatus($relationshipValue) {
+    static function rollUpRelationshipStatus($relationshipValue, $b_met_before = false) {
         $relationshipValue = intval($relationshipValue ?? 0);
         $statuses = [];
         if ($relationshipValue >= 1) {
@@ -31,7 +31,10 @@ class relation {
                 $statuses[] = "archenemy";
             }
         } else {
-            return "a stranger to";
+            if ($b_met_before) {
+                return "an acquaintance of";
+            } else 
+                return "a stranger to";
         }
         
         if (count($statuses) > 1) {
@@ -57,14 +60,12 @@ function GetRelationshipContext($targetActor) {
     $utilities = new Utilities();
     $playerName = $GLOBALS["PLAYER_NAME"];
     $targetName = $targetActor;
-    $relationshipValue = $utilities->GetActorValue($targetActor, "relationshipRank");
+    $relationshipValue = intval($utilities->GetActorValue($targetActor, "relationshipRank") ?? 0); 
     
-    if ($relationshipValue == null) {
-        $relationshipValue = 0; //retrieveng value has failed, but better to be a stranger than enemy
-    } 
-
-    $relationshipStatus = relation::rollUpRelationshipStatus($relationshipValue);
-    $contextString = "$targetName is $relationshipStatus $playerName.";
+    $s_first_met = DataRetrieveFirstTimeMet($playerName, $targetName);
+    $b_met = ($s_first_met > "");
+    $relationshipStatus = relation::rollUpRelationshipStatus($relationshipValue, $b_met);
+    $contextString = "{$targetName} is {$relationshipStatus} {$playerName}.\n{$s_first_met}";
 
     return $contextString;
 }

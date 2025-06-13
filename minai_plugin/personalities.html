@@ -968,321 +968,326 @@
             `;
         }
 
-        function resetForm() {
-            // Reset all form fields
-            document.getElementById('newId').value = '';
-            document.getElementById('newOrientation').value = '';
-            document.getElementById('speakStyleDuringSex').value = '';
-            document.getElementById('newSexFantasies').value = '';
-            
-            // Clear any error messages
-            document.getElementById('generateError').style.display = 'none';
-            document.getElementById('speakStyleDuringSexError').style.display = 'none';
-            
-            // Clear the raw response
-            document.getElementById('rawResponse').innerHTML = '';
-            
-            // Clear the generate prompt
-            document.getElementById('generatePrompt').value = '';
-        }
+function resetForm() {
+    // Reset all form fields
+    document.getElementById('newId').value = '';
+    document.getElementById('newOrientation').value = '';
+    document.getElementById('speakStyleDuringSex').value = '';
+    document.getElementById('newSexFantasies').value = '';
+    
+    // Clear any error messages
+    document.getElementById('generateError').style.display = 'none';
+    document.getElementById('speakStyleDuringSexError').style.display = 'none';
+    
+    // Clear the raw response
+    document.getElementById('rawResponse').innerHTML = '';
+    
+    // Clear the generate prompt
+    document.getElementById('generatePrompt').value = '';
+}
 
-        function changePage(direction) {
-            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-            const newPage = currentPage + direction;
-            
-            if (newPage >= 1 && newPage <= totalPages) {
-                currentPage = newPage;
-                renderEntries();
+function changePage(direction) {
+    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+    const newPage = currentPage + direction;
+    
+    if (newPage >= 1 && newPage <= totalPages) {
+        currentPage = newPage;
+        renderEntries();
+    }
+}
+
+// Add this function to handle sorting if needed
+function sortEntries(field) {
+    filteredData.sort((a, b) => {
+        const aVal = a[field] || '';
+        const bVal = b[field] || '';
+        return aVal.localeCompare(bVal);
+    });
+    currentPage = 1;
+    renderEntries();
+}
+
+
+function filterEntries() {
+    const searchText = document.getElementById('searchInput').value.toLowerCase();
+    
+    filteredData = data.filter(row => {
+        const personality = JSON.parse(row.x_personality);
+        return (
+            row.id.toLowerCase().includes(searchText) ||
+            personality.orientation.toLowerCase().includes(searchText) ||
+            personality.relationshipStyle.toLowerCase().includes(searchText) ||
+            personality.speakStyleDuringSex.toLowerCase().includes(searchText) ||
+            (personality.preferredSexPositions || []).join(',').toLowerCase().includes(searchText) ||
+            (personality.sexualBehavior || []).join(',').toLowerCase().includes(searchText) ||
+            (personality.sexFantasies || []).join(',').toLowerCase().includes(searchText) ||
+            (personality.sexPersonalityTraits || []).join(',').toLowerCase().includes(searchText)
+        );
+    });
+    
+    currentPage = 1; // Reset to first page when filtering 
+     
+    renderEntries(); // --- 
+     
+} 
+
+function editEntry(id) {
+    const entryDiv = document.querySelector(`.entry-row .entry-value[data-field="id"][data-value="${id}"]`).closest('.entry-row');
+    const editBtn = entryDiv.querySelector('.editBtn');
+    
+    if (entryDiv.classList.contains('editing')) {
+        // Save changes
+        const updatedData = {
+            id: id,
+            x_personality: {
+                orientation: entryDiv.querySelector('[data-field="orientation"]').textContent,
+                relationshipStyle: entryDiv.querySelector('[data-field="relationshipStyle"]').textContent,
+                speakStyleDuringSex: entryDiv.querySelector('[data-field="speakStyleDuringSex"]').textContent,
+                preferredSexPositions: entryDiv.querySelector('[data-field="preferredSexPositions"]').textContent.split(',').map(p => p.trim()),
+                sexualBehavior: entryDiv.querySelector('[data-field="sexualBehavior"]').textContent.split(',').map(b => b.trim()),
+                sexFantasies: entryDiv.querySelector('[data-field="sexFantasies"]').textContent.split(',').map(f => f.trim()),
+                sexPersonalityTraits: entryDiv.querySelector('[data-field="sexPersonalityTraits"]').textContent.split(',').map(t => t.trim())
             }
-        }
+        };
 
-        // Add this function to handle sorting if needed
-        function sortEntries(field) {
-            filteredData.sort((a, b) => {
-                const aVal = a[field] || '';
-                const bVal = b[field] || '';
-                return aVal.localeCompare(bVal);
-            });
-            currentPage = 1;
-            renderEntries();
-        }
-
-        function filterEntries() {
-            const searchText = document.getElementById('searchInput').value.toLowerCase();
-            filteredData = data.filter(row => {
-                const personality = JSON.parse(row.x_personality);
-                return (
-                    row.id.toLowerCase().includes(searchText) ||
-                    personality.orientation.toLowerCase().includes(searchText) ||
-                    personality.relationshipStyle.toLowerCase().includes(searchText) ||
-                    personality.speakStyleDuringSex.toLowerCase().includes(searchText) ||
-                    (personality.preferredSexPositions || []).join(',').toLowerCase().includes(searchText) ||
-                    (personality.sexualBehavior || []).join(',').toLowerCase().includes(searchText) ||
-                    (personality.sexFantasies || []).join(',').toLowerCase().includes(searchText) ||
-                    (personality.sexPersonalityTraits || []).join(',').toLowerCase().includes(searchText)
-                );
-            });
-            currentPage = 1; // Reset to first page when filtering
-            renderEntries();
-        }
-
-        function editEntry(id) {
-            const entryDiv = document.querySelector(`.entry-row .entry-value[data-field="id"][data-value="${id}"]`).closest('.entry-row');
-            const editBtn = entryDiv.querySelector('.editBtn');
-            
-            if (entryDiv.classList.contains('editing')) {
-                // Save changes
-                const updatedData = {
-                    id: id,
-                    x_personality: {
-                        orientation: entryDiv.querySelector('[data-field="orientation"]').textContent,
-                        relationshipStyle: entryDiv.querySelector('[data-field="relationshipStyle"]').textContent,
-                        speakStyleDuringSex: entryDiv.querySelector('[data-field="speakStyleDuringSex"]').textContent,
-                        preferredSexPositions: entryDiv.querySelector('[data-field="preferredSexPositions"]').textContent.split(',').map(p => p.trim()),
-                        sexualBehavior: entryDiv.querySelector('[data-field="sexualBehavior"]').textContent.split(',').map(b => b.trim()),
-                        sexFantasies: entryDiv.querySelector('[data-field="sexFantasies"]').textContent.split(',').map(f => f.trim()),
-                        sexPersonalityTraits: entryDiv.querySelector('[data-field="sexPersonalityTraits"]').textContent.split(',').map(t => t.trim())
-                    }
-                };
-
-                fetch('api/personalities.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({
-                        table: 'minai_x_personalities',
-                        data: JSON.stringify(updatedData),
-                        id: id,
-                        action: 'update'
-                    })
-                })
-                .then(response => response.json())
-                .then(result => {
-                    if (result.status === 'success') {
-                        loadTable();
-                    } else {
-                        console.error('Failed to update:', result.message);
-                    }
-                });
-
-                // Remove editable state
-                entryDiv.querySelectorAll('.entry-value').forEach(el => {
-                    el.contentEditable = false;
-                    el.style = '';
-                });
-                entryDiv.classList.remove('editing');
-                editBtn.textContent = 'Edit';
+        fetch('api/personalities.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                table: 'minai_x_personalities',
+                data: JSON.stringify(updatedData),
+                id: id,
+                action: 'update'
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.status === 'success') {
+                loadTable();
             } else {
-                // Enable editing
-                entryDiv.querySelectorAll('.entry-value:not([data-field="id"])').forEach(el => {
-                    makeEditable(el);
-                });
-                entryDiv.classList.add('editing');
-                editBtn.textContent = 'Save';
+                console.error('Failed to update:', result.message);
             }
-        }
-
-        function deleteEntry(id) {
-            if (confirm('Are you sure you want to delete this personality?')) {
-                fetch('api/personalities.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({
-                        table: 'minai_x_personalities',
-                        id: id,
-                        action: 'delete'
-                    })
-                })
-                .then(response => response.json())
-                .then(result => {
-                    if (result.status === 'success') {
-                        loadTable();
-                    } else {
-                        console.error('Failed to delete:', result.message);
-                    }
-                });
-            }
-        }
-
-        function makeEditable(element) {
-            element.contentEditable = true;
-            element.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
-            element.style.padding = '4px 8px';
-            element.style.borderRadius = '4px';
-            element.style.border = '1px solid var(--border-color)';
-        }
-
-        function exportToCSV() {
-            // Convert the data to CSV format
-            const csvRows = [];
-            
-            // Add header row
-            csvRows.push(['ID', 'Orientation', 'Relationship Style', 'Speak Style', 
-                          'Preferred Positions', 'Sexual Behavior', 'Fantasies', 'Personality Traits']);
-            
-            // Add data rows
-            data.forEach(entry => {
-                const personality = JSON.parse(entry.x_personality);
-                csvRows.push([
-                    entry.id,
-                    personality.orientation,
-                    personality.relationshipStyle,
-                    personality.speakStyleDuringSex,
-                    Array.isArray(personality.preferredSexPositions) ? personality.preferredSexPositions.join('|') : personality.preferredSexPositions,
-                    Array.isArray(personality.sexualBehavior) ? personality.sexualBehavior.join('|') : personality.sexualBehavior,
-                    Array.isArray(personality.sexFantasies) ? personality.sexFantasies.join('|') : personality.sexFantasies,
-                    Array.isArray(personality.sexPersonalityTraits) ? personality.sexPersonalityTraits.join('|') : personality.sexPersonalityTraits
-                ]);
-            });
-            
-            // Convert to CSV string
-            const csvString = csvRows.map(row => 
-                row.map(cell => `"${cell.replace(/"/g, '""')}"`)
-                   .join(',')
-            ).join('\n');
-            
-            // Create and trigger download
-            const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            if (navigator.msSaveBlob) { // IE 10+
-                navigator.msSaveBlob(blob, 'personalities.csv');
-            } else {
-                link.href = URL.createObjectURL(blob);
-                link.download = 'personalities.csv';
-                link.style.display = 'none';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
-        }
-
-        function importFromCSV(input) {
-            const file = input.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const text = e.target.result;
-                const rows = text.split('\n').map(row => {
-                    // Handle quoted CSV properly
-                    const matches = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
-                    if (!matches) return [];
-                    return matches.map(cell => cell.replace(/^"(.*)"$/, '$1').replace(/""/g, '"'));
-                });
-                
-                // Skip header row
-                const importedData = rows.slice(1).filter(row => row.length >= 8).map(row => ({
-                    id: row[0],
-                    x_personality: JSON.stringify({
-                        orientation: row[1],
-                        relationshipStyle: row[2],
-                        speakStyleDuringSex: row[3],
-                        preferredSexPositions: row[4].split('|'),
-                        sexualBehavior: row[5].split('|'),
-                        sexFantasies: row[6].split('|'),
-                        sexPersonalityTraits: row[7].split('|')
-                    })
-                }));
-
-                if (importedData.length === 0) {
-                    alert('No valid data found in CSV file');
-                    return;
-                }
-
-                if (confirm(`Are you sure you want to import ${importedData.length} personalities? This will add to existing entries.`)) {
-                    importPersonalities(importedData);
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        function importPersonalities(importedData) {
-            fetch('api/personalities.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({
-                    action: 'import',
-                    data: JSON.stringify(importedData)
-                })
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.status === 'success') {
-                    alert('Import successful!');
-                    loadTable();
-                } else {
-                    alert('Import failed: ' + (result.message || 'Unknown error'));
-                }
-            })
-            .catch(error => {
-                alert('Import failed: ' + error.message);
-            });
-        }
-
-        // Add this after the existing script tag
-        document.getElementById('newEntryForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const personality = {
-                id: document.getElementById('newId').value,
-                x_personality: {
-                    orientation: document.getElementById('newOrientation').value,
-                    speakStyleDuringSex: document.getElementById('speakStyleDuringSex').value,
-                    sexFantasies: document.getElementById('newSexFantasies').value.split(',').map(f => f.trim()).filter(f => f),
-                    sexualBehavior: [],
-                    relationshipStyle: "casual",
-                    sexPersonalityTraits: [],
-                    preferredSexPositions: []
-                }
-            };
-
-            // Add validation
-            if (!personality.id || !personality.x_personality.orientation || !personality.x_personality.speakStyleDuringSex) {
-                alert('Please fill in all required fields');
-                return;
-            }
-
-            const errEl = document.getElementById('generateError');
-            errEl.style.display = 'none';
-
-            fetch('api/personalities.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({
-                    action: 'update',
-                    id: personality.id,
-                    data: JSON.stringify(personality)
-                })
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.status === 'success') {
-                    errEl.style.display = 'block';
-                    errEl.style.color = 'var(--success-color)';
-                    errEl.innerHTML = result.message || 'New personality added successfully!';
-                    resetForm();
-                    loadTable();
-                } else {
-                    console.error('Server error:', result);
-                    errEl.style.display = 'block';
-                    errEl.style.color = 'var(--error-color)';
-                    errEl.innerHTML = `Failed to add personality: ${result.message}${result.details ? `<br>${result.details}` : ''}`;
-                }
-            })
-            .catch(error => {
-                console.error('Network error:', error);
-                errEl.style.display = 'block';
-                errEl.style.color = 'var(--error-color)';
-                errEl.innerHTML = `Error adding personality: ${error.message}`;
-            });
         });
+
+        // Remove editable state
+        entryDiv.querySelectorAll('.entry-value').forEach(el => {
+            el.contentEditable = false;
+            el.style = '';
+        });
+        entryDiv.classList.remove('editing');
+        editBtn.textContent = 'Edit';
+    } else {
+        // Enable editing
+        entryDiv.querySelectorAll('.entry-value:not([data-field="id"])').forEach(el => {
+            makeEditable(el);
+        });
+        entryDiv.classList.add('editing');
+        editBtn.textContent = 'Save';
+    }
+}
+
+function deleteEntry(id) {
+    if (confirm('Are you sure you want to delete this personality?')) {
+        fetch('api/personalities.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                table: 'minai_x_personalities',
+                id: id,
+                action: 'delete'
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.status === 'success') {
+                loadTable();
+            } else {
+                console.error('Failed to delete:', result.message);
+            }
+        });
+    }
+}
+
+function makeEditable(element) {
+    element.contentEditable = true;
+    element.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
+    element.style.padding = '4px 8px';
+    element.style.borderRadius = '4px';
+    element.style.border = '1px solid var(--border-color)';
+}
+
+function exportToCSV() {
+    // Convert the data to CSV format
+    const csvRows = [];
+    
+    // Add header row
+    csvRows.push(['ID', 'Orientation', 'Relationship Style', 'Speak Style', 
+                  'Preferred Positions', 'Sexual Behavior', 'Fantasies', 'Personality Traits']);
+    
+    // Add data rows
+    data.forEach(entry => {
+        const personality = JSON.parse(entry.x_personality);
+        csvRows.push([
+            entry.id,
+            personality.orientation,
+            personality.relationshipStyle,
+            personality.speakStyleDuringSex,
+            Array.isArray(personality.preferredSexPositions) ? personality.preferredSexPositions.join('|') : personality.preferredSexPositions,
+            Array.isArray(personality.sexualBehavior) ? personality.sexualBehavior.join('|') : personality.sexualBehavior,
+            Array.isArray(personality.sexFantasies) ? personality.sexFantasies.join('|') : personality.sexFantasies,
+            Array.isArray(personality.sexPersonalityTraits) ? personality.sexPersonalityTraits.join('|') : personality.sexPersonalityTraits
+        ]);
+    });
+    
+    // Convert to CSV string
+    const csvString = csvRows.map(row => 
+        row.map(cell => `"${cell.replace(/"/g, '""')}"`)
+           .join(',')
+    ).join('\n');
+    
+    // Create and trigger download
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    if (navigator.msSaveBlob) { // IE 10+
+        navigator.msSaveBlob(blob, 'personalities.csv');
+    } else {
+        link.href = URL.createObjectURL(blob);
+        link.download = 'personalities.csv';
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+}
+
+function importFromCSV(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const text = e.target.result;
+        const rows = text.split('\n').map(row => {
+            // Handle quoted CSV properly
+            const matches = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+            if (!matches) return [];
+            return matches.map(cell => cell.replace(/^"(.*)"$/, '$1').replace(/""/g, '"'));
+        });
+        
+        // Skip header row
+        const importedData = rows.slice(1).filter(row => row.length >= 8).map(row => ({
+            id: row[0],
+            x_personality: JSON.stringify({
+                orientation: row[1],
+                relationshipStyle: row[2],
+                speakStyleDuringSex: row[3],
+                preferredSexPositions: row[4].split('|'),
+                sexualBehavior: row[5].split('|'),
+                sexFantasies: row[6].split('|'),
+                sexPersonalityTraits: row[7].split('|')
+            })
+        }));
+
+        if (importedData.length === 0) {
+            alert('No valid data found in CSV file');
+            return;
+        }
+
+        if (confirm(`Are you sure you want to import ${importedData.length} personalities? This will add to existing entries.`)) {
+            importPersonalities(importedData);
+        }
+    };
+    reader.readAsText(file);
+}
+
+function importPersonalities(importedData) {
+    fetch('api/personalities.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            action: 'import',
+            data: JSON.stringify(importedData)
+        })
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.status === 'success') {
+            alert('Import successful!');
+            loadTable();
+        } else {
+            alert('Import failed: ' + (result.message || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        alert('Import failed: ' + error.message);
+    });
+}
+
+// Add this after the existing script tag
+document.getElementById('newEntryForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const personality = {
+        id: document.getElementById('newId').value,
+        x_personality: {
+            orientation: document.getElementById('newOrientation').value,
+            speakStyleDuringSex: document.getElementById('speakStyleDuringSex').value,
+            sexFantasies: document.getElementById('newSexFantasies').value.split(',').map(f => f.trim()).filter(f => f),
+            sexualBehavior: [],
+            relationshipStyle: "casual",
+            sexPersonalityTraits: [],
+            preferredSexPositions: []
+        }
+    };
+
+    // Add validation
+    if (!personality.id || !personality.x_personality.orientation || !personality.x_personality.speakStyleDuringSex) {
+        alert('Please fill in all required fields');
+        return;
+    }
+
+    const errEl = document.getElementById('generateError');
+    errEl.style.display = 'none';
+
+    fetch('api/personalities.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            action: 'update',
+            id: personality.id,
+            data: JSON.stringify(personality)
+        })
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.status === 'success') {
+            errEl.style.display = 'block';
+            errEl.style.color = 'var(--success-color)';
+            errEl.innerHTML = result.message || 'New personality added successfully!';
+            resetForm();
+            loadTable();
+        } else {
+            console.error('Server error:', result);
+            errEl.style.display = 'block';
+            errEl.style.color = 'var(--error-color)';
+            errEl.innerHTML = `Failed to add personality: ${result.message}${result.details ? `<br>${result.details}` : ''}`;
+        }
+    })
+    .catch(error => {
+        console.error('Network error:', error);
+        errEl.style.display = 'block';
+        errEl.style.color = 'var(--error-color)';
+        errEl.innerHTML = `Error adding personality: ${error.message}`;
+    });
+});
     </script>
 </body>
 

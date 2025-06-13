@@ -218,8 +218,7 @@ class ActionBuilder {
 
         // Check enable callback
         if ($this->enableCallback) {
-            $result = is_callable($this->enableCallback) ? 
-                call_user_func($this->enableCallback) : false;
+            $result = is_callable($this->enableCallback) ? call_user_func($this->enableCallback) : false;
             self::$enabledActionsCache[$this->actionName] = $result;
             return $result;
         }

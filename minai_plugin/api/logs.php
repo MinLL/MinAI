@@ -1,7 +1,7 @@
 <?php
 header('Content-Type: application/json');
 set_time_limit(120); // Increase timeout to 2 minutes
-require_once("../logger.php");
+require_once("/var/www/html/HerikaServer/ext/minai_plugin/logger.php");
 
 $logDir = realpath('/var/www/html/HerikaServer/log/');
 

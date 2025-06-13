@@ -95,19 +95,40 @@ function addXPersonality($jsonXPersonality) {
     if(!$jsonXPersonality) {
         return;
     }
-
+    
+    // if only one ore more fields are missing, use defaults:
+    $orient = ($jsonXPersonality["orientation"] ?? "heterosexual");
+    $relStyle = ($jsonXPersonality["relationshipStyle"] ?? "open relationship");
+    
     $GLOBALS["HERIKA_PERS"] .= "
-    - Orientation: {$jsonXPersonality["orientation"]}
-    - Romantic relationship type: {$jsonXPersonality["relationshipStyle"]}";
+- Sexual orientation: {$orient}
+- Romantic relationship type: {$relStyle}";
 
-    if(IsSexActive()) {
-        $GLOBALS["HERIKA_PERS"] .= "
-During sex {$GLOBALS["HERIKA_NAME"]}:
-- speaks in this style {$jsonXPersonality["speakStyleDuringSex"]};
-- prefers these positions: ".implode(", ", $jsonXPersonality["preferredSexPositions"]).";
-- likes to participate in such sex activities: ".implode(", ", $jsonXPersonality["sexualBehavior"]).";
-- has secret sex fantasies:
-".implode("\n  ",$jsonXPersonality["sexFantasies"]);
+    if(IsSexActiveSpeaker()) {
+        
+        $speak_style = ($jsonXPersonality["speakStyleDuringSex"] ?? "playful banter" );
+        
+        if (isset($jsonXPersonality["preferredSexPositions"]) && (count($jsonXPersonality["preferredSexPositions"]) > 0))
+            $prefSexPos = implode(", ", $jsonXPersonality["preferredSexPositions"]);
+        else 
+            $prefSexPos = "missionary, cowgirl, reverse cowgirl, doggy style";
+        
+        if (isset($jsonXPersonality["sexualBehavior"]) && (count($jsonXPersonality["sexualBehavior"]) > 0))
+            $sexBehavior = implode(", ", $jsonXPersonality["sexualBehavior"]);
+        else
+            $sexBehavior = "breast play, facials, cum tasting, deep throat, cock teasing, threesomes, outdoor sex, public sex";
+
+        if (isset($jsonXPersonality["sexFantasies"]) && (count($jsonXPersonality["sexFantasies"]) > 0))
+            $sexFnts = implode(", ", $jsonXPersonality["sexFantasies"]);
+        else
+            $sexFnts = "outdoor sex, passion in a secluded place, romantic tryst";
+        
+        $GLOBALS["HERIKA_PERS"] .= "\n
+## During sex {$GLOBALS["HERIKA_NAME"]}:
+    - speaks in this style: {$speak_style};
+    - prefers these positions: {$prefSexPos};
+    - likes to participate in such sex activities: {$sexBehavior};
+    - has secret sex fantasies: {$sexFnts} ";
     }
 }
 

@@ -76,7 +76,7 @@ if ($sexEnabled) {
     directRegisterAction(
         "ExtCmdStartVaginal", 
         "StartVaginal", 
-        "Initiate vaginal intercourse with the target - one of the primary sex actions", 
+        "Initiate vaginal intercourse with the target", 
         true,
         [
             "male-female" => "Initiate vaginal intercourse with #target_possessive# - one of the primary sex actions",
@@ -101,7 +101,7 @@ if ($sexEnabled) {
     directRegisterAction(
         "ExtCmdStartThreesome", 
         "StartThreesome", 
-        "Initiate sexual activity with multiple partners simultaneously - use for three-person encounters", 
+        "Initiate sexual activity involving three persons simultaneously - use for three-person encounters as a very desirable intimate entertainment. Should chose a target partner as third person. Use this action when The Dragonborn is not involved in another intimate activity", 
         true
     );
     
@@ -109,7 +109,7 @@ if ($sexEnabled) {
     directRegisterAction(
         "ExtCmdStartOrgy", 
         "StartOrgy", 
-        "Begin group sexual activity with multiple willing participants in the vicinity", 
+        "Begin group sexual activity with multiple willing participants in the vicinity in groups up to five participants. Should chose 2 or 3 extra partners that are not already involved in intimate activities as targets. Ultimate group bonding intimate activity", 
         true
     );
     
@@ -125,7 +125,7 @@ if ($sexEnabled) {
     directRegisterAction(
         "ExtCmdRemoveClothes", 
         "RemoveClothes", 
-        "Take off all clothing and armor - necessary for intimate activities", 
+        "Take off all clothing and armor for intimate activities, unwinding, sleeping, swimming or just get naked to show off the beauty of your body", 
         true
     );
     

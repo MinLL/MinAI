@@ -402,7 +402,8 @@ Function IsSexActive() {
 
 Function IsSexActiveSpeaker() {
     // if there is active scene thread involving current speaker
-    return getScene($GLOBALS["HERIKA_NAME"]);
+    $scene = getScene($GLOBALS["HERIKA_NAME"]);
+    return (isset($scene) && !empty($scene));
 }
 
 Function IsPlayer($name) {
@@ -462,11 +463,10 @@ Function ShouldEnableSexFunctions($name) {
     // - Actor is in a scene AND transitions aren't allowed
     // - Actor is in combat
     // - Actor's arousal is too low
-    if ($inScene && !$transitionsAllowed) {
+    if ($inScene && (!$transitionsAllowed)) {
         return false;
     }
-    
-    return $arousalOk && !$inCombat;
+    return ($arousalOk && (!$inCombat));
 }
 
 
@@ -506,8 +506,8 @@ if (!isset($GLOBALS["minai_all_actions_loaded"])) {
 }
 
 Function IsActionEnabled($actionName) {
-    $actionName = strtolower($actionName);
-    
+    $actionName = strtolower(trim($actionName));
+
     // If we haven't loaded all actions yet, do it now
     if (!$GLOBALS["minai_all_actions_loaded"]) {
         // Load all enabled actions at once
@@ -529,8 +529,7 @@ Function IsActionEnabled($actionName) {
     }
     
     // Return from cache (defaults to false if not found)
-    $returnValue = isset($GLOBALS["minai_action_enabled_cache"][$actionName]) ? 
-           $GLOBALS["minai_action_enabled_cache"][$actionName] : false;
+    $returnValue = isset($GLOBALS["minai_action_enabled_cache"][$actionName]) ? $GLOBALS["minai_action_enabled_cache"][$actionName] : false;
     minai_log("info", "IsActionEnabled: {$actionName} = {$returnValue}");
     return $returnValue;
 }
@@ -773,6 +772,7 @@ function GetCurrentPartyMembers() {
         'names' => []
     ];
     
+    /*
     // Check if CurrentParty data exists in the database
     $query = "SELECT value FROM conf_opts WHERE id='CurrentParty'";
     $dbResult = $GLOBALS["db"]->fetchAll($query);
@@ -788,16 +788,17 @@ function GetCurrentPartyMembers() {
     
     // Wrap with array brackets to make it valid JSON
     $rawData = '[' . $rawData . ']';
-    
+    */
     // Parse the JSON data
+    $rawData = DataGetCurrentPartyConf();
+
     $partyData = json_decode($rawData, true);
     
     // If parsing failed, return empty result
     if (!is_array($partyData)) {
         return $result;
     }
-    
-    // Store member data and names
+
     foreach ($partyData as $member) {
         if (isset($member['name'])) {
             $result['members'][] = $member;
@@ -807,6 +808,7 @@ function GetCurrentPartyMembers() {
     
     return $result;
 }
+
 
 /**
  * Check if a character is in the player's current party
@@ -883,7 +885,7 @@ function GetCurrentLocationContext($actor) {
         if (isset($locationMatch[2])) {
             $location = trim($locationMatch[2]);
             $locationData['current'] = $location;
-            
+               
             // Process hold if present
             if (isset($holdMatch[1])) {
                 $hold = trim($holdMatch[1]);
