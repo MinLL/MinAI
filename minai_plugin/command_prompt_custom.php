@@ -4,9 +4,14 @@ if (isset($GLOBALS["minai_skip_processing"]) && $GLOBALS["minai_skip_processing"
     return;
 }
 
-require_once("util.php");
+require_once("util.php"); 
 $GLOBALS["PATCH_PROMPT_ENFORCE_ACTIONS"] = true;
 $target = $GLOBALS["target"];
+
+if (!isset($GLOBALS["action_prompts"]) || (empty($GLOBALS["action_prompts"]))) {
+    include("/var/www/html/HerikaServer/ext/minai_plugin/config.php");
+    Logger::debug("MinAI command_prompt_custom: action_prompts not defined! ");
+}
 
 if (IsEnabled($GLOBALS["PLAYER_NAME"], "isSinging")) {
     $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] = ExpandPromptVariables($GLOBALS["action_prompts"]["singing"]);
@@ -32,8 +37,12 @@ elseif (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"] && $GLOBAL
     }
 }
 else {
-    if (IsExplicitScene() && IsSexActiveSpeaker()) { // speaker should be in scene to use explicit prompt, otherwise a spectator would answer like a participant
-        $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] = ExpandPromptVariables($GLOBALS["action_prompts"]["explicit_scene"]);
+    if (IsExplicitScene()) { 
+        if (!IsSexActiveSpeaker()) { // speaker should be in scene to use explicit prompt, otherwise a spectator would answer like a participant
+            $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] = ExpandPromptVariables($GLOBALS["action_prompts"]["normal_scene"]);
+        } else {
+            $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] = ExpandPromptVariables($GLOBALS["action_prompts"]["explicit_scene"]);
+        }
     } else {
         $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] = ExpandPromptVariables($GLOBALS["action_prompts"]["normal_scene"]);
     }   

@@ -21,6 +21,12 @@ function cleanupSlop($contextData) {
     // Arrays to keep track of ethereal arrow messages
     $etherealArrowPositions = []; // Store positions of all ethereal arrow messages by character
     $etherealArrowLatest = [];    // Store only the latest formatted message by character
+
+    $prev_spell_cast = "";
+    $last_spell_cast = "";
+    $content_before_1 = ""; // previous content line
+    $content_before_2 = ""; // content line 2 steps back
+    $content_before_3 = ""; // content line 3 steps back
     
     // Define object categories for contextual descriptions
     $objectCategories = [
@@ -70,8 +76,17 @@ function cleanupSlop($contextData) {
             if (trim($line) === '') {
                 continue;
             }
-            
+                        
             $content = $line;
+            
+            $crt_content = strtolower(trim($content));
+            if ( ($crt_content == $content_before_1) || ($crt_content == $content_before_2) || ($crt_content == $content_before_3) ) {
+                continue; // skip duplicate content line
+            } else {
+                $content_before_3 = $content_before_2;
+                $content_before_2 = $content_before_1;
+                $content_before_1 = $crt_content;
+            }
             
             // Remove any existing double parentheses that might interfere with our patterns
             $content = str_replace('))', ')', $content);
@@ -88,7 +103,7 @@ function cleanupSlop($contextData) {
                     return "$name took a drink from {$playerPronouns['possessive']} Waterskin";
                 }
             }, $content);
-
+           
             // Remove form[] indicator messages
             if (preg_match('/[^\n]+? found 1 used in a form\[\] to indicate true\n?/', $content)) {
                 continue; // Skip this line entirely
@@ -151,6 +166,30 @@ function cleanupSlop($contextData) {
             if (IsRadiant() && preg_match('/talks to ' . preg_quote($GLOBALS["PLAYER_NAME"], '/') . ' for the first time\. They haven\'t yet been acquainted/i', $content)) {
                 continue;
             }
+
+            // Remove ' found N' message at end of line 
+            if (preg_match('/ found \d+$/', $crt_content)) {
+                continue; // Skip this line entirely
+            }
+            
+            // Remove 'Some_name:@Other name@' message 
+            if (preg_match('/^[a-z\s_\']+:@[a-z\s_\']+@$/', $crt_content)) {
+                continue; // Skip this line entirely
+            }
+
+            // Remove 'NPC Name casts Spell Name' - '/^([A-Z][a-zA-Z]+)(?: ([A-Z][a-zA-Z]+))? casts ([A-Z][a-zA-Z ]+)$/'
+            if (preg_match('/^([A-Z][a-z_\'A-Z]+)(?: ([A-Z][a-z_\'A-Z]+))? casts ([A-Z][a-zA-Z ]+)$/', $content)) {
+                //error_log(" casts: $content - dbg ");
+                if (($content == $last_spell_cast) || ($content == $prev_spell_cast)) {
+                    continue; // Skip this line entirely
+                } else {
+                    if (($last_spell_cast > "") && ($prev_spell_cast != $last_spell_cast))
+                        $prev_spell_cast = $last_spell_cast;
+                    $last_spell_cast = $content;
+                }
+            }
+
+            // TODO: repeated memory
             
             // Pattern: Handle "$name uses $object" messages (both plain and parenthesized formats)
             if (preg_match('/^\(?(.+?)\s+uses\s+(.+?)\)?$/i', $content, $matches)) {
