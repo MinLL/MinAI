@@ -20,16 +20,28 @@ $GLOBALS["TTS_FALLBACK_FNCT"] = function($responseTextUnmooded, $mood, $response
         return;
     if (!isset($GLOBALS["speaker"]))
         $GLOBALS["speaker"] = $GLOBALS["HERIKA_NAME"];
-    $race = str_replace(" ", "", strtolower(GetActorValue($GLOBALS["speaker"], "Race")));
-    $gender = strtolower(GetActorValue($GLOBALS["speaker"], "Gender"));
-    if ($gender.$race) {
-        $fallback = $GLOBALS["voicetype_fallbacks"][$gender.$race];
+    
+    // Special handling for The Narrator to prevent voice inheritance from nearby NPCs
+    if ($GLOBALS["speaker"] == "The Narrator" || $GLOBALS["HERIKA_NAME"] == "The Narrator") {
+        if (isset($GLOBALS['devious_narrator_eldritch_voice'])) {
+            $fallback = $GLOBALS['devious_narrator_eldritch_voice'];
+        } else {
+            $fallback = "dragon"; // Default narrator voice
+        }
+        minai_log("info", "Using narrator voice: {$fallback}");
+    } else {
+        $race = str_replace(" ", "", strtolower(GetActorValue($GLOBALS["speaker"], "Race")));
+        $gender = strtolower(GetActorValue($GLOBALS["speaker"], "Gender"));
+        if ($gender.$race) {
+            $fallback = $GLOBALS["voicetype_fallbacks"][$gender.$race];
+        }
+        if (!isset($fallback)) {
+            minai_log("info", "Warning: Could not find fallback for {$GLOBALS["speaker"]}: {$gender}{$race}. Using last resort fallback: malecommoner");
+            $fallback = "malecommoner";
+        }
+        minai_log("info", "Voice type fallback to {$fallback} for {$GLOBALS["speaker"]}");
     }
-    if (!isset($fallback)) {
-        minai_log("info", "Warning: Could not find fallback for {$GLOBALS["speaker"]}: {$gender}{$race}. Using last resort fallback: malecommoner");
-        $fallback = "malecommoner";
-    }
-    minai_log("info", "Voice type fallback to {$fallback} for {$GLOBALS["speaker"]}");
+    
     $GLOBALS["TTS"]["FORCED_VOICE_DEV"] = $fallback;
     $GLOBALS["TTS"]["MELOTTS"]["voiceid"] = $fallback;
     
