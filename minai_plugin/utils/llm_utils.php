@@ -180,8 +180,16 @@ function callLLM($messages, $model = null, $options = []) {
         if (!isset($response['choices'][0]['message']['content'])) {
             minai_log("info", "callLLM: Unexpected response format");
             minai_log("debug", "callLLM: Response: " . json_encode($response));
-            SetLLMFallbackProfile();
-            return callLLM($messages, $GLOBALS['CONNECTOR']['openrouter']['model'], $options);
+            
+            // Only use fallback if we haven't retried yet to prevent infinite recursion
+            if (!$isRetry) {
+                SetLLMFallbackProfile();
+                $isRetry = true;
+                return callLLM($messages, $GLOBALS['CONNECTOR']['openrouter']['model'], $options);
+            } else {
+                minai_log("info", "callLLM: Fallback also failed, returning null");
+                return null;
+            }
         }
 
         $responseContent = $response['choices'][0]['message']['content'];
@@ -202,6 +210,9 @@ function callLLM($messages, $model = null, $options = []) {
         
         // Strip asterisks from gagged speech while preserving action descriptions
         $responseContent = StripGagAsterisks($responseContent);
+        
+        // Reset retry flag on successful response
+        $isRetry = false;
         
         // Log the response
         $timestamp = date('Y-m-d\TH:i:sP');

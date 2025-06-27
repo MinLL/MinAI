@@ -5,6 +5,26 @@ require_once(__DIR__ . "/contextbuilders/system_prompt_context.php");
 require_once(__DIR__ . "/utils/format_util.php");
 require_once(__DIR__ . "/utils/prompt_slop_cleanup.php");
 
+function GetPlayerVoiceType() {
+    // Get player voice type from config or use default
+    if (isset($GLOBALS['player_voice_model']) && !empty($GLOBALS['player_voice_model'])) {
+        return $GLOBALS['player_voice_model'];
+    }
+    
+    // Check for voice type based on player race/gender
+    $playerRace = isset($GLOBALS['PLAYER_RACE']) ? strtolower($GLOBALS['PLAYER_RACE']) : 'nord';
+    $playerGender = isset($GLOBALS['PLAYER_GENDER']) ? strtolower($GLOBALS['PLAYER_GENDER']) : 'female';
+    
+    // Use fallback mapping similar to NPC voices
+    $voiceKey = $playerGender . $playerRace;
+    if (isset($GLOBALS['voicetype_fallbacks'][$voiceKey])) {
+        return $GLOBALS['voicetype_fallbacks'][$voiceKey];
+    }
+    
+    // Final fallback
+    return $playerGender === 'male' ? 'maleeventoned' : 'femaleeventoned';
+}
+
 function convertRelationshipStatus($targetActor) {
     $relationshipRank = GetActorValue($targetActor, "relationshipRank");
     if ($relationshipRank == 0) {
@@ -410,13 +430,31 @@ function interceptRoleplayInput() {
             minai_log("info", "Roleplay input transformed from \"{$originalInput}\" to \"{$response}\"");
             
             if ($GLOBALS["gameRequest"][0] == "minai_roleplay") {
-                // rewrite as player input
-                $GLOBALS["gameRequest"][0] = "inputtext";
-                $GLOBALS["gameRequest"][3] = $PLAYER_NAME . ": " . $response;
+                // For roleplay requests, we need to generate TTS and send response directly
+                minai_log("info", "Processing roleplay response for TTS");
+                
+                // Trigger TTS for the player character response
+                $ttsResponse = array(
+                    "speaker" => $PLAYER_NAME,
+                    "text" => $response,
+                    "voice_type" => GetPlayerVoiceType()
+                );
+                
+                // Send TTS response directly
+                if (function_exists('sendTTSResponse')) {
+                    sendTTSResponse($ttsResponse);
+                } else {
+                    // Fallback: format as standard response
+                    $GLOBALS["gameRequest"][0] = "inputtext";
+                    $GLOBALS["gameRequest"][3] = $PLAYER_NAME . ": " . $response;
+                    $GLOBALS["FORCED_TTS"] = true; // Flag to force TTS processing
+                }
             }
             else {
                 // Format the response with a single character name prefix
+                $GLOBALS["gameRequest"][0] = "inputtext";
                 $GLOBALS["gameRequest"][3] = $PLAYER_NAME . ": " . $response;
+                $GLOBALS["FORCED_TTS"] = true; // Flag to force TTS processing
             }
             # minai_log("info", "Final gameRequest[3]: " . $GLOBALS["gameRequest"][3]);
         } else {
