@@ -18,7 +18,7 @@ function InitializeCoreContextBuilders() {
     // Register personality context builder
     $registry->register('personality', [
         'section' => 'character',
-        'header' => 'Personality',
+        'header' => 'Personality', // 'header' => 'PROFILE', ???
         'description' => 'Core personality description',
         'priority' => 10, // High priority - should be first in character section
         'enabled' => isset($GLOBALS['minai_context']['personality']) ? (bool)$GLOBALS['minai_context']['personality'] : true,
@@ -77,6 +77,14 @@ function InitializeCoreContextBuilders() {
     ]);
 }
 
+function StrCleanBullets($s_input = ""){
+    $s_res = strtr($s_input,[
+        '* ' => ' ',
+        '# ' => ' ',
+    ]);
+    return $s_res;
+}
+
 /**
  * Build the personality context
  * 
@@ -97,6 +105,31 @@ function BuildPersonalityContext($params) {
     // Get the personality from global variables
     $herika_pers = isset($GLOBALS["HERIKA_PERS"]) ? $GLOBALS["HERIKA_PERS"] : "";
     
+    if (isset($GLOBALS['HERIKA_PERSONALITY']) && (trim($GLOBALS['HERIKA_PERSONALITY']) > "")) {
+        $herika_pers .= "\n\n## Behavioral patterns\n" . trim($GLOBALS['HERIKA_PERSONALITY']);
+    }
+    if (isset($GLOBALS['HERIKA_BACKGROUND']) && (trim($GLOBALS['HERIKA_BACKGROUND']) > "")) {
+        $herika_pers .= "\n\n## Background\n" . trim($GLOBALS['HERIKA_BACKGROUND']);
+    }
+    if (isset($GLOBALS['HERIKA_GOALS']) && (trim($GLOBALS['HERIKA_GOALS']) > "")) {
+        $herika_pers .= "\n\n## Goals\n" .  StrCleanBullets(trim($GLOBALS['HERIKA_GOALS']));
+    }
+    if (isset($GLOBALS['HERIKA_SPEECHSTYLE']) && (trim($GLOBALS['HERIKA_SPEECHSTYLE']) > "")) {
+        $herika_pers .= "\n\n## Speech style\n" . trim($GLOBALS['HERIKA_SPEECHSTYLE']);
+    }
+    if (isset($GLOBALS['HERIKA_RELATIONSHIPS']) && (trim($GLOBALS['HERIKA_RELATIONSHIPS']) > "")) {
+        $herika_pers .= "\n\n## Social connections\n" . StrCleanBullets(trim($GLOBALS['HERIKA_RELATIONSHIPS']));
+    }
+    if (isset($GLOBALS['HERIKA_APPEARANCE']) && (trim($GLOBALS['HERIKA_APPEARANCE']) > "")) {
+        $herika_pers .= "\n\n## Appearance\n" . trim($GLOBALS['HERIKA_APPEARANCE']);
+    }
+    if (isset($GLOBALS['HERIKA_OCCUPATION']) && (trim($GLOBALS['HERIKA_OCCUPATION']) > "")) {
+        $herika_pers .= "\n\n## Occupation\n" . trim($GLOBALS['HERIKA_OCCUPATION']);
+    }
+    if (isset($GLOBALS['HERIKA_SKILLS']) && (trim($GLOBALS['HERIKA_SKILLS']) > "")) {
+        $herika_pers .= "\n\n## Skills\n" . StrCleanBullets(trim($GLOBALS['HERIKA_SKILLS']));
+    }
+
     if (empty($herika_pers)) {
         return "";
     }
