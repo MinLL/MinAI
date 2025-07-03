@@ -109,20 +109,26 @@ $GLOBALS['action_prompts'] = Array(
 
 
 // Roleplay translation settings
+// TRANSLATION MODE: Converts casual player input into character-appropriate speech while preserving the original meaning
+// ROLEPLAY MODE: Generates new character responses based on the current situation and conversation context
 $GLOBALS['roleplay_settings'] = Array(
     "context_messages" => 10,
-    "system_prompt" => "You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking.",
-    "system_prompt_explicit" => "You are #PLAYER_NAME# in an intimate scenario. Your responses should reflect the passionate situation while maintaining your character's personality.",
-    "system_prompt_combat" => "You are #PLAYER_NAME# in the midst of combat. Your responses should be appropriately tense and urgent while maintaining your character's personality.",
-    "roleplay_system_prompt" => "You are #PLAYER_NAME#. Your responses should reflect your character's personality, background, and current situation.",
-    "roleplay_system_prompt_explicit" => "You are #PLAYER_NAME# in an intimate scenario. Your responses should reflect both the passionate situation and your character's personality.",
-    "roleplay_system_prompt_combat" => "You are #PLAYER_NAME# in combat. Your responses should reflect both the urgent situation and your character's personality.",
-    "translation_request" => "Translate this casual speech into your character's manner: \"#ORIGINAL_INPUT#\"",
-    "translation_request_explicit" => "Translate this casual speech to reflect the current intimate situation while maintaining your character's manner: \"#ORIGINAL_INPUT#\"",
-    "translation_request_combat" => "Translate this casual speech into an appropriately tense and urgent manner while maintaining your character's style: \"#ORIGINAL_INPUT#\"",
-    "roleplay_request" => "You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue in response to the ongoing conversation and situation.",
-    "roleplay_request_explicit" => "You are roleplaying as #PLAYER_NAME# in an intimate scenario. Respond naturally to the ongoing conversation and situation as your character would in this situation with a succinct line of dialogue.",
-    "roleplay_request_combat" => "You are roleplaying as #PLAYER_NAME# in combat. Respond naturally to the ongoing conversation and situation as your character would in this situation with a succinct line of dialogue.",
+    
+    // TRANSLATION MODE PROMPTS - Convert casual input to character voice
+    "system_prompt" => "You are #PLAYER_NAME#. TRANSLATION MODE: Convert casual speech into how your character would say the same thing.",
+    "system_prompt_explicit" => "You are #PLAYER_NAME# in an intimate scenario. TRANSLATION MODE: Convert casual speech into how your character would express the same meaning in this passionate situation.",
+    "system_prompt_combat" => "You are #PLAYER_NAME# in combat. TRANSLATION MODE: Convert casual speech into how your character would express the same meaning in this urgent combat situation.",
+    "translation_request" => "TRANSLATE this casual speech into your character's manner while keeping the same meaning: \"#ORIGINAL_INPUT#\"",
+    "translation_request_explicit" => "TRANSLATE this casual speech to reflect the current intimate situation while maintaining your character's manner and the original meaning: \"#ORIGINAL_INPUT#\"",
+    "translation_request_combat" => "TRANSLATE this casual speech into an appropriately tense and urgent manner while maintaining your character's style and the original meaning: \"#ORIGINAL_INPUT#\"",
+    
+    // ROLEPLAY MODE PROMPTS - Generate new character responses
+    "roleplay_system_prompt" => "You are #PLAYER_NAME#. ROLEPLAY MODE: Generate natural character responses based on your personality and the situation.",
+    "roleplay_system_prompt_explicit" => "You are #PLAYER_NAME# in an intimate scenario. ROLEPLAY MODE: Generate natural character responses that reflect both the passionate situation and your character's personality.",
+    "roleplay_system_prompt_combat" => "You are #PLAYER_NAME# in combat. ROLEPLAY MODE: Generate natural character responses that reflect both the urgent combat situation and your character's personality.",
+    "roleplay_request" => "ROLEPLAY as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue in response to the ongoing conversation and situation.",
+    "roleplay_request_explicit" => "ROLEPLAY as #PLAYER_NAME# in an intimate scenario. Respond naturally to the ongoing conversation and situation as your character would with a succinct line of dialogue.",
+    "roleplay_request_combat" => "ROLEPLAY as #PLAYER_NAME# in combat. Respond naturally to the ongoing conversation and situation as your character would with a succinct line of dialogue.",
     "sections" => Array(
         "CHARACTER_BACKGROUND" => Array(
             "enabled" => true,
