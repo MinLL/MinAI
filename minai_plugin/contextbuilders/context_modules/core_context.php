@@ -75,7 +75,20 @@ function InitializeCoreContextBuilders() {
         'enabled' => isset($GLOBALS['minai_context']['current_task']) ? (bool)$GLOBALS['minai_context']['current_task'] : true,
         'builder_callback' => 'BuildCurrentTaskContext'
     ]);
+    
+    // Oghma context builder
+    $registry->register('oghma_infinium', [
+        'section' => 'misc',
+        'header' => 'Oghma Infinium Lore',
+        'description' => 'Lore Information from the Oghma Infinium.',
+        'priority' => 25,
+        'enabled' => true,
+        'builder_callback' => 'BuildOghmaInfiniumContext'
+    ]);
+    
 }
+
+//---------------------------------------    
 
 function StrCleanBullets($s_input = ""){
     $s_res = strtr($s_input,[
@@ -84,6 +97,23 @@ function StrCleanBullets($s_input = ""){
     ]);
     return $s_res;
 }
+
+
+/**
+ * Build the Oghma Infinium context
+ * 
+ * @param array $params Parameters including herika_name, player_name, target
+ * @return string Formatted Oghma Infinium context
+ */
+function BuildOghmaInfiniumContext($params) {
+
+    if (isset($GLOBALS["OGHMA_HINT"]) && (!empty($GLOBALS["OGHMA_HINT"])) ) {
+        //error_log("oghma minai: ". ($GLOBALS["OGHMA_HINT"] ?? "") . " - dbg");        
+        return $GLOBALS["OGHMA_HINT"];
+    } else 
+        return "";
+}
+
 
 /**
  * Build the personality context
