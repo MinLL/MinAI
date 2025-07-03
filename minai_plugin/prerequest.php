@@ -17,17 +17,7 @@ require_once("config.php");
 require_once("util.php");
 require_once("contextbuilders.php");
 require_once("prompts/info_prompts.php");
-// Set speaker, but ensure narrator gets proper voice assignment
-if ($GLOBALS["HERIKA_NAME"] == "The Narrator") {
-    $GLOBALS["speaker"] = "The Narrator";
-    // Force narrator voice type instead of inheriting from previous speaker
-    if (isset($GLOBALS['devious_narrator_eldritch_voice'])) {
-        $GLOBALS["TTS"]["FORCED_VOICE_DEV"] = $GLOBALS['devious_narrator_eldritch_voice'];
-        $GLOBALS["TTS"]["MELOTTS"]["voiceid"] = $GLOBALS['devious_narrator_eldritch_voice'];
-    }
-} else {
-    $GLOBALS["speaker"] = $GLOBALS["HERIKA_NAME"];
-}
+$GLOBALS["speaker"] = $GLOBALS["HERIKA_NAME"];
 $GLOBALS["minai_processing_input"] = false;
 
 // Configure metrics collection with default values if not set in config
