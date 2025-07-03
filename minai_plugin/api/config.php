@@ -6,7 +6,7 @@ $pluginPath = "/var/www/html/HerikaServer/ext/minai_plugin";
 
 // Always load the base configuration first
 require_once("$pluginPath/config.base.php");
-require_once("../logger.php");
+require_once("$pluginPath/logger.php");
 
 // Then load the custom config if it exists, otherwise create it from base
 if (!file_exists("$pluginPath/config.php")) {

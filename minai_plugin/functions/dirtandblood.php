@@ -15,7 +15,7 @@ if ($canBathe) {
     directRegisterAction(
         "ExtCmdStartBathing", 
         "StartBathing", 
-        "Unequip your gear and strip naked to take a bath, cleansing yourself of dirt and blood (You do not need to RemoveClothes first)",
+        "Take a bath, cleanse yourself of dirt and blood, clean off the grime of battle",
         true
     );
 } 

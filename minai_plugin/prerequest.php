@@ -58,6 +58,7 @@ SetNarratorProfile();
 if (IsEnabled($GLOBALS["PLAYER_NAME"], "isTalkingToNarrator") && isPlayerInput() ) {
     minai_log("info", "Forcing herika_name to the narrator: Is talking to narrator");
     SetEnabled($GLOBALS["PLAYER_NAME"], "isTalkingToNarrator", false);
+	SaveOriginalHerikaName();
     $GLOBALS["HERIKA_NAME"] = "The Narrator";
     $GLOBALS["minai_processing_input"] = true;
     $GLOBALS["using_self_narrator"] = true;
@@ -206,6 +207,58 @@ $GLOBALS["action_post_process_fnct"] = function($actions) {
     if (isset($actions)) {
         foreach ($actions as $key => $action) {
             // Check if this is one of our item commands
+            if (strpos($action, 'ExtCmdStartThreesome@') !== false) { 
+                $transitionsAllowed = AreSexTransitionsAllowed($GLOBALS["PLAYER_NAME"]);
+                if (!$transitionsAllowed) {
+                    minai_log("info", "Processing item command: " . $action);
+                    $target = "";
+                    $old_target = "";
+                    // Extract parts: format is like "Agdaz|command|ExtCmdStartThreesome@Lena\r\n"
+                    $parts = explode('|', $action);
+                    if (count($parts) >= 3) {
+                        $actor = trim($parts[0]);
+                        $cmdType = trim($parts[1]);
+                        // Remove any trailing \r\n from the command part
+                        $commandPart = rtrim($parts[2], "\r\n");
+                        // Split command part into segments by @ symbol
+                        $cmdSegments = explode('@', $commandPart);
+                        if (count($cmdSegments) >= 2) { // target specified
+                            $cmd = trim($cmdSegments[0]);
+                            $target = trim($cmdSegments[1]);
+                            $old_target = $target;
+                            if (strpos($target, ',') > 0) {
+                                $arr_target = explode(',', $target);
+                                $target = "";
+                                foreach ($arr_target as $s_npc) {
+                                    if (strlen($s_npc) > 0)
+                                        if (!(strtolower($s_npc) == strtolower($GLOBALS["PLAYER_NAME"])))
+                                            $target = $s_npc;
+                                }
+                            }
+                            
+                            if (strtolower($target) == strtolower($GLOBALS["PLAYER_NAME"])) {// if target is player, need to be replaced
+                                //if (strtolower($GLOBALS["HERIKA_NAME"]) == strtolower($GLOBALS["PLAYER_NAME"])) {
+                                $target = "";
+                            }
+
+                        } 
+                        if ($target == "") { // no target, need to find one
+                            $in_range = DataBeingsInRangeExcluding($actor, true) ?? "|Inigo|Lucifer|Serana|";
+                            $arr_in_range = explode("|",$in_range) ?? [];
+                            foreach ($arr_in_range as $s_npc) {
+                                if (!IsActorInSexScene($s_npc)) { // IsActorInSexScene($name);
+                                    $target = $s_npc;
+                                }
+                            }
+                        }
+                        $target = trim($target);
+                        $s_act = "{$actor}|{$cmdType}|{$cmd}@{$target}\r\n";
+                        if ($target > "") 
+                            $actions[$key] = $s_act;
+                    }
+                }
+            }
+
             if (strpos($action, 'ExtCmdGiveItem@') !== false || 
                 strpos($action, 'ExtCmdTakeItem@') !== false || 
                 strpos($action, 'ExtCmdTradeItem@') !== false) {

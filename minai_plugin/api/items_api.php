@@ -8,8 +8,8 @@ require_once($path . "conf".DIRECTORY_SEPARATOR."conf.php");
 require_once($path. "lib" .DIRECTORY_SEPARATOR."{$GLOBALS["DBDRIVER"]}.class.php");
 $GLOBALS["db"] = new sql();
 require_once("$pluginPath/logger.php");
-require_once("../util.php");
-require_once("../items.php");
+require_once("$pluginPath/util.php");
+require_once("$pluginPath/items.php");
 require_once("$pluginPath/db_utils.php");
 // Ensure required tables exist
 CreateItemsTableIfNotExists();

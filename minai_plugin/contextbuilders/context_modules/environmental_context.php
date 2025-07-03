@@ -12,7 +12,8 @@ require_once(__DIR__ . "/../../environmentalContext.php");
 require_once(__DIR__ . "/../../contextbuilders/weather_context.php");
 require_once(__DIR__ . "/../../contextbuilders/dirtandblood_context.php");
 require_once(__DIR__ . "/../../contextbuilders/exposure_context.php");
-
+require_once("/var/www/html/HerikaServer/ext/minai_plugin/location_context_details.php");
+require_once("/var/www/html/HerikaServer/lib/utils_game_timestamp.php");
 /**
  * Helper function to validate and sanitize parameters for context builders
  * 
@@ -151,6 +152,7 @@ function InitializeEnvironmentalContextBuilders() {
  * @return string Formatted day/night context
  */
 function BuildDayNightStateContext($params) {
+    /* original code:
     $character = $params['player_name'];
     
     // Try to get detailed date information first
@@ -166,6 +168,8 @@ function BuildDayNightStateContext($params) {
     }
     
     return "It is " . $dayState . ".";
+    -- end original code */
+    return get_datetime_for_prompt_explained(0,true,true,true);
 }
 
 /**
@@ -383,7 +387,11 @@ function BuildLocationContext($params) {
     $currentLocation = ucwords(GetActorValue($character, "currentLocation"));
     $hasLocation = false;
     if (!empty($currentLocation)) {
-        $context .= "Current Location: " . $currentLocation . ".\n";
+        $s_loc_extra = GetLocationDetails($currentLocation);
+        if ($s_loc_extra > "")
+            $context .= "Current Location: " . $currentLocation . ", " . $s_loc_extra . ".\n";
+        else 
+            $context .= "Current Location: " . $currentLocation . ".\n";
         $hasLocation = true;
     } else {
         // Try cell if no location

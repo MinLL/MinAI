@@ -255,7 +255,8 @@ function BuildPartyMembershipContext($params) {
         if (empty($partyMemberNames)) {
             return "{$player_name} is not currently traveling with any companions.";
         } else {
-            $companions = implode(', ', $partyMemberNames);
+            //$companions = implode(', ', $partyMemberNames); //this allow duplicates
+            $companions = implode(', ', array_keys(array_flip($partyMemberNames))); // remove duplicates
             return "{$player_name} is currently traveling with {$companions}.";
         }
     }
@@ -277,14 +278,16 @@ function BuildPartyMembershipContext($params) {
         if (empty($otherPartyMembers)) {
             return "{$character} is currently in an adventuring party with {$player_name}.";
         } else {
-            $otherMembers = implode(', ', $otherPartyMembers);
+            //$otherMembers = implode(', ', $otherPartyMembers); //this allow duplicates
+            $otherMembers = implode(', ', array_keys(array_flip($otherPartyMembers))); // remove duplicates
             return "{$character} is currently in an adventuring party with {$player_name} and {$otherMembers}.";
         }
     } else {
         if (empty($otherPartyMembers)) {
             return "{$character} is not currently in an adventuring party with {$player_name}.";
         } else {
-            $otherMembers = implode(', ', $otherPartyMembers);
+            //$otherMembers = implode(', ', $otherPartyMembers);
+            $otherMembers = implode(', ', array_keys(array_flip($otherPartyMembers))); // remove duplicates
             return "{$character} is not currently in an adventuring party with {$player_name}, who is traveling with {$otherMembers}.";
         }
     }

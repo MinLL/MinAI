@@ -41,6 +41,10 @@ function updateThreadsDB() {
         
         $scene = $jsonData["scene"];
         $fallback = isset($jsonData["fallback"]) ? $jsonData["fallback"] : "";
+        if ($fallback > "") {
+            if(file_exists("/var/www/html/HerikaServer/ext/minai_plugin/scene_fallback_process.php")) 
+                include("/var/www/html/HerikaServer/ext/minai_plugin/scene_fallback_process.php");
+        } 
 
         $threadInfo = [
             "type" => $type,
