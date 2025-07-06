@@ -1,6 +1,6 @@
 # ⚠️❗️ 🚨 THIS PROJECT IS DEPRECATED 🚨 ❗️⚠️
 
-**This project is no longer maintained. Please use SkyrimNet instead: [SkyrimNet](https://github.com/MinLL/SkyrimNet-GamePlugin/tree/main).**
+**This project is no longer maintained. Please use SkyrimNet instead as an alternative to CHIM/MinAI: [SkyrimNet](https://github.com/MinLL/SkyrimNet-GamePlugin/tree/main).**
 
 # MinAI
 
