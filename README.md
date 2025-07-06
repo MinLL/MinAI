@@ -1,4 +1,9 @@
+# ⚠️❗️ 🚨 THIS PROJECT IS DEPRECATED 🚨 ❗️⚠️
+
+**This project is no longer maintained. Please use SkyrimNet instead: [SkyrimNet-GamePlugin](https://github.com/MinLL/SkyrimNet-GamePlugin/tree/main).**
+
 # MinAI
+
 A significant expansion to CHIM that brings AI to the entirety of the Skyrim world, and bridges LLMs with various Skyrim Mods. 
 
 Documentation for modders can be found [here](https://github.com/MinLL/MinAI/blob/main/ModdersGuide.md). FAQ can be found [here](https://github.com/MinLL/MinAI/blob/main/FAQ.md).
