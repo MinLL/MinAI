@@ -10,7 +10,7 @@ function GetSubmissiveLolaContext($name) {
 
     $playerName = $GLOBALS["PLAYER_NAME"];
 
-    $subLolaOwnerName = GetActorValue($playerName, "subLolaOwnerName");
+    $subLolaOwnerName = GetActorValue($playerName, "subLolaOwnerName", true);
     if ($subLolaOwnerName == "" || $subLolaOwnerName == "0") {
         return "";
     }
@@ -21,7 +21,7 @@ function GetSubmissiveLolaContext($name) {
     if (strtolower($name) == strtolower($subLolaOwnerName)) {
         $subLolaOwnerName = $GLOBALS["HERIKA_NAME"]; // This will have the right capitalization / etc
 
-        $subLolaOwnerAttitude = GetActorValue($playerName, "subLolaOwnerAttitude");
+        $subLolaOwnerAttitude = intval(GetActorValue($playerName, "subLolaOwnerAttitude"));
 
         if ($subLolaOwnerAttitude == 0) {
             // Playful
@@ -35,7 +35,7 @@ function GetSubmissiveLolaContext($name) {
         // Contexte
 
         // Submission
-        $subLolaGlobalSubmissionScore  = GetActorValue($playerName, "subLolaGlobalSubmissionScore");
+        $subLolaGlobalSubmissionScore  = intval(GetActorValue($playerName, "subLolaGlobalSubmissionScore"));
         if ($subLolaGlobalSubmissionScore < 0) {
             $ret .= "{$playerName} is a rebellious slave that needs to be put in place. {$subLolaOwnerName} is displeased and particularly harsh. {$subLolaOwnerName} will threaten {$playerName} with hard punishment or being sold away.\n";
         } elseif ($subLolaGlobalSubmissionScore < 20) {
@@ -59,7 +59,7 @@ function GetSubmissiveLolaContext($name) {
         }
 
         // Sex
-        $subLolaTimesSexIsRequired = GetActorValue($playerName, "subLolaTimesSexIsRequired");
+        $subLolaTimesSexIsRequired = intval(GetActorValue($playerName, "subLolaTimesSexIsRequired"));
         if ($subLolaTimesSexIsRequired > 0) {
             $ret .= "{$playerName} is expected to offer to have sex with {$subLolaOwnerName}. {$subLolaOwnerName} is willing to have sex with {$playerName} and will remind {$playerName} about their obligation. {$subLolaOwnerName} might make {$playerName} beg to have sex with them before doing so.\n";
         }

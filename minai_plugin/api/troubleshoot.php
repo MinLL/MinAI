@@ -1,7 +1,7 @@
 <?php
 header('Content-Type: application/json');
 set_time_limit(120);
-require_once("../logger.php");
+require_once("/var/www/html/HerikaServer/ext/minai_plugin/logger.php");
 // Set up paths and imports
 $serverRoot = '/var/www/html/HerikaServer';
 require_once($serverRoot . '/conf/conf.php');

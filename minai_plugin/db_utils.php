@@ -115,6 +115,7 @@ function CreateItemsTableIfNotExists() {
                 UNIQUE(item_id, file_name)
               )"
             );
+            error_log("MinAI create table: minai_items - exec trace"); //debug
         }
     } catch (Exception $e) {
         // Log error but don't fail
@@ -132,6 +133,7 @@ function InitiateDBTables() {
     
     // Seed default items
     SeedDefaultItems();
+    error_log("MinAI InitiateDBTables - exec trace"); //debug
 }
 
 function ResetDBTables() {

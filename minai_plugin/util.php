@@ -12,6 +12,13 @@ require_once("mind_influence.php");
 $GLOBALS[MINAI_ACTOR_VALUE_CACHE] = [];
 $targetOverride = null;
 
+function array_unique_caseinsensitive($arr_input) {
+    return array_intersect_key(
+        $arr_input,
+        array_unique(array_map('strtolower', $arr_input))
+    );
+}
+
 // Get Value from the cache. $name/$key should be lowercase
 Function GetActorValueCache($name, $key) {
     if (isset($GLOBALS[MINAI_ACTOR_VALUE_CACHE][$name])
@@ -40,7 +47,7 @@ Function BuildActorValueCache($name) {
     $idPrefix = "_minai_{$name}//";
     $origLength = strlen($idPrefix);
     $idPrefix = $GLOBALS["db"]->escape($idPrefix);
-    $query = "select * from conf_opts where LOWER(id) like LOWER('{$idPrefix}%')";
+    $query = "select * from conf_opts where (id ilike '{$idPrefix}%' )";
     $ret = $GLOBALS["db"]->fetchAll($query);
     // minai_log("info", "Building cache for $name");
     foreach ($ret as $row) {
@@ -93,6 +100,7 @@ function ActorCanOrgasm($name) {
  * @param string $value The value to set
  * @return bool True if successful
  */
+
 function SetActorValue($name, $key, $value) {
     // Upsert new value
     return $GLOBALS['db']->upsertRowOnConflict(
@@ -110,30 +118,34 @@ function SetActorValue($name, $key, $value) {
 Function GetActorValue($name, $key, $preserveCase=false, $skipCache=false) {
     $db = $GLOBALS['db'];
     // minai_log("info", "Looking up $name: $key");
-    If (!$preserveCase && !$skipCache) {
-        $name = strtolower($name);
-        $key = strtolower($key);
+    $l_key = strtolower($key);
+    $l_name = strtolower($name);
 
-        If (!HasActorValueCache($name)) {
-            BuildActorValueCache($name);
+    if (!$skipCache) {
+        if (!HasActorValueCache($l_name)) {
+            BuildActorValueCache($l_name);
         }
         // minai_log("info", "Checking cache: $name, $key");
-        $ret = GetActorValueCache($name, $key);
-        return $ret === null ? "" : strtolower($ret);
+        $ret = (GetActorValueCache($l_name, $l_key) ?? "");
+        if (!$preserveCase)
+		    $ret = strtolower($ret);
+        return $ret;
     }
 
     // return strtolower("JobInnkeeper,Whiterun,,,,Bannered Mare Services,,Whiterun Bannered Mare Faction,,SLA TimeRate,sla_Arousal,sla_Exposure,slapp_HaveSeenBody,slapp_IsAnimatingWKidFaction,");
-    $name = $db->escape($name);
-    $query = "select * from conf_opts where LOWER(id)=LOWER('_minai_{$db->escape($name)}//{$db->escape($key)}')";
-    if ($preserveCase) {
-        $tmp = strtolower($name);
-        $query = "select * from conf_opts where LOWER(id)='_minai_{$db->escape($tmp)}//{$db->escape($key)}'";
-    }
+    $e_name = $db->escape($l_name);
+    $e_key = $db->escape($l_key);
+    $query = "SELECT * FROM conf_opts WHERE (LOWER(id)=LOWER('_minai_{$e_name}//{$e_key}'))";
+
     $ret = $GLOBALS["db"]->fetchAll($query);
     if (!$ret) {
         return "";
     }
-    $ret = strtolower($ret[0]['value']);
+
+    if ($preserveCase)
+        $ret = ($ret[0]['value'] ?? '');
+    else
+        $ret = strtolower($ret[0]['value'] ?? '');
     
     return $ret;
 }
@@ -361,7 +373,7 @@ function PreloadCommonActorData() {
     }
     
     // Remove duplicates and empty values
-    $relevantActors = array_filter(array_unique($relevantActors));
+    $relevantActors = array_filter(array_unique_caseinsensitive($relevantActors));
     
     // Common flag checks
     $commonFlags = [
@@ -369,6 +381,7 @@ function PreloadCommonActorData() {
         "isChild", 
         "CanVibrate", 
         "isVibratorActive",
+		"isNaked",
         "enableAISex"
     ];
     
@@ -378,7 +391,7 @@ function PreloadCommonActorData() {
         "AllKeywords", 
         "Race", 
         "arousal", 
-        "scene",
+        "Scene",
         "relationshipRank",
         "playerName"
     ];
@@ -403,7 +416,14 @@ Function IsSexActive() {
 Function IsSexActiveSpeaker() {
     // if there is active scene thread involving current speaker
     $scene = getScene($GLOBALS["HERIKA_NAME"]);
-    return (isset($scene) && !empty($scene));
+    return (isset($scene) && (!empty($scene)));
+}
+
+Function IsInScene($name) {
+    //$value = strtolower(trim(GetActorValue($name, "Scene")));
+    //return $value != null && $value != "" && $value != "none";
+    $scene = getScene($name);
+    return (isset($scene) && (!empty($scene)));
 }
 
 Function IsPlayer($name) {
@@ -414,7 +434,7 @@ $GLOBALS["GenericFuncRet"] =function($gameRequest) {
     // Example, if papyrus execution gives some error, we will need to rewrite request her.
     // BY default, request will be $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdSpankAss"]
     // $gameRequest = [type of message,localts,gamets,data]
-    $GLOBALS["FORCE_MAX_TOKENS"]=48;    // We can overwrite anything here using $GLOBALS;
+    $GLOBALS["FORCE_MAX_TOKENS"]=256; // was 48   // We can overwrite anything here using $GLOBALS;
 
     if (stripos($gameRequest[3],"error")!==false) // Papyrus returned error
         return ["argName"=>"target","request"=>"{$GLOBALS["HERIKA_NAME"]} says sorry about unable to complete the task. {$GLOBALS["TEMPLATE_DIALOG"]}"];
@@ -429,11 +449,6 @@ Function IsModEnabled($mod) {
 
 Function IsConfigEnabled($configKey) {
     return IsEnabled($GLOBALS['PLAYER_NAME'], $configKey);
-}
-
-Function IsInScene($name) {
-    $value = strtolower(trim(GetActorValue($name, "scene")));
-    return $value != null && $value != "" && $value != "none";
 }
 
 Function ShouldClearFollowerFunctions() {
@@ -485,7 +500,6 @@ Function IsChildActor($name) {
     return str_contains(GetActorValue($name, "Race"), "child") || IsEnabled($name, "isChild");
 }
 
-
 Function IsMale($name) {
     return HasKeyword($name, "ActorSexMale");
 }
@@ -494,6 +508,16 @@ Function IsFemale($name) {
     return HasKeyword($name, "ActorSexFemale");
 }
 
+function GetGender($name) {
+    $s_res = "other";
+    if (IsFemale($name)) {
+        $s_res = "female";
+    } else {
+        if (IsMale($name))
+            $s_res = "male";
+    }
+    return $s_res;
+}
 
 // Cache for action enabled checks
 if (!isset($GLOBALS["minai_action_enabled_cache"])) {
@@ -511,7 +535,7 @@ Function IsActionEnabled($actionName) {
     // If we haven't loaded all actions yet, do it now
     if (!$GLOBALS["minai_all_actions_loaded"]) {
         // Load all enabled actions at once
-        $query = "SELECT * FROM conf_opts WHERE LOWER(id) LIKE LOWER('_minai_ACTION//%') AND LOWER(value)=LOWER('TRUE')";
+        $query = "SELECT * FROM conf_opts WHERE (id ILIKE '_minai_ACTION//%') AND (LOWER(value)='true') ";
         $rows = $GLOBALS["db"]->fetchAll($query);
         
         // Mark all found actions as enabled
@@ -596,7 +620,7 @@ function PreloadActions($actionNames) {
     }
     
     $whereClause = implode(" OR ", $whereConditions);
-    $query = "SELECT LOWER(SUBSTRING(id FROM 14)) as action_name FROM conf_opts WHERE ({$whereClause}) AND LOWER(value)=LOWER('TRUE')";
+    $query = "SELECT LOWER(SUBSTRING(id FROM 14)) as action_name FROM conf_opts WHERE ({$whereClause}) AND (LOWER(value)='true') ";
     $rows = $GLOBALS["db"]->fetchAll($query);
     
     // Mark missing actions as disabled by default
@@ -700,12 +724,12 @@ Function GetTargetActor() {
 }
 
 Function IsNewRadiantConversation() {
-    return $GLOBALS["db"]->fetchAll("select 1 from conf_opts where id='_minai_RADIANT//initial' and value='TRUE'");
+    return $GLOBALS["db"]->fetchAll("select 1 from conf_opts where (id='_minai_RADIANT//initial') and (LOWER(value)='true') ");
 }
 
 Function GetLastInput() {
     $db = $GLOBALS['db'];
-    $ret = $GLOBALS["db"]->fetchAll("select * from conf_opts where id='_minai_RADIANT//lastInput'");
+    $ret = $GLOBALS["db"]->fetchAll("select * from conf_opts where (id='_minai_RADIANT//lastInput') ");
     if (!$ret) {
         return 0;
     }
@@ -809,6 +833,26 @@ function GetCurrentPartyMembers() {
     return $result;
 }
 
+/**
+ * Get party member number/index $nc from nearby actors list
+ * 
+ * @return the member name
+ */
+function GetOnePartyMember($nc=0, $s_fallback="") {
+    
+    $s_res = $s_fallback;
+
+    $nearbyActors = GetActorValue("PLAYER", "nearbyActors", true);
+
+    if (!empty($nearbyActors)) {
+        $arr_actors = explode(",", $nearbyActors);
+        if (isset($arr_actors)) {
+            $s_res = $arr_actors[$nc] ?? $s_fallback; 
+        }
+    }
+
+    return $s_res;
+}
 
 /**
  * Check if a character is in the player's current party
@@ -1054,7 +1098,7 @@ function GetAllActorValues($actor) {
     $actor = strtolower($db->escape($actor));
     $result = [];
     
-    $query = "SELECT id, value FROM conf_opts WHERE LOWER(id) LIKE LOWER('_minai_{$actor}//%')";
+    $query = "SELECT id, value FROM conf_opts WHERE (id ILIKE '_minai_{$actor}//%') ";
     $rows = $db->fetchAll($query);
     
     foreach ($rows as $row) {

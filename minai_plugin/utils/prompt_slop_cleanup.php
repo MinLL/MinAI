@@ -12,7 +12,7 @@ function cleanupSlop($contextData) {
     $playerPronouns = $GLOBALS["player_pronouns"];
     $pronounSelf = "{$playerPronouns['object']}self";
     $cleaned = [];
-    $lastTimePassIndex = -1; // Track index of the last "Time passes" message
+    //$lastTimePassIndex = -1; // Track index of the last "Time passes" message
     
     // Arrays to keep track of "uses" messages
     $characterUsesPositions = []; // Store positions of all use messages by character
@@ -60,13 +60,47 @@ function cleanupSlop($contextData) {
         'meditating' => ['cancel meditation']
     ];
     
+    $lastrole = "";
     foreach ($contextData as $entry) {
         if (!isset($entry['content'])) {
             continue;
         }
         
         $originalContent = $entry['content'];
-        
+
+        if (isset($entry['role'])) {
+            if ($entry['role'] == 'assistant') {
+                if (strlen(trim($originalContent)) > 0) {
+                    if ((strpos($originalContent,"{") >= 0) && (strpos($originalContent,"}") > 0)) {
+                        $s_json = $originalContent;
+                        $arr_extract = json_decode($s_json, true);
+                        //error_log(" json found: $s_json - exec trace " . print_r($arr_extract, true) ); //debug
+                        if (isset($arr_extract)) {
+                            $msg = trim($arr_extract['message'] ?? "");
+                            $speaker = $arr_extract['character'] ?? "";
+                            $action = $arr_extract['action'] ?? "";
+                            $target = $arr_extract['target'] ?? "";
+                            if (strlen($msg) > 0 ) {
+                                $entry['role'] == 'user';
+                                $originalContent = $speaker . ": " . $msg;
+                            } else {
+                                if (strlen($action) > 0) {
+                                    $entry['role'] == 'user';
+                                    $originalContent = $speaker . " perform " . $action ;
+                                    if (strlen($target) > 0) {
+                                        $originalContent .= " on " . $target ;
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        $entry['role'] == 'user';
+                        //error_log(" assistant changed: $originalContent - exec trace "); //debug
+                    }
+                }
+            }
+        }
+
         // Split content into lines to process each line individually
         $contentLines = explode("\n", $originalContent);
         $processedLines = [];
@@ -87,6 +121,26 @@ function cleanupSlop($contextData) {
                 $content_before_2 = $content_before_1;
                 $content_before_1 = $crt_content;
             }
+
+            // (... responds to ... about the ongoing conversation)
+            if (stripos($content, ' about the ongoing conversation') !== false) {
+                continue;
+            }
+
+            if ((stripos($content, ' starts a dialogue with ')) && (stripos($content, ' about a relevant topic')))  {
+                continue;
+            }
+            
+            //: ... (Talking to
+            if (stripos($content, ': ... (Talking to ')) {
+                continue;
+            }
+
+            // Check if this is a "Time passes" message
+            if (stripos($content, 'Time passes without anyone in the group talking') !== false) {
+                continue;
+            }
+
             
             // Remove any existing double parentheses that might interfere with our patterns
             $content = str_replace('))', ')', $content);
@@ -173,7 +227,7 @@ function cleanupSlop($contextData) {
             }
             
             // Remove 'Some_name:@Other name@' message 
-            if (preg_match('/^[a-z\s_\']+:@[a-z\s_\']+@$/', $crt_content)) {
+            if (preg_match('/^[a-z\s_\'-]+:@[a-z\s_\'-]+@$/', $crt_content)) {
                 continue; // Skip this line entirely
             }
 
@@ -189,6 +243,8 @@ function cleanupSlop($contextData) {
                 }
             }
 
+            // {"target":""} 
+            $content = str_replace('{"target":""}', ' ', $content); 
             // TODO: repeated memory
             
             // Pattern: Handle "$name uses $object" messages (both plain and parenthesized formats)
@@ -396,9 +452,6 @@ function cleanupSlop($contextData) {
             // Remove leading and trailing whitespace
             $content = trim($content);
             
-            // Check if this is a "Time passes" message
-            $isTimePassMessage = (stripos($content, 'Time passes without anyone in the group talking') !== false);
-
             // Only add non-empty lines to processed lines
             if (!empty($content)) {
                 $processedLines[] = $content;
@@ -417,24 +470,24 @@ function cleanupSlop($contextData) {
             }
             
             // Check if this is a "Time passes" message
-            $isTimePassMessage = (stripos($joinedContent, 'Time passes without anyone in the group talking') !== false);
+            //$isTimePassMessage = (stripos($joinedContent, 'Time passes without anyone in the group talking') !== false);
             
             // Skip consecutive "Time passes" messages and only keep the first one
-            if ($isTimePassMessage && $lastTimePassIndex >= 0) {
-                continue; // Skip adding this as a new entry
-            }
+            //if ($isTimePassMessage && $lastTimePassIndex >= 0) {
+            //    continue; // Skip adding this as a new entry
+            //}
             // error_log("DEBUG: Original content: " . $originalContent);
             // error_log("DEBUG: Joined content: " . $joinedContent);
             $entry['content'] = $joinedContent;
             $cleaned[] = $entry;
             
             // Update the index if this was a time pass message
-            if ($isTimePassMessage) {
-                $lastTimePassIndex = count($cleaned) - 1;
-            } else {
+            //if ($isTimePassMessage) {
+            //    $lastTimePassIndex = count($cleaned) - 1;
+            //} else {
                 // Reset the index if we've added a non-time pass message
-                $lastTimePassIndex = -1;
-            }
+            //    $lastTimePassIndex = -1;
+            //}
         }
     }
     
@@ -480,8 +533,8 @@ function cleanupSlop($contextData) {
     }
     
     // Reindex the array to ensure sequential keys
-    $cleaned = array_values($cleaned);
-    
+    //$cleaned = array_values($cleaned); // reindex is done anyway in caller function after slop cleanup  
+
     // Only prune if original context history was set
     if (isset($GLOBALS["ORIGINAL_CONTEXT_HISTORY"])) {
         // error_log("DEBUG: Pruning context history to " . $GLOBALS["ORIGINAL_CONTEXT_HISTORY"]);

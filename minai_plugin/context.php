@@ -105,13 +105,22 @@ if ($GLOBALS["minai_processing_input"]) {
 
 // Clean up slop text patterns
 minai_start_timer('cleanupSlop', 'contextProcessing');
+
 if (isset($GLOBALS["enable_prompt_slop_cleanup"]) && $GLOBALS["enable_prompt_slop_cleanup"]) {
     $GLOBALS["contextDataFull"] = cleanupSlop($GLOBALS["contextDataFull"]);
 }
 minai_stop_timer('cleanupSlop');
 
+
 // Re-index the array after removing elements
-$GLOBALS["contextDataFull"] = array_values($GLOBALS["contextDataFull"]);
+//$GLOBALS["contextDataFull"] = array_values($GLOBALS["contextDataFull"]);
+
+$arr_prefix = [
+    'role' => 'user', 
+    'content' => "#Recent events and dialogue history will follow on next messages:"
+];
+$n_elements = array_unshift($GLOBALS["contextDataFull"], $arr_prefix);
+
 minai_stop_timer('contextProcessing');
 
 // Update the system prompt (0th entry) with our optimized version

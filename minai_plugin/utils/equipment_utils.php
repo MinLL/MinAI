@@ -80,7 +80,7 @@ Function GetVibratingDevicesContext($name) {
             }
         }
     }
-    $arousal = GetActorValue($name, "arousal");
+    $arousal = intval(GetActorValue($name, "arousal"));
     return [
         'visibleItems' => $visibleItems,
         'hiddenItems' => $hiddenItems,

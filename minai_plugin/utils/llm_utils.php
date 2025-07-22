@@ -137,8 +137,8 @@ function callLLM($messages, $model = null, $options = []) {
         $headers = [
             'Content-Type: application/json',
             "Authorization: Bearer {$apiKey}",
-            "HTTP-Referer: https://www.nexusmods.com/skyrimspecialedition/mods/126330",
-            "X-Title: CHIM"
+            "HTTP-Referer:  https://dwemerdynamics.com/",
+            "X-Title: Dwemer Dynamics"
         ];
 
         // Prepare request data
