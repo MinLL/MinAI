@@ -8,6 +8,7 @@ function getScene($actor, $threadId = null) {
     // Also escape square brackets
     $actor = str_replace('[', '\[', $actor);
     $actor = str_replace(']', '\]', $actor);
+    $c_actor = ', ' . $actor;     
     
     if(isset($threadId)) {
         $scene = $GLOBALS["db"]->fetchAll("SELECT * from minai_threads WHERE thread_id = '$threadId'");
@@ -16,6 +17,10 @@ function getScene($actor, $threadId = null) {
         $scene = $GLOBALS["db"]->fetchAll("SELECT * from minai_threads WHERE 
             male_actors ~* '(,|^)\\s*$actor\\s*(,|$)' OR 
             female_actors ~* '(,|^)\\s*$actor\\s*(,|$)' OR 
+            ( 
+            (length('{$actor}') > 3)  AND
+            ( concat('  ,',fallback) LIKE '%{$c_actor}%')
+            ) OR 
             victim_actors ~* '(,|^)\\s*$actor\\s*(,|$)'");
     }
 
@@ -25,7 +30,43 @@ function getScene($actor, $threadId = null) {
     }
     $scene = $scene[0];
     $sceneDesc = getSceneDesc($scene);
-    
+
+    // check for outlier actor, not detected in papyrus script and not in male/female actors: 
+    if (strlen($actor) > 3) { // doesn't work well for short names
+        $s_actors = ($scene["male_actors"] ?? ' _ ') . " _ " . ($scene["female_actors"] ?? ' _ ');
+        if (stripos($s_actors, $actor) === false) { //actor not found in male/female actors
+            $s_fallback = "__ , " . ($scene['fallback'] ?? ''); 
+            if (strpos($s_fallback , $c_actor) > 0) { //check again in fallback, in list from beginning. sql could give false positive
+                if(isset($threadId)) {
+                    $sql_where = " WHERE thread_id = '$threadId' ";
+                } else {
+                    $sc_id = ($scene['curr_scene_id'] ?? 'zZz');
+                    $sql_where = " WHERE curr_scene_id='{$sc_id}' ";
+                }
+                //$gender = strtolower(GetActorValue($actor, "gender", false, true));
+                //$gender = GetGender($actor);
+                //if ($gender == "female") { // female outlier, add to females list
+                if (IsFemale($actor)) {
+                    if($scene["female_actors"])
+                        $scene["female_actors"] = $scene["female_actors"].",".$actor;
+                    else
+                        $scene["female_actors"] = $actor;
+                    $sql = "UPDATE minai_threads SET female_actors='{$scene["female_actors"]}' ";
+                } else { //male outlier
+                    error_log("getScene male outlier: {$actor} "); //debug
+                    if($scene["male_actors"])
+                        $scene["male_actors"] = $scene["male_actors"].",".$actor;
+                    else
+                        $scene["male_actors"] = $actor;
+                    $sql = "UPDATE minai_threads SET male_actors='{$scene["male_actors"]}' ";
+                } 
+                $GLOBALS["db"]->execQuery($sql . $sql_where);
+                
+                //$s_actors = ($scene["male_actors"] ?? '') . "," . ($scene["female_actors"] ?? ''); //debug
+                //error_log("all actors: $s_actors "); //debug
+            }
+        }
+    }
     // Build list of all actors
     $allActors = [];
     if($scene["female_actors"]) {
@@ -34,7 +75,7 @@ function getScene($actor, $threadId = null) {
     if($scene["male_actors"]) {
         $allActors = array_merge($allActors, array_map('trim', explode(",", $scene["male_actors"])));
     }
-    
+    //error_log("array: " . print_r($allActors,true) );
     // Add assault context if victims are present
     if (!empty($scene["victim_actors"]) && $scene["victim_actors"] !== null) {
         $victims = array_map('trim', explode(",", $scene["victim_actors"]));
@@ -59,7 +100,7 @@ function getScene($actor, $threadId = null) {
             $sceneDesc .= $scene["fallback"];
         }
     }
-
+    
     if($scene["female_actors"] && $scene["male_actors"]) {
         /*
         Scene with mixed gender actors.
@@ -105,30 +146,26 @@ function addXPersonality($jsonXPersonality) {
 - Romantic relationship type: {$relStyle}";
 
     if(IsSexActiveSpeaker()) {
+
+        $sex_howto = "";
         
-        $speak_style = ($jsonXPersonality["speakStyleDuringSex"] ?? "playful banter" );
+        if (isset($jsonXPersonality["speakStyleDuringSex"]) && (strlen($jsonXPersonality["speakStyleDuringSex"]) > 0))
+            $sex_howto .= strip_tags("\n - speaks in this style: " . ($jsonXPersonality["speakStyleDuringSex"] ?? "playful banter" )) . ";";
         
         if (isset($jsonXPersonality["preferredSexPositions"]) && (count($jsonXPersonality["preferredSexPositions"]) > 0))
-            $prefSexPos = implode(", ", $jsonXPersonality["preferredSexPositions"]);
-        else 
-            $prefSexPos = "missionary, cowgirl, reverse cowgirl, doggy style";
+            $sex_howto .= strip_tags("\n - prefers these positions: " . implode(", ", $jsonXPersonality["preferredSexPositions"])) . ";";
         
         if (isset($jsonXPersonality["sexualBehavior"]) && (count($jsonXPersonality["sexualBehavior"]) > 0))
-            $sexBehavior = implode(", ", $jsonXPersonality["sexualBehavior"]);
-        else
-            $sexBehavior = "breast play, facials, cum tasting, deep throat, cock teasing, threesomes, outdoor sex, public sex";
+            $sex_howto .= strip_tags("\n - likes to participate in such sex activities: " . implode(", ", $jsonXPersonality["sexualBehavior"])) . ";";
 
         if (isset($jsonXPersonality["sexFantasies"]) && (count($jsonXPersonality["sexFantasies"]) > 0))
-            $sexFnts = implode(", ", $jsonXPersonality["sexFantasies"]);
-        else
-            $sexFnts = "outdoor sex, passion in a secluded place, romantic tryst";
+            $sex_howto .= strip_tags("\n - has secret sex fantasies: " . implode(", ", $jsonXPersonality["sexFantasies"])) . ";";
+
+        if (isset($jsonXPersonality["sexPersonalityTraits"]) && (count($jsonXPersonality["sexPersonalityTraits"]) > 0))
+            $sex_howto .= strip_tags("\n - act like this: " . implode(", ", $jsonXPersonality["sexPersonalityTraits"])) . ";";
         
-        $GLOBALS["HERIKA_PERS"] .= "\n
-## During sex {$GLOBALS["HERIKA_NAME"]}:
-    - speaks in this style: {$speak_style};
-    - prefers these positions: {$prefSexPos};
-    - likes to participate in such sex activities: {$sexBehavior};
-    - has secret sex fantasies: {$sexFnts} ";
+        if (strlen($sex_howto) > 0)
+            $GLOBALS["HERIKA_PERS"] .= "\n## During sex {$GLOBALS["HERIKA_NAME"]}: {$sex_howto}\n";
     }
 }
 

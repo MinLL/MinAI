@@ -442,7 +442,7 @@ function BuildArousalContext($params) {
     if ($character == "The Narrator") {
         $character = $params['player_name'];
     }
-    $arousal = GetActorValue($character, "arousal");
+    $arousal = intval(GetActorValue($character, "arousal"));
     
     $ret = "";
     if (isset($arousal) && $arousal !== "") {

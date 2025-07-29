@@ -171,7 +171,7 @@ function GetMindInfluenceContext($state) {
     $playerName = $GLOBALS["PLAYER_NAME"] ?? "the player";
     $arousal = 0;
     if (isset($GLOBALS["PLAYER_NAME"])) {
-        $arousal = GetActorValue($GLOBALS["PLAYER_NAME"], "arousal");
+        $arousal = intval(GetActorValue($GLOBALS["PLAYER_NAME"], "arousal"));
     }
     
     // Set state-specific context first (these are the first-person perspectives)

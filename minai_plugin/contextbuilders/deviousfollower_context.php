@@ -1,13 +1,13 @@
 <?php
 
 function IsDeviousFollower($name) {
-    $dfName = GetActorValue($GLOBALS["PLAYER_NAME"], "deviousFollowerName");
+    $dfName = GetActorValue($GLOBALS["PLAYER_NAME"], "deviousFollowerName", true);
     return (strtolower($name) == strtolower($dfName) && IsModEnabled("DeviousFollowers"));
 }
 
 function GetDeviousFollowerContext($name) {
     $playerName = $GLOBALS["PLAYER_NAME"];
-    $dfName = GetActorValue($playerName, "deviousFollowerName");
+    $dfName = GetActorValue($playerName, "deviousFollowerName", true);
     if (strtolower($name) != strtolower($dfName)) {
         return "";
     }
@@ -20,9 +20,9 @@ function GetDeviousFollowerContext($name) {
         return;
     }
     $dfName = $GLOBALS["HERIKA_NAME"]; // This will have the right capitalization / etc
-    $dfDebt = GetActorValue($playerName, "deviousFollowerDebt");
-    $dfEnslaveDebt = GetActorValue($playerName, "deviousFollowerEnslaveDebt");
-    $dfContractRemaining = GetActorValue($playerName, "deviousFollowerContractRemaining");
+    $dfDebt = intval(GetActorValue($playerName, "deviousFollowerDebt"));
+    $dfEnslaveDebt = intval(GetActorValue($playerName, "deviousFollowerEnslaveDebt"));
+    $dfContractRemaining = intval(GetActorValue($playerName, "deviousFollowerContractRemaining"));
     $dfWill =  GetActorValue($playerName, "deviousFollowerWillpower");
     $dfRules = GetActorValue($playerName, "deviousFollowerRules");
     $dfDueForSpanks = GetActorValue($playerName, "deviousTimeForSpanks");

@@ -25,7 +25,7 @@ $GLOBALS['voicetype_fallbacks'] = Array("maleargonian" => "argonianmale", "femal
 $GLOBALS['enforce_short_responses'] = false;
 $GLOBALS['use_llm_fallback'] = false;
 $GLOBALS['enforce_single_json'] = false;
-$GLOBALS['CHIM_NO_EXAMPLES'] = false;
+$GLOBALS['CHIM_NO_EXAMPLES'] = true;
 
 // Context Builder Configuration - controls which sections are included in the system prompt
 $GLOBALS['minai_context'] = array(
@@ -111,18 +111,22 @@ $GLOBALS['action_prompts'] = Array(
 // Roleplay translation settings
 $GLOBALS['roleplay_settings'] = Array(
     "context_messages" => 10,
-    "system_prompt" => "You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking.",
+
+    "system_prompt" => "You are #PLAYER_NAME#. Your task is to translate casual speech into your manner of speaking while preserving the original meaning.",
     "system_prompt_explicit" => "You are #PLAYER_NAME# in an intimate scenario. Your responses should reflect the passionate situation while maintaining your character's personality.",
     "system_prompt_combat" => "You are #PLAYER_NAME# in the midst of combat. Your responses should be appropriately tense and urgent while maintaining your character's personality.",
+    
     "roleplay_system_prompt" => "You are #PLAYER_NAME#. Your responses should reflect your character's personality, background, and current situation.",
     "roleplay_system_prompt_explicit" => "You are #PLAYER_NAME# in an intimate scenario. Your responses should reflect both the passionate situation and your character's personality.",
     "roleplay_system_prompt_combat" => "You are #PLAYER_NAME# in combat. Your responses should reflect both the urgent situation and your character's personality.",
-    "translation_request" => "Translate this casual speech into your character's manner: \"#ORIGINAL_INPUT#\"",
-    "translation_request_explicit" => "Translate this casual speech to reflect the current intimate situation while maintaining your character's manner: \"#ORIGINAL_INPUT#\"",
-    "translation_request_combat" => "Translate this casual speech into an appropriately tense and urgent manner while maintaining your character's style: \"#ORIGINAL_INPUT#\"",
-    "roleplay_request" => "You are roleplaying as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue in response to the ongoing conversation and situation.",
-    "roleplay_request_explicit" => "You are roleplaying as #PLAYER_NAME# in an intimate scenario. Respond naturally to the ongoing conversation and situation as your character would in this situation with a succinct line of dialogue.",
-    "roleplay_request_combat" => "You are roleplaying as #PLAYER_NAME# in combat. Respond naturally to the ongoing conversation and situation as your character would in this situation with a succinct line of dialogue.",
+
+    "translation_request" => "Translate this casual speech into your character's manner while keeping the same meaning: \"#ORIGINAL_INPUT#\"",
+    "translation_request_explicit" => "Translate this casual speech to reflect the current intimate situation while maintaining your character's manner and the original meaning: \"#ORIGINAL_INPUT#\"",
+    "translation_request_combat" => "Translate this casual speech into an appropriately tense and urgent manner while maintaining your character's style and the original meaning: \"#ORIGINAL_INPUT#\"",    
+
+    "roleplay_request" => "Roleplay as #PLAYER_NAME#. Respond naturally as your character would in this situation with a succinct line of dialogue in response to the ongoing conversation and situation.",
+    "roleplay_request_explicit" => "Roleplay as #PLAYER_NAME# in an intimate scenario. Respond naturally to the ongoing conversation as your character would in this intimate context with a succinct line of dialogue.",
+    "roleplay_request_combat" => "Roleplay as #PLAYER_NAME# in combat. Respond naturally to the ongoing conversation as your character would in this combat context with a succinct line of dialogue.",
     "sections" => Array(
         "CHARACTER_BACKGROUND" => Array(
             "enabled" => true,

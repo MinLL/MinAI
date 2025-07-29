@@ -55,6 +55,11 @@ function ValidateEnvironmentParams($params, $required = ['herika_name', 'player_
         }
     }
     
+    if (($params['target'] == strtolower($params['target'])) || 
+        ($params['herika_name'] == strtolower($params['herika_name'])) || 
+        ($params['player_name'] == strtolower($params['player_name'])) ) { // debug   
+        error_log(" WARNING params: " . print_r($params, true) ." validated: " . print_r($validated, true) );    
+    } 
     return $validated;
 }
 
@@ -502,6 +507,7 @@ function BuildFrostfallContext($params) {
     return $context;
 }
 
+
 /**
  * Build the nearby characters context
  * 
@@ -527,8 +533,9 @@ function BuildNearbyCharactersContext($params) {
     $characters = array_filter(array_map('trim', $characters), function($item) {
         return !empty($item);
     });
+
     // Ensure herika_name, player_name and target are included without duplicates
-    $characters = array_unique(array_merge($characters, array_filter([$herika_name, $player_name, $target])));
+    $characters = array_unique_caseinsensitive(array_merge($characters, array_filter([$herika_name, $player_name, $target])));
     // Remove parentheses from character names
     $characters = array_map(function($name) {
         return trim(trim($name, '()'));
@@ -537,8 +544,8 @@ function BuildNearbyCharactersContext($params) {
     // If we have characters after cleaning, create the formatted list
     if (count($characters) > 0) {
         // Define attributes to fetch in batch - use lowercase for array keys
-        $attributes = ['race', 'gender', 'faction', 'sitstate', 'sleepstate', 'dirtandblood'];
-        $flags = ['issneaking', 'isswimming', 'isonmount', 'isincombat', 'isencumbered', 'hostiletoplayer'];
+        $attributes = ['race', 'gender', 'faction', 'sitstate', 'sleepstate', 'dirtandblood', 'Scene'];
+        $flags = ['IsSneaking', 'IsSwimming', 'IsOnMount', 'inCombat', 'isEncumbered', 'hostiletoplayer','isNaked', 'IsBleedingOut'];
         
         // Correctly call the batch functions from global scope
         $actorValues = \BatchGetActorValues($characters, $attributes);
@@ -552,31 +559,21 @@ function BuildNearbyCharactersContext($params) {
             
             // Get race if available
             if (isset($actorValues[$charKey]['race']) && !empty($actorValues[$charKey]['race'])) {
-                $line .= " (" . $actorValues[$charKey]['race'];
-                
-                // Get gender if available
-                if (isset($actorValues[$charKey]['gender']) && !empty($actorValues[$charKey]['gender'])) {
-                    $line .= " " . $actorValues[$charKey]['gender'];
-                }
-                
-                $line .= ")";
+                $s_race = $actorValues[$charKey]['race'];
+                $gender = GetGender($character);
+                $line .= " ({$s_race} {$gender})";
             }
             
             // Add faction info if available
             if (isset($actorValues[$charKey]['faction']) && !empty($actorValues[$charKey]['faction'])) {
                 $line .= " - " . $actorValues[$charKey]['faction'];
             }
-            
-            // Add character state
-            if (isset($actorValues[$charKey]['sitstate']) && !empty($actorValues[$charKey]['sitstate']) && intval($actorValues[$charKey]['sitstate']) == 3) {
-                $line .= " - sitting";
+
+            // Add hostility flag
+            if (isset($actorFlags[$charKey]['hostiletoplayer']) && $actorFlags[$charKey]['hostiletoplayer']) {
+                $line .= " - hostile to outsiders";
             }
-            
-            // Check if character is sleeping
-            if (isset($actorValues[$charKey]['sleepstate']) && !empty($actorValues[$charKey]['sleepstate']) && $actorValues[$charKey]['sleepstate'] != "awake") {
-                $line .= " - " . $actorValues[$charKey]['sleepstate'];
-            }
-            
+
             // Movement and combat states
             if (isset($actorFlags[$charKey]['issneaking']) && $actorFlags[$charKey]['issneaking']) {
                 $line .= " - sneaking";
@@ -597,12 +594,11 @@ function BuildNearbyCharactersContext($params) {
             if (isset($actorFlags[$charKey]['isencumbered']) && $actorFlags[$charKey]['isencumbered']) {
                 $line .= " - encumbered";
             }
-            
-            // Add hostility flag
-            if (isset($actorFlags[$charKey]['hostiletoplayer']) && $actorFlags[$charKey]['hostiletoplayer']) {
-                $line .= " - hostile to outsiders";
+
+            if (isset($actorFlags[$charKey]['isbleedingout']) && $actorFlags[$charKey]['isbleedingout']) {
+                $line .= " - bleeding";
             }
-            
+
             // Add hygiene information
             if (isset($actorValues[$charKey]['dirtandblood']) && !empty($actorValues[$charKey]['dirtandblood'])) {
                 $hygiene = $actorValues[$charKey]['dirtandblood'];
@@ -642,6 +638,27 @@ function BuildNearbyCharactersContext($params) {
                     $line .= " - jazbay scented";
                 } elseif (stripos($hygiene, "Superior") !== false) {
                     $line .= " - luxuriously scented";
+                }
+            }
+
+            if (isset($actorFlags[$charKey]['isnaked']) && $actorFlags[$charKey]['isnaked']) {
+                $line .= " - naked";
+            }
+
+            // ---------------------- 
+
+            if (IsInScene($character)) { //IsInScene($character) 
+                //error_log(" in scene: $character - dbg ");
+                $line .= " - involved in intimate activities"; 
+            } else {
+                // Add character state
+                if (isset($actorValues[$charKey]['sitstate']) && !empty($actorValues[$charKey]['sitstate']) && intval($actorValues[$charKey]['sitstate']) == 3) {
+                    $line .= " - sitting";
+                }
+                
+                // Check if character is sleeping
+                if (isset($actorValues[$charKey]['sleepstate']) && !empty($actorValues[$charKey]['sleepstate']) && $actorValues[$charKey]['sleepstate'] != "awake") {
+                    $line .= " - " . $actorValues[$charKey]['sleepstate'];
                 }
             }
             

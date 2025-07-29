@@ -246,9 +246,11 @@ function BuildInteractionContext($params) {
     }
     else {
         $ret .= "{$herika_name} currently interacting with {$target}."; // could be 2 NPCs interacting
-        $s_last_talk = DataRetrieveLastTimeTalk($herika_name, $target);
-        if ($s_last_talk > "")
-            $ret .= "\n{$s_last_talk}";
+        if (function_exists('DataRetrieveLastTimeTalk')) {
+            $s_last_talk = DataRetrieveLastTimeTalk($herika_name, $target);
+            if ($s_last_talk > "")
+                $ret .= "\n{$s_last_talk}";
+        }
     }
 
     return $ret;

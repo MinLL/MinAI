@@ -20,13 +20,31 @@ $GLOBALS["HERIKA_NAME"] = "The Narrator";
 SetNarratorProfile();
 try {
     // Get player name from query param or use default
-    $playerName = $_GET['player'] ?? $GLOBALS["PLAYER_NAME"] ?? "Player";
+    $playerName = $_GET['player'] ?? ($GLOBALS["PLAYER_NAME"] ?? "Player");
     
     // Get actor name from query param or use default
-    $actorName = $_GET['actor'] ?? "Brynjolf";
-
+    $actorName = $_GET['actor'] ?? "";
+    if (!strlen(trim($actorName)) > 0)
+        $actorName = GetOnePartyMember(0, "Herika");
+    else {
+        $profilePath = GetActorConfigPath($actorName);
+        if (!file_exists($profilePath)) {
+            $actorName = GetOnePartyMember(0, "Herika");
+        }
+    }
+    
     // Get second NPC name for NPC-to-NPC interaction
-    $secondNpcName = $_GET['secondnpc'] ?? "Brand-Shei";
+    $secondNpcName = $_GET['secondnpc'] ?? "";
+    if (!strlen(trim($secondNpcName)) > 0) 
+        $secondNpcName = GetOnePartyMember(1, "Inigo");
+    else {
+        $profilePath2 = GetActorConfigPath($secondNpcName);
+        if (!file_exists($profilePath2)) {
+            $secondNpcName = GetOnePartyMember(1, "Inigo");
+        }
+    }
+
+    //error_log("preview: $actorName $secondNpcName");
 
     // Get player pronouns
     $playerPronouns = GetActorPronouns($playerName);

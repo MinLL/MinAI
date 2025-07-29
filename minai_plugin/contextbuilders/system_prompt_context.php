@@ -626,15 +626,15 @@ function BuildSystemPrompt() {
            
             $system_prompt .= "- Your response should reflect your personality\n";
             $system_prompt .= "- Prioritize responding to the most recent dialogue and events\n";
-            $system_prompt .= "- Include variety in your responses, and avoid repeating yourself\n";
+            $system_prompt .= "- Include variety in your responses and avoid repeating yourself\n";
         }
     }
     if (!isset($GLOBALS['minai_context']['action_enforcement'])) {
         $GLOBALS['minai_context']['action_enforcement'] = true;
     }
     if ($GLOBALS['minai_context']['action_enforcement']) {
-        $GLOBALS["COMMAND_PROMPT"] = ""; # Kill don't narrate
-        $GLOBALS["COMMAND_PROMPT_FUNCTIONS"]=""; # Handled by the system prompt
+        $GLOBALS["COMMAND_PROMPT"] = ""; // Kill don't narrate
+        $GLOBALS["COMMAND_PROMPT_FUNCTIONS"]=""; // Handled by the system prompt
         if (isset($GLOBALS["FUNCTIONS_ARE_ENABLED"]) && $GLOBALS["FUNCTIONS_ARE_ENABLED"]) {
             $system_prompt .= "\n# AVAILABLE ACTIONS\n";
             $system_prompt .= " - This section defines actions that {$display_name} can perform to interact with the world.\n";
