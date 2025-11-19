@@ -6,8 +6,7 @@ if ($GLOBALS["gameRequest"][0] == "chatnf_minai_narrate") {
     SetNarratorProfile();
     $narratePrompt = "The Narrator: {$cleanedMessage}";
     $GLOBALS["PROMPTS"]["chatnf_minai_narrate"] = [
-        "cue"=>[
-        ],
+        "cue"=>[],
         "player_request"=>[$narratePrompt]
     ];
     OverrideGameRequestPrompt($narratePrompt);

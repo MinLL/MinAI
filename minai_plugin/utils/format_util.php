@@ -100,7 +100,6 @@ class FormatUtil {
         
         // Add debug logging for the result
         // minai_log("debug", "Formatted context: " . str_replace("\n", "\\n", $formatted));
-        
         return $formatted;
     }
 } 

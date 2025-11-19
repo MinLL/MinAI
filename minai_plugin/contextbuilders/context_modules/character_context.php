@@ -56,16 +56,6 @@ function ValidateContextParams($params, $required = ['herika_name']) {
 function InitializeCharacterContextBuilders() {
     $registry = ContextBuilderRegistry::getInstance();
     
-    // Register physical description context builder
-    $registry->register('physical_description', [
-        'section' => 'status',
-        'header' => 'Physical Appearance',
-        'description' => 'Physical description of the character',
-        'priority' => 10,
-        'enabled' => isset($GLOBALS['minai_context']['physical_description']) ? (bool)$GLOBALS['minai_context']['physical_description'] : true,
-        'builder_callback' => 'BuildPhysicalDescriptionContext'
-    ]);
-    
     // Register career context builder
     $registry->register('career', [
         'section' => 'status',
@@ -76,6 +66,46 @@ function InitializeCharacterContextBuilders() {
         'builder_callback' => 'BuildCareerContext'
     ]);
     
+    // Register level context builder
+    $registry->register('level', [
+        'section' => 'status',
+        'header' => 'Power Level',
+        'description' => 'Character level and power description',
+        'priority' => 4,
+        'enabled' => isset($GLOBALS['minai_context']['level']) ? (bool)$GLOBALS['minai_context']['level'] : true,
+        'builder_callback' => 'BuildLevelContext'
+    ]);
+    
+    // Register family status context builder
+    $registry->register('family_status', [
+        'section' => 'status',
+        'header' => 'Family Status',
+        'description' => 'Character family information',
+        'priority' => 6,
+        'enabled' => isset($GLOBALS['minai_context']['family_status']) ? (bool)$GLOBALS['minai_context']['family_status'] : true,
+        'builder_callback' => 'BuildFamilyStatusContext'
+    ]);
+    
+    // Register physical description context builder
+    $registry->register('physical_description', [
+        'section' => 'status',
+        'header' => 'Physical Appearance',
+        'description' => 'Physical description of the character',
+        'priority' => 10,
+        'enabled' => isset($GLOBALS['minai_context']['physical_description']) ? (bool)$GLOBALS['minai_context']['physical_description'] : true,
+        'builder_callback' => 'BuildPhysicalDescriptionContext'
+    ]);
+    
+    // Register third party context builder for everyone info
+    $registry->register('third_party_global_info', [
+        'section' => 'misc',
+        'header' => 'General Information',
+        'description' => 'General information from third parties not tied to a specific character',
+        'priority' => 11,
+        'enabled' => isset($GLOBALS['minai_context']['third_party']) ? (bool)$GLOBALS['minai_context']['third_party'] : true,
+        'builder_callback' => 'BuildThirdPartyGlobalContext'
+    ]);
+
     // Register character state context builder
     $registry->register('character_state', [
         'section' => 'status',
@@ -86,6 +116,16 @@ function InitializeCharacterContextBuilders() {
         'builder_callback' => 'BuildCharacterStateContext'
     ]);
     
+    // Register vitals context builder
+    $registry->register('vitals', [
+        'section' => 'status',
+        'header' => 'Combat Vitals',
+        'description' => 'Character health, magicka, stamina and combat status',
+        'priority' => 17,
+        'enabled' => isset($GLOBALS['minai_context']['vitals']) ? (bool)$GLOBALS['minai_context']['vitals'] : true,
+        'builder_callback' => 'BuildVitalsContext'
+    ]);
+
     // Register equipment context builder
     $registry->register('equipment', [
         'section' => 'status',
@@ -94,6 +134,16 @@ function InitializeCharacterContextBuilders() {
         'priority' => 20,
         'enabled' => isset($GLOBALS['minai_context']['equipment']) ? (bool)$GLOBALS['minai_context']['equipment'] : true,
         'builder_callback' => 'BuildEquipmentContext'
+    ]);
+    
+    // Register bounty context builder
+    $registry->register('bounty', [
+        'section' => 'interaction',
+        'header' => 'Bounty Status',
+        'description' => 'Player bounty status',
+        'priority' => 25,
+        'enabled' => isset($GLOBALS['minai_context']['bounty']) ? (bool)$GLOBALS['minai_context']['bounty'] : true,
+        'builder_callback' => 'BuildBountyContext'
     ]);
     
     // Register tattoos context builder
@@ -158,17 +208,6 @@ function InitializeCharacterContextBuilders() {
         'builder_callback' => 'BuildSurvivalContext'
     ]);
     
-    
-    // Register bounty context builder
-    $registry->register('bounty', [
-        'section' => 'interaction',
-        'header' => 'Bounty Status',
-        'description' => 'Player bounty status',
-        'priority' => 40,
-        'enabled' => isset($GLOBALS['minai_context']['bounty']) ? (bool)$GLOBALS['minai_context']['bounty'] : true,
-        'builder_callback' => 'BuildBountyContext'
-    ]);
-    
     // Register mind influence context builder
     $registry->register('mind_influence', [
         'section' => 'status',
@@ -177,26 +216,6 @@ function InitializeCharacterContextBuilders() {
         'priority' => 80,
         'enabled' => isset($GLOBALS['minai_context']['mind_influence']) ? (bool)$GLOBALS['minai_context']['mind_influence'] : true,
         'builder_callback' => 'BuildMindInfluenceContext'
-    ]);
-    
-    // Register level context builder
-    $registry->register('level', [
-        'section' => 'status',
-        'header' => 'Power Level',
-        'description' => 'Character level and power description',
-        'priority' => 4,
-        'enabled' => isset($GLOBALS['minai_context']['level']) ? (bool)$GLOBALS['minai_context']['level'] : true,
-        'builder_callback' => 'BuildLevelContext'
-    ]);
-    
-    // Register family status context builder
-    $registry->register('family_status', [
-        'section' => 'status',
-        'header' => 'Family Status',
-        'description' => 'Character family information',
-        'priority' => 6,
-        'enabled' => isset($GLOBALS['minai_context']['family_status']) ? (bool)$GLOBALS['minai_context']['family_status'] : true,
-        'builder_callback' => 'BuildFamilyStatusContext'
     ]);
     
     // Register third party context builder for character-specific info
@@ -209,25 +228,6 @@ function InitializeCharacterContextBuilders() {
         'builder_callback' => 'BuildThirdPartyContext'
     ]);
     
-    // Register third party context builder for everyone info
-    $registry->register('third_party_global_info', [
-        'section' => 'misc',
-        'header' => 'General Information',
-        'description' => 'General information from third parties not tied to a specific character',
-        'priority' => 10,
-        'enabled' => isset($GLOBALS['minai_context']['third_party']) ? (bool)$GLOBALS['minai_context']['third_party'] : true,
-        'builder_callback' => 'BuildThirdPartyGlobalContext'
-    ]);
-
-    // Register vitals context builder
-    $registry->register('vitals', [
-        'section' => 'status',
-        'header' => 'Combat Vitals',
-        'description' => 'Character health, magicka, stamina and combat status',
-        'priority' => 25,
-        'enabled' => isset($GLOBALS['minai_context']['vitals']) ? (bool)$GLOBALS['minai_context']['vitals'] : true,
-        'builder_callback' => 'BuildVitalsContext'
-    ]);
 }
 
 /**
@@ -246,7 +246,8 @@ function BuildPhysicalDescriptionContext($params) {
     $breastsScore = GetActorValue($character, "breastsScore");
     $buttScore = GetActorValue($character, "buttScore");
     $isexposed = GetActorValue($character, "isexposed");
-    
+    $isnaked = IsEnabled($character, "IsNaked");
+    $is_nsfw = !($GLOBALS['disable_nsfw'] ?? true);
     // Get proper pronouns for the character
     $pronouns = GetActorPronouns($character);
     
@@ -261,14 +262,15 @@ function BuildPhysicalDescriptionContext($params) {
         }
     }
     
-    // Don't add beauty/physical attributes for NPCs unless specified
+    // Don't add beauty/physical attributes for NPCs unless specified - add_npc_physical_details not implemented yet
+    /*
     $isPlayer = IsPlayer($character);
     $addPhysicalDetails = $isPlayer || isset($params['add_npc_physical_details']);
     
     if (!$addPhysicalDetails) {
         return $ret;
     }
-    
+    */
     // Beauty description using 0-10 scale
     if (isset($beautyScore) && $beautyScore !== "" && !$isWerewolf) {
         // Convert to 0-10 scale if needed
@@ -344,11 +346,17 @@ function BuildPhysicalDescriptionContext($params) {
         
         $ret .= ucfirst($pronouns['subject']) . " has {$breastsDesc} (chest) and {$buttDesc} (posterior). ";
     }
-    
-    if (IsEnabled($character, "isexposed")) {
-        $ret .= GetPenisSize($character);
+    if ($is_nsfw) {
+        if ($isnaked || $isexposed) {
+            $ret .= GetPenisSize($character);
+        } elseif ($gender == 'male') {
+            $arousalThreshold = intval(GetActorValue($GLOBALS['PLAYER_NAME'], "arousalForHarass"));
+            $arousal = intval(GetActorValue($character, "arousal"));
+            if (($arousal > 80) && ($arousal >= $arousalThreshold)) {
+                $ret.= "<penis_erection_status>{$character} has a visible erection.</penis_erection_status> ";
+            }
+        } 
     }
-    
     return $ret;
 }
 
@@ -361,6 +369,7 @@ function BuildPhysicalDescriptionContext($params) {
 function GetPenisSize($name) {
     $tngsize = GetActorValue($name, "tngsize");
     $gender = strtolower(GetActorValue($name, "gender"));
+    $isPlayer = IsPlayer($name);
     // Get the size stage (0-4 scale)
     $sizeStage = 2; // Default to average
     if (!HasKeyword($name, "TNG_Gentlewoman") && $gender == "female") {
@@ -384,18 +393,28 @@ function GetPenisSize($name) {
     
     // Map stage to description
     $sizeDescription = "";
-    switch ($sizeStage) {
-        case 0: $sizeDescription = "Embarrassingly Tiny Prick"; break;
-        case 1: $sizeDescription = "Small Cock"; break;
-        case 2: $sizeDescription = "Average Sized Cock"; break;
-        case 3: $sizeDescription = "Large Cock"; break;
-        case 4: $sizeDescription = "Impressively Huge Cock, one of the biggest you've ever seen"; break;
-        default: $sizeDescription = "";
+    if ($isPlayer) {
+        switch ($sizeStage) {
+            case 0: $sizeDescription = "an embarrassingly tiny prick, tells himself size doesn't matter"; break;
+            case 1: $sizeDescription = "a small cock, he has illusions that skill compensates"; break;
+            case 2: $sizeDescription = "an average sized cock, or at least he thinks so"; break;
+            case 3: $sizeDescription = "a large cock, not many complaints"; break;
+            case 4: $sizeDescription = "a huge cock, the biggest cock ever seen"; break;
+            default: $sizeDescription = "";
+        }
+    } else {
+        switch ($sizeStage) {
+            case 0: $sizeDescription = "an Embarrassingly Tiny Prick"; break;
+            case 1: $sizeDescription = "a Small Cock"; break;
+            case 2: $sizeDescription = "an Average Sized Cock, or at least he thinks so"; break;
+            case 3: $sizeDescription = "a Large Cock"; break;
+            case 4: $sizeDescription = "an Impressively Huge Cock, one of the biggest ever seen"; break;
+            default: $sizeDescription = "";
+        }
     }
     
-    
     if ($sizeDescription != "") {
-        return "{$name} has an {$sizeDescription}. ";
+        return "<penis_size>{$name} has {$sizeDescription}.</penis_size> ";
     }
     
     return "";
@@ -438,37 +457,57 @@ function BuildTattooContext($params) {
  */
 function BuildArousalContext($params) {
     // Determine which character we're building context for
+    $ret = "";
+
     $character = $params['herika_name'];
     if ($character == "The Narrator") {
         $character = $params['player_name'];
     }
+
     $arousal = intval(GetActorValue($character, "arousal"));
-    
-    $ret = "";
-    if (isset($arousal) && $arousal !== "") {
+   
+    if (isset($arousal) && ($arousal >= 0)) {
         // Convert percentage (0-99) to stage (0-10)
-        $stage = min(10, floor(floatval($arousal) / 10));
-        
-        $arousalDesc = "";
-        switch ($stage) {
-            case 0: $arousalDesc = "Completely Satisfied and Content"; break;
-            case 1: $arousalDesc = "Fulfilled with No Desire"; break;
-            case 2: $arousalDesc = "Not Aroused"; break;
-            case 3: $arousalDesc = "Slightly Aroused and Curious"; break;
-            case 4: $arousalDesc = "Moderately Aroused and Interested"; break;
-            case 5: $arousalDesc = "Noticeably Aroused and Eager"; break;
-            case 6: $arousalDesc = "Quite Aroused and Desiring"; break;
-            case 7: $arousalDesc = "Very Horny and Wanting"; break;
-            case 8: $arousalDesc = "Intensely Horny and Needing"; break;
-            case 9: $arousalDesc = "Burning with Passionate Desire"; break;
-            case 10: $arousalDesc = "Overwhelmingly Horny and Desperate"; break;
-            default: $arousalDesc = "Unknown";
+        $stage = intval(min(10, floor(floatval($arousal) / 10)));
+        $arousalDesc = ""; 
+        $s_gender = GetGender($character);
+
+        if ($s_gender == 'male') {
+            switch ($stage) {
+                case 0: $arousalDesc = "completely satisfied and content, with a clear and focused mind"; break;
+                case 1: $arousalDesc = "fulfilled without any sexual desire disturbing the chain of thought"; break;
+                case 2: $arousalDesc = "not aroused, detached from any sexual interest in the people present"; break;
+                case 3: $arousalDesc = "slightly excited and with part of the mind attentive to the physical attributes of the people present"; break;
+                case 4: $arousalDesc = "moderately aroused and interested, first signs of erection"; break;
+                case 5: $arousalDesc = "noticeably aroused, thoughts focusing on the physical attributes of people around him"; break;
+                case 6: $arousalDesc = "quite aroused, thoughts focused on finding sex partners"; break;
+                case 7: $arousalDesc = "very horny, visible hard-on"; break;
+                case 8: $arousalDesc = "intensely aroused with a prominent erection"; break;
+                case 9: $arousalDesc = "super-excited, full of desire, with an erection that's hard to keep under control"; break;
+                case 10: $arousalDesc = "extremely aroused with a long-lasting erection and painful pulsing tension in the testicles, entirely focused on satisfying his desires"; break;
+                default: $arousalDesc = "unknown";
+            }
+        } else {
+            switch ($stage) {
+                case 0: $arousalDesc = "completely satisfied and content, not interested"; break;
+                case 1: $arousalDesc = "fulfilled with no desire"; break;
+                case 2: $arousalDesc = "not aroused"; break;
+                case 3: $arousalDesc = "slightly aroused and curious"; break;
+                case 4: $arousalDesc = "moderately aroused and interested, prone to flirting"; break;
+                case 5: $arousalDesc = "noticeably aroused and eager, flirting"; break;
+                case 6: $arousalDesc = "quite aroused and desiring, prone to direct proposals"; break;
+                case 7: $arousalDesc = "very horny and wanting, looking for potential partners"; break;
+                case 8: $arousalDesc = "intensely horny and needing, actively looking for potential partners"; break;
+                case 9: $arousalDesc = "burning with passionate desire, ready to unwind"; break;
+                case 10: $arousalDesc = "overwhelmingly horny and desperate, sensation of intense heat radiating from within and her mind full of sexual fantasies"; break;
+                default: $arousalDesc = "unknown";
+            }
         }
         
         // Add the numerical rating
-        $arousalDesc .= " ({$stage}/10)";
+        //$arousalDesc .= " ({$stage}/10)";
         
-        $ret .= "{$character} is {$arousalDesc} (arousal).\n";
+        $ret .= "<arousal_status>{$character} is {$arousalDesc} (arousal level {$stage}/10).</arousal_status>\n";
     }
     
     return $ret;
@@ -909,56 +948,54 @@ function BuildCharacterStateContext($params) {
     $utilities = new Utilities();
     
     $context = "";
-    
-    // Sitting state - interpret the raw sit state value
-    $sitStateValue = $utilities->GetActorValue($character, "sitState");
-    if (!empty($sitStateValue)) {
-        $sitStateDesc = "";
-        switch (intval($sitStateValue)) {
-            case 4: 
-                $sitStateDesc = "sitting but wants to stand";
-                break;
-            case 3: 
-                $sitStateDesc = "sitting";
-                break;
-            case 2: 
-                $sitStateDesc = "wants to sit";
-                break;
-            case 0: 
-            default:
-                $sitStateDesc = "";
-                break;
+
+    if (IsInScene($character)) { //IsInScene($character) 
+        $context .= $character . " having sex now. ";
+    } else {
+        // Sitting state - interpret the raw sit state value
+        $sitStateValue = $utilities->GetActorValue($character, "sitState");
+        if (!empty($sitStateValue)) {
+            $sitStateDesc = "";
+            switch (intval($sitStateValue)) {
+                case 4: 
+                    $sitStateDesc = "sitting but wants to stand";
+                    break;
+                case 3: 
+                    $sitStateDesc = "sitting";
+                    break;
+                case 2: 
+                    $sitStateDesc = "wants to sit";
+                    break;
+                case 0: 
+                default:
+                    $sitStateDesc = "";
+                    break;
+            }
+            if (strlen($sitStateDesc) > 0) {
+                $context .= $character . " is " . $sitStateDesc . ". ";
+            }
         }
-        
-        if (!empty($sitStateDesc)) {
-            $context .= $character . " is " . $sitStateDesc . ". ";
+        // Sleep state
+        $sleepState = $utilities->GetActorValue($character, "sleepState");
+        if (!empty($sleepState)) {
+            $context .= $character . " is " . $sleepState . ". ";
         }
-    }
-    
-    // Sleep state
-    $sleepState = $utilities->GetActorValue($character, "sleepState");
-    if (!empty($sleepState)) {
-        $context .= $character . " is " . $sleepState . ". ";
-    }
-    
-    // Encumbrance
-    if (IsEnabled($character, "isEncumbered")) {
-        $context .= $character . " is overly encumbered and slow to move, carrying exhausting weight. ";
-    }
-    
-    // Mount status
-    if (IsEnabled($character, "isOnMount")) {
-        $context .= $character . " is riding a horse. ";
-    }
-    
-    // Swimming status
-    if (IsEnabled($character, "isSwimming")) {
-        $context .= $character . " is swimming. ";
-    }
-    
-    // Sneaking status
-    if (IsEnabled($character, "isSneaking")) {
-        $context .= $character . " is sneaking. ";
+        // Encumbrance
+        if (IsEnabled($character, "isEncumbered")) {
+            $context .= $character . " is overly encumbered and slow to move, carrying exhausting weight. ";
+        }
+        // Mount status
+        if (IsEnabled($character, "isOnMount")) {
+            $context .= $character . " is riding a horse. ";
+        }
+        // Swimming status
+        if (IsEnabled($character, "isSwimming")) {
+            $context .= $character . " is swimming. ";
+        }
+        // Sneaking status
+        if (IsEnabled($character, "isSneaking")) {
+            $context .= $character . " is sneaking. ";
+        }
     }
     
     return $context;

@@ -1,15 +1,77 @@
 <?php
+
+//----------------------------------------------------------------
+// functions rework
+//----------------------------------------------------------------
+
+$s_lang =strtolower($GLOBALS["CORE_LANG"] ?? 'en');
+
+if ($s_lang == 'en') {
+
+    foreach ($GLOBALS["FUNCTIONS"] as $n => $func) {
+
+        $func_name = ($GLOBALS["FUNCTIONS"][$n]["name"] ?? "___");
+        //$func_desc = ($GLOBALS["FUNCTIONS"][$n]["description"] ?? "-_-");
+        
+        if ($func_name == 'GiveItemTo') { //{$GLOBALS["HERIKA_NAME"]} gives item to a single actor (target property is the actor). Amount and item will be inferred from dialogue, so no need to specify.
+            $GLOBALS["FUNCTIONS"][$n]["description"] = "{$GLOBALS["HERIKA_NAME"]} gives item to a single actor (target property is the actor). Target actor must be selected from <nearby_characters> list. Amount and item will be inferred from dialogue, so no need to specify.";
+        } elseif ($func_name == 'GiveGoldTo') { //{$GLOBALS["HERIKA_NAME"]} takes amount (property target) of septims/coins/gold from {$GLOBALS["PLAYER_NAME"]} (property listener) once {$GLOBALS["PLAYER_NAME"]} agree.
+            $GLOBALS["FUNCTIONS"][$n]["description"] = "{$GLOBALS["HERIKA_NAME"]} gives some coins/gold/septims to a single actor (target property is the actor). Target actor must be selected from <nearby_characters> list. Amount will be inferred from dialogue, so no need to specify.";
+        } elseif ($func_name == 'Relax') { // Stop whatever you are doing and relax at the current location. Used to Rest, Enjoy Moment, Chill, Eat, Drink, Loosen Up.
+            $GLOBALS["FUNCTIONS"][$n]["description"] = "{$GLOBALS["HERIKA_NAME"]} stops whatever is doing and relax or rest at the current location. Used to Rest, Enjoy Moment, Chill, Feast, Loosen Up.";
+        }
+    }
+}
+
+/*
+$GLOBALS["FUNCTIONS"] = [
+    [
+        "name" => $F_NAMES_LOCAL["Inspect"],
+        "description" => $F_TRANSLATIONS_LOCAL["Inspect"],
+        "parameters" => [
+            "type" => "object",
+            "properties" => [
+                "target" => [
+                    "type" => "string",
+                    "description" => "Target NPC, Actor, or being",
+                    "enum" => $GLOBALS['FUNCTION_PARM_INSPECT']
+
+                ]
+            ],
+            "required" => ["target"],
+        ],
+    ],
+
+foreach ($GLOBALS["FUNCTIONS"] as $n=>$f) {
+    $internalCode=getFunctionByTrlName($f["name"]);
+    if (isset($GLOBALS["F_TRANSLATIONS_NEW"][$internalCode]))
+        $GLOBALS["FUNCTIONS"][$n]["description"]=$GLOBALS["F_TRANSLATIONS_NEW"][$internalCode];
+
+    if (isset($GLOBALS["F_NAMES_NEW"][$internalCode]))
+        $GLOBALS["FUNCTIONS"][$n]["name"]=$GLOBALS["F_NAMES_NEW"][$internalCode];
+}
+
+*/
+
+//----------------------------------------------------------------
+
+
 // Start metrics for this entry point
 require_once("utils/metrics_util.php");
 // Avoid processing for fast / storage events
-if (isset($GLOBALS["minai_skip_processing"]) && $GLOBALS["minai_skip_processing"]) {
-    return;
-}
+//if (isset($GLOBALS["minai_skip_processing"]) && $GLOBALS["minai_skip_processing"]) {
+//    return;
+//}
+
+//error_log("->functions MINAI: " . implode(' . ', $GLOBALS["ENABLED_FUNCTIONS"]));
 
 // Use function module caching to avoid repeated inclusion checks
 if (!isset($GLOBALS["loaded_function_modules"])) {
     $GLOBALS["loaded_function_modules"] = [];
 }
+
+if (!isset($GLOBALS["db"]))
+    $GLOBALS["db"] = new sql();
 
 // Helper function for lazy-loading function modules
 function load_function_module($module_path) {
@@ -144,6 +206,10 @@ if (!$GLOBALS["function_eligibility_cache"]["in_no_actions_faction"]) {
                 load_function_module("functions/slapp.php");
             }
         }
+        
+//error_log("-> sex functions: " . implode(' . ', $GLOBALS["ENABLED_FUNCTIONS"]));
+        
+        
         if ($GLOBALS["function_eligibility_cache"]["use_devious_narrator"]) {
             // Anything loaded after this will have functions enabled for the narrator
             EnableDeviousNarratorActions();
@@ -214,5 +280,5 @@ if (!empty($commandsToPurge)) {
 
 minai_stop_timer('functions_php');
 
-
+//error_log("->functions end: " . implode(' . ', $GLOBALS["ENABLED_FUNCTIONS"]));
 

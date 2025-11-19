@@ -2,5 +2,6 @@
 {
     "name":"minai",
     "description":"Extension for CHIM that expands its capabilities and optionally adds NSFW integrations.",
-    "config_url":"/HerikaServer/ext/minai_plugin/index.html"
+    "config_url":"/HerikaServer/ext/minai_plugin/index.html",
+    "version":"2.1.3-dev7 for CHIM 1.3.5.x"
  }

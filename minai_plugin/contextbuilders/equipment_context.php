@@ -13,7 +13,7 @@ require_once("wornequipment_context.php");
 Function GetUnifiedEquipmentContext($name, $forceNarrator = false, $debug = false) {
     $ret = "";
     $isNarrator = $forceNarrator || ($GLOBALS["HERIKA_NAME"] == "The Narrator");
-    
+    $isPlayer = IsPlayer($name) && (!$isNarrator); //$GLOBALS["PLAYER_NAME"]
     // Get equipment data
     $equipment = ProcessEquipment($name);
     if (isset($equipment["revealedStatus"])) 
@@ -56,7 +56,10 @@ Function GetUnifiedEquipmentContext($name, $forceNarrator = false, $debug = fals
             empty($categories["armor"]["arms"]) && 
             empty($categories["armor"]["legs"])) {
             // Truly naked
-            $ret .= "- {$name} is completely naked and exposed";
+            if ($isPlayer)
+                $ret .= "- {$name} is completely naked, confident, ready for anything and anyone"; 
+            else 
+                $ret .= "- {$name} is completely naked and exposed";
             
             // Add restraint status to nakedness if applicable
             if (!empty($restraintDesc)) {

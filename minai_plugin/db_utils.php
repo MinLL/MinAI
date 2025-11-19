@@ -123,6 +123,22 @@ function CreateItemsTableIfNotExists() {
     }
 }
 
+function UpdateSpeechTableIfNotHaveEmotionFields() {
+    $db = $GLOBALS['db'];
+    try {
+        $query = "
+        ALTER TABLE speech ADD COLUMN IF NOT EXISTS mood TEXT; 
+        ALTER TABLE speech ADD COLUMN IF NOT EXISTS emotion TEXT; 
+        ALTER TABLE speech ADD COLUMN IF NOT EXISTS emotion_intensity TEXT; 
+        ";
+        $db->execQuery($query);        
+        //error_log("MinAI alter table 'speech' - exec trace"); //debug
+    } catch (Exception $e) {
+        // Log error but don't fail
+        error_log("Error altering 'speech' table: " . $e->getMessage());
+    }
+}
+
 function InitiateDBTables() {
     CreateThreadsTableIfNotExists();
     CreateActionsTableIfNotExists();
@@ -130,7 +146,7 @@ function InitiateDBTables() {
     CreateEquipmentDescriptionTableIfNotExist();
     CreateTattooDescriptionTableIfNotExists();
     CreateItemsTableIfNotExists();
-    
+    UpdateSpeechTableIfNotHaveEmotionFields();
     // Seed default items
     SeedDefaultItems();
     error_log("MinAI InitiateDBTables - exec trace"); //debug

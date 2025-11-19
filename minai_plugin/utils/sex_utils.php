@@ -11,10 +11,10 @@ function getScene($actor, $threadId = null) {
     $c_actor = ', ' . $actor;     
     
     if(isset($threadId)) {
-        $scene = $GLOBALS["db"]->fetchAll("SELECT * from minai_threads WHERE thread_id = '$threadId'");
+        $scene = $GLOBALS["db"]->fetchAll("SELECT  *  from  minai_threads  WHERE  thread_id = '$threadId'");
     } else {
         // Use case-insensitive regex pattern matching for actor names
-        $scene = $GLOBALS["db"]->fetchAll("SELECT * from minai_threads WHERE 
+        $scene = $GLOBALS["db"]->fetchAll("SELECT *  from minai_threads  WHERE 
             male_actors ~* '(,|^)\\s*$actor\\s*(,|$)' OR 
             female_actors ~* '(,|^)\\s*$actor\\s*(,|$)' OR 
             ( 
@@ -44,9 +44,9 @@ function getScene($actor, $threadId = null) {
                     $sql_where = " WHERE curr_scene_id='{$sc_id}' ";
                 }
                 //$gender = strtolower(GetActorValue($actor, "gender", false, true));
-                //$gender = GetGender($actor);
-                //if ($gender == "female") { // female outlier, add to females list
-                if (IsFemale($actor)) {
+                $gender = GetGender($actor);
+                if ($gender == "female") { // female outlier, add to females list
+                //if (Is Female($actor)) {
                     if($scene["female_actors"])
                         $scene["female_actors"] = $scene["female_actors"].",".$actor;
                     else
@@ -150,22 +150,22 @@ function addXPersonality($jsonXPersonality) {
         $sex_howto = "";
         
         if (isset($jsonXPersonality["speakStyleDuringSex"]) && (strlen($jsonXPersonality["speakStyleDuringSex"]) > 0))
-            $sex_howto .= strip_tags("\n - speaks in this style: " . ($jsonXPersonality["speakStyleDuringSex"] ?? "playful banter" )) . ";";
+            $sex_howto .= strip_tags("\n - speaks in this style: " . ($jsonXPersonality["speakStyleDuringSex"] ?? "playful banter" ));
         
         if (isset($jsonXPersonality["preferredSexPositions"]) && (count($jsonXPersonality["preferredSexPositions"]) > 0))
-            $sex_howto .= strip_tags("\n - prefers these positions: " . implode(", ", $jsonXPersonality["preferredSexPositions"])) . ";";
+            $sex_howto .= strip_tags("\n - prefers these positions: " . implode(", ", $jsonXPersonality["preferredSexPositions"]));
         
         if (isset($jsonXPersonality["sexualBehavior"]) && (count($jsonXPersonality["sexualBehavior"]) > 0))
-            $sex_howto .= strip_tags("\n - likes to participate in such sex activities: " . implode(", ", $jsonXPersonality["sexualBehavior"])) . ";";
+            $sex_howto .= strip_tags("\n - likes to participate in such sex activities: " . implode(", ", $jsonXPersonality["sexualBehavior"]));
 
         if (isset($jsonXPersonality["sexFantasies"]) && (count($jsonXPersonality["sexFantasies"]) > 0))
-            $sex_howto .= strip_tags("\n - has secret sex fantasies: " . implode(", ", $jsonXPersonality["sexFantasies"])) . ";";
+            $sex_howto .= strip_tags("\n - has secret sex fantasies: " . implode(", ", $jsonXPersonality["sexFantasies"]));
 
         if (isset($jsonXPersonality["sexPersonalityTraits"]) && (count($jsonXPersonality["sexPersonalityTraits"]) > 0))
-            $sex_howto .= strip_tags("\n - act like this: " . implode(", ", $jsonXPersonality["sexPersonalityTraits"])) . ";";
+            $sex_howto .= strip_tags("\n - act like this: " . implode(", ", $jsonXPersonality["sexPersonalityTraits"]));
         
         if (strlen($sex_howto) > 0)
-            $GLOBALS["HERIKA_PERS"] .= "\n## During sex {$GLOBALS["HERIKA_NAME"]}: {$sex_howto}\n";
+            $GLOBALS["HERIKA_PERS"] .= "\n<response_guidelines>\n## During sex {$GLOBALS["HERIKA_NAME"]}: {$sex_howto}\n</response_guidelines>\n";
     }
 }
 
@@ -200,8 +200,8 @@ function replaceActorsNamesInSceneDesc($actors, $sceneDesc) {
 }
 
 function getXPersonality($currentName) {
-    $codename=strtr(strtolower(trim($GLOBALS["db"]->escape($currentName))),[" "=>"_","'"=>"+"]);
-    $queryRet = $GLOBALS["db"]->fetchAll("SELECT * from minai_x_personalities WHERE LOWER(id) = LOWER('$codename')");
+    $codename = strtr(strtolower(trim($GLOBALS["db"]->escape($currentName))),[" "=>"_","'"=>"+"]);
+    $queryRet = $GLOBALS["db"]->fetchAll("SELECT * from minai_x_personalities WHERE (id = '$codename') ");
     $jsonXPersonality = null;
     if ($queryRet)
         $jsonXPersonality =  $queryRet[0]["x_personality"];
@@ -255,7 +255,67 @@ Function IsExplicitScene() {
     return false;
 }
 
+function randomize_speak_style($HerikaName, $arr_speakStyle, $max_random=100) {
+    
+    if (isset($arr_speakStyle))
+        $arr_res = $arr_speakStyle;
+    else {
+        $arr_res = ["style" => "dirty talk", "role" => "normal"];
+        return $arr_res;
+    }
+    
+    $s_speakStyle = $arr_res["style"];
+    
+    if (($s_speakStyle == "aggressor talk") || ($s_speakStyle == "victim talk"))
+        return $arr_res;
+
+    if (($s_speakStyle == "dominant talk") || ($s_speakStyle == "submissive talk") || ($s_speakStyle == "sweet talk") || ($s_speakStyle == "breathless gasps")) {
+        $v_rnd = 9999;
+        $a_rnd = 9999;
+        
+        if ($max_random > 1000) 
+            $max_random = 1000;
+        else 
+            if ($max_random < 5) $max_random = 5;
+
+        $max_10 = intval($max_random * 0.5);
+        $max_100 = intval($max_random * 10);
+        
+        $gender = GetGender($HerikaName);
+
+        if ($gender == 'female') { 
+            $v_rnd = rand(1, $max_10); // higher probability to be victim
+            $a_rnd = rand(1, $max_100);
+        } elseif ($gender == 'male') { 
+            $v_rnd = rand(1, $max_100); 
+            $a_rnd = rand(1, $max_10); // higher probability to be aggressor
+        }        
+
+        $isVictim = false;
+
+        if ($v_rnd < 2) {
+            if (($s_speakStyle == "submissive talk") || ($s_speakStyle == "sweet talk") || ($s_speakStyle == "breathless gasps")) { // chance to be victim
+                $arr_res = ["style" => "victim talk", "role" => "victim"];
+                $isVictim = true;
+                error_log("randomized, $HerikaName is victim - exec trace "); // debug
+            }
+        }
+
+        if ((!$isVictim) && ($a_rnd < 2)) {
+            if (($s_speakStyle == "dominant talk") || ($s_speakStyle == "breathless gasps")) { // chance of aggression
+                $arr_res = ["style" => "aggressor talk", "role" => "aggressor"];
+                error_log("randomized, $HerikaName is aggressor - exec trace "); // debug
+            }
+        }
+    }
+
+    return $arr_res;
+}
+
 function determineSpeakStyle($currentName, $scene, $jsonXPersonality) {
+    
+    $arr_res = ["style" => "dirty talk", "role" => "normal"];
+    
     $speakStyles = ["dirty talk", "sweet talk", "sensual whispering", "dominant talk", 
                     "submissive talk", "teasing talk", "erotic storytelling", 
                     "breathless gasps", "sultry seduction", "playful banter"];
@@ -270,17 +330,77 @@ function determineSpeakStyle($currentName, $scene, $jsonXPersonality) {
         $isVictim = in_array(strtolower($currentName), $victimActors);
         $hasVictims = true;
         
-        // If there are victims and speaker isn't one, they're an aggressor
-        if ($hasVictims && !$isVictim) {
+        if ($hasVictims && !$isVictim) { // If there are victims and speaker isn't one, they're an aggressor
             $isAggressor = true;
         }
     }
     
+    // Other non-consensual circumstances:  
+
+    if ((!$isVictim) && ($GLOBALS["NPC_react_to_non_consensual_acts"])) {
+        $targetToSpeak = getTargetDuringSex($scene) ?? "";
+        
+        if ($targetToSpeak == $GLOBALS["PLAYER_NAME"]) { // test only when NPC is in a scene with player
+
+            $npc_gender = GetGender($currentName);
+            $player_gender = GetGender($targetToSpeak);
+
+            if (($npc_gender == "female") && ($player_gender == "male")) { // 
+                // stranger to player?
+                $i_first_met = GetFirstInteraction($targetToSpeak, $currentName); 
+                //error_log("stranger? $currentName - $i_first_met  - exec trace "); // debug 
+                $b_unknown = ($i_first_met <= 0); // player never met this person
+                if ($b_unknown) { // player having sex with stranger
+                    $isVictim = true;
+                    error_log("stranger detected, $currentName is victim - exec trace "); // debug 
+                }
+                // antagonistic relationship?
+                if (!$isVictim) {
+                    $i_rel = intval(GetActorValue($currentName, "RelationshipRank")); 
+                    if (($i_rel < -1 ) && ($i_rel > -5 )) { // player having sex with enemy
+                        $isVictim = true;
+                        error_log("enemy detected, $currentName is victim - exec trace "); // debug 
+                    }
+                }
+                // is scared by player?
+                if (!$isVictim) {
+                    $n_fear = GetAdverseInteractions($currentName, $targetToSpeak); 
+                    if ($n_fear >= 5) { // player having sex with scared npc
+                        $isVictim = true;
+                        error_log("fear detected, $currentName is victim - exec trace "); // debug
+                    } 
+                }
+                // low arousal?
+                if (!$isVictim) {
+                    $l_arousal = GetActorArousal($currentName); 
+                    if ($l_arousal < 5) { // player having sex with cold npc
+                        $isVictim = true;
+                        error_log("low libido detected, $currentName is victim - exec trace "); // debug
+                    } 
+                }
+            }        
+        } 
+
+        if ($isVictim) { // add to $scene["victim_actors"]
+
+            $sc_id = ($scene['curr_scene_id'] ?? 'zZz');
+            $sql_where = " WHERE curr_scene_id='{$sc_id}' ";
+
+            if($scene["victim_actors"])
+                $scene["victim_actors"] = $scene["victim_actors"].",".$currentName;
+            else
+                $scene["victim_actors"] = $currentName;
+
+            $sql = "UPDATE minai_threads SET victim_actors='{$scene["victim_actors"]}' ";
+            $GLOBALS["db"]->execQuery($sql . $sql_where);
+        }
+    }
+
     // Override speak style based on role in scene
     if ($isVictim) {
-        return ["style" => "victim talk", "role" => "victim"];
+        $arr_res = ["style" => "victim talk", "role" => "victim"];
     } elseif ($isAggressor) {
-        return ["style" => "aggressor talk", "role" => "aggressor"];
+        $arr_res = ["style" => "aggressor talk", "role" => "aggressor"];
     } else {
         $speakStyle = null;
         if ($jsonXPersonality) {
@@ -289,8 +409,11 @@ function determineSpeakStyle($currentName, $scene, $jsonXPersonality) {
         if(!$speakStyle) {
             $speakStyle = $speakStyles[array_rand($speakStyles)];
         }
-        return ["style" => $speakStyle, "role" => "normal"];
+        $arr_res = ["style" => $speakStyle, "role" => "normal"];
+        $arr_res = randomize_speak_style($currentName, $arr_res, 100); // randomly spice things
     }
+    
+    return $arr_res;
 }
 
 function GetActorArousal($actorName) {

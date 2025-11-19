@@ -58,6 +58,8 @@ minai_stop_timer('sex_conditions');
 // If no sex actions are enabled, skip everything
 if (!$sexEnabled) {
     return;
+    //error_log("->sex not enabled: " . implode(' . ', $GLOBALS["ENABLED_FUNCTIONS"])); // debug
+
 }
 
 // COMMON SEX ACTIONS

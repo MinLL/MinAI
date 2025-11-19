@@ -1,4 +1,6 @@
 <?php
+
+
 // Avoid processing for fast / storage events
 if (isset($GLOBALS["minai_skip_processing"]) && $GLOBALS["minai_skip_processing"]) {
     return;
@@ -11,12 +13,50 @@ require_once("mind_influence.php");
 
 $GLOBALS[MINAI_ACTOR_VALUE_CACHE] = [];
 $targetOverride = null;
+if (!isset($GLOBALS["db"]))
+	$GLOBALS["db"] = new sql();
+
+
+Function SetRadiance($rechat_h, $rechat_p) {
+
+    // minai_log("info", "Setting Rechat Parameters (h={$rechat_h}, p={$rechat_p})");
+    $GLOBALS["RECHAT_H"] = $rechat_h;
+    $GLOBALS["RECHAT_P"] = $rechat_p;
+}
+
+Function CheckRechat($rechat_h, $rechat_p) {
+
+    // minai_log("info", "CheckRadiance: Setting Rechat Parameters (h={$rechat_h}, p={$rechat_p})");
+    
+    if (!isset($GLOBALS["RECHAT_H"]))
+		$GLOBALS["RECHAT_H"] = $rechat_h;
+	elseif (intval($GLOBALS["RECHAT_H"]) < 1)
+		$GLOBALS["RECHAT_H"] = $rechat_h;
+
+    if (!isset($GLOBALS["RECHAT_P"]))
+		$GLOBALS["RECHAT_P"] = $rechat_p;
+	elseif (intval($GLOBALS["RECHAT_P"]) < 1)
+		$GLOBALS["RECHAT_P"] = $rechat_p;
+        
+    //error_log(" CheckRadiance: Setting Rechat Parameters (h={$GLOBALS["RECHAT_H"]}, p={$GLOBALS["RECHAT_P"]}) - exec trace"); // debug    
+}
 
 function array_unique_caseinsensitive($arr_input) {
     return array_intersect_key(
         $arr_input,
         array_unique(array_map('strtolower', $arr_input))
     );
+}
+
+function array_unique_multi(array $array_in, string $unq_key): array 
+{
+    $arr_unique = [];
+    foreach ($array_in as $v) {
+        if (!array_key_exists($v[$unq_key], $arr_unique)) {
+            $arr_unique[$v[$unq_key]] = $v;
+        }
+    }
+    return array_values($arr_unique);
 }
 
 // Get Value from the cache. $name/$key should be lowercase
@@ -41,7 +81,7 @@ Function HasActorValueCache($name, $key=null) {
 }
 
 Function BuildActorValueCache($name) {
-    $name = strtolower($name);
+   $name = strtolower($name);
     $GLOBALS[MINAI_ACTOR_VALUE_CACHE][$name] = [];
 
     $idPrefix = "_minai_{$name}//";
@@ -115,7 +155,7 @@ function SetActorValue($name, $key, $value) {
 
 // Return the specified actor value.
 // Caches the results of several queries that are repeatedly referenced.
-Function GetActorValue($name, $key, $preserveCase=false, $skipCache=false) {
+Function GetActorValue($name, $key, $preserveCase=false, $skipCache=false, $checkOnlyInCache=false) {
     $db = $GLOBALS['db'];
     // minai_log("info", "Looking up $name: $key");
     $l_key = strtolower($key);
@@ -127,9 +167,17 @@ Function GetActorValue($name, $key, $preserveCase=false, $skipCache=false) {
         }
         // minai_log("info", "Checking cache: $name, $key");
         $ret = (GetActorValueCache($l_name, $l_key) ?? "");
-        if (!$preserveCase)
-		    $ret = strtolower($ret);
-        return $ret;
+        if ($checkOnlyInCache) {
+            if (!$preserveCase)
+                $ret = strtolower($ret);
+            return $ret;
+        } else {
+            if (strlen($ret) > 0) {
+                if (!$preserveCase)
+                    $ret = strtolower($ret);
+                return $ret;
+            }
+        }
     }
 
     // return strtolower("JobInnkeeper,Whiterun,,,,Bannered Mare Services,,Whiterun Bannered Mare Faction,,SLA TimeRate,sla_Arousal,sla_Exposure,slapp_HaveSeenBody,slapp_IsAnimatingWKidFaction,");
@@ -212,6 +260,21 @@ Function IsInFaction($name, $faction) {
     return str_contains($GLOBALS["minai_faction_cache"][$name], $faction);
 }
 
+function IsCreature($name) {
+    $b_res = false;    
+    
+    $b_res = IsInFaction($name,"Creature Faction");
+    if (!$b_res) { // check also races
+        $charKey = strtolower($name);
+        if (isset($actorValues[$charKey]['race']) && (!empty($actorValues[$charKey]['race']))) {
+            $s_race = strtolower($actorValues[$charKey]['race']);        
+            $b_res = (stripos('dog,horse,cat,cow,goat,bear,snowcat,chicken,wolf', $s_race) !== false); 
+        }
+    }
+
+    return $b_res;
+}                    
+                    
 // Cache for keyword checks
 if (!isset($GLOBALS["minai_keyword_cache"])) {
     $GLOBALS["minai_keyword_cache"] = [];
@@ -434,7 +497,7 @@ $GLOBALS["GenericFuncRet"] =function($gameRequest) {
     // Example, if papyrus execution gives some error, we will need to rewrite request her.
     // BY default, request will be $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdSpankAss"]
     // $gameRequest = [type of message,localts,gamets,data]
-    $GLOBALS["FORCE_MAX_TOKENS"]=256; // was 48   // We can overwrite anything here using $GLOBALS;
+    $GLOBALS["FORCE_MAX_TOKENS"]=512; // was 48   // We can overwrite anything here using $GLOBALS;
 
     if (stripos($gameRequest[3],"error")!==false) // Papyrus returned error
         return ["argName"=>"target","request"=>"{$GLOBALS["HERIKA_NAME"]} says sorry about unable to complete the task. {$GLOBALS["TEMPLATE_DIALOG"]}"];
@@ -481,7 +544,10 @@ Function ShouldEnableSexFunctions($name) {
     if ($inScene && (!$transitionsAllowed)) {
         return false;
     }
-    return ($arousalOk && (!$inCombat));
+    
+    $b_enable_sex = ($arousalOk && (!$inCombat));
+    //error_log("->ShouldEnableSexFunctions: enable=$b_enable_sex arousal=$arousalOk combat=$inCombat  ");
+    return $b_enable_sex;
 }
 
 
@@ -493,7 +559,9 @@ Function ShouldEnableHarassFunctions($name) {
         // User may also not have arousal mod, so default to enabled
         return true;
     }
-    return (intval($arousal) >= intval($arousalThreshold));
+    $b_res = (intval($arousal) >= intval($arousalThreshold));
+    //error_log(" - ShouldEnableHarassFunctions: $name $b_res $arousal >= $arousalThreshold - exec trace");
+    return $b_res;
 }
 
 Function IsChildActor($name) {
@@ -509,12 +577,17 @@ Function IsFemale($name) {
 }
 
 function GetGender($name) {
-    $s_res = "other";
-    if (IsFemale($name)) {
-        $s_res = "female";
-    } else {
-        if (IsMale($name))
-            $s_res = "male";
+        
+    $s_res = GetActorValue($name, "gender");
+    if (strlen($s_res) < 1) {
+        if (IsFemale($name)) {
+            $s_res = "female";
+        } else {
+            if (IsMale($name))
+                $s_res = "male";
+            else 
+                $s_res = "other";
+        }
     }
     return $s_res;
 }
@@ -529,8 +602,29 @@ if (!isset($GLOBALS["minai_all_actions_loaded"])) {
     $GLOBALS["minai_all_actions_loaded"] = false;
 }
 
+Function SetActionEnabled($action_name, $enabled) {
+    $sl_act_name = strtolower(trim($action_name));
+    $sid = "_minai_ACTION//".trim($action_name);
+    $value = $enabled ? 'TRUE' : 'FALSE';
+    $GLOBALS["minai_action_enabled_cache"][$sl_act_name] = $enabled;
+    $db = $GLOBALS['db'];
+    if (isset($db)) {
+        $db->upsertRowOnConflict(
+            'conf_opts',
+            array(
+                'id' => $sid,
+                'value' => $value
+            ),
+            'id'
+        );    
+    } else 
+        error_log("ERROR in SetActionEnabled, null db!");
+    return $GLOBALS["db"]->query("UPDATE conf_opts SET value = '{$value}' WHERE LOWER(id) = LOWER('$sid')");
+}
+
 Function IsActionEnabled($actionName) {
-    $actionName = strtolower(trim($actionName));
+    $action_in = trim($actionName);
+    $actionName = strtolower(trim($action_in));
 
     // If we haven't loaded all actions yet, do it now
     if (!$GLOBALS["minai_all_actions_loaded"]) {
@@ -554,7 +648,10 @@ Function IsActionEnabled($actionName) {
     
     // Return from cache (defaults to false if not found)
     $returnValue = isset($GLOBALS["minai_action_enabled_cache"][$actionName]) ? $GLOBALS["minai_action_enabled_cache"][$actionName] : false;
-    minai_log("info", "IsActionEnabled: {$actionName} = {$returnValue}");
+    //if (!$returnValue)
+        SetActionEnabled($action_in, $returnValue);
+    minai_log("info", "IsActionEnabled: {$action_in} = ". ($returnValue ? "Y" : "N")  );
+    //error_log("IsActionEnabled: {$action_in} = ". ($returnValue ? "Y" : "N") . "  - exec trace"); //debug
     return $returnValue;
 }
 
@@ -570,11 +667,11 @@ Function RegisterAction($actionName) {
     }
     
     $checkName = strtolower($actionName);
-    if (str_contains(strtolower($actionName), 'stimulatewith') || str_contains(strtolower($actionName), 'teasewith')) {
-        $checkName = 'MinaiGlobalVibrator';
+    if (str_contains($checkName, 'stimulatewith') || str_contains($checkName, 'teasewith')) {
+        $actionName = 'MinaiGlobalVibrator';
     }
-    minai_log("info", "Checking IsActionEnabled: {$checkName}");
-    if (IsActionEnabled($checkName)) {
+    minai_log("info", "Checking IsActionEnabled: {$actionName}");
+    if (IsActionEnabled($actionName)) {
         $GLOBALS["ENABLED_FUNCTIONS"][]=$actionName;
         $GLOBALS["minai_registered_actions"][$actionName] = true;
         minai_log("info", "Registering {$actionName}");
@@ -612,7 +709,7 @@ function PreloadActions($actionNames) {
     $whereConditions = [];
     foreach ($missingActions as $action) {
         $escapedAction = $GLOBALS["db"]->escape($action);
-        $whereConditions[] = "LOWER(id)=LOWER('_minai_ACTION//{$escapedAction}')";
+        $whereConditions[] = "(LOWER(id)=LOWER('_minai_ACTION//{$escapedAction}'))";
     }
     
     if (empty($whereConditions)) {
@@ -894,8 +991,8 @@ function GetCurrentLocationContext($actor) {
     // Query to fetch recent context data with focus on location information
     $query = "SELECT location 
               FROM eventlog 
-              WHERE location IS NOT NULL AND location != ''
-              AND type = 'infoloc'
+              WHERE (location IS NOT NULL) AND (location != '')
+              AND (type = 'infoloc')
               ORDER BY gamets DESC, ts DESC, rowid DESC 
               LIMIT 3";
     
@@ -923,7 +1020,7 @@ function GetCurrentLocationContext($actor) {
         preg_match('/Current Date in Skyrim World:\s*([^$]+)/', $locationString, $dateMatch);
         
         // Match buildings/passages information
-        preg_match('/buildings to go:(.+), Current/', $locationString, $buildingsMatch);
+        preg_match('/Buildings to go:(.+), Current/', $locationString, $buildingsMatch);
         
         // Process location if we found it
         if (isset($locationMatch[2])) {
@@ -1117,6 +1214,111 @@ function GetAllActorValues($actor) {
 
 function in_arrayi($needle, $haystack) {
     return in_array(strtolower($needle), array_map('strtolower', $haystack));
+}
+
+function getConfOptionValue($s_key = "") {
+    $s_res = "";
+    if (strlen(trim($s_key)) > 0) {
+        $ret = $GLOBALS["db"]->fetchAll("SELECT * FROM conf_opts WHERE (id='{$s_key}') LIMIT 1");
+        if ($ret) {
+            $s_res = $ret[0]['value'] ?? "";
+        }
+    }
+    return $s_res;
+}
+
+function setConfOption($s_key = "", $s_value = "") {
+    $b_res = false;
+    $s_id = trim($s_key);
+    $s_val = trim($s_value);
+
+    if ((strlen($s_id) > 0) && (strlen() > 0)) {
+        $b_res = $GLOBALS['db']->upsertRowOnConflict(
+            'conf_opts',
+            array(
+                'id' => $s_id,
+                'value' => $s_val
+            ),
+            'id'
+        );
+    } 
+    return $b_res;
+}
+    
+function GetAdverseInteractions($s_npc_name, $s_player_name) {
+    
+	$i_res = 0;
+	if ((strlen($s_player_name)>0) && (strlen($s_npc_name)>0) && ($s_player_name != $s_npc_name) && 
+        ($s_player_name != "The Narrator") && ($s_npc_name != "The Narrator") && 
+        ($s_player_name != "everyone") && ($s_npc_name != "everyone")) {
+            
+		$s_player = $GLOBALS['db']->escape($s_player_name);
+		$s_npc = $GLOBALS['db']->escape($s_npc_name);
+        
+        $s_sql = "SELECT count(rowid) as n_fear FROM speech WHERE 
+speaker = '{$s_npc}' AND 
+listener = '{$s_player}' AND 
+emotion_intensity = 'strong' AND
+mood IN ('anxious', 'angry', 'irritated', 'disgusted') AND 
+emotion IN ('panic', 'fear', 'anger', 'disgust', 'aversion') AND
+localts > (SELECT (MAX(localts) - 900) as m15 FROM speech)  
+LIMIT 128"; 
+        //error_log($s_sql); //debug
+        
+		$db_rec = $GLOBALS['db']->fetchAll($s_sql);
+		if (is_array($db_rec) && sizeof($db_rec)>0) {
+			$i_res = intval($db_rec[0]['n_fear'] ?? 0);
+		}
+	}
+	return $i_res;
+}    
+    
+function getChimExecMode() {
+    /* Check modes
+    * Standard (STANDARD)
+        - when using text input, Easy Roleplay can be done just by prepending ** to the text)
+        Example:**(create a long speech about being the Dragonborn) => I am no mere wanderer upon these snow-bitten roads. I am Dovahkiin...
+        Example:**you're like a zombie => By the Nine, thou walk’st with the stench of the draugr—undead, cursed, and far from Sovngarde’s grace
+        - when using text input, you can achieve Event Injection With Response just putting text bewteen parenthesys
+        Example:(Volkur falls to the ground wounded)
+
+    * Whisper (WHISPER)
+        (When enabled, we should send to plugin via InternalSetting a reduced DISTANCE_ACTIVATING_NPC,
+        from this point, all NPC beyond that distance should be marked as far away, We must take this in 
+        account to only store people NOT far away on eventlog (so far away NPCs won't have access to this context).
+        If player is in stealh mode, no rechat (this is a standard behavior).
+
+    * Director. (DIRECTOR)
+        Call instruction directly.
+
+    * Spawn Character (SPAWN)
+        Call spawn character directly.
+
+    * Easy Roleplay (IMPERSONATION)
+        (Smart Impersonation) (we should need a prompt parameter so user can customice this). 
+        Just prefix two asterisks at user input, and add the prompt. 
+        Example: "Hello" => **(Rewrite and translate the following text into English, employing Skyrim lore language and drawing upon the context.) Hello.
+
+    * Easy Roleplay (CREATION)
+          
+        Example: "Speech about being the Dragonborn" => **(Generate text employing Skyrim lore language and drawing upon the context, following the next instruction:Speech about being the Dragonborn ) 
+
+    * Event Injection (INJECTION_LOG)
+        (Whatever is typed/said is injected into event log as an roleplay instruction)
+        Just store player speech on eventlog and die.
+
+    * Event Injection With Response  (INJECTION_CHAT)
+        (Whatever is typed/said is injected into event log as an roleplay instruction expecting response)
+        Just store player speech on eventlog and follow the standard flow.
+    */
+
+    $EXECUTION_MODE_= getConfOptionValue("chim_mode"); 
+    if (strlen($EXECUTION_MODE) < 3) 
+        $EXECUTION_MODE = "STANDARD";
+    $EXECUTION_MODE=strtoupper($EXECUTION_MODE);
+    if (!in_array(($gameRequest[0] ?? '_?_'),["inputtext","inputtext_s","ginputtext","ginputtext_s"])) {
+        $EXECUTION_MODE="STANDARD";
+    }
 }
 
 require_once("contextbuilders/wornequipment_context.php");

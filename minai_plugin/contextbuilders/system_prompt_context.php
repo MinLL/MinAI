@@ -10,6 +10,7 @@ require_once(__DIR__ . "/../config.php");
 require_once(__DIR__ . "/../util.php");
 require_once(__DIR__ . "/../utils/format_util.php");
 require_once(__DIR__ . "/../utils/metrics_util.php");
+require_once(__DIR__ . "/../utils/variable_utils.php");
 
 // Include all context builder modules
 require_once(__DIR__ . "/context_modules/core_context.php");
@@ -322,20 +323,38 @@ class ContextBuilderRegistry {
 function BuildSystemPrompt() {
     // Start metrics collection for system prompt builder
     minai_start_timer('system_prompt_builder', 'context_php');
+
+
+    if ((!isset($GLOBALS["action_prompts"]["normal_scene"])) ||
+        (!isset($GLOBALS["action_prompts"]["explicit_scene"])) ||
+        (empty($GLOBALS["action_prompts"]))) {
+        $GLOBALS["action_prompts"] = $GLOBALS["action_prompts_copy"];    
+        //include("/var/www/html/HerikaServer/ext/minai_plugin/config .php");
+        error_log("WARNING - system_prompt_context: CHIM made an attempt to disable MinAI action_prompts! ");
+    }
     
     // Access global variables needed for the system prompt
+    
     $prompt_head = isset($GLOBALS["PROMPT_HEAD"]) ? $GLOBALS["PROMPT_HEAD"] : "";
+    $use_prompt_head_override = $GLOBALS['use_prompt_head_override'] ?? false;
+    if ($use_prompt_head_override) {
+        $prompt_head_override = $GLOBALS['PROMPT_HEAD_OVERRIDE'] ?? "";
+        if (strlen(trim($prompt_head_override)) > 1) {
+            $prompt_head = $prompt_head_override;
+        }
+    }
+    $prompt_head = trim($prompt_head);
     $herika_name = isset($GLOBALS["HERIKA_NAME"]) ? $GLOBALS["HERIKA_NAME"] : "";
     $player_name = isset($GLOBALS["PLAYER_NAME"]) ? $GLOBALS["PLAYER_NAME"] : "";
     $target = isset($GLOBALS["target"]) ? $GLOBALS["target"] : 
              (isset($GLOBALS["HERIKA_TARGET"]) ? $GLOBALS["HERIKA_TARGET"] : $player_name);
     
     // Determine if NSFW context should be included
-    $include_nsfw = !isset($GLOBALS["disable_nsfw"]) || !$GLOBALS["disable_nsfw"];
+    $include_nsfw = (!($GLOBALS["disable_nsfw"] ?? false));
     
     // Check for self_narrator mode (Narrator as player's subconscious)
     $is_self_narrator = false;
-    if ($herika_name === "The Narrator" && isset($GLOBALS['self_narrator']) && $GLOBALS['self_narrator'] === true) {
+    if ((($herika_name === "The Narrator") || ($herika_name === "Narrator")) && isset($GLOBALS['self_narrator']) && $GLOBALS['self_narrator'] === true) {
         $is_self_narrator = true;
     }
     
@@ -356,24 +375,26 @@ function BuildSystemPrompt() {
             $display_name = "{$player_name}'s subconscious";
         }
     }
-    
+
     // Initialize the system prompt
     $system_prompt = "";
     
     // Build the core instruction section
-    $system_prompt .= "# Instructions\n";
+    $system_prompt .= "# Main context\n";
     if (!empty($prompt_head)) {
         $system_prompt .= trim($prompt_head) . "\n\n";
     }
-    $system_prompt .= "You are roleplaying as {$display_name} in a Skyrim adventure.\n";
-    $system_prompt .= "Respond in character as {$display_name} at all times.\n\n";
+
+    $system_prompt .= "<background_context>\n";
+    $system_prompt .= "\n<who_are_you>\nYou are {$display_name}, you live in Skyrim, a fantasy realm.\n";
+    $system_prompt .= "You must stay in character as {$display_name} at all times.\n\n";
     
     // Get registry instance
     $registry = ContextBuilderRegistry::getInstance();
 
     // Set up actors based on self_narrator mode
     $actors = array();
-    if ($GLOBALS["HERIKA_NAME"] == "The Narrator") {
+    if (($GLOBALS["HERIKA_NAME"] == "The Narrator") || ($GLOBALS["HERIKA_NAME"] == "Narrator")) {
         // Only include player in narrator mode (self narrator or not)
         $actors['primary'] = "The Narrator";
         
@@ -400,7 +421,7 @@ function BuildSystemPrompt() {
 
     // Define the shared sections
     $shared_sections = array(
-        'environment' => "# Environmental Context",
+        'environment' => "# Environmental Context Description",
         'misc' => "# Additional Information"
     );
 
@@ -425,6 +446,9 @@ function BuildSystemPrompt() {
             $actor_params['herika_name'] = $target;
             $actor_params['is_target'] = true;
         }
+
+        $s_gender = GetGender($display_name);
+        $prns = GetActorPronouns($display_name);
         
         // Process each section for this actor
         foreach ($actor_sections as $section_id => $section_title) {
@@ -515,10 +539,22 @@ function BuildSystemPrompt() {
             if ($is_self_narrator && $actor_role === 'primary') {
                 $header_name = $display_name;
             }
+
+            if ($actor_role === 'primary') 
+                $actor_type = 'your';
+            else
+                $actor_type = 'interlocutor';
+            
+            $system_prompt .= "<description_of_{$actor_type}_character>\n";
             $system_prompt .= "# " . $header_name . "\n";
             $system_prompt .= $actor_content . "\n";
+            $system_prompt .= "</description_of_{$actor_type}_character>\n";
         }
-    }
+        if ($actor_role === 'primary') {
+            $system_prompt .= "</who_are_you>\n\n"; 
+        }
+        
+    } // --- end foreach actors
     
     // Add shared sections (environment, misc, etc.)
     foreach ($shared_sections as $section_id => $section_header) {
@@ -557,12 +593,16 @@ function BuildSystemPrompt() {
                 $context = $registry->formatContext($context);
                 
                 // Add the sub-header if provided
+                $s_bld_tag_end = "";
                 if (!empty($builder['header'])) {
-                    $section_content .= "## " . $builder['header'] . "\n";
+                    $s_bld_tag = strtolower(str_replace([' ','#',',','.'],['_','','',''],trim($builder['header'])));
+                    $s_bld_tag_begin = "<$s_bld_tag>";
+                    $s_bld_tag_end = "</$s_bld_tag>";
+                    $section_content .= "{$s_bld_tag_begin}\n## " . $builder['header'] . "\n";
                 }
                 
                 // Add the content
-                $section_content .= trim($context) . "\n\n";
+                $section_content .= trim($context) . "\n{$s_bld_tag_end}\n\n";
                 
                 // Record metrics for this builder
                 minai_stop_timer('context_builder_' . $id, [
@@ -587,8 +627,11 @@ function BuildSystemPrompt() {
         
         // Add the section to the system prompt if it has content
         if (!empty($section_content)) {
+            $s_tag = strtolower($section_id . str_replace([' ','#',',','.'],['_','','',''],$section_header));
+            $system_prompt .= "\n<{$s_tag}>\n";
             $system_prompt .= $section_header . "\n";
             $system_prompt .= $section_content;
+            $system_prompt .= "</{$s_tag}>\n";
         }
         
         // Record metrics for section build
@@ -596,14 +639,17 @@ function BuildSystemPrompt() {
             'section' => $section_id,
             'content_length' => strlen($section_content)
         ]);
-    }
+    } // --- end shared sections
+    $system_prompt .= "</background_context>\n\n";
+    // background
     
     // Add guidance for the LLM on how to format responses
     if (!isset($GLOBALS['minai_context']['response_guidelines'])) {
         $GLOBALS['minai_context']['response_guidelines'] = true;
     }
-    if ($GLOBALS['minai_context']['response_guidelines']) {
-    $system_prompt .= "# Response Guidelines\n";        
+    if (($GLOBALS['minai_context']['response_guidelines']) && ($display_name != 'The Narrator')) {
+
+        $system_prompt .= "<response_guidelines>\n# Response Guidelines for {$display_name}\n";        
         if ($is_diary_request) {
             // Special guidelines for diary entries
             if ($is_self_narrator) {
@@ -618,28 +664,122 @@ function BuildSystemPrompt() {
             $system_prompt .= "- Reference recent experiences, observations, and emotions\n";
         } else {
             // Standard response guidelines
-            $system_prompt .= "- Stay in character as {$display_name} at all times\n";
-            $system_prompt .= "- Respond appropriately to the context of the conversation\n";
+            $system_prompt .= "- Stay in character as {$display_name} at all times.\n";
+            $system_prompt .= "- Respond appropriately to the context of the conversation.\n";
+            $system_prompt .= "- Think carefully, the quality of your response is important.\n";
+            $system_prompt .= "- Prioritize responding to the most recent dialogue and events.\n";
+            $system_prompt .= "- Include variety in your responses and avoid repeating yourself.\n";
+            //$system_prompt .= "## When indicating a pause or trailing off in speech or suggesting an incomplete thought or idea, always use an ellipsis (...). Never replace the ellipsis with a dot. Example: 'their... distractions.' is correct, 'their. distractions.' is incorrect.\n";
+
             if ($GLOBALS['enforce_short_responses']) {
-                $system_prompt .= "- Be concise and direct in your responses\n";
+                $system_prompt .= "- Be concise and direct in your responses.\n";
             }
-           
-            $system_prompt .= "- Your response should reflect your personality\n";
-            $system_prompt .= "- Prioritize responding to the most recent dialogue and events\n";
-            $system_prompt .= "- Include variety in your responses and avoid repeating yourself\n";
+            $system_prompt .= "- OoC (Out of Character) instructions are important and must be followed exactly. \n";
+            
+            $system_prompt .= "</response_guidelines>\n";
+            
+        }
+
+    }
+
+    if (!isset($GLOBALS['use_emotions_expression'])) {
+        $GLOBALS['use_emotions_expression'] = true;
+    }
+    if (($GLOBALS['use_emotions_expression']) && ($display_name != 'The Narrator') && ($display_name != 'Narrator')) {
+
+        $system_prompt .= "\n<emotions_expression>\n# Emotions Expression Guidelines for {$display_name}\n\n";        
+        if (!$is_diary_request) {
+            
+            //$s_gender = GetGender($display_name);
+            //$prns = GetActorPronouns($display_name);
+            //error_log(" sys prompt prns $display_name $s_gender: " . print_r($prns,true) ); //debug
+            $emo = ($GLOBALS['action_prompts']['emotions_expression'] ?? "");
+
+            if (strlen($emo) < 32) {
+
+                /*
+                <emotions_expression>
+                # Emotions Expression Guidelines for Juniper
+
+                ## Juniper MUST express her emotions by altering her speech style. 
+
+                ## Emotion intensity has three levels: 
+                - Low = mostly clear speech, occasionally clipped. 
+                - Moderate = partial alteration of speech style, possibly some ellipses or some stuttering. 
+                - Strong = when Juniper experiences strong emotion, her speech MUST completely alter with stutters, ellipses, filler words, profanities, swearing, fragmented sentences, interruptions, incomplete thoughts; speech will become messy and fragmented almost unintelligible, broken to mostly single words or syllables. Juniper could use profanity, swearing an filler words to express strong emotions. 
+                Emotion intensity will raise gradually from Low to Moderate and from Moderate to strong. 
+
+                ## Examples:
+                ### Expressing strong anger: 
+                I can\'t believe thi... this! I... Damn it! You... you... enough! You lied to me! Every time... every fucking single time! By the Nines! I\'m... I\'m done! 
+
+                ### Expressing strong fear: 
+                I think I hear... something. No, no... no! Gods... it\'s here! Don\'t... let it... I... um, can\'t breathe! By the Gods... 
+
+                ### Expressing strong desire or love: 
+                Oh... I feel... for... for you. What I need... need you closer. I can\'t... I barely breathe. Damn... My... my heart is racing.
+                </emotions_expression>
+                */
+
+                $emo = "## #herika_name# MUST express #herika_possessive# emotions by altering #herika_possessive# speech style. \n" .
+                $emo .= "## Emotion intensity has three levels: \n" .
+                $emo .= "- Low = mostly clear speech, occasionally clipped  \n" .
+                $emo .= "- Moderate = partial alteration of speech style, possibly some ellipses or some stuttering. '  \n" .
+                $emo .= "- Strong = when Juniper experiences strong emotion, her speech MUST completely alter with stutters, ellipses, filler words, profanities, swearing, fragmented sentences, interruptions, incomplete thoughts; speech will become messy and fragmented almost unintelligible, broken to mostly single words or syllables. Juniper could use profanity, swearing an filler words to express strong emotions. \n" .
+                $emo .= "Emotion intensity will raise gradually from low to Moderate and from Moderate to strong. \n";
+                $emo .= "\n";
+                $emo .= "## Examples: \n";
+                $emo .= "### Expressing strong anger: \n";
+                $emo .= "I can\'t believe thi... this! I... Damn it! You... you... enough! You lied to me! Every time... every fucking single time! By the Nines! I\'m... I\'m done!  \n";
+                $emo .= "\n";
+                $emo .= "### Expressing strong fear:\n";
+                $emo .= "I think I hear... something. No, no... no! Gods... it\'s here! Don\'t... let it... I... um, can\'t breathe! By the Gods... \n";
+                $emo .= "\n";
+                
+                // save for later use
+                $GLOBALS['action_prompts']['emotions_expression'] = $emo;
+            }
+            $system_prompt .= $emo;
+
+            if (!$GLOBALS["disable_nsfw"]) {
+                $s_aroused = "I can bar-barely... breathe. Damn... I can't stop thinking what would happen... Gods-if we just... ";
+                $b_aroused = (IsInScene($display_name) || ((!IsEnabled($display_name, "inCombat")) && (GetActorArousal($display_name) >= (0.85 * GetMinArousalForSex())))); 
+                if ($b_aroused) {
+                    //error_log(" sys prompt prns $display_name $s_gender: " . print_r($prns,true) ); //debug
+                    if ($s_gender == 'male') {
+                        $s_aroused = "I have an erect... erection. Suck my... my dick bitch! And... by The Nines! My cock's... damn... my... I can't stop... shit! Fuck... fuck... fuck!";
+                    } elseif ($s_gender == 'female') { 
+                        $s_aroused = "Oh... you're so... so warm! I ca... can feel it. By The Nines... want it... it now! Fuck... I'm dripping. Damn...";
+                    } else {
+                        $s_aroused = "My... my heart is racing. Damn... I'm... I'm trembling. Can't stop... if we just... Fuck!";
+                    }
+                }
+                $s_example = "Expressing strong arousal or desire: \n{$s_aroused}\n";
+            } else {
+                $s_aroused = "Oh... I feel... for... for you. What I need... need you closer. I can't... I barely breathe. Damn... My... my heart is racing.";
+                $s_example = "Expressing strong desire or love: \n{$s_aroused}\n";
+            }
+            $system_prompt .= "\n\n### {$s_example}</emotions_expression>\n";
         }
     }
+
     if (!isset($GLOBALS['minai_context']['action_enforcement'])) {
         $GLOBALS['minai_context']['action_enforcement'] = true;
     }
     if ($GLOBALS['minai_context']['action_enforcement']) {
         $GLOBALS["COMMAND_PROMPT"] = ""; // Kill don't narrate
+        $b_func = (strlen(($GLOBALS["COMMAND_PROMPT_FUNCTIONS"] ?? "")) > 0);
         $GLOBALS["COMMAND_PROMPT_FUNCTIONS"]=""; // Handled by the system prompt
         if (isset($GLOBALS["FUNCTIONS_ARE_ENABLED"]) && $GLOBALS["FUNCTIONS_ARE_ENABLED"]) {
-            $system_prompt .= "\n# AVAILABLE ACTIONS\n";
-            $system_prompt .= " - This section defines actions that {$display_name} can perform to interact with the world.\n";
-            $system_prompt .= " - Use these actions when they align with your character's intentions and the current situation.\n";
-            $system_prompt .= " - While Talk is an available action for dialogue, prioritize other contextually appropriate actions when possible.\n";
+            if ($b_func) {
+                $system_prompt .= "\n\n# AVAILABLE ACTIONS\n<actions_usage_instructions>\n";
+                $system_prompt .= " - This section defines available actions that {$display_name} can perform to interact with the world.\n";
+                $system_prompt .= " - {$display_name} will use these actions when they align with {$prns["possessive"]} intentions and the current situation.\n";
+                $system_prompt .= " - While 'Talk' is an available action for dialogue, prioritize other contextually appropriate actions when possible. \n";
+                $system_prompt .= "</actions_usage_instructions>\n";
+            } else {
+                error_log(" system_prompt_context: Warning missing functions list! "); //debug
+            }
         }
     }
     else {

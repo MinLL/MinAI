@@ -1272,8 +1272,8 @@
                                     <label class="option-label" for="enforce-short-responses">Enforce Short Responses</label>
                                     <button class="reset-button" onclick="resetOptionToDefault('enforce-short-responses')">Reset to Default</button>
                                 </div>
-                                <p>Force the LLM to provide shorter responses.</p>
-                                <input type="checkbox" id="enforce-short-responses">
+                                <p><input type="checkbox" id="enforce-short-responses"> Force the LLM to provide shorter responses.</p>
+                                
                             </div>
 
                             <!-- enable_prompt_slop_cleanup -->
@@ -1282,8 +1282,8 @@
                                     <label class="option-label" for="enable-prompt-slop-cleanup">Enable Prompt Slop Cleanup</label>
                                     <button class="reset-button" onclick="resetOptionToDefault('enable-prompt-slop-cleanup')">Reset to Default</button>
                                 </div>
-                                <p>Clean up and optimize prompts before sending to the LLM.</p>
-                                <input type="checkbox" id="enable-prompt-slop-cleanup">
+                                <p><input type="checkbox" id="enable-prompt-slop-cleanup"> Clean up and optimize prompts before sending to the LLM.</p>
+                                
                             </div>
 
                             <!-- use_llm_fallback -->
@@ -1292,12 +1292,12 @@
                                     <label class="option-label" for="use-llm-fallback">Use LLM Fallback</label>
                                     <button class="reset-button" onclick="resetOptionToDefault('use-llm-fallback')">Reset to Default</button>
                                 </div>
-                                <p>Enable fallback to alternative LLM configuration when primary LLM call fails. 
+                                <p><input type="checkbox" id="use-llm-fallback"> Enable fallback to alternative LLM configuration when primary LLM call fails. 
                                     This can help recover from errors and censorship, but will result in increased token cost and response time 
                                     when a retry is performed. Response time hit is fairly minimal, but the full token cost of both requests 
                                     will be charged. The connector settings for the "LLMFallback" profile will be used (This will be created if it doesn't exist when you boot the game),
                                     and it will only work with openrouterjson.</p>
-                                <input type="checkbox" id="use-llm-fallback">
+                                
                             </div>
 
                             <!-- strip_emotes_from_output -->
@@ -1306,8 +1306,8 @@
                                     <label class="option-label" for="strip-emotes">Strip emotes from output</label>
                                     <button class="reset-button" onclick="resetOptionToDefault('strip-emotes')">Reset to Default</button>
                                 </div>
-                                <p>Remove anything between two astericks from the response...</p>
-                                <input type="checkbox" id="strip-emotes">
+                                <p><input type="checkbox" id="strip-emotes"> Remove anything between two asterisks from the response.</p>
+                                
                             </div>
 
                             <!-- enforce_single_json -->
@@ -1316,8 +1316,8 @@
                                     <label class="option-label" for="enforce-single-json">Enforce Single JSON Response</label>
                                     <button class="reset-button" onclick="resetOptionToDefault('enforce-single-json')">Reset to Default</button>
                                 </div>
-                                <p>Forces the LLM to provide only one single JSON response object per interaction...</p>
-                                <input type="checkbox" id="enforce-single-json">
+                                <p><input type="checkbox" id="enforce-single-json"> Forces the LLM to provide only one single JSON response object per interaction.</p>
+                                
                             </div>
                         </div>
                     </div>
@@ -1334,8 +1334,18 @@
                                     <label class="option-label" for="disable-nsfw">Disable NSFW</label>
                                     <button class="reset-button" onclick="resetOptionToDefault('disable-nsfw')">Reset to Default</button>
                                 </div>
-                                <p>Globally disable all NSFW features.</p>
-                                <input type="checkbox" id="disable-nsfw">
+                                <p><input type="checkbox" id="disable-nsfw"> Globally disable all NSFW features.</p>
+                                
+                            </div>
+
+                            <!-- NPC_react_to_non_consensual_acts -->
+                            <div class="option-group checkbox-group">
+                                <div class="option-label-container">
+                                    <label class="option-label" for="npc-react-to-nc-acts">React to non-consensual acts</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('npc-react-to-nc-acts')">Reset to Default</button>
+                                </div>
+                                <p><input type="checkbox" id="npc-react-to-nc-acts"> NPC is aware of and will react to non-consensual acts.</p>
+                                
                             </div>
 
                             <!-- restrict_nonfollower_functions -->
@@ -1344,8 +1354,8 @@
                                     <label class="option-label" for="restrict-nonfollower-functions">Restrict Non-Follower Functions</label>
                                     <button class="reset-button" onclick="resetOptionToDefault('restrict-nonfollower-functions')">Reset to Default</button>
                                 </div>
-                                <p>Restrict actions that only make sense for followers to followers.</p>
-                                <input type="checkbox" id="restrict-nonfollower-functions">
+                                <p><input type="checkbox" id="restrict-nonfollower-functions"> Restrict actions that only make sense for followers to followers.</p>
+                                
                             </div>
 
                             <!-- always_enable_functions -->
@@ -1354,8 +1364,8 @@
                                     <label class="option-label" for="always-enable-functions">Always Enable Functions</label>
                                     <button class="reset-button" onclick="resetOptionToDefault('always-enable-functions')">Reset to Default</button>
                                 </div>
-                                <p>Enable functions during things like rechat. Disabled for the narrator to avoid crashes (CTD).</p>
-                                <input type="checkbox" id="always-enable-functions">
+                                <p><input type="checkbox" id="always-enable-functions"> Enable functions during things like rechat. Disabled for the narrator to avoid crashes (CTD).</p>
+                                
                             </div>
 
                             <!-- force_aiff_name_to_ingame_name -->
@@ -1364,8 +1374,8 @@
                                     <label class="option-label" for="force-aiff-name">Force CHIM Name to Match In-Game Name</label>
                                     <button class="reset-button" onclick="resetOptionToDefault('force-aiff-name')">Reset to Default</button>
                                 </div>
-                                <p>Force the configured name in CHIM to match the in-game name.</p>
-                                <input type="checkbox" id="force-aiff-name">
+                                <p><input type="checkbox" id="force-aiff-name"> Force the configured name in CHIM to match the in-game name.</p>
+                                
                             </div>
 
                             <!-- disable_worn_equipment -->
@@ -1374,8 +1384,8 @@
                                     <label class="option-label" for="disable-worn-equipment">Disable Worn Equipment</label>
                                     <button class="reset-button" onclick="resetOptionToDefault('disable-worn-equipment')">Reset to Default</button>
                                 </div>
-                                <p>Disable the worn equipment system, which customizes the description of items that actors are wearing.</p>
-                                <input type="checkbox" id="disable-worn-equipment">
+                                <p><input type="checkbox" id="disable-worn-equipment"> Disable the worn equipment system, which customizes the description of items that actors are wearing.</p>
+                                
                             </div>
 
                             <!-- use_defeat -->
@@ -1384,8 +1394,8 @@
                                     <label class="option-label" for="use-defeat">Add Support for Defeat mods</label>
                                     <button class="reset-button" onclick="resetOptionToDefault('use-defeat')">Reset to Default</button>
                                 </div>
-                                <p>If using a supported defeat mod, the LLM will differentiate between victory and defeat in combat.</p>
-                                <input type="checkbox" id="use-defeat">
+                                <p><input type="checkbox" id="use-defeat"> If using a supported defeat mod, the LLM will differentiate between victory and defeat in combat.</p>
+                                
                             </div>
 
                             <!-- realnames_support -->
@@ -1394,8 +1404,8 @@
                                     <label class="option-label" for="realnames-support">Add Support for Realnames Extended</label>
                                     <button class="reset-button" onclick="resetOptionToDefault('realnames-support')">Reset to Default</button>
                                 </div>
-                                <p>Automatically seed NPC profiles that are renamed via Realnames Extended...</p>
-                                <input type="checkbox" id="realnames-support">
+                                <p><input type="checkbox" id="realnames-support"> Automatically seed NPC profiles that are renamed via Realnames Extended.</p>
+                                
                             </div>
                             
                             <!-- Inventory Settings Header -->
@@ -1412,14 +1422,14 @@
                                     <input type="number" id="inventory-items-limit" min="1" max="20">
                                 </div>
                                 
-                                <!-- use_item_relevancy_scoring -->
+                                <!-- use_item_relevancy_scoring xmd -->
                                 <div class="option-group checkbox-group">
                                     <div class="option-label-container">
                                         <label class="option-label" for="use-item-relevancy-scoring">Use Item Relevancy Scoring</label>
                                         <button class="reset-button" onclick="resetOptionToDefault('use-item-relevancy-scoring')">Reset to Default</button>
                                     </div>
-                                    <p>Use relevancy scoring for inventory items (Future implementation - Currently unavailable)</p>
-                                    <input type="checkbox" id="use-item-relevancy-scoring">
+                                    <p><input type="checkbox" id="use-item-relevancy-scoring"> Use relevancy scoring for inventory items (Future implementation - Currently unavailable)</p>
+                                    
                                 </div>
                             </div>
                         </div>
@@ -1448,7 +1458,7 @@
                                     <label class="option-label" for="events-to-ignore">Events to Ignore</label>
                                     <button class="reset-button" onclick="resetOptionToDefault('events-to-ignore')">Reset to Default</button>
                                 </div>
-                                <p>List of game events to ignore...</p>
+                                <p>List of game events to ignore.</p>
                                 <div id="events-to-ignore-container" class="dynamic-list-container"></div>
                                 <button class="add-list-item" onclick="addListItem('events-to-ignore-container')">Add Event to Ignore</button>
                             </div>
@@ -1459,7 +1469,7 @@
                                     <label class="option-label" for="input-delay">Input Delay for Radiance (Seconds)</label>
                                     <button class="reset-button" onclick="resetOptionToDefault('input-delay')">Reset to Default</button>
                                 </div>
-                                <p>Prevents radiant dialogue from triggering too quickly after player input...</p>
+                                <p>Prevents radiant dialogue from triggering too quickly after player input.</p>
                                 <input type="range" id="input-delay" min="0" max="30" value="15">
                             </div>
                         </div>
@@ -1476,11 +1486,19 @@
                             <!-- PROMPT_HEAD_OVERRIDE -->
                             <div class="option-group text-input">
                                 <div class="option-label-container">
-                                    <label class="option-label" for="prompt-head-override">PROMPT_HEAD_OVERRIDE</label>
+                                    <label class="option-label" for="prompt-head-override">Prompt Head Override</label>
                                     <button class="reset-button" onclick="resetOptionToDefault('prompt-head-override')">Reset to Default</button>
                                 </div>
-                                <p>Set this to override the prompt head for all profiles...</p>
-                                <input type="text" id="prompt-head-override">
+                                <p>New prompt (if enabled this will override the prompt head for all profiles): </p>
+                                <textarea id="prompt-head-override" class="prompt-textarea" rows="6"></textarea>                                
+                            </div>    
+                            <div class="option-group checkbox-group">
+                                <div class="option-label-container">
+                                    <label class="option-label" for="use-prompt-head-override">Enable Prompt Head Override</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('use-prompt-head-override')">Reset to Default</button>
+                                </div>
+                                <p><input type="checkbox" id="use-prompt-head-override"> Use this prompt instead of CHIM PROMPT_HEAD for all profiles.</p>
+                                
                             </div>
 
                             <!-- use_narrator_profile -->
@@ -1489,8 +1507,8 @@
                                     <label class="option-label" for="use-narrator-profile">Use Narrator Profile</label>
                                     <button class="reset-button" onclick="resetOptionToDefault('use-narrator-profile')">Reset to Default</button>
                                 </div>
-                                <p>Use an alternative profile for the narrator instead of the default one...</p>
-                                <input type="checkbox" id="use-narrator-profile">
+                                <p><input type="checkbox" id="use-narrator-profile"> Use an alternative profile for the narrator instead of the default one.</p>
+                                
                             </div>
 
                             <!-- stop_narrator_context_leak -->
@@ -1499,8 +1517,8 @@
                                     <label class="option-label" for="stop-narrator-context-leak">Stop Narrator Context Leak</label>
                                     <button class="reset-button" onclick="resetOptionToDefault('stop-narrator-context-leak')">Reset to Default</button>
                                 </div>
-                                <p>Purge narrator dialogue from the context that is shared with nearby NPC's...</p>
-                                <input type="checkbox" id="stop-narrator-context-leak">
+                                <p><input type="checkbox" id="stop-narrator-context-leak"> Purge narrator dialogue from the context that is shared with nearby NPC's.</p>
+                                
                             </div>
 
                             <!-- devious_narrator_eldritch_voice -->
@@ -1509,8 +1527,8 @@
                                     <label class="option-label" for="eldritch-voice">Eldritch Voice Type</label>
                                     <button class="reset-button" onclick="resetOptionToDefault('eldritch-voice')">Reset to Default</button>
                                 </div>
-                                <p>Voice type to use for eldritch narration...</p>
-                                <input type="text" id="eldritch-voice">
+                                <p><input type="text" id="eldritch-voice"> Voice type to use for eldritch narration.</p>
+                                
                             </div>
 
                             <!-- devious_narrator_telvanni_voice -->
@@ -1519,8 +1537,8 @@
                                     <label class="option-label" for="telvanni-voice">Devious Narrator Telvanni Voice</label>
                                     <button class="reset-button" onclick="resetOptionToDefault('telvanni-voice')">Reset to Default</button>
                                 </div>
-                                <p>If the Telvanni Devious Narrator is active, override it's voice type with the specified id.</p>
-                                <input type="text" id="telvanni-voice">
+                                <p><input type="text" id="telvanni-voice"> If the Telvanni Devious Narrator is active, override it's voice type with the specified id.</p>
+                                
                             </div>
 
                             <!-- self_narrator_toggle -->
@@ -1529,8 +1547,8 @@
                                     <label class="option-label" for="self-narrator">Use Self Narrator</label>
                                     <button class="reset-button" onclick="resetOptionToDefault('self-narrator')">Reset to Default</button>
                                 </div>
-                                <p>Add support for the Narrator roleplaying as the character thinking to themself...</p>
-                                <input type="checkbox" id="self-narrator">
+                                <p><input type="checkbox" id="self-narrator"> Add support for the Narrator roleplaying as the character thinking to themself.</p>
+                                
                             </div>
                         </div>
                     </div>
@@ -1547,8 +1565,8 @@
                                     <label class="option-label" for="force-voice-type">Force Voice Type</label>
                                     <button class="reset-button" onclick="resetOptionToDefault('force-voice-type')">Reset to Default</button>
                                 </div>
-                                <p>Force the voice type to use the actor's base voice type...</p>
-                                <input type="checkbox" id="force-voice-type">
+                                <p><input type="checkbox" id="force-voice-type"> Force the voice type to use the actor's base voice type.</p>
+                                
                             </div>
 
                             <!-- VoiceType Fallbacks -->
@@ -1557,7 +1575,7 @@
                                     <label class="option-label" for="voicetype-fallbacks">VoiceType Fallbacks</label>
                                     <button class="reset-button" onclick="resetOptionToDefault('voicetype-fallbacks')">Reset to Default</button>
                                 </div>
-                                <p>Provide default voices for specific gender and race combinations...</p>
+                                <p>Provide default voices for specific gender and race combinations.</p>
                                 <div id="voicetype-container" class="voicetype-container"></div>
                                 <button class="add-voicetype" onclick="addVoiceTypeEntry()">Add VoiceType Fallback</button>
                             </div>
@@ -1585,6 +1603,25 @@
                                         <li><strong>Herika pronouns:</strong> #herika_subject#, #herika_object#, #herika_possessive#</li>
                                     </ul>
                                 </details>
+                            </div>
+                            
+                            <!-- Emotions Expression Prompt -->
+                            <div class="option-group">
+                                <div class="option-label-container">
+                                    <label class="option-label" for="emotions-expression-prompt">Verbal Emotions Expression Prompt</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('emotions-expression-prompt')">Reset to Default</button>
+                                </div>
+                                <textarea id="emotions-expression-prompt" class="prompt-textarea" rows="4"></textarea>
+                            </div>
+
+                            <!-- Emotions Expression checkbox -->
+                            <div class="option-group checkbox-group">
+                                <div class="option-label-container">
+                                    <label class="option-label" for="use-emotions-expression">Enable Emotions Expression Prompt</label>
+                                    <button class="reset-button" onclick="resetOptionToDefault('use-emotions-expression')">Reset to Default</button>
+                                </div>
+                                <p><input type="checkbox" id="use-emotions-expression"> Insert <i>Verbal Emotions Expression Prompt</i> instructions in system prompt.</p>
+                                
                             </div>
                             
                             <!-- Singing Prompt -->
@@ -1670,15 +1707,15 @@
                             Advanced Settings
                         </div>
                         <div class="section-content collapsed">
-                            <!-- CHIM_NO_EXAMPLES -->
+                            <!-- CHIM_NO_EXAMPLES xmd -->
                             <div class="option-group checkbox-group">
                                 <div class="option-label-container">
                                     <label class="option-label" for="chim-no-examples">Disable OpenRouterJSON Examples</label>
                                     <button class="reset-button" onclick="resetOptionToDefault('chim-no-examples')">Reset to Default</button>
                                 </div>
-                                <p>Disable the examples that are sent to the LLM ("Stop staring at me / What are you looking at?"). Reduces LLM slop, but may cause issues with particularly weak LLMs that rely on these examples.</p>
-                                <input type="checkbox" id="chim-no-examples">
-                            </div>
+                                <p><input type="checkbox" id="chim-no-examples"> Disable the examples that are sent to the LLM ("Stop staring at me / What are you looking at?"). Reduces LLM slop, but may cause issues with particularly weak LLMs that rely on these examples.</p>
+                                
+                            </div> 
                             
                             <!-- minai_metrics_enabled -->
                             <div class="option-group checkbox-group">
@@ -1686,8 +1723,8 @@
                                     <label class="option-label" for="minai-metrics-enabled">Enable Metrics Collection</label>
                                     <button class="reset-button" onclick="resetOptionToDefault('minai-metrics-enabled')">Reset to Default</button>
                                 </div>
-                                <p>Enable collection of anonymous usage metrics</p>
-                                <input type="checkbox" id="minai-metrics-enabled">
+                                <p><input type="checkbox" id="minai-metrics-enabled"> Enable collection of anonymous usage metrics</p>
+                                
                             </div>
                             
                             <!-- minai_metrics_sampling_rate -->
@@ -1710,11 +1747,14 @@
                         </div>
                         <div class="section-content collapsed">
                             <div class="info-section">
-                                <p><strong>💡 Translation vs Roleplay: Understanding the Two Modes</strong></p>
-                                
+                                <p>💡 This section only refers to roleplay chat modes activated according to 
+                                MCM - MinAI - General - Roleplay Text or Roleplay Voice settings.</br> 
+                                None of the instructions here are taken into account in normal chat mode.</p>
+                                <p><strong>💡 Translation vs Roleplay: Understanding the Two Chat Modes</strong></p>
+
                                 <details>
                                     <summary><strong>Translation Mode (Converting Player Input)</strong></summary>
-                                    <p>Used when the player types dialogue that needs to be converted into their character's speaking style.</p>
+                                    <p>Used when the player's dialogue that needs to be converted into their character's speaking style.</p>
                                     <div class="example-block">
                                         <p><strong>Example Scenario:</strong></p>
                                         <ul>
@@ -1727,8 +1767,11 @@
                                 </details>
 
                                 <details>
-                                    <summary><strong>Roleplay Mode (Automatic Responses)</strong></summary>
-                                    <p>Used with the "tap to roleplay" feature where the character generates appropriate dialogue for the situation.</p>
+                                    <summary><strong>Roleplay Mode (Automatic Responses in Chat)</strong></summary>
+                                    <p>Used with the "tap to roleplay" feature where the character generates appropriate dialogue for the situation. 
+                                    To activate this mode, tap the "Roleplay Voice" key. 
+                                    A very short activation will generate a player comment instead of STT.
+                                    </p>
                                     <div class="example-block">
                                         <p><strong>Example Scenario:</strong></p>
                                         <ul>
@@ -1743,11 +1786,12 @@
                                 <div class="important-note">
                                     <p><strong>Key Technical Differences:</strong></p>
                                     <ul>
-                                        <li>Translation prompts must include '#ORIGINAL_INPUT#' variable</li>
-                                        <li>Roleplay prompts focus on generating contextual responses</li>
-                                        <li>Both modes should maintain character personality and current situation awareness</li>
+                                        <li>Translation prompts must include '#ORIGINAL_INPUT#' variable.</li>
+                                        <li>Roleplay prompts focus on generating contextual responses.</li>
+                                        <li>Both modes should maintain character personality and current situation awareness.</li>
                                     </ul>
                                 </div>
+                                
                             </div>
 
                             <!-- Context Messages -->
@@ -1780,7 +1824,7 @@
                                                 <label class="option-label" for="system-prompt">System Prompt</label>
                                                 <button class="reset-button" onclick="resetOptionToDefault('system-prompt')">Reset to Default</button>
                                             </div>
-                                            <p>The system prompt used for normal interactions...</p>
+                                            <p>The system prompt used for normal interactions.</p>
                                             <textarea id="system-prompt" rows="3"></textarea>
                                         </div>
 
@@ -2063,7 +2107,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                             
                             <div class="preview-panel" id="preview-content">
                                 Loading preview...
-                            </div>
+                            </div> 
                         </div>
                     </div>
                 </div>
@@ -2115,6 +2159,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 const configData = await response.json();
 
                 document.getElementById('prompt-head-override').value = configData.PROMPT_HEAD_OVERRIDE;
+                document.getElementById('use-prompt-head-override').checked = configData.use_prompt_head_override;
                 document.getElementById('use-narrator-profile').checked = configData.use_narrator_profile;
                 document.getElementById('enforce-short-responses').checked = configData.enforce_short_responses;
                 document.getElementById('enable-prompt-slop-cleanup').checked = configData.enable_prompt_slop_cleanup;
@@ -2124,6 +2169,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 document.getElementById('force-voice-type').checked = configData.force_voice_type;
                 document.getElementById('self-narrator').checked = configData.self_narrator;
                 document.getElementById('disable-nsfw').checked = configData.disable_nsfw;
+                document.getElementById('npc-react-to-nc-acts').checked = configData.NPC_react_to_non_consensual_acts;
                 document.getElementById('restrict-nonfollower-functions').checked = configData.restrict_nonfollower_functions;
                 document.getElementById('always-enable-functions').checked = configData.always_enable_functions;
                 document.getElementById('force-aiff-name').checked = configData.force_aiff_name_to_ingame_name;
@@ -2147,6 +2193,8 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 populateDynamicList('commands-to-purge-container', configData.commands_to_purge);
                 populateDynamicList('events-to-ignore-container', configData.events_to_ignore);
                 populateVoiceTypeFallbacks(configData.voicetype_fallbacks);
+                document.getElementById('emotions-expression-prompt').value = configData.action_prompts.emotions_expression;
+                document.getElementById('use-emotions-expression').checked = configData.use_emotions_expression;
                 document.getElementById('singing-prompt').value = configData.action_prompts.singing;
                 document.getElementById('self-narrator-explicit').value = configData.action_prompts.self_narrator_explicit;
                 document.getElementById('self-narrator-normal').value = configData.action_prompts.self_narrator_normal;
@@ -2236,7 +2284,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     const content = section.querySelector('.section-content');
                     
                     // Check if this is the Context Preview section
-                    if (header && header.textContent.trim() === 'Context Preview') {
+                    if (header && header.textContent.trim() === 'Context Preview xxx not now xxx') {
                         // Make sure Context Preview is expanded
                         header.classList.remove('collapsed');
                         content.classList.remove('collapsed');
@@ -2261,6 +2309,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
             // Get the current config
             const newConfig = {
                 PROMPT_HEAD_OVERRIDE: document.getElementById('prompt-head-override').value,
+                use_prompt_head_override: document.getElementById('use-prompt-head-override').checked,
                 use_narrator_profile: document.getElementById('use-narrator-profile').checked,
                 enforce_short_responses: document.getElementById('enforce-short-responses').checked,
                 enable_prompt_slop_cleanup: document.getElementById('enable-prompt-slop-cleanup').checked,
@@ -2270,6 +2319,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 force_voice_type: document.getElementById('force-voice-type').checked,
                 self_narrator: document.getElementById('self-narrator').checked,
                 disable_nsfw: document.getElementById('disable-nsfw').checked,
+                NPC_react_to_non_consensual_acts: document.getElementById('npc-react-to-nc-acts').checked,
                 restrict_nonfollower_functions: document.getElementById('restrict-nonfollower-functions').checked,
                 always_enable_functions: document.getElementById('always-enable-functions').checked,
                 force_aiff_name_to_ingame_name: document.getElementById('force-aiff-name').checked,
@@ -2291,7 +2341,9 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 minai_metrics_sampling_rate: parseFloat(document.getElementById('minai-metrics-sampling-rate').value),
                 
                 voicetype_fallbacks: getVoiceTypeFallbacks(),
+                use_emotions_expression: document.getElementById('use-emotions-expression').checked,
                 action_prompts: {
+                    emotions_expression: document.getElementById('emotions-expression-prompt').value,
                     singing: document.getElementById('singing-prompt').value,
                     player_diary: document.getElementById('player-diary').value,
                     follower_diary: document.getElementById('follower-diary').value,
@@ -2641,7 +2693,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     const content = header.nextElementSibling;
                     
                     // If collapsing all, still keep Context Preview expanded
-                    if (!expand && header.textContent.trim() === 'Context Preview') {
+                    if (!expand && header.textContent.trim() === 'Context Preview xxx not now xxx') {
                         header.classList.remove('collapsed');
                         content.classList.remove('collapsed');
                         
@@ -3079,6 +3131,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 
                 const config = {
                     PROMPT_HEAD_OVERRIDE: document.getElementById('prompt-head-override').value,
+                    use_prompt_head_override: document.getElementById('use-prompt-head-override').checked,
                     use_narrator_profile: document.getElementById('use-narrator-profile').checked,
                     enforce_short_responses: document.getElementById('enforce-short-responses').checked,
                     enable_prompt_slop_cleanup: document.getElementById('enable-prompt-slop-cleanup').checked,
@@ -3088,6 +3141,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     force_voice_type: document.getElementById('force-voice-type').checked,
                     self_narrator: document.getElementById('self-narrator').checked,
                     disable_nsfw: document.getElementById('disable-nsfw').checked,
+                    NPC_react_to_non_consensual_acts: document.getElementById('npc-react-to-nc-acts').checked,
                     restrict_nonfollower_functions: document.getElementById('restrict-nonfollower-functions').checked,
                     always_enable_functions: document.getElementById('always-enable-functions').checked,
                     force_aiff_name_to_ingame_name: document.getElementById('force-aiff-name').checked,
@@ -3104,7 +3158,9 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     inventory_items_limit: parseInt(document.getElementById('inventory-items-limit').value),
                     use_item_relevancy_scoring: document.getElementById('use-item-relevancy-scoring').checked,
                     voicetype_fallbacks: getVoiceTypeFallbacks(),
+                    use_emotions_expression: document.getElementById('use-emotions-expression').checked,
                     action_prompts: {
+                        emotions_expression: document.getElementById('emotions-expression-prompt').value,
                         singing: document.getElementById('singing-prompt').value,
                         player_diary: document.getElementById('player-diary').value,
                         follower_diary: document.getElementById('follower-diary').value,
@@ -3193,6 +3249,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
 
                         // Apply all fields with proper type handling
                         document.getElementById('prompt-head-override').value = importedConfig.PROMPT_HEAD_OVERRIDE ?? baseConfig.PROMPT_HEAD_OVERRIDE;
+                        document.getElementById('use-prompt-head-override').checked = importedConfig.use_prompt_head_override ?? baseConfig.use_prompt_head_override;
                         document.getElementById('use-narrator-profile').checked = importedConfig.use_narrator_profile ?? baseConfig.use_narrator_profile;
                         document.getElementById('enforce-short-responses').checked = importedConfig.enforce_short_responses ?? baseConfig.enforce_short_responses;
                         document.getElementById('enable-prompt-slop-cleanup').checked = importedConfig.enable_prompt_slop_cleanup ?? baseConfig.enable_prompt_slop_cleanup;
@@ -3202,6 +3259,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                         document.getElementById('force-voice-type').checked = importedConfig.force_voice_type ?? baseConfig.force_voice_type;
                         document.getElementById('self-narrator').checked = importedConfig.self_narrator ?? baseConfig.self_narrator;
                         document.getElementById('disable-nsfw').checked = importedConfig.disable_nsfw ?? baseConfig.disable_nsfw;
+                        document.getElementById('npc-react-to-nc-acts').checked = importedConfig.NPC_react_to_non_consensual_acts ?? baseConfig.NPC_react_to_non_consensual_acts;
                         document.getElementById('restrict-nonfollower-functions').checked = importedConfig.restrict_nonfollower_functions ?? baseConfig.restrict_nonfollower_functions;
                         document.getElementById('always-enable-functions').checked = importedConfig.always_enable_functions ?? baseConfig.always_enable_functions;
                         document.getElementById('force-aiff-name').checked = importedConfig.force_aiff_name_to_ingame_name ?? baseConfig.force_aiff_name_to_ingame_name;
@@ -3228,8 +3286,11 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                             populateVoiceTypeFallbacks(importedConfig.voicetype_fallbacks);
                         }
 
+                        document.getElementById('use-emotions-expression').checked = importedConfig.use_emotions_expression ?? baseConfig.use_emotions_expression;
+                        
                         // Handle action prompts
                         if (importedConfig.action_prompts) {
+                            document.getElementById('emotions-expression-prompt').value = importedConfig.action_prompts.emotions_expression ?? baseConfig.action_prompts.emotions_expression;
                             document.getElementById('singing-prompt').value = importedConfig.action_prompts.singing ?? baseConfig.action_prompts.singing;
                             document.getElementById('player-diary').value = importedConfig.action_prompts.player_diary ?? baseConfig.action_prompts.player_diary;
                             document.getElementById('follower-diary').value = importedConfig.action_prompts.follower_diary ?? baseConfig.action_prompts.follower_diary;
@@ -3507,6 +3568,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
             const mapping = {
                 // Basic settings
                 'prompt-head-override': 'PROMPT_HEAD_OVERRIDE',
+                'use-prompt-head-override': 'use_prompt_head_override',
                 'use-narrator-profile': 'use_narrator_profile',
                 'enforce-short-responses': 'enforce_short_responses',
                 'enable-prompt-slop-cleanup': 'enable_prompt_slop_cleanup',
@@ -3516,6 +3578,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 'force-voice-type': 'force_voice_type',
                 'self-narrator': 'self_narrator',
                 'disable-nsfw': 'disable_nsfw',
+                'npc-react-to-nc-acts': 'NPC_react_to_non_consensual_acts',
                 'restrict-nonfollower-functions': 'restrict_nonfollower_functions',
                 'always-enable-functions': 'always_enable_functions',
                 'force-aiff-name': 'force_aiff_name_to_ingame_name',
@@ -3539,7 +3602,9 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 'minai-metrics-enabled': 'minai_metrics_enabled',
                 'minai-metrics-sampling-rate': 'minai_metrics_sampling_rate',
 
+                'use-emotions-expression': 'use_emotions_expression',
                 // Action prompts
+                'emotions-expression-prompt': 'action_prompts.emotions_expression',
                 'singing-prompt': 'action_prompts.singing',
                 'player-diary': 'action_prompts.player_diary',
                 'follower-diary': 'action_prompts.follower_diary',
@@ -3564,9 +3629,12 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 'roleplay-request-combat': 'roleplay_settings.roleplay_request_combat',
 
                 // Section configurations
-                'roleplay_settings.sections.CHARACTER_BACKGROUND': 'roleplay_settings.sections.CHARACTER_BACKGROUND',
-                'roleplay_settings.sections.CHARACTER_STATUS': 'roleplay_settings.sections.CHARACTER_STATUS',
+                'roleplay_settings.sections.PROMPT_HEADER': 'roleplay_settings.sections.PROMPT_HEADER',
+                'roleplay_settings.sections.YOUR_PERSONA': 'roleplay_settings.sections.YOUR_PERSONA',
+                'roleplay_settings.sections.YOUR_CHARACTER_STATUS': 'roleplay_settings.sections.YOUR_CHARACTER_STATUS',
+                'roleplay_settings.sections.YOUR_INTERLOCUTOR': 'roleplay_settings.sections.YOUR_INTERLOCUTOR',
                 'roleplay_settings.sections.NEARBY_ENTITIES': 'roleplay_settings.sections.NEARBY_ENTITIES',
+                'roleplay_settings.sections.NEARBY_PLACES': 'roleplay_settings.sections.NEARBY_PLACES',
                 'roleplay_settings.sections.RECENT_EVENTS': 'roleplay_settings.sections.RECENT_EVENTS',
                 'roleplay_settings.sections.INSTRUCTIONS': 'roleplay_settings.sections.INSTRUCTIONS'
             };
@@ -3640,6 +3708,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 const configMapping = {
                     // Basic settings
                     'prompt-head-override': 'PROMPT_HEAD_OVERRIDE',
+                    'use-prompt-head-override': 'use_prompt_head_override',
                     'use-narrator-profile': 'use_narrator_profile',
                     'enforce-short-responses': 'enforce_short_responses',
                     'enable-prompt-slop-cleanup': 'enable_prompt_slop_cleanup',
@@ -3649,6 +3718,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     'force-voice-type': 'force_voice_type',
                     'self-narrator': 'self_narrator',
                     'disable-nsfw': 'disable_nsfw',
+                    'npc-react-to-nc-acts': 'NPC_react_to_non_consensual_acts',
                     'restrict-nonfollower-functions': 'restrict_nonfollower_functions',
                     'always-enable-functions': 'always_enable_functions',
                     'force-aiff-name': 'force_aiff_name_to_ingame_name',
@@ -3672,7 +3742,9 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                     'minai-metrics-enabled': 'minai_metrics_enabled',
                     'minai-metrics-sampling-rate': 'minai_metrics_sampling_rate',
 
+                    'use-emotions-expression': 'use_emotions_expression',
                     // Action prompts
+                    'emotions-expression-prompt': 'action_prompts.emotions_expression',
                     'singing-prompt': 'action_prompts.singing',
                     'player-diary': 'action_prompts.player_diary',
                     'follower-diary': 'action_prompts.follower_diary',
@@ -3819,6 +3891,7 @@ Intimate: You are roleplaying as #PLAYER_NAME#. Respond naturally as your charac
                 
                 // System prompt settings
                 "response_guidelines": "System Prompt Settings",
+                "verbal_emotions_expression": "System Prompt Settings",
                 "action_enforcement": "System Prompt Settings"
             };
             

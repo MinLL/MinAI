@@ -1,17 +1,35 @@
 <?php
+// not to be included explicitly, must be included only via requireFilesRecursively()
+
 // Start metrics for this entry point
 require_once("utils/metrics_util.php");
 
+/*
+// min old version
 $fast_commands = ["addnpc","_quest","setconf","request","_speech","infoloc","infonpc","infonpc_close",
-"infoaction","status_msg","delete_event","itemfound","_questdata","_uquest","location","_questreset"];
+    "infoaction","status_msg","delete_event","itemfound","_questdata","_uquest","location","_questreset"];
 
-// $fast_commands = [];
+// chim new version
+$fast_commands = ["addnpc","updateprofile","diary","_quest","setconf","request","_speech","infoloc","infonpc","infonpc_close",
+    "infoaction","status_msg","delete_event","itemfound","_questdata","_uquest","location","_questreset",
+    "chat","bleedout","waitstart","waitstop",
+    "util_location_name","spellcast","npcspellcast","updateprofiles_batch_async","core_profile_assign","switchrace","combatbark"
+    ];
+*/
+
+// chim new version
+$fast_commands = ["addnpc","updateprofile","diary","_quest","setconf","request","_speech","infoloc","infonpc","infonpc_close",
+    "infoaction","status_msg","delete_event","itemfound","_questdata","_uquest","location","_questreset",
+    "chat","bleedout","waitstart","waitstop",
+    "util_location_name","spellcast","npcspellcast","updateprofiles_batch_async","core_profile_assign","switchrace","combatbark"
+    ];
+
 // Check for exact matches against fast commands
 if (isset($GLOBALS["gameRequest"]) && in_array($GLOBALS["gameRequest"][0], $fast_commands)) {
     $GLOBALS["minai_skip_processing"] = true;
-}
-else {
-    // error_log("Processing Non-Fast request: " . $GLOBALS["gameRequest"][0]);
+    //error_log("Skip fast-request: " . $GLOBALS["gameRequest"][0]); // debug
+} else {
+    //error_log("Processing Non-Fast request: " . $GLOBALS["gameRequest"][0]); // debug
 }
 
 // Avoid processing for fast / storage events
@@ -26,6 +44,20 @@ minai_start_timer('preprocessing_php', 'MinAI');
 // Initialize common variables
 require_once("utils/init_common_variables.php");
 
+if ((!isset($GLOBALS["action_prompts"]["normal_scene"])) ||
+    (!isset($GLOBALS["action_prompts"]["explicit_scene"])) ||
+    (empty($GLOBALS["action_prompts"]))) {
+
+    //include("/var/www/html/HerikaServer/ext/minai_plugin/config .php");
+    $GLOBALS["action_prompts"] = $GLOBALS["action_prompts_copy"]; 
+    error_log("WARNING in preprocessing: CHIM made an attempt to disable MinAI action_prompts! ");
+}
+
+
+require_once("util.php");
+require_once("contextbuilders.php");
+require_once("roleplaybuilder.php");
+
 // Check for banned phrases in gameRequest[3]
 $banned_phrases = ["Thank you for watching", "Thanks for watching", "Thank you very much for watching"];
 if (isset($GLOBALS["gameRequest"][3])) {
@@ -38,9 +70,6 @@ if (isset($GLOBALS["gameRequest"][3])) {
     }
 }
 
-require_once("util.php");
-require_once("contextbuilders.php");
-require_once("roleplaybuilder.php");
 // TODO: Add an actual install routine to the HerikaServer proper to not do this every request.
 // InitiateDBTables();
 

@@ -1,15 +1,27 @@
 <?php
+// not to be included explicitly, must be included only via requireFilesRecursively()
 // Start metrics for this entry point
 require_once("utils/metrics_util.php");
 // $globalTimer = new MinAITimerScope('globals_php', 'MinAI');
 
 require_once("config.base.php");
 require_once("logger.php");
+require_once("util.php");
+
 $pluginPath = "/var/www/html/HerikaServer/ext/minai_plugin";
 if (!file_exists("$pluginPath/config.php")) {
     copy("$pluginPath/config.base.php", "$pluginPath/config.php");
 }
 require_once("config.php");
+
+if ((isset($GLOBALS["action_prompts"]["normal_scene"])) &&
+    (isset($GLOBALS["action_prompts"]["explicit_scene"]))) {
+    if (!isset($GLOBALS["action_prompts_copy"])) {
+        $GLOBALS["action_prompts_copy"] = $GLOBALS["action_prompts"];
+        //error_log(" globals: making action_prompts copy ");
+    }
+}
+
 $GLOBALS["TTS_FALLBACK_FNCT"] = function($responseTextUnmooded, $mood, $responseText) {
 
     if (!isset($GLOBALS["db"]))
@@ -43,8 +55,6 @@ $GLOBALS["TTS_FALLBACK_FNCT"] = function($responseTextUnmooded, $mood, $response
 };
 
 
-
-
 $GLOBALS["external_fast_commands"] = [
     // Events that set $MUST_DIE=true in customintegrations.php
     "minai_init",             // Initialization event
@@ -59,4 +69,14 @@ $GLOBALS["external_fast_commands"] = [
     // "minai_clearinventory"    // Clear inventory
 ];
 
+if (!isset($GLOBALS["NPC_react_to_non_consensual_acts"])) 
+    $GLOBALS["NPC_react_to_non_consensual_acts"] = true;
+
 $GLOBALS["CHIM_NO_EXAMPLES"] = true;
+$GLOBALS["CHIM_DEBUG_LEVEL"] = 0;
+
+if (IsRadiant()) {
+	//error_log(" Radiant - exec trace "); //debug
+	$GLOBALS["BORED_EVENT_SERVERSIDE"] = false; // MinAI radiant will suspend CHIM bored sside event
+} 
+

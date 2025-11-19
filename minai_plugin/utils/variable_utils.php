@@ -7,23 +7,24 @@ function GetActorPronouns($name) {
         "possessive" => "their"
     ];
     
-    // Try to determine gender from keywords
-    if (IsMale($name)) {
+    $gender = GetGender($name);
+    
+    if ($gender == 'male') {
         $pronouns = [
             "subject" => "he",
             "object" => "him",
             "possessive" => "his"
         ];
-    } else if (IsFemale($name)) {
+    } elseif ($gender == 'female') {
         $pronouns = [
             "subject" => "she",
             "object" => "her",
             "possessive" => "her"
         ];
     }
-    
     return $pronouns;
 }
+
 function replaceVariables($content, $replacements, $depth = 0) {
     if (empty($content) || $depth > 10) { // Prevent infinite recursion
         return $content;
@@ -64,10 +65,17 @@ function replaceVariables($content, $replacements, $depth = 0) {
 
 
 function ExpandPromptVariables($prompt) {
-    // Get pronouns for target, Herika, and player from globals
-    $targetPronouns = $GLOBALS["target_pronouns"];
-    $herikaPronouns = $GLOBALS["herika_pronouns"];
-    $playerPronouns = $GLOBALS["player_pronouns"];
+    // Get pronouns for target, Herika, and player (sometime globals are not ok)
+    //$targetPronouns = $GLOBALS["target_pronouns"];
+    $targetPronouns = GetActorPronouns($GLOBALS["target"]);
+    //$herikaPronouns = $GLOBALS["herika_pronouns"];
+    $herikaPronouns = GetActorPronouns($GLOBALS["HERIKA_NAME"]);
+    //$playerPronouns = $GLOBALS["player_pronouns"];
+    $playerPronouns = GetActorPronouns($GLOBALS["PLAYER_NAME"]);
+
+    $GLOBALS["target_pronouns"] = $targetPronouns;
+    $GLOBALS["herika_pronouns"] = $herikaPronouns;
+    $GLOBALS["player_pronouns"] = $playerPronouns;
     
     $variables = array(
         '#target#' => $GLOBALS["target"],

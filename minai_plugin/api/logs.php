@@ -8,20 +8,31 @@ $logDir = realpath('/var/www/html/HerikaServer/log/');
 // Function to safely get real path even for symlinks
 function getSafePath($base, $path) {
     $realBase = realpath($base);
-    $fullPath = realpath($base . DIRECTORY_SEPARATOR . $path);
-    
-    // If the file is a symlink, get the real path
-    if (is_link($base . DIRECTORY_SEPARATOR . $path)) {
-        $fullPath = realpath(readlink($base . DIRECTORY_SEPARATOR . $path));
+    $filePath = $base . DIRECTORY_SEPARATOR . $path;
+
+    // Check if it's a symlink first
+    if (is_link($filePath)) {
+        $linkTarget = readlink($filePath);
+        if ($linkTarget !== false) {
+            // Resolve relative symlinks
+            if (strpos($linkTarget, '/') !== 0) {
+                $linkTarget = dirname($filePath) . DIRECTORY_SEPARATOR . $linkTarget;
+            }
+            $fullPath = realpath($linkTarget);
+        } else {
+            return false; // Invalid symlink
+        }
+    } else {
+        $fullPath = realpath($filePath);
     }
-    
+
     // Check if the path is within allowed directories
-    if ($fullPath === false || 
-        (strpos($fullPath, $realBase) !== 0 && 
-         strpos($fullPath, '/var/log/apache2') !== 0)) {
+    if ( (($fullPath) === false) || 
+		(strpos($fullPath, $realBase) !== 0) && (strpos($fullPath, '/var/log/apache2') !== 0)
+        ) {
         return false;
-    }
-    
+    } 
+
     return $fullPath;
 }
 
@@ -29,23 +40,25 @@ function getSafePath($base, $path) {
 if (isset($_GET['list'])) {
     $files = glob($logDir . DIRECTORY_SEPARATOR . '*.log');
     $logFiles = [];
-    
+
     foreach ($files as $file) {
-        if (is_readable($file) || is_readable(readlink($file))) {
+        if ( (is_readable($file)) || (is_link($file) && is_readable(readlink($file))) ) {
             $filename = basename($file);
             $realPath = getSafePath($logDir, $filename);
-            
-            if ($realPath && is_readable($realPath)) {
+            if (($realPath) && is_readable($realPath)) {
+                $i_sz = filesize($realPath);
+                if (!$i_sz) $i_sz = 0;
+                $i_ts = filemtime($realPath);
+                if (!$i_ts) $i_ts = 0;
                 $logFiles[] = [
                     'name' => $filename,
-                    'size' => filesize($realPath),
-                    'modified' => filemtime($realPath),
+                    'size' => $i_sz,
+                    'modified' => $i_ts,
                     'readable' => true
                 ];
             }
         }
     }
-    
     echo json_encode(['files' => $logFiles]);
     exit;
 }

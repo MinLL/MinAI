@@ -11,7 +11,7 @@ function addSexEventsToEventLog($sceneDesc, $threadId) {
         'info_sexscenechange',
         $gameRequest[1],
         $gameRequest[2],
-        $sceneDesc." #SEX_SCENARIO #ID_$threadId",
+        "<SEX_SCENARIO>#SEX_SCENARIO #ID_$threadId: " . $sceneDesc . "</SEX_SCENARIO>",
     ]);
 }
 
@@ -65,7 +65,7 @@ function updateThreadsDB() {
         switch(strtolower($type)) {
             case "startthread": 
             case "scenechange": {
-                $thread = $db->fetchAll("SELECT * from minai_threads WHERE thread_id = $threadId LIMIT 1");
+                $thread = $db->fetchAll("SELECT  * from minai_threads WHERE thread_id = $threadId LIMIT 1");
                 if(!isset($thread)) {
                     minai_log("error", "Failed to fetch thread with ID: $threadId");
                     return;

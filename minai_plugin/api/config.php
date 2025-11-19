@@ -63,15 +63,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // Prepare the response using the loaded configuration
     $configData = array(
         // Basic settings
-        "PROMPT_HEAD_OVERRIDE" => $GLOBALS["PROMPT_HEAD_OVERRIDE"],
-        "use_narrator_profile" => $GLOBALS["use_narrator_profile"],
-        "enforce_short_responses" => $GLOBALS["enforce_short_responses"],
+        "PROMPT_HEAD_OVERRIDE" => $GLOBALS["PROMPT_HEAD_OVERRIDE"] ?? "",
+        "use_prompt_head_override" => $GLOBALS["use_prompt_head_override"] ?? false,
+        "use_narrator_profile" => $GLOBALS["use_narrator_profile"] ?? false,
+        "enforce_short_responses" => $GLOBALS["enforce_short_responses"] ?? false,
         "stop_narrator_context_leak" => $GLOBALS["stop_narrator_context_leak"],
         "devious_narrator_eldritch_voice" => $GLOBALS["devious_narrator_eldritch_voice"],
         "devious_narrator_telvanni_voice" => $GLOBALS["devious_narrator_telvanni_voice"],
         "force_voice_type" => $GLOBALS["force_voice_type"],
         "self_narrator" => $GLOBALS["self_narrator"],
         "disable_nsfw" => $GLOBALS["disable_nsfw"],
+        "NPC_react_to_non_consensual_acts" => $GLOBALS["NPC_react_to_non_consensual_acts"],
         "restrict_nonfollower_functions" => $GLOBALS["restrict_nonfollower_functions"],
         "always_enable_functions" => $GLOBALS["always_enable_functions"],
         "force_aiff_name_to_ingame_name" => $GLOBALS["force_aiff_name_to_ingame_name"],
@@ -89,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         "realnames_support" => $GLOBALS["realnames_support"],
         "use_llm_fallback" => $GLOBALS["use_llm_fallback"],
         "enforce_single_json" => $GLOBALS["enforce_single_json"],
-        "CHIM_NO_EXAMPLES" => $GLOBALS["CHIM_NO_EXAMPLES"],
+        "CHIM_NO_EXAMPLES" => $GLOBALS["CHIM_NO_EXAMPLES"] ?? true,
         
         // Server settings
         "input_delay_for_radiance" => intval($GLOBALS["input_delay_for_radiance"]),
@@ -102,8 +104,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         "minai_metrics_enabled" => $GLOBALS["minai_metrics_enabled"],
         "minai_metrics_sampling_rate" => floatval($GLOBALS["minai_metrics_sampling_rate"]),
         
+        "use_emotions_expression" => $GLOBALS["use_emotions_expression"] ?? false,
         // Action prompts
         "action_prompts" => array(
+            "emotions_expression" => ($GLOBALS["action_prompts"]["emotions_expression"] ?? ""),
             "singing" => $GLOBALS["action_prompts"]["singing"],
             "player_diary" => $GLOBALS["action_prompts"]["player_diary"],
             "follower_diary" => $GLOBALS["action_prompts"]["follower_diary"],
@@ -121,7 +125,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     );
 
     // Return the config data as JSON
-    echo json_encode($configData);
+    $s_json = json_encode($configData, JSON_INVALID_UTF8_SUBSTITUTE);
+    if (!($s_json === false)) {
+        //error_log(" dbg api config.php json encode: $s_json "); // debug
+        echo $s_json;
+    } else {
+        echo "";
+        error_log(" api config.php json encode error: " . json_last_error_msg() ." configData=". print_r($configData, true) );
+    }
 }
 
 // Update config data and write it back to the config.php file (POST request)
@@ -138,6 +149,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'PROMPT_HEAD_OVERRIDE',
             'use_narrator_profile',
             'enforce_short_responses',
+            'disable_nsfw',
+            'restrict_nonfollower_functions',
+            'always_enable_functions',
+            'strip_emotes_from_output',
+            'input_delay_for_radiance',
             // ... add all required fields ...
         ];
 
@@ -155,6 +171,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Basic settings
         $newConfig .= "\$GLOBALS['PROMPT_HEAD_OVERRIDE'] = \"" . ($input['PROMPT_HEAD_OVERRIDE']) . "\";\n";
+        $newConfig .= "\$GLOBALS['use_prompt_head_override'] = " . ($input['use_prompt_head_override'] ? 'true' : 'false') . ";\n";
         $newConfig .= "\$GLOBALS['use_narrator_profile'] = " . ($input['use_narrator_profile'] ? 'true' : 'false') . ";\n";
         $newConfig .= "\$GLOBALS['enforce_short_responses'] = " . ($input['enforce_short_responses'] ? 'true' : 'false') . ";\n";
         $newConfig .= "\$GLOBALS['stop_narrator_context_leak'] = " . ($input['stop_narrator_context_leak'] ? 'true' : 'false') . ";\n";
@@ -163,6 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $newConfig .= "\$GLOBALS['force_voice_type'] = " . ($input['force_voice_type'] ? 'true' : 'false') . ";\n";
         $newConfig .= "\$GLOBALS['self_narrator'] = " . ($input['self_narrator'] ? 'true' : 'false') . ";\n";
         $newConfig .= "\$GLOBALS['disable_nsfw'] = " . ($input['disable_nsfw'] ? 'true' : 'false') . ";\n";
+        $newConfig .= "\$GLOBALS['NPC_react_to_non_consensual_acts'] = " . ($input['NPC_react_to_non_consensual_acts'] ? 'true' : 'false') . ";\n";
         $newConfig .= "\$GLOBALS['restrict_nonfollower_functions'] = " . ($input['restrict_nonfollower_functions'] ? 'true' : 'false') . ";\n";
         $newConfig .= "\$GLOBALS['always_enable_functions'] = " . ($input['always_enable_functions'] ? 'true' : 'false') . ";\n";
         $newConfig .= "\$GLOBALS['force_aiff_name_to_ingame_name'] = " . ($input['force_aiff_name_to_ingame_name'] ? 'true' : 'false') . ";\n";
@@ -183,7 +201,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $newConfig .= "\$GLOBALS['CHIM_NO_EXAMPLES'] = " . ($input['CHIM_NO_EXAMPLES'] ? 'true' : 'false') . ";\n";
         
         // Server settings
-        $newConfig .= "\$GLOBALS['input_delay_for_radiance'] = " . (intval($input['input_delay_for_radiance']) ?: 15) . ";\n";
+        $newConfig .= "\$GLOBALS['input_delay_for_radiance'] = " . (intval($input['input_delay_for_radiance']) ?: 25) . ";\n";
         
         // Inventory settings
         $newConfig .= "\$GLOBALS['inventory_items_limit'] = " . (intval($input['inventory_items_limit']) ?: 5) . ";\n";
@@ -193,8 +211,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $newConfig .= "\$GLOBALS['minai_metrics_enabled'] = " . ($input['minai_metrics_enabled'] ? 'true' : 'false') . ";\n";
         $newConfig .= "\$GLOBALS['minai_metrics_sampling_rate'] = " . (floatval($input['minai_metrics_sampling_rate']) ?: 0.1) . ";\n";
         
+        $newConfig .= "\$GLOBALS['use_emotions_expression'] = " . ($input['use_emotions_expression'] ? 'true' : 'false') . ";\n";
         // Action prompts
         $newConfig .= "\$GLOBALS['action_prompts'] = " . buildAssociativeArrayString(array(
+            'emotions_expression' => $input['action_prompts']['emotions_expression'], 
             'singing' => $input['action_prompts']['singing'],
             'player_diary' => $input['action_prompts']['player_diary'],
             'follower_diary' => $input['action_prompts']['follower_diary'],

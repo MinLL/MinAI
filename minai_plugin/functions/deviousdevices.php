@@ -475,7 +475,7 @@ if (!$inCombat) {
         // Set custom prompt template for this action
         $actionType = $isEquip ? "equipping" : "removing";
         $deviceType = str_replace(["ExtCmdEquip", "ExtCmdUnequip"], "", $actionName);
-        // $GLOBALS["PROMPTS"]["afterfunc"]["cue"][$actionName] = "{$GLOBALS["HERIKA_NAME"]} comments on $actionType a $deviceType on/from {$target}. {$GLOBALS["TEMPLATE_DIALOG"]}";
+        // $GLOBALS["PROMPTS"]["afterfunc"]["cue"][$actionName] = "{$GLOBALS["HERIKA_NAME"]} comments on $actionType a $deviceType on/from {$target}. {$GLOBALS["TEMPLATE_  DIALOG"]}";
         
         // Register the action
         directRegisterAction(

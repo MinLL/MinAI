@@ -26,4 +26,5 @@ directRegisterAction(
     ShouldEnableHarassFunctions($GLOBALS['HERIKA_NAME']) && !$GLOBALS["disable_nsfw"]
 );
 
+//error_log(" --- slapp.php - exec trace ");
 // actions registered in deviousfollowers_context.php
