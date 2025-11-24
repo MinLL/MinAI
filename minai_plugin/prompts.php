@@ -64,7 +64,7 @@ $GLOBALS["PROMPTS"]["minai_force_rechat"] = [
 		"({$GLOBALS["HERIKA_NAME"]} replies to {$GLOBALS["target"]}. {$GLOBALS["HERIKA_NAME"]} add their insights to the conversation.) {$GLOBALS["TEMPLATE_DIALOG"]}",
 		"({$GLOBALS["HERIKA_NAME"]} reacts to {$GLOBALS["target"]}. {$GLOBALS["HERIKA_NAME"]} add humor to lighten the conversation.) {$GLOBALS["TEMPLATE_DIALOG"]}",
 		"({$GLOBALS["HERIKA_NAME"]} responds to {$GLOBALS["target"]}. {$GLOBALS["HERIKA_NAME"]} follow the conversation and express their own thoughts.) {$GLOBALS["TEMPLATE_DIALOG"]}",
-		"({$GLOBALS["HERIKA_NAME"]} reacts to {$GLOBALS["target"]}. {$GLOBALS["HERIKA_NAME"]} make a personal remark.) {$GLOBALS["TEMPLATE_DIALOG"]}",
+		"({$GLOBALS["HERIKA_NAME"]} reacts to {$GLOBALS["target"]}. {$GLOBALS["HERIKA_NAME"]} makes a personal remark.) {$GLOBALS["TEMPLATE_DIALOG"]}",
 		"({$GLOBALS["HERIKA_NAME"]} replies to {$GLOBALS["target"]}. {$GLOBALS["HERIKA_NAME"]} share an opinion with the interlocutor.) {$GLOBALS["TEMPLATE_DIALOG"]}",
 		"({$GLOBALS["HERIKA_NAME"]} reacts to {$GLOBALS["target"]}. {$GLOBALS["HERIKA_NAME"]} tell a joke related to current conversation topic.) {$GLOBALS["TEMPLATE_DIALOG"]}",
 		"({$GLOBALS["HERIKA_NAME"]} responds to {$GLOBALS["target"]}. {$GLOBALS["HERIKA_NAME"]} add a personal point of view regarding conversation topic.) {$GLOBALS["TEMPLATE_DIALOG"]}",

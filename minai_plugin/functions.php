@@ -246,23 +246,84 @@ $lastDefeat = GetActorValue("PLAYER", "lastDefeat");
 $defeatCooldown = !empty($lastDefeat) && (time() - intval($lastDefeat) < 300);
 $inCombat = IsEnabled($GLOBALS["HERIKA_NAME"], "inCombat");
 $isFollower = IsFollower($GLOBALS["HERIKA_NAME"]);
+$inScene = IsSexActiveSpeaker(); 
 
 foreach ($GLOBALS["ENABLED_FUNCTIONS"] as $n=>$func) {
     // Block Attack command if:
     // - Command is in commands_to_purge list
     // - NPC is in combat and command is Attack
     // - NPC is a follower, there's an active defeat cooldown, and command is Attack
-    if (in_array($func, $GLOBALS["commands_to_purge"]) || 
-        ($inCombat && $func == "Attack") ||
-        ($defeatCooldown && $func == "Attack" && $isFollower)) {
-        $commandsToPurge[] = $n;
-    }
-    // Purge ExchangeItems if the npc is a follower
-    if ($isFollower && $func == "ExchangeItems") {
-        $commandsToPurge[] = $n;
-    }
-}
+    if ($func == "Attack") {
+        if (in_array($func, $GLOBALS["commands_to_purge"]) || 
+           $inCombat || $inScene ||
+           ($defeatCooldown && $isFollower)) {
+            $commandsToPurge[] = $n;
+        }
+    } elseif ($func == "ExchangeItems") {
+        // Purge ExchangeItems if the npc is a follower
+        if ($isFollower || $inScene) {
+            $commandsToPurge[] = $n;
+        } 
+    } elseif ($func == "Brawl") {
+        if ($inScene)
+            $commandsToPurge[] = $n;
+    } elseif ($func == "AttackHunt") { 
+        if ($inScene)
+            $commandsToPurge[] = $n;
+    } elseif ($func == "Hunt") { 
+        if ($inScene)
+            $commandsToPurge[] = $n;
+    } elseif ($func == "Fight") {
+        if ($inScene)
+            $commandsToPurge[] = $n;
 
+    } elseif ($func == "OpenInventory") {
+        if ($inScene || $inCombat)
+            $commandsToPurge[] = $n;
+    } elseif ($func == "OpenInventory2") {
+        if ($inScene || $inCombat)
+            $commandsToPurge[] = $n;
+    } elseif ($func == "ExtCmdStartBathing") {
+        if ($inScene || $inCombat)
+            $commandsToPurge[] = $n;
+    } elseif ($func == "StartBathing") {
+        if ($inScene || $inCombat)
+            $commandsToPurge[] = $n;
+    } elseif ($func == "LetsRelax") {
+        if ($inScene || $inCombat)
+            $commandsToPurge[] = $n;
+
+    } elseif ($func == "GoToSleep") {
+        if ($inScene || $inCombat)
+            $commandsToPurge[] = $n;
+    } elseif ($func == "TravelTo") {
+        if ($inScene || $inCombat)
+            $commandsToPurge[] = $n;
+    } elseif ($func == "LeadTheWayTo") {
+        if ($inScene || $inCombat)
+            $commandsToPurge[] = $n;
+        
+    } elseif ($func == "IncreaseWalkSpeed") {
+        if ($inScene || $inCombat)
+            $commandsToPurge[] = $n;
+    } elseif ($func == "DecreaseWalkSpeed") {
+        if ($inScene || $inCombat)
+            $commandsToPurge[] = $n;
+    } elseif ($func == "FollowPlayer") {
+        if ($inScene || $inCombat)
+            $commandsToPurge[] = $n;
+    } elseif ($func == "ReturnBackHome") {
+        if ($inScene || $inCombat)
+            $commandsToPurge[] = $n;
+
+    } elseif ($func == "TakeASeat") {
+        if ($inScene || $inCombat)
+            $commandsToPurge[] = $n;
+    } elseif ($func == "ComeCloser") {
+        if ($inScene || $inCombat)
+            $commandsToPurge[] = $n;
+    } 
+}
 
 // if HERIKA_TARGEt is "The Narrator" and isn't the devious narrator, turn off actions.
 if ($GLOBALS["target"] == "The Narrator" && !$GLOBALS["function_eligibility_cache"]["use_devious_narrator"]) {

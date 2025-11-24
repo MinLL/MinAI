@@ -141,7 +141,6 @@ function getGaggedSpeech($name) {
 function interceptRoleplayInput() {
     minai_start_timer('interceptRoleplayInput', 'preprocessing_php');
     if (IsEnabled($GLOBALS["PLAYER_NAME"], "isRoleplaying") && (isPlayerInput() || $GLOBALS["gameRequest"][0] == "minai_roleplay")) {
-
         $b_roleplay = false;
         if ($GLOBALS["gameRequest"][0] == "minai_roleplay") {
             $b_roleplay = true;
@@ -190,6 +189,7 @@ Do not mention the probability and how you decided to choose the answer.
 </verbalized_sampling>";
         }
         $vsampling = $GLOBALS["TEMPLATE_DIALOG_VSAMPLING_PLAYER"] ?? "";
+        //$output_format = $GLOBALS["TEMPLATE_DIALOG_OUTPUT_FORMAT"] ?? "";
 
         $prompt_head = ($GLOBALS["PROMPT_HEAD"] ?? "");
         $use_prompt_head_override = $GLOBALS['use_prompt_head_override'] ?? false;
@@ -348,6 +348,7 @@ Do not mention the probability and how you decided to choose the answer.
             'HERIKA_DYNAMIC' => ($b_narrator ? "" : $HERIKA_DYNAMIC),
             'HERIKA_NAME' => $HERIKA_NAME,
             'PLAYER_NAME' => $PLAYER_NAME,
+            //'OUTPUT_FORMATTING' => $output_format,
             'VSAMPLING_PLAYER' => $vsampling, //replaceVariables(($GLOBALS["TEMPLATE_DIALOG_VSAMPLING_PLAYER"] ?? ""), ['PLAYER_NAME' => $PLAYER_NAME]),
             'DEVICE_STATUS' => '' // Remove old device status string
         ];

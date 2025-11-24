@@ -3,8 +3,8 @@ function setAggressorTalkPrompts($currentName) {
 
     $context = $GLOBALS["SEX_SCENE_CONTEXT"];
     $victims = isset($context["victimActors"]) ? (is_array($context["victimActors"]) ? implode(" and ", $context["victimActors"]) : $context["victimActors"]) : $GLOBALS["target"];
-    $in0 = "<instruction>";
-    $in1 = "</instruction>";
+    $in0 = "(";
+    $in1 = ")";
     
     // Get pronouns for each victim
     $victimPronouns = [];

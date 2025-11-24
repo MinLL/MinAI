@@ -181,7 +181,16 @@ function cleanupSlop($contextData) {
             }
 
             if ($line_length < 50) {
-            
+
+                if (!(strpos($sl_line, ' found ') === false)) {
+                    if (!(strpos($sl_line, ' fovblocktoken') === false))  
+                        continue;
+                    if (!(strpos($sl_line, ' fovrestoretoken') === false))  
+                        continue;
+                    if (!(strpos($sl_line, ' fovblurtoken') === false))  
+                        continue;
+                }
+                    
                 if (!(strpos($sl_line, ': ... (talking to ') === false)) { //: ... (Talking to
                     continue;
                 }

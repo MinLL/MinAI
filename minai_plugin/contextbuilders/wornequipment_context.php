@@ -3,6 +3,8 @@
 // It is used by the equipment_context.php file to parse the equipment data
 // and return an array of equipment items.
 
+require_once(__DIR__ . "/../config.php");
+
 function ParseEncodedEquipmentData($encodedString) {
   $results = [];
   $currentIndex = 0;
@@ -556,8 +558,15 @@ function DetermineHiddenByFromTypes($itemTypes, $slotMask) {
 
 function ProcessEquipment($actorName)
 {
-  // Only support postgresql for now
-  if ($GLOBALS["disable_worn_equipment"] || $GLOBALS["DBDRIVER"] !== "postgresql") {
+  
+  if (isset($GLOBALS["disable_worn_equipment"])) 
+    $b_dwe = $GLOBALS["disable_worn_equipment"];
+  else {
+    $b_dwe = true;
+    error_log("Warning: wornequipment_context.php - disable_worn_equipment var not defined! ");     
+  }
+      
+  if ($b_dwe) {
     return [
       'visibleItems' => [],
       'hiddenItems' => []

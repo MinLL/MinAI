@@ -125,9 +125,10 @@ error_log(" bored r=$i_rnd b=$i_bored dontuse=".((!$b_use) ? "Y" : "N")); // deb
 		"({$HERIKA} initiates a conversation about what {$herika_she} dislikes about current location.) {$MY_TEMPLATE_DIALOG}",
 		"({$HERIKA} start dialogue about the dangers around.) {$MY_TEMPLATE_DIALOG}",
 		"({$HERIKA} initiates a conversation about the state of {$herika_her} gear or supplies.) {$MY_TEMPLATE_DIALOG}",
-		// --- new cues
-		"({$HERIKA} recalls a strange dream.) {$MY_TEMPLATE_DIALOG_FICTION} {$STORY_STYLE_DIRECT} {$STORY_STYLE_SHORT}",
-		"({$HERIKA} recalls a frightening dream.) {$MY_TEMPLATE_DIALOG_FICTION} {$STORY_STYLE_SHORT}",
+		"({$HERIKA} start dialogue about random topic.) {$MY_TEMPLATE_DIALOG}",
+		"({$HERIKA} start dialogue about random topic related to RECENT EVENTS.) {$MY_TEMPLATE_DIALOG}",
+		"({$HERIKA} start dialogue about random topic related to DIALOGUE HISTORY.) {$MY_TEMPLATE_DIALOG}",
+		// --- story
 		"({$HERIKA} tell a strange story.) {$MY_TEMPLATE_DIALOG_STORY} {$STORY_STYLE_SHORT}",
 		"({$HERIKA} tell a frightening story.) {$MY_TEMPLATE_DIALOG_STORY} {$STORY_STYLE_DIRECT} {$STORY_STYLE_SHORT} {$STORY_STYLE_LORE}",
 		"({$HERIKA} tell a story where forces of good prevail.) {$MY_TEMPLATE_DIALOG_STORY} {$STORY_STYLE_LORE} {$STORY_STYLE_DETAIL}",
@@ -136,9 +137,24 @@ error_log(" bored r=$i_rnd b=$i_bored dontuse=".((!$b_use) ? "Y" : "N")); // deb
 		"({$HERIKA} tell a story where forces of evil prevail.) {$MY_TEMPLATE_DIALOG_STORY} {$STORY_STYLE_DETAIL} {$STORY_STYLE_JJOYCE}",
 		"({$HERIKA} tell a story with educational moral value.) {$MY_TEMPLATE_DIALOG_STORY} {$STORY_STYLE_LORE} {$STORY_STYLE_SHORT}",
 		"({$HERIKA} remember a story from childhood.) {$MY_TEMPLATE_DIALOG_TELLING} {$STORY_STYLE_LORE} {$STORY_STYLE_VOCAB_SIMPLE} {$STORY_STYLE_SHORT}",
-		"({$HERIKA} start dialogue about random topic.) {$MY_TEMPLATE_DIALOG}",
-		"({$HERIKA} start dialogue about random topic related to RECENT EVENTS.) {$MY_TEMPLATE_DIALOG}",
-		"({$HERIKA} start dialogue about random topic related to DIALOGUE HISTORY.) {$MY_TEMPLATE_DIALOG}",
+		//dreams	
+		"({$HERIKA} recalls a strange dream.) {$MY_TEMPLATE_DIALOG_FICTION} {$STORY_STYLE_DIRECT} {$STORY_STYLE_SHORT}",
+		"({$HERIKA} recalls a frightening dream.) {$MY_TEMPLATE_DIALOG_FICTION} {$STORY_STYLE_SHORT}",
+		"({$HERIKA} ponder about dreams.) {$MY_TEMPLATE_DIALOG}",
+		"({$HERIKA} ponder about nightmares.){$MY_TEMPLATE_DIALOG}",
+		"({$HERIKA} initiates a conversation about one of {$herika_her} recurrent nightmares.) {$MY_TEMPLATE_DIALOG}",
+		"({$HERIKA} initiates a conversation about one of {$herika_her} recurrent dreams.) {$MY_TEMPLATE_DIALOG}",
+		"({$HERIKA} initiates a conversation about one of {$herika_her} recent nightmares.) {$MY_TEMPLATE_DIALOG}",
+		"({$HERIKA} initiates a conversation about one of {$herika_her} recent dreams) {$MY_TEMPLATE_DIALOG}",
+		"({$HERIKA} ask about one of {$PLAYER}'s nightmares.) {$MY_TEMPLATE_DIALOG_ASK}",
+		"({$HERIKA} ask about one of {$PLAYER}'s dreams.) {$MY_TEMPLATE_DIALOG_ASK}",
+		//riddles
+		"({$HERIKA} start dialogue by formulating a riddle. {$HERIKA} ask {$PLAYER} to solve the riddle.) {$MY_TEMPLATE_DIALOG}",
+		"({$HERIKA} start dialogue by formulating a riddle. {$HERIKA} ask somebody nearby to solve the riddle.) {$MY_TEMPLATE_DIALOG}",
+		"({$HERIKA} start dialogue by telling a joke.) {$MY_TEMPLATE_DIALOG}",
+		"({$HERIKA} start dialogue by making a joke related to something mentioned in DIALOGUE HISTORY and RECENT EVENTS.) {$MY_TEMPLATE_DIALOG}",
+		"({$HERIKA} start dialogue by sharing a wisdom related to something mentioned in DIALOGUE HISTORY and RECENT EVENTS.) {$MY_TEMPLATE_DIALOG}",
+		// 
 		//
 		"({$HERIKA} start dialogue wondering about Dwemers mystery.) {$MY_TEMPLATE_DIALOG}",
 		"({$HERIKA} ask why nirnroot chimes.) {$MY_TEMPLATE_DIALOG_ASK}",
@@ -281,13 +297,6 @@ error_log(" bored r=$i_rnd b=$i_bored dontuse=".((!$b_use) ? "Y" : "N")); // deb
 		"({$HERIKA} initiates a conversation about best weapon {$herika_she} would like to receive from {$PLAYER}.) {$MY_TEMPLATE_DIALOG}",
 		"({$HERIKA} initiates a conversation about best armor {$herika_she} would like to receive from {$PLAYER}.) {$MY_TEMPLATE_DIALOG}",
 
-		//riddles
-		"({$HERIKA} start dialogue by formulating a riddle. {$HERIKA} ask {$PLAYER} to solve the riddle.) {$MY_TEMPLATE_DIALOG}",
-		"({$HERIKA} start dialogue by formulating a riddle. {$HERIKA} ask somebody nearby to solve the riddle.) {$MY_TEMPLATE_DIALOG}",
-		"({$HERIKA} start dialogue by telling a joke.) {$MY_TEMPLATE_DIALOG}",
-		"({$HERIKA} start dialogue by making a joke related to something mentioned in DIALOGUE HISTORY and RECENT EVENTS.) {$MY_TEMPLATE_DIALOG}",
-		"({$HERIKA} start dialogue by sharing a wisdom related to something mentioned in DIALOGUE HISTORY and RECENT EVENTS.) {$MY_TEMPLATE_DIALOG}",
-		// 
 		"({$HERIKA} initiates a conversation about why dragons are roaming again in Skyrim.) {$MY_TEMPLATE_DIALOG}",
 		"({$HERIKA} initiates a conversation about weather in Skyrim.) {$MY_TEMPLATE_DIALOG}",
 		"({$HERIKA} initiates a conversation about architecture in Skyrim.) {$MY_TEMPLATE_DIALOG}",
@@ -364,15 +373,6 @@ error_log(" bored r=$i_rnd b=$i_bored dontuse=".((!$b_use) ? "Y" : "N")); // deb
 		"({$HERIKA} ask {$PLAYER} what {$player_he} know about the moons, Masser and Secunda.) {$MY_TEMPLATE_DIALOG_ASK}",
 
 		"({$HERIKA} start dialogue about a topic from <DIALOGUE_HISTORY_and_RECENT_EVENTS>.) {$MY_TEMPLATE_DIALOG}",
-		//dreams	
-		"({$HERIKA} ponder about dreams.) {$MY_TEMPLATE_DIALOG}",
-		"({$HERIKA} ponder about nightmares.){$MY_TEMPLATE_DIALOG}",
-		"({$HERIKA} initiates a conversation about one of {$herika_her} recurrent nightmares.) {$MY_TEMPLATE_DIALOG}",
-		"({$HERIKA} initiates a conversation about one of {$herika_her} recurrent dreams.) {$MY_TEMPLATE_DIALOG}",
-		"({$HERIKA} initiates a conversation about one of {$herika_her} recent nightmares.) {$MY_TEMPLATE_DIALOG}",
-		"({$HERIKA} initiates a conversation about one of {$herika_her} recent dreams) {$MY_TEMPLATE_DIALOG}",
-		"({$HERIKA} ask about one of {$PLAYER}'s nightmares.) {$MY_TEMPLATE_DIALOG_ASK}",
-		"({$HERIKA} ask about one of {$PLAYER}'s dreams.) {$MY_TEMPLATE_DIALOG_ASK}",
 		//
 		"({$HERIKA} initiates a conversation about dragons.) {$MY_TEMPLATE_DIALOG}",
 		"({$HERIKA} ask why dragons are roaming again in Skyrim.) {$MY_TEMPLATE_DIALOG_ASK}",
@@ -456,7 +456,7 @@ error_log(" bored r=$i_rnd b=$i_bored dontuse=".((!$b_use) ? "Y" : "N")); // deb
 		"({$HERIKA} start dialogue about something from <DIALOGUE_HISTORY_and_RECENT_EVENTS>.) {$MY_TEMPLATE_DIALOG}"
 	];
 
-	if ($USE_NSFW && $SEX_ENABLED) {
+	if ($USE_NSFW) {
 		array_push($more_cues, 
 			"({$HERIKA} start dialogue by pondering about matting habits of one of the creatures in Skyrim.) {$MY_TEMPLATE_DIALOG}",
 			"({$HERIKA} start dialogue by pondering about matting habits of one of races in Skyrim.) {$MY_TEMPLATE_DIALOG}",
@@ -474,6 +474,19 @@ error_log(" bored r=$i_rnd b=$i_bored dontuse=".((!$b_use) ? "Y" : "N")); // deb
 			"({$HERIKA} initiates a conversation about {$PLAYER}'s sex fetishes.) {$MY_TEMPLATE_DIALOG}",
 			"({$HERIKA} start dialogue by pondering about {$PLAYER}'s sex preferences.) {$MY_TEMPLATE_DIALOG}",
 
+			// --- story
+			"({$HERIKA} tell an erotic story.) {$MY_TEMPLATE_DIALOG_STORY} {$STORY_STYLE_SHORT}",
+			"({$HERIKA} tell a frightening erotic story.) {$MY_TEMPLATE_DIALOG_STORY} {$STORY_STYLE_DIRECT} {$STORY_STYLE_SHORT} {$STORY_STYLE_LORE}",
+			//dreams	
+			"({$HERIKA} recalls an erotic dream.) {$MY_TEMPLATE_DIALOG_FICTION} {$STORY_STYLE_DIRECT} {$STORY_STYLE_SHORT}",
+			"({$HERIKA} recalls a frightening erotic dream.) {$MY_TEMPLATE_DIALOG_FICTION} {$STORY_STYLE_SHORT}",
+			"({$HERIKA} ponder about erotic dreams.) {$MY_TEMPLATE_DIALOG}",
+			"({$HERIKA} initiates a conversation about one of {$herika_her} recurrent erotic dreams.) {$MY_TEMPLATE_DIALOG}",
+			"({$HERIKA} ask about one of {$PLAYER}'s erotic dreams.) {$MY_TEMPLATE_DIALOG_ASK}",
+			//riddles
+			"({$HERIKA} start dialogue by formulating a riddle with erotic connotations. {$HERIKA} ask {$PLAYER} to solve the riddle.) {$MY_TEMPLATE_DIALOG}",
+			"({$HERIKA} start dialogue by telling a joke  with erotic connotations.) {$MY_TEMPLATE_DIALOG}",
+			// 
 			"({$HERIKA} start dialogue by pondering about sex.) {$MY_TEMPLATE_DIALOG}"
 		);
 
@@ -662,32 +675,72 @@ $GLOBALS["PROMPTS"]["vision"]["extra"]["force_tokens_max"] = 2048;
 
 $GLOBALS["PROMPTS"]["inputtext"]["cue"] = [ // respond after player input
     //original: "$TEMPLATE_ACTION {$GLOBALS["HERIKA_NAME"]} replies to {$GLOBALS["PLAYER_NAME"]}. {$GLOBALS["TEMPLATE_DIALOG"]} {$GLOBALS["MAXIMUM_WORDS"]}", // Response maybe is not a reply, AI can talk to another NPC ???
-    "{$HERIKA} replies, speaking about the current topic. {$MY_TEMPLATE_DIALOG}",
-    "{$HERIKA}'s turn to speak about the current topic. {$MY_TEMPLATE_DIALOG}",
-    "{$HERIKA} answers, focused on the subject. {$MY_TEMPLATE_DIALOG}"
+    "({$HERIKA} replies, speaking about the current topic.) {$MY_TEMPLATE_DIALOG}",
+    "({$HERIKA}'s turn to speak about the current topic.) {$MY_TEMPLATE_DIALOG}",
+    "({$HERIKA} answers, focused on the subject.) {$MY_TEMPLATE_DIALOG}"
 ];
 
 $GLOBALS["PROMPTS"]["inputtext_s"]["cue"] = [ // respond to player input when sneaking 
     //original: "$TEMPLATE_ACTION {$GLOBALS["HERIKA_NAME"]} replies to {$GLOBALS["PLAYER_NAME"]}. {$GLOBALS["TEMPLATE_DIALOG"]} {$GLOBALS["MAXIMUM_WORDS"]}", // Response maybe is not a reply, AI can talk to another NPC ???
-    "{$HERIKA} replies whispering, focused on current topic. {$MY_TEMPLATE_DIALOG}",
-    "Dialogue turn for {$HERIKA}. {$HERIKA} speak about the current topic, whispering. {$MY_TEMPLATE_DIALOG}",
-    "{$HERIKA} answers whispering, focused on the subject. {$MY_TEMPLATE_DIALOG}"
+    "({$HERIKA} replies whispering, focused on current topic.) {$MY_TEMPLATE_DIALOG}",
+    "(Dialogue turn for {$HERIKA}. {$HERIKA} speak about the current topic, whispering.) {$MY_TEMPLATE_DIALOG}",
+    "({$HERIKA} answers whispering, focused on the subject.) {$MY_TEMPLATE_DIALOG}"
 ];
 
 $i_random = rand(1, 4); // to lower the probability of some cues
 if ($i_random == 1) {
 	array_push($GLOBALS["PROMPTS"]["inputtext"]["cue"],
-		//----------------- story
-		"Dialogue turn for {$HERIKA}. {$HERIKA} ask a question related to conversation topic.) {$MY_TEMPLATE_DIALOG}",
-		"Dialogue turn for {$HERIKA}. {$HERIKA} challenges interlocutor viewpoint. {$MY_TEMPLATE_DIALOG}",
-		"Dialogue turn for {$HERIKA}. {$HERIKA} make a joke related to current conversation topic. {$MY_TEMPLATE_DIALOG}"
+		//----------------- 
+		"(Dialogue turn for {$HERIKA}. {$HERIKA} ask a question related to conversation topic.) {$MY_TEMPLATE_DIALOG}",
+		"(Dialogue turn for {$HERIKA}. {$HERIKA} challenges interlocutor viewpoint.) {$MY_TEMPLATE_DIALOG}",
+		"(Dialogue turn for {$HERIKA}. {$HERIKA} make a joke related to current conversation topic.) {$MY_TEMPLATE_DIALOG}"
 	);
 }
 
 //---------------------------------------------------------------------
 
-$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["TakeItem"] = "({$HERIKA} talks about the item taken.) {$MY_TEMPLATE_DIALOG}";
+$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["default"] = "({$HERIKA} talks to {$PLAYER}.) {$MY_TEMPLATE_DIALOG}";
+$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["TakeItem"] = "({$HERIKA} comments about the item taken.) {$MY_TEMPLATE_DIALOG}";
 $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdTakeItem"] = "({$HERIKA} comments about the item taken.) {$MY_TEMPLATE_DIALOG}";	
+$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["Brawl"] = "({$GLOBALS["HERIKA_NAME"]} states the reasons for brawling. {$GLOBALS["TEMPLATE_DIALOG"]}";
+
+$GLOBALS["PROMPTS"]["instruction"]["cue"] = ["<instruction>{$gameRequest[3]}</instruction> ". $GLOBALS["TEMPLATE_DIALOG"]];
+			
+$GLOBALS["PROMPTS"]["playerinfo"]["cue"] = ["(You have been asked to summarize recent events for {$PLAYER}. 
+- Comment on recent events from Review <DIALOGUE_HISTORY_and_RECENT_EVENTS> and offer hints. 
+- Discuss companions' behavior and unusual events. 
+- If you notice anything unusual in the relationships between companions or in their attitude, mention it.
+- If you have relevant information about the current location from <current_location> tag, share it.) {$GLOBALS["TEMPLATE_DIALOG"]}"];
+
+/*
+"afterfunc"=>[
+        "extra"=>[],
+        "cue"=>[
+            "default"=>"({$GLOBALS["HERIKA_NAME"]} talks to {$GLOBALS["PLAYER_NAME"]}.) {$GLOBALS["TEMPLATE_DIALOG"]}",
+            "TakeASeat"=>"({$GLOBALS["HERIKA_NAME"]} talks about the location where they took a seat){$GLOBALS["TEMPLATE_DIALOG"]}",
+            "GetDateTime"=>"({$GLOBALS["HERIKA_NAME"]} answers with the current date and time in short sentence){$GLOBALS["TEMPLATE_DIALOG"]}",
+            "MoveTo"=>"({$GLOBALS["HERIKA_NAME"]} makes a comment about movement to the destination){$GLOBALS["TEMPLATE_DIALOG"]}",
+            "CheckInventory"=>"({$GLOBALS["HERIKA_NAME"]} talks about inventory and backpack items){$GLOBALS["TEMPLATE_DIALOG"]}",
+            "Inspect"=>"({$GLOBALS["HERIKA_NAME"]} talks about items inspected, short speech){$GLOBALS["TEMPLATE_DIALOG"]}",
+            "ReadQuestJournal"=>"({$GLOBALS["HERIKA_NAME"]} talks about quests they have read in the quest journal){$GLOBALS["TEMPLATE_DIALOG"]}",
+            "TravelTo"=>"({$GLOBALS["HERIKA_NAME"]} talks about the destination){$GLOBALS["TEMPLATE_DIALOG"]}",
+            "InspectSurroundings"=>"({$GLOBALS["HERIKA_NAME"]} talks about seen actors, or to the actor its looking for){$GLOBALS["TEMPLATE_DIALOG"]}",
+            "GiveGoldTo"=>"({$GLOBALS["HERIKA_NAME"]} talks about coins or gold given. {$GLOBALS["TEMPLATE_DIALOG"]}",
+            "Brawl"=>"({$GLOBALS["HERIKA_NAME"]} {$GLOBALS["TEMPLATE_DIALOG"]}"
+            
+            ]
+    ],
+
+// Database Prompt (Instruction)
+    "instruction"=>[ 
+        "cue"=>["{$gameRequest[3]} write {$GLOBALS["HERIKA_NAME"]}'s dialogue lines without narrations."],
+        "player_request"=>["The Narrator: {$gameRequest[3]}"],
+    ],
+
+    "playerinfo"=>[ 
+        "cue"=>["(Out of roleplay, game has been loaded) Tell {$GLOBALS["PLAYER_NAME"]} a short summary about last events, and then remind {$GLOBALS["PLAYER_NAME"]} the current task/quest/plan) {$GLOBALS["TEMPLATE_DIALOG"]}"]
+    ],
+*/
 
 //---------------------------------------------------------------------
 
@@ -699,35 +752,35 @@ if (isset($GLOBALS["gameRequest"]) && in_array(strtolower($GLOBALS["gameRequest"
 	//$GLOBALS["PROMPTS"]["rechat"]["cue"] = array(); // erase default CHIM 'rechat' content 
 	//array_push($GLOBALS["PROMPTS"]["rechat"]["cue"], // add to original
 	$GLOBALS["PROMPTS"]["rechat"]["cue"] = array( // replace original
-		"(Dialogue turn for {$HERIKA}. Share a related fact or piece of knowledge.) {$DEFAULT_TEMPLATE_DIALOG}",
-		"(Dialogue turn for {$HERIKA}. Ask the interlocutor to elaborate further.) {$DEFAULT_TEMPLATE_DIALOG}",
-		"(Dialogue turn for {$HERIKA}. Challenge interlocutor viewpoint.) {$DEFAULT_TEMPLATE_DIALOG}",
-		"(Dialogue turn for {$HERIKA}. Expresses curiosity about the current topic.) {$DEFAULT_TEMPLATE_DIALOG}",
-		"(Dialogue turn for {$HERIKA}. Summarize the key points of the discussion.) {$DEFAULT_TEMPLATE_DIALOG}",
-		"(Dialogue turn for {$HERIKA}. Add your insights to the conversation.) {$DEFAULT_TEMPLATE_DIALOG}",
-		"(Dialogue turn for {$HERIKA}. Add humor to lighten the conversation.) {$DEFAULT_TEMPLATE_DIALOG}",
-		"(Dialogue turn for {$HERIKA}. Follow the conversation and express your own thoughts.) {$DEFAULT_TEMPLATE_DIALOG}",
-		"(Dialogue turn for {$HERIKA}. Make a personal remark.) {$DEFAULT_TEMPLATE_DIALOG}",
-		"(Dialogue turn for {$HERIKA}. Share an opinion with the interlocutor.) {$DEFAULT_TEMPLATE_DIALOG}",
-		"(Dialogue turn for {$HERIKA}. Make a joke related to current conversation topic.) {$DEFAULT_TEMPLATE_DIALOG}",
-		"(Dialogue turn for {$HERIKA}. Add a personal point of view regarding conversation topic.) {$DEFAULT_TEMPLATE_DIALOG}",
-		"(Dialogue turn for {$HERIKA}. Contribute with personal expertise regarding conversation topic.) {$DEFAULT_TEMPLATE_DIALOG}",
-		"(Dialogue turn for {$HERIKA}. Interject and add your own opinion.) {$DEFAULT_TEMPLATE_DIALOG}",
+		"(Dialogue turn for {$HERIKA}. {$HERIKA} shares a related fact or piece of knowledge.) {$DEFAULT_TEMPLATE_DIALOG}",
+		"(Dialogue turn for {$HERIKA}. {$HERIKA} ask the interlocutor to elaborate further.) {$DEFAULT_TEMPLATE_DIALOG}",
+		"(Dialogue turn for {$HERIKA}. {$HERIKA} challenges interlocutor viewpoint.) {$DEFAULT_TEMPLATE_DIALOG}",
+		"(Dialogue turn for {$HERIKA}. {$HERIKA} expresses curiosity about the current topic.) {$DEFAULT_TEMPLATE_DIALOG}",
+		"(Dialogue turn for {$HERIKA}. {$HERIKA} summarizes the key points of the discussion.) {$DEFAULT_TEMPLATE_DIALOG}",
+		"(Dialogue turn for {$HERIKA}. {$HERIKA} adds {$herika_her} own insights to the conversation.) {$DEFAULT_TEMPLATE_DIALOG}",
+		"(Dialogue turn for {$HERIKA}. {$HERIKA} adds humor to lighten the conversation.) {$DEFAULT_TEMPLATE_DIALOG}",
+		"(Dialogue turn for {$HERIKA}. {$HERIKA} follows the conversation and express {$herika_her} own thoughts.) {$DEFAULT_TEMPLATE_DIALOG}",
+		"(Dialogue turn for {$HERIKA}. {$HERIKA} makes a personal remark.) {$DEFAULT_TEMPLATE_DIALOG}",
+		"(Dialogue turn for {$HERIKA}. {$HERIKA} shares an opinion with the interlocutor.) {$DEFAULT_TEMPLATE_DIALOG}",
+		"(Dialogue turn for {$HERIKA}. {$HERIKA} makes a joke related to current conversation topic.) {$DEFAULT_TEMPLATE_DIALOG}",
+		"(Dialogue turn for {$HERIKA}. {$HERIKA} adds a personal point of view regarding conversation topic.) {$DEFAULT_TEMPLATE_DIALOG}",
+		"(Dialogue turn for {$HERIKA}. {$HERIKA} contributes with {$herika_her} expertise regarding conversation topic.) {$DEFAULT_TEMPLATE_DIALOG}",
+		"(Dialogue turn for {$HERIKA}. {$HERIKA} interjects and add {$herika_her} opinion.) {$DEFAULT_TEMPLATE_DIALOG}",
 		//----------------- argumentative
-		"(Dialogue turn for {$HERIKA}. Ask a question related to conversation topic.) {$DEFAULT_TEMPLATE_DIALOG}",
-		"(Dialogue turn for {$HERIKA}. Ask interlocutor to give arguments.) {$DEFAULT_TEMPLATE_DIALOG}",
-		"(Dialogue turn for {$HERIKA}. Ask interlocutor to provide more details.) {$DEFAULT_TEMPLATE_DIALOG}",
-		"(Dialogue turn for {$HERIKA}. Ask interlocutor to explain what was said.) {$DEFAULT_TEMPLATE_DIALOG}",
+		"(Dialogue turn for {$HERIKA}. {$HERIKA} asks a question related to conversation topic.) {$DEFAULT_TEMPLATE_DIALOG}",
+		"(Dialogue turn for {$HERIKA}. {$HERIKA} asks interlocutor to give arguments.) {$DEFAULT_TEMPLATE_DIALOG}",
+		"(Dialogue turn for {$HERIKA}. {$HERIKA} asks interlocutor to provide more details.) {$DEFAULT_TEMPLATE_DIALOG}",
+		"(Dialogue turn for {$HERIKA}. {$HERIKA} asks interlocutor to explain what was said.) {$DEFAULT_TEMPLATE_DIALOG}",
 		//"({$HERIKA} ask speaker to reflect more about what was said) {$DEFAULT_TEMPLATE_DIALOG}",
 		//"({$HERIKA} ask speaker to think again) {$DEFAULT_TEMPLATE_DIALOG}",
-		"(Dialogue turn for {$HERIKA}. Ask interlocutor if what said is true.) {$DEFAULT_TEMPLATE_DIALOG}",
-		"(Dialogue turn for {$HERIKA}. Ask group opinion about what was said.) {$DEFAULT_TEMPLATE_DIALOG}",
+		"(Dialogue turn for {$HERIKA}. {$HERIKA} asks interlocutor if what said is true.) {$DEFAULT_TEMPLATE_DIALOG}",
+		"(Dialogue turn for {$HERIKA}. {$HERIKA} asks group opinion about what was said.) {$DEFAULT_TEMPLATE_DIALOG}",
 		//----------------- antagonistic 
-		"(Dialogue turn for {$HERIKA}. Doubt about what was said.) {$DEFAULT_TEMPLATE_DIALOG}",
-		"(Dialogue turn for {$HERIKA}. Contradict the interlocutor.) {$DEFAULT_TEMPLATE_DIALOG}",
-		"(Dialogue turn for {$HERIKA}. Mock the interlocutor.) {$DEFAULT_TEMPLATE_DIALOG}",
-		"(Dialogue turn for {$HERIKA}. Deride the interlocutor's opinion.) {$DEFAULT_TEMPLATE_DIALOG}",
-		"(Dialogue turn for {$HERIKA}. Show disdain for the interlocutor's opinion.) {$DEFAULT_TEMPLATE_DIALOG}",
+		"(Dialogue turn for {$HERIKA}. {$HERIKA} doubts what was said.) {$DEFAULT_TEMPLATE_DIALOG}",
+		"(Dialogue turn for {$HERIKA}. {$HERIKA} contradicts the interlocutor.) {$DEFAULT_TEMPLATE_DIALOG}",
+		"(Dialogue turn for {$HERIKA}. {$HERIKA} mocks the interlocutor.) {$DEFAULT_TEMPLATE_DIALOG}",
+		"(Dialogue turn for {$HERIKA}. {$HERIKA} derides the interlocutor's opinion.) {$DEFAULT_TEMPLATE_DIALOG}",
+		"(Dialogue turn for {$HERIKA}. {$HERIKA} shows disdain for the interlocutor's opinion.) {$DEFAULT_TEMPLATE_DIALOG}",
 		//----------------- new rechat
 		//"(Dialogue or action turn for {$HERIKA}. Consider one answer and/or action involving a third actor, without repeating your answer for each actor. Keep current topic or change it.) {$DEFAULT_TEMPLATE_DIALOG}",
 		"(Dialogue or action turn for {$HERIKA}. Consider an answer and/or action, keep current topic or change it.) {$DEFAULT_TEMPLATE_DIALOG}",
@@ -738,78 +791,65 @@ if (isset($GLOBALS["gameRequest"]) && in_array(strtolower($GLOBALS["gameRequest"
 	if ($i_random == 1) {
 		array_push($GLOBALS["PROMPTS"]["rechat"]["cue"],
 			//----------------- story
-			"(Dialogue turn for {$HERIKA}. Challenge interlocutor viewpoint.) {$DEFAULT_TEMPLATE_DIALOG}",
-			"(Dialogue turn for {$HERIKA}. Make a joke related to current conversation topic.) {$DEFAULT_TEMPLATE_DIALOG}",
-			"(Dialogue turn for {$HERIKA}. Tell a story related to the current topic.) {$DEFAULT_TEMPLATE_DIALOG}",
-			"(Dialogue turn for {$HERIKA}. Tell a dream you had related to the current topic.) {$DEFAULT_TEMPLATE_DIALOG}"
+			"(Dialogue turn for {$HERIKA}. {$HERIKA} challenges interlocutor viewpoint.) {$DEFAULT_TEMPLATE_DIALOG}",
+			"(Dialogue turn for {$HERIKA}. {$HERIKA} makes a joke related to current conversation topic.) {$DEFAULT_TEMPLATE_DIALOG}",
+			"(Dialogue turn for {$HERIKA}. {$HERIKA} tells a story related to the current topic.) {$DEFAULT_TEMPLATE_DIALOG}",
+			"(Dialogue turn for {$HERIKA}. {$HERIKA} tells a dream you had related to the current topic.) {$DEFAULT_TEMPLATE_DIALOG}"
 		);
 	}
 }
 
 //---------------------------------------------------------------------
 
-$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["Brawl"] = "({$GLOBALS["HERIKA_NAME"]} states the reasons for brawling. {$GLOBALS["TEMPLATE_DIALOG"]}";
-
-$GLOBALS["PROMPTS"]["instruction"]["cue"] = ["<instruction>{$gameRequest[3]}</instruction> ". $GLOBALS["TEMPLATE_DIALOG"]];
-
-/*
-// Database Prompt (Instruction)
-    "instruction"=>[ 
-        "cue"=>["{$gameRequest[3]} write {$GLOBALS["HERIKA_NAME"]}'s dialogue lines without narrations."],
-        "player_request"=>["The Narrator: {$gameRequest[3]}"],
-    ],
-*/
-//---------------------------------------------------------------------
-
 array_push($GLOBALS["PROMPTS"]["lockpicked"]["cue"],
-	"({$HERIKA} comment about value of collected items) {$MY_TEMPLATE_DIALOG}",
-	"({$HERIKA} ask {$PLAYER} to give an object from last chest opened) {$MY_TEMPLATE_DIALOG_ASK}",
-	"({$HERIKA} tell {$PLAYER} what object they hope to find) {$MY_TEMPLATE_DIALOG}",
-	"({$HERIKA} tell {$PLAYER} what object they don't want to find) {$MY_TEMPLATE_DIALOG}",
+	"({$HERIKA} comments about value of collected items) {$MY_TEMPLATE_DIALOG}",
+	"({$HERIKA} asks {$PLAYER} to give an object from last chest opened) {$MY_TEMPLATE_DIALOG_ASK}",
+	"({$HERIKA} tells {$PLAYER} what object they hope to find) {$MY_TEMPLATE_DIALOG}",
+	"({$HERIKA} tells {$PLAYER} what object they don't want to find) {$MY_TEMPLATE_DIALOG}",
 	"({$HERIKA} admires {$PLAYER}'s skill in lockpicking) {$MY_TEMPLATE_DIALOG}",
-	"({$HERIKA} comment {$PLAYER}'s skill in lockpicking expressing concern about how such a skill was achieved) {$MY_TEMPLATE_DIALOG}",
-	"({$HERIKA} ask {$PLAYER} how lockpicking skill was achieved) {$MY_TEMPLATE_DIALOG_ASK}",
+	"({$HERIKA} comments {$PLAYER}'s skill in lockpicking expressing concern about how such a skill was achieved) {$MY_TEMPLATE_DIALOG}",
+	"({$HERIKA} asks {$PLAYER} how lockpicking skill was achieved) {$MY_TEMPLATE_DIALOG_ASK}",
 	"({$HERIKA} admires {$PLAYER}'s skill in lockpicking and ask how to learn the skill) {$MY_TEMPLATE_DIALOG}",
-	"({$HERIKA} ask {$PLAYER} if lockpicking skill can be applied in intimate activities) {$MY_TEMPLATE_DIALOG_ASK}",
+	"({$HERIKA} asks {$PLAYER} if lockpicking skill can be applied in intimate activities) {$MY_TEMPLATE_DIALOG_ASK}",
 	"({$HERIKA} admires {$PLAYER}'s skill in lockpicking and compare it with sexual activity related skill) {$MY_TEMPLATE_DIALOG}",
 	"({$HERIKA} admires {$PLAYER}'s skill in lockpicking and compare it with a skillful prelude) {$MY_TEMPLATE_DIALOG}",
 	"({$HERIKA} admires {$PLAYER}'s skill in lockpicking as an arousal factor) {$MY_TEMPLATE_DIALOG}",
 	"({$HERIKA} admires {$PLAYER}'s skill in lockpicking and ask if personal diary is safe from peeking) {$MY_TEMPLATE_DIALOG}",
-	"({$HERIKA} tell {$PLAYER} a short story about a thief) {$MY_TEMPLATE_DIALOG}",
-	"({$HERIKA} comment about one valuable item found) {$MY_TEMPLATE_DIALOG}",
-	"({$HERIKA} comment about least valuable item found) {$MY_TEMPLATE_DIALOG}",
-	"({$HERIKA} is disappointed by the loot) {$MY_TEMPLATE_DIALOG}",
-	"({$HERIKA} is delighted by the loot) {$MY_TEMPLATE_DIALOG}",
+	"({$HERIKA} tells {$PLAYER} a short story about a thief) {$MY_TEMPLATE_DIALOG}",
+	"({$HERIKA} comments about one valuable item found) {$MY_TEMPLATE_DIALOG}",
+	"({$HERIKA} comments about least valuable item found) {$MY_TEMPLATE_DIALOG}",
+	"({$HERIKA} expresses disappointment about the loot) {$MY_TEMPLATE_DIALOG}",
+	"({$HERIKA} expresses delight about the loot) {$MY_TEMPLATE_DIALOG}",
 	"({$HERIKA} thanks {$PLAYER} for always sharing the loot) {$MY_TEMPLATE_DIALOG}"
 ); 
 
 array_push($GLOBALS["PROMPTS"]["combatend"]["cue"],
-	"({$HERIKA} comment about the weapon used in combat) {$MY_TEMPLATE_DIALOG }",
-	"({$HERIKA} compare the weapon they used in combat with other weapons) {$MY_TEMPLATE_DIALOG}",
-	"({$HERIKA} compare {$PLAYER}'s fight skill with his sex skill) {$MY_TEMPLATE_DIALOG}",
+	"({$HERIKA} comments about the weapon used in combat) {$MY_TEMPLATE_DIALOG }",
+	"({$HERIKA} compares the weapon they used in combat with other weapons) {$MY_TEMPLATE_DIALOG}",
+	"({$HERIKA} compares {$PLAYER}'s fight skill with his sex skill) {$MY_TEMPLATE_DIALOG}",
 	"({$HERIKA} admires {$PLAYER}'s skill with the weapon used in combat) {$MY_TEMPLATE_DIALOG}",
-	"({$HERIKA} comment about {$PLAYER}'s skill with the weapon used in combat) {$MY_TEMPLATE_DIALOG}",
-	"({$HERIKA} comment about {$PLAYER}'s skill and compare with own skill) {$MY_TEMPLATE_DIALOG}",
-	"({$HERIKA} comment about {$PLAYER}'s number of kills inflicted in combat) {$MY_TEMPLATE_DIALOG}",
-	"({$HERIKA} comment about {$PLAYER}'s carnage inflicted in combat) {$MY_TEMPLATE_DIALOG}",
-	"({$HERIKA} comment about number of kills inflicted by the team in combat) {$MY_TEMPLATE_DIALOG}",
-	"({$HERIKA} comment about {$PLAYER}'s leadership proven in combat) {$MY_TEMPLATE_DIALOG}",
-	"({$HERIKA} ask {$PLAYER} how many enemies killed in combat) {$MY_TEMPLATE_DIALOG_ASK}",
-	"({$HERIKA} ask {$PLAYER} if he recognize {$HERIKA}'s skills proven in combat) {$MY_TEMPLATE_DIALOG_ASK}",
+	"({$HERIKA} comments about {$PLAYER}'s skill with the weapon used in combat) {$MY_TEMPLATE_DIALOG}",
+	"({$HERIKA} comments about {$PLAYER}'s skill and compare with own skill) {$MY_TEMPLATE_DIALOG}",
+	"({$HERIKA} comments about {$PLAYER}'s number of kills inflicted in combat) {$MY_TEMPLATE_DIALOG}",
+	"({$HERIKA} comments about {$PLAYER}'s carnage inflicted in combat) {$MY_TEMPLATE_DIALOG}",
+	"({$HERIKA} comments about number of kills inflicted by the team in combat) {$MY_TEMPLATE_DIALOG}",
+	"({$HERIKA} comments about {$PLAYER}'s leadership proven in combat) {$MY_TEMPLATE_DIALOG}",
+	"({$HERIKA} asks {$PLAYER} how many enemies killed in combat) {$MY_TEMPLATE_DIALOG_ASK}",
+	"({$HERIKA} asks {$PLAYER} if he recognize {$HERIKA}'s skills proven in combat) {$MY_TEMPLATE_DIALOG_ASK}",
 	"({$HERIKA} admires {$PLAYER}'s combat style) {$MY_TEMPLATE_DIALOG}"
 );
 
 array_push($GLOBALS["PROMPTS"]["combatendmighty"]["cue"],
-	"({$HERIKA} compare {$PLAYER}'s fight skill with his abilities related to intimate activities) {$MY_TEMPLATE_DIALOG}",
+	"({$HERIKA} compares {$PLAYER}'s fight skill with his abilities related to intimate activities) {$MY_TEMPLATE_DIALOG}",
 	"({$HERIKA} admires {$PLAYER}'s skill with the weapon used in combat) {$MY_TEMPLATE_DIALOG}",
-	"({$HERIKA} comment about {$PLAYER}'s skill with the weapon used in combat) {$MY_TEMPLATE_DIALOG}",
-	"({$HERIKA} comment about {$PLAYER}'s skill and compare with own skill) {$MY_TEMPLATE_DIALOG}",
-	"({$HERIKA} comment about {$PLAYER}'s number of kills inflicted in combat) {$MY_TEMPLATE_DIALOG}",
-	"({$HERIKA} comment about {$PLAYER}'s carnage inflicted in combat) {$MY_TEMPLATE_DIALOG}",
-	"({$HERIKA} comment about number of kills inflicted by the team in combat) {$MY_TEMPLATE_DIALOG}",
+	"({$HERIKA} comments about {$PLAYER}'s skill with the weapon used in combat) {$MY_TEMPLATE_DIALOG}",
+	"({$HERIKA} comments about {$PLAYER}'s skill and compare with own skill) {$MY_TEMPLATE_DIALOG}",
+	"({$HERIKA} comments about {$PLAYER}'s number of kills inflicted in combat) {$MY_TEMPLATE_DIALOG}",
+	"({$HERIKA} comments about {$PLAYER}'s carnage inflicted in combat) {$MY_TEMPLATE_DIALOG}",
+	"({$HERIKA} comments about number of kills inflicted by the team in combat) {$MY_TEMPLATE_DIALOG}",
 	"({$HERIKA} admires {$PLAYER}'s leadership proven in combat) {$MY_TEMPLATE_DIALOG}",
-	"({$HERIKA} ask {$PLAYER} how many enemies killed in combat) {$MY_TEMPLATE_DIALOG_ASK}",
-	"({$HERIKA} ask {$PLAYER} to recognize {$HERIKA}'s skills proven in combat) {$MY_TEMPLATE_DIALOG_ASK}",
+	"({$HERIKA} asks {$PLAYER} how many enemies killed in combat) {$MY_TEMPLATE_DIALOG_ASK}",
+	"({$HERIKA} asks {$PLAYER} to recognize {$HERIKA}'s skills proven in combat) {$MY_TEMPLATE_DIALOG_ASK}",
 	"({$HERIKA} admires {$PLAYER}'s combat style) {$MY_TEMPLATE_DIALOG}"
 );
 

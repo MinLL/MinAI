@@ -3,8 +3,8 @@
 function setEroticStorytellingPrompts($currentName)
 {
     $gender = GetGender($currentName);
-    $in0 = "<instruction>";
-    $in1 = "</instruction>";
+    $in0 = "(";
+    $in1 = ")";
 
     $GLOBALS["PROMPTS"]["sextalk_climaxchastity"] = [
         "cue" => [
