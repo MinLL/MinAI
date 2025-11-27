@@ -14,6 +14,10 @@ function get_info_spank_breast_prompt() {
         $targetName = trim($matches[2]);
     }
     
+    if (strlen($targetName) > 0) {
+        $targetName = $targetName."'s ";
+    } 
+    
     $target = $GLOBALS["target"];
     $deviceContext = GetInfoDeviceContext($target);
     
@@ -133,7 +137,7 @@ function get_info_spank_breast_prompt() {
     $reactionDesc = $reactionDescriptions[array_rand($reactionDescriptions)];
     
     // Create the prompt with detailed context
-    $promptText = "$speakerName delivers a firm spanking to $targetName's breasts$helplessnessContext. $reactionDesc.";
+    $promptText = "{$speakerName} delivers a firm spanking to {$targetName}breasts{$helplessnessContext}. {$reactionDesc}.";
     
     return "The Narrator: " . $promptText;
 }

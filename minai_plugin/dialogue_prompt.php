@@ -47,19 +47,26 @@ Do not mention the probability and how you decided to choose the answer.
 $b_rem_asterisk = $GLOBALS["REMOVE_ASTERISKS_FROM_OUTPUT"] ?? true;
 
 if ($b_rem_asterisk) {
-    $GLOBALS["TEMPLATE_DIALOG_OUTPUT_FORMAT"] = "- Speak fluent without narration, context, or emotional descriptions. 
-<output_formatting>
+    $GLOBALS["TEMPLATE_DIALOG_NARRATION"] = "- Always speak in first person. 
+- Your response must be fluent, conversational and authentic, without further explanations, descriptions or narration, without formal, robotic, or repetitive language.
+";
+    $GLOBALS["TEMPLATE_DIALOG_OUTPUT_FORMAT"] = "<output_formatting>
 - Use plain text without formatting, absolutely no markdown formatting, no heading, bold, italic or lists, asterisk sign is absolutely forbidden. 
 </output_formatting>";
 } else {
-    $GLOBALS["TEMPLATE_DIALOG_OUTPUT_FORMAT"] = "<output_formatting>
-- Use plain text. 
+    $GLOBALS["TEMPLATE_DIALOG_NARRATION"] = "- Speak in first person for conversation, you could add a brief third person narrative or description if absolutely necessary to explain a situation or state of mind. 
+- Your response must be fluent and authentic, without formal, robotic, or repetitive language. ";
+    $GLOBALS["TEMPLATE_DIALOG_OUTPUT_FORMAT"] = "<output_formatting> 
+- Use plain text for conversation and pairs of asterisks to distinguish narration, explanations and descriptions. 
+When using asterisks, always use them in pairs, asterisks must enclose narration like this: 
+What should we do? *she thought about whether to leave the house in the heavy rain outside* Maybe we should wait. 
 </output_formatting>";
 }
 
 $rg0 = $GLOBALS["TEMPLATE_DIALOG_RG0"];
 $rg1 = $GLOBALS["TEMPLATE_DIALOG_RG1"];
 $td_fmt = $GLOBALS["TEMPLATE_DIALOG_OUTPUT_FORMAT"];
+$td_narration = $GLOBALS["TEMPLATE_DIALOG_NARRATION"];
 $td_vs = $GLOBALS["TEMPLATE_DIALOG_VSAMPLING"];
 
 $s_connector = '';
@@ -78,19 +85,16 @@ if (isset($GLOBALS["CURRENT_CONNECTOR"])) {
 
 $GLOBALS["TEMPLATE_DIALOG"]="\n<instruction>Write {$currentName}'s next dialogue line.</instruction> 
 {$rg0}
-- Speak in first person. 
-- Your response must be fluent, conversational and authentic, without formal, robotic, or repetitive language.
+{$td_narration}
 - You are {$currentName}, a product of a consciousness with subjective experiences and emotions. 
 - Think and respond as {$currentName} would, according to {$pronouns["possessive"]} quirks, beliefs, biases, and reasoning.
 - Review <DIALOGUE_HISTORY_and_RECENT_EVENTS> to focus on conversation topic and to avoid repeating sentences and phraseology from previous dialog lines.  
-- Your response must be fluent, conversational and authentic, without further explanations, descriptions or narration, without formal, robotic, or repetitive language.
 - Be original, creative, knowledgeable, use your own thoughts. 
 - When {$currentName} experiences strong emotion, {$pronouns["possessive"]} speech must alter with stutters, ellipses, incomplete thoughts, filler words, profanity or swearing, and become messy and fragmented. 
 - Avoid mentioning plans, quests, tasks or objectives or what to focus on until asked. 
 - Use language and vocabulary appropriate to your personality and background. 
 {$td_fmt}
 {$td_vs}"; 
-
 
 
 //"- {$GLOBALS["HERIKA_NAME"]}'s next dialogue lines will use this format \"{$GLOBALS["HERIKA_NAME"]}: \". ";

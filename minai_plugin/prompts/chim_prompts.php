@@ -700,8 +700,8 @@ if ($i_random == 1) {
 //---------------------------------------------------------------------
 
 $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["default"] = "({$HERIKA} talks to {$PLAYER}.) {$MY_TEMPLATE_DIALOG}";
-$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["TakeItem"] = "({$HERIKA} comments about the item taken.) {$MY_TEMPLATE_DIALOG}";
-$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdTakeItem"] = "({$HERIKA} comments about the item taken.) {$MY_TEMPLATE_DIALOG}";	
+$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["TakeItem"] = "({$HERIKA} comments about the item received or taken.) {$MY_TEMPLATE_DIALOG}";
+$GLOBALS["PROMPTS"]["afterfunc"]["cue"]["ExtCmdTakeItem"] = "({$HERIKA} comments about the item received or taken.) {$MY_TEMPLATE_DIALOG}";	
 $GLOBALS["PROMPTS"]["afterfunc"]["cue"]["Brawl"] = "({$GLOBALS["HERIKA_NAME"]} states the reasons for brawling. {$GLOBALS["TEMPLATE_DIALOG"]}";
 
 $GLOBALS["PROMPTS"]["instruction"]["cue"] = ["<instruction>{$gameRequest[3]}</instruction> ". $GLOBALS["TEMPLATE_DIALOG"]];

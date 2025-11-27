@@ -36,6 +36,7 @@ if (!isset($GLOBALS['minai_metrics_file'])) {
     $GLOBALS['minai_metrics_file'] = "/var/www/html/HerikaServer/log/minai_metrics.jsonl";
 }
 
+
 //---------------------------------------
 // Translate or fix some NPC conf. values 
 //---------------------------------------
@@ -499,5 +500,6 @@ if (isset($GLOBALS["enable_prompt_slop_cleanup"]) && $GLOBALS["enable_prompt_slo
     $GLOBALS["CONTEXT_HISTORY"] = $nDataForContext * 3;
     // error_log("DEBUG: Context history set to " . $GLOBALS["CONTEXT_HISTORY"]);
 }
+
 
 minai_stop_timer('prerequest_php');

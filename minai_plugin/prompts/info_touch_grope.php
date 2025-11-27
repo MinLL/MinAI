@@ -14,6 +14,10 @@ function get_info_touch_grope_prompt() {
         $targetName = trim($matches[2]);
     }
     
+    if (strlen($targetName) > 0) {
+        $targetName = $targetName."'s ";
+    } 
+    
     $target = $GLOBALS["target"];
     $deviceContext = GetInfoDeviceContext($target);
     
@@ -131,7 +135,7 @@ function get_info_touch_grope_prompt() {
     $reactionDesc = $reactionDescriptions[array_rand($reactionDescriptions)];
     
     // Create the prompt with detailed context
-    $promptText = "$speakerName reaches down and gropes $targetName's crotch with vulgar intent$helplessnessContext. $reactionDesc.";
+    $promptText = "$speakerName reaches down and gropes {$targetName} crotch with vulgar intent{$helplessnessContext}. $reactionDesc.";
     
     return "The Narrator: " . $promptText;
 }

@@ -14,6 +14,10 @@ function get_info_shock_prompt() {
         $targetName = trim($matches[2]);
     }
     
+    if (strlen($targetName) > 0) {
+        $targetName = $targetName."'s ";
+    } 
+    
     $target = $GLOBALS["target"];
     $deviceContext = GetInfoDeviceContext($target);
     
@@ -26,10 +30,10 @@ function get_info_shock_prompt() {
     
     // Create intro variations for shocking
     $shockIntros = [
-        "activates the punishment runes on $targetName's $deviceDescription",
-        "sends a pulse of painful arcane energy through $targetName's $deviceDescription",
-        "triggers the disciplinary enchantment on $targetName's $deviceDescription",
-        "channels disruptive magic into the soulgems within $targetName's $deviceDescription"
+        "activates the punishment runes on {$targetName}{$deviceDescription}",
+        "sends a pulse of painful arcane energy through {$targetName}{$deviceDescription}",
+        "triggers the disciplinary enchantment on {$targetName}{$deviceDescription}",
+        "channels disruptive magic into the soulgems within {$targetName}{$deviceDescription}"
     ];
     
     $shockIntro = $shockIntros[array_rand($shockIntros)];

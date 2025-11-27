@@ -13,7 +13,7 @@ In response return JSON ONLY! Don't include anything like Here is sex personalit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $connector = "openrouterjson";
 
-    if (!file_exists($path . "connector" . DIRECTORY_SEPARATOR . "$connector.php")) {
+    if (!file_exists($path . "connector" . DIRECTORY_SEPARATOR . "{$connector}.php")) {
         echo json_encode(['status' => 'error', 'message' => 'You need to setup LLM diary config on AIFF config page']);
         return;
     }

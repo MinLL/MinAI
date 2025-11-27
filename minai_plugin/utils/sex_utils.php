@@ -365,7 +365,7 @@ function determineSpeakStyle($currentName, $scene, $jsonXPersonality) {
                 // is scared by player?
                 if (!$isVictim) {
                     $n_fear = GetAdverseInteractions($currentName, $targetToSpeak); 
-                    if ($n_fear >= 5) { // player having sex with scared npc
+                    if ($n_fear >= 5) { // player having sex with hostile npc
                         $isVictim = true;
                         error_log("fear detected, $currentName is victim - exec trace "); // debug
                     } 
@@ -373,7 +373,7 @@ function determineSpeakStyle($currentName, $scene, $jsonXPersonality) {
                 // low arousal?
                 if (!$isVictim) {
                     $l_arousal = GetActorArousal($currentName); 
-                    if ($l_arousal < 5) { // player having sex with cold npc
+                    if ($l_arousal < 1) { // player having sex with cold npc
                         $isVictim = true;
                         error_log("low libido detected, $currentName is victim - exec trace "); // debug
                     } 

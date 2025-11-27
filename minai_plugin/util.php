@@ -153,6 +153,44 @@ function SetActorValue($name, $key, $value) {
     );
 }
 
+if (!function_exists('set_conf_opts_value')) {
+function set_conf_opts_value($key, $value) {
+    // Upsert new value
+    $l_key = strtolower($key);
+    return $GLOBALS['db']->upsertRowOnConflict(
+        'conf_opts',
+        array(
+            'id' => "{$l_key}",
+            'value' => "{$value}"
+        ),
+        'id'
+    );
+}
+}
+
+if (!function_exists('get_conf_opts_value')) {
+function get_conf_opts_value($key, $preserveCase=false) {
+    $s_res = "";
+    $db = $GLOBALS['db'];
+    $l_key = strtolower($key);
+    $e_key = $db->escape($l_key);    
+    
+    if (strlen($key) > 0) {
+
+        $query = "SELECT * FROM conf_opts WHERE (LOWER(id)='{$e_key}') LIMIT 1 ";
+
+        $ret = $GLOBALS["db"]->fetchAll($query);
+        if ($ret) {
+            if ($preserveCase)
+                $s_res = ($ret[0]['value'] ?? '');
+            else
+                $s_res = strtolower($ret[0]['value'] ?? '');        
+        }
+    }
+    return $s_res;
+}
+}
+
 // Return the specified actor value.
 // Caches the results of several queries that are repeatedly referenced.
 Function GetActorValue($name, $key, $preserveCase=false, $skipCache=false, $checkOnlyInCache=false) {
@@ -1256,14 +1294,13 @@ function GetAdverseInteractions($s_npc_name, $s_player_name) {
 		$s_npc = $GLOBALS['db']->escape($s_npc_name);
         
         $s_sql = "SELECT count(rowid) as n_fear FROM speech WHERE 
-speaker = '{$s_npc}' AND 
-listener = '{$s_player}' AND 
-emotion_intensity = 'strong' AND
-mood IN ('anxious', 'angry', 'irritated', 'disgusted') AND 
-emotion IN ('panic', 'fear', 'anger', 'disgust', 'aversion') AND
-localts > (SELECT (MAX(localts) - 900) as m15 FROM speech)  
-LIMIT 128"; 
-        //error_log($s_sql); //debug
+speaker = '{$s_npc}' AND listener = '{$s_player}' AND 
+emotion_intensity IN ('strong','moderate') AND 
+mood IN ('fearful','furious', 'anxious', 'angry', 'irritated', 'disgusted', 'contemptuous', 'sardonic','smug') AND 
+emotion IN ('rage', 'panic', 'fear', 'anger', 'disgust', 'aversion') AND 
+localts > (SELECT (MAX(localts) - 1800) as m15 FROM speech) 
+LIMIT 128 "; 
+        error_log($s_sql); //debug
         
 		$db_rec = $GLOBALS['db']->fetchAll($s_sql);
 		if (is_array($db_rec) && sizeof($db_rec)>0) {
