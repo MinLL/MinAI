@@ -15,16 +15,36 @@ require_once(__DIR__ . "/../system_prompt_context.php");
 function InitializeCoreContextBuilders() {
     $registry = ContextBuilderRegistry::getInstance();
     
+    // Register player background context builder
+    $registry->register('player_background', [
+        //'section' => 'interaction',
+        'section' => 'character',
+        'header' => 'Description of #player_name#',
+        'description' => 'NPC perspective of the player',
+        'priority' => 7,
+        'enabled' => isset($GLOBALS['minai_context']['player_background']) ? (bool)$GLOBALS['minai_context']['player_background'] : true,
+        'builder_callback' => 'BuildPlayerBackgroundContext'
+    ]);
+
     // Register personality context builder
     $registry->register('personality', [
         'section' => 'character',
         'header' => 'Personality', // 'header' => 'PROFILE', ???
         'description' => 'Core personality description',
-        'priority' => 10, // High priority - should be first in character section
+        'priority' => 5, // High priority - should be first in character section
         'enabled' => isset($GLOBALS['minai_context']['personality']) ? (bool)$GLOBALS['minai_context']['personality'] : true,
         'builder_callback' => 'BuildPersonalityContext'
     ]);
     
+    // Register basic interaction context builder
+    $registry->register('interaction', [
+        'section' => 'interaction',
+        'description' => 'Basic information about who the character is interacting with',
+        'priority' => 10, // High priority - should be first in interaction section
+        'enabled' => isset($GLOBALS['minai_context']['interaction']) ? (bool)$GLOBALS['minai_context']['interaction'] : true,
+        'builder_callback' => 'BuildInteractionContext'
+    ]);
+
     // Register dynamic state context builder
     $registry->register('dynamic_state', [
         'section' => 'character',
@@ -45,27 +65,6 @@ function InitializeCoreContextBuilders() {
         'builder_callback' => 'BuildCombatContext'
     ]);
     
-    // Register basic interaction context builder
-    $registry->register('interaction', [
-        'section' => 'interaction',
-        'description' => 'Basic information about who the character is interacting with',
-        'priority' => 10, // High priority - should be first in interaction section
-        'enabled' => isset($GLOBALS['minai_context']['interaction']) ? (bool)$GLOBALS['minai_context']['interaction'] : true,
-        'builder_callback' => 'BuildInteractionContext'
-    ]);
-
-    
-    
-    // Register player background context builder
-    $registry->register('player_background', [
-        'section' => 'interaction',
-        'header' => 'Description of #player_name#',
-        'description' => 'NPC perspective of the player',
-        'priority' => 20,
-        'enabled' => isset($GLOBALS['minai_context']['player_background']) ? (bool)$GLOBALS['minai_context']['player_background'] : true,
-        'builder_callback' => 'BuildPlayerBackgroundContext'
-    ]);
-
     // Register current task context builder
     $registry->register('current_task', [
         'section' => 'interaction',
@@ -133,7 +132,7 @@ function BuildPersonalityContext($params) {
     }
     
     // Get the personality from global variables
-    $herika_pers = isset($GLOBALS["HERIKA_PERS"]) ? $GLOBALS["HERIKA_PERS"] : "";
+    $herika_pers = ($GLOBALS["HERIKA_PERS"] ?? "");
     
     if (isset($GLOBALS['HERIKA_PERSONALITY']) && (trim($GLOBALS['HERIKA_PERSONALITY']) > "")) {
         $herika_pers .= "\n\n## Behavioral patterns\n" . trim($GLOBALS['HERIKA_PERSONALITY']);
@@ -257,6 +256,113 @@ function BuildInteractionContext($params) {
 }
 
 /**
+ * Build the player achievements
+ * 
+ * @player_name
+ * @return string Formatted player achievements
+ */
+function BuildPlayerAchievementsContext($playername) {
+    $s_res = "";
+    
+    if (strlen(trim($playername)) > 0) { 
+        
+        // The Circle
+        $bx = IsInFaction($playername, "The Circle");
+        if ($bx) 
+            $s_res .= "- member of the inner circle of The Companions, Lycanthropy is mandatory condition for membership\n";
+        else {
+            // The Companions
+            if (IsInFaction($playername, "The Companions"))
+                $s_res .= "- member of The Companions\n";
+        }
+        // Nightingales
+        $bx = IsInFaction($playername, "Nightingales");
+        if ($bx) 
+            $s_res .= "- member of the Nightingale Trinity (higher echelon of the Thieves Guild, dedicated to the service of Nocturnal)\n";
+        else {
+            //Thieves' Guild
+            if (IsInFaction($playername, "Thieves' Guild"))
+                $s_res .= "- skilled thief, member of Thieves' Guild\n";
+        }
+        
+        // College of Winterhold - Arch-Mage, also known as Archmagus or Archmagister, the leader of the Mages Guild known as College of Winterhold. 
+        $bx = IsInFaction($playername, "College of Winterhold Arch-Mage Faction");
+        if ($bx) 
+            $s_res .= "- Arch-Mage, the leader of the Mages Guild known as College of Winterhold\n";
+        else {
+            if (IsInFaction($playername, "College of Winterhold"))
+                $s_res .= "- mage, member of College of Winterhold\n";
+        }
+        
+        // Greybeards
+        if (IsInFaction($playername, "Greybeards"))
+            $s_res .= "- recognized as The Dragonborn, member of Greybeards\n";
+
+        // Bards College
+        if (IsInFaction($playername, "Bards College"))
+            $s_res .= "- presumed (debatable) skilled bard, member of Bards College\n";
+
+        // Blood-Kin of the Orcs
+        if (IsInFaction($playername, "Blood-Kin of the Orcs"))
+            $s_res .= "- Blood-Kin of the Orcs, unlimited access to orc settlements\n";
+
+        // The Dawnguard
+        if (IsInFaction($playername, "The Dawnguard"))
+            $s_res .= "- vampire hunter, member of The Dawnguard\n";
+
+        // Thirsk Hall Riekling Tribe
+        if (IsInFaction($playername, "Thirsk Hall Riekling Tribe"))
+            $s_res .= "- chief of Thirsk Hall Riekling Tribe\n";
+
+        // Dark Brotherhood
+        if (IsInFaction($playername, "Dark Brotherhood"))
+            $s_res .= "- professional assassin, member of the Dark Brotherhood\n";
+
+        // Tribunal Temple
+        if (IsInFaction($playername, "Tribunal Temple"))
+            $s_res .= "- member of Tribunal Temple (heretical Dunmeri faction devoted to worship of the Tribunal, the former living gods Almalexia, Sotha Sil, and Vivec)\n";
+
+        // Imperial Legion
+        if (IsInFaction($playername, "Imperial Legion"))
+            $s_res .= "- member of Imperial Legion\n";
+        
+        // Stormcloaks
+        if (IsInFaction($playername, "Stormcloaks"))
+            $s_res .= "- member of Stormcloaks\n";
+        
+        // Volkihar Vampire Clan
+        if (IsInFaction($playername, "Volkihar Vampire Clan"))
+            $s_res .= "- vampire, member of Volkihar Vampire Clan\n";
+        
+        // Blades
+        if (IsInFaction($playername, "Blades"))
+            $s_res .= "- member of the Blades\n";
+
+        // Vigilant of Stendarr For Player
+        if (IsInFaction($playername, "Vigilant of Stendarr For Player"))
+            $s_res .= "- member of Vigilant of Stendarr\n";
+
+        // Riften Fishery Faction
+        if (IsInFaction($playername, "Riften Fishery Faction"))
+            $s_res .= "- exceptional fisherman, member of Riften Fishery Guild\n";
+
+        // Coven of Namira
+        if (IsInFaction($playername, "Coven of Namira"))
+            $s_res .= "- cannibal, member of Coven of Namira\n";
+
+        // 
+        //if (IsInFaction($playername, ""))
+        //    $s_res .= "- member of \n";
+
+        if (strlen($s_res) > 0) {
+            $s_res = "\n### {$playername}'s affiliations: \n" . $s_res;
+        }
+    }
+    //error_log("achievements: $s_res ");
+    return $s_res;
+}
+
+/**
  * Build the player background context
  * 
  * @param array $params Parameters including herika_name, player_name, target, is_self_narrator
@@ -286,7 +392,8 @@ function BuildPlayerBackgroundContext($params) {
     if ($is_self_narrator) {
         return "As {$player_name}'s inner voice, you understand the following about them:\n\n" . trim($player_bio);
     }
-    
+    $player_bio = $player_bio . BuildPlayerAchievementsContext($player_name);
+
     return trim($player_bio);
 }
 
@@ -306,7 +413,7 @@ function BuildDynamicStateContext($params) {
     }
     
     // Get dynamic state from global variables
-    $dynamic_state = isset($GLOBALS["HERIKA_DYNAMIC"]) ? $GLOBALS["HERIKA_DYNAMIC"] : "";
+    $dynamic_state = ($GLOBALS["HERIKA_DYNAMIC"] ?? "" );
     // Replace "The Narrator" with player name if in self-narrator mode
     if (isset($params['is_self_narrator']) && $params['is_self_narrator']) {
         $player_name = $params['player_name'];

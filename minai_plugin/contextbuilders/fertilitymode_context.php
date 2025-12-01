@@ -3,38 +3,53 @@ require_once("FillHerUp_context.php");
 
 Function GetFertilityContext($name) {
     $ret = "";
-    $state = GetActorValue($name, "fertility_state");
-    
     // Skip if no fertility state or male
-    if (empty($state) || GetActorValue($name, "gender") != "female") {
+    if (GetActorValue($name, "gender") != "female") {
         return $ret;
     }
 
-    $isNarrator = ($GLOBALS["HERIKA_NAME"] == "The Narrator");
-    $isSelf = false; //GetTargetActor() == $name;
+//error_log("Fertility $name - exec trace");    
+
+    $state = strtolower(GetActorValue($name, "fertility_state"));
+    if (empty($state)) {
+        return $ret;
+    }
+    
+//error_log("Fertility $name $state - exec trace");    
+
+    //$isNarrator = ($GLOBALS["HERIKA_NAME"] == "The Narrator");
+    $isNarrator = (strtolower($name) == "the narrator");
+    
+    //$isSelf = false; //GetTargetActor() == $name;
     
     // Pregnancy states are visible to everyone
     if ($state == "third_trimester") {
-        $ret .= "{$name} is in the third trimester of pregnancy and is very visibly pregnant.\n";
+        $ret .= "<pregnancy_status>{$name} is in the third trimester of pregnancy and is very visibly pregnant.</pregnancy_status> \n";
     }
     elseif ($state == "second_trimester") {
-        $ret .= "{$name} is in the second trimester of pregnancy and is showing a noticeable baby bump.\n";
+        $ret .= "<pregnancy_status>{$name} is in the second trimester of pregnancy and is showing a noticeable baby bump.</pregnancy_status>\n";
     }
     elseif ($state == "first_trimester") {
-        $ret .= "{$name} is in the first trimester of pregnancy, though it's not very noticeable yet.\n";
+        $ret .= "<pregnancy_status>{$name} is in the first trimester of pregnancy, though it's not very noticeable yet.</pregnancy_status>\n";
     }
-    // Other states only visible to Narrator or self
-    elseif ($isNarrator || $isSelf) {
+    // Other states only visible to Narrator or self <fertility_status>
+    //elseif ($isNarrator || $isSelf) {
+    //elseif (!$isNarrator) {
         if ($state == "ovulating") {
-            $ret .= "{$name} is currently ovulating and fertile.\n";
+            $ret .= "<fertility_status><is_fertile>{$name}</is_fertile> is currently ovulating and fertile, there is a high chance of getting pregnant.</fertility_status>\n";
+            //error_log("Fertility $name $state - exec trace");
         }
         elseif ($state == "pms") {
-            $ret .= "{$name} is experiencing PMS symptoms.\n";
+            $ret .= "<fertility_status><not_fertile>{$name}</not_fertile> is experiencing PMS symptoms.</fertility_status>\n";
         }
         elseif ($state == "menstruating") {
-            $ret .= "{$name} is currently menstruating.\n";
+            $ret .= "<fertility_status><not_fertile>{$name}</not_fertile> is currently menstruating.</fertility_status>\n";
+            //error_log("Fertility $name $state - exec trace");
         }
-    }
+        elseif ($state == "normal") {
+            $ret .= "<fertility_status><not_fertile>{$name}</not_fertile> is not near ovulation, unlikely to get pregnant.</fertility_status>\n";
+        }
+    //}
 
     // Add Fill Her Up context
     $ret .= GetFillHerUpContext($name);

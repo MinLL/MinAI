@@ -111,11 +111,12 @@ function callLLM($messages, $model = null, $options = []) {
             $promptLog .= $message['content'] . "\n\n";
         }
         $promptLog .= "\n";
-        file_put_contents('/var/www/html/HerikaServer/log/minai_context_sent_to_llm.log', $promptLog, FILE_APPEND);
-        minai_log("info", "callLLM: Calling LLM with model: $model");
+
         // Use provided model or fall back to configured model
-        if (!$model && isset($GLOBALS['CONNECTOR']['openrouter']['model'])) {
-            $model = $GLOBALS['CONNECTOR']['openrouter']['model'];
+        $s_con_diary = $NPC_CONF["CONNECTORS_DIARY"] ?? 'openai';
+        
+        if (!$model && isset($GLOBALS['CONNECTOR'][$s_con_diary]['model'])) {
+            $model = $GLOBALS['CONNECTOR'][$s_con_diary]['model'];
         }
         
         if (!$model) {
@@ -124,14 +125,14 @@ function callLLM($messages, $model = null, $options = []) {
         }
 
         // Get API URL and key from globals
-        if (!isset($GLOBALS['CONNECTOR']['openrouter']['url']) || 
-            !isset($GLOBALS['CONNECTOR']['openrouter']['API_KEY'])) {
-            minai_log("info", "callLLM: Missing OpenRouter configuration");
+        if (!isset($GLOBALS['CONNECTOR'][$s_con_diary]['url']) || 
+            !isset($GLOBALS['CONNECTOR'][$s_con_diary]['API_KEY'])) {
+            minai_log("info", "callLLM: Missing $s_con_diary configuration");
             return null;
         }
 
-        $url = $GLOBALS['CONNECTOR']['openrouter']['url'];
-        $apiKey = $GLOBALS['CONNECTOR']['openrouter']['API_KEY'];
+        $url = $GLOBALS['CONNECTOR'][$s_con_diary]['url'];
+        $apiKey = $GLOBALS['CONNECTOR'][$s_con_diary]['API_KEY'];
 
         // Set up headers
         $headers = [
@@ -145,8 +146,8 @@ function callLLM($messages, $model = null, $options = []) {
         $data = array_merge([
             'model' => $model,
             'messages' => $messages,
-            'max_tokens' => $GLOBALS['CONNECTOR']['openrouter']['max_tokens'],
-            'temperature' => $GLOBALS['CONNECTOR']['openrouter']['temperature'],
+            'max_tokens' => intval($GLOBALS['CONNECTOR'][$s_con_diary]['max_tokens'] ?? 1024),
+            'temperature' => floatval($GLOBALS['CONNECTOR'][$s_con_diary]['temperature'] ?? 0.5),
             'stream' => false
         ], $options);
 
@@ -156,11 +157,12 @@ function callLLM($messages, $model = null, $options = []) {
                 'method' => 'POST',
                 'header' => implode("\r\n", $headers),
                 'content' => json_encode($data),
-                'timeout' => 30
+                'timeout' => 60
             ]
         ];
 
-        minai_log("info", "callLLM: Sending request to model: $model");
+        file_put_contents('/var/www/html/HerikaServer/log/minai_context_sent_to_llm.log', "\n>>> {$s_con_diary} {$url} {$model} \n" . $promptLog, FILE_APPEND);
+        //minai_log("info", "callLLM: Calling LLM with model: $model");
         
         // Make the request
         $context = stream_context_create($options);
@@ -180,13 +182,15 @@ function callLLM($messages, $model = null, $options = []) {
         if (!isset($response['choices'][0]['message']['content'])) {
             minai_log("info", "callLLM: Unexpected response format");
             minai_log("debug", "callLLM: Response: " . json_encode($response));
-            SetLLMFallbackProfile();
-            return callLLM($messages, $GLOBALS['CONNECTOR']['openrouter']['model'], $options);
+            return null;
+            //SetLLMFallbackProfile();
+            //return callLLM($messages, $GLOBALS['CONNECTOR']['openrouter']['model'], $options);
         }
 
         $responseContent = $response['choices'][0]['message']['content'];
         
         // Check if response is valid and we haven't retried yet
+        /*
         if (!$isRetry && !validateLLMResponse($responseContent)) {
             minai_log("info", "callLLM: Invalid response detected, retrying with fallback profile");
             
@@ -198,7 +202,7 @@ function callLLM($messages, $model = null, $options = []) {
             
             // Retry the call
             return callLLM($messages, $GLOBALS['CONNECTOR']['openrouter']['model'], $options);
-        }
+        } */
         
         // Strip asterisks from gagged speech while preserving action descriptions
         $responseContent = StripGagAsterisks($responseContent);

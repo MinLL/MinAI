@@ -14,6 +14,7 @@ require_once(__DIR__ . "/../../contextbuilders/dirtandblood_context.php");
 require_once(__DIR__ . "/../../contextbuilders/exposure_context.php");
 require_once("/var/www/html/HerikaServer/ext/minai_plugin/location_context_details.php");
 require_once("/var/www/html/HerikaServer/lib/utils_game_timestamp.php");
+
 /**
  * Helper function to validate and sanitize parameters for context builders
  * 
@@ -102,7 +103,7 @@ function InitializeEnvironmentalContextBuilders() {
     // Register location context builder
     $registry->register('location', [
         'section' => 'environment',
-        'header' => 'Location',
+        'header' => 'Current Location',
         'description' => 'Interior/exterior location information',
         'priority' => 20,
         'enabled' => isset($GLOBALS['minai_context']['location']) ? (bool)$GLOBALS['minai_context']['location'] : true,
@@ -112,9 +113,9 @@ function InitializeEnvironmentalContextBuilders() {
     // Register nearby buildings context builder
     $registry->register('nearby_buildings', [
         'section' => 'environment',
-        'header' => 'Nearby Buildings and Passages',
+        'header' => 'Nearby Points of Interest, Doors and Passages',
         'description' => 'Doors and passages in the vicinity',
-        'priority' => 22,
+        'priority' => 21,
         'enabled' => isset($GLOBALS['minai_context']['nearby_buildings']) ? (bool)$GLOBALS['minai_context']['nearby_buildings'] : true,
         'builder_callback' => 'BuildNearbyBuildingsContext'
     ]);
@@ -142,7 +143,7 @@ function InitializeEnvironmentalContextBuilders() {
     // Register NPC relationships context builder
     $registry->register('npc_relationships', [
         'section' => 'environment',
-        'header' => 'NPC Relationships',
+        'header' => 'Character Relationships',
         'description' => 'NPC relationship to the player',
         'priority' => 40,
         'enabled' => isset($GLOBALS['minai_context']['npc_relationships']) ? (bool)$GLOBALS['minai_context']['npc_relationships'] : true,
@@ -273,7 +274,7 @@ function GetLocationKeywordDescription($keyword) {
     $descriptions = [
         // Settlement Types
         'city' => 'a major urban center',
-        'town' => 'a smaller urban settlement',
+        'town' => 'a small urban settlement',
         'village' => 'a small rural settlement',
         'settlement' => 'a populated area',
         
@@ -382,41 +383,47 @@ function BuildLocationContext($params) {
     
     // Get hold information
     $currentHold = ucwords(GetActorValue($character, "currentHold"));
-    $hasHold = false;
-    if (!empty($currentHold)) {
-        $context .= "Current Hold: " . $currentHold . ".\n";
-        $hasHold = true;
-    }
-    
+    $hasHold = (!empty($currentHold));
+
     // Get location information - prefer location over cell
     $currentLocation = ucwords(GetActorValue($character, "currentLocation"));
-    $hasLocation = false;
-    if (!empty($currentLocation)) {
-        $s_loc_extra = GetLocationDetails($currentLocation);
-        if ($s_loc_extra > "")
-            $context .= "Current Location: " . $currentLocation . ", " . $s_loc_extra . ".\n";
-        else 
-            $context .= "Current Location: " . $currentLocation . ".\n";
-        $hasLocation = true;
-    } else {
+    $hasLocation = (!empty($currentLocation));
+
+    if (!$hasLocation) {
         // Try cell if no location
         $currentCell = ucwords(GetActorValue($character, "CurrentCell"));
         if (!empty($currentCell)) {
-            $context .= "Current Location: " . $currentCell . ".\n";
+            $currentLocation = $currentCell;
             $hasLocation = true;
         } else {
             // Last resort: try GetCurrentLocationContext
             $locationContext = GetCurrentLocationContext($character);
             if (!empty($locationContext['current'])) {
-                $context .= "Current Location: " . ucwords($locationContext['current']) . ".\n";
+                $currentLocation = ucwords($locationContext['current']);
                 $hasLocation = true;
-                
                 // Add hold from locationContext if we don't have it
-                if (!$hasHold && !empty($locationContext['hold'])) {
-                    $context = "Current Hold: " . ucwords($locationContext['hold']) . ".\n" . $context;
+                if ((!$hasHold) && (!empty($locationContext['hold']))) {
+                    $currentHold = ucwords($locationContext['hold']);
+                    $hasHold = true;
                 }
             }
         }
+    }
+    
+    if ($hasLocation) {
+        //error_log(" BuildLocationContext _{$currentLocation}_"); //debug
+        $s_loc_extra = GetLocationDetails($currentLocation);
+        if (strlen($s_loc_extra) > 0) {
+            $context .= "Current Location: " . $currentLocation . ", " . $s_loc_extra . ".\n";
+        } else {
+            $context .= "Current Location: " . $currentLocation . ".\n";
+        }
+        
+    }
+    
+    // Hold
+    if ($hasHold) {
+        $context .= "Current Hold: " . $currentHold . ".\n";
     }
     
     // Get location keywords and format them
@@ -544,7 +551,7 @@ function BuildNearbyCharactersContext($params) {
     // If we have characters after cleaning, create the formatted list
     if (count($characters) > 0) {
         // Define attributes to fetch in batch - use lowercase for array keys
-        $attributes = ['race', 'gender', 'faction', 'sitstate', 'sleepstate', 'dirtandblood', 'Scene'];
+        $attributes = ['race', 'gender', 'faction', 'sitstate', 'sleepstate', 'dirtandblood', 'scene'];
         $flags = ['IsSneaking', 'IsSwimming', 'IsOnMount', 'inCombat', 'isEncumbered', 'hostiletoplayer','isNaked', 'IsBleedingOut'];
         
         // Correctly call the batch functions from global scope
@@ -556,12 +563,14 @@ function BuildNearbyCharactersContext($params) {
         foreach ($characters as $character) {
             $charKey = strtolower($character);
             $line = $character;
-            
+            $s_race = "";
             // Get race if available
             if (isset($actorValues[$charKey]['race']) && !empty($actorValues[$charKey]['race'])) {
                 $s_race = $actorValues[$charKey]['race'];
-                $gender = GetGender($character);
-                $line .= " ({$s_race} {$gender})";
+                $s_gender = $actorValues[$charKey]['gender']; //GetGender($character);
+                $s_child =  (IsChildActor($character)) ? " child" : ""; 
+                
+                $line .= " ({$s_race} {$s_gender}{$s_child})";
             }
             
             // Add faction info if available
@@ -574,23 +583,6 @@ function BuildNearbyCharactersContext($params) {
                 $line .= " - hostile to outsiders";
             }
 
-            // Movement and combat states
-            if (isset($actorFlags[$charKey]['issneaking']) && $actorFlags[$charKey]['issneaking']) {
-                $line .= " - sneaking";
-            }
-            
-            if (isset($actorFlags[$charKey]['isswimming']) && $actorFlags[$charKey]['isswimming']) {
-                $line .= " - swimming";
-            }
-            
-            if (isset($actorFlags[$charKey]['isonmount']) && $actorFlags[$charKey]['isonmount']) {
-                $line .= " - on horseback";
-            }
-            
-            if (isset($actorFlags[$charKey]['isincombat']) && $actorFlags[$charKey]['isincombat']) {
-                $line .= " - in combat";
-            }
-            
             if (isset($actorFlags[$charKey]['isencumbered']) && $actorFlags[$charKey]['isencumbered']) {
                 $line .= " - encumbered";
             }
@@ -599,8 +591,9 @@ function BuildNearbyCharactersContext($params) {
                 $line .= " - bleeding";
             }
 
-            // Add hygiene information
-            if (isset($actorValues[$charKey]['dirtandblood']) && !empty($actorValues[$charKey]['dirtandblood'])) {
+            // Add hygiene information 
+            $b_dirt = ($GLOBALS['minai_context']['dirt_and_blood'] ?? false);
+            if ($b_dirt && isset($actorValues[$charKey]['dirtandblood']) && (!empty($actorValues[$charKey]['dirtandblood']))) {
                 $hygiene = $actorValues[$charKey]['dirtandblood'];
                 
                 if (stripos($hygiene, "Clean") !== false) {
@@ -642,15 +635,34 @@ function BuildNearbyCharactersContext($params) {
             }
 
             if (isset($actorFlags[$charKey]['isnaked']) && $actorFlags[$charKey]['isnaked']) {
-                $line .= " - naked";
+                if (!IsCreature($character))
+                    $line .= " - naked";
             }
 
             // ---------------------- 
 
             if (IsInScene($character)) { //IsInScene($character) 
                 //error_log(" in scene: $character - dbg ");
-                $line .= " - involved in intimate activities"; 
+                $line .= " - having sex now"; 
             } else {
+
+                // Movement and combat states
+                if (isset($actorFlags[$charKey]['issneaking']) && $actorFlags[$charKey]['issneaking']) {
+                    $line .= " - sneaking";
+                }
+                
+                if (isset($actorFlags[$charKey]['isswimming']) && $actorFlags[$charKey]['isswimming']) {
+                    $line .= " - swimming";
+                }
+                
+                if (isset($actorFlags[$charKey]['isonmount']) && $actorFlags[$charKey]['isonmount']) {
+                    $line .= " - on horseback";
+                }
+                
+                if (isset($actorFlags[$charKey]['isincombat']) && $actorFlags[$charKey]['isincombat']) {
+                    $line .= " - in combat";
+                }
+
                 // Add character state
                 if (isset($actorValues[$charKey]['sitstate']) && !empty($actorValues[$charKey]['sitstate']) && intval($actorValues[$charKey]['sitstate']) == 3) {
                     $line .= " - sitting";
@@ -664,8 +676,11 @@ function BuildNearbyCharactersContext($params) {
             
             $contextLines[] = $line;
         }
-        
-        return implode("\n", $contextLines);
+        $n_cl = count($contextLines);
+        if ($n_cl > 0) {
+            $s_cl = implode("\n", $contextLines); 
+            return $s_cl;
+        }
     }
     
     return "";

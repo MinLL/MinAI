@@ -14,6 +14,10 @@ function get_info_touch_pinch_prompt() {
         $targetName = trim($matches[2]);
     }
     
+    if (strlen($targetName) > 0) {
+        $targetName = $targetName."'s ";
+    } 
+    
     $target = $GLOBALS["target"];
     $deviceContext = GetInfoDeviceContext($target);
     
@@ -131,7 +135,7 @@ function get_info_touch_pinch_prompt() {
     $reactionDesc = $reactionDescriptions[array_rand($reactionDescriptions)];
     
     // Create the prompt with detailed context
-    $promptText = "$speakerName cruelly pinches $targetName's nipples$helplessnessContext. $reactionDesc.";
+    $promptText = "$speakerName cruelly pinches {$targetName}nipples{$helplessnessContext}. $reactionDesc.";
     
     return "The Narrator: " . $promptText;
 }

@@ -7,13 +7,19 @@ function get_info_orgasm_prompt() {
     $cleanedMessage = GetCleanedMessage();
     
     // Extract names from the message if possible
-    $targetName = $GLOBALS["target"];
-    $target = $GLOBALS["target"];
+    //$targetName = $GLOBALS["target"];
+    $target = "";
+    $targetName = "";
     if (preg_match('/^(.*?) just had an orgasm/', $cleanedMessage, $matches)) {
         $target = $matches[1];
-        $targetName = $target;
     }
-    
+    if (strlen($target) > 0) {
+        $targetName = $target."'s ";
+    } else {
+        $target = $GLOBALS["target"];
+        $targetName = "";
+    }
+        
     // Check if actor can orgasm
     $canOrgasm = ActorCanOrgasm($target);
     
@@ -31,10 +37,10 @@ function get_info_orgasm_prompt() {
     if (!$canOrgasm) {
         // Create denial variations when orgasm is not allowed
         $denialIntros = [
-            "The intensity of $targetName's $deviceDescription surges to an impossible peak, threatening to shatter their sanity",
-            "$targetName's $deviceDescription unleashes its full devastating power, pushing them beyond all limits",
-            "Overwhelming waves of pleasure from $targetName's $deviceDescription build to a maddening crescendo",
-            "The relentless stimulation from $targetName's $deviceDescription drives them to the very brink of consciousness"
+            "The intensity of {$targetName}{$deviceDescription} surges to an impossible peak, threatening to shatter their sanity",
+            "{$targetName}{$deviceDescription} unleashes its full devastating power, pushing them beyond all limits",
+            "Overwhelming waves of pleasure from {$targetName}{$deviceDescription} build to a maddening crescendo",
+            "The relentless stimulation from {$targetName}{$deviceDescription} drives them to the very brink of consciousness"
         ];
         
         $denialReactions = [];
@@ -75,10 +81,10 @@ function get_info_orgasm_prompt() {
     
     // Create intro variations for orgasm control - reworded to work without a speaker
     $orgasmIntros = [
-        "The intensity of $targetName's $deviceDescription suddenly turns to maximum",
-        "The full power of $targetName's $deviceDescription is unleashed",
-        "$targetName's $deviceDescription activates at its highest setting",
-        "Intense pulses surge through $targetName's $deviceDescription"
+        "The intensity of {$targetName}{$deviceDescription} suddenly turns to maximum",
+        "The full power of {$targetName}{$deviceDescription} is unleashed",
+        "{$targetName}{$deviceDescription} activates at its highest setting",
+        "Intense pulses surge through {$targetName}{$deviceDescription}"
     ];
     
     $orgasmIntro = $orgasmIntros[array_rand($orgasmIntros)];

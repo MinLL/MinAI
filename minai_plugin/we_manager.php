@@ -100,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['act
     // Load data with optional filters
     $sort = isset($_GET['sort']) ? $_GET['sort'] : 'baseFormId';
 
-    $query = "SELECT * FROM equipment_description WHERE 1=1";
+    $query = "SELECT * FROM equipment_description WHERE 1=1 ";
 
     $baseFormId = $db->escape($_GET['baseFormId'] ?? '');
     $modName = $db->escape($_GET['modName'] ?? '');
@@ -131,59 +131,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['act
     }
 
     if (!empty($baseFormId)) {
-        $query .= " AND baseFormId ILIKE '%{$baseFormId}%'";
+        $query .= " AND baseformid ILIKE '%{$baseFormId}%' ";
     }
 
     if (!empty($modName)) {
-        $query .= " AND modName ILIKE '%{$modName}%'";
+        $query .= " AND modname ILIKE '%{$modName}%' ";
     }
 
     if (!empty($name)) {
-        $query .= " AND name ILIKE '%{$name}%'";
+        $query .= " AND name ILIKE '%{$name}%' ";
     }
 
     if (!empty($description)) {
-        $query .= " AND description ILIKE '%{$description}%'";
+        $query .= " AND description ILIKE '%{$description}%' ";
     }
     
     if (!empty($body_part)) {
-        $query .= " AND body_part ILIKE '%{$body_part}%'";
+        $query .= " AND body_part ILIKE '%{$body_part}%' ";
     }
     
     if (isset($_GET['is_restraint']) && $_GET['is_restraint']) {
-        $query .= " AND is_restraint = 1";
+        $query .= " AND is_restraint = 1 ";
     }
     
     // Only show enabled items unless specifically asked to show disabled
     if (!$show_disabled) {
-        $query .= " AND is_enabled = 1";
+        $query .= " AND is_enabled = 1 ";
     }
-
-    $query .= " ORDER BY $sort";
+    
+    if (strlen(trim($sort)) > 0) 
+        $query .= " ORDER BY {$sort} ";
 
     $result = $db->fetchAll($query);
-
+    if (!isset($result)) { //something went wrong, let's showw all records
+        $query = "SELECT * FROM equipment_description ORDER BY modname ASC, name ASC ";
+        $result = $db->fetchAll($query);
+    }
+    
     $data = [];
-    foreach ($result as $row) {
-        // If filtering by worn equipment, check if this item is currently worn
-        if ($filter_worn) {
-            $item_id = strtolower($row['baseformid'] . '|' . $row['modname']);
-            if (!in_array($item_id, $worn_equipment_ids)) {
-                continue; // Skip items that aren't worn
+    if (isset($result)) {
+        foreach ($result as $row) {
+            // If filtering by worn equipment, check if this item is currently worn
+            if ($filter_worn) {
+                $item_id = strtolower($row['baseformid'] . '|' . $row['modname']);
+                if (!in_array($item_id, $worn_equipment_ids)) {
+                    continue; // Skip items that aren't worn
+                }
             }
+            
+            // result column name is all lower case for some reason
+            $data[] = [
+                'baseFormId' => $row['baseformid'],
+                'modName' => $row['modname'],
+                'name' => $row['name'],
+                'description' => $row['description'],
+                'is_restraint' => $row['is_restraint'] ?? 0,
+                'body_part' => $row['body_part'] ?? '',
+                'hidden_by' => $row['hidden_by'] ?? '',
+                'is_enabled' => $row['is_enabled'] ?? 1
+            ];
         }
-        
-        // result column name is all lower case for some reason
-        $data[] = [
-            'baseFormId' => $row['baseformid'],
-            'modName' => $row['modname'],
-            'name' => $row['name'],
-            'description' => $row['description'],
-            'is_restraint' => $row['is_restraint'] ?? 0,
-            'body_part' => $row['body_part'] ?? '',
-            'hidden_by' => $row['hidden_by'] ?? '',
-            'is_enabled' => $row['is_enabled'] ?? 1
-        ];
     }
 
     echo json_encode(['status' => 'success', 'data' => $data]);

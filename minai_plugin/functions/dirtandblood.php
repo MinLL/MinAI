@@ -3,7 +3,9 @@
 // Check if actor can start bathing
 function canStartBathing() {
     return IsModEnabled("DirtAndBlood") && 
-           !IsInFaction($GLOBALS["HERIKA_NAME"], "NoActionsFaction");
+        !IsSexActive() && 
+        !IsEnabled($GLOBALS["HERIKA_NAME"], "inCombat") && 
+        !IsInFaction($GLOBALS["HERIKA_NAME"], "NoActionsFaction");
 }
 
 // Cache condition result

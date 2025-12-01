@@ -14,6 +14,10 @@ function get_info_turn_off_prompt() {
         $targetName = trim($matches[2]);
     }
     
+    if (strlen($targetName) > 0) {
+        $targetName = $targetName."'s ";
+    } 
+    
     $target = $GLOBALS["target"];
     $deviceContext = GetInfoDeviceContext($target);
     
@@ -28,10 +32,10 @@ function get_info_turn_off_prompt() {
     
     // Create intro variations for turning off
     $turnOffIntros = [
-        "deactivates $targetName's $deviceDescription",
-        "turns off $targetName's $deviceDescription",
-        "shuts down $targetName's $deviceDescription",
-        "stops the stimulation from $targetName's $deviceDescription"
+        "deactivates {$targetName}{$deviceDescription}",
+        "turns off {$targetName}{$deviceDescription}",
+        "shuts down {$targetName}{$deviceDescription}",
+        "stops the stimulation from {$targetName}{$deviceDescription}"
     ];
     
     $turnOffIntro = $turnOffIntros[array_rand($turnOffIntros)];

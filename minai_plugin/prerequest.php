@@ -1,24 +1,29 @@
 <?php
+// not to be included explicitly, must be included only via requireFilesRecursively()
+
 /**
  * MinAI Pre-request Processing
  * 
  * This file is included at the beginning of each request to perform initialization and preparation.
  */
-
-// Start metrics for this entry point
 require_once("utils/metrics_util.php");
-minai_start_timer('prerequest_php', 'MinAI');
-
-// Avoid processing for fast / storage events
-if (isset($GLOBALS["minai_skip_processing"]) && $GLOBALS["minai_skip_processing"]) {
-    return;
-}
 require_once("config.php");
 require_once("util.php");
 require_once("contextbuilders.php");
 require_once("prompts/info_prompts.php");
+
 $GLOBALS["speaker"] = $GLOBALS["HERIKA_NAME"];
-$GLOBALS["minai_processing_input"] = false;
+
+if (!isset($GLOBALS["db"]))
+	$GLOBALS["db"] = new sql();
+
+if ((!isset($GLOBALS["action_prompts"]["normal_scene"])) ||
+    (!isset($GLOBALS["action_prompts"]["explicit_scene"])) ||
+    (empty($GLOBALS["action_prompts"]))) {
+    //include("/var/www/html/HerikaServer/ext/minai_plugin/config .php");
+	$GLOBALS["action_prompts"] = $GLOBALS["action_prompts_copy"]; 
+    error_log("WARNING - prerequest: CHIM made an attempt to disable action_prompts! ");
+}
 
 // Configure metrics collection with default values if not set in config
 if (!isset($GLOBALS['minai_metrics_enabled'])) {
@@ -32,16 +37,115 @@ if (!isset($GLOBALS['minai_metrics_file'])) {
 }
 
 
-Function SetRadiance($rechat_h, $rechat_p) {
-    // minai_log("info", "Setting Rechat Parameters (h={$rechat_h}, p={$rechat_p})");
-    $GLOBALS["RECHAT_H"] = $rechat_h;
-    $GLOBALS["RECHAT_P"] = $rechat_p;
+//---------------------------------------
+// Translate or fix some NPC conf. values 
+//---------------------------------------
+if ($gameRequest[0] == "setconf") {
+    
+    $vars=explode("@",$gameRequest[3]);
+	
+	if (!(strpos($vars[0],'_minai_') === false)) {
+		$key = $vars[0];
+		$value = $vars[1] ?? "";
+		$sl_key = strtolower($key);
+		$sl_value = strtolower($value);
+		$sl_name = "";
+		$i_slash = strpos($sl_key,'/',7);
+		if ($i_slash > 7)
+			$sl_name = substr($sl_key,7,$i_slash-7);
+		
+		if (strpos($sl_key,'//gender') > 0) {
+			if (strpos("female,male,other.", $sl_value) === false) { // sexlab gender determination error for non-humans, fallback to male, statistically most probable
+				$value = "male";
+			}
+			//error_log("$sl_key $sl_value -> $value - exec trace "); //debug
+		} elseif (strpos($sl_key,'//race') > 0) {
+			if ($value == "nord")
+				$value = "Nord";
+			elseif ($value == "IMPERIAL") 
+				$value = "Imperial";
+			elseif ($sl_name == "felicia")
+				$value = "Breton-Elf mixed";
+			elseif (strlen(trim($value)) < 1) {
+				if ($sl_name == "karlossos the riekling")
+					$value = "Riekling";
+				elseif ($sl_name == "riekling chief")
+					$value = "Riekling";
+				elseif ($sl_name == "redcap")
+					$value = "Riekling";
+				elseif ($sl_name == "cog")
+					$value = "Riekling";
+				elseif (strpos($sl_name,"riekling") !== false) 	
+					$value = "Riekling";
+			} elseif (strpos($sl_value,' tkaa') > 0) {
+				$value = str_ireplace(' TKAA','',$value);
+			}
+		} elseif (strpos($sl_key,'//career') > 0) {
+			//format: _minai_name//key
+		
+			if ($sl_value == "2hwarrior")
+				$value = 'two handed weapons warrior';
+			elseif ($sl_value == "1hwarrior")
+				$value = 'one handed weapons warrior';
+			elseif ($sl_value == "inigo combat thief")
+				$value = 'long range weapons, stealth and thief warrior';
+			elseif ($sl_value == "lucifer class")
+				$value = 'skilled archer warrior';
+			elseif ($sl_value == "mystic blue boundbow class")
+				$value = 'mystic archer';
+			elseif ($sl_value == "onean ineon")
+				$value = 'faerie healer';
+			elseif ($sl_value == "helenmage")
+				$value = 'conjurer and healing mage';
+			elseif ($sl_value == "herikaclass")
+				$value = 'knowledge engineering enhanced warrior, the first of its kind';
+			//elseif ($sl_value == '')
+				//$value = '';
+			elseif ($sl_name == "aela the huntress")
+				$value = 'companions warrior and Werewolf';
+			elseif ($sl_name == "sorine jurard")
+				$value = 'vampire hunter technical advisor';
+			elseif ($sl_name == "faendal")
+				$value = 'archer hunter';
+			elseif ($sl_name == "svana far-shield")
+				$value = 'handmaiden';
+			elseif ($sl_name == "sinding")
+				$value = 'secluded werewolf';
+			elseif ($sl_name == "vigilant tyranus")
+				$value = 'Vigil of Stendarr, Daedra eradicator';
+			//elseif ($sl_name == '')
+				//$value = '';
+			//error_log("$sl_name $sl_key $sl_value $value - exec trace "); //debug
+		}
+		if ($vars[1] != $value) {
+			$vars[1] = $value;
+			$gameRequest[3] = implode("@",$vars);
+			//error_log("$gameRequest[3] / name=$sl_name key=$key value=$sl_value -> $value - exec trace "); //debug
+		}
+	}
+	
 }
+//---------------------------------------
+
+// Avoid processing for fast / storage events
+if (isset($GLOBALS["minai_skip_processing"]) && $GLOBALS["minai_skip_processing"]) {
+    return;
+}
+
+// Start metrics for this entry point
+minai_start_timer('prerequest_php', 'MinAI');
+//---------------------------------------
+
+$GLOBALS["minai_processing_input"] = false;
+
 
 if (IsRadiant()) {
     SetRadiance(0, 0); // Disable rechat during radiant conversations, as this is handled by MinAI's controller in-game
+	$GLOBALS["BORED_EVENT_SERVERSIDE"] = false; // MinAI radiant will suspend CHIM bored sside event
+} else {
+	CheckRechat(3, 50);
 }
-
+SaveOriginalHerikaName();
 SetNarratorProfile();
 
 // If talking to the narrator, force it to respond.
@@ -396,5 +500,6 @@ if (isset($GLOBALS["enable_prompt_slop_cleanup"]) && $GLOBALS["enable_prompt_slo
     $GLOBALS["CONTEXT_HISTORY"] = $nDataForContext * 3;
     // error_log("DEBUG: Context history set to " . $GLOBALS["CONTEXT_HISTORY"]);
 }
+
 
 minai_stop_timer('prerequest_php');

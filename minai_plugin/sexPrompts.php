@@ -14,14 +14,13 @@ require_once("speakStylesPrompts/submissiveTalk.php");
 require_once("speakStylesPrompts/victimTalk.php");
 require_once("speakStylesPrompts/aggressorTalk.php");
 
-$currentName = $GLOBALS["HERIKA_NAME"];
+$HerikaName = $GLOBALS["HERIKA_NAME"];
+$currentName = strtolower($HerikaName);
 
-if($currentName === "The Narrator") {
+if (($currentName === "the narrator") || ($currentName === "narrator"))  {
     return;
 }
 
-
-$currentName = strtolower($currentName);
 $scene = getScene($currentName);
 // Add debug logging for scene data
 // minai_log("info", "Scene data: " . json_encode($scene));
@@ -40,65 +39,88 @@ $GLOBALS["SEX_SCENE_CONTEXT"] = [
 
 $jsonXPersonality = getXPersonality($currentName);
 addXPersonality($jsonXPersonality);
-
-setPlayfulBanterPrompts($currentName); //default prompts when scene is not found 
+setDirtyTalkPrompts($HerikaName); //default prompts when scene or speak style is not found 
 
 if(isset($scene)){
-    $targetToSpeak = getTargetDuringSex($scene);
-    
-    $speakStyleInfo = determineSpeakStyle($currentName, $scene, $jsonXPersonality);
-    $speakStyle = $speakStyleInfo["style"];
-    
+    $targetToSpeak = getTargetDuringSex($scene) ?? "";
+    $gender = GetGender($HerikaName);
+       
+    $speakStyleInfo = determineSpeakStyle($HerikaName, $scene, $jsonXPersonality);
+    $speakStyle = strtolower(trim($speakStyleInfo["style"]));
+
     minai_log("info", "Setting sex speak style: $speakStyle. Role: {$speakStyleInfo["role"]}");
+    //error_log(" $HerikaName use $speakStyle with $targetToSpeak - exec trace "); // debug 
     
     switch($speakStyle) {
         case "victim talk": {
-            setVictimTalkPrompts($currentName);
+            setVictimTalkPrompts($HerikaName);
             break;
         }
         case "aggressor talk": {
-            setAggressorTalkPrompts($currentName);
+            setAggressorTalkPrompts($HerikaName);
             break;
         }
         case "dirty talk": {
-            setDirtyTalkPrompts($currentName);
+            setDirtyTalkPrompts($HerikaName);
             break;
         }
         case "sweet talk": {
-            setSweeTalkPrompts($currentName);
+            setSweeTalkPrompts($HerikaName);
             break;
         }
         case "sensual whispering": {
-            setSensualWhisperingPrompts($currentName);
+            setSensualWhisperingPrompts($HerikaName);
             break;
         }
         case "dominant talk": {
-            setDominantTalkPrompts($currentName);
+            setDominantTalkPrompts($HerikaName);
             break;
         }
         case "submissive talk": {
-            setSubmissiveTalkPrompts($currentName);
+            setSubmissiveTalkPrompts($HerikaName);
             break;
         }
         case "teasing talk": {
-            setTeasingTalkPrompts($currentName);
+            setTeasingTalkPrompts($HerikaName);
             break;
         }
         case "erotic storytelling": {
-            setEroticStorytellingPrompts($currentName);
+            setEroticStorytellingPrompts($HerikaName);
             break;
         }
         case "breathless gasps": {
-            setBreathlessGaspsPrompts($currentName);
+            setBreathlessGaspsPrompts($HerikaName);
             break;
         }
         case "sultry seduction": {
-            setSultrySeductionPrompts($currentName);
+            setSultrySeductionPrompts($HerikaName);
             break;
         }
         case "playful banter": {
-            setPlayfulBanterPrompts($currentName);
+            setPlayfulBanterPrompts($HerikaName);
             break;
         }
+        default: {
+            $i_rnd = rand(1, 4);
+            if ($gender == 'female') {
+                if ($i_rnd == 1) 
+                    setSweeTalkPrompts($HerikaName);
+                elseif ($i_rnd == 2)
+                    setPlayfulBanterPrompts($HerikaName);
+                elseif ($i_rnd == 3)
+                    setSubmissiveTalkPrompts($HerikaName);
+                else
+                    setDirtyTalkPrompts($HerikaName);
+            } elseif ($gender == 'male') { 
+                if ($i_rnd == 1) 
+                    setDominantTalkPrompts($HerikaName);
+                elseif ($i_rnd == 2)
+                    setBreathlessGaspsPrompts($HerikaName);
+                else
+                    setDirtyTalkPrompts($HerikaName);
+            }
+        }
     }
+//} else {
+//    minai_log("warn", "Setting sex speak style failed attempt: scene not found.");
 }

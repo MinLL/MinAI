@@ -1,6 +1,6 @@
 <?php
 // We need access to gameRequest here, but it's not global.
-// Impl copied from main.php
+// Impl copied from main .php
 
 require_once("util.php");
 require_once(__DIR__.DIRECTORY_SEPARATOR."updateThreadsDB.php");
@@ -49,6 +49,18 @@ function ProcessIntegrations() {
     if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "minai_init") {
         // This is sent once by the SKSE plugin when the game is loaded. Do our initialization here.
         minai_log("info", "Initializing");
+
+        //m_init.sh
+        $startScript = "/var/www/html/HerikaServer/ext/minai_plugin/m_init.sh";
+        if (file_exists($startScript)) {
+            $output = [];
+            $retval = null;
+            $res = exec($startScript, $output, $retval);
+            $res = $res ? $res : "F";
+            error_log("exec {$startScript} res={$res} return code={$retval} output: " . print_r($output,true));
+        } else 
+            error_log("file not found: {$startScript} ");       
+
         DropThreadsTableIfExists();
         InitiateDBTables();
         importXPersonalities();
@@ -119,30 +131,31 @@ function ProcessIntegrations() {
         minai_log("info", "Processing NPC request ({$speaker} => {$target}: {$message})");
         $GLOBALS["PROMPTS"]["npc_talk"]= [
             "cue"=>[
-                //"write dialogue for {$GLOBALS["HERIKA_NAME"]}.{$GLOBALS["TEMPLATE_DIALOG"]}  " //'write' prefix lead to double answers, TEMPLATE_DIALOG already has a "Write ..." => the result is "write dialogue ... Write next line"
-                "{$GLOBALS["TEMPLATE_DIALOG"]} "
+                //"write dialogue for {$GLOBALS["HERIKA_NAME"]}.{$GLOBALS["TEMPLATE_ DIALOG"]}  " //'write' prefix lead to double answers, TEMPLATE_ DIALOG already has a "Write ..." => the result is "write dialogue ... Write next line"
+                "{$GLOBALS["HERIKA_NAME"]} speaks. {$GLOBALS["TEMPLATE_DIALOG"]} "
             ], 
             "player_request"=>[
                 "{$speaker}: {$message} (Talking to {$target})"
             ]
         ];
     }
-    if (isset($GLOBALS["gameRequest"]) && in_array(strtolower($GLOBALS["gameRequest"][0]), ["radiant", "radiantsearchinghostile", "radiantsearchingfriend", "radiantcombathostile", "radiantcombatfriend", "minai_force_rechat"])) {
-        if (strtolower($GLOBALS["gameRequest"][0]) == "minai_force_rechat" || time() > GetLastInput() + $GLOBALS["input_delay_for_radiance"]) {
+    if (isset($GLOBALS["gameRequest"]) && in_array(strtolower($GLOBALS["gameRequest"][0]), ["rechat", "bored", "radiant", "radiantsearchinghostile", "radiantsearchingfriend", "radiantcombathostile", "radiantcombatfriend", "minai_force_rechat"])) {
+        $f_delay = floatval(DataLastKnownGameTS() - GetLastInput()) * 0.00864; //seconds
+        $b_safe = ($f_delay > 1.0) && ($f_delay > ($GLOBALS["input_delay_for_radiance"] ?? 3.00)) ;
+        $s_type = $GLOBALS["gameRequest"][0];
+        if (strtolower((($GLOBALS["gameRequest"][0]) == "minai_force_rechat") && ($f_delay > 0.50)) || $b_safe) {
             // Block rechat/radiant during sex scenes
             if (IsSexActive()) {
-                minai_log("info", "Blocking rechat/radiant during sex scene");
+                minai_log("info", "Blocking rechat/radiant/bored during sex scene");
                 $MUST_DIE = true;
-            }
-            else if ($GLOBALS["HERIKA_NAME"] == "The Narrator") {
+            } elseif ($GLOBALS["HERIKA_NAME"] == "The Narrator") {
                 // Fail safe
                 minai_log("info", "WARNING - Radiant dialogue started with narrator");
                 $MUST_DIE = true;
-            }
-            else {
+            } else {
                 // $GLOBALS["HERIKA_NAME"] is npc1
                 // Fix parsing of target NPC name from radiant event
-                $requestData = $GLOBALS["gameRequest"][3] ?? '';
+                $requestData = ($GLOBALS["gameRequest"][3] ?? '');
                 if (strpos($requestData, 'Context location:') !== false) {
                     // Parse target from format "(Context location: )Min:NPCName"
                     $parts = explode(':', $requestData);
@@ -153,30 +166,37 @@ function ProcessIntegrations() {
                 }
 
                 if (empty(trim($GLOBALS["HERIKA_TARGET"]))) {
-                    minai_log("info", "Blocking radiant/rechat - target is empty or invalid");
-                    $MUST_DIE = true;
+                    if (!in_array($s_type,["rechat", "bored"])) {
+                        minai_log("info", "Blocking radiant/rechat - target is empty or invalid");
+                        $MUST_DIE = true;
+                    }
                 }
                 else if ($GLOBALS["HERIKA_TARGET"] == $GLOBALS["HERIKA_NAME"]) {
-                    minai_log("info", "Blocking radiant/rechat - source and target are the same NPC");
-                    $MUST_DIE = true;
+                    if (!in_array($s_type,["rechat", "bored"])) {
+                        minai_log("info", "Blocking radiant/rechat - source and target are the same NPC");
+                        $MUST_DIE = true;
+                    }
                 }
                 else {
                     if ($GLOBALS["HERIKA_TARGET"] == $GLOBALS["HERIKA_NAME"])
                         $GLOBALS["HERIKA_TARGET"] = $GLOBALS["PLAYER_NAME"];
                     minai_log("info", "Starting {$GLOBALS["gameRequest"][0]} dialogue between {$GLOBALS["HERIKA_NAME"]} and {$GLOBALS["HERIKA_TARGET"]}");
+                    //error_log("Starting {$GLOBALS["gameRequest"][0]} dialogue between {$GLOBALS["HERIKA_NAME"]} and {$GLOBALS["HERIKA_TARGET"]} - {$f_delay} ".$GLOBALS["input_delay_for_radiance"]); //debug
                     StoreRadiantActors($GLOBALS["HERIKA_TARGET"], $GLOBALS["HERIKA_NAME"]);
                     $GLOBALS["target"] = $GLOBALS["HERIKA_TARGET"];
                 }
             }
-        }
-        else {
+        } else { // radiant request too soon
             // Avoid race condition where we send input, the server starts to process the request, and then
             // a radiant request comes in 
-            minai_log("info", "Not starting radiance: Input was too recent");
-            $MUST_DIE=true;
+            if (!in_array($s_type,["rechat", "bored"])) {
+                minai_log("info", "Not starting radiance: Input was too recent: {$f_delay} ".$GLOBALS["input_delay_for_radiance"]);
+                //error_log("Not starting radiance: Input was too recent: {$f_delay} "); //debug
+                $MUST_DIE=true;
+            }
         }
     }
-    if (in_array($GLOBALS["gameRequest"][0],["inputtext","inputtext_s","ginputtext","ginputtext_s","rechat","bored", "radiant", "minai_force_rechat"])) {
+    if (in_array($GLOBALS["gameRequest"][0],["inputtext", "inputtext_s", "ginputtext", "ginputtext_s", "rechat", "bored", "radiant", "minai_force_rechat"])) {
         if (!in_array($GLOBALS["gameRequest"][0], ["radiant", "rechat", "minai_force_rechat"]))
             ClearRadiantActors();
         // minai_log("info", "Setting lastInput time.");
@@ -186,7 +206,7 @@ function ProcessIntegrations() {
             'conf_opts',
             array(
                 'id' => $id,
-                'value' => time()
+                'value' => DataLastKnownGameTS()
             ),
             'id'
         );
@@ -213,13 +233,13 @@ function ProcessIntegrations() {
         $GLOBALS["HERIKA_PERS"] .= "\nWhen singing, you should be musical and poetic. Format your responses as song lyrics or poetry.\n";
         
         // Force response to be musical
-        $GLOBALS["TEMPLATE_DIALOG"] = "Respond with song lyrics or a musical performance.";
+        $GLOBALS["TEMPLATE_ DIALOG"] = "Respond with song lyrics or a musical performance.";
         }*/
 
     // Handle narrator talk events
     if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "minai_narrator_talk") {
         SetEnabled($GLOBALS["PLAYER_NAME"], "isTalkingToNarrator", false);
-        SaveOriginalHerikaName(); //$GLOBALS["ORIGINAL_HERIKA_NAME"] = $GLOBALS["HERIKA_NAME"]; // xmd
+        SaveOriginalHerikaName(); //
         $GLOBALS["HERIKA_NAME"] = "The Narrator";
         SetNarratorProfile();
         

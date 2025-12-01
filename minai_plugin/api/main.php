@@ -18,6 +18,17 @@ require_once("..".DIRECTORY_SEPARATOR."config.php");
 require_once("..".DIRECTORY_SEPARATOR."importDataToDB.php");
 require_once("..".DIRECTORY_SEPARATOR."util.php");
 require_once("..".DIRECTORY_SEPARATOR."db_utils.php");
+
+$startScript = "/var/www/html/HerikaServer/ext/minai_plugin/m_init.sh";
+if (file_exists($startScript)) {
+    $output = [];
+    $retval = null;
+    $res = exec($startScript, $output, $retval);
+    $res = $res ? $res : "F";
+    error_log("exec {$startScript} res={$res} return code={$retval} output: " . print_r($output,true));
+} else 
+    error_log("file not found: {$startScript} ");
+
 InitiateDBTables();
 
 $requestMethod = $_SERVER['REQUEST_METHOD'];

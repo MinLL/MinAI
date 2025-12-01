@@ -134,14 +134,17 @@ if (IsModEnabled("SLAPP") && !IsDeviousFollower($GLOBALS['HERIKA_NAME'])) {
         "Give #target_object# a friendly hug - shows affection and comfort",
         true
     );
-    
+
     directRegisterAction(
         "ExtCmdKiss", 
         "Kiss", 
         "Kiss #target_object# - expresses romantic affection",
         true
     );
+    
+    //error_log(" deviousfollower_context.php ExtCmdHug ExtCmdKiss");
 }
+
 if (IsModEnabled("SLHH") && !IsDeviousFollower($GLOBALS['HERIKA_NAME'])) {
     directRegisterAction(
         "ExtCmdMolest", 
@@ -149,6 +152,7 @@ if (IsModEnabled("SLHH") && !IsDeviousFollower($GLOBALS['HERIKA_NAME'])) {
         "Inappropriately touch #target_object# - a lewd act of dominance",
         !$GLOBALS["disable_nsfw"]
     );
+    //error_log(" deviousfollower_context.php ExtCmdMolest ");
 }
 
 

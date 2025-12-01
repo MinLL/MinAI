@@ -16,6 +16,10 @@ function get_info_stimulate_prompt($intensity = "medium") {
         $targetName = trim($matches[3]);
     }
     
+    if (strlen($targetName) > 0) {
+        $targetName = $targetName."'s ";
+    } 
+    
     // If intensity wasn't found in the message, use the parameter
     if (empty($intensityWord)) {
         $intensityWord = $intensity;
@@ -170,7 +174,7 @@ function get_info_stimulate_prompt($intensity = "medium") {
     }
     
     // Create the prompt with detailed context
-    $promptText = "$speakerName deliberately activates $targetName's $deviceDescription, sending $stimulateDesc through their body. ";
+    $promptText = "{$speakerName} deliberately activates {$targetName}{$deviceDescription}, sending {$stimulateDesc} through their body. ";
     $promptText .= "The direct stimulation builds steadily$helplessnessContext, $reactionDesc.$chastityContext";
     
     return "The Narrator: " . $promptText;

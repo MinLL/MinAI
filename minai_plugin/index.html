@@ -27,6 +27,22 @@
             color: var(--text-color);
         }
 
+/* unvisited link */
+a:link {
+  color: var(--text-color);
+}
+/* visited link */
+a:visited {
+  color: var(--text-color);
+}
+/* mouse over link */
+a:hover {
+  color: var(--warning-color);
+}
+/* selected link */
+a:active {
+  color: var(--success-color);
+}
         .container {
             display: flex;
             flex-direction: column;
@@ -306,6 +322,20 @@
             opacity: 0.9;
         }
 
+        .version-text {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .version-text p {
+            margin: 2px 0;
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
         .version-details {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -443,6 +473,21 @@
             border: 1px solid var(--border-color);
         }
 
+        .important-note {
+            background: rgba(76, 175, 80, 0.1);
+            border-left: 3px solid var(--primary-color);
+            padding: 10px 15px;
+            margin: 15px 0;
+        }
+
+        .nav-button.warning {
+            background: linear-gradient(135deg,
+                rgba(244, 67, 54, 0.1) 0%,
+                rgba(244, 67, 54, 0.2) 100%
+            );
+            border: 1px solid var(--error-color);
+        }
+
         footer {
             position: fixed;
             bottom: 20px;
@@ -537,6 +582,16 @@
                         <button class="update-button" onclick="updateToLatestVersion('main')">Update to Latest Development</button>
                     </div>
                 </div>
+                
+                <div align="left" class="version-text">
+                <p><a href="version_changelog.txt" target="_blank">Versions:</a></p> 
+                <p>- 2.1.3 (stable) is compatible with CHIM v1.2.x, not with CHIM v1.3.x </p> 
+                <p>- 2.1.3-dev7 is compatible with CHIM v1.3.5.x. (recomended) <a href="version_changelog.txt" target="_blank">Read this for details.</a></p>
+                <div class="important-note">
+                <b>IMPORTANT:</b> After the update, open the plugin <a href="config.html" class="cache-bust">Configuration Page</a>, </br>reset the settings with <a href="config.html"><nobr class="nav-button warning">Reset All to Defaults</nobr></a> then save.
+                </div>
+                </div>
+                
             </div>
 
             <!-- Primary Navigation Links -->
@@ -739,20 +794,20 @@
                         </div>
                     `;
                     
-                    if (localVersion !== stableVersion) {
-                        versionInfoDiv.innerHTML += `
-                            <div class="update-warning">
-                                A new stable version is available!
-                            </div>
-                        `;
-                    }
-                    if (localVersion !== mainVersion && localVersion === stableVersion) {
-                        versionInfoDiv.innerHTML += `
-                            <div class="development-info">
-                                A new development version is available
-                            </div>
-                        `;
-                    }
+                    //if (localVersion !== stableVersion) {
+                    //    versionInfoDiv.innerHTML += `
+                    //        <div class="update-warning">
+                    //            A new stable version is available!
+                    //        </div>
+                    //    `;
+                    //}
+                    //if (localVersion !== mainVersion && localVersion === stableVersion) {
+                    //    versionInfoDiv.innerHTML += `
+                    //        <div class="development-info">
+                    //            A new development version is available
+                    //        </div>
+                    //    `;
+                    //}
 
                     updateButtonsDiv.innerHTML = `
                         <div class="links">
