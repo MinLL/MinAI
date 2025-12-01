@@ -139,6 +139,48 @@ function UpdateSpeechTableIfNotHaveEmotionFields() {
     }
 }
 
+//----------------------------------------------------
+// database maintenance tools
+// - autovacuum / table
+//----------------------------------------------------
+
+function SetAutoVacuum() {
+
+    if ($checkVersion("db_maintenance")<20251128002) {
+        Logger::debug(" try patch: db_maintenance 20251128002");
+
+        try {
+            $db->execQuery("DROP FUNCTION IF EXISTS public.sql_exec2(text) CASCADE");
+
+            $db->execQuery("
+            CREATE FUNCTION public.sql_exec2(text) returns text 
+            language plpgsql volatile 
+            AS 
+            $$
+                BEGIN
+                  EXECUTE $1;
+                  RETURN $1;
+                END;
+            $$; 
+            ");
+
+            $db->execQuery("SELECT sql_exec2('ALTER TABLE \"'||pgc.relname||'\" SET (autovacuum_enabled = on, toast.autovacuum_enabled = on) '||';')
+                FROM pg_catalog.pg_class pgc
+                LEFT JOIN pg_catalog.pg_namespace pgn ON pgn.oid = pgc.relnamespace
+                WHERE (pgc.relkind ='r')
+                AND (pgn.nspname='public'); ");
+
+            $updateVersion("db_maintenance",20251128002);
+
+        } catch (Exception $e) {
+            error_log("Error altering 'speech' table: " . $e->getMessage());
+        }
+
+        Logger::info("Applied patch db_maintenance 20251128002");
+    }
+}
+
+
 function InitiateDBTables() {
     CreateThreadsTableIfNotExists();
     CreateActionsTableIfNotExists();
@@ -147,6 +189,7 @@ function InitiateDBTables() {
     CreateTattooDescriptionTableIfNotExists();
     CreateItemsTableIfNotExists();
     UpdateSpeechTableIfNotHaveEmotionFields();
+    SetAutoVacuum();
     // Seed default items
     SeedDefaultItems();
     error_log("MinAI InitiateDBTables - exec trace"); //debug
@@ -165,6 +208,8 @@ function ResetDBTables() {
     CreateItemsTableIfNotExists();
     SeedDefaultItems();
 }
+
+
 
 /**
  * Seeds the minai_items table with default items from a JSON file

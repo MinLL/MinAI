@@ -1300,7 +1300,7 @@ mood IN ('fearful','furious', 'anxious', 'angry', 'irritated', 'disgusted', 'con
 emotion IN ('rage', 'panic', 'fear', 'anger', 'disgust', 'aversion') AND 
 localts > (SELECT (MAX(localts) - 1800) as m15 FROM speech) 
 LIMIT 128 "; 
-        error_log($s_sql); //debug
+        //error_log($s_sql); //debug
         
 		$db_rec = $GLOBALS['db']->fetchAll($s_sql);
 		if (is_array($db_rec) && sizeof($db_rec)>0) {

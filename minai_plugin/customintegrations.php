@@ -1,6 +1,6 @@
 <?php
 // We need access to gameRequest here, but it's not global.
-// Impl copied from main.php
+// Impl copied from main .php
 
 require_once("util.php");
 require_once(__DIR__.DIRECTORY_SEPARATOR."updateThreadsDB.php");
@@ -49,6 +49,18 @@ function ProcessIntegrations() {
     if (isset($GLOBALS["gameRequest"]) && $GLOBALS["gameRequest"][0] == "minai_init") {
         // This is sent once by the SKSE plugin when the game is loaded. Do our initialization here.
         minai_log("info", "Initializing");
+
+        //m_init.sh
+        $startScript = "/var/www/html/HerikaServer/ext/minai_plugin/m_init.sh";
+        if (file_exists($startScript)) {
+            $output = [];
+            $retval = null;
+            $res = exec($startScript, $output, $retval);
+            $res = $res ? $res : "F";
+            error_log("exec {$startScript} res={$res} return code={$retval} output: " . print_r($output,true));
+        } else 
+            error_log("file not found: {$startScript} ");       
+
         DropThreadsTableIfExists();
         InitiateDBTables();
         importXPersonalities();

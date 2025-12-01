@@ -568,7 +568,9 @@ function BuildNearbyCharactersContext($params) {
             if (isset($actorValues[$charKey]['race']) && !empty($actorValues[$charKey]['race'])) {
                 $s_race = $actorValues[$charKey]['race'];
                 $s_gender = $actorValues[$charKey]['gender']; //GetGender($character);
-                $line .= " ({$s_race} {$s_gender})";
+                $s_child =  (IsChildActor($character)) ? " child" : ""; 
+                
+                $line .= " ({$s_race} {$s_gender}{$s_child})";
             }
             
             // Add faction info if available
