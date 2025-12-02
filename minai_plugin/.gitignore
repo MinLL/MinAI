@@ -12,3 +12,9 @@ xPersonalitiesDBImport/imported.txt~
 manifest.json~
 
 *.html~
+
+*.php_???
+
+*.html_???
+
+*.json_???

@@ -146,7 +146,32 @@ function UpdateSpeechTableIfNotHaveEmotionFields() {
 
 function SetAutoVacuum() {
 
-    if ($checkVersion("db_maintenance")<20251128002) {
+    $db = $GLOBALS['db'];
+
+    $checkVersion2 = function($tablename) {
+        $db = $GLOBALS['db'];
+        $query = "
+        SELECT version 
+        FROM public.database_versioning
+        WHERE tablename = '$tablename'
+        ";
+
+        $existsColumn=$db->fetchAll($query);
+
+        if (sizeof($existsColumn) == 0 || !$existsColumn[0]["version"] )
+            return -1;
+        else
+            return intval($existsColumn[0]["version"]);
+    };
+
+    $updateVersion2 = function($tablename,$version) {
+        $db = $GLOBALS['db'];
+        $db->execQuery("INSERT INTO public.database_versioning SELECT '$tablename',$version where not exists (SELECT 1 from public.database_versioning where tablename='$tablename')");
+        $db->execQuery("UPDATE public.database_versioning set version=$version WHERE tablename='$tablename'");
+        Logger::info("TABLE $tablename updated to version $version");
+    };
+
+    if ($checkVersion2("db_maintenance")<20251128002) {
         Logger::debug(" try patch: db_maintenance 20251128002");
 
         try {
@@ -170,7 +195,7 @@ function SetAutoVacuum() {
                 WHERE (pgc.relkind ='r')
                 AND (pgn.nspname='public'); ");
 
-            $updateVersion("db_maintenance",20251128002);
+            $updateVersion2("db_maintenance",20251128002);
 
         } catch (Exception $e) {
             error_log("Error altering 'speech' table: " . $e->getMessage());
@@ -189,7 +214,7 @@ function InitiateDBTables() {
     CreateTattooDescriptionTableIfNotExists();
     CreateItemsTableIfNotExists();
     UpdateSpeechTableIfNotHaveEmotionFields();
-    SetAutoVacuum();
+    //SetAutoVacuum();
     // Seed default items
     SeedDefaultItems();
     error_log("MinAI InitiateDBTables - exec trace"); //debug
