@@ -91,7 +91,7 @@ if ($GLOBALS['use_emotions_expression']) {
     $GLOBALS["responseTemplate"]["mood"] = $crt_moods;
 }
 
-$GLOBALS["responseTemplate"]["message"] = "lines of dialogue, plain text formatting";
+$GLOBALS["responseTemplate"]["message"] = "lines of dialogue, plain text, no formatting";
 $GLOBALS["responseTemplate"]["target"] = "the name of the character or entity who is the target of the action|the name of the location that is the destination of the action";
 $GLOBALS["responseTemplate"] = array_merge($GLOBALS["responseTemplate"], [
     "probability" => "number in 0.0 - 1.0 interval"

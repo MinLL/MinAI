@@ -13,14 +13,44 @@ if (isset($GLOBALS["DEBUG_DATA"]["RAW"])) {
 		}
 	}
 	if ($b_ok)
-		set_conf_opts_value('debug_data_raw', $s_json);
+		setConfOption('debug_data_raw', $s_json);
 	else 
-		set_conf_opts_value('debug_data_raw', '');
+		setConfOption('debug_data_raw','');
 }
 
 /*
+$semaphore_main = $GLOBALS["SEMAPHORES"]["MAIN"] ?? null;
+$semaphore_addnpc = $GLOBALS["SEMAPHORES"]["ADDNPC"] ?? null;
+$semaphore_vsx = $GLOBALS["SEMAPHORES"]["VSX"] ?? null;
 
-$GLOBALS["LAST_LLM_RESPONSE"]
+if (isset($semaphore_main) && $semaphore_main) {
+	@sem_release($semaphore_main);
+	$sx = "released";
+} else {
+	$sx = "undefined";	
+}
+Logger::error("[postrequest] semaphore_main $sx - exec trace " .__FILE__ . " " . __LINE__);
+
+if (isset($semaphore_addnpc) && $semaphore_addnpc) {
+	@sem_release($semaphore_addnpc);
+	$sx = "released";
+} else {
+	$sx = "undefined";	
+}
+Logger::error("[postrequest] semaphore_addnpc $sx - exec trace " .__FILE__ . " " . __LINE__);
+
+if (isset($semaphore_vsx) && $semaphore_vsx) {
+	@sem_release($semaphore_vsx);
+	$sx = "released";
+} else {
+	$sx = "undefined";	
+}
+Logger::error("[postrequest] semaphore_vsx $sx - exec trace " .__FILE__ . " " . __LINE__);
+*/
+
+/*
+
+$GLOBALS["LAST_LLM_ RESPONSE"]
 
 */    
 

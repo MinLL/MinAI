@@ -326,6 +326,10 @@ function cleanupSlop($contextData) {
                     continue;
                 }
 
+                if ($sl_line == 'crab died') {
+                    continue;
+                }
+
                 if ($sl_line == 'bear has killed deer') {
                     continue;
                 }

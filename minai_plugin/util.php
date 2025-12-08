@@ -153,44 +153,6 @@ function SetActorValue($name, $key, $value) {
     );
 }
 
-if (!function_exists('set_conf_opts_value')) {
-function set_conf_opts_value($key, $value) {
-    // Upsert new value
-    $l_key = strtolower($key);
-    return $GLOBALS['db']->upsertRowOnConflict(
-        'conf_opts',
-        array(
-            'id' => "{$l_key}",
-            'value' => "{$value}"
-        ),
-        'id'
-    );
-}
-}
-
-if (!function_exists('get_conf_opts_value')) {
-function get_conf_opts_value($key, $preserveCase=false) {
-    $s_res = "";
-    $db = $GLOBALS['db'];
-    $l_key = strtolower($key);
-    $e_key = $db->escape($l_key);    
-    
-    if (strlen($key) > 0) {
-
-        $query = "SELECT * FROM conf_opts WHERE (LOWER(id)='{$e_key}') LIMIT 1 ";
-
-        $ret = $GLOBALS["db"]->fetchAll($query);
-        if ($ret) {
-            if ($preserveCase)
-                $s_res = ($ret[0]['value'] ?? '');
-            else
-                $s_res = strtolower($ret[0]['value'] ?? '');        
-        }
-    }
-    return $s_res;
-}
-}
-
 // Return the specified actor value.
 // Caches the results of several queries that are repeatedly referenced.
 Function GetActorValue($name, $key, $preserveCase=false, $skipCache=false, $checkOnlyInCache=false) {
@@ -863,12 +825,12 @@ Function IsNewRadiantConversation() {
 }
 
 Function GetLastInput() {
-    $db = $GLOBALS['db'];
+    
     $ret = $GLOBALS["db"]->fetchAll("select * from conf_opts where (id='_minai_RADIANT//lastInput') ");
     if (!$ret) {
         return 0;
     }
-    return intval($ret[0]['value']);
+    return intval($ret[0]['value'] ?? 0);
 }
 
 Function IsRadiant() {
@@ -1233,7 +1195,7 @@ function GetAllActorValues($actor) {
     $actor = strtolower($db->escape($actor));
     $result = [];
     
-    $query = "SELECT id, value FROM conf_opts WHERE (id ILIKE '_minai_{$actor}//%') ";
+    $query = "SELECT id, value FROM public.conf_opts WHERE (id ILIKE '_minai_{$actor}//%') ";
     $rows = $db->fetchAll($query);
     
     foreach ($rows as $row) {
@@ -1254,33 +1216,44 @@ function in_arrayi($needle, $haystack) {
     return in_array(strtolower($needle), array_map('strtolower', $haystack));
 }
 
-function getConfOptionValue($s_key = "") {
+function getConfOptionValue($key, $preserveCase=true) {
     $s_res = "";
-    if (strlen(trim($s_key)) > 0) {
-        $ret = $GLOBALS["db"]->fetchAll("SELECT * FROM conf_opts WHERE (id='{$s_key}') LIMIT 1");
+    $e_key = $GLOBALS['db']->escape(strtolower($key));    
+    if (strlen($key) > 0) {
+        $query = "SELECT * FROM public.conf_opts WHERE (LOWER(id)='{$e_key}') LIMIT 1 ";
+        $ret = $GLOBALS["db"]->fetchAll($query);
         if ($ret) {
-            $s_res = $ret[0]['value'] ?? "";
+            if ($preserveCase)
+                $s_res = ($ret[0]['value'] ?? '');
+            else
+                $s_res = strtolower($ret[0]['value'] ?? '');        
         }
     }
     return $s_res;
 }
 
-function setConfOption($s_key = "", $s_value = "") {
-    $b_res = false;
-    $s_id = trim($s_key);
-    $s_val = trim($s_value);
-
-    if ((strlen($s_id) > 0) && (strlen() > 0)) {
-        $b_res = $GLOBALS['db']->upsertRowOnConflict(
+function setConfOption($key, $value) {
+    $l_key = $GLOBALS['db']->escape(strtolower($key));
+    if (strlen($l_key) > 0) {
+        return $GLOBALS['db']->upsertRowOnConflict(
             'conf_opts',
             array(
-                'id' => $s_id,
-                'value' => $s_val
+                'id' => "{$l_key}",
+                'value' => "{$value}"
             ),
             'id'
         );
+    }
+}
+
+function deleteConfOption($key = "") {
+    $s_res = "";
+    if (strlen($key) > 0) {
+        $s_id = $GLOBALS['db']->escape(strtolower($key));
+        $sql = "DELETE FROM public.conf_opts WHERE (LOWER(id)='{$s_id}') ";
+        $s_res = $GLOBALS['db']->execQueryVerbose($sql);
     } 
-    return $b_res;
+    return $s_res;
 }
     
 function GetAdverseInteractions($s_npc_name, $s_player_name) {
@@ -1309,6 +1282,41 @@ LIMIT 128 ";
 	}
 	return $i_res;
 }    
+
+function getAllContentOfLocation($loc)
+{
+    $scandir = scandir($loc);
+
+    $scandir = array_filter($scandir, function ($element) {
+        return !preg_match('/^\./', $element);
+    });
+
+
+    if (empty($scandir)) {
+        echo '<p style="color:red">        Empty Dir</p>';
+    }
+
+    foreach ($scandir as $file) {
+        $baseLink = $loc.DIRECTORY_SEPARATOR.$file;
+
+        echo '<ol>';
+        if (is_dir($baseLink)) {
+            echo '<p style="font-weight:bold;color:blue">'.$file.'</p>';
+            getAllContentOfLocation($baseLink);
+        } else {
+            echo $file.'';
+        }
+        echo '</ol>';
+    }
+}
+    
+function getFilesRecursively($pattern) {
+    yield from glob($pattern);
+    foreach (glob(dirname($pattern) . "/*", GLOB_ONLYDIR) as $dir) {
+        yield from rglob("$dir/" . basename($pattern));
+    }
+}
+
     
 function getChimExecMode() {
     /* Check modes

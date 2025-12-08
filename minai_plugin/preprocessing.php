@@ -11,18 +11,21 @@ $fast_commands = ["addnpc","_quest","setconf","request","_speech","infoloc","inf
 
 // chim new version
 $fast_commands = ["addnpc","updateprofile","diary","_quest","setconf","request","_speech","infoloc","infonpc","infonpc_close",
-    "infoaction","status_msg","delete_event","itemfound","_questdata","_uquest","location","_questreset",
-    "chat","bleedout","waitstart","waitstop",
-    "util_location_name","spellcast","npcspellcast","updateprofiles_batch_async","core_profile_assign","switchrace","combatbark"
-    ];
+    "infoaction","status_msg","delete_event","itemfound","_questdata","_uquest","location","_questreset","chat","bleedout","waitstart","waitstop",
+    "util_location_name","spellcast","npcspellcast","updateprofiles_batch_async","core_profile_assign","switchrace","combatbark",
+    "util_location_npc","enable_bg","region"];
+    
 */
 
 // chim new version
 $fast_commands = ["addnpc","updateprofile","diary","_quest","setconf","request","_speech","infoloc","infonpc","infonpc_close",
-    "infoaction","status_msg","delete_event","itemfound","_questdata","_uquest","location","_questreset",
-    "chat","bleedout","waitstart","waitstop",
-    "util_location_name","spellcast","npcspellcast","updateprofiles_batch_async","core_profile_assign","switchrace","combatbark"
-    ];
+    "infoaction","status_msg","delete_event","itemfound","_questdata","_uquest","location","_questreset","chat","bleedout","waitstart","waitstop",
+    "util_location_name","spellcast","npcspellcast","updateprofiles_batch_async","core_profile_assign","switchrace","combatbark",
+    "util_location_npc","enable_bg","region"];
+
+if (isset($GLOBALS["external_fast_commands"])) {
+    $fast_commands = array_merge($fast_commands, $GLOBALS["external_fast_commands"]);
+}
 
 // Check for exact matches against fast commands
 if (isset($GLOBALS["gameRequest"]) && in_array($GLOBALS["gameRequest"][0], $fast_commands)) {
@@ -59,6 +62,7 @@ require_once("contextbuilders.php");
 require_once("roleplaybuilder.php");
 
 // Check for banned phrases in gameRequest[3]
+/*
 $banned_phrases = ["Thank you for watching", "Thanks for watching", "Thank you very much for watching"];
 if (isset($GLOBALS["gameRequest"][3])) {
     $message = strtolower($GLOBALS["gameRequest"][3]);
@@ -69,6 +73,7 @@ if (isset($GLOBALS["gameRequest"][3])) {
         }
     }
 }
+*/
 
 // TODO: Add an actual install routine to the HerikaServer proper to not do this every request.
 // InitiateDBTables();
