@@ -4,5 +4,5 @@
     "config_url":"/HerikaServer/ext/minai_plugin/index.html",
     "mod_download_url":"https://github.com/MinLL/MinAI/releases/download/2.1.3/MinAI-2.1.3.zip",
     "git_repo":"https://github.com/MinLL/MinAI",
-    "version":"2.1.3-dev7c for CHIM 1.3.5.x"
+    "version":"2.1.3-dev7d"
 }

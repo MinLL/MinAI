@@ -3,8 +3,9 @@ Changelog
 MinAI server plugin version 2.1.3-dev7d
 ---------------------------------------
 
+- Fix the configuration page - display items based on NSFW status
 - Updates to increase compatibility with CHIM.
-- Optimizations to increase execution speed.
+- Few optimizations to increase execution speed.
 
 MinAI server plugin version 2.1.3-dev7c
 ---------------------------------------
