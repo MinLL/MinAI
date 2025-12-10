@@ -140,7 +140,7 @@ $GLOBALS["minai_processing_input"] = false;
 
 
 if (IsRadiant()) {
-    SetRadiance(0, 0); // Disable rechat during radiant conversations, as this is handled by MinAI's controller in-game
+	SetRadiance(0, 0); // Disable rechat during radiant conversations, as this is handled by MinAI's controller in-game
 	$GLOBALS["BORED_EVENT_SERVERSIDE"] = false; // MinAI radiant will suspend CHIM bored sside event
 } else {
 	CheckRechat(3, 50);

@@ -146,8 +146,36 @@ function UpdateSpeechTableIfNotHaveEmotionFields() {
 
 function SetAutoVacuum() {
 
-    if ($checkVersion("db_maintenance")<20251128002) {
-        Logger::debug(" try patch: db_maintenance 20251128002");
+    $db = $GLOBALS['db'];
+
+    $checkVersion2 = function($tablename) {
+        $db = $GLOBALS['db'];
+        $query = "
+        SELECT version 
+        FROM public.database_versioning
+        WHERE tablename = '$tablename'
+        ";
+
+        $existsColumn=$db->fetchAll($query);
+
+        if (sizeof($existsColumn) == 0 || !$existsColumn[0]["version"] )
+            return -1;
+        else
+            return intval($existsColumn[0]["version"]);
+    };
+
+    $updateVersion2 = function($tablename,$version) {
+        $db = $GLOBALS['db'];
+        $db->execQuery("INSERT INTO public.database_versioning SELECT '$tablename',$version where not exists (SELECT 1 from public.database_versioning where tablename='$tablename')");
+        $db->execQuery("UPDATE public.database_versioning set version=$version WHERE tablename='$tablename'");
+        //Logger::info("TABLE $tablename updated to version $version");
+        error_log("TABLE $tablename updated to version $version"); //debug
+        
+    };
+
+    if ($checkVersion2("db_maintenance")<20251129002) {
+        //Logger::debug(" try patch: db_maintenance 20251129002");
+        error_log(" try patch: db_maintenance 20251129002"); //debug
 
         try {
             $db->execQuery("DROP FUNCTION IF EXISTS public.sql_exec2(text) CASCADE");
@@ -164,19 +192,21 @@ function SetAutoVacuum() {
             $$; 
             ");
 
-            $db->execQuery("SELECT sql_exec2('ALTER TABLE \"'||pgc.relname||'\" SET (autovacuum_enabled = on, toast.autovacuum_enabled = on) '||';')
-                FROM pg_catalog.pg_class pgc
-                LEFT JOIN pg_catalog.pg_namespace pgn ON pgn.oid = pgc.relnamespace
-                WHERE (pgc.relkind ='r')
-                AND (pgn.nspname='public'); ");
 
-            $updateVersion("db_maintenance",20251128002);
+            $db->execQuery("SELECT public.sql_exec2('ALTER TABLE '||quote_ident(pgn.nspname)||'.'||quote_ident(pgc.relname)||' SET (autovacuum_enabled = on, toast.autovacuum_enabled = on);') 
+                FROM pg_catalog.pg_class pgc 
+                LEFT JOIN pg_catalog.pg_namespace pgn ON pgn.oid = pgc.relnamespace 
+                WHERE (pgc.relkind ='r') 
+                AND (pgn.nspname='public'); "); 
+
+            $updateVersion2("db_maintenance",20251129002);
 
         } catch (Exception $e) {
             error_log("Error altering 'speech' table: " . $e->getMessage());
         }
 
-        Logger::info("Applied patch db_maintenance 20251128002");
+        //Logger::info("Applied patch db_maintenance 20251129002");
+        error_log("Applied patch db_maintenance 20251129002"); //debug
     }
 }
 
@@ -189,7 +219,6 @@ function InitiateDBTables() {
     CreateTattooDescriptionTableIfNotExists();
     CreateItemsTableIfNotExists();
     UpdateSpeechTableIfNotHaveEmotionFields();
-    SetAutoVacuum();
     // Seed default items
     SeedDefaultItems();
     error_log("MinAI InitiateDBTables - exec trace"); //debug
@@ -197,7 +226,7 @@ function InitiateDBTables() {
 
 function ResetDBTables() {
     DropThreadsTableIfExists();
-    // DropItemRelevanceTableIfExists();
+    //DropItemRelevanceTableIfExists();
     //DropScenariosTableIfExists();
     DropItemsTableIfExists();
     CreateThreadsTableIfNotExists();
