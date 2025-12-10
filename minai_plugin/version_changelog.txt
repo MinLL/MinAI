@@ -5,7 +5,7 @@ MinAI server plugin version 2.1.3-dev7d
 
 - Fix the configuration page - display items based on NSFW status
 - Updates to increase compatibility with CHIM.
-- Few optimizations to increase execution speed.
+- Few optimizations to increase increase fluency in rechat.
 
 MinAI server plugin version 2.1.3-dev7c
 ---------------------------------------
@@ -197,3 +197,4 @@ About WSL and permissions:
 - Access from windows to files hosted by WSL is done with user=root credentials
 Therefore, every time WSL files are modified from Windows, the file attributes related to ownership and access/execute rights must be restored. 
 The commands that restore the attributes apply to the folder where the changes were made or one level higher and are given from the Linux command line.
+
