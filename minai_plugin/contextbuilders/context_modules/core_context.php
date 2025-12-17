@@ -91,8 +91,8 @@ function InitializeCoreContextBuilders() {
 
 function StrCleanBullets($s_input = ""){
     $s_res = strtr($s_input,[
+        '** ' => ' ',
         '* ' => ' ',
-        '# ' => ' ',
     ]);
     return $s_res;
 }
@@ -158,7 +158,10 @@ function BuildPersonalityContext($params) {
     if (isset($GLOBALS['HERIKA_SKILLS']) && (trim($GLOBALS['HERIKA_SKILLS']) > "")) {
         $herika_pers .= "\n\n## Skills\n" . StrCleanBullets(trim($GLOBALS['HERIKA_SKILLS']));
     }
-
+    if (isset($GLOBALS["PROFILE_PROMPT"]) && (trim($GLOBALS['PROFILE_PROMPT']) > "")) {
+        $herika_pers .= "\n\n<group_profile_prompt>\n## Other\n".trim($GLOBALS["PROFILE_PROMPT"])."\n</group_profile_prompt>";
+    }
+    
     if (empty($herika_pers)) {
         return "";
     }
