@@ -154,5 +154,9 @@ Function GetActorConfigPath($actorName) {
     // with just dirname((__FILE__)) it was getting directory of repo not php server 
     $path = "/var/www/html/HerikaServer/";
     $newConfFile=md5($actorName);
-    return $path . "conf".DIRECTORY_SEPARATOR."conf_$newConfFile.php";
+    $s_file = $path . "conf/conf_{$newConfFile}.php";
+    if (!file_exists($s_file)) {
+        $s_file = $path . "conf/.old/conf_{$newConfFile}.php";
+    }    
+    return $s_file;
 }

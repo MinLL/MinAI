@@ -123,7 +123,7 @@ directRegisterAction(
 directRegisterAction(
     "ExtCmdTrade", 
     "Trade", 
-    "Engage in buying and selling items with {$GLOBALS["PLAYER_NAME"]} - facilitates commerce and equipment upgrades",
+    "Engage in trade, exchange, buy or sell items with {$GLOBALS["PLAYER_NAME"]} - facilitates commerce and equipment upgrades",
     canTrade()
 );
 

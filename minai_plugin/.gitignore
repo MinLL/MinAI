@@ -18,3 +18,5 @@ manifest.json~
 *.html_???
 
 *.json_???
+
+config.php

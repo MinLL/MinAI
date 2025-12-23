@@ -4,6 +4,10 @@ function shouldEnableSexAction() {
     return ShouldEnableSexFunctions($GLOBALS['HERIKA_NAME']);
 }
 
+function shouldEnablePreSexAction() {
+    return ShouldEnablePreSexFunctions($GLOBALS['HERIKA_NAME']);
+}
+
 // Function to check if sex actions are enabled, extended for sex scene
 function shouldEnableActiveSexAction() {
     return ShouldEnableSexFunctions($GLOBALS['HERIKA_NAME']) && IsSexActive();
@@ -48,6 +52,7 @@ minai_start_timer('sex_conditions', 'load_module_sex.php');
 
 // Cache enable conditions results to avoid recalculation
 $sexEnabled = shouldEnableSexAction();
+$pre_sexEnabled = shouldEnablePreSexAction();
 $activeSexEnabled = $sexEnabled && IsSexActive();
 $femaleActionsEnabled = $sexEnabled && hasAtLeastOneFemale();
 $maleActionsEnabled = $sexEnabled && hasAtLeastOneMale();
@@ -55,6 +60,24 @@ $ostimEnabled = $activeSexEnabled && IsModEnabled("Ostim");
 
 minai_stop_timer('sex_conditions');
 
+if ($pre_sexEnabled) {
+    // PutOnClothes
+    directRegisterAction(
+        "ExtCmdPutOnClothes", 
+        "PutOnClothes", 
+        "Dress yourself in available clothing and armor - restores modesty", 
+        true
+    );
+    
+    // RemoveClothes
+    directRegisterAction(
+        "ExtCmdRemoveClothes", 
+        "RemoveClothes", 
+        "Take off all clothing and armor for intimate activities, unwinding, sleeping, swimming or just get naked to show off the beauty of your body", 
+        true
+    );
+}
+    
 // If no sex actions are enabled, skip everything
 if (!$sexEnabled) {
     return;
@@ -114,22 +137,94 @@ if ($sexEnabled) {
         "Begin group sexual activity with multiple willing participants in the vicinity in groups up to five participants. Should chose 2 or 3 extra partners that are not already involved in intimate activities as targets. Ultimate group bonding intimate activity", 
         true
     );
-    
-    // PutOnClothes
+
+    // -----------------------------------------
+
+    // StartCuddleSex
     directRegisterAction(
-        "ExtCmdPutOnClothes", 
-        "PutOnClothes", 
-        "Dress yourself in available clothing and armor - restores modesty", 
+        "ExtCmdStartCuddleSex", 
+        "StartCuddleSex", 
+        "Begin intimate, gentle sex with close body contact - emphasizes emotional connection", 
         true
     );
     
-    // RemoveClothes
+    // StartKissingSex
     directRegisterAction(
-        "ExtCmdRemoveClothes", 
-        "RemoveClothes", 
-        "Take off all clothing and armor for intimate activities, unwinding, sleeping, swimming or just get naked to show off the beauty of your body", 
+        "ExtCmdStartKissingSex", 
+        "StartKissingSex", 
+        "Begin passionate kissing as foreplay or during sex - builds intimacy and arousal", 
         true
     );
+
+    // StartMissionarySex
+    directRegisterAction(
+        "ExtCmdStartMissionarySex", 
+        "StartMissionarySex", 
+        "Begin face-to-face sex with partner on back - the most common position", 
+        true,
+        [
+            "male-female" => "Begin face-to-face sex with #target_object# on #target_possessive# back - the most common position",
+            "female-male" => "Begin face-to-face sex with #target_object# on #target_possessive# back - the most common position"
+        ]
+    );
+    
+    // Start69Sex
+    directRegisterAction(
+        "ExtCmdStart69Sex", 
+        "Start69Sex", 
+        "Begin mutual oral sex simultaneously - provides pleasure to both partners", 
+        true
+    );
+
+    // StartCowgirlSex
+    directRegisterAction(
+        "ExtCmdStartCowgirlSex", 
+        "StartCowgirlSex", 
+        "Begin sex with partner on top, facing forward - gives them control", 
+        true,
+        [
+            "male-female" => "Begin sex with #target_object# on top, facing forward - gives #target_object# control",
+            "female-male" => "Begin sex with you on top of #target_object#, facing forward - gives you control"
+        ]
+    );
+    
+    // StartReverseCowgirl
+    directRegisterAction(
+        "ExtCmdStartReverseCowgirl", 
+        "StartReverseCowgirl", 
+        "Begin sex with partner on top, facing away - a visually exciting position", 
+        true,
+        [
+            "male-female" => "Begin sex with #target_object# on top, facing away from you - a visually exciting position",
+            "female-male" => "Begin sex with you on top, facing away from #target_object# - a visually exciting position"
+        ]
+    );
+    
+    // StartDoggystyle
+    directRegisterAction(
+        "ExtCmdStartDoggystyle", 
+        "StartDoggystyle", 
+        "Begin sex from behind with partner on hands and knees - allows deep penetration", 
+        true,
+        [
+            "male-female" => "Begin sex from behind with #target_object# on hands and knees - allows deep penetration",
+            "female-male" => "Begin sex with #target_object# entering you from behind while you're on hands and knees"
+        ]
+    );
+    
+    // StartFacesitting
+    directRegisterAction(
+        "ExtCmdStartFacesitting", 
+        "StartFacesitting", 
+        "Begin oral sex with partner sitting on your face - demonstrates submission or dominance", 
+        true,
+        [
+            "male-female" => "Begin oral sex with #target_object# sitting on your face",
+            "female-male" => "Begin oral sex by sitting on #target_possessive# face"
+        ]
+    );
+
+    // -----------------------------------------
     
     minai_stop_timer('common_sex_actions');
 }
@@ -212,30 +307,6 @@ if ($femaleActionsEnabled) {
 if ($activeSexEnabled) {
     minai_start_timer('active_sex_actions', 'load_module_sex.php');
     
-    // StartCuddleSex
-    directRegisterAction(
-        "ExtCmdStartCuddleSex", 
-        "StartCuddleSex", 
-        "Begin intimate, gentle sex with close body contact - emphasizes emotional connection", 
-        true
-    );
-    
-    // StartKissingSex
-    directRegisterAction(
-        "ExtCmdStartKissingSex", 
-        "StartKissingSex", 
-        "Begin passionate kissing as foreplay or during sex - builds intimacy and arousal", 
-        true
-    );
-    
-    // Start69Sex
-    directRegisterAction(
-        "ExtCmdStart69Sex", 
-        "Start69Sex", 
-        "Begin mutual oral sex simultaneously - provides pleasure to both partners", 
-        true
-    );
-    
     // StartGrindingSex
     directRegisterAction(
         "ExtCmdStartGrindingSex", 
@@ -252,14 +323,6 @@ if ($activeSexEnabled) {
         true
     );
     
-    // EndSex
-    directRegisterAction(
-        "ExtCmdEndSex", 
-        "EndSex", 
-        "Stop all sexual activity immediately and disengage - use when the scene should conclude", 
-        true
-    );
-    
     // StartRimjob
     directRegisterAction(
         "ExtCmdStartRimjob", 
@@ -268,65 +331,16 @@ if ($activeSexEnabled) {
         true
     );
     
-    // StartMissionarySex
+    // -----------------------------------------
+    
+    // EndSex
     directRegisterAction(
-        "ExtCmdStartMissionarySex", 
-        "StartMissionarySex", 
-        "Begin face-to-face sex with partner on back - the most common position", 
-        true,
-        [
-            "male-female" => "Begin face-to-face sex with #target_object# on #target_possessive# back - the most common position",
-            "female-male" => "Begin face-to-face sex with #target_object# on #target_possessive# back - the most common position"
-        ]
+        "ExtCmdEndSex", 
+        "EndSex", 
+        "Stop all sexual activity immediately and disengage - use when the scene should conclude", 
+        true
     );
     
-    // StartCowgirlSex
-    directRegisterAction(
-        "ExtCmdStartCowgirlSex", 
-        "StartCowgirlSex", 
-        "Begin sex with partner on top, facing forward - gives them control", 
-        true,
-        [
-            "male-female" => "Begin sex with #target_object# on top, facing forward - gives #target_object# control",
-            "female-male" => "Begin sex with you on top of #target_object#, facing forward - gives you control"
-        ]
-    );
-    
-    // StartReverseCowgirl
-    directRegisterAction(
-        "ExtCmdStartReverseCowgirl", 
-        "StartReverseCowgirl", 
-        "Begin sex with partner on top, facing away - a visually exciting position", 
-        true,
-        [
-            "male-female" => "Begin sex with #target_object# on top, facing away from you - a visually exciting position",
-            "female-male" => "Begin sex with you on top, facing away from #target_object# - a visually exciting position"
-        ]
-    );
-    
-    // StartDoggystyle
-    directRegisterAction(
-        "ExtCmdStartDoggystyle", 
-        "StartDoggystyle", 
-        "Begin sex from behind with partner on hands and knees - allows deep penetration", 
-        true,
-        [
-            "male-female" => "Begin sex from behind with #target_object# on hands and knees - allows deep penetration",
-            "female-male" => "Begin sex with #target_object# entering you from behind while you're on hands and knees"
-        ]
-    );
-    
-    // StartFacesitting
-    directRegisterAction(
-        "ExtCmdStartFacesitting", 
-        "StartFacesitting", 
-        "Begin oral sex with partner sitting on your face - demonstrates submission or dominance", 
-        true,
-        [
-            "male-female" => "Begin oral sex with #target_object# sitting on your face",
-            "female-male" => "Begin oral sex by sitting on #target_possessive# face"
-        ]
-    );
     
     minai_stop_timer('active_sex_actions');
 }

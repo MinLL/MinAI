@@ -165,7 +165,7 @@ function addXPersonality($jsonXPersonality) {
             $sex_howto .= strip_tags("\n - act like this: " . implode(", ", $jsonXPersonality["sexPersonalityTraits"]));
         
         if (strlen($sex_howto) > 0)
-            $GLOBALS["HERIKA_PERS"] .= "\n<response_guidelines>\n## During sex {$GLOBALS["HERIKA_NAME"]}: {$sex_howto}\n</response_guidelines>\n";
+            $GLOBALS["HERIKA_PERS"] .= "\n<response_guidelines><personality_sexual_behavior>\n## When having sex {$GLOBALS["HERIKA_NAME"]}: {$sex_howto}\n</personality_sexual_behavior></response_guidelines>\n";
     }
 }
 

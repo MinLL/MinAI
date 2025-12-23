@@ -15,6 +15,16 @@ require_once(__DIR__ . "/../system_prompt_context.php");
 function InitializeCoreContextBuilders() {
     $registry = ContextBuilderRegistry::getInstance();
     
+    // Register personality context builder
+    $registry->register('personality', [
+        'section' => 'character',
+        'header' => '#herika_name# core personality', //'Personality', // 'header' => 'PROFILE', ???
+        'description' => 'Core personality description',
+        'priority' => 5, // High priority - should be first in character section
+        'enabled' => isset($GLOBALS['minai_context']['personality']) ? (bool)$GLOBALS['minai_context']['personality'] : true,
+        'builder_callback' => 'BuildPersonalityContext'
+    ]);
+    
     // Register player background context builder
     $registry->register('player_background', [
         //'section' => 'interaction',
@@ -26,16 +36,6 @@ function InitializeCoreContextBuilders() {
         'builder_callback' => 'BuildPlayerBackgroundContext'
     ]);
 
-    // Register personality context builder
-    $registry->register('personality', [
-        'section' => 'character',
-        'header' => 'Personality', // 'header' => 'PROFILE', ???
-        'description' => 'Core personality description',
-        'priority' => 5, // High priority - should be first in character section
-        'enabled' => isset($GLOBALS['minai_context']['personality']) ? (bool)$GLOBALS['minai_context']['personality'] : true,
-        'builder_callback' => 'BuildPersonalityContext'
-    ]);
-    
     // Register basic interaction context builder
     $registry->register('interaction', [
         'section' => 'interaction',
@@ -134,32 +134,32 @@ function BuildPersonalityContext($params) {
     // Get the personality from global variables
     $herika_pers = ($GLOBALS["HERIKA_PERS"] ?? "");
     
-    if (isset($GLOBALS['HERIKA_PERSONALITY']) && (trim($GLOBALS['HERIKA_PERSONALITY']) > "")) {
-        $herika_pers .= "\n\n## Behavioral patterns\n" . trim($GLOBALS['HERIKA_PERSONALITY']);
+    if (isset($GLOBALS['HERIKA_BACKGROUND']) && (trim($GLOBALS['HERIKA_BACKGROUND']) > "")) { // core_npc_master.npc_static_bio
+        $herika_pers .= "\n\n<personality_background>\n## {$herika_name} Background \n" . trim($GLOBALS['HERIKA_BACKGROUND']) . "\n</personality_background>\n";
     }
-    if (isset($GLOBALS['HERIKA_BACKGROUND']) && (trim($GLOBALS['HERIKA_BACKGROUND']) > "")) {
-        $herika_pers .= "\n\n## Background\n" . trim($GLOBALS['HERIKA_BACKGROUND']);
+    if (isset($GLOBALS['HERIKA_PERSONALITY']) && (trim($GLOBALS['HERIKA_PERSONALITY']) > "")) { // core_npc_master.personality 
+        $herika_pers .= "\n\n<personality_core_traits>\n## Personality core traits, behavioral patterns \n" . trim($GLOBALS['HERIKA_PERSONALITY']) . "\n</personality_core_traits>\n";
     }
-    if (isset($GLOBALS['HERIKA_GOALS']) && (trim($GLOBALS['HERIKA_GOALS']) > "")) {
-        $herika_pers .= "\n\n## Goals\n" .  StrCleanBullets(trim($GLOBALS['HERIKA_GOALS']));
+    if (isset($GLOBALS['HERIKA_SPEECHSTYLE']) && (trim($GLOBALS['HERIKA_SPEECHSTYLE']) > "")) { // core_npc_master.speechstyle
+        $herika_pers .= "\n\n<speech_style>\n## Speech style \n" . trim($GLOBALS['HERIKA_SPEECHSTYLE']) . "\n</speech_style>\n";
     }
-    if (isset($GLOBALS['HERIKA_SPEECHSTYLE']) && (trim($GLOBALS['HERIKA_SPEECHSTYLE']) > "")) {
-        $herika_pers .= "\n\n## Speech style\n" . trim($GLOBALS['HERIKA_SPEECHSTYLE']);
+    if (isset($GLOBALS['HERIKA_APPEARANCE']) && (trim($GLOBALS['HERIKA_APPEARANCE']) > "")) { // core_npc_master.appearance
+        $herika_pers .= "\n\n<personality_appearance>\n## Appearance \n" . trim($GLOBALS['HERIKA_APPEARANCE']) . "\n</personality_appearance>\n";
     }
-    if (isset($GLOBALS['HERIKA_RELATIONSHIPS']) && (trim($GLOBALS['HERIKA_RELATIONSHIPS']) > "")) {
-        $herika_pers .= "\n\n## Social connections\n" . StrCleanBullets(trim($GLOBALS['HERIKA_RELATIONSHIPS']));
+    if (isset($GLOBALS['HERIKA_SKILLS']) && (trim($GLOBALS['HERIKA_SKILLS']) > "")) { // core_npc_master.skills
+        $herika_pers .= "\n\n<personality_skills>\n## Skills \n" . StrCleanBullets(trim($GLOBALS['HERIKA_SKILLS'])) . "\n</personality_skills>\n";
     }
-    if (isset($GLOBALS['HERIKA_APPEARANCE']) && (trim($GLOBALS['HERIKA_APPEARANCE']) > "")) {
-        $herika_pers .= "\n\n## Appearance\n" . trim($GLOBALS['HERIKA_APPEARANCE']);
+    if (isset($GLOBALS['HERIKA_OCCUPATION']) && (trim($GLOBALS['HERIKA_OCCUPATION']) > "")) { // core_npc_master.occupation
+        $herika_pers .= "\n\n<personality_occupation>\n## Occupation \n" . trim($GLOBALS['HERIKA_OCCUPATION']) . "\n</personality_occupation>\n";
     }
-    if (isset($GLOBALS['HERIKA_OCCUPATION']) && (trim($GLOBALS['HERIKA_OCCUPATION']) > "")) {
-        $herika_pers .= "\n\n## Occupation\n" . trim($GLOBALS['HERIKA_OCCUPATION']);
+    if (isset($GLOBALS['HERIKA_GOALS']) && (trim($GLOBALS['HERIKA_GOALS']) > "")) { // core_npc_master.goals
+        $herika_pers .= "\n\n<personality_goals>\n## Goals\n" . StrCleanBullets(trim($GLOBALS['HERIKA_GOALS'])) . "\n</personality_goals>\n";
     }
-    if (isset($GLOBALS['HERIKA_SKILLS']) && (trim($GLOBALS['HERIKA_SKILLS']) > "")) {
-        $herika_pers .= "\n\n## Skills\n" . StrCleanBullets(trim($GLOBALS['HERIKA_SKILLS']));
+    if (isset($GLOBALS['HERIKA_RELATIONSHIPS']) && (trim($GLOBALS['HERIKA_RELATIONSHIPS']) > "")) { // core_npc_master.relationships
+        $herika_pers .= "\n\n<personality_relationships>\n## Relationships, social connections\n" . StrCleanBullets(trim($GLOBALS['HERIKA_RELATIONSHIPS'])) . "\n</personality_relationships>\n";
     }
-    if (isset($GLOBALS["PROFILE_PROMPT"]) && (trim($GLOBALS['PROFILE_PROMPT']) > "")) {
-        $herika_pers .= "\n\n<group_profile_prompt>\n## Other\n".trim($GLOBALS["PROFILE_PROMPT"])."\n</group_profile_prompt>";
+    if (isset($GLOBALS["PROFILE_PROMPT"]) && (trim($GLOBALS['PROFILE_PROMPT']) > "")) { // core_profiles.prompt
+        $herika_pers .= "\n\n<personality_group_details>\n## Group related details\n" . trim($GLOBALS["PROFILE_PROMPT"]) . "\n</personality_group_details>\n";
     }
     
     if (empty($herika_pers)) {

@@ -729,10 +729,10 @@ function BuildSystemPrompt() {
                 $emo .= "Emotion intensity will raise gradually from low to Moderate and from Moderate to strong. \n";
                 $emo .= "\n";
                 $emo .= "## Examples: \n";
-                $emo .= "### Expressing strong anger: \n";
+                $emo .= "### Being angry: \n";
                 $emo .= "I can\'t believe thi... this! I... Damn it! You... you... enough! You lied to me! Every time... every fucking single time! By the Nines! I\'m... I\'m done!  \n";
                 $emo .= "\n";
-                $emo .= "### Expressing strong fear:\n";
+                $emo .= "### Being fearful:\n";
                 $emo .= "I think I hear... something. No, no... no! Gods... it\'s here! Don\'t... let it... I... um, can\'t breathe! By the Gods... \n";
                 $emo .= "\n";
                 
@@ -754,10 +754,10 @@ function BuildSystemPrompt() {
                         $s_aroused = "My... my heart is racing. Damn... I'm... I'm trembling. Can't stop... if we just... Fuck!";
                     }
                 }
-                $s_example = "Expressing strong arousal or desire: \n{$s_aroused}\n";
+                $s_example = "Being aroused, horny, desiring or in love: \n{$s_aroused}\n";
             } else {
                 $s_aroused = "Oh... I feel... for... for you. What I need... need you closer. I can't... I barely breathe. Damn... My... my heart is racing.";
-                $s_example = "Expressing strong desire or love: \n{$s_aroused}\n";
+                $s_example = "Being in love or desiring: \n{$s_aroused}\n";
             }
             $system_prompt .= "\n\n### {$s_example}</emotions_expression>\n";
         }
@@ -768,15 +768,26 @@ function BuildSystemPrompt() {
     }
     if ($GLOBALS['minai_context']['action_enforcement']) {
         $GLOBALS["COMMAND_PROMPT"] = ""; // Kill don't narrate
-        $b_func = (strlen(($GLOBALS["COMMAND_PROMPT_FUNCTIONS"] ?? "")) > 0);
+
+        $b_func = false;
+        $actionsList = "";
+        if (isset($GLOBALS["PROMPT_ACTIONS_LIST"]) && !empty($GLOBALS["PROMPT_ACTIONS_LIST"])) { // CHIM version > 2.2.2 (in unstable branch now)
+            $actionsList = $GLOBALS["PROMPT_ACTIONS_LIST"];
+            $b_func = (strlen($actionsList) > 0);
+        } else { // for previous versions: CHIM 1.3.5 and 2.x.x 
+            $b_func = (strlen(($GLOBALS["COMMAND_PROMPT_FUNCTIONS"] ?? "")) > 0);
+        }     
+
         $GLOBALS["COMMAND_PROMPT_FUNCTIONS"]=""; // Handled by the system prompt
         if (isset($GLOBALS["FUNCTIONS_ARE_ENABLED"]) && $GLOBALS["FUNCTIONS_ARE_ENABLED"]) {
             if ($b_func) {
-                $system_prompt .= "\n\n# AVAILABLE ACTIONS\n<actions_usage_instructions>\n";
+                $system_prompt .= "\n<actions_usage_instructions>\n# ACTIONS USAGE INSTRUCTIONS\n";
                 $system_prompt .= " - This section defines available actions that {$display_name} can perform to interact with the world.\n";
                 $system_prompt .= " - {$display_name} will use these actions when they align with {$prns["possessive"]} intentions and the current situation.\n";
                 $system_prompt .= " - While 'Talk' is an available action for dialogue, prioritize other contextually appropriate actions when possible. \n";
-                $system_prompt .= "</actions_usage_instructions>\n";
+                $system_prompt .= "</actions_usage_instructions>";
+                
+                $system_prompt .= $actionsList;
             } else {
                 error_log(" system_prompt_context: Warning missing functions list! "); //debug
             }

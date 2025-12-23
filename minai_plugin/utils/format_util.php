@@ -32,6 +32,12 @@ class FormatUtil {
             if (empty(trim($line))) {
                 continue;
             }
+
+            // xml tags
+            if (strpos(trim($line), '<') === 0) {
+                $result[] = trim($line);
+                continue;
+            }
             
             // Special case for "Key Points:" - exact pattern match
             if (preg_match('/^(?:[-•*]\s*)?Key\s+Points:$/', trim($line))) {
