@@ -11,7 +11,7 @@ This version should be compatible with CHIM v1.3.5.x, v2.1.x, v2.2.2.
 
 MinAI server plugin version 2.1.3-dev7e
 ---------------------------------------
-- added PROFILE_PROMPT from CHIM v 2.x.x. 
+- added PROFILE_PROMPT from CHIM v2.x.x. 
 
 
 MinAI server plugin version 2.1.3-dev7d
@@ -228,6 +228,14 @@ The commands that restore the attributes apply to the folder where the changes w
 
 
 FAQ
+
+- MinAI plugin is not maintained.
+
+It's a way of saying that Min is no longer developing this project and has not officially transferred responsibility to another person.
+Since I use the MinAI plugin and have been constantly updating it to keep it compatible with CHIM, I decided to make the new versions accessible to everyone. 
+I publish the updates in the forked version in my repository and send them to Min if he wants to publish them in the original repository. 
+I will continue to update the plugin as long as it brings something extra or something different from CHIM. 
+It is also a good environment to test new ideas or new technologies, but I do not intend to add too many new features and it is not a priority to integrate other mods. 
 
 - CHIM AI Action Editor is disabling some actions from MinAI.
 

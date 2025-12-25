@@ -14,7 +14,7 @@ function GetLocationDetails($locationName) {
 		// safe places:
 		"aemer's refuge"		=> "a private mountain stone fortress that follows the design of the city of Markarth, owned by {$s_owner}, safe for rest, unwinding and intimacy",
 		"arch mage's quarters"	=> "a private home at the top of the main tower in the College of Winterhold. Owned by {$s_owner} as Arch-Mage. A large space with a garden in center, luxurious furniture and large beds. Safe for rest, unwinding and intimacy",
-		"azura's dawn" 			=> "a private home owned by {$s_owner}, safe for rest, unwinding and intimacy",
+		"azura's dawn" 			=> "a private home owned by {$s_owner}, safe for rest, unwinding and intimacy. The impressive mansion has a well-guarded treasury where {$s_owner} keeps millions of septims, huge amounts of gold bars and gemstones. The indoor pool is unparalleled in Skyrim. The huge dining room can feed dozens of guests. The master bedroom has a large bed and a bathroom with a jacuzzi",
 		"black briar lodge"		=> "a private place in The Rift owned by {$s_owner}, safe for rest, unwinding and intimacy",
 		"blackfall estate" 		=> "a private grand estate with multiple levels and a beautiful exterior, owned by {$s_owner}, safe for rest, unwinding and intimacy",
 		"bloodchill manor"		=> "a private home in Bloodchill Cavern, a small cave southwest of Winterhold, owned by {$s_owner}, safe for rest, unwinding and intimacy",
