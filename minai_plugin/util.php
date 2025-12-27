@@ -518,6 +518,37 @@ Function ShouldClearFollowerFunctions() {
     return ($GLOBALS["restrict_nonfollower_functions"] && !IsFollower($GLOBALS["HERIKA_NAME"]));
 }
 
+
+Function ShouldEnablePreSexFunctions($name) {
+    // Check if sex mods are enabled
+    if (!IsModEnabled("Sexlab") && !IsModEnabled("Ostim")) {
+        return false;
+    }
+
+    // Check if AI sex is enabled for NPC-NPC interactions
+    //if (IsRadiant() && (!IsEnabled("PLAYER", "enableAISex"))) {
+    //    return false;
+    //}
+
+    // Get existing conditions
+    $arousalOk = GetActorArousal($name) >= intval(GetMinArousalForSex() / 3);
+    $inCombat = IsEnabled($name, "inCombat");
+    
+    // Add new conditions
+    $inScene = IsActorInSexScene($name);
+    //$transitionsAllowed = AreSexTransitionsAllowed($GLOBALS["PLAYER_NAME"]);
+    
+    // Block sex functions if:
+    // - Actor is in a scene 
+    // - Actor is in combat
+    // - Actor's arousal is too low
+    
+    $b_enable_sex = ($arousalOk && (!$inCombat) && (!$inScene));
+    //error_log("->ShouldEnablePreSexFunctions: $name enable=$b_enable_sex arousal=$arousalOk combat=$inCombat scene=$inScene "); // debug
+    return $b_enable_sex;
+}
+
+
 Function ShouldEnableSexFunctions($name) {
     // Check if sex mods are enabled
     if (!IsModEnabled("Sexlab") && !IsModEnabled("Ostim")) {

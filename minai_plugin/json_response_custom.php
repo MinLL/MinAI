@@ -10,9 +10,12 @@ require_once("config.php");
 // add emotions
 if ($GLOBALS['use_emotions_expression']) {
     $GLOBALS["responseTemplate"] = array_merge($GLOBALS["responseTemplate"], [
-        "emotion" => "calm|arousal|desire|love|joy|enthusiasm|gratitude|pride|fear|apprehension|panic|anxiety|grief|envy|jealousy|disappointment|shame|regret|embarrassment|anger|rage|resentment|disgust|aversion",
+        //"emotion" => "calm|arousal|desire|love|happy|gratitude|pride|fear|apprehension|panic|anxiety|grief|envy|jealousy|disappointment|shame|embarrassment|anger|rage|resentment|disgust",
+        "emotion" => "calm|surprised|aroused|desire|love|happy|amusement|gratitude|proud|anxious|fearful|panic|grieving|envious|jealous|sad|disappointed|ashamed|angry|offended|disgusted|sarcastic", 
         "emotion intensity" => "low|moderate|strong"
     ]);
+    //inworld tts: [happy], [sad], [angry], [surprised], [fearful], [disgusted]
+    //inworld tts refusal: aroused anxious nervous worried embarrassed resentful
 
     $crt_moods = trim($GLOBALS["responseTemplate"]["mood"] ?? ""); 
     if ($crt_moods == "")
@@ -91,7 +94,7 @@ if ($GLOBALS['use_emotions_expression']) {
     $GLOBALS["responseTemplate"]["mood"] = $crt_moods;
 }
 
-$GLOBALS["responseTemplate"]["message"] = "lines of dialogue, plain text, no formatting";
+$GLOBALS["responseTemplate"]["message"] = "generated response, lines of dialogue in plain text without formatting";
 $GLOBALS["responseTemplate"]["target"] = "the name of the character or entity who is the target of the action|the name of the location that is the destination of the action";
 $GLOBALS["responseTemplate"] = array_merge($GLOBALS["responseTemplate"], [
     "probability" => "number in 0.0 - 1.0 interval"

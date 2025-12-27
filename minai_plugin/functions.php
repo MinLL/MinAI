@@ -13,10 +13,13 @@ if ($s_lang == 'en') {
         $func_name = ($GLOBALS["FUNCTIONS"][$n]["name"] ?? "___");
         //$func_desc = ($GLOBALS["FUNCTIONS"][$n]["description"] ?? "-_-");
         
-        if ($func_name == 'GiveItemTo') { //{$GLOBALS["HERIKA_NAME"]} gives item to a single actor (target property is the actor). Amount and item will be inferred from dialogue, so no need to specify.
-            $GLOBALS["FUNCTIONS"][$n]["description"] = "{$GLOBALS["HERIKA_NAME"]} gives item to a single actor (target property is the actor). Target actor must be selected from <nearby_characters> list. Amount and item will be inferred from dialogue, so no need to specify.";
-        } elseif ($func_name == 'GiveGoldTo') { //{$GLOBALS["HERIKA_NAME"]} takes amount (property target) of septims/coins/gold from {$GLOBALS["PLAYER_NAME"]} (property listener) once {$GLOBALS["PLAYER_NAME"]} agree.
-            $GLOBALS["FUNCTIONS"][$n]["description"] = "{$GLOBALS["HERIKA_NAME"]} gives some coins/gold/septims to a single actor (target property is the actor). Target actor must be selected from <nearby_characters> list. Amount will be inferred from dialogue, so no need to specify.";
+        if ($func_name == 'GiveItemTo') { //"{$GLOBALS["HERIKA_NAME"]} gives a specific item from inventory to another actor. REQUIRED: Must include 'item' field with exact item name from <inventory> tag, and 'target' field with recipient name";
+            $GLOBALS["FUNCTIONS"][$n]["description"] = "{$GLOBALS["HERIKA_NAME"]} gives a specific item from inventory to another actor. REQUIRED: Must include 'item' field with exact item name from inventory, and 'target' field with recipient name. Target actor must be selected from <nearby_characters> list.";
+        } elseif ($func_name == 'TradeItems') { //{$GLOBALS["HERIKA_NAME"]} gives item to a single actor (target property is the actor). Amount and item will be inferred from dialogue, so no need to specify.
+            //$GLOBALS["FUNCTIONS"][$n]["description"]="{$GLOBALS["HERIKA_NAME"]} trade items with another actor. Amount and item will be infered from dialogue, so no need to specify";
+            $GLOBALS["FUNCTIONS"][$n]["description"]="{$GLOBALS["HERIKA_NAME"]} trade items or exchange items with another actor or {$GLOBALS["PLAYER_NAME"]}. Amount and item will be inferred from dialogue, so no need to specify";
+        } elseif ($func_name == 'GiveGoldTo') { //gives gold/coins/septims to another actor. Specify the amount to give";
+            $GLOBALS["FUNCTIONS"][$n]["description"] = "{$GLOBALS["HERIKA_NAME"]} gives coins/gold/septims to a single actor or {$GLOBALS["PLAYER_NAME"]}. Specify the amount to give.";
         } elseif ($func_name == 'Relax') { // Stop whatever you are doing and relax at the current location. Used to Rest, Enjoy Moment, Chill, Eat, Drink, Loosen Up.
             $GLOBALS["FUNCTIONS"][$n]["description"] = "{$GLOBALS["HERIKA_NAME"]} stops whatever is doing and relax or rest at the current location. Used to Rest, Enjoy Moment, Chill, Feast, Loosen Up.";
         }
@@ -158,6 +161,7 @@ if (!isset($GLOBALS["function_eligibility_cache"])) {
         "in_no_nsfw_faction" => IsInFaction($GLOBALS["HERIKA_NAME"], "NoNSFWActionsFaction"),
         "in_no_sex_faction" => IsInFaction($GLOBALS["HERIKA_NAME"], "NoSexActionsFaction"),
         "enable_sex" => ShouldEnableSexFunctions($GLOBALS["HERIKA_NAME"]),
+        "enable_pre_sex" => ShouldEnablePreSexFunctions($GLOBALS["HERIKA_NAME"]),
         "enable_harass" => ShouldEnableHarassFunctions($GLOBALS["HERIKA_NAME"]),
         "use_devious_narrator" => ShouldUseDeviousNarrator()
     ];
@@ -201,14 +205,13 @@ if (!$GLOBALS["function_eligibility_cache"]["in_no_actions_faction"]) {
         if (!$GLOBALS["function_eligibility_cache"]["in_no_sex_faction"]) {
             if ($GLOBALS["function_eligibility_cache"]["enable_sex"]) {
                 load_function_module("functions/sex.php");
+            } elseif ($GLOBALS["function_eligibility_cache"]["enable_pre_sex"]) {
+                load_function_module("functions/sex.php");
             }
             if ($GLOBALS["function_eligibility_cache"]["enable_harass"]) {
                 load_function_module("functions/slapp.php");
             }
         }
-        
-//error_log("-> sex functions: " . implode(' . ', $GLOBALS["ENABLED_FUNCTIONS"]));
-        
         
         if ($GLOBALS["function_eligibility_cache"]["use_devious_narrator"]) {
             // Anything loaded after this will have functions enabled for the narrator
@@ -248,12 +251,17 @@ $inCombat = IsEnabled($GLOBALS["HERIKA_NAME"], "inCombat");
 $isFollower = IsFollower($GLOBALS["HERIKA_NAME"]);
 $inScene = IsSexActiveSpeaker(); 
 
+if (!isset($GLOBALS["commands_to_purge"]))
+    $GLOBALS["commands_to_purge"] = [];
+
 foreach ($GLOBALS["ENABLED_FUNCTIONS"] as $n=>$func) {
     // Block Attack command if:
     // - Command is in commands_to_purge list
     // - NPC is in combat and command is Attack
     // - NPC is a follower, there's an active defeat cooldown, and command is Attack
-    if ($func == "Attack") {
+    if (in_array($func, $GLOBALS["commands_to_purge"])) {
+        $commandsToPurge[] = $n;
+    } elseif ($func == "Attack") {
         if (in_array($func, $GLOBALS["commands_to_purge"]) || 
            $inCombat || $inScene ||
            ($defeatCooldown && $isFollower)) {
@@ -338,6 +346,8 @@ if (!empty($commandsToPurge)) {
         unset($GLOBALS["ENABLED_FUNCTIONS"][$n]);
     }
 }
+
+$GLOBALS["ENABLED_FUNCTIONS_COPY"] = $GLOBALS["ENABLED_FUNCTIONS"] ?? [];
 
 minai_stop_timer('functions_php');
 

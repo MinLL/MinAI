@@ -7,6 +7,7 @@ minai_start_timer('context_php', 'MinAI');
 if (isset($GLOBALS["minai_skip_processing"]) && $GLOBALS["minai_skip_processing"]) {
   return;
 }
+
 require_once("config.php");
 require_once("util.php");
 require_once("contextbuilders.php");
@@ -16,6 +17,30 @@ require_once("contextbuilders/system_prompt_context.php");
 require_once("utils/prompt_slop_cleanup.php");
 
 minai_start_timer("contextProcessing", "context_php");
+
+
+
+//error_log("->functions ctx: " . implode(' . ', $GLOBALS["ENABLED_FUNCTIONS"]));
+/*
+if (isset($GLOBALS["ENABLED_FUNCTIONS"]) && (count($GLOBALS["ENABLED_FUNCTIONS"])>0)) {
+	//$s_ef = implode(' . ', $GLOBALS["ENABLED_FUNCTIONS"];
+	if (count($GLOBALS["ENABLED_FUNCTIONS"]) < count($GLOBALS["ENABLED_FUNCTIONS_COPY"])) {
+		if (
+			//(!in_array('ExtCmdIncreaseArousal',$GLOBALS["ENABLED_FUNCTIONS"])) && 
+			//(!in_array('ExtCmdDecreaseArousal',$GLOBALS["ENABLED_FUNCTIONS"])) && 
+			(!in_array('ExtCmdGiveItem',$GLOBALS["ENABLED_FUNCTIONS"])) && 
+			(!in_array('ExtCmdTakeItem',$GLOBALS["ENABLED_FUNCTIONS"])) && 
+			(!in_array('ExtCmdTrade',$GLOBALS["ENABLED_FUNCTIONS"])) && 
+			(!in_array('ExtCmdStartLooting',$GLOBALS["ENABLED_FUNCTIONS"])) && 
+			(!in_array('ExtCmdStopLooting',$GLOBALS["ENABLED_FUNCTIONS"])) && 
+			(!in_array('ExtCmdFollow',$GLOBALS["ENABLED_FUNCTIONS"]))  
+		){ 	// broken functions
+			$GLOBALS["ENABLED_FUNCTIONS"] = $GLOBALS["ENABLED_FUNCTIONS_COPY"];
+			error_log("Warning: functions replaced from copy. ");
+		}
+	}
+}
+*/
 
 //---------------------------------------------------------------------------
 // Slop cleanup:
@@ -293,7 +318,12 @@ if (isset($GLOBALS['head'])) { // clean system (head) prompt
 	
 	//warn about relationship
 	if (stripos($GLOBALS['head'][0]['content'],'rival, foe')) {
-			error_log(" - WARNING - relationship " . ($GLOBALS["HERIKA_NAME"] ?? "?") );
+			error_log(" - WARNING - relationship. npc: " . ($GLOBALS["HERIKA_NAME"] ?? "?") );
+	}
+
+	//warn about placeholder
+	if (strpos($GLOBALS['head'][0]['content'],'PLAYER_NAME')) {
+			error_log(" - WARNING - unsolved PLAYER_NAME placeholder in prompt. npc: " . ($GLOBALS["HERIKA_NAME"] ?? "?") );
 	}
 	
 }	

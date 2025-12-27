@@ -25,6 +25,9 @@ if ((!isset($GLOBALS["action_prompts"]["normal_scene"])) ||
     error_log("WARNING - prerequest: CHIM made an attempt to disable action_prompts! ");
 }
 
+$GLOBALS["ENABLED_FUNCTIONS_COPY"] = $GLOBALS["ENABLED_FUNCTIONS"] ?? [];
+//$GLOBALS["ENABLED_FUNCTIONS"][] = 'ExtCmdUndefined';
+
 // Configure metrics collection with default values if not set in config
 if (!isset($GLOBALS['minai_metrics_enabled'])) {
     $GLOBALS['minai_metrics_enabled'] = true;
@@ -192,7 +195,16 @@ Function GetConfigPath($npcName) {
     // with just dirname((__FILE__)) it was getting directory of repo not php server 
     $path = getcwd().DIRECTORY_SEPARATOR;
     $newConfFile=md5($npcName);
-    return $path . "conf".DIRECTORY_SEPARATOR."conf_$newConfFile.php";
+
+    $s_file = $path . "conf/conf_{$newConfFile}.php";
+
+    if (!file_exists($s_file)) {
+        $s_file = $path . "conf/.old/conf_{$newConfFile}.php";
+    }    
+
+    //return $path . "conf".DIRECTORY_SEPARATOR."conf_$newConfFile.php";
+   return $s_file;
+
 }
 
 if (isset($GLOBALS["realnames_support"]) && $GLOBALS["realnames_support"]) {

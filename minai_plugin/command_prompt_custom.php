@@ -43,8 +43,6 @@ elseif (isset($GLOBALS["self_narrator"]) && $GLOBALS["self_narrator"] && $GLOBAL
         }
         $GLOBALS["COMMAND_PROMPT_ENFORCE_ACTIONS"] .= " Aim for your responses to be two up to four sentences. ";
     }
-//} elseif ((isset($GLOBALS['use_emotions_expression']) && ($GLOBALS['use_emotions_expression'])) {
-//$GLOBALS["action_prompts"]["emotions_expression"] ...
 
 } else {
     if (IsExplicitScene()) { 
